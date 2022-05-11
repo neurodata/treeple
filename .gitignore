@@ -1,0 +1,44 @@
+# Distribution / packaging
+.Python
+dist/
+*.egg*
+build
+coverage
+*.xml
+.venv
+
+# Sphinx documentation
+docs/_build/
+docs/generated/
+docs/auto_examples/
+docs/auto_tutorials/
+docs/modules/generated/
+docs/sphinxext/cachedir
+pip-log.txt
+.coverage
+tags
+docs/coverages
+docs/samples
+cover
+
+# Pycharm
+.idea/
+
+*.pyc
+
+*.so 
+*.cpp 
+*.c
+*.html
+
+.cache
+.pytest_cache
+.ipynb_checkpoints
+.DS_Store
+.vscode/
+
+__pycache__
+
+# Profiling
+profiling/
+*.prof

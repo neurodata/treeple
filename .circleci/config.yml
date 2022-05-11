@@ -1,0 +1,125 @@
+# See: https://circleci.com/blog/deploying-documentation-to-github-pages-with-continuous-integration/
+version: 2.1
+
+jobs:
+  docs-build:
+    docker:
+      - image: circleci/python:3.8.1-buster
+    environment:
+      - CODECOV_TOKEN: "cb142a98-9da3-4fc9-b6b5-ed62b9809d16"
+      - OMP_NUM_THREADS: 2
+      - MKL_NUM_THREADS: 2
+      - MINICONDA_PATH: ~/miniconda
+      - CONDA_ENV_NAME: testenv
+      - PYTHON_VERSION: 3.7
+      - NUMPY_VERSION: 1.21.2
+      - SCIPY_VERSION: 1.7.1
+      - MATPLOTLIB_VERSION: 1.5.1
+      - CYTHON_VERSION: 0.29.24
+      - SCIKIT_IMAGE_VERSION: 0.12.3
+    steps:
+      - checkout
+
+      # make sure pandoc is on the system
+      - run: sudo apt-get update && sudo apt-get install -y pandoc
+
+      - restore_cache:
+          keys:
+            - doc-min-deps-ccache-{{ .Branch }}
+            - doc-min-deps-ccache
+            
+      - save_cache:
+          key: doc-min-deps-ccache-{{ .Branch }}-{{ .BuildNum }}
+          paths:
+            - ~/.ccache
+            - ~/.cache/pip
+
+      - run:
+          name: Setup Python environment via Pipenv
+          command: |
+            sudo pip install --upgrade pip
+            sudo pip install pipenv
+            pipenv install --skip-lock --dev
+            pipenv run make build-dev
+
+        # Look at what we have and fail early if there is some library conflict
+        - run:
+            name: Check installation
+            command: |
+               pipenv run which python
+               pipenv run python -c "import sklearn; sklearn.utils.show_versions()"
+               pipenv run LIBGL_DEBUG=verbose python -c "import matplotlib.pyplot as plt; plt.figure()"
+
+        # Build docs
+        - run:
+            name: make html
+            command: |
+              pipenv run cd doc;
+              pipenv run make html;
+
+        # Save the outputs
+        - store_artifacts:
+            path: doc/_build/html/
+            destination: dev
+        - persist_to_workspace:
+            root: doc/_build
+            paths:
+              - html
+
+      - save_cache:
+          key: pip-packages-v1-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+          paths:
+            - "~/.local/share/virtualenvs/venv"
+
+  docs-deploy:
+    docker:
+      - image: node:8
+    steps:
+      - checkout
+
+      - attach_workspace:
+          at: doc/_build
+
+      - restore_cache:
+          keys:
+            - website-cache
+
+      - run:
+          name: Install and configure dependencies
+          command: |
+            npm install --global gh-pages@3.0
+            git config --global user.email "circle@scikit-morf.com"
+            git config --global user.name "Circle Ci"
+
+      - add_ssh_keys:
+          fingerprints:
+            - "d6:88:6b:a0:80:bf:14:8e:80:2e:ed:11:52:26:37:68"
+
+      - run:
+          # push built docs into the `dev` directory on the `gh-pages` branch
+          name: Deploy docs to gh-pages branch
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "main" ]; then
+              echo "Deploying dev docs for ${CIRCLE_BRANCH}.";
+              gh-pages --dotfiles --message "doc updates [skip ci] (${CIRCLE_BUILD_NUM})" --dist doc/_build/html --dest ./dev
+            else
+              echo "Deploying stable docs for ${CIRCLE_BRANCH}.";
+              gh-pages --dotfiles --message "doc updates [skip ci] (${CIRCLE_BUILD_NUM})" --dist doc/_build/html --dest ./stable
+            fi;
+
+      - save_cache:
+          key: website-cache
+          paths:
+            - ~/skmorf
+
+workflows:
+  commit:
+    jobs:
+      - docs-build
+      - docs-deploy:
+          requires:
+            - build_docs
+          filters:
+            branches:
+              only:
+                - main

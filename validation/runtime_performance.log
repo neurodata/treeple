@@ -1,0 +1,30 @@
+2021-07-20 11:55:33,568:INFO:Results for sparse_parity1000
+2021-07-20 11:55:33,568:INFO:SklearnRF: 304.6246728571429 ms ± 13.713625035303075 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+2021-07-20 11:55:33,569:INFO:ReRF-Base: 187.98925042857144 ms ± 14.893853575074248 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+2021-07-20 11:55:33,569:INFO:ReRF-Sporf: 242.50209828571417 ms ± 16.84038576645442 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+2021-07-20 11:55:33,569:INFO:Cy-Sporf: 311.72033199999987 ms ± 25.30068401647153 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+2021-07-20 11:56:11,584:INFO:Results for sparse_parity5000
+2021-07-20 11:56:11,584:INFO:SklearnRF: 1.3992965282857142 s ± 106.67657975172814 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+2021-07-20 11:56:11,585:INFO:ReRF-Base: 1.3284360908571433 s ± 54.88220962659038 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+2021-07-20 11:56:11,585:INFO:ReRF-Sporf: 1.4563220658571423 s ± 105.5093596011073 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+2021-07-20 11:56:11,585:INFO:Cy-Sporf: 1.242871462999999 s ± 40.41659048710263 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+2021-07-20 11:57:29,227:INFO:Results for sparse_parity10000
+2021-07-20 11:57:29,228:INFO:SklearnRF: 2.771171984571432 s ± 82.17021790650652 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+2021-07-20 11:57:29,228:INFO:ReRF-Base: 3.0301562135714284 s ± 250.11058305935947 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+2021-07-20 11:57:29,228:INFO:ReRF-Sporf: 2.8254168615714264 s ± 101.61912528602943 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+2021-07-20 11:57:29,228:INFO:Cy-Sporf: 2.458843074714287 s ± 139.1670283134213 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+2021-07-20 11:57:34,922:INFO:Results for orthant400
+2021-07-20 11:57:34,923:INFO:SklearnRF: 239.35383742857093 ms ± 8.056692767301453 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+2021-07-20 11:57:34,923:INFO:ReRF-Base: 153.12758071428334 ms ± 10.270257739381305 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+2021-07-20 11:57:34,923:INFO:ReRF-Sporf: 175.06093342857451 ms ± 12.74500800672531 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+2021-07-20 11:57:34,923:INFO:Cy-Sporf: 242.1015542857187 ms ± 20.292985158744344 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+2021-07-20 11:57:48,291:INFO:Results for orthant2000
+2021-07-20 11:57:48,292:INFO:SklearnRF: 342.4453024285583 ms ± 21.4787623017525 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+2021-07-20 11:57:48,292:INFO:ReRF-Base: 549.8081291428564 ms ± 4.771704875991145 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+2021-07-20 11:57:48,292:INFO:ReRF-Sporf: 641.3691042857173 ms ± 12.920225037450695 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+2021-07-20 11:57:48,293:INFO:Cy-Sporf: 373.8090527142828 ms ± 25.472325270999832 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+2021-07-20 11:58:13,626:INFO:Results for orthant4000
+2021-07-20 11:58:13,626:INFO:SklearnRF: 507.9345562857165 ms ± 12.054854281194125 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+2021-07-20 11:58:13,626:INFO:ReRF-Base: 1.0804216421428603 s ± 34.459734411553725 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+2021-07-20 11:58:13,627:INFO:ReRF-Sporf: 1.3920177512857126 s ± 97.59952041797634 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+2021-07-20 11:58:13,627:INFO:Cy-Sporf: 635.4678957142872 ms ± 34.653617565564474 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
