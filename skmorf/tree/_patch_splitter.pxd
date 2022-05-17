@@ -20,21 +20,22 @@ from sklearn.tree._tree cimport UINT32_t         # Unsigned 32 bit integer
 from sklearn.tree._oblique_splitter cimport ObliqueSplitter
 from sklearn.tree._oblique_splitter cimport ObliqueSplitRecord
 from sklearn.utils._sorting cimport simultaneous_sort
-
+from sklearn.tree._utils cimport rand_int
+from sklearn.tree._utils cimport rand_uniform
 
 from libcpp.vector cimport vector
 
 
 cdef class ImagePatchSplitter(ObliqueSplitter):
     # sampling patch dimensions
-    cdef public int min_patch_height
-    cdef public int max_patch_height
-    cdef public int min_patch_width
-    cdef public int max_patch_width
+    cdef public SIZE_t min_patch_height
+    cdef public SIZE_t max_patch_height
+    cdef public SIZE_t min_patch_width
+    cdef public SIZE_t max_patch_width
 
     # the passed in 2D image dimensions
-    cdef public int image_height
-    cdef public int image_width
+    cdef public SIZE_t image_height
+    cdef public SIZE_t image_width
 
     # All oblique splitters (i.e. non-axis aligned splitters) require a
     # function to sample a projection matrix that is applied to the feature matrix
@@ -46,14 +47,14 @@ cdef class ImagePatchSplitter(ObliqueSplitter):
 
 cdef class MtsPatchSplitter(ObliqueSplitter):
     # sampling patch dimensions over the 2D mts
-    cdef public int min_patch_signals
-    cdef public int max_patch_signals
-    cdef public int min_patch_time
-    cdef public int max_patch_time
+    cdef public SIZE_t min_patch_signals
+    cdef public SIZE_t max_patch_signals
+    cdef public SIZE_t min_patch_time
+    cdef public SIZE_t max_patch_time
 
     # the passed in 2D multivariate time-series dimensions
-    cdef public int n_signals
-    cdef public int n_time_points
+    cdef public SIZE_t n_signals
+    cdef public SIZE_t n_time_points
 
     # All oblique splitters (i.e. non-axis aligned splitters) require a
     # function to sample a projection matrix that is applied to the feature matrix
