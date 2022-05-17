@@ -4,17 +4,16 @@
 # can be found at: https://github.com/astropy/astropy-helpers/blob/master/astropy_helpers/openmp_helpers.py  # noqa
 
 
-import os
-import sys
 import glob
+import os
+import subprocess
+import sys
 import tempfile
 import textwrap
-import subprocess
+from distutils.errors import CompileError, LinkError
+from distutils.sysconfig import customize_compiler
 
 from numpy.distutils.ccompiler import new_compiler
-from distutils.sysconfig import customize_compiler
-from distutils.errors import CompileError, LinkError
-
 
 CCODE = textwrap.dedent(
     """\
@@ -81,9 +80,7 @@ def check_openmp_support():
 
             # Compile, test program
             openmp_flags = get_openmp_flag(ccompiler)
-            ccompiler.compile(
-                ["test_openmp.c"], output_dir="objects", extra_postargs=openmp_flags
-            )
+            ccompiler.compile(["test_openmp.c"], output_dir="objects", extra_postargs=openmp_flags)
 
             # Link test program
             extra_preargs = os.getenv("LDFLAGS", None)

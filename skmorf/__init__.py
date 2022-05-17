@@ -33,6 +33,7 @@ if __SKLEARN_SETUP__:
 else:
     from . import __check_build
     from .utils._show_versions import show_versions
+
     __check_build  # avoid flakes unused variable error
 
     __all__ = ["tree"]

@@ -1,17 +1,15 @@
 import numpy as np
-from numpy.testing import (
-    assert_almost_equal,
-    assert_allclose,
-    assert_array_equal,
-    assert_array_almost_equal,
-)
-
 import pytest
-from oblique_forests.tree import ObliqueDecisionTreeClassifier as OTC
+from numpy.testing import (
+    assert_allclose,
+    assert_almost_equal,
+    assert_array_almost_equal,
+    assert_array_equal,
+)
 from oblique_forests.sporf import ObliqueForestClassifier
-from oblique_forests.utils import run_tests_if_main
+from oblique_forests.tree import ObliqueDecisionTreeClassifier as OTC
 from oblique_forests.tree import ObliqueDecisionTreeRegressor as OTR
-
+from oblique_forests.utils import run_tests_if_main
 from sklearn import datasets
 from sklearn.metrics import accuracy_score, mean_squared_error
 
@@ -442,7 +440,6 @@ diabetes.target = diabetes.target[perm]
 # Ignoring digits dataset cause it takes a minute
 
 
-
 # also load the iris dataset
 # and randomly permute it
 iris = datasets.load_iris()
@@ -515,7 +512,6 @@ def test_iris():
     assert score > 0.9
 
 
-
 def test_tree():
     clf = OTC()
 
@@ -550,6 +546,7 @@ def test_diabetes():
     score = mean_squared_error(reg.predict(diabetes.data), diabetes.target)
     assert score == pytest.approx(0)
 
+
 def test_probability():
 
     clf = OTC(random_state=0, max_features="auto")
@@ -561,9 +558,7 @@ def test_probability():
 
     assert_array_equal(np.argmax(p, 1), clf.predict(iris.data))
 
-    assert_almost_equal(
-        clf.predict_proba(iris.data), np.exp(clf.predict_log_proba(iris.data))
-    )
+    assert_almost_equal(clf.predict_proba(iris.data), np.exp(clf.predict_log_proba(iris.data)))
 
 
 def test_pure_set():

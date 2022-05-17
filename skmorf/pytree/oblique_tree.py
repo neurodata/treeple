@@ -425,9 +425,7 @@ class ObliqueTree:
                 split = self.splitter.split(cur.sample_idx)
 
                 is_leaf = (
-                    is_leaf
-                    or split.no_split
-                    or split.improvement <= self.min_impurity_decrease
+                    is_leaf or split.no_split or split.improvement <= self.min_impurity_decrease
                 )
 
             # Add the node to the tree

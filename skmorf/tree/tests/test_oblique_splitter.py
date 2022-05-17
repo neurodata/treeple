@@ -3,8 +3,8 @@ import importlib
 import inspect
 import sys
 
-
 cython_test_modules = ["_test_oblique_splitter"]
+
 
 def cytest(func):
     """
@@ -62,16 +62,16 @@ for mod in cython_test_modules:
 #         assert 4 == j
 
 #     def test_matmul(self):
-        
+
 #         b = BOS()
 
 #         A = np.zeros((3, 3), dtype=np.float64)
 #         B = np.ones((3, 3), dtype=np.float64)
-        
+
 #         for i in range(3):
 #             for j in range(3):
 #                 A[i, j] = 3*i + j + 1
-        
+
 #         res = b.test_matmul(A, B)
 
 #         C = np.ones((3, 3), dtype=np.float64)

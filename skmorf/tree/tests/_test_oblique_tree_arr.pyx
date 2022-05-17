@@ -4,15 +4,17 @@
 #cython: binding=True
 
 import numpy as np
-cimport numpy as np
-from cython.operator import dereference
-np.import_array()
 
-from sklearn import datasets
-from sklearn.utils import check_random_state
+cimport numpy as np
+
+from cython.operator import dereference
+
+np.import_array()
 
 from numpy import float32 as DTYPE
 from numpy import float64 as DOUBLE
+from sklearn import datasets
+from sklearn.utils import check_random_state
 
 ctypedef np.npy_float32 DTYPE_t          # Type of X
 ctypedef np.npy_float64 DOUBLE_t         # Type of y, sample_weight
@@ -20,11 +22,19 @@ ctypedef np.npy_intp SIZE_t              # Type for indices and counters
 ctypedef np.npy_int32 INT32_t            # Signed 32 bit integer
 ctypedef np.npy_uint32 UINT32_t          # Unsigned 32 bit integer
 
-from oblique_forests.tree._criterion import Gini, MSE
+from oblique_forests.tree._criterion import MSE, Gini
+
 from oblique_forests.tree._criterion cimport Criterion
+
 from oblique_forests.tree._oblique_splitter import ObliqueSplitter
-from oblique_forests.tree._oblique_splitter cimport BaseObliqueSplitter, ObliqueSplitRecord
+
+from oblique_forests.tree._oblique_splitter cimport (
+    BaseObliqueSplitter,
+    ObliqueSplitRecord,
+)
+
 from oblique_forests.tree._oblique_tree import ObliqueDepthFirstTreeBuilder
+
 from oblique_forests.tree._oblique_tree cimport ObliqueTree, ObliqueTreeBuilder
 
 TREE_UNDEFINED = -2

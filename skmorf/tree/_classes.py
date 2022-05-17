@@ -20,7 +20,6 @@ from sklearn.tree._oblique_tree import ObliqueTree
 
 from ._patch_splitter import ImagePatchSplitter
 
-
 __all__ = [
     "ImagePatchDecisionTreeClassifier",
     "ImagePatchDecisionTreeRegressor",
@@ -38,7 +37,7 @@ CRITERIA_REG = {
     "mse": _criterion.MSE,
     "friedman_mse": _criterion.FriedmanMSE,
     "mae": _criterion.MAE,
-    "poisson": _criterion.Poisson
+    "poisson": _criterion.Poisson,
 }
 
 # =============================================================================
@@ -330,9 +329,7 @@ class ImagePatchDecisionTreeClassifier(ObliqueDecisionTreeClassifier):
         """Set tree function."""
         return ObliqueTree
 
-    def _set_splitter(
-        self, issparse, criterion, min_samples_leaf, min_weight_leaf, random_state
-    ):
+    def _set_splitter(self, issparse, criterion, min_samples_leaf, min_weight_leaf, random_state):
         """Set splitting function."""
         splitter = self.splitter
 
@@ -341,7 +338,7 @@ class ImagePatchDecisionTreeClassifier(ObliqueDecisionTreeClassifier):
                 "Sparse input is not supported for oblique trees. "
                 "Please convert your data to a dense array."
             )
-        
+
         if not isinstance(self.splitter, ObliqueSplitter):
             splitter = ImagePatchSplitter(
                 criterion,

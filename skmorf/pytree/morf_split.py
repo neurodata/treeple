@@ -158,9 +158,7 @@ class Conv2DSplitter(ObliqueSplitter):
 
         # get random row and column indices
         if self.discontiguous_height:
-            row_idx = np.random.choice(
-                self.image_height, size=rand_height, replace=False
-            )
+            row_idx = np.random.choice(self.image_height, size=rand_height, replace=False)
         else:
             row_idx = np.arange(multi_idx[0], multi_idx[0] + rand_height)
         if self.disontiguous_width:
@@ -180,9 +178,7 @@ class Conv2DSplitter(ObliqueSplitter):
         return patch_idxs
 
     def _compute_index_in_vectorized_data(self, idx):
-        return np.ravel_multi_index(
-            idx, dims=self.structured_data_shape, mode="raise", order="C"
-        )
+        return np.ravel_multi_index(idx, dims=self.structured_data_shape, mode="raise", order="C")
 
     def _compute_vectorized_index_in_data(self, vec_idx):
         return np.unravel_index(vec_idx, shape=self.structured_data_shape, order="C")
@@ -229,9 +225,7 @@ class Conv2DSplitter(ObliqueSplitter):
             rand_height = rand_heights[idx]
             rand_width = rand_widths[idx]
             # get patch positions
-            patch_idxs = self._get_rand_patch_idx(
-                rand_height=rand_height, rand_width=rand_width
-            )
+            patch_idxs = self._get_rand_patch_idx(rand_height=rand_height, rand_width=rand_width)
 
             # get indices for this patch
             proj_mat[patch_idxs, idx] = 1
@@ -345,9 +339,7 @@ class GaborSplitter(Conv2DSplitter):
         self.offset = offset
 
     # not used.
-    def _convolutional_kernel_matrix(
-        self, kernel, image_height, image_width, mode="full"
-    ):
+    def _convolutional_kernel_matrix(self, kernel, image_height, image_width, mode="full"):
         """Manually doing convolution matrix.
 
         # sample mtry times different filters
@@ -415,9 +407,7 @@ class GaborSplitter(Conv2DSplitter):
         # create the toeplitz matrix for each row of the filter
         toeplitz_list = []
         for i in range(kernel_padded.shape[0]):
-            c = kernel_padded[
-                i, :
-            ]  # i th row of the F to define first column of toeplitz matrix
+            c = kernel_padded[i, :]  # i th row of the F to define first column of toeplitz matrix
 
             # first row for the toeplitz function should be defined otherwise
             # the result is wrong
@@ -547,26 +537,18 @@ class GaborSplitter(Conv2DSplitter):
         else:
             # generate random heights and widths of the patch. Note add 1 because numpy
             # needs is exclusive of the high end of interval
-            rand_height = rng.randint(
-                self.patch_height_min, self.patch_height_max + 1, size=None
-            )
-            rand_width = rng.randint(
-                self.patch_width_min, self.patch_width_max + 1, size=None
-            )
+            rand_height = rng.randint(self.patch_height_min, self.patch_height_max + 1, size=None)
+            rand_width = rng.randint(self.patch_width_min, self.patch_width_max + 1, size=None)
 
             # choose patch
             # get patch positions
-            patch_idxs = self._get_rand_patch_idx(
-                rand_height=rand_height, rand_width=rand_width
-            )
+            patch_idxs = self._get_rand_patch_idx(rand_height=rand_height, rand_width=rand_width)
 
             proj_mat[patch_idxs, :] = 1.0
 
         # sample mtry times different filters
         for idx in range(self.proj_dims):
-            patch_weights = np.zeros(
-                (self.n_features, self.proj_dims), dtype=np.float64
-            )
+            patch_weights = np.zeros((self.n_features, self.proj_dims), dtype=np.float64)
 
             if apply_conv_first:
                 # generate random heights and widths of the patch. Note add 1 because numpy
@@ -574,9 +556,7 @@ class GaborSplitter(Conv2DSplitter):
                 rand_height = rng.randint(
                     self.patch_height_min, self.patch_height_max + 1, size=None
                 )
-                rand_width = rng.randint(
-                    self.patch_width_min, self.patch_width_max + 1, size=None
-                )
+                rand_width = rng.randint(self.patch_width_min, self.patch_width_max + 1, size=None)
 
                 # choose patch
                 # get patch positions
@@ -777,9 +757,7 @@ class SampleGraphSplitter(ObliqueSplitter):
             rand_height = rand_heights[idx]
             rand_width = rand_widths[idx]
             # get patch positions
-            patch_idxs = self._get_rand_patch_idx(
-                rand_height=rand_height, rand_width=rand_width
-            )
+            patch_idxs = self._get_rand_patch_idx(rand_height=rand_height, rand_width=rand_width)
 
             # get indices for this patch
             proj_mat[patch_idxs, idx] = 1

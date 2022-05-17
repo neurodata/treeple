@@ -16,10 +16,13 @@ The module contains:
 cimport cython
 
 import numpy as np
+
 cimport numpy as np
+
 np.import_array()
 
 from . import check_random_state
+
 
 cdef UINT32_t DEFAULT_SEED = 1
 

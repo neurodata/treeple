@@ -3,8 +3,8 @@ import importlib
 import inspect
 import sys
 
-
 cython_test_modules = ["_test_oblique_tree"]
+
 
 def cytest(func):
     """

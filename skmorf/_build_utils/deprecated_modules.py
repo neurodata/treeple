@@ -1,7 +1,7 @@
 """Generates submodule to allow deprecation of submodules and keeping git
 blame."""
-from pathlib import Path
 from contextlib import suppress
+from pathlib import Path
 
 # This is a set of 3-tuples consisting of
 # (new_module_name, deprecated_path, correct_import_path)

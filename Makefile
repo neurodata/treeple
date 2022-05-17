@@ -74,13 +74,23 @@ pep:
 black:
 	@if command -v black > /dev/null; then \
 		echo "Running black"; \
-		black --check oblique_forests; \
-		black oblique_forests/*; \
+		black --check skmorf; \
+		black skmorf/*; \
 	else \
 		echo "black not found, please install it!"; \
 		exit 1; \
 	fi;
 	@echo "black passed"
+
+isort:
+	@if command -v isort > /dev/null; then \
+		echo "Running isort"; \
+		isort skmorf examples; \
+	else \
+		echo "isort not found, please install it!"; \
+		exit 1; \
+	fi;
+	@echo "isort passed"
 
 build-dev:
 	pip install --verbose --no-build-isolation --editable .
@@ -88,6 +98,15 @@ build-dev:
 build-doc:
 	cd docs; make clean
 	cd docs; make html
+
+run-checks:
+	isort --check ./skmorf
+	black --check skmorf
+	flake8 ./skmorf
+	mypy ./skmorf
+	@$(MAKE) pydocstyle
+	check-manifest
+	@$(MAKE) codespell-error
 
 build-pipy:
 	python setup.py sdist bdist_wheel

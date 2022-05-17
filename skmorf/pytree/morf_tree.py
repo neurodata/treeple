@@ -1,16 +1,16 @@
+import numbers
+
 import numpy as np
 import numpy.random as rng
 from scipy.sparse import issparse
 from sklearn.base import is_classifier
 from sklearn.tree import _tree
 from sklearn.utils import check_random_state
-import numbers
 
 from ._split import BaseObliqueSplitter
-from .oblique_tree import ObliqueSplitter, ObliqueTreeClassifier, ObliqueTree
-
 from .conv import _apply_convolution
 from .morf_split import Conv2DSplitter, GaborSplitter
+from .oblique_tree import ObliqueSplitter, ObliqueTree, ObliqueTreeClassifier
 
 # =============================================================================
 # Types and constants
@@ -223,7 +223,7 @@ class Conv2DObliqueTreeClassifier(ObliqueTreeClassifier):
         expanded_class_weight = None
 
         # Check parameters
-        self.max_depth = (2 ** 31) - 1 if self.max_depth is None else self.max_depth
+        self.max_depth = (2**31) - 1 if self.max_depth is None else self.max_depth
         # self.max_leaf_nodes = (-1 if self.max_leaf_nodes is None
         #                   else self.max_leaf_nodes)
 

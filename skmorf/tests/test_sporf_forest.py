@@ -1,20 +1,20 @@
-import numpy as np
-from numpy.testing import (
-    assert_almost_equal,
-    assert_allclose,
-    assert_array_equal,
-    assert_array_almost_equal,
-)
-import pickle
 import copy
-from sklearn.model_selection import cross_val_score
-from sklearn.base import clone
+import pickle
+
+import numpy as np
 import pytest
-
+from numpy.testing import (
+    assert_allclose,
+    assert_almost_equal,
+    assert_array_almost_equal,
+    assert_array_equal,
+)
 from oblique_forests.sporf import ObliqueForestClassifier, PythonObliqueForestClassifier
+from sklearn.base import clone
+from sklearn.model_selection import cross_val_score
 
 
-@pytest.mark.skip(reason='Python version can skip')
+@pytest.mark.skip(reason="Python version can skip")
 def test_sparse_parity_py():
     clf = PythonObliqueForestClassifier(
         random_state=1,
@@ -102,12 +102,13 @@ def test_clone():
     X_train = train[:, :-1]
     y_train = train[:, -1]
     clf.fit(X_train, y_train)
-    print('Did first fit...')
+    print("Did first fit...")
     new_clf = clone(clf)
     new_clf.fit(X_train, y_train)
-    print('did second fit...')
+    print("did second fit...")
 
     pickled = pickle.dumps(clf)
+
 
 def test_orthant_crossval():
     clf = ObliqueForestClassifier(
@@ -117,7 +118,7 @@ def test_orthant_crossval():
         feature_combinations=2.0,
         n_jobs=-1,
     )
-    print('Trying to make new cpy of ', clf)
+    print("Trying to make new cpy of ", clf)
     new_clf = copy.deepcopy(clf)
     print(new_clf)
 

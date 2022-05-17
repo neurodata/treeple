@@ -1,9 +1,8 @@
-<!-- [![Codecov](https://codecov.io/gh/adam2392/mne-hfo/branch/master/graph/badge.svg)](https://codecov.io/gh/adam2392/mne-hfo)
-![.github/workflows/main.yml](https://github.com/adam2392/mne-hfo/workflows/.github/workflows/main.yml/badge.svg)
-[![CircleCI](https://circleci.com/gh/adam2392/mne-hfo.svg?style=svg)](https://circleci.com/gh/adam2392/mne-hfo)
-![License](https://img.shields.io/pypi/l/mne-bids)
-[![Code Maintainability](https://api.codeclimate.com/v1/badges/3afe97439ec5133ce267/maintainability)](https://codeclimate.com/github/adam2392/mne-hfo/maintainability)
-[![PEP8](https://img.shields.io/badge/code%20style-pep8-orange.svg)](https://www.python.org/dev/peps/pep-0008/) -->
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![CircleCI](https://circleci.com/gh/adam2392/scikit-morf/tree/main.svg?style=svg)](https://circleci.com/gh/adam2392/scikit-morf/tree/main)
+[![Main](https://github.com/adam2392/scikit-morf/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/adam2392/scikit-morf/actions/workflows/main.yml)
+[![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
+[![codecov](https://codecov.io/gh/adam2392/scikit-morf/branch/main/graph/badge.svg?token=H1reh7Qwf4)](https://codecov.io/gh/adam2392/scikit-morf)
 
 Scikit-MORF
 ===========

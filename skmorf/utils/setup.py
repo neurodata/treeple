@@ -19,12 +19,9 @@ def configuration(parent_package="", top_path=None):  # noqa
         #  extra_link_args=["-Xpreprocessor", "-fopenmp"],
         language="c++",
     )
-    config.add_extension('_openmp_helpers',
-                         sources=['_openmp_helpers.pyx'],
-                         libraries=libraries)
+    config.add_extension("_openmp_helpers", sources=["_openmp_helpers.pyx"], libraries=libraries)
     config.add_data_files("_random.pxd")
     return config
-
 
 
 if __name__ == "__main__":

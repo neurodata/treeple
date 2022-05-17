@@ -7,23 +7,18 @@
 # See _patch_splitter.pyx for details.
 
 import numpy as np
+
 cimport numpy as np
-
-from sklearn.tree._criterion cimport Criterion
-
-from sklearn.tree._tree cimport DTYPE_t          # Type of X
-from sklearn.tree._tree cimport DOUBLE_t         # Type of y, sample_weight
-from sklearn.tree._tree cimport SIZE_t           # Type for indices and counters
-from sklearn.tree._tree cimport INT32_t          # Signed 32 bit integer
-from sklearn.tree._tree cimport UINT32_t         # Unsigned 32 bit integer
-
-from sklearn.tree._oblique_splitter cimport ObliqueSplitter
-from sklearn.tree._oblique_splitter cimport ObliqueSplitRecord
-from sklearn.utils._sorting cimport simultaneous_sort
-from sklearn.tree._utils cimport rand_int
-from sklearn.tree._utils cimport rand_uniform
-
 from libcpp.vector cimport vector
+from sklearn.tree._criterion cimport Criterion
+from sklearn.tree._oblique_splitter cimport ObliqueSplitRecord, ObliqueSplitter
+from sklearn.tree._tree cimport DOUBLE_t  # Type of y, sample_weight
+from sklearn.tree._tree cimport DTYPE_t  # Type of X
+from sklearn.tree._tree cimport INT32_t  # Signed 32 bit integer
+from sklearn.tree._tree cimport SIZE_t  # Type for indices and counters
+from sklearn.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
+from sklearn.tree._utils cimport rand_int, rand_uniform
+from sklearn.utils._sorting cimport simultaneous_sort
 
 
 cdef class ImagePatchSplitter(ObliqueSplitter):

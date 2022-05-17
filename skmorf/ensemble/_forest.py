@@ -38,8 +38,8 @@ Single and multi-output problems are both handled.
 
 from sklearn.ensemble._forest import ForestClassifier
 
-
 from ..tree import ManifoldObliqueDecisionTreeClassifier
+
 
 class ManifoldObliqueRandomForestClassifier(ForestClassifier):
     """Manifold oblique random forest classifier (MORF).
@@ -88,11 +88,11 @@ class ManifoldObliqueRandomForestClassifier(ForestClassifier):
         max_depth=None,
         min_samples_split=2,
         min_samples_leaf=1,
-        min_weight_fraction_leaf=0.,
+        min_weight_fraction_leaf=0.0,
         max_features=1.0,
         feature_combinations=1.5,
         max_leaf_nodes=None,
-        min_impurity_decrease=0.,
+        min_impurity_decrease=0.0,
         min_impurity_split=None,
         bootstrap=True,
         oob_score=False,
@@ -116,8 +116,10 @@ class ManifoldObliqueRandomForestClassifier(ForestClassifier):
                 "feature_combinations",
                 "min_weight_fraction_leaf",
                 "max_leaf_nodes",
-                "min_impurity_decrease", "min_impurity_split",
-                "random_state", "ccp_alpha"
+                "min_impurity_decrease",
+                "min_impurity_split",
+                "random_state",
+                "ccp_alpha",
             ),
             bootstrap=bootstrap,
             oob_score=oob_score,

@@ -3,8 +3,8 @@ The :mod:`sklearn.ensemble` module includes ensemble-based methods for
 classification, regression and anomaly detection.
 """
 # from ._base import BaseEnsemble
-from ._forest import RandomForestClassifier
-from ._forest import RandomForestRegressor
+from ._forest import RandomForestClassifier, RandomForestRegressor
+
 # from ._forest import RandomTreesEmbedding
 # from ._forest import ExtraTreesClassifier
 # from ._forest import ExtraTreesRegressor
@@ -25,12 +25,13 @@ from ._forest import RandomForestRegressor
 
 __all__ = [
     # "BaseEnsemble",
-           "RandomForestClassifier", "RandomForestRegressor",
-        #    "RandomTreesEmbedding", "ExtraTreesClassifier",
-        #    "ExtraTreesRegressor", "BaggingClassifier",
-        #    "BaggingRegressor", "IsolationForest", "GradientBoostingClassifier",
-        #    "GradientBoostingRegressor", "AdaBoostClassifier",
-        #    "AdaBoostRegressor", "VotingClassifier", "VotingRegressor",
-        #    "StackingClassifier", "StackingRegressor",
-        #    'HistGradientBoostingClassifier', 'HistGradientBoostingRegressor',
-           ]
+    "RandomForestClassifier",
+    "RandomForestRegressor",
+    #    "RandomTreesEmbedding", "ExtraTreesClassifier",
+    #    "ExtraTreesRegressor", "BaggingClassifier",
+    #    "BaggingRegressor", "IsolationForest", "GradientBoostingClassifier",
+    #    "GradientBoostingRegressor", "AdaBoostClassifier",
+    #    "AdaBoostRegressor", "VotingClassifier", "VotingRegressor",
+    #    "StackingClassifier", "StackingRegressor",
+    #    'HistGradientBoostingClassifier', 'HistGradientBoostingRegressor',
+]

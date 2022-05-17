@@ -5,15 +5,14 @@ Utilities useful during the build.
 # license: BSD
 
 
+import contextlib
 import os
+from distutils.version import LooseVersion
+
 import oblique_forests
 
-from distutils.version import LooseVersion
-import contextlib
-
-from .pre_build_helpers import basic_check_build
 from .openmp_helpers import check_openmp_support
-
+from .pre_build_helpers import basic_check_build
 
 DEFAULT_ROOT = "sklearn"
 # on conda, this is the latest for python 3.5
@@ -41,9 +40,10 @@ def build_from_c_and_cpp_files(extensions):
 
 
 def _check_cython_version():
-    message = ('Please install Cython with a version >= {0} in order '
-               'to build a scikit-learn from source.').format(
-                    CYTHON_MIN_VERSION)
+    message = (
+        "Please install Cython with a version >= {0} in order "
+        "to build a scikit-learn from source."
+    ).format(CYTHON_MIN_VERSION)
     try:
         import Cython
     except ModuleNotFoundError as e:
@@ -51,8 +51,9 @@ def _check_cython_version():
         raise ModuleNotFoundError(message) from e
 
     if LooseVersion(Cython.__version__) < CYTHON_MIN_VERSION:
-        message += (' The current version of Cython is {} installed in {}.'
-                    .format(Cython.__version__, Cython.__path__))
+        message += " The current version of Cython is {} installed in {}.".format(
+            Cython.__version__, Cython.__path__
+        )
         raise ValueError(message)
 
 
@@ -82,6 +83,7 @@ def cythonize_extensions(top_path, config):
     n_jobs = 1
     with contextlib.suppress(ImportError):
         import joblib
+
         if LooseVersion(joblib.__version__) > LooseVersion("0.13.0"):
             # earlier joblib versions don't account for CPU affinity
             # constraints, and may over-estimate the number of available
@@ -91,10 +93,9 @@ def cythonize_extensions(top_path, config):
     config.ext_modules = cythonize(
         config.ext_modules,
         nthreads=n_jobs,
-        compile_time_env={
-            'SKLEARN_OPENMP_PARALLELISM_ENABLED': oblique_forests._OPENMP_SUPPORTED},
-        compiler_directives={'language_level': 3})
-
+        compile_time_env={"SKLEARN_OPENMP_PARALLELISM_ENABLED": oblique_forests._OPENMP_SUPPORTED},
+        compiler_directives={"language_level": 3},
+    )
 
 
 def maybe_cythonize_extensions(top_path, config):

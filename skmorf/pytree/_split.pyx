@@ -7,24 +7,30 @@ cimport cython
 import numpy as np
 
 from libcpp.unordered_map cimport unordered_map
+
 from cython.operator import dereference, postincrement
 
 from libcpp.algorithm cimport sort as stdsort
-
-from libcpp.vector cimport vector
 from libcpp.pair cimport pair
+from libcpp.vector cimport vector
 
 from cython.parallel import prange
 
 # TODO: rand not thread safe, replace with sklearn's utils when merging code
 #from libc.stdlib cimport rand, srand, RAND_MAX 
 
-from ..tree._utils cimport rand_int, rand_uniform
-
 # DTYPE_t = type of X
 # DOUBLE_t = type of y
 # SIZE_t = indices type
-from ..tree._utils cimport DTYPE_t, DOUBLE_t, SIZE_t, INT32_t, UINT32_t
+from ..tree._utils cimport (
+    DOUBLE_t,
+    DTYPE_t,
+    INT32_t,
+    SIZE_t,
+    UINT32_t,
+    rand_int,
+    rand_uniform,
+)
 
 # 0 < t < len(y)
 
