@@ -9,12 +9,44 @@ Scikit-MORF
 
 Scikit-morf is a scikit-learn compatible API for building manifold oblique random forests (MORF). These class of random forests are built on combinations of features rather then individual features themselves.
 
+History
+=======
 In 2001, Leo Breiman proposed two types of Random Forests. One was known as ``Forest-RI``, which is the axis-aligned traditional random forest. One was known as ``Forest-RC``, which is the random oblique linear combinations random forest. This leveraged random combinations of features to perform splits. MORF builds upon ``Forest-RC`` by proposing additional functions to combine features.
-
-.. target for :end-before: title-end-content
 
 Installation
 ------------
+
+Conda (Recommended)
+-------------------
+First, create a virtual environment using Conda.
+
+```bash
+conda create -n sklearn-dev python=3.8
+
+# activate the virtual environment
+conda activate sklearn-dev
+```
+
+Next, `skmorf` from source:
+
+```
+pip install -e .
+```
+
+Finally, install all requirements for development and docs
+
+```bash
+pip install -r requirements_testing.txt
+pip install -r requirements_doc.txt
+```
+
+Note that currently, we need to build the development version of scikit-learn with oblique trees within this [PR](https://github.com/scikit-learn/scikit-learn/pull/22754).
+
+Checkout this PR code, and build from source, using scikit-learn's build from source page instructions.
+
+
+Some outdated instructions
+--------------------------
 Using conda instructions from sklearn:
 
     conda create -n sklearn-dev -c conda-forge python numpy scipy cython \
