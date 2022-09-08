@@ -3,14 +3,7 @@ This module gathers tree-based methods, including decision, regression and
 randomized trees. Single and multi-output problems are both handled.
 """
 
-# Authors: Gilles Louppe <g.louppe@gmail.com>
-#          Peter Prettenhofer <peter.prettenhofer@gmail.com>
-#          Brian Holt <bdholt1@gmail.com>
-#          Noel Dawe <noel@dawe.me>
-#          Satrajit Gosh <satrajit.ghosh@gmail.com>
-#          Joly Arnaud <arnaud.v.joly@gmail.com>
-#          Fares Hedayati <fares.hedayati@gmail.com>
-#          Nelson Liu <nelson@nelsonliu.me>
+# Authors: Adam Li <adam2392@gmail.com>
 #
 # License: BSD 3 clause
 

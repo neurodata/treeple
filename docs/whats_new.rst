@@ -2,47 +2,18 @@
 
 .. _whats_new:
 
-.. currentmodule:: scikit_morf
+.. include:: whats_new/_contributors.rst
 
-What's new?
-===========
+Release History
+===============
 
-.. currentmodule:: scikit_morf
-.. _changes_0_1:
+Release notes for all scikit-morf releases are linked in this page.
 
-Version 0.1 (unreleased)
-------------------------
+**Tip:** `Subscribe to scikit-morf releases <https://libraries.io/pypi/scikit-morf>`__
+on libraries.io to be notified when new versions are released.
 
-xxx
+.. toctree::
+    :maxdepth: 1
 
-Notable changes
-~~~~~~~~~~~~~~~
+    Version 0.1 <whats_new/v0.1.rst>
 
-- xxx
-
-Authors
-~~~~~~~
-
-* `Adam Li`_
-
-Detailed list of changes
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-Enhancements
-^^^^^^^^^^^^
-
-API changes
-^^^^^^^^^^^
-
-Requirements
-^^^^^^^^^^^^
-
-
-Bug fixes
-^^^^^^^^^
-
-- xxx
-
-:doc:`Find out what was new in previous releases <whats_new_previous_releases>`
-
-.. include:: authors.rst

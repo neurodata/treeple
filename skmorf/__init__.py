@@ -1,8 +1,7 @@
 """Scikit manifold oblique random forests."""
 import os
 import sys
-
-__version__ = "0.1dev"
+from ._version import __version__  # noqa: F401
 
 # On OSX, we can get a runtime error due to multiple OpenMP libraries loaded
 # simultaneously. This can happen for instance when calling BLAS inside a
@@ -22,13 +21,13 @@ try:
     # This variable is injected in the __builtins__ by the build
     # process. It is used to enable importing subpackages of sklearn when
     # the binaries are not built
-    __SKLEARN_SETUP__
+    __SKMORF_SETUP__
 except NameError:
-    __SKLEARN_SETUP__ = False
+    __SKMORF_SETUP__ = False
 
-if __SKLEARN_SETUP__:
-    sys.stderr.write("Partial import of sklearn during the build process.\n")
-    # We are not importing the rest of scikit-learn during the build
+if __SKMORF_SETUP__:
+    sys.stderr.write("Partial import of skmorf during the build process.\n")
+    # We are not importing the rest of scikit-morf during the build
     # process, as it may not be compiled yet
 else:
     from . import __check_build

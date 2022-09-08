@@ -6,44 +6,48 @@ Installation
 Dependencies
 ------------
 
-* ``mne`` (>=0.22)
-* ``mne-bids`` (>=0.6)
-* ``numpy`` (>=1.14)
-* ``scipy`` (>=1.5.0 for certain operations with EEGLAB data)
+* ``numpy`` (>=1.23)
+* ``scipy`` (>=1.6.0)
+* ``scikit-learn`` (>=1.1)
 * ``joblib`` (>=1.0.0)
-* ``pandas`` (>=0.23.4, optional, for generating event statistics)
-* ``matplotlib`` (optional, for using the interactive data inspector)
+* ``pandas`` (>=1.1)
+* ``matplotlib`` (optional)
 
-We require that you use Python 3.6 or higher.
-You may choose to install ``mne-hfo`` `via pip <#Installation via pip>`_.
+**scikit-morf** supports Python >= 3.8.
 
-Installation via Pipenv
+Installing with ``pip``
 -----------------------
 
-To install MNE-HFO including all dependencies required to use all features,
-simply run the following at the root of the repository:
+**scikit-morf** is available [on PyPI](https://pypi.org/project/scikit-morf/). Just run
 
 .. code-block:: bash
 
-    python -m venv .venv
-    pipenv install
+    pip install scikit-morf
 
-If you want to install a snapshot of the current development version, run:
+    # or if you use poetry which is recommended
+    poetry add scikit-morf
+
+## Installing from source
+
+To install **scikit-morf** from source, first clone [the repository](https://github.com/adam2392/scikit-morf):
+
+.. code-block:: bash
+
+    git clone https://github.com/adam2392/scikit-morf.git
+    cd scikit-morf
+
+Then run installation via poetry (recommended)
+
+.. code-block:: bash
+
+    poetry install
+
+or via pip
+
+.. code-block:: bash
+
+    pip install -e .
 
 .. code-block:: bash
 
    pip install --user -U https://api.github.com/repos/adam2392/mne-hfo/zipball/master
-
-To check if everything worked fine, the following command should not give any
-error messages:
-
-.. code-block:: bash
-
-   python -c 'import mne_hfo'
-
-MNE-HFO works best with the latest stable release of MNE-Python. To ensure
-MNE-Python is up-to-date, run:
-
-.. code-block:: bash
-
-   pip install --user -U mne

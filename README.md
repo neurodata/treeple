@@ -20,63 +20,33 @@ Conda (Recommended)
 -------------------
 First, create a virtual environment using Conda.
 
-```bash
-conda create -n sklearn-dev python=3.8
+    conda create -n sklearn-dev python=3.9
 
-# activate the virtual environment
-conda activate sklearn-dev
-```
+# activate the virtual environment and install necessary packages to build from source
+    
+    conda activate sklearn-dev
+    conda install -c conda-forge numpy scipy cython joblib threadpoolctl pytest compilers llvm-openmp
+
 
 Next, `skmorf` from source:
 
-```
-pip install -e .
-```
 
-Finally, install all requirements for development and docs
+    pip install -e .
 
-```bash
-pip install -r requirements_testing.txt
-pip install -r requirements_doc.txt
-```
+
+To install the package from github, clone the repository and then `cd` into the directory. You can then use `poetry` to install:
+
+    poetry install
+
+    # if you would like an editable install of dodiscover for dev purposes
+    pip install -e .
+
+    pip install https://api.github.com/repos/adam2392/scikit-morf/zipball/main
 
 Note that currently, we need to build the development version of scikit-learn with oblique trees within this [PR](https://github.com/scikit-learn/scikit-learn/pull/22754).
 
 Checkout this PR code, and build from source, using scikit-learn's build from source page instructions.
 
-
-Some outdated instructions
---------------------------
-Using conda instructions from sklearn:
-
-    conda create -n sklearn-dev -c conda-forge python numpy scipy cython \
-    joblib threadpoolctl pytest compilers llvm-openmp
-
-    conda activate sklearn-dev
-    
-    # install files from Pipfile
-    pip install pipenv 
-    pipenv install --dev --skip-lock
-
-    # or install via requirements.txt
-    pip install -r requirements.txt
-
-    # clean out any left-over build files
-    make clean
-
-    # build the package
-    make build-dev
-
-To install the necessary development packages, run:
-
-    pip install -r test_requirements.txt
-
-    # check code style
-    make pep
-
-then use Makefile recipe to build dev version. You'll need Cython installed.
-
-    make build-dev
 
 Alpha Functionality
 -------------------

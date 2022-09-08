@@ -1,10 +1,12 @@
 # See: https://circleci.com/blog/deploying-documentation-to-github-pages-with-continuous-integration/
 version: 2.1
 
+orbs:
+  python: circleci/python@2.0.3
+
 jobs:
   docs-build:
-    docker:
-      - image: circleci/python:3.8.1-buster
+    executor: python/default
     environment:
       - CODECOV_TOKEN: "cb142a98-9da3-4fc9-b6b5-ed62b9809d16"
       - OMP_NUM_THREADS: 2
@@ -16,6 +18,7 @@ jobs:
       - SCIPY_VERSION: 1.7.1
       - MATPLOTLIB_VERSION: 1.5.1
       - CYTHON_VERSION: 0.29.24
+      - SCIKIT_LEARN_VERSION: 1.1.0
       - SCIKIT_IMAGE_VERSION: 0.12.3
     steps:
       - checkout
@@ -35,41 +38,62 @@ jobs:
             - ~/.cache/pip
 
       - run:
-          name: Setup Python environment via Pipenv
+          name: Install the latest version of Poetry
           command: |
-            sudo pip install --upgrade pip
-            sudo pip install pipenv
-            pipenv install --skip-lock --dev
-            pipenv run make build-dev
+            curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | POETRY_UNINSTALL=1 python -
+            curl -sSL https://install.python-poetry.org | python3 -
 
-        # Look at what we have and fail early if there is some library conflict
-        - run:
-            name: Check installation
-            command: |
-               pipenv run which python
-               pipenv run python -c "import sklearn; sklearn.utils.show_versions()"
-               pipenv run LIBGL_DEBUG=verbose python -c "import matplotlib.pyplot as plt; plt.figure()"
+      - python/install-packages:
+          pkg-manager: poetry
+          cache-version: "v1" # change to clear cache
+          args: "--with docs"
 
-        # Build docs
-        - run:
-            name: make html
-            command: |
-              pipenv run cd doc;
-              pipenv run make html;
+      - run:
+          name: Check poetry package versions
+          command: |
+            poetry --version
+            poetry show
 
-        # Save the outputs
-        - store_artifacts:
-            path: doc/_build/html/
-            destination: dev
-        - persist_to_workspace:
-            root: doc/_build
-            paths:
-              - html
+      # Look at what we have and fail early if there is some library conflict
+      - run:
+          name: Check installation
+          command: |
+            poetry run which python
+            poetry run python -c "import sklearn; sklearn.utils.show_versions()"
+            poetry run python -c "import skmorf;"
+            poetry run python -c "import numpy; numpy.show_config()"
+            poetry run LIBGL_DEBUG=verbose python -c "import matplotlib.pyplot as plt; plt.figure()"
+      
+      # Build docs
+      - run:
+          name: Build documentation
+          command: |
+            cd docs
+            poetry run make html
 
-      - save_cache:
-          key: pip-packages-v1-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+      # Save the example test results
+      - store_test_results:
+          path: docs/_build/test-results
+      - store_artifacts:
+          path: docs/_build/test-results
+          destination: test-results
+      # Save the SG RST
+      - store_artifacts:
+          path: docs/auto_examples.zip
+      - store_artifacts:
+          path: docs/generated.zip
+      # Save the outputs
+      - store_artifacts:
+          path: docs/_build/html/
+          destination: dev
+      - store_artifacts:
+          path: docs/_build/html_stable/
+          destination: stable
+      - persist_to_workspace:
+          root: docs/_build
           paths:
-            - "~/.local/share/virtualenvs/venv"
+            - html
+            - html_stable
 
   docs-deploy:
     docker:
@@ -78,7 +102,7 @@ jobs:
       - checkout
 
       - attach_workspace:
-          at: doc/_build
+          at: docS/_build
 
       - restore_cache:
           keys:
@@ -118,7 +142,7 @@ workflows:
       - docs-build
       - docs-deploy:
           requires:
-            - build_docs
+            - docs-build
           filters:
             branches:
               only:

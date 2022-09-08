@@ -4,10 +4,8 @@
 
 PYTHON ?= python
 PYTESTS ?= pytest
-CODESPELL_SKIPS ?= "docs/auto_*,*.fif,*.eve,*.gz,*.tgz,*.zip,*.mat,*.stc,*.label,*.w,*.bz2,*.annot,*.sulc,*.log,*.local-copy,*.orig_avg,*.inflated_avg,*.gii,*.pyc,*.doctree,*.pickle,*.inv,*.png,*.edf,*.touch,*.thickness,*.nofix,*.volume,*.defect_borders,*.mgh,lh.*,rh.*,COR-*,FreeSurferColorLUT.txt,*.examples,.xdebug_mris_calc,bad.segments,BadChannels,*.hist,empty_file,*.orig,*.js,*.map,*.ipynb,searchindex.dat,install_mne_c.rst,plot_*.rst,*.rst.txt,c_EULA.rst*,*.html,gdf_encodes.txt,*.svg"
-CODESPELL_DIRS ?= oblique_forests/ docs/ examples/ tests/
 
-all: clean inplace test
+all: clean
 
 clean-so:
 	find . -name "*.so" | xargs rm -f
@@ -26,87 +24,14 @@ clean-ctags:
 
 clean: clean-build clean-so clean-ctags
 
-inplace:
-	$(PYTHON) setup.py develop
-
-test-coverage:
-	rm -rf coverage .coverage
-	$(PYTESTS) --cov=oblique_forests --cov-report html:coverage
-
-
-check-manifest:
-	check-manifest --ignore .circleci/*,docs,.DS_Store
-
-reqs:
-	pipfile2req --dev > test_requirements.txt
-	pipfile2req > requirements.txt
-	pipfile2req > docs/requirements.txt
-	pipfile2req --dev >> docs/requirements.txt
-
-flake:
-	@if command -v flake8 > /dev/null; then \
-		echo "Running flake8"; \
-		flake8 --count oblique_forests examples tests; \
-	else \
-		echo "flake8 not found, please install it!"; \
-		exit 1; \
-	fi;
-	@echo "flake8 passed"
-
-pydocstyle:
-	@echo "Running pydocstyle"
-	@pydocstyle
-
-codespell:  # running manually
-	@codespell -w -i 3 -q 3 -S $(CODESPELL_SKIPS) --ignore-words=ignore_words.txt $(CODESPELL_DIRS)
-
-codespell-error:  # running on travis
-	@echo "Running code-spell check"
-	@codespell -i 0 -q 7 -S $(CODESPELL_SKIPS) --ignore-words=ignore_words.txt $(CODESPELL_DIRS)
-
-type-check:
-	mypy ./oblique_forests
-
-pep:
-	@$(MAKE) -k black pydocstyle check-manifest codespell-error
-#type-check
-
-black:
-	@if command -v black > /dev/null; then \
-		echo "Running black"; \
-		black --check skmorf; \
-		black skmorf/*; \
-	else \
-		echo "black not found, please install it!"; \
-		exit 1; \
-	fi;
-	@echo "black passed"
-
-isort:
-	@if command -v isort > /dev/null; then \
-		echo "Running isort"; \
-		isort skmorf examples; \
-	else \
-		echo "isort not found, please install it!"; \
-		exit 1; \
-	fi;
-	@echo "isort passed"
-
 build-dev:
 	pip install --verbose --no-build-isolation --editable .
 
-build-doc:
-	cd docs; make clean
-	cd docs; make html
-
-run-checks:
-	isort --check ./skmorf
-	black --check skmorf
-	flake8 ./skmorf
-	mypy ./skmorf
-	@$(MAKE) pydocstyle
-	check-manifest
-	@$(MAKE) codespell-error
+build-docs:
+	@echo "Building documentation"
+	make -C docs/ clean
+	make -C docs/ html-noplot
+	cd docs/ && make view
 
 build-pipy:
 	python setup.py sdist bdist_wheel
@@ -114,4 +39,3 @@ build-pipy:
 test-pipy:
 	twine check dist/*
 	twine upload --repository testpypi dist/*
-
