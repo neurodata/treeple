@@ -30,7 +30,7 @@ jobs:
           python-version: '3.9'
           architecture: 'x64'
       - name: Install Poetry ${{ matrix.poetry-version }}
-        uses: abatilo/actions-poetry@v2.1.6
+        uses: abatilo/actions-poetry@v2.2.0
         with:
           poetry-version: ${{ matrix.poetry-version }}
       - name: Install Poetry Dynamic Versioning Plugin
@@ -72,7 +72,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           architecture: 'x64'
       - name: Install Poetry ${{ matrix.poetry-version }}
-        uses: abatilo/actions-poetry@v2.1.6
+        uses: abatilo/actions-poetry@v2.2.0
         with:
           poetry-version: ${{ matrix.poetry-version }}
       - name: Install Poetry Dynamic Versioning Plugin
@@ -129,7 +129,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           architecture: 'x64'
       - name: Install Poetry ${{ matrix.poetry-version }}
-        uses: abatilo/actions-poetry@v2.1.6
+        uses: abatilo/actions-poetry@v2.2.0
         with:
           poetry-version: ${{ matrix.poetry-version }}
       - name: Install Poetry Dynamic Versioning Plugin
