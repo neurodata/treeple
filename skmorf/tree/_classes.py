@@ -7,7 +7,7 @@ randomized trees. Single and multi-output problems are both handled.
 #
 # License: BSD 3 clause
 
-from sklearn.tree import _criterion
+from sklearn.tree import _criterion, BaseDecisionTree
 from sklearn.tree._oblique_splitter import ObliqueSplitter
 from sklearn.tree._oblique_tree import ObliqueTree
 
@@ -343,3 +343,4 @@ class ImagePatchDecisionTreeClassifier(ObliqueDecisionTreeClassifier):
             )
 
         return splitter
+

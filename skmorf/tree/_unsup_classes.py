@@ -6,7 +6,7 @@ randomized trees. Single and multi-output problems are both handled.
 # Authors: Adam Li <adam2392@gmail.com>
 #
 # License: BSD 3 clause
-
+from sklearn.base import TransformerMixin
 from sklearn.tree import BaseDecisionTree, _criterion
 from sklearn.tree._oblique_splitter import ObliqueSplitter
 from sklearn.tree._oblique_tree import ObliqueTree
@@ -37,7 +37,7 @@ CRITERIA_REG = {
 # =============================================================================
 
 
-class UnsupervisedDecisionTree(BaseDecisionTree):
+class UnsupervisedDecisionTree(TransformerMixin, BaseDecisionTree):
     """An unsupervised decision tree.
 
     Read more in the :ref:`User Guide <tree>`.
@@ -273,49 +273,8 @@ class UnsupervisedDecisionTree(BaseDecisionTree):
             0.93...,  0.93...,  1.     ,  0.93...,  1.      ])
     """
 
-    def __init__(
-        self,
-        *,
-        criterion="gini",
-        splitter="best",
-        max_depth=None,
-        min_samples_split=2,
-        min_samples_leaf=1,
-        min_weight_fraction_leaf=0.0,
-        max_features=None,
-        random_state=None,
-        max_leaf_nodes=None,
-        min_impurity_decrease=0.0,
-        class_weight=None,
-        ccp_alpha=0.0,
-        image_height=None,
-        image_width=None,
-        patch_height_max=None,
-        patch_height_min=1,
-        patch_width_max=None,
-        patch_width_min=1,
-    ):
-        super().__init__(
-            criterion=criterion,
-            splitter=splitter,
-            max_depth=max_depth,
-            min_samples_split=min_samples_split,
-            min_samples_leaf=min_samples_leaf,
-            min_weight_fraction_leaf=min_weight_fraction_leaf,
-            max_features=max_features,
-            max_leaf_nodes=max_leaf_nodes,
-            class_weight=class_weight,
-            random_state=random_state,
-            min_impurity_decrease=min_impurity_decrease,
-            ccp_alpha=ccp_alpha,
-        )
-
-        self.image_height = image_height
-        self.image_width = image_width
-        self.patch_height_max = patch_height_max
-        self.patch_height_min = patch_height_min
-        self.patch_width_max = patch_width_max
-        self.patch_width_min = patch_width_min
+    def __init__(self, *, criterion, splitter, max_depth, min_samples_split, min_samples_leaf, min_weight_fraction_leaf, max_features, max_leaf_nodes, random_state, min_impurity_decrease, class_weight=None, ccp_alpha=0):
+        super().__init__(criterion=criterion, splitter, max_depth, min_samples_split, min_samples_leaf, min_weight_fraction_leaf, max_features, max_leaf_nodes, random_state, min_impurity_decrease, class_weight, ccp_alpha)
 
     def fit(self, X, y=None, sample_weight=None, check_input=True):
         """Build a decision tree classifier from the training set (X, y).
@@ -346,10 +305,8 @@ class UnsupervisedDecisionTree(BaseDecisionTree):
         self : UnsupervisedDecisionTree
             Fitted estimator.
         """
-        super().fit(
-            X,
-            y,
-            sample_weight=sample_weight,
-            check_input=check_input,
-        )
+        self.fit_transform(X, y, sample_weight)
         return self
+
+    def fit_transform(self, X, y=None, sample_weight=None):
+        return super().fit_transform(X, y, sample_weight=sample_weight)
