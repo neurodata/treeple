@@ -1,7 +1,7 @@
 import os
 import sys
 
-from oblique_forests._build_utils import cythonize_extensions
+from sklearn._build_utils import cythonize_extensions
 
 
 def configuration(parent_package="", top_path=None):  # noqa

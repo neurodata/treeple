@@ -1,7 +1,11 @@
 """Scikit manifold oblique random forests."""
+import logging
 import os
 import sys
-from ._version import __version__  # noqa: F401
+
+__version__ = '0.0.0dev0'
+logger = logging.getLogger(__name__)
+
 
 # On OSX, we can get a runtime error due to multiple OpenMP libraries loaded
 # simultaneously. This can happen for instance when calling BLAS inside a
@@ -31,8 +35,8 @@ if __SKMORF_SETUP__:
     # process, as it may not be compiled yet
 else:
     from . import __check_build
-    from .utils._show_versions import show_versions
+    from sklearn.utils._show_versions import show_versions
 
-    __check_build  # avoid flakes unused variable error
-
-    __all__ = ["tree"]
+    __all__ = [
+        "tree"
+    ]

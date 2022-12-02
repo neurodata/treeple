@@ -42,7 +42,7 @@ exclude = ['*tests']
 python = ">=3.8,<3.11"
 numpy = "^1.23.0"
 scipy = "^1.9.0"
-scikit-learn = "^1.1.0"
+scikit-learn = { git = "https://github.com/neurodata/scikit-learn.git", branch = "obliquepr" }
 importlib-resources = { version = "*", python = "<3.9" }
 
 [tool.poetry.group.test]
@@ -85,7 +85,11 @@ nbsphinx = { version = "^0.8" }
 pandas = { version = "^1.1" }
 
 [build-system]
-requires = ["poetry-core>=1.0.0", "Cython~=0.29.6"]
+requires = [
+    "poetry-core>=1.0.0",
+    "Cython~=0.29.6",
+    "numpy"
+]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poe.tasks]
@@ -145,12 +149,7 @@ profile = 'black'
 multi_line_output = 3
 line_length = 100
 py_version = 38
-extend_skip_glob = [
-    'setup.py',
-    'docs/*',
-    'examples/*',
-    'skmorf/__init__.py',
-]
+extend_skip_glob = ['setup.py', 'docs/*', 'examples/*', 'skmorf/__init__.py']
 
 [tool.pydocstyle]
 convention = 'numpy'
