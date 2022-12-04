@@ -6,15 +6,14 @@ randomized trees. Single and multi-output problems are both handled.
 # Authors: Adam Li <adam2392@gmail.com>
 #
 # License: BSD 3 clause
-from sklearn.base import TransformerMixin
-from sklearn.tree import BaseDecisionTree, _criterion
-from sklearn.tree._oblique_splitter import ObliqueSplitter
-from sklearn.tree._oblique_tree import ObliqueTree
 
+from sklearn.base import TransformerMixin
+from sklearn.tree import BaseDecisionTree
+
+from skmorf.tree import _unsup_criterion
 
 __all__ = [
     "UnsupervisedDecisionTree",
-    "ImagePatchDecisionTreeRegressor",
 ]
 
 
@@ -22,14 +21,9 @@ __all__ = [
 # Types and constants
 # =============================================================================
 
-CRITERIA_CLF = {"gini": _criterion.Gini, "entropy": _criterion.Entropy}
-# TODO: Remove "mse" in version 1.2.
-CRITERIA_REG = {
-    "squared_error": _criterion.MSE,
-    "mse": _criterion.MSE,
-    "friedman_mse": _criterion.FriedmanMSE,
-    "mae": _criterion.MAE,
-    "poisson": _criterion.Poisson,
+CRITERIA = {
+    "twoMeans": _unsup_criterion.TwoMeans,
+    "fastBIC": _unsup_criterion.BIC
 }
 
 # =============================================================================
@@ -44,9 +38,10 @@ class UnsupervisedDecisionTree(TransformerMixin, BaseDecisionTree):
 
     Parameters
     ----------
-    criterion : {"gini", "entropy"}, default="gini"
+    criterion : {"twoMeans", "fastBIC"}, default="fastBIC"
         The function to measure the quality of a split. Supported criteria are
-        "gini" for the Gini impurity and "entropy" for the information gain.
+        "fastBIC" for the fast BIC criterion and "twoMeans" for the difference
+        between two means.
 
     splitter : {"best", "random"}, default="best"
         The strategy used to choose the split at each node. Supported

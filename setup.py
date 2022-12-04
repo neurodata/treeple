@@ -1,224 +1,248 @@
 
 # file required until PEP660 is correctly supported by setuptools
 # https://github.com/pypa/setuptools/issues/2816
-
+import sys 
+import os
+import platform
+from os.path import join
 from setuptools import setup
+import importlib
+import traceback
+
+from setuptools import Command, Extension, setup
+from setuptools.command.build_ext import build_ext
+
+import sklearn._min_dependencies as min_deps
+from sklearn._build_utils import _check_cython_version  # noqa
+from sklearn.externals._packaging.version import parse as parse_version  # noqa
+
+
+DISTNAME = "scikit-morf"
+DESCRIPTION = "A set of python modules for machine learning and data mining"
+with open("README.rst") as f:
+    LONG_DESCRIPTION = f.read()
+MAINTAINER = "Andreas Mueller"
+MAINTAINER_EMAIL = "amueller@ais.uni-bonn.de"
+URL = "http://github.com/adam2392/scikit-morf.com"
+DOWNLOAD_URL = "https://pypi.org/project/scikit-morf/#files"
+LICENSE = "new BSD"
+PROJECT_URLS = {
+    "Bug Tracker": "https://github.com/adam2392scikit-morf/issues",
+    "Source Code": "https://github.com/adam2392/scikit-morf",
+}
+
+# We can actually import a restricted version of sklearn that
+# does not need the compiled code
+import skmorf  # noqa
+
+VERSION = skmorf.__version__
 
 setup()
 
-# #
-# # License: 3-clause BSD
+def check_package_status(package, min_version):
+    """
+    Returns a dictionary containing a boolean specifying whether given package
+    is up-to-date, along with the version string (empty string if
+    not installed).
+    """
+    package_status = {}
+    try:
+        module = importlib.import_module(package)
+        package_version = module.__version__
+        package_status["up_to_date"] = parse_version(package_version) >= parse_version(
+            min_version
+        )
+        package_status["version"] = package_version
+    except ImportError:
+        traceback.print_exc()
+        package_status["up_to_date"] = False
+        package_status["version"] = ""
 
-# import sys
-# import os
-# import platform
-# import shutil
-# from distutils.command.clean import clean as Clean
-# from pkg_resources import parse_version
-# import traceback
-# from setuptools import setup
-# try:
-#     import builtins
-# except ImportError:
-#     # Python 2 compat: just to be able to declare that Python >=3.5 is needed.
-#     import __builtin__ as builtins
+    req_str = "scikit-morf requires {} >= {}.\n".format(package, min_version)
 
-# # This is a bit (!) hackish: we are setting a global variable so that the
-# # main sklearn __init__ can detect if it is being loaded by the setup
-# # routine, to avoid attempting to load components that aren't built yet:
-# # the numpy distutils extensions that are used by scikit-morf to
-# # recursively build the compiled extensions in sub-packages is based on the
-# # Python import machinery.
-# builtins.__SKLEARN_SETUP__ = True
+    instructions = (
+        "Installation instructions are available on the "
+        "scikit-morf website: "
+        "http://scikit-morf.org/stable/install.html\n"
+    )
 
+    if package_status["up_to_date"] is False:
+        if package_status["version"]:
+            raise ImportError(
+                "Your installation of {} {} is out-of-date.\n{}{}".format(
+                    package, package_status["version"], req_str, instructions
+                )
+            )
+        else:
+            raise ImportError(
+                "{} is not installed.\n{}{}".format(package, req_str, instructions)
+            )
 
-# # Give setuptools a hint to complain if it's too old a version
-# SETUP_REQUIRES = ["setuptools >= 46.4.0"]
-# # This enables setuptools to install wheel on-the-fly
-# SETUP_REQUIRES += ["wheel"] if "bdist_wheel" in sys.argv else []
+extension_config = {
+    "__check_build": [
+        {"sources": ["_check_build.pyx"]},
+    ],
+    "tree": [
+        {"sources": ["_unsup_criterion.pyx"], "language": "c++", "include_np": True},
+        {"sources": ["_patch_splitter.pyx"], "include_np": True},
+    ],
+}
 
+def configure_extension_modules():
+    # Skip cythonization as we do not want to include the generated
+    # C/C++ files in the release tarballs as they are not necessarily
+    # forward compatible with future versions of Python for instance.
+    if "sdist" in sys.argv or "--help" in sys.argv:
+        return []
 
-# # We can actually import a restricted version of sklearn that
-# # does not need the compiled code
-# import skmorf
+    from sklearn._build_utils import cythonize_extensions
+    from sklearn._build_utils import gen_from_templates
+    import numpy
 
-# VERSION = skmorf.__version__
+    is_pypy = platform.python_implementation() == "PyPy"
+    np_include = numpy.get_include()
 
-# if platform.python_implementation() == 'PyPy':
-#     SCIPY_MIN_VERSION = '1.1.0'
-#     NUMPY_MIN_VERSION = '1.14.0'
-# else:
-#     SCIPY_MIN_VERSION = '0.17.0'
-#     NUMPY_MIN_VERSION = '1.11.0'
+    optimization_level = "O2"
+    if os.name == "posix":
+        default_extra_compile_args = [f"-{optimization_level}"]
+        default_libraries = ["m"]
+    else:
+        default_extra_compile_args = [f"/{optimization_level}"]
+        default_libraries = []
 
-# JOBLIB_MIN_VERSION = '0.11'
+    cython_exts = []
+    for submodule, extensions in extension_config.items():
+        submodule_parts = submodule.split(".")
+        parent_dir = join("skmorf", *submodule_parts)
+        for extension in extensions:
+            if is_pypy and not extension.get("compile_for_pypy", True):
+                continue
 
+            # Generate files with Tempita
+            tempita_sources = []
+            sources = []
+            for source in extension["sources"]:
+                source = join(parent_dir, source)
+                new_source_path, path_ext = os.path.splitext(source)
 
-# # Custom clean command to remove build artifacts
+                if path_ext != ".tp":
+                    sources.append(source)
+                    continue
 
-# class CleanCommand(Clean):  # noqa
-#     description = "Remove build artifacts from the source tree"
+                # `source` is a Tempita file
+                tempita_sources.append(source)
 
-#     def run(self):  # noqa
-#         Clean.run(self)
-#         # Remove c files if we are not within a sdist package
-#         cwd = os.path.abspath(os.path.dirname(__file__))
-#         remove_c_files = not os.path.exists(os.path.join(cwd, 'PKG-INFO'))
-#         if remove_c_files:
-#             print('Will remove generated .c files')
-#         if os.path.exists('build'):
-#             shutil.rmtree('build')
-#         for dirpath, dirnames, filenames in os.walk('skmorf'):
-#             for filename in filenames:
-#                 if any(filename.endswith(suffix) for suffix in
-#                        (".so", ".pyd", ".dll", ".pyc")):
-#                     os.unlink(os.path.join(dirpath, filename))
-#                     continue
-#                 extension = os.path.splitext(filename)[1]
-#                 if remove_c_files and extension in ['.c', '.cpp']:
-#                     pyx_file = str.replace(filename, extension, '.pyx')
-#                     if os.path.exists(os.path.join(dirpath, pyx_file)):
-#                         os.unlink(os.path.join(dirpath, filename))
-#             for dirname in dirnames:
-#                 if dirname == '__pycache__':
-#                     shutil.rmtree(os.path.join(dirpath, dirname))
+                # Do not include pxd files that were generated by tempita
+                if os.path.splitext(new_source_path)[-1] == ".pxd":
+                    continue
+                sources.append(new_source_path)
 
+            gen_from_templates(tempita_sources)
 
-# cmdclass = {'clean': CleanCommand}
+            # By convention, our extensions always use the name of the first source
+            source_name = os.path.splitext(os.path.basename(sources[0]))[0]
+            if submodule:
+                name_parts = ["skmorf", submodule, source_name]
+            else:
+                name_parts = ["skmorf", source_name]
+            name = ".".join(name_parts)
 
-# # custom build_ext command to set OpenMP compile flags depending on os and
-# # compiler
-# # build_ext has to be imported after setuptools
-# try:
-#     from numpy.distutils.command.build_ext import build_ext  # noqa
+            # Make paths start from the root directory
+            include_dirs = [
+                join(parent_dir, include_dir)
+                for include_dir in extension.get("include_dirs", [])
+            ]
+            if extension.get("include_np", False):
+                include_dirs.append(np_include)
 
-#     class build_ext_subclass(build_ext):  # noqa
-#         def build_extensions(self):  # noqa
-#             from skmorf._build_utils.openmp_helpers import get_openmp_flag
+            depends = [
+                join(parent_dir, depend) for depend in extension.get("depends", [])
+            ]
 
-#             if not os.getenv('SKLEARN_NO_OPENMP'):
-#                 openmp_flag = get_openmp_flag(self.compiler)
+            extra_compile_args = (
+                extension.get("extra_compile_args", []) + default_extra_compile_args
+            )
+            libraries_ext = extension.get("libraries", []) + default_libraries
 
-#                 for e in self.extensions:
-#                     e.extra_compile_args += openmp_flag
-#                     e.extra_link_args += openmp_flag
+            new_ext = Extension(
+                name=name,
+                sources=sources,
+                language=extension.get("language", None),
+                include_dirs=include_dirs,
+                libraries=libraries_ext,
+                depends=depends,
+                extra_link_args=extension.get("extra_link_args", None),
+                extra_compile_args=extra_compile_args,
+            )
+            cython_exts.append(new_ext)
 
-#             build_ext.build_extensions(self)
+    return cythonize_extensions(cython_exts)
 
-#     cmdclass['build_ext'] = build_ext_subclass
+def setup_package():
+    python_requires = ">=3.8"
+    required_python_version = (3, 8)
 
-# except ImportError:
-#     # Numpy should not be a dependency just to be able to introspect
-#     # that python 3.5 is required.
-#     pass
+    metadata = dict(
+        name=DISTNAME,
+        maintainer=MAINTAINER,
+        maintainer_email=MAINTAINER_EMAIL,
+        description=DESCRIPTION,
+        license=LICENSE,
+        url=URL,
+        download_url=DOWNLOAD_URL,
+        project_urls=PROJECT_URLS,
+        version=VERSION,
+        long_description=LONG_DESCRIPTION,
+        classifiers=[
+            "Intended Audience :: Science/Research",
+            "Intended Audience :: Developers",
+            "License :: OSI Approved :: BSD License",
+            "Programming Language :: C",
+            "Programming Language :: Python",
+            "Topic :: Software Development",
+            "Topic :: Scientific/Engineering",
+            "Development Status :: 5 - Production/Stable",
+            "Operating System :: Microsoft :: Windows",
+            "Operating System :: POSIX",
+            "Operating System :: Unix",
+            "Operating System :: MacOS",
+            "Programming Language :: Python :: 3",
+            "Programming Language :: Python :: 3.8",
+            "Programming Language :: Python :: 3.9",
+            "Programming Language :: Python :: 3.10",
+            "Programming Language :: Python :: 3.11",
+            "Programming Language :: Python :: Implementation :: CPython",
+            "Programming Language :: Python :: Implementation :: PyPy",
+        ],
+        python_requires=python_requires,
+        install_requires=min_deps.tag_to_packages["install"],
+        package_data={"": ["*.csv", "*.gz", "*.txt", "*.pxd", "*.rst", "*.jpg"]},
+        zip_safe=False,  # the package can run out of an .egg file
+        extras_require={
+            key: min_deps.tag_to_packages[key]
+            for key in ["examples", "docs", "tests", "benchmark"]
+        },
+    )
 
+    commands = [arg for arg in sys.argv[1:] if not arg.startswith("-")]
+    if not all(
+        command in ("egg_info", "dist_info", "clean", "check") for command in commands
+    ):
+        if sys.version_info < required_python_version:
+            required_version = "%d.%d" % required_python_version
+            raise RuntimeError(
+                "Scikit-learn requires Python %s or later. The current"
+                " Python version is %s installed in %s."
+                % (required_version, platform.python_version(), sys.executable)
+            )
 
-# # Optional wheelhouse-uploader features
-# # To automate release of binary packages for scikit-morf we need a tool
-# # to download the packages generated by travis and appveyor workers (with
-# # version number matching the current release) and upload them all at once
-# # to PyPI at release time.
-# # The URL of the artifact repositories are configured in the setup.cfg file.
+        check_package_status("numpy", min_deps.NUMPY_MIN_VERSION)
+        check_package_status("scipy", min_deps.SCIPY_MIN_VERSION)
 
-# WHEELHOUSE_UPLOADER_COMMANDS = {'fetch_artifacts', 'upload_all'}
-# if WHEELHOUSE_UPLOADER_COMMANDS.intersection(sys.argv):
-#     import wheelhouse_uploader.cmd
-
-#     cmdclass.update(vars(wheelhouse_uploader.cmd))
-
-
-# def configuration(parent_package='', top_path=None):  # noqa
-#     if os.path.exists('MANIFEST'):
-#         os.remove('MANIFEST')
-
-#     from numpy.distutils.misc_util import Configuration
-
-#     config = Configuration(None, parent_package, top_path)
-
-#     # Avoid non-useful msg:
-#     # "Ignoring attempt to set 'name' (from ... "
-#     config.set_options(ignore_setup_xxx_py=True,
-#                        assume_default_configuration=True,
-#                        delegate_options_to_subpackages=True,
-#                        quiet=True)
-
-#     config.add_subpackage('skmorf')
-
-#     return config
-
-
-# def get_numpy_status():  # noqa
-#     """
-#     Return a dictionary containing a boolean specifying whether NumPy
-#     is up-to-date, along with the version string (empty string if
-#     not installed).
-#     """
-#     numpy_status = {}
-#     try:
-#         import numpy
-#         numpy_version = numpy.__version__
-#         numpy_status['up_to_date'] = parse_version(
-#             numpy_version) >= parse_version(NUMPY_MIN_VERSION)
-#         numpy_status['version'] = numpy_version
-#     except ImportError:
-#         traceback.print_exc()
-#         numpy_status['up_to_date'] = False
-#         numpy_status['version'] = ""
-#     return numpy_status
-
-
-# def setup_package():  # noqa
-#     metadata = dict()
-
-#     if len(sys.argv) == 1 or (
-#             len(sys.argv) >= 2 and ('--help' in sys.argv[1:] or
-#                                     sys.argv[1] in ('--help-commands',
-#                                                     'egg_info',
-#                                                     '--version',
-#                                                     'clean'))):
-#         # For these actions, NumPy is not required
-#         #
-#         # They are required to succeed without Numpy for example when
-#         # pip is used to install Scikit-learn when Numpy is not yet present in
-#         # the system.
-#         try:
-#             from setuptools import setup
-#         except ImportError:
-#             from distutils.core import setup
-
-#         metadata['version'] = VERSION
-#     else:
-#         if sys.version_info < (3, 5):
-#             raise RuntimeError(
-#                 "Scikit-learn requires Python 3.5 or later. The current"
-#                 " Python version is %s installed in %s."
-#                 % (platform.python_version(), sys.executable))
-
-#         numpy_status = get_numpy_status()
-#         numpy_req_str = "scikit-morf requires NumPy >= {}.\n".format(
-#             NUMPY_MIN_VERSION)
-
-#         instructions = ("Installation instructions are available on the "
-#                         "scikit-morf website: "
-#                         "http://adam2392.github.io/scikit-morf/stable/install.html\n")
-
-#         if numpy_status['up_to_date'] is False:
-#             if numpy_status['version']:
-#                 raise ImportError("Your installation of Numerical Python "
-#                                   "(NumPy) {} is out-of-date.\n{}{}"
-#                                   .format(numpy_status['version'],
-#                                           numpy_req_str, instructions))
-#             else:
-#                 raise ImportError("Numerical Python (NumPy) is not "
-#                                   "installed.\n{}{}"
-#                                   .format(numpy_req_str, instructions))
-
-#         from numpy.distutils.core import setup
-
-#         metadata['configuration'] = configuration
-
-#     setup(setup_requires=SETUP_REQUIRES, **metadata)
+        _check_cython_version()
+        metadata["ext_modules"] = configure_extension_modules()
+    setup(**metadata)
 
 
-# if __name__ == "__main__":
-#     setup_package()
+if __name__ == "__main__":
+    setup_package()
