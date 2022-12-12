@@ -84,7 +84,6 @@ extension_config = {
     ],
     "tree": [
         {"sources": ["_unsup_criterion.pyx"], "language": "c++", "include_np": True},
-        {"sources": ["_patch_splitter.pyx"], "include_np": True},
     ],
 }
 

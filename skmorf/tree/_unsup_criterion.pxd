@@ -3,7 +3,8 @@
 # cython: language_level=3
 # cython: linetrace=True
 
-from sklearn.tree._criterion cimport BaseCriterion, SIZE_t, DTYPE_t
+from sklearn.tree._tree cimport SIZE_t, DTYPE_t, DOUBLE_t
+from sklearn.tree._criterion cimport BaseCriterion
 
 
 # Note: This class is an exact copy of scikit-learn's Criterion
@@ -23,18 +24,27 @@ cdef class UnsupervisedCriterion(BaseCriterion):
     # impurity of a split on that node. It also computes the output statistics.
 
     # Internal structures
-    cdef const DTYPE_T[:] X # 1D memview for values of X (i.e. feature values)
+    cdef const DTYPE_T[:, ::1] X # 2D memview for values of X (i.e. feature values)
 
     # TODO: WIP. Assumed the sum "metric" of node, left and right
+    # XXX: this can possibly be defined in downstream classes instead as memoryviews.
+    # The sum of the metric stored either at the split, going left, or right
+    # of the split. 
     cdef double sum_total   # The sum of the weighted count of each feature.
     cdef double sum_left    # Same as above, but for the left side of the split
     cdef double sum_right   # Same as above, but for the right side of the split
 
     # Methods
     # -------
-    # The 'init' method is copied here with the exact same signature as that of
-    # supervised learning criterion in scikit-learn to ensure that Unsupervised
-    # criterion can be used with 
-    cdef int init(self, const DOUBLE_t[:, ::1] y, DOUBLE_t* sample_weight,
-                  double weighted_n_samples, SIZE_t* samples, SIZE_t start,
-                  SIZE_t end) nogil except -1
+    # The 'init' method is copied here with the almost the exact same signature
+    # as that of supervised learning criterion in scikit-learn to ensure that
+    # Unsupervised criterion can be used with splitter and tree methods.
+    cdef int init(
+        self,
+        const DOUBLE_t[:, ::1] X,
+        DOUBLE_t* sample_weight,
+        double weighted_n_samples, 
+        SIZE_t* samples, 
+        SIZE_t start,
+        SIZE_t end
+    ) nogil except -1
