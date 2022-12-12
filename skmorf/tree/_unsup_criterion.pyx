@@ -46,7 +46,19 @@ cdef class UnsupervisedCriterion(BaseCriterion):
 
 
 cdef class TwoMeans(Criterion):
-    """Two-Means Criterion.
+    r"""Two means split impurity.
+
+    The two means split finds the cutpoint that minimizes the one-dimensional
+    2-means objective, which is finding the cutoff point where the total variance
+    from cluster 1 and cluster 2 are minimal. 
+
+    The mathematical optimization problem is to find the cutoff index ``s``,
+    which is called 'pos' in scikit-learn.
+
+        \min_s \sum_{i=1}^s (x_i - \hat{\mu}_1)^2 + \sum_{i=s+1}^N (x_i - \hat{\mu}_2)^2
+
+    where x is a N-dimensional feature vector, N is the number of samples and the \mu
+    terms are the estimated means of each cluster 1 and 2.
     """
 
     def __cinit__(self, const DTYPE_t[:] X):
@@ -61,12 +73,13 @@ cdef class TwoMeans(Criterion):
         # need to implement
         pass
     
-    cdef int init(self, const DOUBLE_t[:, ::1] y,
-                  DOUBLE_t* sample_weight,
-                  double weighted_n_samples,
-                  SIZE_t* samples,
-                  SIZE_t start,
-                  SIZE_t end) nogil except -1:
+    cdef int init(
+        self,
+        const DOUBLE_t[:, ::1] X,
+        const DOUBLE_t[:] sample_weight,
+        double weighted_n_samples,
+        const SIZE_t[:] sample_indices
+    ) nogil except -1:
         """Initialize the criterion.
 
         This initializes the criterion at node samples[start:end] and children
@@ -77,7 +90,7 @@ cdef class TwoMeans(Criterion):
 
         Parameters
         ----------
-        y : array-like, dtype=DOUBLE_t
+        X : array-like, dtype=DOUBLE_t
             The target stored as a buffer for memory efficiency. Note that
             this is not used, but simply passed as a convenience function.
         sample_weight : array-like, dtype=DOUBLE_t
@@ -86,39 +99,9 @@ cdef class TwoMeans(Criterion):
             The total weight of all samples.
         samples : array-like, dtype=SIZE_t
             A mask on the samples, showing which ones we want to use
-        start : SIZE_t
-            The first sample to use in the mask
-        end : SIZE_t
-            The last sample to use in the mask
         """
-        self.sample_weight = sample_weight
-        self.samples = samples
-        self.start = start
-        self.end = end
-        self.n_node_samples = end - start
-        self.weighted_n_samples = weighted_n_samples
-        self.weighted_n_node_samples = 0.0
-
-        cdef SIZE_t i
-        cdef SIZE_t p
-        cdef DOUBLE_t w = 1.0
-        self.sum_total = 0.0
-
-        for p in range(start, end):
-            i = samples[p]
-
-            # w is originally set to be 1.0, meaning that if no sample weights
-            # are given, the default weight of each sample is 1.0
-            if sample_weight != NULL:
-                w = sample_weight[i]
-            
-            # ith sample; overall compute the weighted average
-            self.sum_total += w * X[i]
-            self.weighted_n_node_samples += w
-
-        # Reset to pos=start
-        self.reset()
-        return 0
+        # need to implement
+        pass
         
     cdef int reset(self) nogil except -1:
         """Reset the criterion at pos=start.
@@ -180,3 +163,5 @@ cdef class TwoMeans(Criterion):
     ) nogil:
         # need to implement
         pass
+
+
