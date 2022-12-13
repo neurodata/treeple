@@ -41,11 +41,11 @@ class UnsupervisedRandomForest(TransformerMixin, BaseForest):
             random_state=random_state,
             verbose=verbose,
             warm_start=warm_start,
-            max_samples=max_samples)
+            max_samples=max_samples)·
 
     def fit_transform(self, X, y=None, sample_weight=None):
         super().fit(X, y, sample_weight)
-
+·
         # apply to the leaves
         output = self.apply(X)
         return output

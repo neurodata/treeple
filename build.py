@@ -4,7 +4,7 @@ import sys
 import numpy as np
 import builtins
 
-import skmorf
+import sktree
 from distutils.command.build_ext import build_ext
 from distutils.core import Distribution
 from distutils.core import Extension
@@ -16,7 +16,7 @@ from distutils.errors import DistutilsPlatformError
 # the numpy distutils extensions that are used by scikit-learn to
 # recursively build the compiled extensions in sub-packages is based on the
 # Python import machinery.
-builtins.__SKMORF_SETUP__ = True
+builtins.__sktree_SETUP__ = True
 
 # See: https://numpy.org/doc/stable/reference/c-api/deprecations.html
 # Defines that our code is clean against numpy version
@@ -40,7 +40,7 @@ languages = ['c++']
 # C/C++/Cython Extensions
 # If you are interested in defining C extensions, then take a look at
 # poetry and the package pendulum. https://github.com/sdispater/pendulum
-with_extensions = os.getenv("SKMORF_EXTENSIONS", None)
+with_extensions = os.getenv("sktree_EXTENSIONS", None)
 if with_extensions == "1" or with_extensions is None:
     with_extensions = True
 if with_extensions == "0" or hasattr(sys, "pypy_version_info"):
@@ -51,7 +51,7 @@ if with_extensions:
     extensions = [
         Extension(
             "*",
-            ["skmorf/*.pyx"],
+            ["sktree/*.pyx"],
             extra_compile_args=compile_args,
             extra_link_args=link_args,
             include_dirs=include_dirs,
@@ -96,7 +96,7 @@ class ExtBuilder(build_ext):
         # allow each extension to be built with for example
         # openMP support. We look inside our repo for 
         # whether or not OPENMP is supported or not.
-        if skmorf._OPENMP_SUPPORTED:
+        if sktree._OPENMP_SUPPORTED:
             openmp_flag = get_openmp_flag(self.compiler)
 
             for e in self.extensions:
@@ -111,17 +111,20 @@ class ExtBuilder(build_ext):
         except (DistutilsPlatformError, FileNotFoundError):
             print(
                 "  Unable to build the C extensions, "
-                "Scikit-morf will use the pure python code instead."
+                "scikit-tree will use the pure python code instead."
             )
 
 
 
 def build(setup_kwargs):
+    """This function is mandatory in order to build the extensions.
+
+    Builds the disbituion using setuptools outdated API.
+
+    XXX: Need to update the build system.
     """
-    This function is mandatory in order to build the extensions.
-    """
-    distribution = Distribution({"name": "scikit-morf", "ext_modules": extensions})
-    distribution.package_dir = "skmorf"
+    distribution = Distribution({"name": "scikit-tree", "ext_modules": extensions})
+    distribution.package_dir = "sktree"
 
     cmd = ExtBuilder(distribution)
     cmd.ensure_finalized()

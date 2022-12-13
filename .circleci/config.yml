@@ -60,7 +60,7 @@ jobs:
           command: |
             poetry run which python
             poetry run python -c "import sklearn; sklearn.utils.show_versions()"
-            poetry run python -c "import skmorf;"
+            poetry run python -c "import sktree;"
             poetry run python -c "import numpy; numpy.show_config()"
             poetry run LIBGL_DEBUG=verbose python -c "import matplotlib.pyplot as plt; plt.figure()"
       
@@ -112,7 +112,7 @@ jobs:
           name: Install and configure dependencies
           command: |
             npm install --global gh-pages@3.0
-            git config --global user.email "circle@scikit-morf.com"
+            git config --global user.email "circle@scikit-tree.com"
             git config --global user.name "Circle Ci"
 
       - add_ssh_keys:
@@ -134,7 +134,7 @@ jobs:
       - save_cache:
           key: website-cache
           paths:
-            - ~/skmorf
+            - ~/sktree
 
 workflows:
   commit:

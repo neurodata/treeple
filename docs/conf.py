@@ -12,34 +12,34 @@ import sphinx_gallery  # noqa: F401
 from sphinx_gallery.sorting import ExampleTitleSortKey
 
 sys.path.insert(0, os.path.abspath(".."))
-import skmorf
+import sktree
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 curdir = os.path.dirname(__file__)
 sys.path.append(os.path.abspath(os.path.join(curdir, "..")))
-sys.path.append(os.path.abspath(os.path.join(curdir, "..", "skmorf")))
+sys.path.append(os.path.abspath(os.path.join(curdir, "..", "sktree")))
 
 # -- project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 # General information about the project.
-project = "Scikit-Morf"
+project = "scikit-tree"
 author = "Adam Li <adam.li@columbia.edu>"
 td = date.today()
-copyright = f"2022-{td.year}, scikit-morf Developers. Last updated on {td.isoformat()}"
+copyright = f"2022-{td.year}, scikit-tree Developers. Last updated on {td.isoformat()}"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # The short X.Y version.
-version = skmorf.__version__
+version = sktree.__version__
 # The full version, including alpha/beta/rc tags.
 release = version
 
-gh_url = "https://github.com/adam2392/Scikit-Morf"
+gh_url = "https://github.com/neurodata/scikit-tree"
 
 # -- general configuration ------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -203,7 +203,7 @@ intersphinx_mapping = {
 intersphinx_timeout = 5
 
 # -- sphinx-gallery ----------------------------------------------------------
-os.environ["_SKMORF_BUILDING_DOC"] = "true"
+os.environ["_sktree_BUILDING_DOC"] = "true"
 scrapers = ("matplotlib",)
 
 compress_images = ("images", "thumbnails")
@@ -216,9 +216,9 @@ if sys.platform.startswith("win"):
         compress_images = ()
 
 sphinx_gallery_conf = {
-    "doc_module": ("skmorf",),
+    "doc_module": ("sktree",),
     "reference_url": {
-        "skmorf": None,
+        "sktree": None,
     },
     "examples_dirs": ["../examples"],
     "gallery_dirs": ["auto_examples"],
@@ -245,7 +245,7 @@ bibtex_style = "unsrt"
 bibtex_footbibliography_header = ""
 
 # -- Sphinx-issues -----------------------------------------------------------
-issues_github_path = "adam2392/Scikit-Morf"
+issues_github_path = "adam2392/scikit-tree"
 
 # -- sphinx.ext.linkcode -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/extensions/linkcode.html
@@ -289,6 +289,6 @@ def linkcode_resolve(domain: str, info: Dict[str, str]) -> Optional[str]:
         branch = "main"
     else:
         return None  # alternatively, link to a maint/version branch
-    fname = fname.split("/skmorf/")[1]
-    url = f"{gh_url}/blob/{branch}/skmorf/{fname}#{lines}"
+    fname = fname.split("/sktree/")[1]
+    url = f"{gh_url}/blob/{branch}/sktree/{fname}#{lines}"
     return url

@@ -7,13 +7,13 @@
 What's new?
 ===========
 
-Here we list a changelog of scikit-morf.
+Here we list a changelog of scikit-tree.
 
 .. contents:: Contents
    :local:
    :depth: 3
 
-.. currentmodule:: skmorf
+.. currentmodule:: sktree
 
 .. _current:
 
@@ -26,7 +26,7 @@ Version 0.1
 Changelog
 ---------
 
-- |Feature| Implement and test the :class:`skmorf.CPDAG` for CPDAGs, by `Adam Li`_ (:pr:`6`)
+- |Feature| Implement and test the :class:`sktree.CPDAG` for CPDAGs, by `Adam Li`_ (:pr:`6`)
 
 Code and Documentation Contributors
 -----------------------------------

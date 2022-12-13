@@ -8,7 +8,7 @@ API Documentation
 
 Classification
 --------------
-:py:mod:`scikit-morf`:
+:py:mod:`scikit-tree`:
 
 .. automodule:: scikit_morf
    :no-members:

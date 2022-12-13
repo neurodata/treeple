@@ -25,13 +25,13 @@ try:
     # This variable is injected in the __builtins__ by the build
     # process. It is used to enable importing subpackages of sklearn when
     # the binaries are not built
-    __SKMORF_SETUP__
+    __sktree_SETUP__
 except NameError:
-    __SKMORF_SETUP__ = False
+    __sktree_SETUP__ = False
 
-if __SKMORF_SETUP__:
-    sys.stderr.write("Partial import of skmorf during the build process.\n")
-    # We are not importing the rest of scikit-morf during the build
+if __sktree_SETUP__:
+    sys.stderr.write("Partial import of sktree during the build process.\n")
+    # We are not importing the rest of scikit-tree during the build
     # process, as it may not be compiled yet
 else:
     from . import __check_build

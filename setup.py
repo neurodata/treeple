@@ -17,25 +17,25 @@ from sklearn._build_utils import _check_cython_version  # noqa
 from sklearn.externals._packaging.version import parse as parse_version  # noqa
 
 
-DISTNAME = "scikit-morf"
+DISTNAME = "scikit-tree"
 DESCRIPTION = "A set of python modules for machine learning and data mining"
 with open("README.rst") as f:
     LONG_DESCRIPTION = f.read()
 MAINTAINER = "Andreas Mueller"
 MAINTAINER_EMAIL = "amueller@ais.uni-bonn.de"
-URL = "http://github.com/adam2392/scikit-morf.com"
-DOWNLOAD_URL = "https://pypi.org/project/scikit-morf/#files"
+URL = "http://github.com/neurodata/scikit-tree.com"
+DOWNLOAD_URL = "https://pypi.org/project/scikit-tree/#files"
 LICENSE = "new BSD"
 PROJECT_URLS = {
-    "Bug Tracker": "https://github.com/adam2392scikit-morf/issues",
-    "Source Code": "https://github.com/adam2392/scikit-morf",
+    "Bug Tracker": "https://github.com/adam2392scikit-tree/issues",
+    "Source Code": "https://github.com/neurodata/scikit-tree",
 }
 
 # We can actually import a restricted version of sklearn that
 # does not need the compiled code
-import skmorf  # noqa
+import sktree  # noqa
 
-VERSION = skmorf.__version__
+VERSION = sktree.__version__
 
 setup()
 
@@ -58,12 +58,12 @@ def check_package_status(package, min_version):
         package_status["up_to_date"] = False
         package_status["version"] = ""
 
-    req_str = "scikit-morf requires {} >= {}.\n".format(package, min_version)
+    req_str = "scikit-tree requires {} >= {}.\n".format(package, min_version)
 
     instructions = (
         "Installation instructions are available on the "
-        "scikit-morf website: "
-        "http://scikit-morf.org/stable/install.html\n"
+        "scikit-tree website: "
+        "http://scikit-tree.org/stable/install.html\n"
     )
 
     if package_status["up_to_date"] is False:
@@ -112,7 +112,7 @@ def configure_extension_modules():
     cython_exts = []
     for submodule, extensions in extension_config.items():
         submodule_parts = submodule.split(".")
-        parent_dir = join("skmorf", *submodule_parts)
+        parent_dir = join("sktree", *submodule_parts)
         for extension in extensions:
             if is_pypy and not extension.get("compile_for_pypy", True):
                 continue
@@ -141,9 +141,9 @@ def configure_extension_modules():
             # By convention, our extensions always use the name of the first source
             source_name = os.path.splitext(os.path.basename(sources[0]))[0]
             if submodule:
-                name_parts = ["skmorf", submodule, source_name]
+                name_parts = ["sktree", submodule, source_name]
             else:
-                name_parts = ["skmorf", source_name]
+                name_parts = ["sktree", source_name]
             name = ".".join(name_parts)
 
             # Make paths start from the root directory
