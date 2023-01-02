@@ -2,6 +2,7 @@ import numpy as np
 cimport numpy as cnp
 cnp.import_array()
 
+from .criterion import BaseCriterion
 
 cdef class UnsupervisedCriterion(BaseCriterion):
     """Abstract criterion for unsupervised learning.
