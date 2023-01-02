@@ -4,7 +4,8 @@
 # cython: linetrace=True
 
 from sklearn.tree._tree cimport SIZE_t, DTYPE_t, DOUBLE_t
-from sklearn.tree._criterion cimport BaseCriterion
+# from sklearn.tree._criterion cimport BaseCriterion
+from ._criterion cimport BaseCriterion
 
 
 # Note: This class is an exact copy of scikit-learn's Criterion
@@ -17,6 +18,7 @@ from sklearn.tree._criterion cimport BaseCriterion
 #
 # Other changes include the removal of "weighted" samples, which is
 # not needed since criterion are compuated on the data itself.
+
 cdef class UnsupervisedCriterion(BaseCriterion):
     """Abstract unsupervised criterion."""
 
