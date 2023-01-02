@@ -6,7 +6,6 @@
 # from sklearn.tree._criterion cimport BaseCriterion
 from sklearn.tree._tree cimport DOUBLE_t, DTYPE_t, SIZE_t
 
-
 # Note: This class is an exact copy of scikit-learn's Criterion
 # class, with the exception of the type of the internal structure.
 # In scikit-learn, they store a buffer for the y-labels, whereas here
@@ -14,17 +13,16 @@ from sklearn.tree._tree cimport DOUBLE_t, DTYPE_t, SIZE_t
 #
 # In our criterions, we do not store the 'y-labels' because there are none
 # in unsupervised learning. We instead store a memview of the dataset 'X'.
-#
-# Other changes include the removal of "weighted" samples, which is
-# not needed since criterion are compuated on the data itself.
-cdef class UnsupervisedCriterion:
+
+
+cdef class UnsupervisedCriterion(BaseCriterion):
     """Abstract unsupervised criterion."""
 
     # The criterion computes the impurity of a node and the reduction of
     # impurity of a split on that node. It also computes the output statistics.
 
     # Internal structures
-    cdef const DTYPE_t[:, ::1] X # 2D memview for values of X (i.e. feature values)
+    cdef const DTYPE_T[:,:] X # 2D memview for values of X (i.e. feature values)
 
     # TODO: WIP. Assumed the sum "metric" of node, left and right
     # XXX: this can possibly be defined in downstream classes instead as memoryviews.
@@ -41,8 +39,8 @@ cdef class UnsupervisedCriterion:
     # Unsupervised criterion can be used with splitter and tree methods.
     cdef int init(
         self,
-        const DOUBLE_t[:, ::1] X,
-        const DOUBLE_t[:] sample_weight,
+        const DOUBLE_t[:,:] X,
+        DOUBLE_t* sample_weight,
         double weighted_n_samples, 
         const SIZE_t[:] samples,
     ) nogil except -1
