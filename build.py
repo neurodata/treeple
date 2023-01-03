@@ -51,7 +51,7 @@ if with_extensions:
     extensions = [
         Extension(
             "*",
-            ["sktree/*.pyx"],
+            ["sktree/tree/*.pyx"],
             extra_compile_args=compile_args,
             extra_link_args=link_args,
             include_dirs=include_dirs,

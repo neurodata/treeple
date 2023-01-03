@@ -79,9 +79,6 @@ def check_package_status(package, min_version):
             )
 
 extension_config = {
-    "__check_build": [
-        {"sources": ["_check_build.pyx"]},
-    ],
     "tree": [
         {"sources": ["_unsup_criterion.pyx"], "language": "c++", "include_np": True},
     ],
