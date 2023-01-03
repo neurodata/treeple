@@ -78,7 +78,7 @@ NODE_DTYPE = np.asarray(<Node[:1]>(&dummy)).dtype
 cdef class UnsupervisedTreeBuilder:
     """Interface for different tree building strategies."""
 
-    cpdef build(self, Tree tree, object X, cnp.ndarray sample_weight=None):
+    cpdef build(self, UnsupervisedTree tree, object X, cnp.ndarray sample_weight=None):
         """Build a decision tree from the training set X."""
         pass
 
@@ -146,7 +146,7 @@ cdef class BestFirstTreeBuilder(UnsupervisedTreeBuilder):
     """
     cdef SIZE_t max_leaf_nodes
 
-    def __cinit__(self, Splitter splitter, SIZE_t min_samples_split,
+    def __cinit__(self, UnsupervisedSplitter splitter, SIZE_t min_samples_split,
                   SIZE_t min_samples_leaf,  min_weight_leaf,
                   SIZE_t max_depth, SIZE_t max_leaf_nodes,
                   double min_impurity_decrease):
@@ -158,19 +158,19 @@ cdef class BestFirstTreeBuilder(UnsupervisedTreeBuilder):
         self.max_leaf_nodes = max_leaf_nodes
         self.min_impurity_decrease = min_impurity_decrease
 
-    cpdef build(self, Tree tree, object X, cnp.ndarray y,
+    cpdef build(self, UnsupervisedTree tree, object X,
                 cnp.ndarray sample_weight=None):
-        """Build a decision tree from the training set (X, y)."""
+        """Build a decision tree from the training set X."""
 
         # check input
-        X, y, sample_weight = self._check_input(X, y, sample_weight)
+        X, sample_weight = self._check_input(X, sample_weight)
 
         # Parameters
-        cdef Splitter splitter = self.splitter
+        cdef UnsupervisedSplitter splitter = self.splitter
         cdef SIZE_t max_leaf_nodes = self.max_leaf_nodes
 
         # Recursive partition (without actual recursion)
-        splitter.init(X, y, sample_weight)
+        splitter.init(X, sample_weight)
 
         cdef vector[FrontierRecord] frontier
         cdef FrontierRecord record
@@ -256,7 +256,7 @@ cdef class BestFirstTreeBuilder(UnsupervisedTreeBuilder):
         if rc == -1:
             raise MemoryError()
 
-    cdef inline int _add_split_node(self, Splitter splitter, Tree tree,
+    cdef inline int _add_split_node(self, UnsupervisedSplitter splitter, UnsupervisedTree tree,
                                     SIZE_t start, SIZE_t end, double impurity,
                                     bint is_first, bint is_left, Node* parent,
                                     SIZE_t depth,
@@ -467,7 +467,7 @@ cdef class UnsupervisedTree:
 
     def __reduce__(self):
         """Reduce re-implementation, for pickling."""
-        return (Tree, (self.n_features,
+        return (UnsupervisedTree, (self.n_features,
                        sizet_ptr_to_ndarray(self.n_classes, self.n_outputs),
                        self.n_outputs), self.__getstate__())
 

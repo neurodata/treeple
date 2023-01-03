@@ -84,7 +84,7 @@ cdef class UnsupervisedTreeBuilder:
     # This class controls the various stopping criteria and the node splitting
     # evaluation order, e.g. depth-first or best-first.
 
-    cdef Splitter splitter              # Splitting algorithm
+    cdef UnsupervisedSplitter splitter              # Splitting algorithm
 
     cdef SIZE_t min_samples_split       # Minimum number of samples in an internal node
     cdef SIZE_t min_samples_leaf        # Minimum number of samples in a leaf
@@ -92,5 +92,5 @@ cdef class UnsupervisedTreeBuilder:
     cdef SIZE_t max_depth               # Maximal tree depth
     cdef double min_impurity_decrease   # Impurity threshold for early stopping
 
-    cpdef build(self, Tree tree, object X, cnp.ndarray sample_weight=*)
+    cpdef build(self, UnsupervisedTree tree, object X, cnp.ndarray sample_weight=*)
     cdef _check_input(self, object X, cnp.ndarray sample_weight)
