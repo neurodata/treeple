@@ -4,10 +4,9 @@
 
 # License: BSD 3 clause
 
-from ._splitter cimport BaseSplitter
-from ._unsup_splitter cimport UnsupervisedCriterion
+from ._unsup_criterion cimport UnsupervisedCriterion
 
-cdef class BaseSplitter:
+cdef class BaseUnsupervisedSplitter:
     """This is an abstract interface for splitters. 
 
     For example, a tree model could be either supervisedly, or unsupervisedly computing splits on samples of
