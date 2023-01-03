@@ -2,8 +2,6 @@ import numpy as np
 cimport numpy as cnp
 cnp.import_array()
 
-from .criterion import BaseCriterion
-
 cdef class UnsupervisedCriterion(BaseCriterion):
     """Abstract criterion for unsupervised learning.
     
@@ -46,7 +44,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         pass
 
 
-cdef class TwoMeans(Criterion):
+cdef class TwoMeans(UnsupervisedCriterion):
     r"""Two means split impurity.
 
     The two means split finds the cutpoint that minimizes the one-dimensional
