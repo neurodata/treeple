@@ -1,14 +1,14 @@
+import builtins
 import os
 import shutil
 import sys
+from distutils.command.build_ext import build_ext
+from distutils.core import Distribution, Extension
+from distutils.errors import DistutilsPlatformError
+
 import numpy as np
-import builtins
 
 import sktree
-from distutils.command.build_ext import build_ext
-from distutils.core import Distribution
-from distutils.core import Extension
-from distutils.errors import DistutilsPlatformError
 
 # This is a bit (!) hackish: we are setting a global variable so that the
 # main sklearn __init__ can detect if it is being loaded by the setup
@@ -26,16 +26,16 @@ DEFINE_MACRO_NUMPY_C_API = (
 )
 
 compile_args = [
-    # "-march=native", 
-    "-O3", 
+    # "-march=native",
+    "-O3",
     # "-msse", "-msse2", "-mfma", "-mfpmath=sse"
-    ]
+]
 link_args = []
 include_dirs = [np.get_include()]
 libraries = []
 if os.name == "posix":
     libraries.append("m")
-languages = ['c++']
+languages = ["c++"]
 
 # C/C++/Cython Extensions
 # If you are interested in defining C extensions, then take a look at
@@ -91,10 +91,10 @@ class ExtBuilder(build_ext):
         # see above.
         for ext in self.extensions:
             ext.define_macros.append(DEFINE_MACRO_NUMPY_C_API)
-        
+
         # we also define compile time extras, which will
         # allow each extension to be built with for example
-        # openMP support. We look inside our repo for 
+        # openMP support. We look inside our repo for
         # whether or not OPENMP is supported or not.
         if sktree._OPENMP_SUPPORTED:
             openmp_flag = get_openmp_flag(self.compiler)
@@ -113,7 +113,6 @@ class ExtBuilder(build_ext):
                 "  Unable to build the C extensions, "
                 "scikit-tree will use the pure python code instead."
             )
-
 
 
 def build(setup_kwargs):

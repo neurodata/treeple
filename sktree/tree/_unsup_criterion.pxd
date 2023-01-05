@@ -3,8 +3,8 @@
 # cython: language_level=3
 # cython: linetrace=True
 
-from sklearn.tree._tree cimport SIZE_t, DTYPE_t, DOUBLE_t
 from sklearn.tree._criterion cimport BaseCriterion
+from sklearn.tree._tree cimport DOUBLE_t, DTYPE_t, SIZE_t
 
 
 # Note: This class is an exact copy of scikit-learn's Criterion

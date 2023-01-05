@@ -40,8 +40,8 @@ jobs:
       - run:
           name: Install the latest version of Poetry
           command: |
-            curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | POETRY_UNINSTALL=1 python -
-            curl -sSL https://install.python-poetry.org | python3 -
+            curl -sSL https://install.python-poetry.org | python3 - --version 1.3.0
+            poetry --version
 
       - python/install-packages:
           pkg-manager: poetry
@@ -68,8 +68,7 @@ jobs:
       - run:
           name: Build documentation
           command: |
-            cd docs
-            poetry run make html
+            poetry run poe build_docs
 
       # Save the example test results
       - store_test_results:

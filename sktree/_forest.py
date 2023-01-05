@@ -13,13 +13,14 @@ Single and multi-output problems are both handled.
 # License: BSD 3 clause
 
 from sklearn.base import TransformerMixin
-from sklearn.ensemble._forest import ForestClassifier, BaseForest
+from sklearn.ensemble._forest import BaseForest, ForestClassifier
 
 from .tree import UnsupervisedDecisionTree
 
 
 class UnsupervisedRandomForest(TransformerMixin, BaseForest):
-    def __init__(self,
+    def __init__(
+        self,
         n_estimators=100,
         *,
         estimator_params=tuple(),
@@ -41,11 +42,11 @@ class UnsupervisedRandomForest(TransformerMixin, BaseForest):
             random_state=random_state,
             verbose=verbose,
             warm_start=warm_start,
-            max_samples=max_samples)·
+            max_samples=max_samples,
+        )
 
     def fit_transform(self, X, y=None, sample_weight=None):
         super().fit(X, y, sample_weight)
-·
         # apply to the leaves
         output = self.apply(X)
         return output

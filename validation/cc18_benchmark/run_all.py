@@ -1,30 +1,26 @@
+import argparse
+import collections
+import logging
+import os
+import pickle
+import time
+from pathlib import Path
+
 import numpy as np
 import openml
-import pickle
-import logging
-import time
-from tqdm import tqdm
-import os
-from pathlib import Path
-import collections
-
 from joblib import Parallel, delayed
-
-from sklearn.ensemble import RandomForestClassifier
+from oblique_forests.ensemble import RandomForestClassifier as ObliqueRF
+from oblique_forests.sporf import ObliqueForestClassifier as ObliqueSPORF
+from rerf.rerfClassifier import rerfClassifier
 from sklearn.calibration import CalibratedClassifierCV
-from sklearn.model_selection import StratifiedKFold
-from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.impute import SimpleImputer
 from sklearn.metrics import cohen_kappa_score
-
-from oblique_forests.sporf import ObliqueForestClassifier as ObliqueSPORF
-from oblique_forests.ensemble import RandomForestClassifier as ObliqueRF
-
-from rerf.rerfClassifier import rerfClassifier
-
-import argparse
+from sklearn.model_selection import StratifiedKFold
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from tqdm import tqdm
 
 
 def _check_nested_equality(lst1, lst2):
@@ -43,7 +39,7 @@ def _check_nested_equality(lst1, lst2):
 def stratify_samplesizes(y, block_lengths):
     """
     Sort data and labels into blocks that preserve class balance
-    
+
     Parameters
     ----------
     X: data matrix
@@ -52,7 +48,7 @@ def stratify_samplesizes(y, block_lengths):
     """
     clss, counts = np.unique(y, return_counts=True)
     ratios = counts / sum(counts)
-    class_idxs = [np.where(y==i)[0] for i in clss]
+    class_idxs = [np.where(y == i)[0] for i in clss]
 
     sort_idxs = []
     prior_idxs = np.zeros(len(clss)).astype(int)
@@ -76,10 +72,11 @@ def train_test(X, y, task_name, task_id, nominal_indices, args, clfs, save_path,
     if args.vary_samples:
         sample_sizes = np.logspace(
             np.log10(n_classes * 2),
-            np.log10(np.floor(len(y)*(args.cv-1.1)/args.cv)),
+            np.log10(np.floor(len(y) * (args.cv - 1.1) / args.cv)),
             num=10,
             endpoint=True,
-            dtype=int)        
+            dtype=int,
+        )
     else:
         sample_sizes = [len(y)]
 
@@ -99,7 +96,7 @@ def train_test(X, y, task_name, task_id, nominal_indices, args, clfs, save_path,
     }
 
     if len(nominal_indices) == n_features:
-        print(f'Skipping task: {task_name}, {task_id} because all features are nominal')
+        print(f"Skipping task: {task_name}, {task_id} because all features are nominal")
         return
 
     # get the original numerical indices
@@ -111,8 +108,9 @@ def train_test(X, y, task_name, task_id, nominal_indices, args, clfs, save_path,
     # Numeric Preprocessing
     numeric_transformer = Pipeline(
         steps=[
-            ('imputer', SimpleImputer(strategy="median")),
-            ('standardizer', StandardScaler()),]
+            ("imputer", SimpleImputer(strategy="median")),
+            ("standardizer", StandardScaler()),
+        ]
     )
 
     # Nominal preprocessing
@@ -122,7 +120,7 @@ def train_test(X, y, task_name, task_id, nominal_indices, args, clfs, save_path,
     #         ("onehot", OneHotEncoder(handle_unknown="ignore", sparse=False)),
     #     ]
     # )
-    
+
     transformers = []
     numeric_indices = np.arange(X.shape[1])
     # Get numeric indices first
@@ -134,7 +132,9 @@ def train_test(X, y, task_name, task_id, nominal_indices, args, clfs, save_path,
 
     _, n_features_fitted = preprocessor.fit_transform(X, y).shape
     results_dict["n_features_fitted"] = n_features_fitted
-    print(f'Features={n_features}, nominal={len(nominal_indices)} (After transforming={n_features_fitted})')
+    print(
+        f"Features={n_features}, nominal={len(nominal_indices)} (After transforming={n_features_fitted})"
+    )
 
     for clf_name, clf in clfs:
         pipeline = Pipeline(steps=[("Preprocessor", preprocessor), ("Estimator", clf)])
@@ -166,12 +166,18 @@ def train_test(X, y, task_name, task_id, nominal_indices, args, clfs, save_path,
             for n_samples in sample_sizes:
                 start_time = time.time()
                 # Fix too few samples for internal CV of these methods
-                if clf_name in ['IRF', 'SigRF'] and np.min(np.unique(y_train[:n_samples], return_counts=True)[1]) < 5:
-                    print(f'{clf_name} requires more samples of minimum class. Skipping n={n_samples}')
+                if (
+                    clf_name in ["IRF", "SigRF"]
+                    and np.min(np.unique(y_train[:n_samples], return_counts=True)[1]) < 5
+                ):
+                    print(
+                        f"{clf_name} requires more samples of minimum class. Skipping n={n_samples}"
+                    )
                     y_proba = np.repeat(
                         np.bincount(y_train[:n_samples]).reshape(1, -1) / len(y_train[:n_samples]),
                         X_test.shape[0],
-                        axis=0)
+                        axis=0,
+                    )
                     # y_proba_oob = y_proba
                     train_time = time.time() - start_time
                 else:
@@ -188,11 +194,13 @@ def train_test(X, y, task_name, task_id, nominal_indices, args, clfs, save_path,
                 results_dict[f"{clf_name}_metadata"]["test_times"].append(test_time)
 
             fold_probas.append(probas_vs_sample_sizes)
-            print(f'{clf_name} Time: train_time={train_time:.3f}, test_time={test_time:.3f}, Cohen Kappa={cohen_kappa_score(y_test, y_proba.argmax(1)):.3f}')
-        
+            print(
+                f"{clf_name} Time: train_time={train_time:.3f}, test_time={test_time:.3f}, Cohen Kappa={cohen_kappa_score(y_test, y_proba.argmax(1)):.3f}"
+            )
+
         results_dict[clf_name] = fold_probas
     # If existing data, load and append to. Else save
-    if os.path.isfile(save_path) and args.mode == 'OVERWRITE':
+    if os.path.isfile(save_path) and args.mode == "OVERWRITE":
         logging.info(f"OVERWRITING {task_name} ({task_id})")
         with open(save_path, "rb") as f:
             prior_results = pickle.load(f)
@@ -210,11 +218,12 @@ def train_test(X, y, task_name, task_id, nominal_indices, args, clfs, save_path,
             "cv",
             "nominal_features",
             "n_features_fitted",
-            "sample_sizes"
+            "sample_sizes",
         ]
         for key in verify_keys:
-            assert _check_nested_equality(prior_results[key], results_dict[key]), \
-                f'OVERWRITE {key} does not match saved value'
+            assert _check_nested_equality(
+                prior_results[key], results_dict[key]
+            ), f"OVERWRITE {key} does not match saved value"
 
         # Replace/add data
         replace_keys = [name for name, _ in clfs]
@@ -236,11 +245,9 @@ def run_cc18(args, clfs, data_dir, random_state):
     )
 
     for key, val in vars(args).items():
-        logging.info(f'{key}={val}')
+        logging.info(f"{key}={val}")
 
-    benchmark_suite = openml.study.get_suite(
-        "OpenML-CC18"
-    )  # obtain the benchmark suite
+    benchmark_suite = openml.study.get_suite("OpenML-CC18")  # obtain the benchmark suite
 
     folder = data_dir / f"sporf_benchmarks/rerf/results_cv{args.cv}_features={args.max_features}"
 
@@ -255,8 +262,8 @@ def run_cc18(args, clfs, data_dir, random_state):
                 break
             except Exception as e:
                 attempts += 1
-                time.sleep(2) # Number of seconds
-                print('Trying again...')
+                time.sleep(2)  # Number of seconds
+                print("Trying again...")
 
         task_name = task.get_dataset().name
 
@@ -268,7 +275,7 @@ def run_cc18(args, clfs, data_dir, random_state):
             if not os.path.isfile(save_path):
                 logging.info(f"OVERWRITE MODE: Skipping {task_name} (doesn't  exist)")
                 return
-        elif args.mode == 'APPEND' and os.path.isfile(save_path):
+        elif args.mode == "APPEND" and os.path.isfile(save_path):
             logging.info(f"APPEND MODE: Skipping {task_name} (already exists)")
             return
 
@@ -277,49 +284,66 @@ def run_cc18(args, clfs, data_dir, random_state):
 
         X, y = task.get_X_and_y()  # get the data
 
-        nominal_indices = task.get_dataset().get_features_by_type(
-            "nominal", [task.target_name]
-        )
+        nominal_indices = task.get_dataset().get_features_by_type("nominal", [task.target_name])
         try:
-            train_test(X, y, task_name, task_id, nominal_indices, args, clfs, save_path, random_state=random_state)
+            train_test(
+                X,
+                y,
+                task_name,
+                task_id,
+                nominal_indices,
+                args,
+                clfs,
+                save_path,
+                random_state=random_state,
+            )
         except Exception as e:
-            print(f"Test {task_name} ({task_id}) Failed | X.shape={X.shape} | {len(nominal_indices)} nominal indices")
+            print(
+                f"Test {task_name} ({task_id}) Failed | X.shape={X.shape} | {len(nominal_indices)} nominal indices"
+            )
             print(e)
             logging.error(
                 f"Test {task_name} ({task_id}) Failed | X.shape={X.shape} | {len(nominal_indices)} nominal indices"
             )
             import traceback
+
             logging.error(e)
             traceback.sprint_exc()
 
     task_ids_to_run = []
     for task_id in benchmark_suite.tasks:
         if args.start_id is not None and task_id < args.start_id:
-            print(f'Skipping task_id={task_id}')
-            logging.info(f'Skipping task_id={task_id}')
+            print(f"Skipping task_id={task_id}")
+            logging.info(f"Skipping task_id={task_id}")
             continue
         if args.stop_id is not None and task_id >= args.stop_id:
-            print(f'Stopping at task_id={task_id}')
-            logging.info(f'Stopping at task_id={task_id}')
+            print(f"Stopping at task_id={task_id}")
+            logging.info(f"Stopping at task_id={task_id}")
             break
         task_ids_to_run.append(task_id)
 
     if args.parallel_tasks is not None and args.parallel_tasks > 1:
         Parallel(n_jobs=args.parallel_tasks, verbose=1)(
-            delayed(_run_task_helper)(
-                    task_id
-                    ) for task_id in tqdm(task_ids_to_run)
-                )
+            delayed(_run_task_helper)(task_id) for task_id in tqdm(task_ids_to_run)
+        )
     else:
         for task_id in tqdm(task_ids_to_run):  # iterate over all tasks
             _run_task_helper(task_id)
 
+
 parser = argparse.ArgumentParser(description="Run CC18 dataset.")
-parser.add_argument("--mode", action="store", default="CREATE", choices=["OVERWRITE", "CREATE", "APPEND"])
+parser.add_argument(
+    "--mode", action="store", default="CREATE", choices=["OVERWRITE", "CREATE", "APPEND"]
+)
 parser.add_argument("--cv", action="store", type=int, default=10)
 parser.add_argument("--n_estimators", action="store", type=int, default=500)
 parser.add_argument("--n_jobs", action="store", type=int, default=12)
-parser.add_argument("--max_features", action="store", default='sqrt', help="Either an integer, float, or string in {'sqrt', 'log2'}. Default uses all features.")
+parser.add_argument(
+    "--max_features",
+    action="store",
+    default="sqrt",
+    help="Either an integer, float, or string in {'sqrt', 'log2'}. Default uses all features.",
+)
 parser.add_argument("--start_id", action="store", type=int, default=None)
 parser.add_argument("--stop_id", action="store", type=int, default=None)
 # parser.add_argument("--honest_prior", action="store", default="ignore", choices=["ignore", "uniform", "empirical"])
@@ -338,7 +362,7 @@ except:
     except:
         pass
 
-print(f'Max features is: {max_features}')
+print(f"Max features is: {max_features}")
 random_state = 12345
 
 clfs = [
@@ -348,8 +372,8 @@ clfs = [
             n_estimators=args.n_estimators,
             max_features=max_features,
             n_jobs=args.n_jobs,
-            random_state=random_state
-        )
+            random_state=random_state,
+        ),
     ),
     # (
     #     "Oblique-RF",
@@ -373,16 +397,16 @@ clfs = [
         ObliqueSPORF(
             n_estimators=args.n_estimators,
             max_features=max_features,
-            feature_combinations = 1.5,
+            feature_combinations=1.5,
             n_jobs=args.n_jobs,
-            random_state=random_state
-        )
+            random_state=random_state,
+        ),
     ),
 ]
 
 
-data_dir = Path('/mnt/ssd3/ronan/')
-data_dir = Path('/home/adam2392/Downloads/cysporf_vs_rf_without_nominal')
+data_dir = Path("/mnt/ssd3/ronan/")
+data_dir = Path("/home/adam2392/Downloads/cysporf_vs_rf_without_nominal")
 run_cc18(args, clfs, data_dir, random_state=random_state)
 # python run_all.py --mode CREATE --n_jobs 45 --max_features sqrt --stop_id 29 --honest_prior ignore --uf_kappa 1.5
 # python run_all.py --mode CREATE --n_jobs 45 --max_features 0.33 --honest_prior ignore

@@ -1,14 +1,16 @@
 import logging
-import numpy as np
-import timeit
 import sys
+import timeit
 from collections import defaultdict
 from pathlib import Path
 
+import numpy as np
 from oblique_forests.ensemble import RandomForestClassifier
 from oblique_forests.sporf import ObliqueForestClassifier, PythonObliqueForestClassifier
 
-sys.path.append("/Users/ChesterHuynh/OneDrive - Johns Hopkins/research/seeg localization/SPORF/Python")
+sys.path.append(
+    "/Users/ChesterHuynh/OneDrive - Johns Hopkins/research/seeg localization/SPORF/Python"
+)
 from rerf.rerfClassifier import rerfClassifier
 
 
@@ -31,13 +33,12 @@ def load_data(n, data_path, exp_name):
 
 def main():
     logging.basicConfig(
-        filename=Path(__file__).parents[0] / "runtime_performance.log", 
+        filename=Path(__file__).parents[0] / "runtime_performance.log",
         format="%(asctime)s:%(levelname)s:%(message)s",
-        level=logging.INFO
+        level=logging.INFO,
     )
     data_path = Path(__file__).parents[0] / "data"
-    exps = {"sparse_parity" : [1000, 5000, 10000],
-            "orthant" : [400, 2000, 4000]}
+    exps = {"sparse_parity": [1000, 5000, 10000], "orthant": [400, 2000, 4000]}
     n_reps = 7  # Number of times to execute fit
 
     # Experiment parameters
@@ -55,37 +56,66 @@ def main():
             # ==================================
             # Sklearn RF
             # ==================================
-            clf = RandomForestClassifier(n_estimators=n_estimators, max_features=max_features, n_jobs=n_jobs)
-            timings = timeit.repeat("clf.fit(X_train, y_train)", repeat=n_reps, number=1, 
-                                    globals={"clf": clf, "X_train": X_train, "y_train": y_train})
+            clf = RandomForestClassifier(
+                n_estimators=n_estimators, max_features=max_features, n_jobs=n_jobs
+            )
+            timings = timeit.repeat(
+                "clf.fit(X_train, y_train)",
+                repeat=n_reps,
+                number=1,
+                globals={"clf": clf, "X_train": X_train, "y_train": y_train},
+            )
             n_list["SklearnRF"] = timings
 
             # ==================================
             # C++ RF
             # ==================================
-            clf = rerfClassifier(n_estimators=n_estimators, projection_matrix="Base",
-                                 max_features=max_features, n_jobs=n_jobs)
-            timings = timeit.repeat("clf.fit(X_train, y_train)", repeat=n_reps, number=1, 
-                                    globals={"clf": clf, "X_train": X_train, "y_train": y_train})
+            clf = rerfClassifier(
+                n_estimators=n_estimators,
+                projection_matrix="Base",
+                max_features=max_features,
+                n_jobs=n_jobs,
+            )
+            timings = timeit.repeat(
+                "clf.fit(X_train, y_train)",
+                repeat=n_reps,
+                number=1,
+                globals={"clf": clf, "X_train": X_train, "y_train": y_train},
+            )
             n_list["ReRF-Base"] = timings
 
             # ==================================
             # C++ SPORF
             # ==================================
-            clf = rerfClassifier(n_estimators=n_estimators, projection_matrix="RerF",
-                                 max_features=max_features, n_jobs=n_jobs)
-            timings = timeit.repeat("clf.fit(X_train, y_train)", repeat=n_reps, number=1, 
-                                    globals={"clf": clf, "X_train": X_train, "y_train": y_train})
+            clf = rerfClassifier(
+                n_estimators=n_estimators,
+                projection_matrix="RerF",
+                max_features=max_features,
+                n_jobs=n_jobs,
+            )
+            timings = timeit.repeat(
+                "clf.fit(X_train, y_train)",
+                repeat=n_reps,
+                number=1,
+                globals={"clf": clf, "X_train": X_train, "y_train": y_train},
+            )
             n_list["ReRF-Sporf"] = timings
 
             # ==================================
             # Cython SPORF
             # ==================================
-            clf = ObliqueForestClassifier(n_estimators=n_estimators,
-                                          feature_combinations=feature_combinations,
-                                          max_features=max_features, n_jobs=n_jobs)
-            timings = timeit.repeat("clf.fit(X_train, y_train)", repeat=n_reps, number=1, 
-                                    globals={"clf": clf, "X_train": X_train, "y_train": y_train})
+            clf = ObliqueForestClassifier(
+                n_estimators=n_estimators,
+                feature_combinations=feature_combinations,
+                max_features=max_features,
+                n_jobs=n_jobs,
+            )
+            timings = timeit.repeat(
+                "clf.fit(X_train, y_train)",
+                repeat=n_reps,
+                number=1,
+                globals={"clf": clf, "X_train": X_train, "y_train": y_train},
+            )
             n_list["Cy-Sporf"] = timings
 
             logging.info(f"Results for {exp_name}{n}")
@@ -100,7 +130,9 @@ def main():
                 if std < 1.0:
                     unit_std = "ms"
                     std *= 1000
-                logging.info(f"{clf_name}: {mean} {unit_mean} ± {std} {unit_std} per loop (mean ± std. dev. of {n_reps} runs, 1 loop each)")
+                logging.info(
+                    f"{clf_name}: {mean} {unit_mean} ± {std} {unit_std} per loop (mean ± std. dev. of {n_reps} runs, 1 loop each)"
+                )
 
 
 if __name__ == "__main__":

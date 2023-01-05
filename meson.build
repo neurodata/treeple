@@ -29,17 +29,6 @@ elif cc.get_id() == 'msvc'
   endif
 endif
 
-# TODO: the below -Wno flags are all needed to silence warnings in
-# f2py-generated code. This should be fixed in f2py itself.
-_global_c_args = cc.get_supported_arguments(
-  '-Wno-unused-but-set-variable',
-  '-Wno-unused-function',
-  '-Wno-conversion',
-  '-Wno-misleading-indentation',
-  '-Wno-incompatible-pointer-types',
-)
-add_project_arguments(_global_c_args, language : 'c')
-
 # We need -lm for all C code (assuming it uses math functions, which is safe to
 # assume for scikit-tree). For C++ it isn't needed, because libstdc++/libc++ is
 # guaranteed to depend on it. For Fortran code, Meson already adds `-lm`.
@@ -48,20 +37,6 @@ if m_dep.found()
   add_project_link_arguments('-lm', language : 'c')
 endif
 
-# Hide symbols when building on Linux with GCC. For Python extension modules,
-# we only need `PyInit_*` to be public, anything else may cause problems. So we
-# use a linker script to avoid exporting those symbols (this is in addition to
-# Meson using `-fvisibility=hidden` for C and `-fvisibility-inlines-hidden` for
-# C++ code. See gh-15996 for details.
-# _linker_script = meson.project_source_root() / 'sktree/_build_utils/link-version-pyinit.map'
-# version_link_args = ['-Wl,--version-script=' + _linker_script]
-# # Note that FreeBSD only accepts version scripts when -shared is passed,
-# # hence we need to pass that to `cc.links` explicitly (flag is already
-# # present for `extension_module` invocations).
-# if not cc.links('', name: '-Wl,--version-script', args: ['-shared', version_link_args])
-#   version_link_args = []
-# endif
-
 cython = find_program('cython')
 
 # https://mesonbuild.com/Python-module.html
@@ -69,6 +44,9 @@ py_mod = import('python')
 # NOTE: with Meson >=0.64.0 we can add `pure: false` here and remove that line
 # everywhere else, see https://github.com/mesonbuild/meson/pull/10783.
 py3 = py_mod.find_installation()
+if py3.language_version().version_compare('<3.8')
+    error('At least Python 3.8 is required.')
+endif
 py3_dep = py3.dependency()
 
 subdir('sktree')
