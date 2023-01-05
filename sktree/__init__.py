@@ -34,7 +34,7 @@ if __sktree_SETUP__:
     # We are not importing the rest of scikit-tree during the build
     # process, as it may not be compiled yet
 else:
-    from . import __check_build
+    from . import tree
     from sklearn.utils._show_versions import show_versions
 
     __all__ = ["tree"]

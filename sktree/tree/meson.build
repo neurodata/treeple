@@ -15,7 +15,7 @@ endforeach
 # TODO: comment in _classes.py when we have a working Cython unsupervised tree with a Python API
 python_sources = [
   '__init__.py',
-#   '_classes.py',
+  '_classes.py',
 ]
 
 py3.install_sources(

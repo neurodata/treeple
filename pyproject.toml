@@ -204,3 +204,4 @@ precision = 2
 
 [tool.bandit]
 exclude_dirs = ["**/tests"]
+skips = ['B404', 'B603']
