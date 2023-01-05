@@ -57,7 +57,7 @@ class UnsupervisedRandomForest(TransformerMixin, BaseForest):
         max_samples=None,
     ) -> None:
         super().__init__(
-            estimator=UnsupervisedDecisionTree(),
+            estimator=UnsupervisedDecisionTree(),  # type: ignore
             n_estimators=n_estimators,
             estimator_params=estimator_params,
             bootstrap=bootstrap,

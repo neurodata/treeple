@@ -25,7 +25,7 @@ try:
     # This variable is injected in the __builtins__ by the build
     # process. It is used to enable importing subpackages of sklearn when
     # the binaries are not built
-    __sktree_SETUP__
+    __sktree_SETUP__  # type: ignore
 except NameError:
     __sktree_SETUP__ = False
 
