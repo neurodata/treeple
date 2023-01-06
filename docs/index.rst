@@ -19,7 +19,6 @@ Contents
 
    whats_new
    install
-   api
    use
 
 Indices and tables

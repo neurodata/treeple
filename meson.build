@@ -37,13 +37,22 @@ if m_dep.found()
   add_project_link_arguments('-lm', language : 'c')
 endif
 
-cython = find_program('cython')
+cython = find_program(
+  'cython',
+  required: true
+)
+if not cython.found()
+  error('MESON_BUILD_FAILED: Cython3 not found. Please install it.')
+endif
 
 # https://mesonbuild.com/Python-module.html
-py_mod = import('python')
+py3_mod = import('python')
+py3 = py3_mod.find_installation('python3')
+message(py3.full_path())
+message(py3.get_install_dir())
+# py_mod = find_program('python')
 # NOTE: with Meson >=0.64.0 we can add `pure: false` here and remove that line
 # everywhere else, see https://github.com/mesonbuild/meson/pull/10783.
-py3 = py_mod.find_installation()
 if py3.language_version().version_compare('<3.8')
     error('At least Python 3.8 is required.')
 endif

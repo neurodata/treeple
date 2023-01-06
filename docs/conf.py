@@ -45,7 +45,7 @@ gh_url = "https://github.com/neurodata/scikit-tree"
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = "4.0"
+needs_sphinx = "5.0"
 
 # The document name of the “root” document, that is, the document that contains
 # the root toctree directive.
@@ -61,11 +61,12 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.linkcode",
     "sphinx.ext.mathjax",
-    "numpydoc",
+    "sphinx.ext.viewcode",
+    "sphinx_issues",
     "sphinxcontrib.bibtex",
     "sphinx_copybutton",
     "sphinx_gallery.gen_gallery",
-    "sphinx_issues",
+    "numpydoc",
 ]
 
 templates_path = ["_templates"]
@@ -120,11 +121,7 @@ html_context = {
     "pygment_light_style": "tango",
     "pygment_dark_style": "native",
     "versions_dropdown": {
-        "dev": "v0.5 (devel)",
-        "stable": "v0.4",
-        "v0.3": "v0.3",
-        "v0.2": "v0.2",
-        "v0.1": "v0.1",
+        "dev": "v0.1 (devel)",
     },
 }
 

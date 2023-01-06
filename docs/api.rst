@@ -10,13 +10,15 @@ Classification
 --------------
 :py:mod:`sktree`:
 
-.. automodule:: skmorf
+.. automodule:: sktree
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: skmorf
+.. currentmodule:: sktree
 
 .. autosummary::
    :toctree: generated/
+   
+   UnsupervisedRandomForest
 
     

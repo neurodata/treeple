@@ -35,6 +35,7 @@ if __sktree_SETUP__:
     # process, as it may not be compiled yet
 else:
     from . import tree
+    from ._forest import UnsupervisedRandomForest
     from sklearn.utils._show_versions import show_versions
 
-    __all__ = ["tree"]
+    __all__ = ["tree", "UnsupervisedRandomForest"]

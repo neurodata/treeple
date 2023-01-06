@@ -26,7 +26,7 @@ Version 0.1
 Changelog
 ---------
 
-- |Feature| Implement and test the :class:`sktree.CPDAG` for CPDAGs, by `Adam Li`_ (:pr:`6`)
+- 
 
 Code and Documentation Contributors
 -----------------------------------

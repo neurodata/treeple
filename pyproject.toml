@@ -24,7 +24,7 @@ include = [
     { path = "meson.build", format = "sdist" },
 ]
 
-[tool.poetry.build]
+# [tool.poetry.build]
 # generate-setup-file = false
 # script = "build.py"
 
@@ -75,7 +75,7 @@ files = ["sktree/__init__.py"]
 python = ">=3.8,<3.11"
 numpy = "^1.23.0"
 scipy = "^1.9.0"
-scikit-learn = "^1.1.0"
+scikit-learn = { git = "https://github.com/neurodata/scikit-learn.git", branch = 'split' }
 importlib-resources = { version = "*", python = "<3.9" }
 
 [tool.poetry.group.test]
@@ -130,7 +130,7 @@ _apply_version = 'semversioner release'
 
 type_check = 'mypy -p sktree --config-file pyproject.toml'
 unit_test = 'pytest ./sktree --cov=sktree --cov-report=xml --cov-config=pyproject.toml'
-build_docs = 'make -C docs/ clean; make -C docs/ html-noplot'
+build_docs = 'make -C docs/ clean html-noplot'
 clean = { shell = 'rm -rf builddir; rm -rf clean; rm -rf build; rm -rf _build; rm -rf dist;' }
 
 [[tool.poe.tasks.lint]]

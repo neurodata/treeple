@@ -59,7 +59,7 @@ jobs:
           name: Check installation
           command: |
             poetry run which python
-            poetry run python -c "import sklearn; sklearn.utils.show_versions()"
+            poetry run python -c "import sklearn; sklearn.utils._show_versions.show_versions()"
             poetry run python -c "import sktree;"
             poetry run python -c "import numpy; numpy.show_config()"
             poetry run LIBGL_DEBUG=verbose python -c "import matplotlib.pyplot as plt; plt.figure()"

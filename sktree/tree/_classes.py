@@ -1,5 +1,6 @@
 from sklearn.tree import BaseDecisionTree
 
+from ._unsup_criterion import UnsupervisedCriterion
 
 class UnsupervisedDecisionTree(BaseDecisionTree):
     """Unsupervised decision tree.
