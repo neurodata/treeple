@@ -138,8 +138,8 @@ cdef inline void _add_to_frontier(
     push_heap(frontier.begin(), frontier.end(), &_compare_records)
 
 
-cdef class BestFirstTreeBuilder(UnsupervisedTreeBuilder):
-    """Build a decision tree in best-first fashion.
+cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
+    """Build an unsupervised decision tree in best-first fashion.
 
     The best node to expand is given by the node at the frontier that has the
     highest impurity improvement.
@@ -163,6 +163,7 @@ cdef class BestFirstTreeBuilder(UnsupervisedTreeBuilder):
         """Build a decision tree from the training set X."""
 
         # check input
+        # TODO: refactor _check_input
         X, sample_weight = self._check_input(X, sample_weight)
 
         # Parameters
