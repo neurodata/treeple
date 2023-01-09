@@ -3,7 +3,7 @@
 # cython: language_level=3
 # cython: linetrace=True
 
-from sklearn.tree._criterion cimport BaseCriterion
+# from sklearn.tree._criterion cimport BaseCriterion
 from sklearn.tree._tree cimport DOUBLE_t, DTYPE_t, SIZE_t
 
 
@@ -17,7 +17,7 @@ from sklearn.tree._tree cimport DOUBLE_t, DTYPE_t, SIZE_t
 #
 # Other changes include the removal of "weighted" samples, which is
 # not needed since criterion are compuated on the data itself.
-cdef class UnsupervisedCriterion(BaseCriterion):
+cdef class UnsupervisedCriterion:
     """Abstract unsupervised criterion."""
 
     # The criterion computes the impurity of a node and the reduction of

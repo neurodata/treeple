@@ -19,7 +19,6 @@ classifiers = [
     'Programming Language :: Python :: 3.10',
 ]
 keywords = ['tree', 'oblique trees', 'manifold-learning', 'scikit-learn']
-
 include = [
     { path = "meson.build", format = "sdist" },
 ]
@@ -31,7 +30,7 @@ include = [
 [build-system]
 build-backend = "mesonpy"
 requires = [
-    "meson-python>=0.11.0",
+    "meson-python>=0.12.0",
     # `wheel` is needed for non-isolated builds, given that `meson-python`
     # doesn't list it as a runtime requirement (at least in 0.10.0)
     # See https://github.com/FFY00/meson-python/blob/main/pyproject.toml#L4
@@ -40,6 +39,7 @@ requires = [
     "packaging",
     "Cython>=0.29.24",
     "scikit-learn",
+    # "scikit-learn" = { git = "https://github.com/neurodata/scikit-learn.git", branch = 'split' }
     "lazy_loader>=0.1",
 
     # We follow scipy for much of these pinnings

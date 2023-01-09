@@ -5,7 +5,7 @@ cimport numpy as cnp
 cnp.import_array()
 
 
-cdef class UnsupervisedCriterion(BaseCriterion):
+cdef class UnsupervisedCriterion:
     """Abstract criterion for unsupervised learning.
     
     This object is a copy of the Criterion class of scikit-learn, but is used

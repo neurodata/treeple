@@ -15,6 +15,10 @@ import sys
 def main():
     in_fname, out_fname = (op.abspath(p) for p in sys.argv[1:3])
 
+    print('inside cythoner: ')
+    print('input file: ', in_fname)
+    print('output file: ', out_fname)
+
     sbp.run(
         [
             "cython",
