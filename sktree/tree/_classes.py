@@ -1,6 +1,5 @@
 from sklearn.tree import BaseDecisionTree
 
-from ._unsup_criterion import UnsupervisedCriterion
 
 class UnsupervisedDecisionTree(BaseDecisionTree):
     """Unsupervised decision tree.
@@ -57,3 +56,6 @@ class UnsupervisedDecisionTree(BaseDecisionTree):
             random_state=random_state,
             min_impurity_decrease=min_impurity_decrease,
         )
+
+    def fit(self, X, y=None, sample_weight=None, check_input=True):
+        return super().fit(X, y, sample_weight, check_input)

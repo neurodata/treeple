@@ -30,7 +30,7 @@ except NameError:
     __sktree_SETUP__ = False
 
 if __sktree_SETUP__:
-    sys.stderr.write('Running from SciPy source directory.\n')
+    sys.stderr.write("Running from SciPy source directory.\n")
     sys.stderr.write("Partial import of sktree during the build process.\n")
     # We are not importing the rest of scikit-tree during the build
     # process, as it may not be compiled yet
