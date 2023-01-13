@@ -255,7 +255,7 @@ bibtex_style = "unsrt"
 bibtex_footbibliography_header = ""
 
 # -- Sphinx-issues -----------------------------------------------------------
-issues_github_path = "adam2392/scikit-tree"
+issues_github_path = "neurodata/scikit-tree"
 
 # -- sphinx.ext.linkcode -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/extensions/linkcode.html
@@ -299,6 +299,6 @@ def linkcode_resolve(domain: str, info: Dict[str, str]) -> Optional[str]:
         branch = "main"
     else:
         return None  # alternatively, link to a maint/version branch
-    fname = fname.split("/sktree/")[1]
-    url = f"{gh_url}/blob/{branch}/sktree/{fname}#{lines}"
+    fname = fname.split("/scikit-tree/")[1]
+    url = f"{gh_url}/blob/{branch}/scikit-tree/{fname}#{lines}"
     return url
