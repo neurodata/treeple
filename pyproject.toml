@@ -131,7 +131,7 @@ _apply_version = 'semversioner release'
 
 type_check = 'mypy -p sktree --config-file pyproject.toml'
 unit_test = 'pytest ./sktree --cov=sktree --cov-report=xml --cov-config=pyproject.toml'
-build_docs = 'make -C docs/ clean html-noplot'
+build_docs = 'make -C docs/ clean html'
 clean = { shell = 'rm -rf builddir; rm -rf clean; rm -rf build; rm -rf _build; rm -rf dist;' }
 
 [[tool.poe.tasks.lint]]
