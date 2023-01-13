@@ -17,6 +17,7 @@ Contents
    :maxdepth: 2
    :caption: Getting started:
 
+   api
    whats_new
    install
    use

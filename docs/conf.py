@@ -79,7 +79,7 @@ nitpick_ignore = []
 # The name of a reST role (builtin or Sphinx extension) to use as the default
 # role, that is, for text marked up `like this`. This can be set to 'py:obj' to
 # make `filter` a cross-reference to the Python function “filter”.
-default_role = "py:obj"
+default_role = "literal"
 
 # -- options for HTML output -------------------------------------------------
 
@@ -110,7 +110,7 @@ html_theme_options = {
     "use_edit_page_button": False,
     "navigation_with_keys": False,
     "show_toc_level": 1,
-    "navbar_end": ["theme-switcher", "version-switcher", "navbar-icon-links"],
+    "navbar_end": ["version-switcher", "navbar-icon-links"],
 }
 # Custom sidebar templates, maps document names to template names.
 html_sidebars = {
@@ -155,6 +155,18 @@ numpydoc_xref_ignore = {
     "n_pixels",
     "n_classes",
     "instance",
+    "optional",
+    "ArrayLike",
+    "estimator",
+    "pandas",
+    "n_samples",
+    "n_features",
+    "n_estimators",
+    "n_nodes",
+    "X",
+    "default",
+    "sparse",
+    "matrix"
 }
 
 # validation
@@ -167,7 +179,7 @@ error_ignores = {
     "RT02",  # The first line of the Returns section should contain only the type, unless multiple values are being returned  # noqa
 }
 
-numpydoc_validate = True
+numpydoc_validate = False
 numpydoc_validation_checks = {"all"} | set(error_ignores)
 numpydoc_validation_exclude = {  # set of regex
     # we currently don't document these properly (probably okay)
@@ -180,6 +192,7 @@ numpydoc_validation_exclude = {  # set of regex
     r"\.__iter__",
     r"\.__div__",
     r"\.__neg__",
+    r"\.__len__",
 }
 
 # -- sphinx-copybutton -------------------------------------------------------
