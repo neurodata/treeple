@@ -102,19 +102,20 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: package
-          path: dist
+          path: build/meson-dist
       - name: Install sdist
-        run: pip install ./dist/*.tar.gz
+        run: pip install ./build/meson-dist/*.tar.gz
       - name: Test sdist install
         run: python -c "import sktree; print(sktree.__version__)"
       - name: Remove sdist install
         run: python -m pip uninstall -yq sktree
-      - name: Install wheel
-        run: pip install ./dist/*.whl
-      - name: Test wheel install
-        run: python -c "import sktree; print(sktree.__version__)"
-      - name: Remove wheel install
-        run: python -m pip uninstall -yq sktree
+      # TODO: uncomment when meson supports building wheels
+      # - name: Install wheel
+      #   run: pip install ./dist/*.whl
+      # - name: Test wheel install
+      #   run: python -c "import sktree; print(sktree.__version__)"
+      # - name: Remove wheel install
+      #   run: python -m pip uninstall -yq sktree
 
   test:
     timeout-minutes: 30
