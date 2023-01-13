@@ -21,12 +21,12 @@ class UnsupervisedRandomForest(TransformerMixin, BaseForest):
     ----------
     n_estimators : int, optional
         Number of trees to fit, by default 100.
-        
-    criterion : {"gini", "entropy", "log_loss"}, default="gini"
+
+    criterion : {"twomeans", "fastbic"}, default="twomeans"
         The function to measure the quality of a split. Supported criteria are
-        "gini" for the Gini impurity and "log_loss" and "entropy" both for the
-        Shannon information gain, see :ref:`tree_mathematical_formulation`.
-        Note: This parameter is tree-specific.
+        "twomeans" for maximizing the variance and "fastbic" for the
+        maximizing the Bayesian Information Criterion (BIC), see
+        :ref:`tree_mathematical_formulation`.
 
     max_depth : int, default=None
         The maximum depth of the tree. If None, then nodes are expanded until
@@ -122,7 +122,7 @@ class UnsupervisedRandomForest(TransformerMixin, BaseForest):
         self,
         n_estimators=100,
         *,
-        criterion='twomeans',
+        criterion="twomeans",
         max_depth=None,
         min_samples_split=2,
         min_samples_leaf=1,
@@ -169,7 +169,6 @@ class UnsupervisedRandomForest(TransformerMixin, BaseForest):
         self.max_features = max_features
         self.max_leaf_nodes = max_leaf_nodes
         self.min_impurity_decrease = min_impurity_decrease
-
 
     def fit_transform(self, X, y=None, sample_weight=None):
         """Fit and transform X.
