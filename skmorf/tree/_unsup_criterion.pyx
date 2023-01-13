@@ -369,8 +369,6 @@ cdef class TwoMeans(UnsupervisedCriterion):
         TODO: No, it does not handle the computation. 
         See scikit-learn splitter and tree for how node_value() is used.
 
-        
-
         Parameters
         ----------
         dest : double pointer
@@ -381,8 +379,9 @@ cdef class TwoMeans(UnsupervisedCriterion):
         # TODO: no notion of classes
         # Possible tip: See how node_value is used in splitter and tree.
         for k in range(self.n_outputs):
-            memcpy(dest, &self.sum_total[k, 0], self.n_classes[k] * sizeof(double))
-            dest += self.max_n_classes
+            memcpy(dest, &self.sum_total[k], sizeof(double))
+            # TODO: need to revisit
+            # dest += self.sum_total[k] / self.weighted_n_node_samples
 
     cdef void set_sample_pointers(
         self,
@@ -399,10 +398,9 @@ cdef class TwoMeans(UnsupervisedCriterion):
         cdef SIZE_t i
         cdef SIZE_t p
         cdef SIZE_t k
-        cdef SIZE_t c
         cdef DOUBLE_t w = 1.0
 
-        memset(&self.sum_total[0], 0, self.n_outputs * sizeof(double))
+        memset(&self.sum_total[0], 0, sizeof(double))
 
         for p in range(start, end):
             i = self.sample_indices[p]
@@ -413,10 +411,10 @@ cdef class TwoMeans(UnsupervisedCriterion):
                 w = self.sample_weight[i]
 
             for k in range(self.n_outputs):
-                y_ik = self.y[i, k]
-                w_y_ik = w * y_ik
-                self.sum_total[k] += w_y_ik
-                self.sq_sum_total += w_y_ik * y_ik
+                X_i = self.X[i]
+                w_X_i = w * X_i
+                self.sum_total[k] += w_X_i
+                self.sq_sum_total += w_X_i * X_i
 
             self.weighted_n_node_samples += w
 
