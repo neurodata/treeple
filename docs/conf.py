@@ -59,7 +59,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
-    "sphinx.ext.linkcode",
+    # "sphinx.ext.linkcode",
     "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
     "sphinx_issues",
