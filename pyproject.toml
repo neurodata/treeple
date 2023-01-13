@@ -116,6 +116,7 @@ sphinx-gallery = { version = "^0.11.0" }
 ipython = { version = "^7.4.0" }
 nbsphinx = { version = "^0.8" }
 pandas = { version = "^1.1" }
+memory_profiler = { version = "^0.60.0" }
 
 [tool.poe.tasks]
 _flake8 = 'flake8'

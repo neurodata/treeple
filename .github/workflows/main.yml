@@ -85,7 +85,7 @@ jobs:
       - name: Install from source
         run: |
           poetry install
-          pip install meson ninja meson-python Cython numpy
+          pip install meson ninja meson-python Cython numpy scikit-learn
       - name: Test package install
         run: poetry run python -c "import sktree; print(sktree.__version__)"
       - name: Remove package install
