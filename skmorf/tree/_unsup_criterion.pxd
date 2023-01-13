@@ -13,9 +13,7 @@ from sklearn.tree._criterion cimport BaseCriterion
 #
 # In our criterions, we do not store the 'y-labels' because there are none
 # in unsupervised learning. We instead store a memview of the dataset 'X'.
-#
-# Other changes include the removal of "weighted" samples, which is
-# not needed since criterion are compuated on the data itself.
+
 
 cdef class UnsupervisedCriterion(BaseCriterion):
     """Abstract unsupervised criterion."""
