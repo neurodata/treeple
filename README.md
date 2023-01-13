@@ -16,8 +16,28 @@ In 2001, Leo Breiman proposed two types of Random Forests. One was known as ``Fo
 
 Installation
 ------------
-Our installation will try to follow scikit-learn installation as close as possible, as we contain Cython code
-subclassed, or inspired by the scikit-learn tree submodule.
+Our installation will try to follow scikit-learn installation as close as possible, as we contain Cython code subclassed, or inspired by the scikit-learn tree submodule.
+
+Building locally with Meson
+---------------------------
+Make sure you have the necessary packages installed
+
+    # install general package dependencies
+    poetry install --with style,test,docs
+
+    # install build dependencies
+    pip install meson ninja meson-python Cython
+
+Run the following to build the local files
+
+    # generate ninja make files
+    meson build --prefix=$PWD/build
+
+    # compile
+    ninja -C build
+
+    # install scikit-tree package
+    meson install -C build
 
 Conda (Recommended)
 -------------------
