@@ -29,7 +29,6 @@ cover
 *.so 
 *.cpp 
 *.c
-*.html
 
 .cache
 .pytest_cache
