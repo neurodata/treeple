@@ -97,6 +97,7 @@ jobs:
           meson build --prefix=$PWD/build
           ninja -C build
           meson install -C build
+          cd build
           meson dist
       - name: Upload package distribution files
         if: ${{ matrix.os == 'ubuntu' && matrix.python-version == '3.10' }}
