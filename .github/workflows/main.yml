@@ -92,7 +92,10 @@ jobs:
       - name: Check poetry lock file
         run: poetry update --dry-run
       - name: Build package
-        run: poetry build
+        run: |
+          meson build --prefix=$PWD/build
+          ninja -C build
+          meson install -C build
       - name: Upload package distribution files
         if: ${{ matrix.os == 'ubuntu' && matrix.python-version == '3.10' }}
         uses: actions/upload-artifact@v3

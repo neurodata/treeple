@@ -39,6 +39,10 @@ Run the following to build the local files
     # install scikit-tree package
     meson install -C build
 
+    # to check installation
+    python -c "from sktree import tree"
+    python -c "import sklearn; print(sklearn.__version__);"
+
 Conda (Recommended)
 -------------------
 First, create a virtual environment using Conda.

@@ -40,7 +40,7 @@ requires = [
     "packaging",
     "Cython>=0.29.24",
     "scikit-learn",
-    # "scikit-learn" = { git = "https://github.com/neurodata/scikit-learn.git", branch = 'split' }
+    # "scikit-learn" = { git = "https://github.com/neurodata/scikit-learn.git", branch = 'split' },
     "lazy_loader>=0.1",
 
     # We follow scipy for much of these pinnings
