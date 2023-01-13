@@ -14,7 +14,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
     This object stores methods on how to calculate how good a split is using
     different metrics for unsupervised splitting.
     """
-    def __cinit__(self, const DTYPE_t[:,:] X):
+    def __cinit__(self):
         """Initialize attributes for this criterion.
 
         Parameters
@@ -38,10 +38,6 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         # So I think sharing cinit should be fine.
         # See: http://docs.cython.org/en/latest/src/userguide/special_methods.html#initialisation-methods 
         # about cinit and subclasses
-
-        # TODO: there are no classes in unsupervised learning
-        cdef SIZE_t k = 0
-        cdef SIZE_t max_n_classes = 0
 
         # TODO: You are also missing instantiations for 
         # sum_total, sum_left, sum_right. See _unsup_criterion.pxd file 
@@ -116,6 +112,17 @@ cdef class TwoMeans(UnsupervisedCriterion):
     pair minimizes the splitting criteria described in the following 
     section
     """
+
+    cdef __cinit__(self, SIZE_t n_outputs):
+        """Initialize parameters for this criterion.
+
+        Parameters
+        ----------
+        n_outputs : SIZE_t
+            The number of targets to be predicted
+        """
+        #TODO: maybe pass user specified number of clusters?
+        self.n_outputs = n_outputs
 
     cdef int init(
         self,
@@ -302,6 +309,7 @@ cdef class TwoMeans(UnsupervisedCriterion):
 
         cdef const DTYPE_t[:,:] X = self.X
         
+        # TODO: these need to be redone 
         for p in range(end):
             i = self.sample_indices[p]
 
