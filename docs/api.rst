@@ -20,5 +20,3 @@ Classification
    :toctree: generated/
    
    UnsupervisedRandomForest
-
-    
