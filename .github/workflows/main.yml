@@ -106,7 +106,7 @@ jobs:
           name: package
           path: build/meson-dist
       - name: Install sdist
-        run: pip install ./build/meson-dist/*.tar.gz
+        run: pip install ./build/meson-dist/*.tar.xz
       - name: Test sdist install
         run: python -c "import sktree; print(sktree.__version__)"
       - name: Remove sdist install
