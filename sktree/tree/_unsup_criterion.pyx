@@ -1,9 +1,11 @@
 import numpy as np
+
 cimport numpy as cnp
+
 cnp.import_array()
 
 
-cdef class UnsupervisedCriterion(BaseCriterion):
+cdef class UnsupervisedCriterion:
     """Abstract criterion for unsupervised learning.
     
     This object is a copy of the Criterion class of scikit-learn, but is used
@@ -45,7 +47,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         pass
 
 
-cdef class TwoMeans(Criterion):
+cdef class TwoMeans(UnsupervisedCriterion):
     r"""Two means split impurity.
 
     The two means split finds the cutpoint that minimizes the one-dimensional
@@ -72,6 +74,7 @@ cdef class TwoMeans(Criterion):
         """
         # need to implement
         pass
+    
     
     cdef int init(
         self,

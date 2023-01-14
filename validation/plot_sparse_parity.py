@@ -1,10 +1,9 @@
-
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 
 # Load true values
-#test_df = pd.read_csv("Sparse_parity_test.csv", header=None).to_numpy()
+# test_df = pd.read_csv("Sparse_parity_test.csv", header=None).to_numpy()
 test_df = np.load("data/sparse_parity_test.npy")
 y = test_df[:, -1]
 

@@ -8,16 +8,15 @@ API Documentation
 
 Classification
 --------------
-:py:mod:`scikit-morf`:
+:py:mod:`sktree`:
 
-.. automodule:: scikit_morf
+.. automodule:: sktree
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: scikit_morf
+.. currentmodule:: sktree
 
 .. autosummary::
    :toctree: generated/
-
-    LineLengthDetector
-    RMSDetector
+   
+   UnsupervisedRandomForest

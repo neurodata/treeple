@@ -12,40 +12,40 @@ import sphinx_gallery  # noqa: F401
 from sphinx_gallery.sorting import ExampleTitleSortKey
 
 sys.path.insert(0, os.path.abspath(".."))
-import skmorf
+import sktree
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 curdir = os.path.dirname(__file__)
 sys.path.append(os.path.abspath(os.path.join(curdir, "..")))
-sys.path.append(os.path.abspath(os.path.join(curdir, "..", "skmorf")))
+sys.path.append(os.path.abspath(os.path.join(curdir, "..", "sktree")))
 
 # -- project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 # General information about the project.
-project = "Scikit-Morf"
+project = "scikit-tree"
 author = "Adam Li <adam.li@columbia.edu>"
 td = date.today()
-copyright = f"2022-{td.year}, scikit-morf Developers. Last updated on {td.isoformat()}"
+copyright = f"2022-{td.year}, scikit-tree Developers. Last updated on {td.isoformat()}"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # The short X.Y version.
-version = skmorf.__version__
+version = sktree.__version__
 # The full version, including alpha/beta/rc tags.
 release = version
 
-gh_url = "https://github.com/adam2392/Scikit-Morf"
+gh_url = "https://github.com/neurodata/scikit-tree"
 
 # -- general configuration ------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = "4.0"
+needs_sphinx = "5.0"
 
 # The document name of the “root” document, that is, the document that contains
 # the root toctree directive.
@@ -59,13 +59,14 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
-    "sphinx.ext.linkcode",
+    # "sphinx.ext.linkcode",
     "sphinx.ext.mathjax",
-    "numpydoc",
+    "sphinx.ext.viewcode",
+    "sphinx_issues",
     "sphinxcontrib.bibtex",
     "sphinx_copybutton",
     "sphinx_gallery.gen_gallery",
-    "sphinx_issues",
+    "numpydoc",
 ]
 
 templates_path = ["_templates"]
@@ -78,7 +79,7 @@ nitpick_ignore = []
 # The name of a reST role (builtin or Sphinx extension) to use as the default
 # role, that is, for text marked up `like this`. This can be set to 'py:obj' to
 # make `filter` a cross-reference to the Python function “filter”.
-default_role = "py:obj"
+default_role = "literal"
 
 # -- options for HTML output -------------------------------------------------
 
@@ -109,7 +110,7 @@ html_theme_options = {
     "use_edit_page_button": False,
     "navigation_with_keys": False,
     "show_toc_level": 1,
-    "navbar_end": ["theme-switcher", "version-switcher", "navbar-icon-links"],
+    "navbar_end": ["version-switcher", "navbar-icon-links"],
 }
 # Custom sidebar templates, maps document names to template names.
 html_sidebars = {
@@ -120,11 +121,7 @@ html_context = {
     "pygment_light_style": "tango",
     "pygment_dark_style": "native",
     "versions_dropdown": {
-        "dev": "v0.5 (devel)",
-        "stable": "v0.4",
-        "v0.3": "v0.3",
-        "v0.2": "v0.2",
-        "v0.1": "v0.1",
+        "dev": "v0.1 (devel)",
     },
 }
 
@@ -158,6 +155,18 @@ numpydoc_xref_ignore = {
     "n_pixels",
     "n_classes",
     "instance",
+    "optional",
+    "ArrayLike",
+    "estimator",
+    "pandas",
+    "n_samples",
+    "n_features",
+    "n_estimators",
+    "n_nodes",
+    "X",
+    "default",
+    "sparse",
+    "matrix"
 }
 
 # validation
@@ -170,7 +179,7 @@ error_ignores = {
     "RT02",  # The first line of the Returns section should contain only the type, unless multiple values are being returned  # noqa
 }
 
-numpydoc_validate = True
+numpydoc_validate = False
 numpydoc_validation_checks = {"all"} | set(error_ignores)
 numpydoc_validation_exclude = {  # set of regex
     # we currently don't document these properly (probably okay)
@@ -183,6 +192,7 @@ numpydoc_validation_exclude = {  # set of regex
     r"\.__iter__",
     r"\.__div__",
     r"\.__neg__",
+    r"\.__len__",
 }
 
 # -- sphinx-copybutton -------------------------------------------------------
@@ -203,7 +213,7 @@ intersphinx_mapping = {
 intersphinx_timeout = 5
 
 # -- sphinx-gallery ----------------------------------------------------------
-os.environ["_SKMORF_BUILDING_DOC"] = "true"
+os.environ["_sktree_BUILDING_DOC"] = "true"
 scrapers = ("matplotlib",)
 
 compress_images = ("images", "thumbnails")
@@ -216,9 +226,9 @@ if sys.platform.startswith("win"):
         compress_images = ()
 
 sphinx_gallery_conf = {
-    "doc_module": ("skmorf",),
+    "doc_module": ("sktree",),
     "reference_url": {
-        "skmorf": None,
+        "sktree": None,
     },
     "examples_dirs": ["../examples"],
     "gallery_dirs": ["auto_examples"],
@@ -245,50 +255,50 @@ bibtex_style = "unsrt"
 bibtex_footbibliography_header = ""
 
 # -- Sphinx-issues -----------------------------------------------------------
-issues_github_path = "adam2392/Scikit-Morf"
+issues_github_path = "neurodata/scikit-tree"
 
 # -- sphinx.ext.linkcode -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/extensions/linkcode.html
 
-def linkcode_resolve(domain: str, info: Dict[str, str]) -> Optional[str]:
-    """Determine the URL corresponding to a Python object.
+# def linkcode_resolve(domain: str, info: Dict[str, str]) -> Optional[str]:
+#     """Determine the URL corresponding to a Python object.
 
-    Parameters
-    ----------
-    domain : str
-        One of 'py', 'c', 'cpp', 'javascript'.
-    info : dict
-        With keys "module" and "fullname".
+#     Parameters
+#     ----------
+#     domain : str
+#         One of 'py', 'c', 'cpp', 'javascript'.
+#     info : dict
+#         With keys "module" and "fullname".
 
-    Returns
-    -------
-    url : str | None
-        The code URL. If None, no link is added.
-    """
-    if domain != "py":
-        return None  # only document python objects
+#     Returns
+#     -------
+#     url : str | None
+#         The code URL. If None, no link is added.
+#     """
+#     if domain != "py":
+#         return None  # only document python objects
 
-    # retrieve pyobject and file
-    try:
-        module = import_module(info["module"])
-        pyobject = module
-        for elt in info["fullname"].split("."):
-            pyobject = getattr(pyobject, elt)
-        fname = inspect.getsourcefile(pyobject).replace("\\", "/")
-    except Exception:
-        # Either the object could not be loaded or the file was not found.
-        # For instance, properties will raise.
-        return None
+#     # retrieve pyobject and file
+#     try:
+#         module = import_module(info["module"])
+#         pyobject = module
+#         for elt in info["fullname"].split("."):
+#             pyobject = getattr(pyobject, elt)
+#         fname = inspect.getsourcefile(pyobject).replace("\\", "/")
+#     except Exception:
+#         # Either the object could not be loaded or the file was not found.
+#         # For instance, properties will raise.
+#         return None
 
-    # retrieve start/stop lines
-    source, start_line = inspect.getsourcelines(pyobject)
-    lines = "L%d-L%d" % (start_line, start_line + len(source) - 1)
+#     # retrieve start/stop lines
+#     source, start_line = inspect.getsourcelines(pyobject)
+#     lines = "L%d-L%d" % (start_line, start_line + len(source) - 1)
 
-    # create URL
-    if "dev" in release:
-        branch = "main"
-    else:
-        return None  # alternatively, link to a maint/version branch
-    fname = fname.split("/skmorf/")[1]
-    url = f"{gh_url}/blob/{branch}/skmorf/{fname}#{lines}"
-    return url
+#     # create URL
+#     if "dev" in release:
+#         branch = "main"
+#     else:
+#         return None  # alternatively, link to a maint/version branch
+#     fname = fname.split("/scikit-tree/")[1]
+#     url = f"{gh_url}/blob/{branch}/scikit-tree/{fname}#{lines}"
+#     return url

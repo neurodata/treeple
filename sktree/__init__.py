@@ -3,7 +3,7 @@ import logging
 import os
 import sys
 
-__version__ = '0.0.0dev0'
+__version__ = "0.0.0dev0"
 logger = logging.getLogger(__name__)
 
 
@@ -25,18 +25,24 @@ try:
     # This variable is injected in the __builtins__ by the build
     # process. It is used to enable importing subpackages of sklearn when
     # the binaries are not built
-    __SKMORF_SETUP__
+    __sktree_SETUP__  # type: ignore
 except NameError:
-    __SKMORF_SETUP__ = False
+    __sktree_SETUP__ = False
 
-if __SKMORF_SETUP__:
-    sys.stderr.write("Partial import of skmorf during the build process.\n")
-    # We are not importing the rest of scikit-morf during the build
+if __sktree_SETUP__:
+    sys.stderr.write("Running from SciPy source directory.\n")
+    sys.stderr.write("Partial import of sktree during the build process.\n")
+    # We are not importing the rest of scikit-tree during the build
     # process, as it may not be compiled yet
 else:
-    from . import __check_build
-    from sklearn.utils._show_versions import show_versions
+    try:
+        from . import tree
+        from ._forest import UnsupervisedRandomForest
+        from sklearn.utils._show_versions import show_versions
+    except ImportError as e:
+        msg = """Error importing scikit-tree: you cannot import scikit-tree while
+        being in scikit-tree source directory; please exit the scikit-tree source
+        tree first and relaunch your Python interpreter."""
+        raise ImportError(msg) from e
 
-    __all__ = [
-        "tree"
-    ]
+    __all__ = ["tree", "UnsupervisedRandomForest"]

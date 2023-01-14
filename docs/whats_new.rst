@@ -7,9 +7,9 @@
 Release History
 ===============
 
-Release notes for all scikit-morf releases are linked in this page.
+Release notes for all scikit-tree releases are linked in this page.
 
-**Tip:** `Subscribe to scikit-morf releases <https://libraries.io/pypi/scikit-morf>`__
+**Tip:** `Subscribe to scikit-tree releases <https://libraries.io/pypi/scikit-tree>`__
 on libraries.io to be notified when new versions are released.
 
 .. toctree::

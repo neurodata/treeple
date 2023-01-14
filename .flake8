@@ -22,6 +22,7 @@ exclude =
     docs/_build
     docs/generated
     docs/auto_examples
+    validation
 
 per-file-ignores =
     # __init__.py files are allowed to have unused imports

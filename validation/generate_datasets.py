@@ -1,5 +1,5 @@
 import numpy as np
-from sporfdata import sparse_parity, orthant
+from sporfdata import orthant, sparse_parity
 
 # Sparse parity
 for n in [1000, 5000, 10000]:
@@ -32,5 +32,3 @@ df[:, :-1] = X
 df[:, -1] = y
 
 np.save("data/orthant_test", df)
-
-

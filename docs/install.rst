@@ -13,28 +13,28 @@ Dependencies
 * ``pandas`` (>=1.1)
 * ``matplotlib`` (optional)
 
-**scikit-morf** supports Python >= 3.8.
+**scikit-tree** supports Python >= 3.8.
 
 Installing with ``pip``
 -----------------------
 
-**scikit-morf** is available [on PyPI](https://pypi.org/project/scikit-morf/). Just run
+**scikit-tree** is available [on PyPI](https://pypi.org/project/scikit-tree/). Just run
 
 .. code-block:: bash
 
-    pip install scikit-morf
+    pip install scikit-tree
 
     # or if you use poetry which is recommended
-    poetry add scikit-morf
+    poetry add scikit-tree
 
 ## Installing from source
 
-To install **scikit-morf** from source, first clone [the repository](https://github.com/adam2392/scikit-morf):
+To install **scikit-tree** from source, first clone [the repository](https://github.com/neurodata/scikit-tree):
 
 .. code-block:: bash
 
-    git clone https://github.com/adam2392/scikit-morf.git
-    cd scikit-morf
+    git clone https://github.com/neurodata/scikit-tree.git
+    cd scikit-tree
 
 Then run installation via poetry (recommended)
 

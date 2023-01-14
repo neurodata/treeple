@@ -1,9 +1,9 @@
 :orphan:
 
-Examples using scikit-morf
+Examples using scikit-tree
 ===========================
 
-To be able to effectively use scikit-morf, look at some of the examples here
+To be able to effectively use scikit-tree, look at some of the examples here
 to learn everything you need!
 
 
