@@ -65,7 +65,34 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         samples : array-like, dtype=SIZE_t
             A mask on the samples, showing which ones we want to use
         """
-        pass
+        self.sample_weight = sample_weight
+        self.samples = samples
+        self.start = start
+        self.end = end
+        self.n_node_samples = end - start
+        self.weighted_n_samples = weighted_n_samples
+        self.weighted_n_node_samples = 0.0
+
+        cdef SIZE_t i
+        cdef SIZE_t p
+        cdef DOUBLE_t w = 1.0
+        self.sum_total = 0.0
+
+        for p in range(start, end):
+            i = samples[p]
+
+            # w is originally set to be 1.0, meaning that if no sample weights
+            # are given, the default weight of each sample is 1.0
+            if sample_weight != NULL:
+                w = sample_weight[i]
+            
+            # ith sample; overall compute the weighted average
+            self.sum_total += w * X[i]
+            self.weighted_n_node_samples += w
+
+        # Reset to pos=start
+        self.reset()
+        return 0
 
 
 cdef class TwoMeans(UnsupervisedCriterion):
