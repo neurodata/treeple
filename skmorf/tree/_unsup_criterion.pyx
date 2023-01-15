@@ -33,19 +33,10 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         self.weighted_n_left = 0.0
         self.weighted_n_right = 0.0
 
-        # TODO: Yeah I think two means and fastBIC would not require 
-        # any sep logic for initializing C level data structures. 
-        # So I think sharing cinit should be fine.
-        # See: http://docs.cython.org/en/latest/src/userguide/special_methods.html#initialisation-methods 
-        # about cinit and subclasses
-
-        # TODO: You are also missing instantiations for 
-        # sum_total, sum_left, sum_right. See _unsup_criterion.pxd file 
-        # that defines the interface for UnsupervisedCriterion.
-
-        # TODO: I would take a look at the private attributes of 
-        # UnsupervisedCriterion. (i.e. sum_total, sum_left, sum_right)... 
-        # and see what values they "should be holding"
+        # Initialize count metric for current, going left and going right
+        self.sum_total = 0.0
+        self.sum_left = 0.0
+        self.sum_right = 0.0
 
     cdef int init(
         self,
