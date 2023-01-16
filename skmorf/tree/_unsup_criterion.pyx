@@ -200,13 +200,8 @@ cdef class TwoMeans(UnsupervisedCriterion):
 
         self.weighted_n_left = self.weighted_n_node_samples
         self.weighted_n_right = 0.0
-        cdef SIZE_t k
-
-        # TODO: Again UnsupervisedCriterion has no notion of "classes", so irrelevant here.
-        # However, you need to reset sum_left and sum_right right?
-        for k in range(self.n_outputs):
-            memset(&self.sum_right[k], 0, sizeof(double))
-            memcpy(&self.sum_left[k], &self.sum_total[k], sizeof(double))
+        self.sum_right = 0.0
+        self.sum_left = self.sum_total
         return 0
 
     cdef int update(self, SIZE_t new_pos) nogil except -1:
