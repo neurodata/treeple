@@ -305,14 +305,14 @@ cdef class TwoMeans(UnsupervisedCriterion):
         cdef SIZE_t i
         cdef SIZE_t p
         cdef DOUBLE_t w
-        cdef double left_c = 0.0 #left cluster
-        cdef double right_c = 0.0 #right cluster
-        cdef double mu_left #left mean
-        cdef double mu_right #right mean
+        cdef double mu_left = 0.0 #left mean
+        cdef double mu_right = 0.0 #right mean
+        cdef double var = 0.0 #variance
+        cdef double mean #mean
 
         cdef const DTYPE_t[:,:] X = self.X
         
-        # TODO: these need to be redone 
+        #calculate left and right cluster's mean
         for p in range(end):
             i = self.sample_indices[p]
 
@@ -321,6 +321,7 @@ cdef class TwoMeans(UnsupervisedCriterion):
             else:
                 mu_right += X[i] / self.n_samples
 
+        #calculate variance
         for p in range(end):
             i = self.sample_indices[p]
 
@@ -328,11 +329,13 @@ cdef class TwoMeans(UnsupervisedCriterion):
                 w = self.sample_weight[i]
 
             if k < pos:
-                left_c += w * (X[i] - mu_left)**2
+                mean = mu_left
             else:
-                right_c += w * (X[i] - mu_right)**2
+                mean = mu_right
 
-        return (left_c + right_c) / self.n_samples
+            var += w * (X[i] - mean) * (X[i] - mean)
+
+        return var / self.n_samples
 
     cdef void children_impurity(self, double* impurity_left,
                                     double* impurity_right) nogil:
