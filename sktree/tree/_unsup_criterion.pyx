@@ -221,7 +221,7 @@ cdef class TwoMeans(UnsupervisedCriterion):
         """
         cdef double impurity
 
-        impurity =  self._compute_variance() / self.weighted_n_node_samples
+        impurity = self._compute_variance(0, self.end) / self.weighted_n_node_samples
 
         return impurity
 
