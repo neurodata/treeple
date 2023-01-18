@@ -146,7 +146,7 @@ cdef class TwoMeans(UnsupervisedCriterion):
 
     cdef int init(
         self,
-        const DTYPE_t[:, :] X,
+        const DTYPE_t[:,:] X,
         const DOUBLE_t[:] sample_weight,
         double weighted_n_samples,
         const SIZE_t[:] sample_indices
@@ -226,7 +226,6 @@ cdef class TwoMeans(UnsupervisedCriterion):
 
         cdef SIZE_t i
         cdef SIZE_t p
-        cdef SIZE_t k
         cdef DOUBLE_t w = 1.0
 
         # Update statistics up to new_pos
@@ -243,9 +242,7 @@ cdef class TwoMeans(UnsupervisedCriterion):
                 if sample_weight is not None:
                     w = sample_weight[i]
 
-                # TODO: sum_left updated
-                for k in range(self.n_outputs):
-                    self.sum_left[k] += w * self.X[i]
+                self.sum_left += w * self.X[i]
 
                 self.weighted_n_left += w
         else:
@@ -257,18 +254,14 @@ cdef class TwoMeans(UnsupervisedCriterion):
                 if sample_weight is not None:
                     w = sample_weight[i]
 
-                # TODO: sum_left updated
-                for k in range(self.n_outputs):
-                    self.sum_left[k] -= w * self.X[i]
+                self.sum_left -= w * self.X[i]
 
                 self.weighted_n_left -= w
 
         # Update right part statistics
         self.weighted_n_right = (self.weighted_n_node_samples - 
                                 self.weighted_n_left)
-        # TODO: no notion of classes
-        for k in range(self.n_outputs):
-            self.sum_right[k] = self.sum_total[k] - self.sum_left[k]
+        self.sum_right = self.sum_total - self.sum_left
 
         self.pos = new_pos
         return 0
