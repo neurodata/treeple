@@ -225,45 +225,33 @@ cdef class TwoMeans(UnsupervisedCriterion):
 
         return impurity
 
-    cdef double _compute_variance(self) nogil:
+    cdef double _compute_variance(self, start, end) nogil:
         """Computes variance of left and right cluster at `pos`
 
         variance = weight * (left_impurity + right_impurity) / n_samples
         """
-        cdef SIZE_t pos = self.pos
-        cdef SIZE_t end = self.end
-
         cdef SIZE_t i
         cdef SIZE_t p
-        cdef DOUBLE_t w
+        cdef DOUBLE_t w = 1.0
+        cdef SIZE_t n_samples = end - start
 
-        cdef double mu_left = 0.0 #left cluster mean
-        cdef double mu_right = 0.0 #right cluster mean
         cdef double var = 0.0 #variance
-        cdef double mean #mean
+        cdef double mean = 0.0 #mean
 
         cdef const DTYPE_t[:,:] X = self.X
         
-        #calculate left and right cluster's mean
-        for p in range(end):
+        #calculate the mean
+        for p in range(start, end):
             i = self.sample_indices[p]
 
-            if p < pos:
-                mu_left += X[i] / self.n_samples
-            else:
-                mu_right += X[i] / self.n_samples
+            mean += self.X[i] / n_samples
 
         #calculate variance
-        for p in range(end):
+        for p in range(start, end):
             i = self.sample_indices[p]
 
             if self.sample_weight is not None:
                 w = self.sample_weight[i]
-
-            if k < pos:
-                mean = mu_left
-            else:
-                mean = mu_right
 
             var += w * (X[i] - mean) * (X[i] - mean)
 
@@ -298,30 +286,73 @@ cdef class TwoMeans(UnsupervisedCriterion):
         impurity_right : double pointer
             The memory address to save the impurity of the right node
         """
-        # cdef double entropy_left = 0.0
-        # cdef double entropy_right = 0.0
-        # cdef double count_k
-        # cdef SIZE_t k
-        # cdef SIZE_t c
+        cdef const DOUBLE_t[:] sample_weight = self.sample_weight
+        cdef const SIZE_t[:] sample_indices = self.sample_indices
+        cdef SIZE_t pos = self.pos
+        cdef SIZE_t start = self.start
 
-        # for k in range(self.n_outputs):
-        #     for c in range(self.n_classes[k]):
-        #         count_k = self.sum_left[k, c]
-        #         if count_k > 0.0:
-        #             count_k /= self.weighted_n_left
-        #             entropy_left -= count_k * log(count_k)
+        cdef DOUBLE_t X_ik
 
-        #         count_k = self.sum_right[k, c]
-        #         if count_k > 0.0:
-        #             count_k /= self.weighted_n_right
-        #             entropy_right -= count_k * log(count_k)
+        cdef double sq_sum_left = 0.0
+        cdef double sq_sum_right
 
-        # impurity_left[0] = entropy_left / self.n_outputs
-        # impurity_right[0] = entropy_right / self.n_outputs
+        cdef double mu_left = 0.0 #left cluster mean
+        cdef double mu_right = 0.0 #right cluster mean
+
+        cdef SIZE_t i
+        cdef SIZE_t p
+        cdef SIZE_t k
+        cdef DOUBLE_t w = 1.0
+
+        for p in range(start, pos):
+            i = sample_indices[p]
+
+            if sample_weight is not None:
+                w = sample_weight[i]
+
+            X_ik = self.X[i]
+            sq_sum_left += w * X_ik
+
+        sq_sum_right = self.sq_sum_total - sq_sum_left
+
+        impurity_left[0] = sq_sum_left / self.weighted_n_left
+        impurity_right[0] = sq_sum_right / self.weighted_n_right
+
+        for k in range(self.n_outputs):
+            impurity_left[0] -= (self.sum_left[k] / self.weighted_n_left) ** 2.0
+            impurity_right[0] -= (self.sum_right[k] / self.weighted_n_right) ** 2.0
+
+        impurity_left[0] /= self.n_outputs
+        impurity_right[0] /= self.n_outputs
         
         # use left_sum and right_sum to calculate impurity?
         # or should this method take two separate Xs making up
         # left and right child nodes?
+        #calculate left and right cluster's mean
+        for p in range(end):
+            i = self.sample_indices[p]
+
+            if p < pos:
+                mu_left += X[i] / self.n_samples
+            else:
+                mu_right += X[i] / self.n_samples
+
+        #calculate variance
+        for p in range(end):
+            i = self.sample_indices[p]
+
+            if self.sample_weight is not None:
+                w = self.sample_weight[i]
+
+            if k < pos:
+                mean = mu_left
+            else:
+                mean = mu_right
+
+            var += w * (X[i] - mean) * (X[i] - mean)
+
+        return var / self.n_samples
+
         pass
 
     cdef void node_value(self, double* dest) nogil:
@@ -348,7 +379,10 @@ cdef class TwoMeans(UnsupervisedCriterion):
 
         cdef SIZE_t i
         cdef SIZE_t p
+
         cdef DOUBLE_t w = 1.0
+        cdef DOUBLE_t X_i
+        cdef DOUBLE_t W_X_i
 
         for p in range(start, end):
             i = self.sample_indices[p]
