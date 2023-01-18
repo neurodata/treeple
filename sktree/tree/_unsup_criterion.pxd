@@ -40,7 +40,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
     cdef int init(
         self,
         const DOUBLE_t[:,:] X,
-        DOUBLE_t* sample_weight,
+        const DOUBLE_t[:] sample_weight,
         double weighted_n_samples, 
         const SIZE_t[:] samples,
     ) nogil except -1
