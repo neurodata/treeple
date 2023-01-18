@@ -221,14 +221,12 @@ cdef class TwoMeans(UnsupervisedCriterion):
         """
         cdef double impurity
 
-        impurity = self._compute_variance(0, self.end) / self.weighted_n_node_samples
+        impurity = self._compute_variance(self.start, self.end) / self.weighted_n_node_samples
 
         return impurity
 
     cdef double _compute_variance(self, start, end) nogil:
         """Computes variance of left and right cluster at `pos`
-
-        variance = weight * (left_impurity + right_impurity) / n_samples
         """
         cdef SIZE_t i
         cdef SIZE_t p
@@ -255,7 +253,7 @@ cdef class TwoMeans(UnsupervisedCriterion):
 
             var += w * (X[i] - mean) * (X[i] - mean)
 
-        return var / self.n_samples
+        return var / n_samples
 
     cdef void children_impurity(self, double* impurity_left,
                                     double* impurity_right) nogil:
@@ -264,20 +262,10 @@ cdef class TwoMeans(UnsupervisedCriterion):
         i.e. the impurity of the left child (samples[start:pos]) and the
         impurity the right child (samples[pos:end]).
 
-        TODO:
-        Review on TwoMeans specific methods: Good start, and it's def in the right direction.
-        impurity in TwoMeans is defined as the Variance. 
-        
-        Variance formula would be 
-        impurity = weight * (left_impurity + right_impurity) / n_samples 
-        and then left_impurity and right_impurity are defined as: 
-        weight * Variance of left child and weight * Variance of right child. 
+        where the impurity of two children nodes are essentially the variances of two nodes
 
-        So you need to compute variance in node_impurity and children_impurity. 
-        The only thing changing are the pointers.
-
-        You should therefore define a separate function to compute variance.
-        Focus on getting the Criterion correct and ping me w/ questions. We can move onto the splitter once this is done.
+        left_variance = left_weight * left_impurity / n_sample_of_left_child
+        right_variance = right_weight * right_impurity / n_sample_of_right_child
 
         Parameters
         ----------
@@ -286,74 +274,12 @@ cdef class TwoMeans(UnsupervisedCriterion):
         impurity_right : double pointer
             The memory address to save the impurity of the right node
         """
-        cdef const DOUBLE_t[:] sample_weight = self.sample_weight
-        cdef const SIZE_t[:] sample_indices = self.sample_indices
         cdef SIZE_t pos = self.pos
         cdef SIZE_t start = self.start
+        cdef SIZE_t end = self.end
 
-        cdef DOUBLE_t X_ik
-
-        cdef double sq_sum_left = 0.0
-        cdef double sq_sum_right
-
-        cdef double mu_left = 0.0 #left cluster mean
-        cdef double mu_right = 0.0 #right cluster mean
-
-        cdef SIZE_t i
-        cdef SIZE_t p
-        cdef SIZE_t k
-        cdef DOUBLE_t w = 1.0
-
-        for p in range(start, pos):
-            i = sample_indices[p]
-
-            if sample_weight is not None:
-                w = sample_weight[i]
-
-            X_ik = self.X[i]
-            sq_sum_left += w * X_ik
-
-        sq_sum_right = self.sq_sum_total - sq_sum_left
-
-        impurity_left[0] = sq_sum_left / self.weighted_n_left
-        impurity_right[0] = sq_sum_right / self.weighted_n_right
-
-        for k in range(self.n_outputs):
-            impurity_left[0] -= (self.sum_left[k] / self.weighted_n_left) ** 2.0
-            impurity_right[0] -= (self.sum_right[k] / self.weighted_n_right) ** 2.0
-
-        impurity_left[0] /= self.n_outputs
-        impurity_right[0] /= self.n_outputs
-        
-        # use left_sum and right_sum to calculate impurity?
-        # or should this method take two separate Xs making up
-        # left and right child nodes?
-        #calculate left and right cluster's mean
-        for p in range(end):
-            i = self.sample_indices[p]
-
-            if p < pos:
-                mu_left += X[i] / self.n_samples
-            else:
-                mu_right += X[i] / self.n_samples
-
-        #calculate variance
-        for p in range(end):
-            i = self.sample_indices[p]
-
-            if self.sample_weight is not None:
-                w = self.sample_weight[i]
-
-            if k < pos:
-                mean = mu_left
-            else:
-                mean = mu_right
-
-            var += w * (X[i] - mean) * (X[i] - mean)
-
-        return var / self.n_samples
-
-        pass
+        impurity_left = _compute_variance(start,pos) / self.weighted_n_left
+        impurity_right = _compute_variance(pos,end) / self.weighted_n_right
 
     cdef void node_value(self, double* dest) nogil:
         r"""Set the node value with sum_total and save it into dest.
@@ -363,7 +289,8 @@ cdef class TwoMeans(UnsupervisedCriterion):
         dest : double pointer
             The memory address which we will save the node value into.
         """
-        memcpy(dest, &self.sum_total, sizeof(double))
+        # memcpy(dest, &self.sum_total, sizeof(double))
+        dest = self.sum_total
 
     cdef void set_sample_pointers(
         self,
@@ -382,7 +309,7 @@ cdef class TwoMeans(UnsupervisedCriterion):
 
         cdef DOUBLE_t w = 1.0
         cdef DOUBLE_t X_i
-        cdef DOUBLE_t W_X_i
+        cdef DOUBLE_t w_X_i
 
         for p in range(start, end):
             i = self.sample_indices[p]
