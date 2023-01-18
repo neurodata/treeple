@@ -417,8 +417,6 @@ cdef class TwoMeans(UnsupervisedCriterion):
             X_i = self.X[i]
             w_X_i = w * X_i
             self.sum_total += w_X_i
-            self.sq_sum_total += w_X_i * X_i
-
             self.weighted_n_node_samples += w
 
         # Reset to pos=start
