@@ -102,9 +102,6 @@ cdef class TwoMeans(UnsupervisedCriterion):
     ) nogil except -1:
         """Initialize the criterion.
 
-        This initializes the criterion at node samples[start:end] and children
-        samples[start:start] and samples[start:end].
-
         Returns -1 in case of failure to allocate memory (and raise MemoryError)
         or 0 otherwise.
 
@@ -221,41 +218,27 @@ cdef class TwoMeans(UnsupervisedCriterion):
         Evaluate the TwoMeans criterion as impurity of the current node,
         i.e. the impurity of sample_indices[start:end]. The smaller the impurity the
         better.
-
-        TODO:
-        Review on TwoMeans specific methods: Good start, and it's def in the right direction.
-        impurity in TwoMeans is defined as the Variance. 
-        
-        Variance formula would be 
-        impurity = weight * (left_impurity + right_impurity) / n_samples 
-        and then left_impurity and right_impurity are defined as: 
-        weight * Variance of left child and weight * Variance of right child. 
-
-        So you need to compute variance in node_impurity and children_impurity. 
-        The only thing changing are the pointers.
-
-        You should therefore define a separate function to compute variance.
-        Focus on getting the Criterion correct and ping me w/ questions. We can move onto the splitter once this is done.
         """
+        cdef double impurity
 
-        cdef double impurity = 0.0
-
-        # TODO: impurity in TwoMeans criterion is the variance.
-        # variance = weight * (left_impurity + right_impurity) / n_samples
         impurity =  self._compute_variance() / self.weighted_n_node_samples
 
         return impurity
 
-    cdef void _compute_variance(self) nogil:
+    cdef double _compute_variance(self) nogil:
         """Computes variance of left and right cluster at `pos`
+
+        variance = weight * (left_impurity + right_impurity) / n_samples
         """
         cdef SIZE_t pos = self.pos
         cdef SIZE_t end = self.end
+
         cdef SIZE_t i
         cdef SIZE_t p
         cdef DOUBLE_t w
-        cdef double mu_left = 0.0 #left mean
-        cdef double mu_right = 0.0 #right mean
+
+        cdef double mu_left = 0.0 #left cluster mean
+        cdef double mu_right = 0.0 #right cluster mean
         cdef double var = 0.0 #variance
         cdef double mean #mean
 
@@ -292,6 +275,21 @@ cdef class TwoMeans(UnsupervisedCriterion):
 
         i.e. the impurity of the left child (samples[start:pos]) and the
         impurity the right child (samples[pos:end]).
+
+        TODO:
+        Review on TwoMeans specific methods: Good start, and it's def in the right direction.
+        impurity in TwoMeans is defined as the Variance. 
+        
+        Variance formula would be 
+        impurity = weight * (left_impurity + right_impurity) / n_samples 
+        and then left_impurity and right_impurity are defined as: 
+        weight * Variance of left child and weight * Variance of right child. 
+
+        So you need to compute variance in node_impurity and children_impurity. 
+        The only thing changing are the pointers.
+
+        You should therefore define a separate function to compute variance.
+        Focus on getting the Criterion correct and ping me w/ questions. We can move onto the splitter once this is done.
 
         Parameters
         ----------
