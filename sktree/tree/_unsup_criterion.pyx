@@ -17,13 +17,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
     different metrics for unsupervised splitting.
     """
     def __cinit__(self):
-        """Initialize attributes for this criterion.
-
-        Parameters
-        ----------
-        X : array-like, dtype=DTYPE_t
-            The dataset stored as a buffer for memory efficiency of shape
-            (n_samples,).
+        """Initialize attributes for unsupervised criterion.
         """
         self.start = 0
         self.pos = 0
