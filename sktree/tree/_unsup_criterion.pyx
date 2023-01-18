@@ -133,11 +133,6 @@ cdef class TwoMeans(UnsupervisedCriterion):
     section
     """
 
-    cdef __cinit__(self):
-        """Initialize parameters for this criterion.
-        """
-        pass
-
     cdef int init(
         self,
         const DTYPE_t[:,:] X,
