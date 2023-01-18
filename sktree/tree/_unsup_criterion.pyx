@@ -133,16 +133,10 @@ cdef class TwoMeans(UnsupervisedCriterion):
     section
     """
 
-    cdef __cinit__(self, SIZE_t n_outputs):
+    cdef __cinit__(self):
         """Initialize parameters for this criterion.
-
-        Parameters
-        ----------
-        n_outputs : SIZE_t
-            The number of targets to be predicted
         """
-        #TODO: maybe pass user specified number of clusters?
-        self.n_outputs = n_outputs
+        pass
 
     cdef int init(
         self,
