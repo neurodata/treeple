@@ -399,15 +399,12 @@ cdef class TwoMeans(UnsupervisedCriterion):
         self.n_node_samples = end - start
         self.start = start
         self.end = end
-
+        self.sum_total = 0.0
         self.weighted_n_node_samples = 0.0
 
         cdef SIZE_t i
         cdef SIZE_t p
-        cdef SIZE_t k
         cdef DOUBLE_t w = 1.0
-
-        memset(&self.sum_total[0], 0, sizeof(double))
 
         for p in range(start, end):
             i = self.sample_indices[p]
@@ -417,11 +414,10 @@ cdef class TwoMeans(UnsupervisedCriterion):
             if self.sample_weight is not None:
                 w = self.sample_weight[i]
 
-            for k in range(self.n_outputs):
-                X_i = self.X[i]
-                w_X_i = w * X_i
-                self.sum_total[k] += w_X_i
-                self.sq_sum_total += w_X_i * X_i
+            X_i = self.X[i]
+            w_X_i = w * X_i
+            self.sum_total += w_X_i
+            self.sq_sum_total += w_X_i * X_i
 
             self.weighted_n_node_samples += w
 
