@@ -392,14 +392,7 @@ cdef class TwoMeans(UnsupervisedCriterion):
         dest : double pointer
             The memory address which we will save the node value into.
         """
-        cdef SIZE_t k
-
-        # TODO: no notion of classes
-        # Possible tip: See how node_value is used in splitter and tree.
-        for k in range(self.n_outputs):
-            memcpy(dest, &self.sum_total[k], sizeof(double))
-            # TODO: need to revisit
-            # dest += self.sum_total[k] / self.weighted_n_node_samples
+        memcpy(dest, self.sum_total, sizeof(double))
 
     cdef void set_sample_pointers(
         self,
