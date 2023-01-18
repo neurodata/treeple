@@ -39,7 +39,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
     # Unsupervised criterion can be used with splitter and tree methods.
     cdef int init(
         self,
-        const DOUBLE_t[:,:] X,
+        const DTYPE_t[:,:] X,
         const DOUBLE_t[:] sample_weight,
         double weighted_n_samples, 
         const SIZE_t[:] samples,
