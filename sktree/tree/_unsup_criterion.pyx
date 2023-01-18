@@ -29,7 +29,6 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         self.pos = 0
         self.end = 0
 
-        self.n_samples = 0
         self.n_node_samples = 0
         self.weighted_n_node_samples = 0.0
         self.weighted_n_left = 0.0
