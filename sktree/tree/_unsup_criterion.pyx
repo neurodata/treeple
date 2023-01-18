@@ -388,7 +388,7 @@ cdef class TwoMeans(UnsupervisedCriterion):
         dest : double pointer
             The memory address which we will save the node value into.
         """
-        memcpy(dest, self.sum_total, sizeof(double))
+        memcpy(dest, &self.sum_total, sizeof(double))
 
     cdef void set_sample_pointers(
         self,
