@@ -146,10 +146,16 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
     """
     cdef SIZE_t max_leaf_nodes
 
-    def __cinit__(self, UnsupervisedSplitter splitter, SIZE_t min_samples_split,
-                  SIZE_t min_samples_leaf,  min_weight_leaf,
-                  SIZE_t max_depth, SIZE_t max_leaf_nodes,
-                  double min_impurity_decrease):
+    def __cinit__(
+        self,
+        UnsupervisedSplitter splitter,
+        SIZE_t min_samples_split,
+        SIZE_t min_samples_leaf, 
+        double min_weight_leaf,
+        SIZE_t max_depth,
+        SIZE_t max_leaf_nodes,
+        double min_impurity_decrease
+    ):
         self.splitter = splitter
         self.min_samples_split = min_samples_split
         self.min_samples_leaf = min_samples_leaf
@@ -158,12 +164,14 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
         self.max_leaf_nodes = max_leaf_nodes
         self.min_impurity_decrease = min_impurity_decrease
 
-    cpdef build(self, UnsupervisedTree tree, object X,
-                cnp.ndarray sample_weight=None):
+    cpdef build(
+        self,
+        UnsupervisedTree tree,
+        object X,
+        cnp.ndarray sample_weight=None
+    ):
         """Build a decision tree from the training set X."""
-
         # check input
-        # TODO: refactor _check_input
         X, sample_weight = self._check_input(X, sample_weight)
 
         # Parameters
@@ -257,11 +265,19 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
         if rc == -1:
             raise MemoryError()
 
-    cdef inline int _add_split_node(self, UnsupervisedSplitter splitter, UnsupervisedTree tree,
-                                    SIZE_t start, SIZE_t end, double impurity,
-                                    bint is_first, bint is_left, Node* parent,
-                                    SIZE_t depth,
-                                    FrontierRecord* res) nogil except -1:
+    cdef inline int _add_split_node(
+        self,
+        UnsupervisedSplitter splitter,
+        UnsupervisedTree tree,
+        SIZE_t start,
+        SIZE_t end,
+        double impurity,
+        bint is_first,
+        bint is_left,
+        Node* parent,
+        SIZE_t depth,
+        FrontierRecord* res
+    ) nogil except -1:
         """Adds node w/ partition ``[start, end)`` to the frontier. """
         cdef SplitRecord split
         cdef SIZE_t node_id

@@ -40,17 +40,28 @@ cdef class UnsupervisedTree:
     cdef SIZE_t value_stride             # = n_outputs * max_n_classes
 
     # Methods
-    cdef SIZE_t _add_node(self, SIZE_t parent, bint is_left, bint is_leaf,
-                          SIZE_t feature, double threshold, double impurity,
-                          SIZE_t n_node_samples,
-                          double weighted_n_node_samples) nogil except -1
-    cdef int _resize(self, SIZE_t capacity) nogil except -1
-    cdef int _resize_c(self, SIZE_t capacity=*) nogil except -1
+    cdef SIZE_t _add_node(
+        self,
+        SIZE_t parent,
+        bint is_left,
+        bint is_leaf,
+        SIZE_t feature,
+        double threshold,
+        double impurity,
+        SIZE_t n_node_samples,
+        double weighted_n_node_samples
+    ) nogil except -1
+    cdef int _resize(
+        self,
+        SIZE_t capacity
+    ) nogil except -1
+    cdef int _resize_c(
+        self,
+        SIZE_t capacity=*
+    ) nogil except -1
 
     cdef cnp.ndarray _get_value_ndarray(self)
     cdef cnp.ndarray _get_node_ndarray(self)
-
-    cpdef cnp.ndarray predict(self, object X)
 
     cpdef cnp.ndarray apply(self, object X)
     cdef cnp.ndarray _apply_dense(self, object X)
@@ -75,7 +86,7 @@ cdef class UnsupervisedTreeBuilder:
     # This class controls the various stopping criteria and the node splitting
     # evaluation order, e.g. depth-first or best-first.
 
-    cdef UnsupervisedSplitter splitter              # Splitting algorithm
+    cdef UnsupervisedSplitter splitter  # Splitting algorithm
 
     cdef SIZE_t min_samples_split       # Minimum number of samples in an internal node
     cdef SIZE_t min_samples_leaf        # Minimum number of samples in a leaf
@@ -83,5 +94,14 @@ cdef class UnsupervisedTreeBuilder:
     cdef SIZE_t max_depth               # Maximal tree depth
     cdef double min_impurity_decrease   # Impurity threshold for early stopping
 
-    cpdef build(self, UnsupervisedTree tree, object X, cnp.ndarray sample_weight=*)
-    cdef _check_input(self, object X, cnp.ndarray sample_weight)
+    cpdef build(
+        self,
+        UnsupervisedTree tree,
+        object X,
+        cnp.ndarray sample_weight=*
+    )
+    cdef _check_input(
+        self,
+        object X,
+        cnp.ndarray sample_weight
+    )

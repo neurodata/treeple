@@ -27,7 +27,7 @@ cdef class UnsupervisedSplitter(BaseSplitter):
 
     # XXX: not sure if this will work since it subclasses
     # an existing extension type attribute
-    cdef public UnsupervisedCriterion criterion
+    # cdef public UnsupervisedCriterion criterion
 
     # feature matrix
     cdef const DTYPE_t[:, :] X
