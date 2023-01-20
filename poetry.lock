@@ -2529,7 +2529,7 @@ tests = ["black (>=22.3.0)", "flake8 (>=3.8.2)", "matplotlib (>=3.1.3)", "mypy (
 type = "git"
 url = "https://github.com/neurodata/scikit-learn.git"
 reference = 'split'
-resolved_reference = "bafc1b01935959e60b16a74e377b5773ab1d6b76"
+resolved_reference = "ae17cea896c4c830c039983ee96860008c97c14a"
 
 [[package]]
 name = "scipy"
