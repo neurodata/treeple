@@ -29,7 +29,7 @@ cdef inline void swap(DTYPE_t* Xf, SIZE_t* samples,
 cdef inline DTYPE_t median3(DTYPE_t* Xf, SIZE_t n) nogil:
     # Median of three pivot selection, after Bentley and McIlroy (1993).
     # Engineering a sort function. SP&E. Requires 8/3 comparisons on average.
-    cdef DTYPE_t a = Xf[0], b = Xf[n / 2], c = Xf[n - 1]
+    cdef DTYPE_t a = Xf[0], b = Xf[n // 2], c = Xf[n - 1]
     if a < b:
         if b < c:
             return b
@@ -108,7 +108,7 @@ cdef void heapsort(DTYPE_t* Xf, SIZE_t* samples, SIZE_t n) nogil:
     cdef SIZE_t start, end
 
     # heapify
-    start = (n - 2) / 2
+    start = (n - 2) // 2
     end = n
     while True:
         sift_down(Xf, samples, start, end)
@@ -140,7 +140,7 @@ cdef inline void binary_search(INT32_t[::1] sorted_array,
     cdef INT32_t pivot
     index[0] = -1
     while start < end:
-        pivot = start + (end - start) / 2
+        pivot = start + (end - start) // 2
 
         if sorted_array[pivot] == value:
             index[0] = pivot

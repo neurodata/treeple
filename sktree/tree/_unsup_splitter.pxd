@@ -30,13 +30,13 @@ cdef class UnsupervisedSplitter(BaseSplitter):
     # cdef public UnsupervisedCriterion criterion
 
     # feature matrix
-    cdef const DTYPE_t[:, :] X
+    cdef const DTYPE_t[:, ::1] X
     
     cdef SIZE_t n_total_samples
 
     cdef int init(
         self,
-        object X,
+        const DTYPE_t[:, ::1] X,
         const DOUBLE_t[:] sample_weight
     ) except -1
 

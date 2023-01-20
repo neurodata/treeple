@@ -6,7 +6,7 @@ cnp.import_array()
 
 
 cdef double compute_variance(
-    const DTYPE_t[:] Xf,
+    const DTYPE_t[::1] Xf,
     const SIZE_t[:] sample_indices,
     SIZE_t start,
     SIZE_t end,
@@ -66,10 +66,10 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         self.sum_left = 0.0
         self.sum_right = 0.0
 
-    cdef int init_feature_vec(
+    cdef void init_feature_vec(
         self,
-        const DTYPE_t[:] Xf,
-    ) nogil except -1:
+        const DTYPE_t[::1] Xf,
+    ) nogil:
         """Initialize the 1D feature vector, which is used for computing criteria.
 
         This function is used to set a read-only memoryview of a feature
@@ -92,7 +92,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         cdef SIZE_t p_idx
 
         cdef DOUBLE_t w = 1.0
-        for p_idx in range(start, end):
+        for p_idx in range(self.start, self.end):
             s_idx = self.sample_indices[p_idx]
 
             # w is originally set to be 1.0, meaning that if no sample weights
@@ -310,7 +310,7 @@ cdef class TwoMeans(UnsupervisedCriterion):
         double* impurity_left,
         double* impurity_right
     ) nogil:
-       """Evaluate the impurity in children nodes.
+        """Evaluate the impurity in children nodes.
 
         i.e. the impurity of the left child (sample_indices[start:pos]) and the
         impurity the right child (sample_indices[pos:end]).

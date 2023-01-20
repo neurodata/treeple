@@ -3,6 +3,8 @@ import numpy as np
 cimport numpy as cnp
 cnp.import_array()
 
+from libc.string cimport memcpy
+
 from sklearn.tree._utils cimport log
 from sklearn.tree._utils cimport rand_int
 from sklearn.tree._utils cimport rand_uniform
@@ -34,7 +36,7 @@ cdef class UnsupervisedSplitter(BaseSplitter):
 
     cdef int init(
         self,
-        object X,
+        const DTYPE_t[:, ::1] X,
         const DOUBLE_t[:] sample_weight
     ) except -1:
         self.rand_r_state = self.random_state.randint(0, RAND_R_MAX)
@@ -73,6 +75,8 @@ cdef class UnsupervisedSplitter(BaseSplitter):
 
         self.sample_weight = sample_weight
 
+        self.X = X
+
         # initialize criterion
         self.criterion.init(
             self.sample_weight,
@@ -103,7 +107,7 @@ cdef class UnsupervisedSplitter(BaseSplitter):
         pass
 
 
-cdef class BestUnsupervisedSplitter(BaseSplitter):
+cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
     """"""
     def __reduce__(self):
         return (type(self), (self.criterion,
@@ -233,7 +237,9 @@ cdef class BestUnsupervisedSplitter(BaseSplitter):
             features[f_i], features[f_j] = features[f_j], features[f_i]
 
             # initialize feature vector for criterion to evaluate
-            self.criterion.init_feature_vec(Xf)
+            # GIL is needed since we are changing the criterion's internal memory
+            with gil:
+                self.criterion.init_feature_vec(Xf)
 
             # Evaluate all splits along the feature vector
             p = start
