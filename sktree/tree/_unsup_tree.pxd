@@ -9,25 +9,16 @@
 import numpy as np
 cimport numpy as cnp
 
-ctypedef cnp.npy_float32 DTYPE_t          # Type of X
-ctypedef cnp.npy_float64 DOUBLE_t         # Sample_weight
-ctypedef cnp.npy_intp SIZE_t              # Type for indices and counters
-ctypedef cnp.npy_int32 INT32_t            # Signed 32 bit integer
-ctypedef cnp.npy_uint32 UINT32_t          # Unsigned 32 bit integer
+from sklearn.tree._tree cimport DTYPE_t          # Type of X
+from sklearn.tree._tree cimport DOUBLE_t         # Type of y, sample_weight
+from sklearn.tree._tree cimport SIZE_t           # Type for indices and counters
+from sklearn.tree._tree cimport INT32_t          # Signed 32 bit integer
+from sklearn.tree._tree cimport UINT32_t         # Unsigned 32 bit integer
+
+from sklearn.tree._tree cimport Node
+from sklearn.tree._splitter cimport SplitRecord
 
 from ._unsup_splitter cimport UnsupervisedSplitter
-from ._unsup_splitter cimport SplitRecord
-
-cdef struct Node:
-    # Base storage structure for the nodes in a Tree object
-
-    SIZE_t left_child                    # id of the left child of the node
-    SIZE_t right_child                   # id of the right child of the node
-    SIZE_t feature                       # Feature used for splitting the node
-    DOUBLE_t threshold                   # Threshold value at the node
-    DOUBLE_t impurity                    # Impurity of the node (i.e., the value of the criterion)
-    SIZE_t n_node_samples                # Number of samples at the node
-    DOUBLE_t weighted_n_node_samples     # Weighted number of samples at the node
 
 
 cdef class UnsupervisedTree:

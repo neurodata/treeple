@@ -3,7 +3,7 @@
 # cython: language_level=3
 # cython: linetrace=True
 
-# from sklearn.tree._criterion cimport BaseCriterion
+from sklearn.tree._criterion cimport BaseCriterion
 from sklearn.tree._tree cimport DOUBLE_t, DTYPE_t, SIZE_t
 
 # Note: This class is an exact copy of scikit-learn's Criterion
@@ -16,18 +16,24 @@ from sklearn.tree._tree cimport DOUBLE_t, DTYPE_t, SIZE_t
 
 
 cdef class UnsupervisedCriterion(BaseCriterion):
-    """Abstract unsupervised criterion."""
+    """Abstract unsupervised criterion.
+    
+    Notable Changes
+    ---------------
+    1. weighted_n_* : This parameter keeps track of the total "weight" of the samples
+        in the node, left and right
+    """
 
     # The criterion computes the impurity of a node and the reduction of
     # impurity of a split on that node. It also computes the output statistics.
 
     # Internal structures
-    cdef const DTYPE_T[:,:] X # 2D memview for values of X (i.e. feature values)
+    cdef const DTYPE_T[:] Xf # 1D memview for the feature vector to compute criterion on
 
-    # TODO: WIP. Assumed the sum "metric" of node, left and right
-    # XXX: this can possibly be defined in downstream classes instead as memoryviews.
-    # The sum of the metric stored either at the split, going left, or right
-    # of the split. 
+    # Keep running total of Xf[samples[start:end]] and the corresponding sum in
+    # the left and right node. For example, this can then efficiently compute the
+    # mean of the node, and left/right child by subtracting relevant Xf elements
+    # and then dividing by the total number of samples in the node and left/right child.
     cdef double sum_total   # The sum of the weighted count of each feature.
     cdef double sum_left    # Same as above, but for the left side of the split
     cdef double sum_right   # Same as above, but for the right side of the split
@@ -39,8 +45,12 @@ cdef class UnsupervisedCriterion(BaseCriterion):
     # Unsupervised criterion can be used with splitter and tree methods.
     cdef int init(
         self,
-        const DTYPE_t[:,:] X,
         const DOUBLE_t[:] sample_weight,
         double weighted_n_samples, 
         const SIZE_t[:] samples,
+    ) nogil except -1
+
+    cdef int init_feature_vec(
+        self,
+        const DTYPE_t[:] Xf,
     ) nogil except -1

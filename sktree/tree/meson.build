@@ -1,5 +1,7 @@
 extensions = [
-  '_unsup_criterion'
+  '_sklearn_splitter',
+  '_unsup_criterion',
+  '_unsup_splitter',
 ]
 
 foreach ext: extensions
