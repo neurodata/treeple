@@ -7,6 +7,7 @@ Those methods include various random forest methods that operate on manifolds.
 # Authors: Adam Li <adam2392@gmail.com>
 #
 # License: BSD 3 clause
+import numpy as np
 
 from sklearn.base import TransformerMixin
 from sklearn.ensemble._forest import BaseForest
@@ -212,3 +213,31 @@ class UnsupervisedRandomForest(TransformerMixin, BaseForest):
         # Parameters are validated in fit_transform
         self.fit_transform(X, y, sample_weight=sample_weight)
         return self
+
+    def transform(self, X):
+        from joblib import Parallel
+        from sklearn.utils.fixes import delayed
+
+        results = Parallel(
+            n_jobs=self.n_jobs,
+            verbose=self.verbose,
+            prefer="threads",
+        )(delayed(tree.transform)(X) for tree in self.estimators_)
+
+        # TODO: idk if this works. It should be (n_samples, n_leaves_out)
+        return np.hstack(results)
+
+    def proximity_matrix(self, X):
+        """Compute the proximity matrix of samples in X.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features_in)
+            The data array.
+
+        Returns
+        -------
+        prox_matrix : array-like of shape (n_samples, n_samples)
+        """
+        # TODO: implement
+        pass

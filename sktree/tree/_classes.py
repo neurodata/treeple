@@ -1,7 +1,28 @@
+import copy
+import numpy as np
+import numbers
+from math import ceil
+import warnings
+
+from sklearn.base import TransformerMixin
 from sklearn.tree import BaseDecisionTree
+from sklearn.tree import _tree as _sklearn_tree
+from sklearn.tree._criterion import BaseCriterion
+from sklearn.tree._splitter import BaseSplitter
+from sklearn.utils.validation import _check_sample_weight
+from sklearn.utils import check_random_state
+
+from . import _unsup_criterion, _unsup_splitter
+from ._unsup_tree import UnsupervisedTree, UnsupervisedBestFirstTreeBuilder
+
+DOUBLE = _sklearn_tree.DOUBLE
+
+CRITERIA = {"twomeans": _unsup_criterion.TwoMeans}
+
+SPLITTERS = {"best": _unsup_splitter.BestUnsupervisedSplitter}
 
 
-class UnsupervisedDecisionTree(BaseDecisionTree):
+class UnsupervisedDecisionTree(BaseDecisionTree, TransformerMixin):
     """Unsupervised decision tree.
 
     TODO: need to implement the logic fit/fit_transform/etc.
@@ -113,4 +134,126 @@ class UnsupervisedDecisionTree(BaseDecisionTree):
         )
 
     def fit(self, X, y=None, sample_weight=None, check_input=True):
-        return super().fit(X, y, sample_weight, check_input)
+        # Determine output settings
+        n_samples, self.n_features_in_ = X.shape
+        random_state = check_random_state(self.random_state)
+        max_depth = np.iinfo(np.int32).max if self.max_depth is None else self.max_depth
+
+        if isinstance(self.min_samples_leaf, numbers.Integral):
+            min_samples_leaf = self.min_samples_leaf
+        else:  # float
+            min_samples_leaf = int(ceil(self.min_samples_leaf * n_samples))
+
+        if isinstance(self.min_samples_split, numbers.Integral):
+            min_samples_split = self.min_samples_split
+        else:  # float
+            min_samples_split = int(ceil(self.min_samples_split * n_samples))
+            min_samples_split = max(2, min_samples_split)
+
+        min_samples_split = max(min_samples_split, 2 * min_samples_leaf)
+
+        if isinstance(self.max_features, str):
+            if self.max_features == "auto":
+                max_features = max(1, int(np.sqrt(self.n_features_in_)))
+                warnings.warn(
+                    "`max_features='auto'` has been deprecated in 1.1 "
+                    "and will be removed in 1.3. To keep the past behaviour, "
+                    "explicitly set `max_features='sqrt'`.",
+                    FutureWarning,
+                )
+            elif self.max_features == "sqrt":
+                max_features = max(1, int(np.sqrt(self.n_features_in_)))
+            elif self.max_features == "log2":
+                max_features = max(1, int(np.log2(self.n_features_in_)))
+        elif self.max_features is None:
+            max_features = self.n_features_in_
+        elif isinstance(self.max_features, numbers.Integral):
+            max_features = self.max_features
+        else:  # float
+            if self.max_features > 0.0:
+                max_features = max(1, int(self.max_features * self.n_features_in_))
+            else:
+                max_features = 0
+
+        self.max_features_ = max_features
+
+        max_leaf_nodes = -1 if self.max_leaf_nodes is None else self.max_leaf_nodes
+
+        if sample_weight is not None:
+            sample_weight = _check_sample_weight(sample_weight, X, DOUBLE)
+
+        # Set min_weight_leaf from min_weight_fraction_leaf
+        if sample_weight is None:
+            min_weight_leaf = self.min_weight_fraction_leaf * n_samples
+        else:
+            min_weight_leaf = self.min_weight_fraction_leaf * np.sum(sample_weight)
+
+        criterion = self.criterion
+        if not isinstance(criterion, BaseCriterion):
+            criterion = CRITERIA[self.criterion]()
+        else:
+            # Make a deepcopy in case the criterion has mutable attributes that
+            # might be shared and modified concurrently during parallel fitting
+            criterion = copy.deepcopy(criterion)
+
+        splitter = self.splitter
+        if not isinstance(self.splitter, BaseSplitter):
+            splitter = SPLITTERS[self.splitter](
+                criterion,
+                self.max_features_,
+                min_samples_leaf,
+                min_weight_leaf,
+                random_state,
+            )
+
+        self.tree_ = UnsupervisedTree(
+            self.n_features_in_,
+            # TODO: tree shouldn't need this in this case
+            np.array([1] * self.n_outputs_, dtype=np.intp),
+            self.n_outputs_,
+        )
+
+        # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
+        if max_leaf_nodes < 0:
+            builder = UnsupervisedDepthFirstTreeBuilder(
+                splitter,
+                min_samples_split,
+                min_samples_leaf,
+                min_weight_leaf,
+                max_depth,
+                self.min_impurity_decrease,
+            )
+        else:
+            builder = UnsupervisedBestFirstTreeBuilder(
+                splitter,
+                min_samples_split,
+                min_samples_leaf,
+                min_weight_leaf,
+                max_depth,
+                max_leaf_nodes,
+                self.min_impurity_decrease,
+            )
+
+        builder.build(self.tree_, X, y, sample_weight)
+        return self
+
+    def transform(self, X):
+        """Transform each sample to an array of the leaf nodes that it falls into.
+
+        For a single tree, each sample falls into exactly one leaf.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features_in_)
+            The input data array.
+
+        Returns
+        -------
+        X_new : ndarray array of shape (n_samples, n_features_new)
+            Transformed array.
+        """
+        out = self.tree_.transform(X)
+        return out
+
+    def predict(self, X, check_input=True):
+        raise RuntimeError(f"not allowed")

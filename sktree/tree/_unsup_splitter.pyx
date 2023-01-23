@@ -108,7 +108,8 @@ cdef class UnsupervisedSplitter(BaseSplitter):
 
 
 cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
-    """"""
+    """Split in a best-first fashion.
+    """
     def __reduce__(self):
         return (type(self), (self.criterion,
                              self.max_features,
