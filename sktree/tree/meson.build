@@ -2,7 +2,7 @@ extensions = [
   '_sklearn_splitter',
   '_unsup_criterion',
   '_unsup_splitter',
-  '_unsup_tree',
+  # '_unsup_tree',
 ]
 
 foreach ext: extensions
@@ -10,7 +10,7 @@ foreach ext: extensions
     cython_gen.process(ext + '.pyx'),
     c_args: cython_c_args,
     include_directories: [incdir_numpy],
-    override_options : ['cython_language=cpp'],
+    # override_options : ['cython_language=cpp'],
     install: true,
     subdir: 'sktree/tree'
   )
