@@ -19,20 +19,38 @@ def main():
     print("input file: ", in_fname)
     print("output file: ", out_fname)
 
-    sbp.run(
-        [
-            "cython",
-            "-3",
-            "--fast-fail",
-            "--output-file",
-            out_fname,
-            "--include-dir",
-            os.getcwd(),
-        ]
-        + sys.argv[3:]
-        + [in_fname],
-        check=True,
-    )
+    if "unsup_tree" in in_fname:
+        sbp.run(
+            [
+                "cython",
+                "-3",
+                "--fast-fail",
+                "--cplus",
+                "--output-file",
+                out_fname,
+                "--include-dir",
+                os.getcwd(),
+            ]
+            + sys.argv[3:]
+            + [in_fname],
+            check=True,
+        )
+    else:
+        sbp.run(
+            [
+                "cython",
+                "-3",
+                "--fast-fail",
+                # "--cplus",
+                "--output-file",
+                out_fname,
+                "--include-dir",
+                os.getcwd(),
+            ]
+            + sys.argv[3:]
+            + [in_fname],
+            check=True,
+        )
 
 
 if __name__ == "__main__":

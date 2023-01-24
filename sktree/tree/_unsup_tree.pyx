@@ -24,8 +24,8 @@ cnp.import_array()
 from scipy.sparse import issparse
 from scipy.sparse import csr_matrix
 
-from ._utils cimport safe_realloc
-from ._utils cimport sizet_ptr_to_ndarray
+from sklearn.tree._utils cimport safe_realloc
+from sklearn.tree._utils cimport sizet_ptr_to_ndarray
 
 cdef extern from "numpy/arrayobject.h":
     object PyArray_NewFromDescr(PyTypeObject* subtype, cnp.dtype descr,
@@ -146,10 +146,16 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
     """
     cdef SIZE_t max_leaf_nodes
 
-    def __cinit__(self, UnsupervisedSplitter splitter, SIZE_t min_samples_split,
-                  SIZE_t min_samples_leaf,  min_weight_leaf,
-                  SIZE_t max_depth, SIZE_t max_leaf_nodes,
-                  double min_impurity_decrease):
+    def __cinit__(
+        self,
+        UnsupervisedSplitter splitter,
+        SIZE_t min_samples_split,
+        SIZE_t min_samples_leaf, 
+        double min_weight_leaf,
+        SIZE_t max_depth,
+        SIZE_t max_leaf_nodes,
+        double min_impurity_decrease
+    ):
         self.splitter = splitter
         self.min_samples_split = min_samples_split
         self.min_samples_leaf = min_samples_leaf
@@ -158,12 +164,14 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
         self.max_leaf_nodes = max_leaf_nodes
         self.min_impurity_decrease = min_impurity_decrease
 
-    cpdef build(self, UnsupervisedTree tree, object X,
-                cnp.ndarray sample_weight=None):
+    cpdef build(
+        self,
+        UnsupervisedTree tree,
+        object X,
+        cnp.ndarray sample_weight=None
+    ):
         """Build a decision tree from the training set X."""
-
         # check input
-        # TODO: refactor _check_input
         X, sample_weight = self._check_input(X, sample_weight)
 
         # Parameters
@@ -257,11 +265,19 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
         if rc == -1:
             raise MemoryError()
 
-    cdef inline int _add_split_node(self, UnsupervisedSplitter splitter, UnsupervisedTree tree,
-                                    SIZE_t start, SIZE_t end, double impurity,
-                                    bint is_first, bint is_left, Node* parent,
-                                    SIZE_t depth,
-                                    FrontierRecord* res) nogil except -1:
+    cdef inline int _add_split_node(
+        self,
+        UnsupervisedSplitter splitter,
+        UnsupervisedTree tree,
+        SIZE_t start,
+        SIZE_t end,
+        double impurity,
+        bint is_first,
+        bint is_left,
+        Node* parent,
+        SIZE_t depth,
+        FrontierRecord* res
+    ) nogil except -1:
         """Adds node w/ partition ``[start, end)`` to the frontier. """
         cdef SplitRecord split
         cdef SIZE_t node_id
@@ -333,7 +349,12 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
 # =============================================================================
 
 cdef class UnsupervisedTree:
-    """Array-based representation of a binary decision tree.
+    """Array-based representation of a binary decision tree for unsupervised learning.
+
+    This is essentially an exact copy of the corresponding Tree class in
+    scikit-learn with the exception that there is no ``y``. Therefore,
+    any reference to ``n_classes``, ``n_outputs`` are removed. There is
+    no ``predict`` function.
 
     The binary tree is represented as a number of parallel arrays. The i-th
     element of each array holds information about the node `i`. Node 0 is the
@@ -372,7 +393,7 @@ cdef class UnsupervisedTree:
     threshold : array of double, shape [node_count]
         threshold[i] holds the threshold for the internal node i.
 
-    value : array of double, shape [node_count, n_outputs, max_n_classes]
+    value : array of double, shape [node_count]
         Contains the constant prediction value of each node.
 
     impurity : array of double, shape [node_count]
@@ -390,10 +411,6 @@ cdef class UnsupervisedTree:
     # WARNING: these reference the current `nodes` and `value` buffers, which
     # must not be freed by a subsequent memory allocation.
     # (i.e. through `_resize` or `__setstate__`)
-    property n_classes:
-        def __get__(self):
-            return sizet_ptr_to_ndarray(self.n_classes, self.n_outputs)
-
     property children_left:
         def __get__(self):
             return self._get_node_ndarray()['left_child'][:self.node_count]
@@ -432,25 +449,14 @@ cdef class UnsupervisedTree:
         def __get__(self):
             return self._get_value_ndarray()[:self.node_count]
 
-    def __cinit__(self, int n_features, cnp.ndarray n_classes, int n_outputs):
+    def __cinit__(self, int n_features):
         """Constructor."""
         cdef SIZE_t dummy = 0
-        size_t_dtype = np.array(dummy).dtype
-
-        n_classes = _check_n_classes(n_classes, size_t_dtype)
-
+        
         # Input/Output layout
         self.n_features = n_features
-        self.n_outputs = n_outputs
-        self.n_classes = NULL
-        safe_realloc(&self.n_classes, n_outputs)
 
-        self.max_n_classes = np.max(n_classes)
-        self.value_stride = n_outputs * self.max_n_classes
-
-        cdef SIZE_t k
-        for k in range(n_outputs):
-            self.n_classes[k] = n_classes[k]
+        self.value_stride = 1
 
         # Inner structures
         self.max_depth = 0
@@ -462,15 +468,12 @@ cdef class UnsupervisedTree:
     def __dealloc__(self):
         """Destructor."""
         # Free all inner structures
-        free(self.n_classes)
         free(self.value)
         free(self.nodes)
 
     def __reduce__(self):
         """Reduce re-implementation, for pickling."""
-        return (UnsupervisedTree, (self.n_features,
-                       sizet_ptr_to_ndarray(self.n_classes, self.n_outputs),
-                       self.n_outputs), self.__getstate__())
+        return (UnsupervisedTree, (self.n_features), self.__getstate__())
 
     def __getstate__(self):
         """Getstate re-implementation, for pickling."""
@@ -494,8 +497,7 @@ cdef class UnsupervisedTree:
         node_ndarray = d['nodes']
         value_ndarray = d['values']
 
-        value_shape = (node_ndarray.shape[0], self.n_outputs,
-                       self.max_n_classes)
+        value_shape = (node_ndarray.shape[0],)
 
         node_ndarray = _check_node_ndarray(node_ndarray, expected_dtype=NODE_DTYPE)
         value_ndarray = _check_value_ndarray(
@@ -555,10 +557,17 @@ cdef class UnsupervisedTree:
         self.capacity = capacity
         return 0
 
-    cdef SIZE_t _add_node(self, SIZE_t parent, bint is_left, bint is_leaf,
-                          SIZE_t feature, double threshold, double impurity,
-                          SIZE_t n_node_samples,
-                          double weighted_n_node_samples) nogil except -1:
+    cdef SIZE_t _add_node(
+        self,
+        SIZE_t parent,
+        bint is_left,
+        bint is_leaf,
+        SIZE_t feature,
+        double threshold,
+        double impurity,
+        SIZE_t n_node_samples,
+        double weighted_n_node_samples
+    ) nogil except -1:
         """Add a node to the tree.
 
         The new node registers itself as the child of its parent.
@@ -596,14 +605,6 @@ cdef class UnsupervisedTree:
         self.node_count += 1
 
         return node_id
-
-    cpdef cnp.ndarray predict(self, object X):
-        """Predict target for X."""
-        out = self._get_value_ndarray().take(self.apply(X), axis=0,
-                                             mode='clip')
-        if self.n_outputs == 1:
-            out = out.reshape(X.shape[0], self.max_n_classes)
-        return out
 
     cpdef cnp.ndarray apply(self, object X):
         """Finds the terminal region (=leaf node) for each sample in X."""
@@ -925,12 +926,10 @@ cdef class UnsupervisedTree:
         The array keeps a reference to this Tree, which manages the underlying
         memory.
         """
-        cdef cnp.npy_intp shape[3]
+        cdef cnp.npy_intp shape[1]
         shape[0] = <cnp.npy_intp> self.node_count
-        shape[1] = <cnp.npy_intp> self.n_outputs
-        shape[2] = <cnp.npy_intp> self.max_n_classes
         cdef cnp.ndarray arr
-        arr = cnp.PyArray_SimpleNewFromData(3, shape, cnp.NPY_DOUBLE, self.value)
+        arr = cnp.PyArray_SimpleNewFromData(1, shape, cnp.NPY_DOUBLE, self.value)
         Py_INCREF(self)
         if PyArray_SetBaseObject(arr, <PyObject*> self) < 0:
             raise ValueError("Can't initialize array.")
@@ -1063,27 +1062,6 @@ cdef class UnsupervisedTree:
             if not (0.999 < total_weight < 1.001):
                 raise ValueError("Total weight should be 1.0 but was %.9f" %
                                  total_weight)
-
-
-def _check_n_classes(n_classes, expected_dtype):
-    if n_classes.ndim != 1:
-        raise ValueError(
-            f"Wrong dimensions for n_classes from the pickle: "
-            f"expected 1, got {n_classes.ndim}"
-        )
-
-    if n_classes.dtype == expected_dtype:
-        return n_classes
-
-    # Handles both different endianness and different bitness
-    if n_classes.dtype.kind == "i" and n_classes.dtype.itemsize in [4, 8]:
-        return n_classes.astype(expected_dtype, casting="same_kind")
-
-    raise ValueError(
-        "n_classes from the pickle has an incompatible dtype:\n"
-        f"- expected: {expected_dtype}\n"
-        f"- got:      {n_classes.dtype}"
-    )
 
 
 def _check_value_ndarray(value_ndarray, expected_dtype, expected_shape):
