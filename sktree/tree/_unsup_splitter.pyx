@@ -1,14 +1,13 @@
+#cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
+
 import numpy as np
 
 cimport numpy as cnp
+
 cnp.import_array()
 
 from libc.string cimport memcpy
-
-from sklearn.tree._utils cimport log
-from sklearn.tree._utils cimport rand_int
-from sklearn.tree._utils cimport rand_uniform
-from sklearn.tree._utils cimport RAND_R_MAX
+from sklearn.tree._utils cimport RAND_R_MAX, log, rand_int, rand_uniform
 
 from ._sklearn_splitter cimport sort
 
@@ -33,6 +32,41 @@ cdef inline void _init_split(SplitRecord* self, SIZE_t start_pos) nogil:
 
 cdef class UnsupervisedSplitter(BaseSplitter):
     """Base class for unsupervised splitters."""
+
+    def __cinit__(self, UnsupervisedCriterion criterion, SIZE_t max_features,
+                  SIZE_t min_samples_leaf, double min_weight_leaf,
+                  object random_state):
+        """
+        Parameters
+        ----------
+        criterion : Criterion
+            The criterion to measure the quality of a split.
+
+        max_features : SIZE_t
+            The maximal number of randomly selected features which can be
+            considered for a split.
+
+        min_samples_leaf : SIZE_t
+            The minimal number of samples each leaf can have, where splits
+            which would result in having less samples in a leaf are not
+            considered.
+
+        min_weight_leaf : double
+            The minimal weight each leaf can have, where the weight is the sum
+            of the weights of each sample in it.
+
+        random_state : object
+            The user inputted random state to be used for pseudo-randomness
+        """
+        self.criterion = criterion
+
+        self.n_samples = 0
+        self.n_features = 0
+
+        self.max_features = max_features
+        self.min_samples_leaf = min_samples_leaf
+        self.min_weight_leaf = min_weight_leaf
+        self.random_state = random_state
 
     cdef int init(
         self,
@@ -74,9 +108,9 @@ cdef class UnsupervisedSplitter(BaseSplitter):
         self.constant_features = np.empty(n_features, dtype=np.intp)
 
         self.sample_weight = sample_weight
-
+        print('Before setting X')
         self.X = X
-
+        print('After setting X')
         # initialize criterion
         self.criterion.init(
             self.sample_weight,
@@ -91,21 +125,40 @@ cdef class UnsupervisedSplitter(BaseSplitter):
         )
         return 0
 
-    cdef int node_split(
-        self,
-        double impurity,
-        SplitRecord* split,
-        SIZE_t* n_constant_features
-    ) nogil except -1:
-        """Find the best split on node samples[start:end].
+    cdef int node_reset(self, SIZE_t start, SIZE_t end,
+                        double* weighted_n_node_samples) nogil except -1:
+        """Reset splitter on node samples[start:end].
 
-        This is a placeholder method. The majority of computation will be done
-        here.
+        Returns -1 in case of failure to allocate memory (and raise MemoryError)
+        or 0 otherwise.
 
-        It should return -1 upon errors.
+        Parameters
+        ----------
+        start : SIZE_t
+            The index of the first sample to consider
+        end : SIZE_t
+            The index of the last sample to consider
+        weighted_n_node_samples : ndarray, dtype=double pointer
+            The total weight of those samples
         """
-        pass
 
+        self.start = start
+        self.end = end
+
+        self.criterion.set_sample_pointers(start, end)
+
+        weighted_n_node_samples[0] = self.criterion.weighted_n_node_samples
+        return 0
+
+    cdef void node_value(self, double* dest) nogil:
+        """Copy the value of node samples[start:end] into dest."""
+
+        self.criterion.node_value(dest)
+
+    cdef double node_impurity(self) nogil:
+        """Return the impurity of the current node."""
+
+        return self.criterion.node_impurity()
 
 cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
     """Split in a best-first fashion.

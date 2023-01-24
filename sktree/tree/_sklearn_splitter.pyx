@@ -2,13 +2,10 @@ from libc.stdlib cimport qsort
 from libc.string cimport memcpy
 
 import numpy as np
-
 from scipy.sparse import csc_matrix
 
-from sklearn.tree._utils cimport log
-from sklearn.tree._utils cimport rand_int
-from sklearn.tree._utils cimport rand_uniform
-from sklearn.tree._utils cimport RAND_R_MAX
+from sklearn.tree._utils cimport RAND_R_MAX, log, rand_int, rand_uniform
+
 
 # Sort n-element arrays pointed to by Xf and samples, simultaneously,
 # by the values in Xf. Algorithm: Introsort (Musser, SP&E, 1997).

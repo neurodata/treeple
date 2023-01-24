@@ -7,16 +7,15 @@
 # See _unsup_tree.pyx for details.
 
 import numpy as np
+
 cimport numpy as cnp
-
-from sklearn.tree._tree cimport DTYPE_t          # Type of X
-from sklearn.tree._tree cimport DOUBLE_t         # Type of y, sample_weight
-from sklearn.tree._tree cimport SIZE_t           # Type for indices and counters
-from sklearn.tree._tree cimport INT32_t          # Signed 32 bit integer
-from sklearn.tree._tree cimport UINT32_t         # Unsigned 32 bit integer
-
-from sklearn.tree._tree cimport Node
 from sklearn.tree._splitter cimport SplitRecord
+from sklearn.tree._tree cimport DOUBLE_t  # Type of y, sample_weight
+from sklearn.tree._tree cimport DTYPE_t  # Type of X
+from sklearn.tree._tree cimport INT32_t  # Signed 32 bit integer
+from sklearn.tree._tree cimport SIZE_t  # Type for indices and counters
+from sklearn.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
+from sklearn.tree._tree cimport Node
 
 from ._unsup_splitter cimport UnsupervisedSplitter
 
@@ -97,11 +96,11 @@ cdef class UnsupervisedTreeBuilder:
     cpdef build(
         self,
         UnsupervisedTree tree,
-        object X,
+        const DTYPE_t[:, ::1] X,
         cnp.ndarray sample_weight=*
     )
     cdef _check_input(
         self,
-        object X,
+        const DTYPE_t[:, ::1] X,
         cnp.ndarray sample_weight
     )

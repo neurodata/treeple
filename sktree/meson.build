@@ -81,3 +81,4 @@ cython_c_args += ['-Wno-cpp']
 cython_cpp_args = cython_c_args
 
 subdir('tree')
+subdir('tests')

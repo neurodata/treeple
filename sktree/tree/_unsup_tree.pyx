@@ -5,27 +5,25 @@
 # License: BSD 3 clause
 
 from cpython cimport Py_INCREF, PyObject, PyTypeObject
-
-from libc.stdlib cimport free
-from libc.string cimport memcpy
-from libc.string cimport memset
 from libc.stdint cimport SIZE_MAX
-from libcpp.vector cimport vector
-from libcpp.algorithm cimport pop_heap
-from libcpp.algorithm cimport push_heap
+from libc.stdlib cimport free
+from libc.string cimport memcpy, memset
 from libcpp cimport bool
+from libcpp.algorithm cimport pop_heap, push_heap
+from libcpp.vector cimport vector
 
 import struct
 
 import numpy as np
+
 cimport numpy as cnp
+
 cnp.import_array()
 
-from scipy.sparse import issparse
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_matrix, issparse
 
-from sklearn.tree._utils cimport safe_realloc
-from sklearn.tree._utils cimport sizet_ptr_to_ndarray
+from sklearn.tree._utils cimport safe_realloc, sizet_ptr_to_ndarray
+
 
 cdef extern from "numpy/arrayobject.h":
     object PyArray_NewFromDescr(PyTypeObject* subtype, cnp.dtype descr,
@@ -49,6 +47,7 @@ cdef extern from "<stack>" namespace "std" nogil:
 
 from numpy import float32 as DTYPE
 from numpy import float64 as DOUBLE
+
 
 cdef double INFINITY = np.inf
 cdef double EPSILON = np.finfo('double').eps
@@ -78,26 +77,31 @@ NODE_DTYPE = np.asarray(<Node[:1]>(&dummy)).dtype
 cdef class UnsupervisedTreeBuilder:
     """Interface for different tree building strategies."""
 
-    cpdef build(self, UnsupervisedTree tree, object X, cnp.ndarray sample_weight=None):
+    cpdef build(
+        self,
+        UnsupervisedTree tree,
+        const DTYPE_t[:, ::1] X,
+        cnp.ndarray sample_weight=None
+    ):
         """Build a decision tree from the training set X."""
         pass
 
-    cdef inline _check_input(self, object X, cnp.ndarray sample_weight):
+    cdef inline _check_input(self, const DTYPE_t[:, ::1] X, cnp.ndarray sample_weight):
         """Check input dtype, layout and format"""
-        if issparse(X):
-            X = X.tocsc()
-            X.sort_indices()
+        # if issparse(X):
+        #     X = X.tocsc()
+        #     X.sort_indices()
 
-            if X.data.dtype != DTYPE:
-                X.data = np.ascontiguousarray(X.data, dtype=DTYPE)
+        #     if X.data.dtype != DTYPE:
+        #         X.data = np.ascontiguousarray(X.data, dtype=DTYPE)
 
-            if X.indices.dtype != np.int32 or X.indptr.dtype != np.int32:
-                raise ValueError("No support for np.int64 index based "
-                                 "sparse matrices")
+        #     if X.indices.dtype != np.int32 or X.indptr.dtype != np.int32:
+        #         raise ValueError("No support for np.int64 index based "
+        #                          "sparse matrices")
 
-        elif X.dtype != DTYPE:
-            # since we have to copy we will make it fortran for efficiency
-            X = np.asfortranarray(X, dtype=DTYPE)
+        # elif X.dtype != DTYPE:
+        #     # since we have to copy we will make it fortran for efficiency
+        #     X = np.ascontiguousarray(X, dtype=DTYPE)
 
         if (sample_weight is not None and
             (sample_weight.dtype != DOUBLE or
@@ -122,6 +126,17 @@ cdef struct FrontierRecord:
     double impurity_left
     double impurity_right
     double improvement
+
+# Depth first builder ---------------------------------------------------------
+# A record on the stack for depth-first tree growing
+cdef struct StackRecord:
+    SIZE_t start
+    SIZE_t end
+    SIZE_t depth
+    SIZE_t parent
+    bint is_left
+    double impurity
+    SIZE_t n_constant_features
 
 cdef inline bool _compare_records(
     const FrontierRecord& left,
@@ -167,18 +182,19 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
     cpdef build(
         self,
         UnsupervisedTree tree,
-        object X,
+        const DTYPE_t[:, ::1] X,
         cnp.ndarray sample_weight=None
     ):
         """Build a decision tree from the training set X."""
         # check input
-        X, sample_weight = self._check_input(X, sample_weight)
+        # X, sample_weight = self._check_input(X, sample_weight)
 
         # Parameters
         cdef UnsupervisedSplitter splitter = self.splitter
         cdef SIZE_t max_leaf_nodes = self.max_leaf_nodes
 
         # Recursive partition (without actual recursion)
+        print('Wtf')
         splitter.init(X, sample_weight)
 
         cdef vector[FrontierRecord] frontier
@@ -343,6 +359,174 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
 
         return 0
 
+cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
+    """Build a decision tree in depth-first fashion."""
+
+    def __cinit__(
+        self, 
+        UnsupervisedSplitter splitter, 
+        SIZE_t min_samples_split,
+        SIZE_t min_samples_leaf, 
+        double min_weight_leaf,
+        SIZE_t max_depth, 
+        double min_impurity_decrease
+    ):
+        self.splitter = splitter
+        self.min_samples_split = min_samples_split
+        self.min_samples_leaf = min_samples_leaf
+        self.min_weight_leaf = min_weight_leaf
+        self.max_depth = max_depth
+        self.min_impurity_decrease = min_impurity_decrease
+
+    cpdef build(
+        self,
+        UnsupervisedTree tree,
+        const DTYPE_t[:, ::1] X,
+        cnp.ndarray sample_weight=None
+    ):
+        """Build a decision tree from the training set (X, y)."""
+
+        # check input
+        # X, sample_weight = self._check_input(X, sample_weight)
+
+        # Initial capacity
+        cdef int init_capacity
+
+        if tree.max_depth <= 10:
+            init_capacity = (2 ** (tree.max_depth + 1)) - 1
+        else:
+            init_capacity = 2047
+
+        tree._resize(init_capacity)
+
+        # Parameters
+        cdef UnsupervisedSplitter splitter = self.splitter
+        cdef SIZE_t max_depth = self.max_depth
+        cdef SIZE_t min_samples_leaf = self.min_samples_leaf
+        cdef double min_weight_leaf = self.min_weight_leaf
+        cdef SIZE_t min_samples_split = self.min_samples_split
+        cdef double min_impurity_decrease = self.min_impurity_decrease
+
+        # Recursive partition (without actual recursion)
+        print('Wtf inside depth')
+        splitter.init(X, sample_weight)
+
+        cdef SIZE_t start
+        cdef SIZE_t end
+        cdef SIZE_t depth
+        cdef SIZE_t parent
+        cdef bint is_left
+        cdef SIZE_t n_node_samples = splitter.n_samples
+        cdef double weighted_n_node_samples
+        cdef SIZE_t node_id
+
+        # initialize record to keep track of split node data and a pointer to the
+        # memory address containing the split node
+        # Note: the pointer allows us to modularly define different split records
+        cdef SplitRecord split
+
+        cdef double impurity = INFINITY
+        cdef SIZE_t n_constant_features
+        cdef bint is_leaf
+        cdef bint first = 1
+        cdef SIZE_t max_depth_seen = -1
+        cdef int rc = 0
+
+        cdef stack[StackRecord] builder_stack
+        cdef StackRecord stack_record
+
+        with nogil:
+            # push root node onto stack
+            builder_stack.push({
+                "start": 0,
+                "end": n_node_samples,
+                "depth": 0,
+                "parent": _TREE_UNDEFINED,
+                "is_left": 0,
+                "impurity": INFINITY,
+                "n_constant_features": 0})
+
+            while not builder_stack.empty():
+                stack_record = builder_stack.top()
+                builder_stack.pop()
+
+                start = stack_record.start
+                end = stack_record.end
+                depth = stack_record.depth
+                parent = stack_record.parent
+                is_left = stack_record.is_left
+                impurity = stack_record.impurity
+                n_constant_features = stack_record.n_constant_features
+
+                n_node_samples = end - start
+                splitter.node_reset(start, end, &weighted_n_node_samples)
+
+                is_leaf = (depth >= max_depth or
+                           n_node_samples < min_samples_split or
+                           n_node_samples < 2 * min_samples_leaf or
+                           weighted_n_node_samples < 2 * min_weight_leaf)
+
+                if first:
+                    impurity = splitter.node_impurity()
+                    first = 0
+
+                # impurity == 0 with tolerance due to rounding errors
+                is_leaf = is_leaf or impurity <= EPSILON
+
+                if not is_leaf:
+                    splitter.node_split(impurity, &split, &n_constant_features)
+
+                    # If EPSILON=0 in the below comparison, float precision
+                    # issues stop splitting, producing trees that are
+                    # dissimilar to v0.18
+                    is_leaf = (is_leaf or split.pos >= end or
+                               (split.improvement + EPSILON <
+                                min_impurity_decrease))
+
+                node_id = tree._add_node(parent, is_left, is_leaf, split.feature,
+                                         split.threshold,
+                                          impurity, n_node_samples,
+                                          weighted_n_node_samples)
+                if node_id == SIZE_MAX:
+                    rc = -1
+                    break
+
+                # Store value for all nodes, to facilitate tree/model
+                # inspection and interpretation
+                splitter.node_value(tree.value + node_id * tree.value_stride)
+
+                if not is_leaf:
+                    # Push right child on stack
+                    builder_stack.push({
+                        "start": split.pos,
+                        "end": end,
+                        "depth": depth + 1,
+                        "parent": node_id,
+                        "is_left": 0,
+                        "impurity": split.impurity_right,
+                        "n_constant_features": n_constant_features})
+
+                    # Push left child on stack
+                    builder_stack.push({
+                        "start": start,
+                        "end": split.pos,
+                        "depth": depth + 1,
+                        "parent": node_id,
+                        "is_left": 1,
+                        "impurity": split.impurity_left,
+                        "n_constant_features": n_constant_features})
+
+                if depth > max_depth_seen:
+                    max_depth_seen = depth
+
+            if rc >= 0:
+                rc = tree._resize_c(tree.node_count)
+
+            if rc >= 0:
+                tree.max_depth = max_depth_seen
+
+        if rc == -1:
+            raise MemoryError()
 
 # =============================================================================
 # Unsupervised Tree

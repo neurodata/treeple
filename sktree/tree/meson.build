@@ -2,12 +2,12 @@ extensions = [
   '_sklearn_splitter',
   '_unsup_criterion',
   '_unsup_splitter',
-  # '_unsup_tree',
+  '_unsup_tree',
 ]
 
 foreach ext: extensions
   py3.extension_module(ext,
-    cython_gen.process(ext + '.pyx'),
+    cython_gen_cpp.process(ext + '.pyx'),
     c_args: cython_c_args,
     include_directories: [incdir_numpy],
     # override_options : ['cython_language=cpp'],
@@ -28,4 +28,4 @@ py3.install_sources(
 )
 
 # TODO: comment in if we include tests
-# subdir('tests')
+subdir('tests')
