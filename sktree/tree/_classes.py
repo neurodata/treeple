@@ -4,14 +4,15 @@ import warnings
 from math import ceil
 
 import numpy as np
-from sklearn.base import ClusterMixin
+from scipy.sparse import issparse
+from sklearn.base import ClusterMixin, TransformerMixin
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.tree import BaseDecisionTree
 from sklearn.tree import _tree as _sklearn_tree
 from sklearn.tree._criterion import BaseCriterion
 from sklearn.tree._splitter import BaseSplitter
 from sklearn.utils import check_random_state
-from sklearn.utils.validation import _check_sample_weight
+from sklearn.utils.validation import _check_sample_weight, check_is_fitted
 
 from sktree.tree import _unsup_criterion, _unsup_splitter
 from sktree.tree._unsup_tree import (
@@ -28,7 +29,7 @@ CRITERIA = {"twomeans": _unsup_criterion.TwoMeans}
 SPLITTERS = {"best": _unsup_splitter.BestUnsupervisedSplitter}
 
 
-class UnsupervisedDecisionTree(BaseDecisionTree, ClusterMixin):
+class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree):
     """Unsupervised decision tree.
 
     TODO: need to implement the logic fit/fit_transform/etc.
@@ -125,6 +126,8 @@ class UnsupervisedDecisionTree(BaseDecisionTree, ClusterMixin):
         max_leaf_nodes=None,
         random_state=None,
         min_impurity_decrease=0.0,
+        clustering_func=None,
+        clustering_func_args=None,
     ):
         super().__init__(
             criterion=criterion,
@@ -139,40 +142,24 @@ class UnsupervisedDecisionTree(BaseDecisionTree, ClusterMixin):
             min_impurity_decrease=min_impurity_decrease,
         )
 
+        self.clustering_func = clustering_func
+        self.clustering_func_args = clustering_func_args
+
     def fit(self, X, y=None, sample_weight=None, check_input=True):
         self._validate_params()
         random_state = check_random_state(self.random_state)
         if check_input:
-            # Need to validate separately here.
-            # We can't pass multi_output=True because that would allow y to be
-            # csr.
-            check_X_params = dict(
-                dtype=DTYPE
-                # , accept_sparse="csc"
-            )
-            # check_y_params = dict(ensure_2d=False, dtype=None)
+            # TODO: allow X to be sparse
+            check_X_params = dict(dtype=DTYPE)  # , accept_sparse="csc"
             X = self._validate_data(X, validate_separately=(check_X_params))
-            # if issparse(X):
-            #     X.sort_indices()
+            if issparse(X):
+                X.sort_indices()
 
-            #     if X.indices.dtype != np.intc or X.indptr.dtype != np.intc:
-            #         raise ValueError(
-            #             "No support for np.int64 index based sparse matrices"
-            #         )
+                if X.indices.dtype != np.intc or X.indptr.dtype != np.intc:
+                    raise ValueError("No support for np.int64 index based sparse matrices")
 
-            if self.criterion == "poisson":
-                if np.any(y < 0):
-                    raise ValueError(
-                        "Some value(s) of y are negative which is"
-                        " not allowed for Poisson regression."
-                    )
-                if np.sum(y) <= 0:
-                    raise ValueError(
-                        "Sum of y is not positive which is " "necessary for Poisson regression."
-                    )
-
-        if getattr(X, "dtype", None) != DTYPE or not X.flags.contiguous:
-            X = np.ascontiguousarray(X, dtype=DTYPE)
+        # if getattr(X, "dtype", None) != DTYPE or not X.flags.contiguous:
+        #     X = np.ascontiguousarray(X, dtype=DTYPE)
 
         # Determine output settings
         n_samples, self.n_features_in_ = X.shape
@@ -277,26 +264,49 @@ class UnsupervisedDecisionTree(BaseDecisionTree, ClusterMixin):
         self.affinity_matrix_ = self._compute_affinity_matrix(X_leaves)
 
         # compute the labels and set it
-        self.labels_ = self._assign_labels(self.affinity_matrix_)
+        if n_samples >= 2:
+            self.labels_ = self._assign_labels(self.affinity_matrix_)
 
         return self
 
-    def predict(self, X):
+    def predict(self, X, check_input=True):
+        X = self._validate_X_predict(X, check_input=check_input)
+        affinity_matrix = self.transform(X)
+
+        # compute the labels and set it
+        return self._assign_labels(affinity_matrix)
+
+    def transform(self, X):
+        """Transform X to a cluster-distance space.
+
+        In the new space, each dimension is the distance to the cluster
+        centers. Note that even if X is sparse, the array returned by
+        `transform` will typically be dense.
+
+        Parameters
+        ----------
+        X : {array-like, sparse matrix} of shape (n_samples, n_features)
+            New data to transform.
+
+        Returns
+        -------
+        X_new : ndarray of shape (n_samples, n_samples)
+            X transformed in the new space.
+        """
+        check_is_fitted(self)
         # apply to the leaves
         X_leaves = self.apply(X)
 
         # now compute the affinity matrix and set it
         affinity_matrix = self._compute_affinity_matrix(X_leaves)
+        return affinity_matrix
 
-        # compute the labels and set it
-        return self._assign_labels(affinity_matrix)
-
-    def _compute_affinity_matrix(self, X):
+    def _compute_affinity_matrix(self, X_leaves):
         """Compute the proximity matrix of samples in X.
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples,)
+        X_leaves : ndarray of shape (n_samples,)
             For each datapoint x in X and for each tree in the forest,
             is the index of the leaf x ends up in.
 
@@ -304,18 +314,16 @@ class UnsupervisedDecisionTree(BaseDecisionTree, ClusterMixin):
         -------
         prox_matrix : array-like of shape (n_samples, n_samples)
         """
-        n_samples = X.shape[0]
-        aff_matrix = np.zeros((n_samples, n_samples), dtype=np.int)
+        n_samples = X_leaves.shape[0]
+        aff_matrix = np.zeros((n_samples, n_samples), dtype=np.int32)
 
-        # fill the main diagonal with 1's
-        np.fill_diagonal(aff_matrix, 1.0)
+        # for every unique leaf in this dataset, count all co-occurrences of samples
+        # in the same leaf
+        for leaf in np.unique(X_leaves):
+            # find out which samples occur with this leaf
+            samples_in_leaf = np.atleast_1d(np.argwhere(X_leaves == leaf).squeeze())
+            aff_matrix[np.ix_(samples_in_leaf, samples_in_leaf)] += 1
 
-        for unique_leaf in np.unique(X):
-            # find all samples
-            samples_in_leaf = np.argwhere(X == unique_leaf)
-
-            if len(samples_in_leaf) > 1:
-                aff_matrix[np.ix_(samples_in_leaf, samples_in_leaf)] += 1
         return aff_matrix
 
     def _assign_labels(self, affinity_matrix):
@@ -331,9 +339,16 @@ class UnsupervisedDecisionTree(BaseDecisionTree, ClusterMixin):
         predict_labels : ndarray of shape (n_samples,)
             The predicted cluster labels
         """
-        # apply agglomerative clustering to obtain cluster labels
         if self.clustering_func is None:
-            self.clustering_func = AgglomerativeClustering
-        cluster = self.clustering_func(**self.clustering_func_args)
+            self.clustering_func_ = AgglomerativeClustering
+        else:
+            self.clustering_func_ = self.clustering_func
+        if self.clustering_func_args is None:
+            self.clustering_func_args_ = dict()
+        else:
+            self.clustering_func_args_ = self.clustering_func_args
+        cluster = self.clustering_func_(**self.clustering_func_args_)
+
+        # apply agglomerative clustering to obtain cluster labels
         predict_labels = cluster.fit_predict(affinity_matrix)
         return predict_labels

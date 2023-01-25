@@ -27,7 +27,6 @@ cdef class UnsupervisedTree:
 
     # Input/Output layout
     cdef public SIZE_t n_features        # Number of features in X
-    cdef public SIZE_t max_n_classes     # max(n_classes)
 
     # Inner structures: values are stored separately from node structure,
     # since size is determined at runtime.
@@ -35,8 +34,8 @@ cdef class UnsupervisedTree:
     cdef public SIZE_t node_count        # Counter for node IDs
     cdef public SIZE_t capacity          # Capacity of tree, in terms of nodes
     cdef Node* nodes                     # Array of nodes
-    cdef double* value                   # (capacity, n_outputs, max_n_classes) array of values
-    cdef SIZE_t value_stride             # = n_outputs * max_n_classes
+    cdef double* value                   # (capacity) array of values
+    cdef SIZE_t value_stride             # = 1
 
     # Methods
     cdef SIZE_t _add_node(
@@ -96,11 +95,11 @@ cdef class UnsupervisedTreeBuilder:
     cpdef build(
         self,
         UnsupervisedTree tree,
-        const DTYPE_t[:, ::1] X,
+        object X,
         cnp.ndarray sample_weight=*
     )
     cdef _check_input(
         self,
-        const DTYPE_t[:, ::1] X,
+        object X,
         cnp.ndarray sample_weight
     )

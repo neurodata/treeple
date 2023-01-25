@@ -1,3 +1,5 @@
+#cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
+
 # Authors: Adam Li <adam2392@gmail.com>
 #          Jong Shin <jshinm@gmail.com>
 #
@@ -22,7 +24,7 @@ cnp.import_array()
 
 from scipy.sparse import csr_matrix, issparse
 
-from sklearn.tree._utils cimport safe_realloc, sizet_ptr_to_ndarray
+from sklearn.tree._utils cimport safe_realloc
 
 
 cdef extern from "numpy/arrayobject.h":
@@ -80,34 +82,32 @@ cdef class UnsupervisedTreeBuilder:
     cpdef build(
         self,
         UnsupervisedTree tree,
-        const DTYPE_t[:, ::1] X,
+        object X,
         cnp.ndarray sample_weight=None
     ):
         """Build a decision tree from the training set X."""
         pass
 
-    cdef inline _check_input(self, const DTYPE_t[:, ::1] X, cnp.ndarray sample_weight):
+    cdef inline _check_input(self, object X, cnp.ndarray sample_weight):
         """Check input dtype, layout and format"""
-        # if issparse(X):
-        #     X = X.tocsc()
-        #     X.sort_indices()
+        if issparse(X):
+            X = X.tocsc()
+            X.sort_indices()
 
-        #     if X.data.dtype != DTYPE:
-        #         X.data = np.ascontiguousarray(X.data, dtype=DTYPE)
+            if X.data.dtype != DTYPE:
+                X.data = np.ascontiguousarray(X.data, dtype=DTYPE)
 
-        #     if X.indices.dtype != np.int32 or X.indptr.dtype != np.int32:
-        #         raise ValueError("No support for np.int64 index based "
-        #                          "sparse matrices")
+            if X.indices.dtype != np.int32 or X.indptr.dtype != np.int32:
+                raise ValueError("No support for np.int64 index based "
+                                 "sparse matrices")
 
-        # elif X.dtype != DTYPE:
-        #     # since we have to copy we will make it fortran for efficiency
-        #     X = np.ascontiguousarray(X, dtype=DTYPE)
+        elif X.dtype != DTYPE:
+            # since we have to copy we will make it fortran for efficiency
+            X = np.asfortranarray(X, dtype=DTYPE)
 
-        if (sample_weight is not None and
-            (sample_weight.dtype != DOUBLE or
-            not sample_weight.flags.contiguous)):
-                sample_weight = np.asarray(sample_weight, dtype=DOUBLE,
-                                           order="C")
+        if (sample_weight is not None) and \
+            (sample_weight.dtype != DOUBLE or not sample_weight.flags.contiguous):
+            sample_weight = np.asarray(sample_weight, dtype=DOUBLE, order="C")
 
         return X, sample_weight
 
@@ -165,7 +165,7 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
         self,
         UnsupervisedSplitter splitter,
         SIZE_t min_samples_split,
-        SIZE_t min_samples_leaf, 
+        SIZE_t min_samples_leaf,
         double min_weight_leaf,
         SIZE_t max_depth,
         SIZE_t max_leaf_nodes,
@@ -182,19 +182,18 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
     cpdef build(
         self,
         UnsupervisedTree tree,
-        const DTYPE_t[:, ::1] X,
+        object X,
         cnp.ndarray sample_weight=None
     ):
         """Build a decision tree from the training set X."""
         # check input
-        # X, sample_weight = self._check_input(X, sample_weight)
+        X, sample_weight = self._check_input(X, sample_weight)
 
         # Parameters
         cdef UnsupervisedSplitter splitter = self.splitter
         cdef SIZE_t max_leaf_nodes = self.max_leaf_nodes
 
         # Recursive partition (without actual recursion)
-        print('Wtf')
         splitter.init(X, sample_weight)
 
         cdef vector[FrontierRecord] frontier
@@ -327,7 +326,8 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
                                  if parent != NULL
                                  else _TREE_UNDEFINED,
                                  is_left, is_leaf,
-                                 split.feature, split.threshold, impurity, n_node_samples,
+                                 split.feature, split.threshold,
+                                 impurity, n_node_samples,
                                  weighted_n_node_samples)
         if node_id == SIZE_MAX:
             return -1
@@ -363,12 +363,12 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
     """Build a decision tree in depth-first fashion."""
 
     def __cinit__(
-        self, 
-        UnsupervisedSplitter splitter, 
+        self,
+        UnsupervisedSplitter splitter,
         SIZE_t min_samples_split,
-        SIZE_t min_samples_leaf, 
+        SIZE_t min_samples_leaf,
         double min_weight_leaf,
-        SIZE_t max_depth, 
+        SIZE_t max_depth,
         double min_impurity_decrease
     ):
         self.splitter = splitter
@@ -381,13 +381,13 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
     cpdef build(
         self,
         UnsupervisedTree tree,
-        const DTYPE_t[:, ::1] X,
+        object X,
         cnp.ndarray sample_weight=None
     ):
         """Build a decision tree from the training set (X, y)."""
 
         # check input
-        # X, sample_weight = self._check_input(X, sample_weight)
+        X, sample_weight = self._check_input(X, sample_weight)
 
         # Initial capacity
         cdef int init_capacity
@@ -408,7 +408,6 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
         cdef double min_impurity_decrease = self.min_impurity_decrease
 
         # Recursive partition (without actual recursion)
-        print('Wtf inside depth')
         splitter.init(X, sample_weight)
 
         cdef SIZE_t start
@@ -467,7 +466,8 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
                            weighted_n_node_samples < 2 * min_weight_leaf)
 
                 if first:
-                    impurity = splitter.node_impurity()
+                    impurity = 1.0e8
+                    # impurity = splitter.node_impurity()
                     first = 0
 
                 # impurity == 0 with tolerance due to rounding errors
@@ -485,8 +485,8 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
 
                 node_id = tree._add_node(parent, is_left, is_leaf, split.feature,
                                          split.threshold,
-                                          impurity, n_node_samples,
-                                          weighted_n_node_samples)
+                                         impurity, n_node_samples,
+                                         weighted_n_node_samples)
                 if node_id == SIZE_MAX:
                     rc = -1
                     break
@@ -635,8 +635,6 @@ cdef class UnsupervisedTree:
 
     def __cinit__(self, int n_features):
         """Constructor."""
-        cdef SIZE_t dummy = 0
-        
         # Input/Output layout
         self.n_features = n_features
 
@@ -657,7 +655,7 @@ cdef class UnsupervisedTree:
 
     def __reduce__(self):
         """Reduce re-implementation, for pickling."""
-        return (UnsupervisedTree, (self.n_features), self.__getstate__())
+        return (UnsupervisedTree, (self.n_features,), self.__getstate__())
 
     def __getstate__(self):
         """Getstate re-implementation, for pickling."""
@@ -848,8 +846,8 @@ cdef class UnsupervisedTree:
 
         # Extract input
         cdef cnp.ndarray[ndim=1, dtype=DTYPE_t] X_data_ndarray = X.data
-        cdef cnp.ndarray[ndim=1, dtype=INT32_t] X_indices_ndarray  = X.indices
-        cdef cnp.ndarray[ndim=1, dtype=INT32_t] X_indptr_ndarray  = X.indptr
+        cdef cnp.ndarray[ndim=1, dtype=INT32_t] X_indices_ndarray = X.indices
+        cdef cnp.ndarray[ndim=1, dtype=INT32_t] X_indptr_ndarray = X.indptr
 
         cdef DTYPE_t* X_data = <DTYPE_t*>X_data_ndarray.data
         cdef INT32_t* X_indices = <INT32_t*>X_indices_ndarray.data
@@ -986,8 +984,8 @@ cdef class UnsupervisedTree:
 
         # Extract input
         cdef cnp.ndarray[ndim=1, dtype=DTYPE_t] X_data_ndarray = X.data
-        cdef cnp.ndarray[ndim=1, dtype=INT32_t] X_indices_ndarray  = X.indices
-        cdef cnp.ndarray[ndim=1, dtype=INT32_t] X_indptr_ndarray  = X.indptr
+        cdef cnp.ndarray[ndim=1, dtype=INT32_t] X_indices_ndarray = X.indices
+        cdef cnp.ndarray[ndim=1, dtype=INT32_t] X_indptr_ndarray = X.indptr
 
         cdef DTYPE_t* X_data = <DTYPE_t*>X_data_ndarray.data
         cdef INT32_t* X_indices = <INT32_t*>X_indices_ndarray.data
@@ -1064,7 +1062,6 @@ cdef class UnsupervisedTree:
                          shape=(n_samples, self.node_count))
 
         return out
-
 
     cpdef compute_feature_importances(self, normalize=True):
         """Computes the importance of each feature (aka variable)."""
@@ -1230,8 +1227,9 @@ cdef class UnsupervisedTree:
                         # push left child
                         node_idx_stack[stack_size] = current_node.left_child
                         left_sample_frac = (
-                            self.nodes[current_node.left_child].weighted_n_node_samples /
-                            current_node.weighted_n_node_samples)
+                            self.nodes[current_node.left_child].weighted_n_node_samples
+                            / current_node.weighted_n_node_samples
+                        )
                         current_weight = weight_stack[stack_size]
                         weight_stack[stack_size] = current_weight * left_sample_frac
                         stack_size += 1
@@ -1353,4 +1351,3 @@ def _check_node_ndarray(node_ndarray, expected_dtype):
         )
 
     return node_ndarray.astype(expected_dtype, casting="same_kind")
-

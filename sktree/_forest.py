@@ -11,19 +11,24 @@ from warnings import warn
 
 import numpy as np
 from scipy.sparse import issparse
-from sklearn.base import ClusterMixin
+from sklearn.base import ClusterMixin, TransformerMixin
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.ensemble._forest import (
+    MAX_INT,
     BaseForest,
     _generate_unsampled_indices,
     _get_n_samples_bootstrap,
+    _parallel_build_trees,
 )
 from sklearn.metrics import calinski_harabasz_score
+from sklearn.tree._tree import DTYPE
+from sklearn.utils.parallel import Parallel, delayed
+from sklearn.utils.validation import _check_sample_weight, check_is_fitted, check_random_state
 
 from .tree import UnsupervisedDecisionTree
 
 
-class ForestCluster(ClusterMixin, BaseForest):
+class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):
     """Unsupervised forest base class."""
 
     def __init__(
@@ -54,7 +59,97 @@ class ForestCluster(ClusterMixin, BaseForest):
         )
 
     def fit(self, X, y=None, sample_weight=None):
-        super().fit(X, y, sample_weight)
+        self._validate_params()
+
+        # Validate or convert input data
+        X = self._validate_data(
+            X,
+            dtype=DTYPE,  # accept_sparse="csc",
+        )
+        if sample_weight is not None:
+            sample_weight = _check_sample_weight(sample_weight, X)
+
+        if issparse(X):
+            # Pre-sort indices to avoid that each individual tree of the
+            # ensemble sorts the indices.
+            X.sort_indices()
+
+        if not self.bootstrap and self.max_samples is not None:
+            raise ValueError(
+                "`max_sample` cannot be set if `bootstrap=False`. "
+                "Either switch to `bootstrap=True` or set "
+                "`max_sample=None`."
+            )
+        elif self.bootstrap:
+            n_samples_bootstrap = _get_n_samples_bootstrap(
+                n_samples=X.shape[0], max_samples=self.max_samples
+            )
+        else:
+            n_samples_bootstrap = None
+
+        self._validate_estimator()
+
+        if not self.bootstrap and self.oob_score:
+            raise ValueError("Out of bag estimation only available if bootstrap=True")
+
+        random_state = check_random_state(self.random_state)
+
+        if not self.warm_start or not hasattr(self, "estimators_"):
+            # Free allocated memory, if any
+            self.estimators_ = []
+
+        n_more_estimators = self.n_estimators - len(self.estimators_)
+
+        if n_more_estimators < 0:
+            raise ValueError(
+                "n_estimators=%d must be larger or equal to "
+                "len(estimators_)=%d when warm_start==True"
+                % (self.n_estimators, len(self.estimators_))
+            )
+
+        elif n_more_estimators == 0:
+            warn("Warm-start fitting without increasing n_estimators does not " "fit new trees.")
+        else:
+            if self.warm_start and len(self.estimators_) > 0:
+                # We draw from the random state to get the random state we
+                # would have got if we hadn't used a warm_start.
+                random_state.randint(MAX_INT, size=len(self.estimators_))
+
+            trees = [
+                self._make_estimator(append=False, random_state=random_state)
+                for i in range(n_more_estimators)
+            ]
+
+            # Parallel loop: we prefer the threading backend as the Cython code
+            # for fitting the trees is internally releasing the Python GIL
+            # making threading more efficient than multiprocessing in
+            # that case. However, for joblib 0.12+ we respect any
+            # parallel_backend contexts set at a higher level,
+            # since correctness does not rely on using threads.
+            trees = Parallel(n_jobs=self.n_jobs, verbose=self.verbose, prefer="threads",)(
+                delayed(_parallel_build_trees)(
+                    t,
+                    self.bootstrap,
+                    X,
+                    y,
+                    sample_weight,
+                    i,
+                    len(trees),
+                    verbose=self.verbose,
+                    class_weight=self.class_weight,
+                    n_samples_bootstrap=n_samples_bootstrap,
+                )
+                for i, t in enumerate(trees)
+            )
+
+            # Collect newly grown trees
+            self.estimators_.extend(trees)
+
+        if self.oob_score:
+            if callable(self.oob_score):
+                self._set_oob_score_and_attributes(X, scoring_function=self.oob_score)
+            else:
+                self._set_oob_score_and_attributes(X)
 
         # apply to the leaves
         X_leaves = self.apply(X)
@@ -88,14 +183,36 @@ class ForestCluster(ClusterMixin, BaseForest):
         y : ndarray of shape (n_samples,) or (n_samples, n_outputs)
             The predicted classes.
         """
+        X = self._validate_X_predict(X)
+        affinity_matrix = self.transform(X)
+
+        # compute the labels and set it
+        return self._assign_labels(affinity_matrix)
+
+    def transform(self, X):
+        """Transform X to a cluster-distance space.
+
+        In the new space, each dimension is the distance to the cluster
+        centers. Note that even if X is sparse, the array returned by
+        `transform` will typically be dense.
+
+        Parameters
+        ----------
+        X : {array-like, sparse matrix} of shape (n_samples, n_features)
+            New data to transform.
+
+        Returns
+        -------
+        X_new : ndarray of shape (n_samples, n_samples)
+            X transformed in the new space.
+        """
+        check_is_fitted(self)
         # apply to the leaves
         X_leaves = self.apply(X)
 
         # now compute the affinity matrix and set it
         affinity_matrix = self._compute_affinity_matrix(X_leaves)
-
-        # compute the labels and set it
-        return self._assign_labels(affinity_matrix)
+        return affinity_matrix
 
     def _compute_affinity_matrix(self, X):
         """Compute the proximity matrix of samples in X.
@@ -111,18 +228,18 @@ class ForestCluster(ClusterMixin, BaseForest):
         prox_matrix : array-like of shape (n_samples, n_samples)
         """
         n_samples = X.shape[0]
-        aff_matrix = np.zeros((n_samples, n_samples), dtype=np.int)
+        aff_matrix = np.zeros((n_samples, n_samples), dtype=np.float32)
 
         # fill the main diagonal with 1's
-        np.fill_diagonal(aff_matrix, 1.0)
-
+        # np.fill_diagonal(aff_matrix, 1.0)
         for idx in range(self.n_estimators):
             for unique_leaf in np.unique(X[:, idx]):
                 # find all samples
-                samples_in_leaf = np.argwhere(X[:, idx] == unique_leaf)
+                samples_in_leaf = np.atleast_1d(np.argwhere(X[:, idx] == unique_leaf).squeeze())
+                aff_matrix[np.ix_(samples_in_leaf, samples_in_leaf)] += 1
 
-                if len(samples_in_leaf) > 1:
-                    aff_matrix[np.ix_(samples_in_leaf, samples_in_leaf)] += 1
+        # normalize by the number of trees
+        aff_matrix = np.divide(aff_matrix, self.n_estimators)
         return aff_matrix
 
     def _assign_labels(self, affinity_matrix):
@@ -130,7 +247,7 @@ class ForestCluster(ClusterMixin, BaseForest):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_samples)
+        affinity_matrix : ndarray of shape (n_samples, n_samples)
             The affinity matrix.
 
         Returns
@@ -138,10 +255,17 @@ class ForestCluster(ClusterMixin, BaseForest):
         predict_labels : ndarray of shape (n_samples,)
             The predicted cluster labels
         """
-        # apply agglomerative clustering to obtain cluster labels
         if self.clustering_func is None:
-            self.clustering_func = AgglomerativeClustering
-        cluster = self.clustering_func(**self.clustering_func_args)
+            self.clustering_func_ = AgglomerativeClustering
+        else:
+            self.clustering_func_ = self.clustering_func
+        if self.clustering_func_args is None:
+            self.clustering_func_args_ = dict()
+        else:
+            self.clustering_func_args_ = self.clustering_func_args
+        cluster = self.clustering_func_(**self.clustering_func_args_)
+
+        # apply agglomerative clustering to obtain cluster labels
         predict_labels = cluster.fit_predict(affinity_matrix)
         return predict_labels
 
@@ -440,7 +564,7 @@ class UnsupervisedRandomForest(ForestCluster):
         warm_start=False,
         max_samples=None,
         clustering_func=None,
-        clustering_func_args=dict(),
+        clustering_func_args=None,
     ) -> None:
         super().__init__(
             estimator=UnsupervisedDecisionTree(),  # type: ignore

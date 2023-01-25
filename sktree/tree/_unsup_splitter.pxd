@@ -20,13 +20,13 @@ cdef class UnsupervisedSplitter(BaseSplitter):
 
     # XXX: requires BaseSplitter to not define "criterion"
     cdef public UnsupervisedCriterion criterion         # criterion computer
-    cdef const DTYPE_t[:, ::1] X                        # feature matrix
+    cdef const DTYPE_t[:, :] X                                       # feature matrix
     cdef SIZE_t n_total_samples                         # store the total number of samples
 
     # Initialization method for unsupervised splitters
     cdef int init(
         self,
-        const DTYPE_t[:, ::1] X,
+        const DTYPE_t[:, :] X,
         const DOUBLE_t[:] sample_weight
     ) except -1
 

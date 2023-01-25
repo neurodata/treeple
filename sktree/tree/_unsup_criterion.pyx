@@ -1,3 +1,5 @@
+#cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
+
 import numpy as np
 
 cimport numpy as cnp
@@ -5,46 +7,14 @@ cimport numpy as cnp
 cnp.import_array()
 
 
-cdef double compute_variance(
-    const DTYPE_t[::1] Xf,
-    const SIZE_t[:] sample_indices,
-    SIZE_t start,
-    SIZE_t end,
-    double mean,
-) nogil:
-    """Computes variance of feature vector from sample_indices[start:end].
-
-    Parameters 
-    ----------
-    Xf :
-
-
-    Returns
-    -------
-    var : 
-    """
-    # initialize sample and pointer index
-    cdef SIZE_t s_idx, p_idx
-    cdef SIZE_t n_samples_in_split = end - start
-
-    cdef double var = 0.0
-
-    # calculate variance for the sample_indices chosen start:end
-    for p_idx in range(start, end):
-        s_idx = sample_indices[p_idx]
-
-        var += (Xf[s_idx] - mean) * (Xf[s_idx] - mean) / n_samples_in_split
-    return var
-
-
 cdef class UnsupervisedCriterion(BaseCriterion):
     """Abstract criterion for unsupervised learning.
-    
+
     This object is a copy of the Criterion class of scikit-learn, but is used
     for unsupervised learning. However, ``Criterion`` in scikit-learn was
     designed for supervised learning, where the necessary
     ingredients to compute a split point is solely with y-labels. In
-    this object, we subclass and instead rely on the X-data.    
+    this object, we subclass and instead rely on the X-data.
 
     This object stores methods on how to calculate how good a split is using
     different metrics for unsupervised splitting.
@@ -66,17 +36,20 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         self.sum_left = 0.0
         self.sum_right = 0.0
 
+    def __reduce__(self):
+        return (type(self), (), self.__getstate__())
+
     cdef void init_feature_vec(
         self,
-        const DTYPE_t[::1] Xf,
+        const DTYPE_t[:] Xf,
     ) nogil:
         """Initialize the 1D feature vector, which is used for computing criteria.
 
         This function is used to set a read-only memoryview of a feature
         vector. The feature vector must be set in order for criteria to be
-        computed. It then keeps a running total of the feature vector from samples[start:end]
-        so that way it is efficient to compute the right and left sums and corresponding
-        metrics.
+        computed. It then keeps a running total of the feature vector from
+        samples[start:end] so that way it is efficient to compute the right and
+        left sums and corresponding metrics.
 
         Parameters
         ----------
@@ -100,7 +73,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
             if self.sample_weight is not None:
                 w = self.sample_weight[s_idx]
 
-            self.sum_total += self.Xf[s_idx]
+            self.sum_total += self.Xf[s_idx] * w
             self.weighted_n_node_samples += w
 
         # Reset to pos=start
@@ -131,7 +104,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         self.sample_indices = sample_indices
 
         return 0
-    
+
     cdef int reset(self) nogil except -1:
         """Reset the criterion at pos=start.
 
@@ -201,7 +174,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
 
                 # accumulate the values of the feature vectors weighted
                 # by the sample weight
-                self.sum_left += self.Xf[i]
+                self.sum_left += self.Xf[i] * w
 
                 # keep track of the weighted count of each sample
                 self.weighted_n_left += w
@@ -214,13 +187,13 @@ cdef class UnsupervisedCriterion(BaseCriterion):
                 if sample_weight is not None:
                     w = sample_weight[i]
 
-                self.sum_left -= self.Xf[i]
+                self.sum_left -= self.Xf[i] * w
 
                 self.weighted_n_left -= w
 
         # Update right part statistics
-        self.weighted_n_right = (self.weighted_n_node_samples - 
-                                self.weighted_n_left)
+        self.weighted_n_right = (self.weighted_n_node_samples -
+                                 self.weighted_n_left)
         self.sum_right = self.sum_total - self.sum_left
 
         self.pos = new_pos
@@ -246,19 +219,29 @@ cdef class TwoMeans(UnsupervisedCriterion):
 
     The two means split finds the cutpoint that minimizes the one-dimensional
     2-means objective, which is finding the cutoff point where the total variance
-    from cluster 1 and cluster 2 are minimal. 
+    from cluster 1 and cluster 2 are minimal.
 
     The mathematical optimization problem is to find the cutoff index ``s``,
     which is called 'pos' in scikit-learn.
 
         \min_s \sum_{i=1}^s (x_i - \hat{\mu}_1)^2 + \sum_{i=s+1}^N (x_i - \hat{\mu}_2)^2
 
-    where x is a N-dimensional feature vector, N is the number of sample_indices and the \mu
-    terms are the estimated means of each cluster 1 and 2.
+    where x is a N-dimensional feature vector, N is the number of sample_indices and
+    the \mu terms are the estimated means of each cluster 1 and 2.
 
     The variance of the node, left child and right child is computed by keeping track of
     `sum_total`, `sum_left` and `sum_right`, which are the sums of a feature vector at
-    varying split points. 
+    varying split points.
+
+    Weighted Mean and Variance
+    --------------------------
+    Since we allow `sample_weights` to be passed, then we optionally allow for us
+    to compute a weighted sample mean and weighted sample variance. The weighted
+    sample variance has two approaches to compute an unbiased estimate. The first
+    is using "frequencies" and the second is using "reliability" weights. Currently,
+    we have impmlemented the frequencies approach.
+
+    # TODO: implement reliability weighting
 
     Node-Wise Feature Generation
     ----------------------------
@@ -267,19 +250,58 @@ cdef class TwoMeans(UnsupervisedCriterion):
 
     \tilde{X}= A^T X'
 
-    where, A is p x d matrix distributed as f_A, where f_A is the 
-    projection distribution and d is the dimensionality of the 
-    projected space. A is generated by randomly sampling from 
-    {-1,+1} lpd times, then distributing these values uniformly 
+    where, A is p x d matrix distributed as f_A, where f_A is the
+    projection distribution and d is the dimensionality of the
+    projected space. A is generated by randomly sampling from
+    {-1,+1} lpd times, then distributing these values uniformly
     at random in A. l parameter is used to control the sparsity of A
     and is set to 1/20.
 
-    Each of the d rows \tilde{X}[i; :], i \in {1,2,...d} is then 
-    inspected for the best split point. The optimal split point and 
+    Each of the d rows \tilde{X}[i; :], i \in {1,2,...d} is then
+    inspected for the best split point. The optimal split point and
     splitting dimension are chosen according to which point/dimension
-    pair minimizes the splitting criteria described in the following 
+    pair minimizes the splitting criteria described in the following
     section
     """
+    cdef double sum_of_squares(
+        self,
+        SIZE_t start,
+        SIZE_t end,
+        double mean,
+    ) nogil:
+        """Computes variance of feature vector from sample_indices[start:end].
+
+        See: https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Weighted_sample_variance.  # noqa
+
+        Parameters
+        ----------
+        start : SIZE_t
+            The start pointer
+        end : SIZE_t
+            The end pointer.
+        mean : double
+            The precomputed mean.
+
+        Returns
+        -------
+        ss : double
+            Sum of squares
+        """
+        cdef SIZE_t s_idx, p_idx        # initialize sample and pointer index
+        cdef double ss = 0.0            # sum-of-squares
+        cdef DOUBLE_t w = 1.0           # optional weight
+
+        # calculate variance for the sample_indices chosen start:end
+        for p_idx in range(start, end):
+            s_idx = self.sample_indices[p_idx]
+
+            # include optional weighted sum of squares
+            if self.sample_weight is not None:
+                w = self.sample_weight[s_idx]
+
+            ss += w * (self.Xf[s_idx] - mean) * (self.Xf[s_idx] - mean)
+        return ss
+
     cdef double node_impurity(
         self
     ) nogil:
@@ -289,20 +311,26 @@ cdef class TwoMeans(UnsupervisedCriterion):
         i.e. the variance of Xf[sample_indices[start:end]]. The smaller the impurity the
         better.
         """
-        cdef double mean 
+        cdef double mean
         cdef double impurity
+        cdef SIZE_t n_node_samples = self.n_node_samples
+
+        # If calling without setting the
+        if self.Xf is None:
+            with gil:
+                raise MemoryError(
+                    'Xf has not been set yet, so one must call init_feature_vec.'
+                )
 
         # first compute mean
-        mean = self.sum_total / self.n_node_samples
+        mean = self.sum_total / n_node_samples
 
         # then compute the impurity as the variance
-        impurity = compute_variance(
-            self.Xf,
-            self.sample_indices,
+        impurity = self.sum_of_squares(
             self.start,
             self.end,
             mean
-        )
+        ) / self.weighted_n_node_samples
         return impurity
 
     cdef void children_impurity(
@@ -315,10 +343,11 @@ cdef class TwoMeans(UnsupervisedCriterion):
         i.e. the impurity of the left child (sample_indices[start:pos]) and the
         impurity the right child (sample_indices[pos:end]).
 
-        where the impurity of two children nodes are essentially the variances of two nodes
+        where the impurity of two children nodes are essentially the variances of
+        two nodes:
 
-        left_variance = left_weight * left_impurity / n_sample_of_left_child
-        right_variance = right_weight * right_impurity / n_sample_of_right_child
+        - left_variance = left_weight * left_impurity / n_sample_of_left_child
+        - right_variance = right_weight * right_impurity / n_sample_of_right_child
 
         Parameters
         ----------
@@ -332,13 +361,21 @@ cdef class TwoMeans(UnsupervisedCriterion):
         cdef SIZE_t end = self.end
 
         # first compute mean of left and right
-        mean_left = self.sum_left / (pos - start)
-        mean_right = self.sum_right / (end - pos)
+        mean_left = self.sum_left / self.weighted_n_left
+        mean_right = self.sum_right / self.weighted_n_right
 
         # set values at the address pointer is pointing to with the variance
         # of the left and right child
-        impurity_left[0] = compute_variance(self.Xf, self.sample_indices, start, pos, mean_left)
-        impurity_right[0] = compute_variance(self.Xf, self.sample_indices, pos, end, mean_right)
+        impurity_left[0] = self.sum_of_squares(
+            start,
+            pos,
+            mean_left
+        ) / self.weighted_n_left
+        impurity_right[0] = self.sum_of_squares(
+            pos,
+            end,
+            mean_right
+        ) / self.weighted_n_right
 
     cdef void set_sample_pointers(
         self,
@@ -346,7 +383,7 @@ cdef class TwoMeans(UnsupervisedCriterion):
         SIZE_t end
     ) nogil:
         """Set sample pointers in the criterion.
-        
+
         Set given start and end sample_indices. Also will update node statistics,
         such as the `sum_total`, which tracks the total value within the current
         node for sample_indices[start:end].
@@ -361,4 +398,3 @@ cdef class TwoMeans(UnsupervisedCriterion):
         self.n_node_samples = end - start
         self.start = start
         self.end = end
-        

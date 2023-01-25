@@ -43,6 +43,14 @@ Run the following to build the local files
     python -c "from sktree import tree"
     python -c "import sklearn; print(sklearn.__version__);"
 
+You can also do the same thing using the ``dev.py`` CLI:
+
+    # run the build using Meson/Ninja
+    ./dev.py build
+
+    # run specific unit tests
+    ./dev.py test -- sktree/tree/tests/test_tree.py
+
 Conda (Recommended)
 -------------------
 First, create a virtual environment using Conda.

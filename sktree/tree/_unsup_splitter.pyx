@@ -7,7 +7,7 @@ cimport numpy as cnp
 cnp.import_array()
 
 from libc.string cimport memcpy
-from sklearn.tree._utils cimport RAND_R_MAX, log, rand_int, rand_uniform
+from sklearn.tree._utils cimport RAND_R_MAX, rand_int
 
 from ._sklearn_splitter cimport sort
 
@@ -68,9 +68,16 @@ cdef class UnsupervisedSplitter(BaseSplitter):
         self.min_weight_leaf = min_weight_leaf
         self.random_state = random_state
 
+    def __reduce__(self):
+        return (type(self), (self.criterion,
+                             self.max_features,
+                             self.min_samples_leaf,
+                             self.min_weight_leaf,
+                             self.random_state), self.__getstate__())
+
     cdef int init(
         self,
-        const DTYPE_t[:, ::1] X,
+        const DTYPE_t[:, :] X,
         const DOUBLE_t[:] sample_weight
     ) except -1:
         self.rand_r_state = self.random_state.randint(0, RAND_R_MAX)
@@ -108,9 +115,8 @@ cdef class UnsupervisedSplitter(BaseSplitter):
         self.constant_features = np.empty(n_features, dtype=np.intp)
 
         self.sample_weight = sample_weight
-        print('Before setting X')
         self.X = X
-        print('After setting X')
+
         # initialize criterion
         self.criterion.init(
             self.sample_weight,
@@ -163,13 +169,6 @@ cdef class UnsupervisedSplitter(BaseSplitter):
 cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
     """Split in a best-first fashion.
     """
-    def __reduce__(self):
-        return (type(self), (self.criterion,
-                             self.max_features,
-                             self.min_samples_leaf,
-                             self.min_weight_leaf,
-                             self.random_state), self.__getstate__())
-
     cdef int node_split(
         self,
         double impurity,
@@ -260,7 +259,8 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
 
             if f_j < n_known_constants:
                 # f_j in the interval [n_drawn_constants, n_known_constants[
-                features[n_drawn_constants], features[f_j] = features[f_j], features[n_drawn_constants]
+                features[n_drawn_constants], features[f_j] = \
+                    features[f_j], features[n_drawn_constants]
 
                 n_drawn_constants += 1
                 continue
@@ -281,7 +281,8 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
 
             # check if we have found a "constant" feature
             if Xf[end - 1] <= Xf[start] + FEATURE_THRESHOLD:
-                features[f_j], features[n_total_constants] = features[n_total_constants], features[f_j]
+                features[f_j], features[n_total_constants] = \
+                    features[n_total_constants], features[f_j]
 
                 n_found_constants += 1
                 n_total_constants += 1
@@ -353,7 +354,8 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
                 else:
                     partition_end -= 1
 
-                    samples[p], samples[partition_end] = samples[partition_end], samples[p]
+                    samples[p], samples[partition_end] = \
+                        samples[partition_end], samples[p]
 
             self.criterion.reset()
             self.criterion.update(best.pos)

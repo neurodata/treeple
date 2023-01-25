@@ -37,7 +37,6 @@ incdir_numpy = run_command(py3,
   ],
   check: true
 ).stdout().strip()
-
 # inc_np = include_directories(incdir_numpy)
 
 cc = meson.get_compiler('c')
