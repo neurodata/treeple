@@ -5,35 +5,31 @@ from sklearn.datasets import make_blobs
 from sklearn.metrics import adjusted_rand_score
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
-from sktree.tree import UnsupervisedDecisionTree
+from sktree import UnsupervisedRandomForest
 
 
-@parametrize_with_checks([UnsupervisedDecisionTree(random_state=12)])
+@parametrize_with_checks([UnsupervisedRandomForest(random_state=12345)])
 def test_sklearn_compatible_estimator(estimator, check):
     if check.func.__name__ in [
         # Cannot apply agglomerative clustering on < 2 samples
         "check_methods_subset_invariance",
-        # clustering accuracy is poor when using TwoMeans on 1 single tree
-        "check_clustering",
-        # sample weights do not necessarily imply a sample is not used in clustering
+        # # sample weights do not necessarily imply a sample is not used in clustering
         "check_sample_weights_invariance",
-        # sample order is not preserved in predict
+        # # sample order is not preserved in predict
         "check_methods_sample_order_invariance",
     ]:
         pytest.skip()
     check(estimator)
 
 
-def test_unsupervisedtree():
-    n_samples = 10
+def test_urf():
+    n_samples = 100
     n_classes = 2
-    X, y = make_blobs(n_samples=n_samples, centers=n_classes, n_features=2, random_state=1234)
+    X, y = make_blobs(n_samples=n_samples, centers=n_classes, n_features=2, random_state=2**4)
 
-    clf = UnsupervisedDecisionTree(random_state=1234)
+    clf = UnsupervisedRandomForest(random_state=12345)
     clf.fit(X)
     sim_mat = clf.affinity_matrix_
-
-    print(sim_mat)
 
     # all ones along the diagonal
     assert np.array_equal(sim_mat.diagonal(), np.ones(n_samples))
@@ -42,5 +38,6 @@ def test_unsupervisedtree():
     predict_labels = cluster.fit_predict(sim_mat)
     score = adjusted_rand_score(y, predict_labels)
 
-    # a single decision tree does not fit well, but should still have a positive score
-    assert score > 0.05
+    # XXX: This should be > 0.9 according to the UReRF. Hoewver, that could be because they used
+    # the oblique projections by default
+    assert score > 0.6

@@ -108,7 +108,7 @@ jobs:
       - name: Install sdist
         run: pip install ./build/meson-dist/*.tar.xz
       - name: Test sdist install
-        run: python -c "import sktree; print(sktree.__version__)"
+        run: cd docs; python -c "import sktree; print(sktree.__version__)"
       - name: Remove sdist install
         run: python -m pip uninstall -yq sktree
       # TODO: uncomment when meson supports building wheels
@@ -149,8 +149,11 @@ jobs:
       - name: Install packages via poetry
         run: |
           poetry install --with test
+          pip install meson ninja meson-python Cython scikit-learn numpy
+          pip install git+https://github.com/scientific-python/devpy
+          ./dev.py build
       - name: Run pytest 
-        run: poetry run poe unit_test
+        run: ./dev.py test
       - name: Upload coverage stats to codecov
         if: ${{ matrix.os == 'ubuntu' && matrix.python-version == '3.10'}}
         uses: codecov/codecov-action@v3

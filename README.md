@@ -39,9 +39,18 @@ Run the following to build the local files
     # install scikit-tree package
     meson install -C build
 
-    # to check installation
+    # to check installation, you need to be in a different directory
+    cd docs;  
     python -c "from sktree import tree"
     python -c "import sklearn; print(sklearn.__version__);"
+
+You can also do the same thing using the ``dev.py`` CLI:
+
+    # run the build using Meson/Ninja
+    ./dev.py build
+
+    # run specific unit tests
+    ./dev.py test -- sktree/tree/tests/test_tree.py
 
 Conda (Recommended)
 -------------------
@@ -54,15 +63,12 @@ First, create a virtual environment using Conda.
     conda activate sklearn-dev
     conda install -c conda-forge numpy scipy cython joblib threadpoolctl pytest compilers llvm-openmp poetry
 
-
 Next, `sktree` from source:
-
 
     pip install -e .
 
     # if editing Cython files
     pip install --verbose --no-build-isolation --editable .
-
 
 To install the package from github, clone the repository and then `cd` into the directory. You can then use `poetry` to install:
 

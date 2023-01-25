@@ -3,6 +3,7 @@
 dist/
 *.egg*
 build
+build-install/
 coverage
 *.xml
 .venv

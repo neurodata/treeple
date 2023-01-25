@@ -76,7 +76,7 @@ files = ["sktree/__init__.py"]
 python = ">=3.8,<3.11"
 numpy = "^1.23.0"
 scipy = "^1.9.0"
-scikit-learn = { git = "https://github.com/neurodata/scikit-learn.git", branch = 'split' }
+scikit-learn = { git = "https://github.com/neurodata/scikit-learn.git", branch = 'newtreev2' }
 importlib-resources = { version = "*", python = "<3.9" }
 
 [tool.poetry.group.test]
@@ -205,5 +205,9 @@ exclude_lines = ['pragma: no cover', 'if __name__ == .__main__.:']
 precision = 2
 
 [tool.bandit]
-exclude_dirs = ["**/tests"]
+exclude_dirs = ["sktree/tests", "sktree/tree/tests"]
 skips = ['B404', 'B603']
+
+[tool.devpy]
+package = 'sktree'
+commands = ['devpy.build', 'devpy.test']
