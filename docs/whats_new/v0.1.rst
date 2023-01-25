@@ -25,8 +25,7 @@ Version 0.1
 
 Changelog
 ---------
-
-- 
+- |Feature| Implementation of the two-means Unsupervised Random Forest, by `Adam Li`_ (:gh:`9`)
 
 Code and Documentation Contributors
 -----------------------------------
