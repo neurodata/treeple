@@ -205,7 +205,7 @@ exclude_lines = ['pragma: no cover', 'if __name__ == .__main__.:']
 precision = 2
 
 [tool.bandit]
-exclude_dirs = ["**/tests"]
+exclude_dirs = ["sktree/tests", "sktree/tree/tests"]
 skips = ['B404', 'B603']
 
 [tool.devpy]

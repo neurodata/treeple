@@ -14,8 +14,8 @@ from sklearn.tree._splitter import BaseSplitter
 from sklearn.utils import check_random_state
 from sklearn.utils.validation import _check_sample_weight, check_is_fitted
 
-from sktree.tree import _unsup_criterion, _unsup_splitter
-from sktree.tree._unsup_tree import (
+from sktree.tree import _unsup_criterion, _unsup_splitter  # type: ignore
+from sktree.tree._unsup_tree import (  # type: ignore
     UnsupervisedBestFirstTreeBuilder,
     UnsupervisedDepthFirstTreeBuilder,
     UnsupervisedTree,
