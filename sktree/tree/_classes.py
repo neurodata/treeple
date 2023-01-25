@@ -26,13 +26,13 @@ DOUBLE = _sklearn_tree.DOUBLE
 
 CRITERIA = {"twomeans": _unsup_criterion.TwoMeans}
 
-SPLITTERS = {"best": _unsup_splitter.BestUnsupervisedSplitter}
+SPLITTERS = {
+    "best": _unsup_splitter.BestUnsupervisedSplitter,
+}
 
 
 class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree):
     """Unsupervised decision tree.
-
-    TODO: need to implement the logic fit/fit_transform/etc.
 
     Parameters
     ----------
