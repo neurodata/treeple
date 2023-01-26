@@ -26,7 +26,7 @@ Make sure you have the necessary packages installed
     poetry install --with style,test,docs
 
     # install build dependencies
-    pip install meson ninja meson-python Cython scikit-learn numpy
+    pip install meson ninja meson-python Cython numpy  # later scikit-learn
 
 Run the following to build the local files
 

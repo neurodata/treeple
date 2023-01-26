@@ -65,9 +65,16 @@ jobs:
 
       - python/install-packages:
           pkg-manager: poetry
-          cache-version: "v1" # change to clear cache
+          cache-version: "v2" # change to clear cache
           args: "--with docs"
       
+      - run:
+          name: Install extra Meson build
+          command: |
+            pip install meson ninja meson-python Cython numpy scipy 
+            pip install git+https://github.com/scientific-python/devpy
+            ./dev.py build
+
       - run:
           name: Setup pandoc
           command: sudo apt update && sudo apt install -y pandoc optipng
