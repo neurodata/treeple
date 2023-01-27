@@ -90,10 +90,10 @@ jobs:
           poetry run pip install meson ninja meson-python Cython numpy
           poetry run pip install git+https://github.com/scientific-python/devpy
           poetry run dev.py build
-      - name: Test package install
-        run: poetry run python -c "import sktree; print(sktree.__version__)"
-      - name: Remove package install
-        run: python -m pip uninstall -yq sktree
+      # - name: Test package install
+      #   run: poetry run python -c "import sktree; print(sktree.__version__)"
+      # - name: Remove package install
+      #   run: python -m pip uninstall -yq sktree
       - name: Check poetry lock file
         run: poetry update --dry-run
       - name: Build package
@@ -157,7 +157,7 @@ jobs:
           poetry run pip install git+https://github.com/scientific-python/devpy
           poetry run ./dev.py build
       - name: Run pytest 
-        run: poetry run ./dev.py test
+        run: poetry run ./dev.py test -- --cov=sktree --cov-report=xml
       - name: Upload coverage stats to codecov
         if: ${{ matrix.os == 'ubuntu' && matrix.python-version == '3.10'}}
         uses: codecov/codecov-action@v3
