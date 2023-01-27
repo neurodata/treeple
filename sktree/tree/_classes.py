@@ -13,13 +13,13 @@ from sklearn.utils import check_random_state
 from sklearn.utils.validation import _check_sample_weight, check_is_fitted
 
 from sktree.tree import _unsup_criterion, _unsup_splitter  # type: ignore
+from sktree.tree._unsup_criterion import UnsupervisedCriterion
+from sktree.tree._unsup_splitter import UnsupervisedSplitter
 from sktree.tree._unsup_tree import (  # type: ignore
     UnsupervisedBestFirstTreeBuilder,
     UnsupervisedDepthFirstTreeBuilder,
     UnsupervisedTree,
 )
-from sktree.tree._unsup_criterion import UnsupervisedCriterion
-from sktree.tree._unsup_splitter import UnsupervisedSplitter
 
 DTYPE = _sklearn_tree.DTYPE
 DOUBLE = _sklearn_tree.DOUBLE

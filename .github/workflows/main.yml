@@ -89,7 +89,7 @@ jobs:
           poetry install
           poetry run pip install meson ninja meson-python Cython numpy
           poetry run pip install git+https://github.com/scientific-python/devpy
-          poetry run ./dev.py build
+          poetry run dev.py build
       - name: Test package install
         run: poetry run python -c "import sktree; print(sktree.__version__)"
       - name: Remove package install
