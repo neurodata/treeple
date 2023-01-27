@@ -9,8 +9,6 @@ from sklearn.base import ClusterMixin, TransformerMixin
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.tree import BaseDecisionTree
 from sklearn.tree import _tree as _sklearn_tree
-from sklearn.tree._criterion import BaseCriterion
-from sklearn.tree._splitter import BaseSplitter
 from sklearn.utils import check_random_state
 from sklearn.utils.validation import _check_sample_weight, check_is_fitted
 
@@ -20,6 +18,8 @@ from sktree.tree._unsup_tree import (  # type: ignore
     UnsupervisedDepthFirstTreeBuilder,
     UnsupervisedTree,
 )
+from sktree.tree._unsup_criterion import UnsupervisedCriterion
+from sktree.tree._unsup_splitter import UnsupervisedSplitter
 
 DTYPE = _sklearn_tree.DTYPE
 DOUBLE = _sklearn_tree.DOUBLE
@@ -36,14 +36,16 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
 
     Parameters
     ----------
-    criterion : {"twomeans", "fastbic"}, default="twomeans"
+    criterion : {"twomeans", "fastbic"}, default="twomeans", or UnsupervisedCriterion
         The function to measure the quality of a split. Supported criteria are
         "twomeans" for the variance impurity and "fastbic" for the
-        BIC criterion.
-    splitter : {"best", "random"}, default="best"
+        BIC criterion. If ``UnsupervisedCriterion`` instance is passed in, then
+        the user must abide by the Cython internal API. See source code.
+    splitter : {"best", "random"}, default="best", or UnsupervisedSplitter
         The strategy used to choose the split at each node. Supported
         strategies are "best" to choose the best split and "random" to choose
-        the best random split.
+        the best random split. If ``UnsupervisedSplitter`` instance is passed in, then
+        the user must abide by the Cython internal API. See source code.
     max_depth : int, default=None
         The maximum depth of the tree. If None, then nodes are expanded until
         all leaves are pure or until all leaves contain less than
@@ -215,7 +217,7 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
             min_weight_leaf = self.min_weight_fraction_leaf * np.sum(sample_weight)
 
         criterion = self.criterion
-        if not isinstance(criterion, BaseCriterion):
+        if not isinstance(criterion, UnsupervisedCriterion):
             criterion = CRITERIA[self.criterion]()
         else:
             # Make a deepcopy in case the criterion has mutable attributes that
@@ -223,7 +225,7 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
             criterion = copy.deepcopy(criterion)
 
         splitter = self.splitter
-        if not isinstance(self.splitter, BaseSplitter):
+        if not isinstance(self.splitter, UnsupervisedSplitter):
             splitter = SPLITTERS[self.splitter](
                 criterion,
                 self.max_features_,

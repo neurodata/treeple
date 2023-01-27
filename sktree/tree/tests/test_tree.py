@@ -6,7 +6,7 @@ from sklearn.metrics import adjusted_rand_score
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from sktree.tree import UnsupervisedDecisionTree
-
+# from sktree.tree._unsup_oblique_splitter import ObliqueUnsupervisedSplitter
 
 @parametrize_with_checks([UnsupervisedDecisionTree(random_state=12)])
 def test_sklearn_compatible_estimator(estimator, check):
@@ -24,6 +24,7 @@ def test_sklearn_compatible_estimator(estimator, check):
     check(estimator)
 
 
+# @pytest.mark.parametrize('splitter', ['best', ObliqueUnsupervisedSplitter()])
 def test_unsupervisedtree():
     n_samples = 10
     n_classes = 2

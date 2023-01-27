@@ -2,19 +2,19 @@ name: gh-ci-checks
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number }}-${{ github.event.type }}
   cancel-in-progress: true
-# on:
-#   pull_request:
-#     paths:
-#       - '**.py'
-#       - '**.pxd'
-#       - '**.pyx'
-#   push:
-#     branches: [main]
-#     paths:
-#       - '**.py'
-#     tags:
-#       - 'v*.*.*'
-#   workflow_dispatch:
+on:
+  pull_request:
+    paths:
+      - '**.py'
+      - '**.pxd'
+      - '**.pyx'
+  push:
+    branches: [main]
+    paths:
+      - '**.py'
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
 
 jobs:
   style:
