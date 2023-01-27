@@ -71,9 +71,9 @@ jobs:
       - run:
           name: Install extra Meson build
           command: |
-            pip install meson ninja meson-python Cython numpy scipy 
-            pip install git+https://github.com/scientific-python/devpy
-            ./dev.py build
+            poetry run pip install meson ninja meson-python Cython numpy scipy 
+            poetry run pip install git+https://github.com/scientific-python/devpy
+            poetry run ./dev.py build
 
       - run:
           name: Setup pandoc
