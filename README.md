@@ -7,16 +7,21 @@
 scikit-tree
 ===========
 
-scikit-tree is a scikit-learn compatible API for building state-of-the-art decision trees. These include
-unsupervised trees, oblique trees, uncertainty trees, quantile trees and causal trees.
+scikit-tree is a scikit-learn compatible API for building state-of-the-art decision trees. These include unsupervised trees, oblique trees, uncertainty trees, quantile trees and causal trees.
+
+We welcome contributions for modern tree-based algorithms. We use Cython to achieve fast C/C++ speeds, while abiding by a scikit-learn compatible (tested) API. Moreover, our Cython internals are easily extensible because they follow the internal Cython API
+of scikit-learn as well.
 
 History of oblique trees
 ========================
-In 2001, Leo Breiman proposed two types of Random Forests. One was known as ``Forest-RI``, which is the axis-aligned traditional random forest. One was known as ``Forest-RC``, which is the random oblique linear combinations random forest. This leveraged random combinations of features to perform splits. MORF builds upon ``Forest-RC`` by proposing additional functions to combine features.
+In 2001, Leo Breiman proposed two types of Random Forests. One was known as ``Forest-RI``, which is the axis-aligned traditional random forest. One was known as ``Forest-RC``, which is the random oblique linear combinations random forest. This leveraged random combinations of features to perform splits. [MORF](1) builds upon ``Forest-RC`` by proposing additional functions to combine features.
 
 Installation
 ------------
 Our installation will try to follow scikit-learn installation as close as possible, as we contain Cython code subclassed, or inspired by the scikit-learn tree submodule.
+
+AS OF NOW, scikit-tree is in development stage and the installation is still finicky due to the upstream scikit-learn's stalled refactoring PRs of the tree submodule. Once those
+are merged, the installation will be simpler.
 
 Building locally with Meson
 ---------------------------
@@ -102,3 +107,7 @@ Using with Jupyter Notebook
 To setup an ipykernel with jupyter notebook, then do:
 
     python -m ipykernel install --name sklearn --user 
+
+References
+----------
+[1]: [`Li, Adam, et al. "Manifold Oblique Random Forests: Towards Closing the Gap on Convolutional Deep Networks." arXiv preprint arXiv:1909.11799 (2019)`](https://arxiv.org/abs/1909.11799)
