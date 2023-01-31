@@ -396,3 +396,159 @@ cdef class TwoMeans(UnsupervisedCriterion):
         self.n_node_samples = end - start
         self.start = start
         self.end = end
+
+cdef class FastBIC(UnsupervisedCriterion):
+    """Placeholder for FastBIC docs
+    """
+
+    cdef double sum_of_squares(
+        self,
+        SIZE_t start,
+        SIZE_t end,
+        double mean,
+    ) nogil:
+        """Computes variance of feature vector from sample_indices[start:end].
+
+        See: https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Weighted_sample_variance.  # noqa
+
+        Parameters
+        ----------
+        start : SIZE_t
+            The start pointer
+        end : SIZE_t
+            The end pointer.
+        mean : double
+            The precomputed mean.
+
+        Returns
+        -------
+        ss : double
+            Sum of squares
+        """
+        cdef SIZE_t s_idx, p_idx        # initialize sample and pointer index
+        cdef double ss = 0.0            # sum-of-squares
+        cdef DOUBLE_t w = 1.0           # optional weight
+
+        # calculate variance for the sample_indices chosen start:end
+        for p_idx in range(start, end):
+            s_idx = self.sample_indices[p_idx]
+
+            # include optional weighted sum of squares
+            if self.sample_weight is not None:
+                w = self.sample_weight[s_idx]
+
+            ss += w * (self.Xf[s_idx] - mean) * (self.Xf[s_idx] - mean)
+        return ss
+
+    cdef double node_impurity(
+        self
+    ) nogil:
+        """Evaluate the impurity of the current node.
+
+        TODO: describe FastBIC
+
+        1. Prior = w = n/N
+        2. Mean = u
+        3. Vars = sig
+
+        impurity = -2*n*log(w) + n*log(2*pi*sig)
+        """
+        cdef double mean
+        cdef double impurity
+        cdef SIZE_t n_samples = self.n_samples #TODO: define n_samples
+        cdef SIZE_t n_node_samples = self.n_node_samples
+
+        # If calling without setting the
+        if self.Xf is None:
+            with gil:
+                raise MemoryError(
+                    'Xf has not been set yet, so one must call init_feature_vec.'
+                )
+
+        # first compute mean
+        mean = self.sum_total / n_node_samples
+
+        # then compute the variance of the cluster
+        sig = self.sum_of_squares(
+            self.start,
+            self.end,
+            mean
+        ) / self.weighted_n_node_samples
+
+        impurity = -2*n_node_samples*log(n_node_samles/n_samples) \ 
+                    + n_node_samples*log(2*cnp.pi*sig)
+
+        return impurity
+
+    cdef void children_impurity(
+        self,
+        double* impurity_left,
+        double* impurity_right
+    ) nogil:
+        """Evaluate the impurity in children nodes.
+
+        i.e. the impurity of the left child (sample_indices[start:pos]) and the
+        impurity the right child (sample_indices[pos:end]).
+
+        TODO: describe FastBIC
+
+        impurity = 2*n*log(w) - n*log(2*pi*s)
+
+        - left_variance = left_weight * left_impurity / n_sample_of_left_child
+        - right_variance = right_weight * right_impurity / n_sample_of_right_child
+
+        Parameters
+        ----------
+        impurity_left : double pointer
+            The memory address to save the impurity of the left node
+        impurity_right : double pointer
+            The memory address to save the impurity of the right node
+        """
+        cdef SIZE_t pos = self.pos
+        cdef SIZE_t start = self.start
+        cdef SIZE_t end = self.end
+
+        # first compute mean of left and right
+        mean_left = self.sum_left / self.weighted_n_left
+        mean_right = self.sum_right / self.weighted_n_right
+
+        sig_left = self.sum_of_squares(
+            start,
+            pos,
+            mean_left
+        ) / self.weighted_n_left
+
+        sig_right = self.sum_of_squares(
+            pos,
+            end,
+            mean_right
+        ) / self.weighted_n_right
+
+        # set values at the address pointer
+        impurity_left[0] = -2*pos*log(pos/self.n_samples) \ 
+                            + pos*log(2*cnp.pi*sig_left)
+
+        impurity_right[0] = -2*(end-pos)*log((end-pos)/self.n_samples) \ 
+                            + (end-pos)*log(2*cnp.pi*sig_right)
+
+    cdef void set_sample_pointers(
+        self,
+        SIZE_t start,
+        SIZE_t end
+    ) nogil:
+        """Set sample pointers in the criterion.
+
+        Set given start and end sample_indices. Also will update node statistics,
+        such as the `sum_total`, which tracks the total value within the current
+        node for sample_indices[start:end].
+
+        Parameters
+        ----------
+        start : SIZE_t
+            The start sample pointer.
+        end : SIZE_t
+            The end sample pointer.
+        """
+        self.n_node_samples = end - start
+        self.start = start
+        self.end = end
