@@ -1,7 +1,9 @@
 name: "Build and unit tests"
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number }}-${{ github.event.type }}
   cancel-in-progress: true
+
 on:
   pull_request:
     paths:
@@ -212,7 +214,7 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    needs: [style, build, test]
+    needs: [build, test]
     if: startsWith(github.ref, 'refs/tags/')
     steps:
       - name: Checkout repository
