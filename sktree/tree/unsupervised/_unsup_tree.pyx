@@ -756,8 +756,7 @@ cdef class UnsupervisedTree:
         self,
         const DTYPE_t[:, :] X_ndarray,
         SIZE_t sample_index,
-        Node *node,
-        SIZE_t node_id
+        Node *node
     ) nogil:
         """Compute feature from a given data matrix, X.
 

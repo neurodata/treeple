@@ -84,7 +84,7 @@ cdef class ObliqueUnsupervisedSplitter(UnsupervisedSplitter):
         self.min_weight_leaf = min_weight_leaf
         self.random_state = random_state
 
-        # Oblique tree parameteres
+        # Oblique tree parameters
         self.feature_combinations = feature_combinations
 
         # Sparse max_features x n_features projection matrix

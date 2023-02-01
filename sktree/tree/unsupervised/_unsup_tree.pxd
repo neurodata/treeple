@@ -37,7 +37,7 @@ cdef class UnsupervisedTree(BaseTree):
     cdef cnp.ndarray _get_value_ndarray(self)
     cdef cnp.ndarray _get_node_ndarray(self)
     
-    # Overriden Methods
+    # Overridden Methods
     cdef int _set_split_node(
         self,
         SplitRecord* split_node,
@@ -52,8 +52,7 @@ cdef class UnsupervisedTree(BaseTree):
         self,
         const DTYPE_t[:, :] X_ndarray,
         SIZE_t sample_index,
-        Node *node,
-        SIZE_t node_id
+        Node *node
     ) nogil
     cdef void _compute_feature_importances(
         self,
