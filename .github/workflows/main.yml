@@ -58,6 +58,7 @@ jobs:
 
       - name: Install Python packages
         run: |
+          ls
           python -m pip install build_requirements.txt
           python -m pip install git+https://github.com/scientific-python/devpy
 
@@ -117,7 +118,7 @@ jobs:
       #   run: python -m pip uninstall -yq sktree
 
   build-windows:
-    name: Meson Windows tests
+    name: Meson build Windows
     runs-on: windows-2019
     steps:
       - name: Checkout
