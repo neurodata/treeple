@@ -1,4 +1,4 @@
-name: gh-ci-checks
+name: Style checks
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number }}-${{ github.event.type }}
@@ -23,6 +23,7 @@ permissions:
 
 jobs:
   style:
+    name: Formatting, lint, style, and type-checks
     timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
