@@ -59,6 +59,11 @@ jobs:
         if: ${{ matrix.os == 'macos-latest'}}
         run: |
           brew install ccache
+      - name: Install packages for Ubuntu
+        if: ${{ matrix.os == 'ubuntu-22.04'}}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libopenblas-dev libatlas-base-dev liblapack-dev gfortran libgmp-dev libmpfr-dev libsuitesparse-dev ccache libmpc-dev
 
       - name: Install Python packages
         run: |
@@ -172,6 +177,9 @@ jobs:
       - name: build-path
         run: |
           echo "installed_path=$PWD\build\Lib\site-packages" >> $env:GITHUB_ENV
+      - name: prep-test
+        run: |
+          echo "PYTHONPATH=${env:installed_path}" >> $env:GITHUB_ENV
       - name: test
         run: |
           mkdir tmp

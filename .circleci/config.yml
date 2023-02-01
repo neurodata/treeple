@@ -129,6 +129,8 @@ jobs:
           no_output_timeout: 25m
           command: |
             ls
+            ls build
+            ls build-install
             ls build-install/lib
             export PYTHONPATH=$PWD/build-install/lib/python3.8/site-packages
             make -C docs html
