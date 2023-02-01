@@ -1,4 +1,4 @@
-name: Style checks
+name: "Style checks"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number }}-${{ github.event.type }}

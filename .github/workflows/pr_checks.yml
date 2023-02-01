@@ -1,4 +1,4 @@
-name: PR Checks
+name: "PR Checks"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

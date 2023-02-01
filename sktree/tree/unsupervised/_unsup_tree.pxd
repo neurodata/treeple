@@ -53,6 +53,7 @@ cdef class UnsupervisedTree(BaseTree):
         const DTYPE_t[:, :] X_ndarray,
         SIZE_t sample_index,
         Node *node,
+        SIZE_t node_id
     ) nogil
     cdef void _compute_feature_importances(
         self,
