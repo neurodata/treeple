@@ -131,8 +131,9 @@ jobs:
             ls
             ls build
             ls build-install
-            ls build-install/lib
-            export PYTHONPATH=$PWD/build-install/lib/python3.8/site-packages
+            echo "After..."
+            ls build-install/**
+            export PYTHONPATH=$PWD/build-install/usr/lib/python3.8/site-packages
             make -C docs html
 
       - store_artifacts:
