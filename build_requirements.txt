@@ -1,0 +1,6 @@
+meson
+meson-python
+cython
+ninja
+numpy
+scikit-learn@git+ssh://git@github.com/neurodata/scikit-learn.git@tree-featuresv2

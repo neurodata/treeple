@@ -21,17 +21,20 @@ Installation
 Our installation will try to follow scikit-learn installation as close as possible, as we contain Cython code subclassed, or inspired by the scikit-learn tree submodule.
 
 AS OF NOW, scikit-tree is in development stage and the installation is still finicky due to the upstream scikit-learn's stalled refactoring PRs of the tree submodule. Once those
-are merged, the installation will be simpler.
+are merged, the installation will be simpler. The current recommended installation is done locally with meson.
 
-Building locally with Meson
----------------------------
+Building locally with Meson (RECOMMENDED)
+-----------------------------------------
 Make sure you have the necessary packages installed
 
-    # install general package dependencies
-    poetry install --with style,test,docs
-
     # install build dependencies
-    pip install meson ninja meson-python Cython numpy  # later scikit-learn
+    pip install numpy scipy meson ninja meson-python Cython  # later scikit-learn
+
+    # you may need these optional dependencies to build scikit-learn locally
+    conda install -c conda-forge numpy scipy cython joblib threadpoolctl pytest compilers llvm-openmp
+
+    # make sure we have our fork of scikit-learn
+    pip install scikit-learn@git+ssh://git@github.com/neurodata/scikit-learn.git@tree-featuresv2
 
 Run the following to build the local files
 
