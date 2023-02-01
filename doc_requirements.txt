@@ -2,7 +2,7 @@ portray
 matplotlib
 numpydoc
 pydata-sphinx-theme
-sphinx
+sphinx<6
 sphinxcontrib-bibtex
 sphinx-issues
 sphinx-copybutton
