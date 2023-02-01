@@ -79,14 +79,8 @@ jobs:
       - checkout
       - check-skip
       - merge
-
       - apt-install
 
-      - run:
-          name: update submodules
-          command: |
-            git submodule init
-            git submodule update
       - restore_cache:
           keys:
               - deps_ccache-{{ .Branch }}
@@ -99,7 +93,7 @@ jobs:
             pip install git+https://github.com/scientific-python/devpy
             pip install -r doc_requirements.txt
             # extra benchmark deps
-            pip install pyfftw cffi pytest
+            pip install pytest
       - run:
           name: build scikit-tree
           command: |
