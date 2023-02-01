@@ -83,8 +83,8 @@ jobs:
 
       - restore_cache:
           keys:
-              - deps_ccache-{{ .Branch }}
-              - deps_ccache
+            - deps_ccache-{{ .Branch }}
+            - deps_ccache
 
       - run:
           name: setup Python venv
@@ -108,7 +108,7 @@ jobs:
           name: ccache performance
           command: |
             ccache -s
-      
+
       # persist, so downstream tasks can use the built image
       - persist_to_workspace:
           root: ~/
@@ -129,7 +129,7 @@ jobs:
           no_output_timeout: 25m
           command: |
             export PYTHONPATH=$PWD/build-install/lib/python3.8/site-packages
-            python dev.py --no-build docs -j2
+            make -C docs html
 
       - store_artifacts:
           path: docs/build/html
