@@ -125,7 +125,7 @@ _black = 'black .'
 _isort = 'isort .'
 _black_check = 'black --check sktree examples'
 _isort_check = 'isort --check .'
-_pydocstyle = 'pydocstyle .'
+_pydocstyle = 'pydocstyle ./sktree'
 _codespell = 'codespell sktree/ doc/ examples/ --ignore-words=.codespellignore --skip "**/_build/*"'
 _changelog = 'semversioner changelog > CHANGELOG.md'
 _apply_version = 'semversioner release'
@@ -182,7 +182,7 @@ extend_skip_glob = ['setup.py', 'docs/*', 'examples/*', 'sktree/__init__.py']
 convention = 'numpy'
 ignore-decorators = '(copy_doc|property|.*setter|.*getter)'
 match = '^(?!setup|__init__|test_).*\.py'
-match-dir = '^sktree.*'
+match-dir = '^sktree*'
 add_ignore = 'D100,D104,D105,D107'
 
 [tool.mypy]
@@ -198,14 +198,14 @@ filterwarnings = []
 branch = true
 cover_pylib = false
 source = ['sktree']
-omit = ['**/__init__.py', '**/tests/**']
+omit = ['**/__init__.py', '**/tests/**', 'sktree/_build_utils/*']
 
 [tool.coverage.report]
 exclude_lines = ['pragma: no cover', 'if __name__ == .__main__.:']
 precision = 2
 
 [tool.bandit]
-exclude_dirs = ["sktree/tests", "sktree/tree/tests"]
+exclude_dirs = ["sktree/tests", "sktree/tree/tests", 'sktree/_build_utils/*']
 skips = ['B404', 'B603']
 
 [tool.devpy]

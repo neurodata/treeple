@@ -103,6 +103,14 @@ jobs:
         shell: bash -l {0}
         run: ccache -s
 
+      - name: build-path
+        run: |
+          echo "installed_path=$PWD\build\Lib\site-packages" >> $env:GITHUB_ENV
+          
+      - name: prep-test
+        run: |
+          echo "PYTHONPATH=${env:installed_path}" >> $env:GITHUB_ENV
+
       - name: Test sdist install
         run: cd docs; python -c "import sktree; print(sktree.__version__)"
 
