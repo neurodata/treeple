@@ -46,6 +46,10 @@ jobs:
           architecture: "x64"
           cache: "pip"
           cache-dependency-path: "requirements.txt"
+      # Make sure the @v0.7.0 matches the current version of the action
+      - uses: webfactory/ssh-agent@v0.7.0
+        with:
+            ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: show-gcc
         run: |
@@ -58,8 +62,7 @@ jobs:
 
       - name: Install Python packages
         run: |
-          ls
-          python -m pip install build_requirements.txt
+          python -m pip install -r build_requirements.txt
           python -m pip install git+https://github.com/scientific-python/devpy
 
       - name: Prepare compiler cache
@@ -125,6 +128,12 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: recursive
+      
+      # Make sure the @v0.7.0 matches the current version of the action
+      - uses: webfactory/ssh-agent@v0.7.0
+        with:
+            ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+            
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
