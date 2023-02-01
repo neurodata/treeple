@@ -5,6 +5,7 @@
 =================
 API Documentation
 =================
+
 :py:mod:`sktree`:
 .. automodule:: sktree
    :no-members:
