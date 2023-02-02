@@ -1,6 +1,7 @@
 #cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
 
 cimport numpy as cnp
+from libc.math cimport log
 
 cnp.import_array()
 
