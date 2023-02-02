@@ -109,15 +109,11 @@ jobs:
       - name: build-path
         run: |
           echo "$PWD/build-install/"
-          ls build-install/
-          ls build-install/**
-          export INSTALLED_PATH=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages
-          ls $INSTALLED_PATH
 
       - name: prep-test
         run: |
-          export PYTHONPATH=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages
-          echo "$PYTHONPATH"
+          export Python_ROOT_DIR=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages
+          echo "$Python_ROOT_DIR"
 
       - name: Test sdist install
         run: |
