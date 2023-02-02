@@ -109,11 +109,13 @@ jobs:
       - name: build-path
         run: |
           echo "$PWD/build-install/"
+          export INSTALLED_PATH=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages
 
       - name: prep-test
         run: |
           export Python_ROOT_DIR=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages
           echo "$Python_ROOT_DIR"
+          echo "PYTHONPATH=$INSTALLED_PATH" >> $GITHUB_ENV
 
       - name: Test sdist install
         run: |

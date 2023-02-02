@@ -25,7 +25,7 @@ include = [
 
 # [tool.poetry.build]
 # generate-setup-file = false
-# script = "build.py"
+# requires = ['mesonpy', 'ninja', 'Cython']
 
 [build-system]
 build-backend = "mesonpy"
