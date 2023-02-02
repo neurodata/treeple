@@ -455,7 +455,6 @@ cdef class FastBIC(UnsupervisedCriterion):
         """
         cdef double mean
         cdef double impurity
-        cdef SIZE_t n_samples = self.n_samples #TODO: define n_samples
         cdef SIZE_t n_node_samples = self.n_node_samples
 
         # If calling without setting the
@@ -475,7 +474,7 @@ cdef class FastBIC(UnsupervisedCriterion):
             mean
         ) / self.weighted_n_node_samples
 
-        impurity = N*log(2*sig/mu)
+        impurity = n_node_samples*log(2*sig/mu)
 
         return impurity
 
