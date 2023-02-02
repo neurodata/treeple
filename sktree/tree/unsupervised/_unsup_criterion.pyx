@@ -448,10 +448,10 @@ cdef class FastBIC(UnsupervisedCriterion):
         TODO: describe FastBIC
 
         1. Prior = w = n/N
-        2. Mean = u
+        2. Mean = mu
         3. Vars = sig
 
-        impurity = -2*n*log(w) + n*log(2*pi*sig)
+        impurity = N*log(2*sig)-N*log(mu)
         """
         cdef double mean
         cdef double impurity
@@ -475,8 +475,7 @@ cdef class FastBIC(UnsupervisedCriterion):
             mean
         ) / self.weighted_n_node_samples
 
-        impurity = -2*n_node_samples*log(n_node_samles/n_samples) \ 
-                    + n_node_samples*log(2*cnp.pi*sig)
+        impurity = N*log(2*sig/mu)
 
         return impurity
 
@@ -492,7 +491,7 @@ cdef class FastBIC(UnsupervisedCriterion):
 
         TODO: describe FastBIC
 
-        impurity = 2*n*log(w) - n*log(2*pi*s)
+        [Equation here]
 
         - left_variance = left_weight * left_impurity / n_sample_of_left_child
         - right_variance = right_weight * right_impurity / n_sample_of_right_child
@@ -507,6 +506,24 @@ cdef class FastBIC(UnsupervisedCriterion):
         cdef SIZE_t pos = self.pos
         cdef SIZE_t start = self.start
         cdef SIZE_t end = self.end
+        cdef SIZE_t s_l
+        cdef SIZE_t s_r
+        cdef double p_l
+        cdef double p_r
+        cdef double mean_left
+        cdef double mean_right
+        cdef double sig_left
+        cdef double sig_right
+        cdef double left_term
+        cdef double right_term
+
+        # number of samples of left and right
+        s_l = pos - start
+        s_r = end - pos
+
+        # compute prior
+        p_l = s_l / self.n_node_samples
+        p_r = s_r / self.n_node_samples
 
         # first compute mean of left and right
         mean_left = self.sum_left / self.weighted_n_left
@@ -524,12 +541,12 @@ cdef class FastBIC(UnsupervisedCriterion):
             mean_right
         ) / self.weighted_n_right
 
-        # set values at the address pointer
-        impurity_left[0] = -2*pos*log(pos/self.n_samples) \ 
-                            + pos*log(2*cnp.pi*sig_left)
+        left_term = log(2*p_l*sig_left/mean_left)
+        right_term = log(2*p_r*sig_right/mean_right)
 
-        impurity_right[0] = -2*(end-pos)*log((end-pos)/self.n_samples) \ 
-                            + (end-pos)*log(2*cnp.pi*sig_right)
+        # set values at the address pointer
+        impurity_left[0] = s_l*left_term + s_r*right_term
+        impurity_right[0] = s_r*left_term + s_l*right_term
 
     cdef void set_sample_pointers(
         self,
