@@ -12,10 +12,10 @@ from sklearn.tree import _tree as _sklearn_tree
 from sklearn.utils import check_random_state
 from sklearn.utils.validation import _check_sample_weight, check_is_fitted
 
-from sktree.tree import _unsup_criterion, _unsup_splitter  # type: ignore
-from sktree.tree._unsup_criterion import UnsupervisedCriterion
-from sktree.tree._unsup_splitter import UnsupervisedSplitter
-from sktree.tree._unsup_tree import (  # type: ignore
+from . import _unsup_criterion, _unsup_splitter  # type: ignore
+from ._unsup_criterion import UnsupervisedCriterion
+from ._unsup_splitter import UnsupervisedSplitter
+from ._unsup_tree import (  # type: ignore
     UnsupervisedBestFirstTreeBuilder,
     UnsupervisedDepthFirstTreeBuilder,
     UnsupervisedTree,

@@ -526,7 +526,7 @@ class UnsupervisedRandomForest(ForestCluster):
 
     Attributes
     ----------
-    estimator_ : :class:`~sktree.tree.UnsupervisedDecisionTree`
+    estimator_ : UnsupervisedDecisionTree
         The child estimator template used to create the collection of fitted
         sub-estimators.
 

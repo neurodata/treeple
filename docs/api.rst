@@ -24,8 +24,7 @@ on unsupervised criterion such as variance and BIC.
    
    UnsupervisedRandomForest
 
-.. currentmodule:: sktree.tree
 .. autosummary::
    :toctree: generated/
    
-   UnsupervisedDecisionTree
+   tree.UnsupervisedDecisionTree

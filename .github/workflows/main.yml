@@ -111,6 +111,8 @@ jobs:
           echo "$PWD/build-install/"
           ls build-install/
           ls build-install/**
+          echo "installed_path=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages"
+          ls $PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages
           echo "installed_path=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages" >> $env:GITHUB_ENV
 
       - name: prep-test
