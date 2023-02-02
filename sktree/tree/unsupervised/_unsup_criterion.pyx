@@ -475,7 +475,7 @@ cdef class FastBIC(UnsupervisedCriterion):
             mean
         ) / self.weighted_n_node_samples
 
-        impurity = n_node_samples*log(2*sig/mu)
+        impurity = n_node_samples*log(2*sig/mean)
 
         return impurity
 
