@@ -17,7 +17,7 @@ import sktree
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 curdir = os.path.dirname(__file__)
-# sys.path.append(os.path.abspath(os.path.join(curdir, "..")))
+sys.path.append(os.path.abspath(os.path.join(curdir, "..")))
 # sys.path.append(os.path.abspath(os.path.join(curdir, "..", "sktree")))
 
 # -- project information -----------------------------------------------------
@@ -149,6 +149,7 @@ numpydoc_xref_aliases = {
 }
 numpydoc_xref_ignore = {
     "of",
+    'or',
     "shape",
     "n_components",
     "n_pixels",
@@ -161,6 +162,7 @@ numpydoc_xref_ignore = {
     "n_samples",
     "n_features",
     "n_estimators",
+    'n_outputs',
     "n_nodes",
     "X",
     "default",
@@ -176,6 +178,7 @@ error_ignores = {
     "ES01",  # no extended summary found
     "SA01",  # section 'See Also' not found
     "RT02",  # The first line of the Returns section should contain only the type, unless multiple values are being returned  # noqa
+    "PR09",  # ending with a . is not necessary
 }
 
 numpydoc_validate = False

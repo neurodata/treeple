@@ -188,8 +188,7 @@ class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):
         return self
 
     def predict(self, X):
-        """
-        Predict clusters for X.
+        """Predict clusters for X.
 
         The predicted class of an input sample is a vote by the trees in
         the forest, weighted by their probability estimates. That is,
@@ -522,6 +521,8 @@ class UnsupervisedRandomForest(ForestCluster):
     clustering_func : callable
         Scikit-learn compatible clustering function to take the affinity matrix
         and return cluster labels. By default, :class:`sklearn.cluster.AgglomerativeClustering`.
+    clustering_func_args : dict
+        Clustering function class keyword arguments. Passed to `clustering_func`.
 
     Attributes
     ----------

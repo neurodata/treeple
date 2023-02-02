@@ -110,11 +110,11 @@ jobs:
         run: |
           echo "$PWD/build-install/"
           ls build-install/**
-          echo "installed_path=$PWD/build-install/Lib/site-packages" >> $env:GITHUB_ENV
+          echo "installed_path=$PWD/build-install/lib/site-packages" >> $env:GITHUB_ENV
 
       - name: prep-test
         run: |
-          echo "${env:installed_path}""
+          echo "${env:installed_path}"
           echo "PYTHONPATH=${env:installed_path}" >> $env:GITHUB_ENV
 
       - name: Test sdist install

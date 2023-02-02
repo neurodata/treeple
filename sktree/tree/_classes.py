@@ -36,7 +36,7 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
 
     Parameters
     ----------
-    criterion : {"twomeans", "fastbic"}, default="twomeans", or UnsupervisedCriterion
+    criterion : {"twomeans", "fastbic"}, default="twomeans"
         The function to measure the quality of a split. Supported criteria are
         "twomeans" for the variance impurity and "fastbic" for the
         BIC criterion. If ``UnsupervisedCriterion`` instance is passed in, then
@@ -113,6 +113,11 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
 
         ``N``, ``N_t``, ``N_t_R`` and ``N_t_L`` all refer to the weighted sum,
         if ``sample_weight`` is passed.
+    clustering_func : callable
+        Scikit-learn compatible clustering function to take the affinity matrix
+        and return cluster labels. By default, :class:`sklearn.cluster.AgglomerativeClustering`.
+    clustering_func_args : dict
+        Clustering function class keyword arguments. Passed to `clustering_func`.
     """
 
     def __init__(
@@ -159,9 +164,6 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
 
                 if X.indices.dtype != np.intc or X.indptr.dtype != np.intc:
                     raise ValueError("No support for np.int64 index based sparse matrices")
-
-        # if getattr(X, "dtype", None) != DTYPE or not X.flags.contiguous:
-        #     X = np.ascontiguousarray(X, dtype=DTYPE)
 
         # Determine output settings
         n_samples, self.n_features_in_ = X.shape
@@ -272,6 +274,8 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
         return self
 
     def predict(self, X, check_input=True):
+        """Assign labels based on clustering the affinity matrix."""
+
         X = self._validate_X_predict(X, check_input=check_input)
         affinity_matrix = self.transform(X)
 
