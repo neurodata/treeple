@@ -111,13 +111,13 @@ jobs:
           echo "$PWD/build-install/"
           ls build-install/
           ls build-install/**
-          echo "installed_path=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages"
-          ls $PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages
+          export INSTALLED_PATH=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages"
+          ls $INSTALLED_PATH
 
       - name: prep-test
         run: |
           echo ${env:installed_path}
-          export PYTHONPATH=${{env:installed_path}}
+          export PYTHONPATH=$installed_path
           echo $PYTHONPATH
 
       - name: Test sdist install
