@@ -113,16 +113,15 @@ jobs:
           ls build-install/**
           echo "installed_path=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages"
           ls $PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages
-          echo "installed_path=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages" >> $env:GITHUB_ENV
 
       - name: prep-test
         run: |
           echo ${env:installed_path}
-          echo "PYTHONPATH=${env:installed_path}" >> $env:GITHUB_ENV
+          export PYTHONPATH=${{env:installed_path}}
+          echo $PYTHONPATH
 
       - name: Test sdist install
         run: |
-          echo $PYTHONPATH
           cd docs; python -c "import sktree; print(sktree.__version__)"
 
       - name: Save build
