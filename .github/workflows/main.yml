@@ -100,7 +100,7 @@ jobs:
 
       - name: Setup build and install scikit-tree
         run: |
-          python dev.py build
+          python dev.py build -j 2
 
       - name: Ccache performance
         shell: bash -l {0}
@@ -117,8 +117,9 @@ jobs:
       - name: prep-test
         run: |
           echo ${env:installed_path}
-          export PYTHONPATH=$installed_path
+          export PYTHONPATH=$INSTALLED_PATH
           echo $PYTHONPATH
+          ls $INSTALLED_PATH
 
       - name: Test sdist install
         run: |
@@ -239,7 +240,7 @@ jobs:
         run: |
           poetry run pip install -r build_requirements.txt
           poetry run pip install git+https://github.com/scientific-python/devpy
-          poetry run ./dev.py build
+          poetry run ./dev.py build -j 2
 
       - name: Run pytest
         run: poetry run ./dev.py test -- --cov=sktree --cov-report=xml

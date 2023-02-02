@@ -3,7 +3,7 @@ meson-python
 cython
 ninja
 numpy
-scikit-learn@git+ssh://git@github.com/neurodata/scikit-learn.git@tree-featuresv2
+scikit-learn@git+ssh://git@github.com/neurodata/scikit-learn.git@v1.0-refactoredtrees
 click
 rich-click
 doit
