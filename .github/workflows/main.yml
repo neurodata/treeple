@@ -23,9 +23,9 @@ env:
   CCACHE_DIR: "${{ github.workspace }}/.ccache"
 
 jobs:
-  build:
+  build_and_test:
     name: Meson build ${{ matrix.os }} - py${{ matrix.python-version }}
-    timeout-minutes: 15
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -107,23 +107,26 @@ jobs:
         shell: bash -l {0}
         run: ccache -s
 
+      - name: build-path
+        run: |
+          echo "$PWD/build-install/"
+          export INSTALLED_PATH=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages
+
       - name: Setup build and install scikit-tree
         run: |
           python dev.py test -- --cov=sktree --cov-report=xml
-          ls
+          ls 
+          ls $INSTALLED_PATH
 
       - name: Upload coverage stats to codecov
         if: ${{ matrix.os == 'ubuntu-22.04' && matrix.python-version == '3.10'}}
         uses: codecov/codecov-action@v3
         with:
-          files: ./coverage.xml
+          # python dev.py goes into the INSTALLED path in order to run pytest
+          files: $INSTALLED_PATH/coverage.xml
           fail_ci_if_error: true
           verbose: true
 
-      # - name: build-path
-      #   run: |
-      #     echo "$PWD/build-install/"
-      #     export INSTALLED_PATH=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages
 
       # # export Python_ROOT_DIR=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages
       # - name: prep-test
