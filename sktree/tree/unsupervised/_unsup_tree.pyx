@@ -8,7 +8,7 @@
 
 from cpython cimport Py_INCREF, PyObject, PyTypeObject
 from cython.operator cimport dereference as deref
-from libc.stdint cimport SIZE_MAX
+from libc.stdint cimport INTPTR_MAX
 from libc.stdlib cimport free, malloc
 from libc.string cimport memcpy
 from libcpp cimport bool
@@ -338,7 +338,7 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
                                  split_ptr,
                                  impurity, n_node_samples,
                                  weighted_n_node_samples)
-        if node_id == SIZE_MAX:
+        if node_id == INTPTR_MAX:
             return -1
 
         # compute values also for split nodes (might become leafs later).
@@ -502,7 +502,7 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
                 node_id = tree._add_node(parent, is_left, is_leaf, split_ptr,
                                          impurity, n_node_samples,
                                          weighted_n_node_samples)
-                if node_id == SIZE_MAX:
+                if node_id == INTPTR_MAX:
                     rc = -1
                     break
 
