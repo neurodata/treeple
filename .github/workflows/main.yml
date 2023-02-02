@@ -121,7 +121,9 @@ jobs:
           echo "PYTHONPATH=${env:installed_path}" >> $env:GITHUB_ENV
 
       - name: Test sdist install
-        run: cd docs; python -c "import sktree; print(sktree.__version__)"
+        run: |
+          echo $PYTHONPATH
+          cd docs; python -c "import sktree; print(sktree.__version__)"
 
       - name: Save build
         uses: actions/upload-artifact@v3

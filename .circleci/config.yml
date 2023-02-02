@@ -137,11 +137,11 @@ jobs:
             make -C docs html
 
       - store_artifacts:
-          path: docs/build/html
+          path: docs/_build/html
           destination: html
 
       - persist_to_workspace:
-          root: docs/build
+          root: docs/_build
           paths:
             - html
 
@@ -152,7 +152,7 @@ jobs:
       - checkout
 
       - attach_workspace:
-          at: docs/build
+          at: docs/_build
 
       - restore_cache:
           keys:
