@@ -108,7 +108,7 @@ jobs:
 
       - name: Setup build and install scikit-tree
         run: |
-          python dev.py test -j 2 -- --cov=sktree --cov-report=xml
+          python dev.py test -- --cov=sktree --cov-report=xml
 
       - name: Upload coverage stats to codecov
         if: ${{ matrix.os == 'ubuntu-22.04' && matrix.python-version == '3.10'}}
