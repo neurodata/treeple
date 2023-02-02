@@ -116,11 +116,11 @@ jobs:
 
       - name: prep-test
         run: |
-          export PYTHONPATH=$INSTALLED_PATH
+          export PYTHONPATH="$INSTALLED_PATH"
           echo "$PYTHONPATH"
-          ls $INSTALLED_PATH
           echo "$INSTALLED_PATH"
-          export PYTHONPATH=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages
+          export PYTHONPATH="$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages"
+          echo "$PYTHONPATH"
 
       - name: Test sdist install
         run: |
