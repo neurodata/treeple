@@ -117,13 +117,15 @@ jobs:
           python dev.py test -- --cov=sktree --cov-report=xml
           ls 
           ls $INSTALLED_PATH
+          pwd
+          ls $PYTHONPATH
 
       - name: Upload coverage stats to codecov
         if: ${{ matrix.os == 'ubuntu-22.04' && matrix.python-version == '3.10'}}
         uses: codecov/codecov-action@v3
         with:
           # python dev.py goes into the INSTALLED path in order to run pytest
-          files: $INSTALLED_PATH/coverage.xml
+          files: ./coverage.xml
           fail_ci_if_error: true
           verbose: true
 

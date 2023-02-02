@@ -274,7 +274,20 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
         return self
 
     def predict(self, X, check_input=True):
-        """Assign labels based on clustering the affinity matrix."""
+        """Assign labels based on clustering the affinity matrix.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Array to cluster.
+        check_input : bool, optional
+            Whether to validate input, by default True.
+
+        Returns
+        -------
+        labels : array-like of shape (n_samples,)
+            The assigned labels for each sample.
+        """
 
         X = self._validate_X_predict(X, check_input=check_input)
         affinity_matrix = self.transform(X)
