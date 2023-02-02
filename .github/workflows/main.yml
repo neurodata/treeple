@@ -73,7 +73,7 @@ jobs:
           python -m pip install -r build_requirements.txt
           python -m pip install git+https://github.com/scientific-python/devpy
           python -m pip install -r test_requirements.txt
-          
+
       - name: Prepare compiler cache
         id: prep-ccache
         shell: bash
@@ -126,7 +126,6 @@ jobs:
           files: $INSTALLED_PATH/coverage.xml
           fail_ci_if_error: true
           verbose: true
-
 
       # # export Python_ROOT_DIR=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages
       # - name: prep-test
@@ -218,7 +217,7 @@ jobs:
         poetry-version: [1.3.0]
     name: Unit-test ${{ matrix.os }} - py${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}-latest
-    needs: build
+    needs: build_and_test
     defaults:
       run:
         shell: bash
