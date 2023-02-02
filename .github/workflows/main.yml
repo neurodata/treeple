@@ -116,6 +116,7 @@ jobs:
           export Python_ROOT_DIR=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages
           echo "$Python_ROOT_DIR"
           echo "PYTHONPATH=$INSTALLED_PATH" >> $GITHUB_ENV
+          echo "Python_ROOT_DIR=$INSTALLED_PATH" >> $GITHUB_ENV
 
       - name: Test sdist install
         run: |
