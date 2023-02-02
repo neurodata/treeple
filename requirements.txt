@@ -1,0 +1,3 @@
+numpy
+scipy
+scikit-learn@git+ssh://git@github.com/neurodata/scikit-learn.git@v1.0-refactoredtrees

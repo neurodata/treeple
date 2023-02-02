@@ -4,16 +4,15 @@ on:
     types: [created]
 
 permissions:
-   contents: write  # to add labels
+  contents: write # to add labels
 
 jobs:
-
   label_pull_request:
     runs-on: ubuntu-latest
     steps:
-    - uses: thomasjpfan/labeler@v2.5.0
-      continue-on-error: true
-      if: github.repository == 'neurodata/scikit-tree'
-      with:
-        repo-token: "${{ secrets.GITHUB_TOKEN }}"
-        configuration-path: ".github/label-globs.yml"
+      - uses: thomasjpfan/labeler@v2.5.0
+        continue-on-error: true
+        if: github.repository == 'neurodata/scikit-tree'
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          configuration-path: ".github/label-globs.yml"
