@@ -101,6 +101,8 @@ jobs:
       - name: Setup build and install scikit-tree
         run: |
           python dev.py build -j 2
+          cd build
+          meson install
 
       - name: Ccache performance
         shell: bash -l {0}
