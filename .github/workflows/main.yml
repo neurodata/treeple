@@ -111,7 +111,7 @@ jobs:
           echo "$PWD/build-install/"
           ls build-install/
           ls build-install/**
-          export INSTALLED_PATH=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages"
+          export INSTALLED_PATH=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages
           ls $INSTALLED_PATH
 
       - name: prep-test
