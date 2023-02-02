@@ -47,6 +47,8 @@ Run the following to build the local files
     # install scikit-tree package
     meson install -C build
 
+    export PYTHONPATH=${PWD}/build/lib/python3.9/site-packages
+
     # to check installation, you need to be in a different directory
     cd docs;  
     python -c "from sktree import tree"
@@ -56,6 +58,10 @@ You can also do the same thing using the ``dev.py`` CLI:
 
     # run the build using Meson/Ninja
     ./dev.py build
+
+    # you will need to double check the build-install has the proper path 
+    # this might be different from machine to machine
+    export PYTHONPATH=${PWD}/build-install/usr/lib/python3.9/site-packages
 
     # run specific unit tests
     ./dev.py test -- sktree/tree/tests/test_tree.py

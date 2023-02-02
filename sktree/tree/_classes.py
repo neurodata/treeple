@@ -41,7 +41,7 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
         "twomeans" for the variance impurity and "fastbic" for the
         BIC criterion. If ``UnsupervisedCriterion`` instance is passed in, then
         the user must abide by the Cython internal API. See source code.
-    splitter : {"best", "random"}, default="best", or UnsupervisedSplitter
+    splitter : {"best", "random"}, default="best"
         The strategy used to choose the split at each node. Supported
         strategies are "best" to choose the best split and "random" to choose
         the best random split. If ``UnsupervisedSplitter`` instance is passed in, then
@@ -273,14 +273,14 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
 
         return self
 
-    def predict(self, X, check_input=True):
-        """Assign labels based on clustering the affinity matrix."""
+    # def predict(self, X, check_input=True):
+    #     """Assign labels based on clustering the affinity matrix."""
 
-        X = self._validate_X_predict(X, check_input=check_input)
-        affinity_matrix = self.transform(X)
+    #     X = self._validate_X_predict(X, check_input=check_input)
+    #     affinity_matrix = self.transform(X)
 
-        # compute the labels and set it
-        return self._assign_labels(affinity_matrix)
+    #     # compute the labels and set it
+    #     return self._assign_labels(affinity_matrix)
 
     def transform(self, X):
         """Transform X to a cluster-distance space.

@@ -11,13 +11,17 @@ from typing import Dict, Optional
 import sphinx_gallery  # noqa: F401
 from sphinx_gallery.sorting import ExampleTitleSortKey
 
-import sktree
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 curdir = os.path.dirname(__file__)
-sys.path.append(os.path.abspath(os.path.join(curdir, "..")))
+sys.path.append(os.path.abspath(os.path.join(curdir, "../build-install/usr/lib/python3.9/site-packages/")))
+
+import sktree
+import sktree.tree
+from sktree import UnsupervisedRandomForest
+from sktree.tree import UnsupervisedDecisionTree
 # sys.path.append(os.path.abspath(os.path.join(curdir, "..", "sktree")))
 
 # -- project information -----------------------------------------------------
@@ -161,13 +165,16 @@ numpydoc_xref_ignore = {
     "pandas",
     "n_samples",
     "n_features",
+    'n_features_new',
     "n_estimators",
     'n_outputs',
     "n_nodes",
     "X",
     "default",
     "sparse",
-    "matrix"
+    "matrix",
+    'Ignored',
+    'UnsupervisedSplitter',
 }
 
 # validation
