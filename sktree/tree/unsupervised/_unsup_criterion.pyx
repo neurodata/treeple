@@ -321,7 +321,7 @@ cdef class TwoMeans(UnsupervisedCriterion):
                 )
 
         # first compute mean
-        mean = self.sum_total / n_node_samples
+        mean = self.sum_total / self.weighted_n_node_samples
 
         # then compute the impurity as the variance
         impurity = self.sum_of_squares(
@@ -466,7 +466,7 @@ cdef class FastBIC(UnsupervisedCriterion):
                 )
 
         # first compute mean
-        mean = self.sum_total / n_node_samples
+        mean = self.sum_total / self.weighted_n_node_samples
 
         # then compute the variance of the cluster
         sig = self.sum_of_squares(
