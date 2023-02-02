@@ -106,41 +106,35 @@ jobs:
         shell: bash -l {0}
         run: ccache -s
 
-      - name: Setup build and install scikit-tree
-        run: |
-          python dev.py test -- --cov=sktree --cov-report=xml
-
-      - name: Upload coverage stats to codecov
-        if: ${{ matrix.os == 'ubuntu-22.04' && matrix.python-version == '3.10'}}
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./coverage.xml
-          fail_ci_if_error: true
-          verbose: true
-
-      # - name: build-path
+      # - name: Setup build and install scikit-tree
       #   run: |
-      #     echo "$PWD/build-install/"
-      #     export INSTALLED_PATH=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages
+      #     python dev.py test -- --cov=sktree --cov-report=xml
 
-      #     echo "installed_path=$PWD/build/usr/lib/site-packages" >> $env:GITHUB_ENV
-      #     echo "PYTHONPATH=${env:installed_path}" >> $env:GITHUB_ENV
-      #     echo "Python_ROOT_DIR=${env:installed_path}" >> $env:GITHUB_ENV
+      # - name: Upload coverage stats to codecov
+      #   if: ${{ matrix.os == 'ubuntu-22.04' && matrix.python-version == '3.10'}}
+      #   uses: codecov/codecov-action@v3
+      #   with:
+      #     files: ./coverage.xml
+      #     fail_ci_if_error: true
+      #     verbose: true
+
+      - name: build-path
+        run: |
+          echo "$PWD/build-install/"
+          export INSTALLED_PATH=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages
 
       # export Python_ROOT_DIR=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages
-      # - name: prep-test
-      #   run: |
-      #     echo "$Python_ROOT_DIR"
-      #     echo "PYTHONPATH=$INSTALLED_PATH" >> $GITHUB_ENV
-      #     echo "Python_ROOT_DIR=$INSTALLED_PATH" >> $GITHUB_ENV
-      #     echo "$Python_ROOT_DIR"
+      - name: prep-test
+        run: |
+          echo "PYTHONPATH=$INSTALLED_PATH" >> $GITHUB_ENV
+          export PYTHONPATH=$INSTALLED_PATH 
 
-      # - name: Test sdist install
-      #   run: |
-      #     mkdir tmp
-      #     cd tmp
-      #     which python
-      #     python -c "import sktree; print(sktree.__version__)"
+      - name: Test sdist install
+        # make sure that we are in the installed scikit-tree folder by meson
+        run: |
+          cd $PYTHONPATH
+          which python
+          python -c "import sktree; print(sktree.__version__)"
 
       - name: Save build
         uses: actions/upload-artifact@v3
@@ -241,10 +235,12 @@ jobs:
       - name: build-path
         run: |
           echo "installed_path=$PWD/build/usr/lib/site-packages" >> $env:GITHUB_ENV
-
+          export INSTALLED_PATH=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages
+          
       - name: prep-test
         run: |
           echo "PYTHONPATH=${env:installed_path}" >> $env:GITHUB_ENV
+          export PYTHONPATH=$installed_path
 
       - name: Install Poetry ${{ matrix.poetry-version }}
         uses: abatilo/actions-poetry@v2.2.0
