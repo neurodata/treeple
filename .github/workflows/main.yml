@@ -124,14 +124,14 @@ jobs:
           pwd 
           ls
 
-      - name: Upload coverage stats to codecov
-        if: ${{ matrix.os == 'ubuntu-22.04' && matrix.python-version == '3.10'}}
-        uses: codecov/codecov-action@v3
-        with:
-          # python dev.py goes into the INSTALLED path in order to run pytest
-          files: ./coverage.xml
-          fail_ci_if_error: true
-          verbose: true
+      # - name: Upload coverage stats to codecov
+      #   if: ${{ matrix.os == 'ubuntu-22.04' && matrix.python-version == '3.10'}}
+      #   uses: codecov/codecov-action@v3
+      #   with:
+      #     # python dev.py goes into the INSTALLED path in order to run pytest
+      #     files: ./coverage.xml
+      #     fail_ci_if_error: true
+      #     verbose: true
 
       # # export Python_ROOT_DIR=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages
       # - name: prep-test
