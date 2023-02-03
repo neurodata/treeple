@@ -20,6 +20,9 @@ Installation
 ------------
 Our installation will try to follow scikit-learn installation as close as possible, as we contain Cython code subclassed, or inspired by the scikit-learn tree submodule.
 
+**Dependency on a fork of scikit-learn**
+Currently, scikit-tree depends on a refactored fork of the scikit-learn codebase at https://github.com/neurodata/scikit-learn/, which will be maintained to not diverge from the upstream scikit-learn. Within this fork though, we will maintain a refactoring of the `tree/` submodule that more easily allows 3rd party trees to take advantage of the Cython and Python APIs. You will need to download scikit-learn from this fork following the installation instructions.
+
 AS OF NOW, scikit-tree is in development stage and the installation is still finicky due to the upstream scikit-learn's stalled refactoring PRs of the tree submodule. Once those
 are merged, the installation will be simpler. The current recommended installation is done locally with meson.
 
