@@ -167,7 +167,7 @@ jobs:
 
       - add_ssh_keys:
           fingerprints:
-            - "d6:88:6b:a0:80:bf:14:8e:80:2e:ed:11:52:26:37:68"
+            - "57:39:99:f3:09:80:6a:70:ca:c0:2a:06:14:16:ce:60"
 
       - run:
           # push built docs into the `dev` directory on the `gh-pages` branch
