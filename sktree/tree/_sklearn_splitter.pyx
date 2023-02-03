@@ -2,9 +2,6 @@
 
 from libc.stdlib cimport qsort
 from libc.string cimport memcpy
-
-import numpy as np
-
 from sklearn.tree._utils cimport log
 
 

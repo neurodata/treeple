@@ -3,6 +3,8 @@ extensions = [
   '_unsup_criterion',
   '_unsup_splitter',
   '_unsup_tree',
+  '_unsup_oblique_splitter',
+  '_unsup_oblique_tree',
 ]
 
 foreach ext: extensions

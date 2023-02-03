@@ -1,47 +1,46 @@
 # See: https://circleci.com/blog/deploying-documentation-to-github-pages-with-continuous-integration/
 version: 2.1
 
-orbs:
-  python: circleci/python@2.0.3
+# orbs:
+#   python: circleci/python@2.0.3
 
-jobs:
-  docs-build:
-    executor: python/default
-    environment:
-      - CODECOV_TOKEN: "cb142a98-9da3-4fc9-b6b5-ed62b9809d16"
-      - OMP_NUM_THREADS: 2
-      - MKL_NUM_THREADS: 2
-      - MINICONDA_PATH: ~/miniconda
-      - CONDA_ENV_NAME: testenv
-      - PYTHON_VERSION: 3.7
-      - NUMPY_VERSION: 1.21.2
-      - SCIPY_VERSION: 1.7.1
-      - MATPLOTLIB_VERSION: 1.5.1
-      - CYTHON_VERSION: 0.29.24
-      - SCIKIT_LEARN_VERSION: 1.1.0
-      - SCIKIT_IMAGE_VERSION: 0.12.3
+# Aliases to reuse
+_defaults: &defaults
+  docker:
+    # CircleCI maintains a library of pre-built images
+    # documented at https://circleci.com/docs/2.0/circleci-images/
+    - image: cimg/python:3.8
+
+# document commands used by downstream jobs
+commands:
+  check-skip:
     steps:
-      - checkout
-
-      # make sure pandoc is on the system
-      - run: sudo apt-get update && sudo apt-get install -y pandoc
-
-      - restore_cache:
-          keys:
-            - doc-min-deps-ccache-{{ .Branch }}
-            - doc-min-deps-ccache
-            
-      - save_cache:
-          key: doc-min-deps-ccache-{{ .Branch }}-{{ .BuildNum }}
-          paths:
-            - ~/.ccache
-            - ~/.cache/pip
-
       - run:
-          name: Install the latest version of Poetry
+          name: Check-skip
           command: |
-            curl -sSL https://install.python-poetry.org | python3 - --version 1.3.0
-            poetry --version
+            if [ ! -d "sktree" ]; then
+              echo "Build was not run due to skip, exiting job ${CIRCLE_JOB} for PR ${CIRCLE_PULL_REQUEST}."
+              circleci-agent step halt;
+            fi
+            export git_log=$(git log --max-count=1 --pretty=format:"%B" | tr "\n" " ")
+            echo "Got commit message:"
+            echo "${git_log}"
+            if [[ -v CIRCLE_PULL_REQUEST ]] && ([[ "$git_log" == *"[skip circle]"* ]] || [[ "$git_log" == *"[circle skip]"* ]]); then
+              echo "Skip detected, exiting job ${CIRCLE_JOB} for PR ${CIRCLE_PULL_REQUEST}."
+              circleci-agent step halt;
+            fi
+  apt-install:
+    steps:
+      - run:
+          name: Install apt packages
+          command: |
+            sudo apt-get update
+            sudo apt-get install libopenblas-dev gfortran libgmp-dev libmpfr-dev ccache
+            # make sure pandoc is on the system
+            sudo apt-get update && sudo apt-get install -y pandoc optipng
+
+            # install pysal dependencies
+            sudo apt install libspatialindex-dev xdg-utils
 
       - run:
           name: Set BASH_ENV
@@ -50,72 +49,101 @@ jobs:
             sudo apt update
             sudo apt-get update
             sudo apt install -qq graphviz optipng libxft2 graphviz-dev
-            echo "set -e" >> $BASH_ENV
-            echo "export OPENBLAS_NUM_THREADS=4" >> $BASH_ENV
-            echo "export XDG_RUNTIME_DIR=/tmp/runtime-circleci" >> $BASH_ENV
-            echo "export PATH=~/.local/bin/:$PATH" >> $BASH_ENV
-            echo "export DISPLAY=:99" >> $BASH_ENV
-            echo "BASH_ENV:"
+            echo 'set -e' >> $BASH_ENV
+            echo 'export OPENBLAS_NUM_THREADS=4' >> $BASH_ENV
+            echo 'export XDG_RUNTIME_DIR=/tmp/runtime-circleci' >> $BASH_ENV
+            echo 'export PATH=~/.local/bin/:$PATH' >> $BASH_ENV
+            echo 'export DISPLAY=:99' >> $BASH_ENV
+            echo 'BASH_ENV:'
             cat $BASH_ENV
-      
-      - run:
-          name: Install pysal dependencies
-          command: |
-            sudo apt install libspatialindex-dev xdg-utils
 
-      - python/install-packages:
-          pkg-manager: poetry
-          cache-version: "v1" # change to clear cache
-          args: "--with docs"
-      
+  merge:
+    steps:
       - run:
-          name: Setup pandoc
-          command: sudo apt update && sudo apt install -y pandoc optipng
-          
-      - run:
-          name: Check poetry package versions
+          name: merge with upstream
           command: |
-            poetry --version
-            poetry show
+            echo $(git log -1 --pretty=%B) | tee gitlog.txt
+            echo ${CI_PULL_REQUEST//*pull\//} | tee merge.txt
+            if [[ $(cat merge.txt) != "" ]]; then
+              echo "Merging $(cat merge.txt)";
+              git remote add upstream https://github.com/neurodata/scikit-tree.git;
+              git pull --ff-only upstream "refs/pull/$(cat merge.txt)/merge";
+              git fetch upstream main;
+            fi
 
-      # Look at what we have and fail early if there is some library conflict
-      - run:
-          name: Check installation
-          command: |
-            poetry run which python
-            poetry run python -c "import sklearn; sklearn.utils._show_versions.show_versions()"
-            poetry run python -c "import sktree;"
-            poetry run python -c "import numpy; numpy.show_config()"
-      # poetry run LIBGL_DEBUG=verbose python -c "import matplotlib.pyplot as plt; plt.figure()"
-      # Build docs
-      - run:
-          name: Build documentation
-          command: |
-            poetry run poe build_docs
+jobs:
+  # Build scikit-tree from source
+  build_scikit-tree:
+    <<: *defaults
+    steps:
+      - checkout
+      - check-skip
+      - merge
+      - apt-install
 
-      # Save the example test results
-      - store_test_results:
-          path: docs/_build/test-results
+      - restore_cache:
+          keys:
+            - deps_ccache-{{ .Branch }}
+            - deps_ccache
+
+      - run:
+          name: setup Python venv
+          command: |
+            pip install -r build_requirements.txt
+            pip install git+https://github.com/scientific-python/devpy
+            pip install -r doc_requirements.txt
+            # extra benchmark deps
+            pip install pytest
+      - run:
+          name: build scikit-tree
+          command: |
+            python dev.py build -j2
+      - save_cache:
+          key: deps_ccache-{{ .Branch }}
+          paths:
+            - ~/.ccache
+            - ~/.cache/pip
+
+      - run:
+          name: ccache performance
+          command: |
+            ccache -s
+
+      # persist, so downstream tasks can use the built image
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - .
+
+  docs-build:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/
+
+      - check-skip
+      - apt-install
+
+      - run:
+          name: build docs
+          no_output_timeout: 25m
+          command: |
+            ls
+            ls build
+            ls build-install
+            echo "After..."
+            ls build-install/**
+            export PYTHONPATH=$PWD/build-install/usr/lib/python3.8/site-packages
+            make -C docs html
+
       - store_artifacts:
-          path: docs/_build/test-results
-          destination: test-results
-      # Save the SG RST
-      - store_artifacts:
-          path: docs/auto_examples.zip
-      - store_artifacts:
-          path: docs/generated.zip
-      # Save the outputs
-      - store_artifacts:
-          path: docs/_build/html/
-          destination: dev
-      - store_artifacts:
-          path: docs/_build/html_stable/
-          destination: stable
+          path: docs/_build/html
+          destination: html
+
       - persist_to_workspace:
           root: docs/_build
           paths:
             - html
-            - html_stable
 
   docs-deploy:
     docker:
@@ -124,7 +152,7 @@ jobs:
       - checkout
 
       - attach_workspace:
-          at: docS/_build
+          at: docs/_build
 
       - restore_cache:
           keys:
@@ -147,10 +175,10 @@ jobs:
           command: |
             if [ "${CIRCLE_BRANCH}" == "main" ]; then
               echo "Deploying dev docs for ${CIRCLE_BRANCH}.";
-              gh-pages --dotfiles --message "doc updates [skip ci] (${CIRCLE_BUILD_NUM})" --dist doc/_build/html --dest ./dev
+              gh-pages --dotfiles --message "docs updates [skip ci] (${CIRCLE_BUILD_NUM})" --dist docs/_build/html --dest ./dev
             else
               echo "Deploying stable docs for ${CIRCLE_BRANCH}.";
-              gh-pages --dotfiles --message "doc updates [skip ci] (${CIRCLE_BUILD_NUM})" --dist doc/_build/html --dest ./stable
+              gh-pages --dotfiles --message "docs updates [skip ci] (${CIRCLE_BUILD_NUM})" --dist docs/_build/html --dest ./stable
             fi;
 
       - save_cache:
@@ -161,11 +189,13 @@ jobs:
 workflows:
   commit:
     jobs:
-      - docs-build
+      - build_scikit-tree
+      - docs-build:
+          requires:
+            - build_scikit-tree
       - docs-deploy:
           requires:
             - docs-build
           filters:
             branches:
-              only:
-                - main
+              only: main

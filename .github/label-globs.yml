@@ -1,0 +1,15 @@
+Cython:
+- sktree/**/*.pyx.*
+- sktree/**/*.pxd.*
+- sktree/**/*.pxi.*
+
+C/C++:
+- sktree/**/*.c
+- sktree/**/*.c.in
+- sktree/**/*.c.old
+- sktree/**/*.h
+- sktree/**/*.h.in
+- sktree/**/*.cpp
+- sktree/**/*.cc
+- sktree/**/*.cxx
+- sktree/**/*.hpp

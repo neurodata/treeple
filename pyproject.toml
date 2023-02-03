@@ -5,15 +5,15 @@ name = "sktree"
 # any changes to this should not be checked in
 #
 version = "0.0.0"
-description = "Decision trees in Python"
+description = "Modern decision trees in Python"
 authors = ["Neurodata <adam.li@columbia.edu>"]
-license = "MIT"
+license = "BSD-3"
 documentation = "https://scikit-tree.neurodata.io"
 repository = "https://github.com/neurodata/scikit-tree"
 readme = "README.md"
 classifiers = [
     'Development Status :: 4 - Beta',
-    'License :: OSI Approved :: MIT License',
+    'License :: OSI Approved :: BSD-3 License',
     'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
@@ -22,10 +22,6 @@ keywords = ['tree', 'oblique trees', 'manifold-learning', 'scikit-learn']
 include = [
     { path = "meson.build", format = "sdist" },
 ]
-
-# [tool.poetry.build]
-# generate-setup-file = false
-# script = "build.py"
 
 [build-system]
 build-backend = "mesonpy"
@@ -39,7 +35,7 @@ requires = [
     "setuptools<=65.5",
     "packaging",
     "Cython>=0.29.24",
-    "scikit-learn",
+    "scikit-learn@git+ssh://git@github.com/neurodata/scikit-learn.git@tree-featuresv2",
     # "scikit-learn" = { git = "https://github.com/neurodata/scikit-learn.git", branch = 'split' },
     "lazy_loader>=0.1",
 
@@ -125,7 +121,7 @@ _black = 'black .'
 _isort = 'isort .'
 _black_check = 'black --check sktree examples'
 _isort_check = 'isort --check .'
-_pydocstyle = 'pydocstyle .'
+_pydocstyle = 'pydocstyle ./sktree'
 _codespell = 'codespell sktree/ doc/ examples/ --ignore-words=.codespellignore --skip "**/_build/*"'
 _changelog = 'semversioner changelog > CHANGELOG.md'
 _apply_version = 'semversioner release'
@@ -182,7 +178,7 @@ extend_skip_glob = ['setup.py', 'docs/*', 'examples/*', 'sktree/__init__.py']
 convention = 'numpy'
 ignore-decorators = '(copy_doc|property|.*setter|.*getter)'
 match = '^(?!setup|__init__|test_).*\.py'
-match-dir = '^sktree.*'
+match-dir = '^sktree*'
 add_ignore = 'D100,D104,D105,D107'
 
 [tool.mypy]
@@ -198,14 +194,14 @@ filterwarnings = []
 branch = true
 cover_pylib = false
 source = ['sktree']
-omit = ['**/__init__.py', '**/tests/**']
+omit = ['**/__init__.py', '**/tests/**', 'sktree/_build_utils/*']
 
 [tool.coverage.report]
 exclude_lines = ['pragma: no cover', 'if __name__ == .__main__.:']
 precision = 2
 
 [tool.bandit]
-exclude_dirs = ["sktree/tests", "sktree/tree/tests"]
+exclude_dirs = ["sktree/tests", "sktree/tree/tests", 'sktree/_build_utils/*']
 skips = ['B404', 'B603']
 
 [tool.devpy]

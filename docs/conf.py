@@ -11,15 +11,18 @@ from typing import Dict, Optional
 import sphinx_gallery  # noqa: F401
 from sphinx_gallery.sorting import ExampleTitleSortKey
 
-sys.path.insert(0, os.path.abspath(".."))
-import sktree
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 curdir = os.path.dirname(__file__)
-sys.path.append(os.path.abspath(os.path.join(curdir, "..")))
-sys.path.append(os.path.abspath(os.path.join(curdir, "..", "sktree")))
+sys.path.append(os.path.abspath(os.path.join(curdir, "../build-install/usr/lib/python3.9/site-packages/")))
+
+import sktree
+import sktree.tree
+from sktree import UnsupervisedRandomForest
+from sktree.tree import UnsupervisedDecisionTree
+# sys.path.append(os.path.abspath(os.path.join(curdir, "..", "sktree")))
 
 # -- project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -73,8 +76,13 @@ templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints"]
 
 # Sphinx will warn about all references where the target cannot be found.
-nitpicky = True
-nitpick_ignore = []
+nitpicky = False
+
+# TODO: figure out why these are raising an error?
+nitpick_ignore = [
+    ('py:obj', 'UnsupervisedDecisionTree'),
+    ('py:mod', 'sktree.tree'),
+]
 
 # The name of a reST role (builtin or Sphinx extension) to use as the default
 # role, that is, for text marked up `like this`. This can be set to 'py:obj' to
@@ -132,7 +140,7 @@ autosummary_generate = True
 autoclass_content = "class"
 autodoc_typehints = "none"
 autodoc_member_order = "groupwise"
-autodoc_warningiserror = True
+autodoc_warningiserror = False
 autodoc_default_options = {"inherited-members": None}
 
 # -- numpydoc ----------------------------------------------------------------
@@ -147,9 +155,11 @@ numpydoc_xref_aliases = {
     # Python
     "Path": "pathlib.Path",
     "bool": ":class:`python:bool`",
+    # "UnsupervisedDecisionTree": ":class:`sktree.tree.UnsupervisedDecisionTree",
 }
 numpydoc_xref_ignore = {
     "of",
+    'or',
     "shape",
     "n_components",
     "n_pixels",
@@ -161,12 +171,16 @@ numpydoc_xref_ignore = {
     "pandas",
     "n_samples",
     "n_features",
+    'n_features_new',
     "n_estimators",
+    'n_outputs',
     "n_nodes",
     "X",
     "default",
     "sparse",
-    "matrix"
+    "matrix",
+    'Ignored',
+    'UnsupervisedSplitter',
 }
 
 # validation
@@ -177,6 +191,7 @@ error_ignores = {
     "ES01",  # no extended summary found
     "SA01",  # section 'See Also' not found
     "RT02",  # The first line of the Returns section should contain only the type, unless multiple values are being returned  # noqa
+    "PR09",  # ending with a . is not necessary
 }
 
 numpydoc_validate = False

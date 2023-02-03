@@ -23,6 +23,9 @@ exclude =
     docs/generated
     docs/auto_examples
     validation
+    build
+    build-install 
+    dist
 
 per-file-ignores =
     # __init__.py files are allowed to have unused imports

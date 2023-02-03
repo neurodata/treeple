@@ -1,0 +1,65 @@
+name: "Style checks"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number }}-${{ github.event.type }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    paths:
+      - "**.py"
+      - "**.pxd"
+      - "**.pyx"
+  push:
+    branches: [main]
+    paths:
+      - "**.py"
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+
+permissions:
+  contents: read # to fetch code (actions/checkout)
+
+jobs:
+  style:
+    name: Formatting, lint, style, and type-checks
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        poetry-version: [1.3.0]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+          architecture: "x64"
+      
+      - name: Install packages for Ubuntu
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libopenblas-dev libatlas-base-dev liblapack-dev
+
+      - name: Install Poetry ${{ matrix.poetry-version }}
+        uses: abatilo/actions-poetry@v2.2.0
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+      - name: Install Poetry Dynamic Versioning Plugin
+        run: pip install poetry-dynamic-versioning
+
+      - name: Install dependencies
+        run: poetry install --only style
+
+      # check formatting of the code style
+      - name: Check code formatting
+        run: poetry run poe check_format
+
+      # this applies various linting
+      - name: Lint codebase
+        run: poetry run poe lint
+
+      - name: Type check
+        run: poetry run poe type_check

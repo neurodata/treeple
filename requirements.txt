@@ -1,0 +1,4 @@
+numpy
+scipy
+scikit-learn@git+ssh://git@github.com/neurodata/scikit-learn/git@v1.1-refactoredtrees
+# https://github.com/neurodata/scikit-learn/releases/download/v1.1-refactoredtrees/scikit-learn-1.3.dev0.tar.gz

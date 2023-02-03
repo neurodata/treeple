@@ -7,9 +7,10 @@
 # License: BSD 3 clause
 
 from cpython cimport Py_INCREF, PyObject, PyTypeObject
-from libc.stdint cimport SIZE_MAX
-from libc.stdlib cimport free
-from libc.string cimport memcpy, memset
+from cython.operator cimport dereference as deref
+from libc.stdint cimport INTPTR_MAX
+from libc.stdlib cimport free, malloc
+from libc.string cimport memcpy
 from libcpp cimport bool
 from libcpp.algorithm cimport pop_heap, push_heap
 from libcpp.vector cimport vector
@@ -23,8 +24,6 @@ cimport numpy as cnp
 cnp.import_array()
 
 from scipy.sparse import csr_matrix, issparse
-
-from sklearn.tree._utils cimport safe_realloc
 
 
 cdef extern from "numpy/arrayobject.h":
@@ -106,7 +105,7 @@ cdef class UnsupervisedTreeBuilder:
             X = np.asfortranarray(X, dtype=DTYPE)
 
         if (sample_weight is not None) and \
-            (sample_weight.dtype != DOUBLE or not sample_weight.flags.contiguous):
+                (sample_weight.dtype != DOUBLE or not sample_weight.flags.contiguous):
             sample_weight = np.asarray(sample_weight, dtype=DOUBLE, order="C")
 
         return X, sample_weight
@@ -294,7 +293,12 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
         FrontierRecord* res
     ) nogil except -1:
         """Adds node w/ partition ``[start, end)`` to the frontier. """
+        # initialize record to keep track of split node data and a pointer to the
+        # memory address containing the split node
+        # Note: the pointer allows us to modularly define different split records
         cdef SplitRecord split
+        cdef SplitRecord* split_ptr = <SplitRecord *>malloc(splitter.pointer_size())
+
         cdef SIZE_t node_id
         cdef SIZE_t n_node_samples
         cdef SIZE_t n_constant_features = 0
@@ -316,7 +320,12 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
                    )
 
         if not is_leaf:
-            splitter.node_split(impurity, &split, &n_constant_features)
+            splitter.node_split(impurity, split_ptr, &n_constant_features)
+
+            # assign local copy of SplitRecord to assign
+            # pos, improvement, and impurity scores
+            split = deref(split_ptr)
+
             # If EPSILON=0 in the below comparison, float precision issues stop
             # splitting early, producing trees that are dissimilar to v0.18
             is_leaf = (is_leaf or split.pos >= end or
@@ -326,10 +335,10 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
                                  if parent != NULL
                                  else _TREE_UNDEFINED,
                                  is_left, is_leaf,
-                                 split.feature, split.threshold,
+                                 split_ptr,
                                  impurity, n_node_samples,
                                  weighted_n_node_samples)
-        if node_id == SIZE_MAX:
+        if node_id == INTPTR_MAX:
             return -1
 
         # compute values also for split nodes (might become leafs later).
@@ -357,6 +366,8 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
             res.impurity_left = impurity
             res.impurity_right = impurity
 
+        # free up memory containing the pointer to the split record
+        free(split_ptr)
         return 0
 
 cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
@@ -423,6 +434,7 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
         # memory address containing the split node
         # Note: the pointer allows us to modularly define different split records
         cdef SplitRecord split
+        cdef SplitRecord* split_ptr = <SplitRecord *>malloc(splitter.pointer_size())
 
         cdef double impurity = INFINITY
         cdef SIZE_t n_constant_features
@@ -474,7 +486,11 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
                 is_leaf = is_leaf or impurity <= EPSILON
 
                 if not is_leaf:
-                    splitter.node_split(impurity, &split, &n_constant_features)
+                    splitter.node_split(impurity, split_ptr, &n_constant_features)
+
+                    # assign local copy of SplitRecord to assign
+                    # pos, improvement, and impurity scores
+                    split = deref(split_ptr)
 
                     # If EPSILON=0 in the below comparison, float precision
                     # issues stop splitting, producing trees that are
@@ -483,11 +499,10 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
                                (split.improvement + EPSILON <
                                 min_impurity_decrease))
 
-                node_id = tree._add_node(parent, is_left, is_leaf, split.feature,
-                                         split.threshold,
+                node_id = tree._add_node(parent, is_left, is_leaf, split_ptr,
                                          impurity, n_node_samples,
                                          weighted_n_node_samples)
-                if node_id == SIZE_MAX:
+                if node_id == INTPTR_MAX:
                     rc = -1
                     break
 
@@ -525,6 +540,8 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
             if rc >= 0:
                 tree.max_depth = max_depth_seen
 
+        # free the memory created for the SplitRecord pointer
+        free(split_ptr)
         if rc == -1:
             raise MemoryError()
 
@@ -696,410 +713,89 @@ cdef class UnsupervisedTree:
         value = memcpy(self.value, (<cnp.ndarray> value_ndarray).data,
                        self.capacity * self.value_stride * sizeof(double))
 
-    cdef int _resize(self, SIZE_t capacity) nogil except -1:
-        """Resize all inner arrays to `capacity`, if `capacity` == -1, then
-           double the size of the inner arrays.
-
-        Returns -1 in case of failure to allocate memory (and raise MemoryError)
-        or 0 otherwise.
-        """
-        if self._resize_c(capacity) != 0:
-            # Acquire gil only if we need to raise
-            with gil:
-                raise MemoryError()
-
-    cdef int _resize_c(self, SIZE_t capacity=SIZE_MAX) nogil except -1:
-        """Guts of _resize
-
-        Returns -1 in case of failure to allocate memory (and raise MemoryError)
-        or 0 otherwise.
-        """
-        if capacity == self.capacity and self.nodes != NULL:
-            return 0
-
-        if capacity == SIZE_MAX:
-            if self.capacity == 0:
-                capacity = 3  # default initial value
-            else:
-                capacity = 2 * self.capacity
-
-        safe_realloc(&self.nodes, capacity)
-        safe_realloc(&self.value, capacity * self.value_stride)
-
-        # value memory is initialised to 0 to enable classifier argmax
-        if capacity > self.capacity:
-            memset(<void*>(self.value + self.capacity * self.value_stride), 0,
-                   (capacity - self.capacity) * self.value_stride *
-                   sizeof(double))
-
-        # if capacity smaller than node_count, adjust the counter
-        if capacity < self.node_count:
-            self.node_count = capacity
-
-        self.capacity = capacity
-        return 0
-
-    cdef SIZE_t _add_node(
+    cdef int _set_split_node(
         self,
-        SIZE_t parent,
-        bint is_left,
-        bint is_leaf,
-        SIZE_t feature,
-        double threshold,
-        double impurity,
-        SIZE_t n_node_samples,
-        double weighted_n_node_samples
+        SplitRecord* split_node,
+        Node* node
     ) nogil except -1:
-        """Add a node to the tree.
+        """Set split node data.
 
-        The new node registers itself as the child of its parent.
-
-        Returns (size_t)(-1) on error.
+        Parameters
+        ----------
+        split_node : SplitRecord*
+            The pointer to the record of the split node data.
+        node : Node*
+            The pointer to the node that will hold the split node.
         """
-        cdef SIZE_t node_id = self.node_count
+        # left_child and right_child will be set later for a split node
+        node.feature = split_node.feature
+        node.threshold = split_node.threshold
+        return 1
 
-        if node_id >= self.capacity:
-            if self._resize_c() != 0:
-                return SIZE_MAX
+    cdef int _set_leaf_node(
+        self,
+        SplitRecord* split_node,
+        Node* node
+    ) nogil except -1:
+        """Set leaf node data.
 
-        cdef Node* node = &self.nodes[node_id]
-        node.impurity = impurity
-        node.n_node_samples = n_node_samples
-        node.weighted_n_node_samples = weighted_n_node_samples
-
-        if parent != _TREE_UNDEFINED:
-            if is_left:
-                self.nodes[parent].left_child = node_id
-            else:
-                self.nodes[parent].right_child = node_id
-
-        if is_leaf:
-            node.left_child = _TREE_LEAF
-            node.right_child = _TREE_LEAF
-            node.feature = _TREE_UNDEFINED
-            node.threshold = _TREE_UNDEFINED
-
-        else:
-            # left_child and right_child will be set later
-            node.feature = feature
-            node.threshold = threshold
-
-        self.node_count += 1
-
-        return node_id
-
-    cpdef cnp.ndarray apply(self, object X):
-        """Finds the terminal region (=leaf node) for each sample in X."""
-        if issparse(X):
-            return self._apply_sparse_csr(X)
-        else:
-            return self._apply_dense(X)
-
-    cdef inline cnp.ndarray _apply_dense(self, object X):
-        """Finds the terminal region (=leaf node) for each sample in X."""
-
-        # Check input
-        if not isinstance(X, np.ndarray):
-            raise ValueError("X should be in np.ndarray format, got %s"
-                             % type(X))
-
-        if X.dtype != DTYPE:
-            raise ValueError("X.dtype should be np.float32, got %s" % X.dtype)
-
-        # Extract input
-        cdef const DTYPE_t[:, :] X_ndarray = X
-        cdef SIZE_t n_samples = X.shape[0]
-
-        # Initialize output
-        cdef cnp.ndarray[SIZE_t] out = np.zeros((n_samples,), dtype=np.intp)
-        cdef SIZE_t* out_ptr = <SIZE_t*> out.data
-
-        # Initialize auxiliary data-structure
-        cdef Node* node = NULL
-        cdef SIZE_t i = 0
-
-        with nogil:
-            for i in range(n_samples):
-                node = self.nodes
-                # While node not a leaf
-                while node.left_child != _TREE_LEAF:
-                    # ... and node.right_child != _TREE_LEAF:
-                    if X_ndarray[i, node.feature] <= node.threshold:
-                        node = &self.nodes[node.left_child]
-                    else:
-                        node = &self.nodes[node.right_child]
-
-                out_ptr[i] = <SIZE_t>(node - self.nodes)  # node offset
-
-        return out
-
-    cdef inline cnp.ndarray _apply_sparse_csr(self, object X):
-        """Finds the terminal region (=leaf node) for each sample in sparse X.
+        Parameters
+        ----------
+        split_node : SplitRecord*
+            The pointer to the record of the leaf node data.
+        node : Node*
+            The pointer to the node that will hold the leaf node.
         """
-        # Check input
-        if not isinstance(X, csr_matrix):
-            raise ValueError("X should be in csr_matrix format, got %s"
-                             % type(X))
+        node.left_child = _TREE_LEAF
+        node.right_child = _TREE_LEAF
+        node.feature = _TREE_UNDEFINED
+        node.threshold = _TREE_UNDEFINED
+        return 1
 
-        if X.dtype != DTYPE:
-            raise ValueError("X.dtype should be np.float32, got %s" % X.dtype)
+    cdef DTYPE_t _compute_feature(
+        self,
+        const DTYPE_t[:, :] X_ndarray,
+        SIZE_t sample_index,
+        Node *node
+    ) nogil:
+        """Compute feature from a given data matrix, X.
 
-        # Extract input
-        cdef cnp.ndarray[ndim=1, dtype=DTYPE_t] X_data_ndarray = X.data
-        cdef cnp.ndarray[ndim=1, dtype=INT32_t] X_indices_ndarray = X.indices
-        cdef cnp.ndarray[ndim=1, dtype=INT32_t] X_indptr_ndarray = X.indptr
+        In axis-aligned trees, this is simply the value in the column of X
+        for this specific feature.
+        """
+        # the feature index
+        cdef DTYPE_t feature = X_ndarray[sample_index, node.feature]
+        return feature
 
-        cdef DTYPE_t* X_data = <DTYPE_t*>X_data_ndarray.data
-        cdef INT32_t* X_indices = <INT32_t*>X_indices_ndarray.data
-        cdef INT32_t* X_indptr = <INT32_t*>X_indptr_ndarray.data
+    cdef void _compute_feature_importances(
+        self,
+        DOUBLE_t* importance_data,
+        Node* node
+    ) nogil:
+        """Compute feature importances from a Node in the Tree.
 
-        cdef SIZE_t n_samples = X.shape[0]
-        cdef SIZE_t n_features = X.shape[1]
+        Wrapped in a private function to allow subclassing that
+        computes feature importances.
 
-        # Initialize output
-        cdef cnp.ndarray[SIZE_t, ndim=1] out = np.zeros((n_samples,),
-                                                        dtype=np.intp)
-        cdef SIZE_t* out_ptr = <SIZE_t*> out.data
-
-        # Initialize auxiliary data-structure
-        cdef DTYPE_t feature_value = 0.
-        cdef Node* node = NULL
-        cdef DTYPE_t* X_sample = NULL
-        cdef SIZE_t i = 0
-        cdef INT32_t k = 0
-
-        # feature_to_sample as a data structure records the last seen sample
-        # for each feature; functionally, it is an efficient way to identify
-        # which features are nonzero in the present sample.
-        cdef SIZE_t* feature_to_sample = NULL
-
-        safe_realloc(&X_sample, n_features)
-        safe_realloc(&feature_to_sample, n_features)
-
-        with nogil:
-            memset(feature_to_sample, -1, n_features * sizeof(SIZE_t))
-
-            for i in range(n_samples):
-                node = self.nodes
-
-                for k in range(X_indptr[i], X_indptr[i + 1]):
-                    feature_to_sample[X_indices[k]] = i
-                    X_sample[X_indices[k]] = X_data[k]
-
-                # While node not a leaf
-                while node.left_child != _TREE_LEAF:
-                    # ... and node.right_child != _TREE_LEAF:
-                    if feature_to_sample[node.feature] == i:
-                        feature_value = X_sample[node.feature]
-
-                    else:
-                        feature_value = 0.
-
-                    if feature_value <= node.threshold:
-                        node = &self.nodes[node.left_child]
-                    else:
-                        node = &self.nodes[node.right_child]
-
-                out_ptr[i] = <SIZE_t>(node - self.nodes)  # node offset
-
-            # Free auxiliary arrays
-            free(X_sample)
-            free(feature_to_sample)
-
-        return out
-
-    cpdef object decision_path(self, object X):
-        """Finds the decision path (=node) for each sample in X."""
-        if issparse(X):
-            return self._decision_path_sparse_csr(X)
-        else:
-            return self._decision_path_dense(X)
-
-    cdef inline object _decision_path_dense(self, object X):
-        """Finds the decision path (=node) for each sample in X."""
-
-        # Check input
-        if not isinstance(X, np.ndarray):
-            raise ValueError("X should be in np.ndarray format, got %s"
-                             % type(X))
-
-        if X.dtype != DTYPE:
-            raise ValueError("X.dtype should be np.float32, got %s" % X.dtype)
-
-        # Extract input
-        cdef const DTYPE_t[:, :] X_ndarray = X
-        cdef SIZE_t n_samples = X.shape[0]
-
-        # Initialize output
-        cdef cnp.ndarray[SIZE_t] indptr = np.zeros(n_samples + 1, dtype=np.intp)
-        cdef SIZE_t* indptr_ptr = <SIZE_t*> indptr.data
-
-        cdef cnp.ndarray[SIZE_t] indices = np.zeros(n_samples *
-                                                    (1 + self.max_depth),
-                                                    dtype=np.intp)
-        cdef SIZE_t* indices_ptr = <SIZE_t*> indices.data
-
-        # Initialize auxiliary data-structure
-        cdef Node* node = NULL
-        cdef SIZE_t i = 0
-
-        with nogil:
-            for i in range(n_samples):
-                node = self.nodes
-                indptr_ptr[i + 1] = indptr_ptr[i]
-
-                # Add all external nodes
-                while node.left_child != _TREE_LEAF:
-                    # ... and node.right_child != _TREE_LEAF:
-                    indices_ptr[indptr_ptr[i + 1]] = <SIZE_t>(node - self.nodes)
-                    indptr_ptr[i + 1] += 1
-
-                    if X_ndarray[i, node.feature] <= node.threshold:
-                        node = &self.nodes[node.left_child]
-                    else:
-                        node = &self.nodes[node.right_child]
-
-                # Add the leave node
-                indices_ptr[indptr_ptr[i + 1]] = <SIZE_t>(node - self.nodes)
-                indptr_ptr[i + 1] += 1
-
-        indices = indices[:indptr[n_samples]]
-        cdef cnp.ndarray[SIZE_t] data = np.ones(shape=len(indices),
-                                                dtype=np.intp)
-        out = csr_matrix((data, indices, indptr),
-                         shape=(n_samples, self.node_count))
-
-        return out
-
-    cdef inline object _decision_path_sparse_csr(self, object X):
-        """Finds the decision path (=node) for each sample in X."""
-
-        # Check input
-        if not isinstance(X, csr_matrix):
-            raise ValueError("X should be in csr_matrix format, got %s"
-                             % type(X))
-
-        if X.dtype != DTYPE:
-            raise ValueError("X.dtype should be np.float32, got %s" % X.dtype)
-
-        # Extract input
-        cdef cnp.ndarray[ndim=1, dtype=DTYPE_t] X_data_ndarray = X.data
-        cdef cnp.ndarray[ndim=1, dtype=INT32_t] X_indices_ndarray = X.indices
-        cdef cnp.ndarray[ndim=1, dtype=INT32_t] X_indptr_ndarray = X.indptr
-
-        cdef DTYPE_t* X_data = <DTYPE_t*>X_data_ndarray.data
-        cdef INT32_t* X_indices = <INT32_t*>X_indices_ndarray.data
-        cdef INT32_t* X_indptr = <INT32_t*>X_indptr_ndarray.data
-
-        cdef SIZE_t n_samples = X.shape[0]
-        cdef SIZE_t n_features = X.shape[1]
-
-        # Initialize output
-        cdef cnp.ndarray[SIZE_t] indptr = np.zeros(n_samples + 1, dtype=np.intp)
-        cdef SIZE_t* indptr_ptr = <SIZE_t*> indptr.data
-
-        cdef cnp.ndarray[SIZE_t] indices = np.zeros(n_samples *
-                                                    (1 + self.max_depth),
-                                                    dtype=np.intp)
-        cdef SIZE_t* indices_ptr = <SIZE_t*> indices.data
-
-        # Initialize auxiliary data-structure
-        cdef DTYPE_t feature_value = 0.
-        cdef Node* node = NULL
-        cdef DTYPE_t* X_sample = NULL
-        cdef SIZE_t i = 0
-        cdef INT32_t k = 0
-
-        # feature_to_sample as a data structure records the last seen sample
-        # for each feature; functionally, it is an efficient way to identify
-        # which features are nonzero in the present sample.
-        cdef SIZE_t* feature_to_sample = NULL
-
-        safe_realloc(&X_sample, n_features)
-        safe_realloc(&feature_to_sample, n_features)
-
-        with nogil:
-            memset(feature_to_sample, -1, n_features * sizeof(SIZE_t))
-
-            for i in range(n_samples):
-                node = self.nodes
-                indptr_ptr[i + 1] = indptr_ptr[i]
-
-                for k in range(X_indptr[i], X_indptr[i + 1]):
-                    feature_to_sample[X_indices[k]] = i
-                    X_sample[X_indices[k]] = X_data[k]
-
-                # While node not a leaf
-                while node.left_child != _TREE_LEAF:
-                    # ... and node.right_child != _TREE_LEAF:
-
-                    indices_ptr[indptr_ptr[i + 1]] = <SIZE_t>(node - self.nodes)
-                    indptr_ptr[i + 1] += 1
-
-                    if feature_to_sample[node.feature] == i:
-                        feature_value = X_sample[node.feature]
-
-                    else:
-                        feature_value = 0.
-
-                    if feature_value <= node.threshold:
-                        node = &self.nodes[node.left_child]
-                    else:
-                        node = &self.nodes[node.right_child]
-
-                # Add the leave node
-                indices_ptr[indptr_ptr[i + 1]] = <SIZE_t>(node - self.nodes)
-                indptr_ptr[i + 1] += 1
-
-            # Free auxiliary arrays
-            free(X_sample)
-            free(feature_to_sample)
-
-        indices = indices[:indptr[n_samples]]
-        cdef cnp.ndarray[SIZE_t] data = np.ones(shape=len(indices),
-                                                dtype=np.intp)
-        out = csr_matrix((data, indices, indptr),
-                         shape=(n_samples, self.node_count))
-
-        return out
-
-    cpdef compute_feature_importances(self, normalize=True):
-        """Computes the importance of each feature (aka variable)."""
+        Parameters
+        ----------
+        importance_data : DOUBLE_t*
+            An array of importance data with shape (n_features,), containing the
+            importances computed of each feature.
+        node : Node*
+            The node.
+        """
+        cdef Node* nodes = self.nodes
         cdef Node* left
         cdef Node* right
-        cdef Node* nodes = self.nodes
-        cdef Node* node = nodes
-        cdef Node* end_node = node + self.node_count
 
-        cdef double normalizer = 0.
+        left = &nodes[node.left_child]
+        right = &nodes[node.right_child]
 
-        cdef cnp.ndarray[cnp.float64_t, ndim=1] importances
-        importances = np.zeros((self.n_features,))
-        cdef DOUBLE_t* importance_data = <DOUBLE_t*>importances.data
-
-        with nogil:
-            while node != end_node:
-                if node.left_child != _TREE_LEAF:
-                    # ... and node.right_child != _TREE_LEAF:
-                    left = &nodes[node.left_child]
-                    right = &nodes[node.right_child]
-
-                    importance_data[node.feature] += (
-                        node.weighted_n_node_samples * node.impurity -
-                        left.weighted_n_node_samples * left.impurity -
-                        right.weighted_n_node_samples * right.impurity)
-                node += 1
-
-        importances /= nodes[0].weighted_n_node_samples
-
-        if normalize:
-            normalizer = np.sum(importances)
-
-            if normalizer > 0.0:
-                # Avoid dividing by zero (e.g., when root is pure)
-                importances /= normalizer
-
-        return importances
+        importance_data[node.feature] += (
+            node.weighted_n_node_samples * node.impurity -
+            left.weighted_n_node_samples * left.impurity -
+            right.weighted_n_node_samples * right.impurity)
 
     cdef cnp.ndarray _get_value_ndarray(self):
         """Wraps value as a 3-d NumPy array.

@@ -5,10 +5,15 @@ from sklearn.datasets import make_blobs
 from sklearn.metrics import adjusted_rand_score
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
-from sktree.tree import UnsupervisedDecisionTree
+from sktree.tree import UnsupervisedDecisionTree, UnsupervisedObliqueDecisionTree
 
 
-@parametrize_with_checks([UnsupervisedDecisionTree(random_state=12)])
+@parametrize_with_checks(
+    [
+        UnsupervisedDecisionTree(random_state=12),
+        UnsupervisedObliqueDecisionTree(random_state=12),
+    ]
+)
 def test_sklearn_compatible_estimator(estimator, check):
     if check.func.__name__ in [
         # Cannot apply agglomerative clustering on < 2 samples
@@ -24,12 +29,13 @@ def test_sklearn_compatible_estimator(estimator, check):
     check(estimator)
 
 
-def test_unsupervisedtree():
+@pytest.mark.parametrize("ESTIMATOR", [UnsupervisedDecisionTree, UnsupervisedObliqueDecisionTree])
+def test_unsupervisedtree(ESTIMATOR):
     n_samples = 10
     n_classes = 2
-    X, y = make_blobs(n_samples=n_samples, centers=n_classes, n_features=2, random_state=1234)
+    X, y = make_blobs(n_samples=n_samples, centers=n_classes, n_features=6, random_state=1234)
 
-    clf = UnsupervisedDecisionTree(random_state=1234)
+    clf = ESTIMATOR(random_state=1234)
     clf.fit(X)
     sim_mat = clf.affinity_matrix_
 
