@@ -1,5 +1,10 @@
 extensions = [
   '_sklearn_splitter',
+  '_unsup_criterion',
+  '_unsup_splitter',
+  '_unsup_tree',
+  '_unsup_oblique_splitter',
+  '_unsup_oblique_tree',
 ]
 
 foreach ext: extensions
@@ -26,4 +31,3 @@ py3.install_sources(
 
 # TODO: comment in if we include tests
 subdir('tests')
-subdir('unsupervised')

@@ -1,5 +1,3 @@
-from ._classes import UnsupervisedDecisionTree
+from ._classes import UnsupervisedDecisionTree, UnsupervisedObliqueDecisionTree
 
-__all__ = [
-    "UnsupervisedDecisionTree",
-]
+__all__ = ["UnsupervisedDecisionTree", "UnsupervisedObliqueDecisionTree"]

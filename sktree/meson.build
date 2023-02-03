@@ -45,10 +45,9 @@ cc = meson.get_compiler('c')
 # NPY_API_VERSION in order not to break compilation for released SciPy versions
 # when NumPy introduces a new deprecation. Use in a meson.build file::
 #
-#   py3.extension_module('_name',
-#     'source_fname',
-#     numpy_nodepr_api)
-#
+# py3.extension_module('_name',
+#   'source_fname',
+#   numpy_nodepr_api)
 numpy_nodepr_api = '-DNPY_NO_DEPRECATED_API=NPY_1_9_API_VERSION'
 
 python_sources = [
@@ -76,8 +75,8 @@ c_undefined_ok = ['-Wno-maybe-uninitialized']
 # Suppress warning for deprecated Numpy API.
 # (Suppress warning messages emitted by #warning directives).
 # Replace with numpy_nodepr_api after Cython 3.0 is out
-cython_c_args += ['-Wno-cpp']
-cython_cpp_args = cython_c_args
+# cython_c_args += ['-Wno-cpp']
+# cython_cpp_args = cython_c_args
 
 subdir('tree')
 subdir('tests')

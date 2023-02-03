@@ -13,7 +13,7 @@ from cython.operator cimport dereference as deref
 from libcpp.vector cimport vector
 from sklearn.tree._utils cimport rand_int
 
-from .._sklearn_splitter cimport sort
+from ._sklearn_splitter cimport sort
 from ._unsup_criterion cimport UnsupervisedCriterion
 
 
@@ -36,16 +36,23 @@ cdef inline void _init_split(ObliqueSplitRecord* self, SIZE_t start_pos) nogil:
     self.improvement = -INFINITY
 
 
-cdef class ObliqueUnsupervisedSplitter(UnsupervisedSplitter):
+cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
     """Abstract oblique splitter class.
 
     Splitters are called by tree builders to find the best splits on
     both sparse and dense data, one split at a time.
     """
 
-    def __cinit__(self, UnsupervisedCriterion criterion, SIZE_t max_features,
-                  SIZE_t min_samples_leaf, double min_weight_leaf,
-                  double feature_combinations, object random_state, *argv):
+    def __cinit__(
+        self,
+        UnsupervisedCriterion criterion,
+        SIZE_t max_features,
+        SIZE_t min_samples_leaf,
+        double min_weight_leaf,
+        double feature_combinations,
+        object random_state,
+        *argv
+    ):
         """
         Parameters
         ----------
@@ -151,7 +158,7 @@ cdef class ObliqueUnsupervisedSplitter(UnsupervisedSplitter):
         return sizeof(ObliqueSplitRecord)
 
 
-cdef class BestObliqueUnsupervisedSplitter(ObliqueUnsupervisedSplitter):
+cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
     # NOTE: vectors are passed by value, so & is needed to pass by reference
     cdef void sample_proj_mat(self,
                               vector[vector[DTYPE_t]]& proj_mat_weights,
@@ -254,6 +261,11 @@ cdef class BestObliqueUnsupervisedSplitter(ObliqueUnsupervisedSplitter):
 
             # Sort the samples
             sort(&Xf[start], &samples[start], end - start)
+
+            # initialize feature vector for criterion to evaluate
+            # GIL is needed since we are changing the criterion's internal memory
+            with gil:
+                self.criterion.init_feature_vec(Xf)
 
             # Evaluate all splits
             self.criterion.reset()

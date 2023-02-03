@@ -1,7 +1,4 @@
 import copy
-import numbers
-import warnings
-from math import ceil
 
 import numpy as np
 from scipy.sparse import issparse
@@ -9,11 +6,12 @@ from sklearn.base import ClusterMixin, TransformerMixin
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.tree import BaseDecisionTree
 from sklearn.tree import _tree as _sklearn_tree
-from sklearn.utils import check_random_state
-from sklearn.utils.validation import _check_sample_weight, check_is_fitted
+from sklearn.utils.validation import check_is_fitted
 
-from . import _unsup_criterion, _unsup_splitter  # type: ignore
+from . import _unsup_criterion, _unsup_oblique_splitter, _unsup_splitter  # type: ignore
 from ._unsup_criterion import UnsupervisedCriterion
+from ._unsup_oblique_splitter import UnsupervisedObliqueSplitter
+from ._unsup_oblique_tree import UnsupervisedObliqueTree
 from ._unsup_splitter import UnsupervisedSplitter
 from ._unsup_tree import (  # type: ignore
     UnsupervisedBestFirstTreeBuilder,
@@ -29,6 +27,8 @@ CRITERIA = {"twomeans": _unsup_criterion.TwoMeans}
 SPLITTERS = {
     "best": _unsup_splitter.BestUnsupervisedSplitter,
 }
+
+OBLIQUE_SPLITTERS = {"best": _unsup_oblique_splitter.BestObliqueUnsupervisedSplitter}
 
 
 class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree):
@@ -153,8 +153,6 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
         self.clustering_func_args = clustering_func_args
 
     def fit(self, X, y=None, sample_weight=None, check_input=True):
-        self._validate_params()
-        random_state = check_random_state(self.random_state)
         if check_input:
             # TODO: allow X to be sparse
             check_X_params = dict(dtype=DTYPE)  # , accept_sparse="csc"
@@ -165,59 +163,34 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
                 if X.indices.dtype != np.intc or X.indptr.dtype != np.intc:
                     raise ValueError("No support for np.int64 index based sparse matrices")
 
-        # Determine output settings
-        n_samples, self.n_features_in_ = X.shape
-        max_depth = np.iinfo(np.int32).max if self.max_depth is None else self.max_depth
+        super().fit(X, None, sample_weight, check_input)
 
-        if isinstance(self.min_samples_leaf, numbers.Integral):
-            min_samples_leaf = self.min_samples_leaf
-        else:  # float
-            min_samples_leaf = int(ceil(self.min_samples_leaf * n_samples))
+        # apply to the leaves
+        n_samples = X.shape[0]
+        X_leaves = self.apply(X)
 
-        if isinstance(self.min_samples_split, numbers.Integral):
-            min_samples_split = self.min_samples_split
-        else:  # float
-            min_samples_split = int(ceil(self.min_samples_split * n_samples))
-            min_samples_split = max(2, min_samples_split)
+        # now compute the affinity matrix and set it
+        self.affinity_matrix_ = self._compute_affinity_matrix(X_leaves)
 
-        min_samples_split = max(min_samples_split, 2 * min_samples_leaf)
+        # compute the labels and set it
+        if n_samples >= 2:
+            self.labels_ = self._assign_labels(self.affinity_matrix_)
 
-        if isinstance(self.max_features, str):
-            if self.max_features == "auto":
-                max_features = max(1, int(np.sqrt(self.n_features_in_)))
-                warnings.warn(
-                    "`max_features='auto'` has been deprecated in 1.1 "
-                    "and will be removed in 1.3. To keep the past behaviour, "
-                    "explicitly set `max_features='sqrt'`.",
-                    FutureWarning,
-                )
-            elif self.max_features == "sqrt":
-                max_features = max(1, int(np.sqrt(self.n_features_in_)))
-            elif self.max_features == "log2":
-                max_features = max(1, int(np.log2(self.n_features_in_)))
-        elif self.max_features is None:
-            max_features = self.n_features_in_
-        elif isinstance(self.max_features, numbers.Integral):
-            max_features = self.max_features
-        else:  # float
-            if self.max_features > 0.0:
-                max_features = max(1, int(self.max_features * self.n_features_in_))
-            else:
-                max_features = 0
+        return self
 
-        self.max_features_ = max_features
-
-        max_leaf_nodes = -1 if self.max_leaf_nodes is None else self.max_leaf_nodes
-
-        if sample_weight is not None:
-            sample_weight = _check_sample_weight(sample_weight, X, DOUBLE)
-
-        # Set min_weight_leaf from min_weight_fraction_leaf
-        if sample_weight is None:
-            min_weight_leaf = self.min_weight_fraction_leaf * n_samples
-        else:
-            min_weight_leaf = self.min_weight_fraction_leaf * np.sum(sample_weight)
-
+    def _build_tree(
+        self,
+        X,
+        y,
+        sample_weight,
+        is_classification,
+        min_samples_leaf,
+        min_weight_leaf,
+        max_leaf_nodes,
+        min_samples_split,
+        max_depth,
+        random_state,
+    ):
         criterion = self.criterion
         if not isinstance(criterion, UnsupervisedCriterion):
             criterion = CRITERIA[self.criterion]()
@@ -260,18 +233,6 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
             )
 
         builder.build(self.tree_, X, sample_weight)
-
-        # apply to the leaves
-        X_leaves = self.apply(X)
-
-        # now compute the affinity matrix and set it
-        self.affinity_matrix_ = self._compute_affinity_matrix(X_leaves)
-
-        # compute the labels and set it
-        if n_samples >= 2:
-            self.labels_ = self._assign_labels(self.affinity_matrix_)
-
-        return self
 
     def predict(self, X, check_input=True):
         """Assign labels based on clustering the affinity matrix.
@@ -371,3 +332,95 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
         # apply agglomerative clustering to obtain cluster labels
         predict_labels = cluster.fit_predict(affinity_matrix)
         return predict_labels
+
+
+class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
+    def __init__(
+        self,
+        *,
+        criterion="twomeans",
+        splitter="best",
+        max_depth=None,
+        min_samples_split=2,
+        min_samples_leaf=1,
+        min_weight_fraction_leaf=0,
+        max_features=None,
+        max_leaf_nodes=None,
+        random_state=None,
+        min_impurity_decrease=0,
+        feature_combinations=1.5,
+        clustering_func=None,
+        clustering_func_args=None,
+    ):
+        super().__init__(
+            criterion=criterion,
+            splitter=splitter,
+            max_depth=max_depth,
+            min_samples_split=min_samples_split,
+            min_samples_leaf=min_samples_leaf,
+            min_weight_fraction_leaf=min_weight_fraction_leaf,
+            max_features=max_features,
+            max_leaf_nodes=max_leaf_nodes,
+            random_state=random_state,
+            min_impurity_decrease=min_impurity_decrease,
+            clustering_func=clustering_func,
+            clustering_func_args=clustering_func_args,
+        )
+        self.feature_combinations = feature_combinations
+
+    def _build_tree(
+        self,
+        X,
+        y,
+        sample_weight,
+        is_classification,
+        min_samples_leaf,
+        min_weight_leaf,
+        max_leaf_nodes,
+        min_samples_split,
+        max_depth,
+        random_state,
+    ):
+        criterion = self.criterion
+        if not isinstance(criterion, UnsupervisedCriterion):
+            criterion = CRITERIA[self.criterion]()
+        else:
+            # Make a deepcopy in case the criterion has mutable attributes that
+            # might be shared and modified concurrently during parallel fitting
+            criterion = copy.deepcopy(criterion)
+
+        splitter = self.splitter
+        if not isinstance(self.splitter, UnsupervisedObliqueSplitter):
+            splitter = OBLIQUE_SPLITTERS[self.splitter](
+                criterion,
+                self.max_features_,
+                min_samples_leaf,
+                min_weight_leaf,
+                self.feature_combinations,
+                random_state,
+            )
+
+        self.tree_ = UnsupervisedObliqueTree(self.n_features_in_)
+
+        # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
+        if max_leaf_nodes < 0:
+            builder = UnsupervisedDepthFirstTreeBuilder(
+                splitter,
+                min_samples_split,
+                min_samples_leaf,
+                min_weight_leaf,
+                max_depth,
+                self.min_impurity_decrease,
+            )
+        else:
+            builder = UnsupervisedBestFirstTreeBuilder(
+                splitter,
+                min_samples_split,
+                min_samples_leaf,
+                min_weight_leaf,
+                max_depth,
+                max_leaf_nodes,
+                self.min_impurity_decrease,
+            )
+
+        builder.build(self.tree_, X, sample_weight)

@@ -27,7 +27,7 @@ cdef struct ObliqueSplitRecord:
     vector[SIZE_t]* proj_vec_indices    # indices of the features (max_features,)
 
 
-cdef class ObliqueUnsupervisedSplitter(UnsupervisedSplitter):
+cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
     """
     Notable changes wrt scikit-learn:
     1. `weighted_n_node_samples` is used as a stopping criterion and just used to
