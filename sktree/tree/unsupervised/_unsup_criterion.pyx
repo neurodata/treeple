@@ -212,6 +212,44 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         # set values at the address pointer is pointing to with the total value
         dest[0] = self.sum_total
 
+    cdef double sum_of_squares(
+        self,
+        SIZE_t start,
+        SIZE_t end,
+        double mean
+    ) nogil:
+        """Computes variance of feature vector from sample_indices[start:end].
+
+        See: https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Weighted_sample_variance.  # noqa
+
+        Parameters
+        ----------
+        start : SIZE_t
+            The start pointer
+        end : SIZE_t
+            The end pointer.
+        mean : double
+            The precomputed mean.
+
+        Returns
+        -------
+        ss : double
+            Sum of squares
+        """
+        cdef SIZE_t s_idx, p_idx        # initialize sample and pointer index
+        cdef double ss = 0.0            # sum-of-squares
+        cdef DOUBLE_t w = 1.0           # optional weight
+
+        # calculate variance for the sample_indices chosen start:end
+        for p_idx in range(start, end):
+            s_idx = self.sample_indices[p_idx]
+
+            # include optional weighted sum of squares
+            if self.sample_weight is not None:
+                w = self.sample_weight[s_idx]
+
+            ss += w * (self.Xf[s_idx] - mean) * (self.Xf[s_idx] - mean)
+        return ss
 
 cdef class TwoMeans(UnsupervisedCriterion):
     r"""Two means split impurity.
@@ -262,44 +300,6 @@ cdef class TwoMeans(UnsupervisedCriterion):
     pair minimizes the splitting criteria described in the following
     section
     """
-    cdef double sum_of_squares(
-        self,
-        SIZE_t start,
-        SIZE_t end,
-        double mean,
-    ) nogil:
-        """Computes variance of feature vector from sample_indices[start:end].
-
-        See: https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Weighted_sample_variance.  # noqa
-
-        Parameters
-        ----------
-        start : SIZE_t
-            The start pointer
-        end : SIZE_t
-            The end pointer.
-        mean : double
-            The precomputed mean.
-
-        Returns
-        -------
-        ss : double
-            Sum of squares
-        """
-        cdef SIZE_t s_idx, p_idx        # initialize sample and pointer index
-        cdef double ss = 0.0            # sum-of-squares
-        cdef DOUBLE_t w = 1.0           # optional weight
-
-        # calculate variance for the sample_indices chosen start:end
-        for p_idx in range(start, end):
-            s_idx = self.sample_indices[p_idx]
-
-            # include optional weighted sum of squares
-            if self.sample_weight is not None:
-                w = self.sample_weight[s_idx]
-
-            ss += w * (self.Xf[s_idx] - mean) * (self.Xf[s_idx] - mean)
-        return ss
 
     cdef double node_impurity(
         self
@@ -401,45 +401,6 @@ cdef class TwoMeans(UnsupervisedCriterion):
 cdef class FastBIC(UnsupervisedCriterion):
     """Placeholder for FastBIC docs
     """
-
-    cdef double sum_of_squares(
-        self,
-        SIZE_t start,
-        SIZE_t end,
-        double mean,
-    ) nogil:
-        """Computes variance of feature vector from sample_indices[start:end].
-
-        See: https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Weighted_sample_variance.  # noqa
-
-        Parameters
-        ----------
-        start : SIZE_t
-            The start pointer
-        end : SIZE_t
-            The end pointer.
-        mean : double
-            The precomputed mean.
-
-        Returns
-        -------
-        ss : double
-            Sum of squares
-        """
-        cdef SIZE_t s_idx, p_idx        # initialize sample and pointer index
-        cdef double ss = 0.0            # sum-of-squares
-        cdef DOUBLE_t w = 1.0           # optional weight
-
-        # calculate variance for the sample_indices chosen start:end
-        for p_idx in range(start, end):
-            s_idx = self.sample_indices[p_idx]
-
-            # include optional weighted sum of squares
-            if self.sample_weight is not None:
-                w = self.sample_weight[s_idx]
-
-            ss += w * (self.Xf[s_idx] - mean) * (self.Xf[s_idx] - mean)
-        return ss
 
     cdef double node_impurity(
         self
