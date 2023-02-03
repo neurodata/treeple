@@ -5,6 +5,8 @@ extensions = [
   '_unsup_tree',
   '_unsup_oblique_splitter',
   '_unsup_oblique_tree',
+  '_oblique_splitter',
+  '_oblique_tree',
 ]
 
 foreach ext: extensions
