@@ -23,8 +23,10 @@ on unsupervised criterion such as variance and BIC.
    :toctree: generated/
    
    UnsupervisedRandomForest
+   UnsupervisedObliqueRandomForest
 
 .. autosummary::
    :toctree: generated/
    
    tree.UnsupervisedDecisionTree
+   tree.UnsupervisedObliqueDecisionTree

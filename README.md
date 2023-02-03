@@ -66,57 +66,6 @@ You can also do the same thing using the ``dev.py`` CLI:
     # run specific unit tests
     ./dev.py test -- sktree/tree/tests/test_tree.py
 
-Conda (Recommended)
--------------------
-First, create a virtual environment using Conda.
-
-    conda create -n sklearn-dev python=3.9
-
-# activate the virtual environment and install necessary packages to build from source
-    
-    conda activate sklearn-dev
-    conda install -c conda-forge numpy scipy cython joblib threadpoolctl pytest compilers llvm-openmp poetry
-
-Next, `sktree` from source:
-
-    pip install -e .
-
-    # if editing Cython files
-    pip install --verbose --no-build-isolation --editable .
-
-To install the package from github, clone the repository and then `cd` into the directory. You can then use `poetry` to install:
-
-    poetry install
-
-    # if you would like an editable install of dodiscover for dev purposes
-    pip install -e .
-
-    pip install https://api.github.com/repos/neurodata/scikit-tree/zipball/main
-
-
-    pip install https://api.github.com/repos/neurodata/scikit-learn/zipball/obliquepr
-
-Note that currently, we need to build the development version of scikit-learn with oblique trees within this [PR](https://github.com/scikit-learn/scikit-learn/pull/22754).
-
-Checkout this PR code, and build from source, using scikit-learn's build from source page instructions.
-
-
-Alpha Functionality
--------------------
-
-We can impose a Gabor or wavelet filter bank. To do so, install ``skimage`` and ``pywavelets``.
-
-    pip install scikit-image
-    pip install PyWavelets
-
-
-Using with Jupyter Notebook
----------------------------
-
-To setup an ipykernel with jupyter notebook, then do:
-
-    python -m ipykernel install --name sklearn --user 
-
 References
 ----------
 [1]: [`Li, Adam, et al. "Manifold Oblique Random Forests: Towards Closing the Gap on Convolutional Deep Networks." arXiv preprint arXiv:1909.11799 (2019)`](https://arxiv.org/abs/1909.11799)
