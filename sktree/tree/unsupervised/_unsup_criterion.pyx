@@ -419,20 +419,17 @@ cdef class FastBIC(UnsupervisedCriterion):
     \hat{\pi} = \frac{s}{N}
     \hat{\mu}_1 = \frac{1}{s}\sum_{n\le s}{x_n},
     \hat{\sigma}_1 = \frac{1}{s}\sum_{n\le s}{||x_n-\hat{\mu_j}||^2}
-    
+
     """
     cdef double node_impurity(
         self
     ) nogil:
         """Evaluate the impurity of the current node.
 
-        TODO: describe FastBIC
+        Evaluate the FastBIC criterion impurity as variance of the current node,
+        i.e. the variance of Xf[sample_indices[start:end]]. The smaller the impurity the
+        better.
 
-        1. Prior = w = n/N
-        2. Mean = mu
-        3. Vars = sig
-
-        impurity = N*log(2*sig)-N*log(mu)
         """
         cdef double mean
         cdef double impurity
@@ -455,6 +452,7 @@ cdef class FastBIC(UnsupervisedCriterion):
             mean
         ) / self.weighted_n_node_samples
 
+        # simplified equation of maximum log likelihood function at s=0
         impurity = n_node_samples*log(2*sig/mean)
 
         return impurity
@@ -524,7 +522,8 @@ cdef class FastBIC(UnsupervisedCriterion):
         left_term = log(2*p_l*sig_left/mean_left)
         right_term = log(2*p_r*sig_right/mean_right)
 
-        # set values at the address pointer
+        # simplified equation of maximum log likelihood function 
+        # at corresponding sample size for left and right child
         impurity_left[0] = s_l*left_term + s_r*right_term
         impurity_right[0] = s_r*left_term + s_l*right_term
 
