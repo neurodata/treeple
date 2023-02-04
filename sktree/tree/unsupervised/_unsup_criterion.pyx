@@ -399,9 +399,28 @@ cdef class TwoMeans(UnsupervisedCriterion):
         self.end = end
 
 cdef class FastBIC(UnsupervisedCriterion):
-    """Placeholder for FastBIC docs
-    """
+    r"""Fast-BIC split criterion
+    
+    The Bayesian Information Criterion (BIC) is a popular model seleciton 
+    criteria that is based on the log likelihood of the model given data.
 
+    Fast-BIC is a method that combines the speed of the two-means clustering 
+    method with the model flexibility of Mclust-BIC. It sorts data for each 
+    feature and tries all possible splits to assign data points to one of 
+    two Gaussian distributions based on their position relative to the split.
+    The parameters for each cluster are estimated using maximum likelihood 
+    estimation (MLE).The method performs hard clustering rather than soft 
+    clustering like in GMM, resulting in a simpler calculation of the likelihood.
+    
+    \hat{L} = \sum_{n=1}^s[\log\hat{\pi}_1+\log{\mathcal{N}(x_n;\hat{\mu}_1,\hat{\sigma}_1^2)}]
+    + \sum_{n=s+1}^N[\log\hat{\pi}_2+\log{\mathcal{N}(x_n;\hat{\mu}_2,\hat{\sigma}_2^2)}]
+    
+    where the prior, mean, and variance are defined as follows, respectively:
+    \hat{\pi} = \frac{s}{N}
+    \hat{\mu}_1 = \frac{1}{s}\sum_{n\le s}{x_n},
+    \hat{\sigma}_1 = \frac{1}{s}\sum_{n\le s}{||x_n-\hat{\mu_j}||^2}
+    
+    """
     cdef double node_impurity(
         self
     ) nogil:
