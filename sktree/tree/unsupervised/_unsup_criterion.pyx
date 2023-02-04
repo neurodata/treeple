@@ -417,8 +417,12 @@ cdef class FastBIC(UnsupervisedCriterion):
     
     where the prior, mean, and variance are defined as follows, respectively:
     \hat{\pi} = \frac{s}{N}
-    \hat{\mu}_1 = \frac{1}{s}\sum_{n\le s}{x_n},
-    \hat{\sigma}_1 = \frac{1}{s}\sum_{n\le s}{||x_n-\hat{\mu_j}||^2}
+    \hat{\mu} = \frac{1}{s}\sum_{n\le s}{x_n},
+    \hat{\sigma}^2 = \frac{1}{s}\sum_{n\le s}{||x_n-\hat{\mu_j}||^2}
+
+    Fast-BIC is gauranteed to obtain the global maximum likelihood estimator,
+    where as the Mclust-BIC is liable to find only a local maximum. Additionally,
+    Fast-BIC is substantially faster than the traditional BIC method.
 
     """
     cdef double node_impurity(
@@ -426,9 +430,10 @@ cdef class FastBIC(UnsupervisedCriterion):
     ) nogil:
         """Evaluate the impurity of the current node.
 
-        Evaluate the FastBIC criterion impurity as variance of the current node,
-        i.e. the variance of Xf[sample_indices[start:end]]. The smaller the impurity the
-        better.
+        Evaluate the FastBIC criterion impurity as estimated maximum log likelihood.
+        This is the maximum likelihood given prior, mean, and variance at s number of samples
+        Namely, this is the maximum likelihood of Xf[sample_indices[start:end]].
+        The smaller the impurity the better.
 
         """
         cdef double mean
@@ -466,13 +471,6 @@ cdef class FastBIC(UnsupervisedCriterion):
 
         i.e. the impurity of the left child (sample_indices[start:pos]) and the
         impurity the right child (sample_indices[pos:end]).
-
-        TODO: describe FastBIC
-
-        [Equation here]
-
-        - left_variance = left_weight * left_impurity / n_sample_of_left_child
-        - right_variance = right_weight * right_impurity / n_sample_of_right_child
 
         Parameters
         ----------
