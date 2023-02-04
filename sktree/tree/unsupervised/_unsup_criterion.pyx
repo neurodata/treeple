@@ -497,7 +497,7 @@ cdef class FastBIC(UnsupervisedCriterion):
         s_l = pos - start
         s_r = end - pos
 
-        # compute prior
+        # compute prior (i.e. \hat{\pi_1} and \hat{\pi_2} in the paper)
         p_l = s_l / self.n_node_samples
         p_r = s_r / self.n_node_samples
 
