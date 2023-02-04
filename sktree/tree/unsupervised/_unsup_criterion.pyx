@@ -424,6 +424,8 @@ cdef class FastBIC(UnsupervisedCriterion):
     where as the Mclust-BIC is liable to find only a local maximum. Additionally,
     Fast-BIC is substantially faster than the traditional BIC method.
 
+    Reference: https://arxiv.org/abs/1907.02844
+
     """
     cdef double node_impurity(
         self
