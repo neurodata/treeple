@@ -1,0 +1,12 @@
+name: Slack alert
+on:
+  issues:
+    types: [closed]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Send Message
+      run: |
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"[Scikit-tree] Issue on Github was just closed :tada:\nTitle: ${{ github.event.issue.title }}\nIssue Number: <${{ github.event.issue.html_url }}|#${{ github.event.issue.number }}>"}' ${{ secrets.JMS_KEY }}
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"[Scikit-tree] Issue on Github was just closed :tada:\nTitle: ${{ github.event.issue.title }}\nIssue Number: <${{ github.event.issue.html_url }}|#${{ github.event.issue.number }}>"}' ${{ secrets.PI_KEY }}
