@@ -8,5 +8,5 @@ jobs:
     steps:
     - name: Send Message
       run: |
-        curl -X POST -H 'Content-type: application/json' --data '{"text":"[Scikit-tree] Issue on Github was just closed* :tada:\n:small_blue_diamond: ${{ github.event.issue.title }} (Issue <${{ github.event.issue.html_url }}|#${{ github.event.issue.number }}>)"}' ${{ secrets.JMS_KEY }}
-        curl -X POST -H 'Content-type: application/json' --data '{"text":"[Scikit-tree] Issue on Github was just closed* :tada:\n:small_blue_diamond: ${{ github.event.issue.title }} (Issue <${{ github.event.issue.html_url }}|#${{ github.event.issue.number }}>)"}' ${{ secrets.PI_KEY }}
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"[Scikit-tree] Issue on Github was just closed* :tada:\n:small_blue_diamond:${{ github.event.issue.title }} (Issue <${{ github.event.issue.html_url }}|#${{ github.event.issue.number }}>)"}' ${{ secrets.JMS_KEY }}
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"[Scikit-tree] Issue on Github was just closed* :tada:\n:small_blue_diamond:${{ github.event.issue.title }} (Issue <${{ github.event.issue.html_url }}|#${{ github.event.issue.number }}>)"}' ${{ secrets.PI_KEY }}
