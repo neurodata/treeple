@@ -214,44 +214,28 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         # set values at the address pointer is pointing to with the total value
         dest[0] = self.sum_total
 
-    cdef double sum_of_squares(
+    cdef void set_sample_pointers(
         self,
         SIZE_t start,
-        SIZE_t end,
-        double mean
+        SIZE_t end
     ) nogil:
-        """Computes variance of feature vector from sample_indices[start:end].
+        """Set sample pointers in the criterion.
 
-        See: https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Weighted_sample_variance.  # noqa
+        Set given start and end sample_indices. Also will update node statistics,
+        such as the `sum_total`, which tracks the total value within the current
+        node for sample_indices[start:end].
 
         Parameters
         ----------
         start : SIZE_t
-            The start pointer
+            The start sample pointer.
         end : SIZE_t
-            The end pointer.
-        mean : double
-            The precomputed mean.
-
-        Returns
-        -------
-        ss : double
-            Sum of squares
+            The end sample pointer.
         """
-        cdef SIZE_t s_idx, p_idx        # initialize sample and pointer index
-        cdef double ss = 0.0            # sum-of-squares
-        cdef DOUBLE_t w = 1.0           # optional weight
+        self.n_node_samples = end - start
+        self.start = start
+        self.end = end
 
-        # calculate variance for the sample_indices chosen start:end
-        for p_idx in range(start, end):
-            s_idx = self.sample_indices[p_idx]
-
-            # include optional weighted sum of squares
-            if self.sample_weight is not None:
-                w = self.sample_weight[s_idx]
-
-            ss += w * (self.Xf[s_idx] - mean) * (self.Xf[s_idx] - mean)
-        return ss
 
 cdef class TwoMeans(UnsupervisedCriterion):
     r"""Two means split impurity.
@@ -334,6 +318,7 @@ cdef class TwoMeans(UnsupervisedCriterion):
         ) / self.weighted_n_node_samples
         return impurity
 
+
     cdef void children_impurity(
         self,
         double* impurity_left,
@@ -378,29 +363,47 @@ cdef class TwoMeans(UnsupervisedCriterion):
             mean_right
         ) / self.weighted_n_right
 
-    cdef void set_sample_pointers(
+
+    cdef double sum_of_squares(
         self,
         SIZE_t start,
-        SIZE_t end
+        SIZE_t end,
+        double mean
     ) nogil:
-        """Set sample pointers in the criterion.
+        """Computes variance of feature vector from sample_indices[start:end].
 
-        Set given start and end sample_indices. Also will update node statistics,
-        such as the `sum_total`, which tracks the total value within the current
-        node for sample_indices[start:end].
+        See: https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Weighted_sample_variance.  # noqa
 
         Parameters
         ----------
         start : SIZE_t
-            The start sample pointer.
+            The start pointer
         end : SIZE_t
-            The end sample pointer.
-        """
-        self.n_node_samples = end - start
-        self.start = start
-        self.end = end
+            The end pointer.
+        mean : double
+            The precomputed mean.
 
-cdef class FastBIC(UnsupervisedCriterion):
+        Returns
+        -------
+        ss : double
+            Sum of squares
+        """
+        cdef SIZE_t s_idx, p_idx        # initialize sample and pointer index
+        cdef double ss = 0.0            # sum-of-squares
+        cdef DOUBLE_t w = 1.0           # optional weight
+
+        # calculate variance for the sample_indices chosen start:end
+        for p_idx in range(start, end):
+            s_idx = self.sample_indices[p_idx]
+
+            # include optional weighted sum of squares
+            if self.sample_weight is not None:
+                w = self.sample_weight[s_idx]
+
+            ss += w * (self.Xf[s_idx] - mean) * (self.Xf[s_idx] - mean)
+        return ss
+
+cdef class FastBIC(TwoMeans):
     r"""Fast-BIC split criterion
     
     The Bayesian Information Criterion (BIC) is a popular model seleciton 
@@ -528,25 +531,3 @@ cdef class FastBIC(UnsupervisedCriterion):
         # at corresponding sample size for left and right child
         impurity_left[0] = s_l*left_term + s_r*right_term
         impurity_right[0] = s_r*left_term + s_l*right_term
-
-    cdef void set_sample_pointers(
-        self,
-        SIZE_t start,
-        SIZE_t end
-    ) nogil:
-        """Set sample pointers in the criterion.
-
-        Set given start and end sample_indices. Also will update node statistics,
-        such as the `sum_total`, which tracks the total value within the current
-        node for sample_indices[start:end].
-
-        Parameters
-        ----------
-        start : SIZE_t
-            The start sample pointer.
-        end : SIZE_t
-            The end sample pointer.
-        """
-        self.n_node_samples = end - start
-        self.start = start
-        self.end = end
