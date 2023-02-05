@@ -26,6 +26,7 @@ Version 0.1
 Changelog
 ---------
 - |Feature| Implementation of the two-means Unsupervised Random Forest, by `Adam Li`_ (:pr:`9`)
+- |Feature| Implementation of oblique Unsupervised Random Forest, by `Adam Li`_ (:pr:`11`)
 
 Code and Documentation Contributors
 -----------------------------------

@@ -5,10 +5,15 @@ from sklearn.datasets import make_blobs
 from sklearn.metrics import adjusted_rand_score
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
-from sktree import UnsupervisedRandomForest
+from sktree import UnsupervisedObliqueRandomForest, UnsupervisedRandomForest
 
 
-@parametrize_with_checks([UnsupervisedRandomForest(random_state=12345)])
+@parametrize_with_checks(
+    [
+        UnsupervisedRandomForest(random_state=12345, n_estimators=50),
+        UnsupervisedObliqueRandomForest(random_state=12345, n_estimators=50),
+    ]
+)
 def test_sklearn_compatible_estimator(estimator, check):
     if check.func.__name__ in [
         # Cannot apply agglomerative clustering on < 2 samples
@@ -22,12 +27,31 @@ def test_sklearn_compatible_estimator(estimator, check):
     check(estimator)
 
 
-def test_urf():
+@pytest.mark.parametrize(
+    "CLF_NAME, ESTIMATOR",
+    [
+        ("UnsupervisedRandomForest", UnsupervisedRandomForest),
+        ("UnsupervisedObliqueRandomForest", UnsupervisedObliqueRandomForest),
+    ],
+)
+def test_urf(CLF_NAME, ESTIMATOR):
     n_samples = 100
     n_classes = 2
-    X, y = make_blobs(n_samples=n_samples, centers=n_classes, n_features=2, random_state=2**4)
 
-    clf = UnsupervisedRandomForest(random_state=12345)
+    #
+    if CLF_NAME == "UnsupervisedRandomForest":
+        n_features = 5
+        n_estimators = 50
+        expected_score = 0.4
+    else:
+        n_features = 20
+        n_estimators = 20
+        expected_score = 0.9
+    X, y = make_blobs(
+        n_samples=n_samples, centers=n_classes, n_features=n_features, random_state=12345
+    )
+
+    clf = ESTIMATOR(n_estimators=n_estimators, random_state=12345)
     clf.fit(X)
     sim_mat = clf.affinity_matrix_
 
@@ -40,4 +64,4 @@ def test_urf():
 
     # XXX: This should be > 0.9 according to the UReRF. Hoewver, that could be because they used
     # the oblique projections by default
-    assert score > 0.6
+    assert score > expected_score

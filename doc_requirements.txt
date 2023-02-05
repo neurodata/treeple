@@ -1,0 +1,13 @@
+portray
+matplotlib
+numpydoc
+pydata-sphinx-theme
+sphinx<6
+sphinxcontrib-bibtex
+sphinx-issues
+sphinx-copybutton
+sphinx-gallery
+ipython
+nbsphinx
+memory_profiler
+pandas

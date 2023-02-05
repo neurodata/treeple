@@ -25,7 +25,7 @@ from sklearn.tree._tree import DTYPE
 from sklearn.utils.parallel import Parallel, delayed
 from sklearn.utils.validation import _check_sample_weight, check_is_fitted, check_random_state
 
-from .tree import UnsupervisedDecisionTree
+from .tree import UnsupervisedDecisionTree, UnsupervisedObliqueDecisionTree
 
 
 class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):
@@ -188,8 +188,7 @@ class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):
         return self
 
     def predict(self, X):
-        """
-        Predict clusters for X.
+        """Predict clusters for X.
 
         The predicted class of an input sample is a vote by the trees in
         the forest, weighted by their probability estimates. That is,
@@ -409,7 +408,7 @@ class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):
 
 
 class UnsupervisedRandomForest(ForestCluster):
-    """Unsupervised forest base class.
+    """Unsupervised random forest.
 
     An unsupervised random forest is inherently a clustering algorithm that also
     simultaneously computes an adaptive affinity matrix that is based on the 0-1
@@ -522,10 +521,12 @@ class UnsupervisedRandomForest(ForestCluster):
     clustering_func : callable
         Scikit-learn compatible clustering function to take the affinity matrix
         and return cluster labels. By default, :class:`sklearn.cluster.AgglomerativeClustering`.
+    clustering_func_args : dict
+        Clustering function class keyword arguments. Passed to `clustering_func`.
 
     Attributes
     ----------
-    estimator_ : :class:`~sktree.tree.UnsupervisedDecisionTree`
+    estimator_ : UnsupervisedDecisionTree
         The child estimator template used to create the collection of fitted
         sub-estimators.
 
@@ -622,5 +623,231 @@ class UnsupervisedRandomForest(ForestCluster):
         self.max_features = max_features
         self.max_leaf_nodes = max_leaf_nodes
         self.min_impurity_decrease = min_impurity_decrease
+        self.clustering_func = clustering_func
+        self.clustering_func_args = clustering_func_args
+
+
+class UnsupervisedObliqueRandomForest(ForestCluster):
+    """Unsupervised oblique random forest.
+
+    An unsupervised random forest is inherently a clustering algorithm that also
+    simultaneously computes an adaptive affinity matrix that is based on the 0-1
+    tree distance (i.e. do samples fall within the same leaf).
+
+    Parameters
+    ----------
+    n_estimators : int, optional
+        Number of trees to fit, by default 100.
+
+    criterion : {"twomeans", "fastbic"}, default="twomeans"
+        The function to measure the quality of a split. Supported criteria are
+        "twomeans" for maximizing the variance and "fastbic" for the
+        maximizing the Bayesian Information Criterion (BIC), see
+        :ref:`tree_mathematical_formulation`.
+
+    max_depth : int, default=None
+        The maximum depth of the tree. If None, then nodes are expanded until
+        all leaves are pure or until all leaves contain less than
+        min_samples_split samples.
+
+    min_samples_split : int or float, default=2
+        The minimum number of samples required to split an internal node:
+
+        - If int, then consider `min_samples_split` as the minimum number.
+        - If float, then `min_samples_split` is a fraction and
+          `ceil(min_samples_split * n_samples)` are the minimum
+          number of samples for each split.
+
+    min_samples_leaf : int or float, default=1
+        The minimum number of samples required to be at a leaf node.
+        A split point at any depth will only be considered if it leaves at
+        least ``min_samples_leaf`` training samples in each of the left and
+        right branches.  This may have the effect of smoothing the model,
+        especially in regression.
+
+        - If int, then consider `min_samples_leaf` as the minimum number.
+        - If float, then `min_samples_leaf` is a fraction and
+          `ceil(min_samples_leaf * n_samples)` are the minimum
+          number of samples for each node.
+
+    min_weight_fraction_leaf : float, default=0.0
+        The minimum weighted fraction of the sum total of weights (of all
+        the input samples) required to be at a leaf node. Samples have
+        equal weight when sample_weight is not provided.
+
+    max_features : {"sqrt", "log2", None}, int or float, default="sqrt"
+        The number of features to consider when looking for the best split:
+
+        - If int, then consider `max_features` features at each split.
+        - If float, then `max_features` is a fraction and
+          `max(1, int(max_features * n_features_in_))` features are considered at each
+          split.
+        - If "auto", then `max_features=sqrt(n_features)`.
+        - If "sqrt", then `max_features=sqrt(n_features)`.
+        - If "log2", then `max_features=log2(n_features)`.
+        - If None, then `max_features=n_features`.
+
+        Note: the search for a split does not stop until at least one
+        valid partition of the node samples is found, even if it requires to
+        effectively inspect more than ``max_features`` features.
+
+    max_leaf_nodes : int, default=None
+        Grow trees with ``max_leaf_nodes`` in best-first fashion.
+        Best nodes are defined as relative reduction in impurity.
+        If None then unlimited number of leaf nodes.
+
+    min_impurity_decrease : float, default=0.0
+        A node will be split if this split induces a decrease of the impurity
+        greater than or equal to this value.
+
+        The weighted impurity decrease equation is the following::
+
+            N_t / N * (impurity - N_t_R / N_t * right_impurity
+                                - N_t_L / N_t * left_impurity)
+
+        where ``N`` is the total number of samples, ``N_t`` is the number of
+        samples at the current node, ``N_t_L`` is the number of samples in the
+        left child, and ``N_t_R`` is the number of samples in the right child.
+
+        ``N``, ``N_t``, ``N_t_R`` and ``N_t_L`` all refer to the weighted sum,
+        if ``sample_weight`` is passed.
+    bootstrap : bool, optional
+        Whether to bootstrap, by default False.
+    oob_score : bool or callable, default=False
+        Whether to use out-of-bag samples to estimate the generalization score.
+        By default, :func:`~sklearn.metrics.calinski_harabasz_score` is used.
+        Provide a callable with signature `metric(X, predicted_labels)` to use a
+        custom metric. Only available if `bootstrap=True`. Other supported functions
+        from scikit-learn are :func:`sklearn.metrics.silhouette_score`,
+        :func:`sklearn.metrics.calinski_harabasz_score`, and
+        :func:`sklearn.metrics.davies_bouldin_score`.
+    n_jobs : int, optional
+        Number of CPUs to use in `joblib` parallelization for constructing trees,
+        by default None.
+    random_state : int, optional
+        Random seed, by default None.
+    verbose : int, optional
+        Verbosity, by default 0.
+    warm_start : bool, optional
+        Whether to continue constructing trees from previous instant, by default False.
+    max_samples : int or float, default=None
+        If bootstrap is True, the number of samples to draw from X
+        to train each base estimator.
+
+        - If None (default), then draw `X.shape[0]` samples.
+        - If int, then draw `max_samples` samples.
+        - If float, then draw `max_samples * X.shape[0]` samples. Thus,
+          `max_samples` should be in the interval `(0.0, 1.0]`.
+    feature_combinations : float, default=1.5
+        The number of features to combine on average at each split
+        of the decision trees.
+    clustering_func : callable
+        Scikit-learn compatible clustering function to take the affinity matrix
+        and return cluster labels. By default, :class:`sklearn.cluster.AgglomerativeClustering`.
+    clustering_func_args : dict
+        Clustering function class keyword arguments. Passed to `clustering_func`.
+
+    Attributes
+    ----------
+    estimator_ : UnsupervisedDecisionTree
+        The child estimator template used to create the collection of fitted
+        sub-estimators.
+
+    estimators_ : list of UnsupervisedDecisionTree
+        The collection of fitted sub-estimators.
+
+    n_features_in_ : int
+        Number of features seen during :term:`fit`.
+
+    feature_names_in_ : ndarray of shape (`n_features_in_`,)
+        Names of features seen during :term:`fit`. Defined only when `X`
+        has feature names that are all strings.
+
+    feature_importances_ : ndarray of shape (n_features,)
+        The impurity-based feature importances.
+        The higher, the more important the feature.
+        The importance of a feature is computed as the (normalized)
+        total reduction of the criterion brought by that feature.  It is also
+        known as the Gini importance.
+
+        Warning: impurity-based feature importances can be misleading for
+        high cardinality features (many unique values). See
+        :func:`sklearn.inspection.permutation_importance` as an alternative.
+
+    labels_ : ndarray of shape (n_samples,)
+        Labels of each point.
+
+    affinity_matrix_ : ndarray of shape (n_samples, n_samples)
+        Stores the affinity/proximity matrix used in fit. Note this matrix
+        is computed from within-bag and OOB samples.
+
+    oob_score_ : float
+        Score of the training dataset obtained using an out-of-bag estimate.
+        This attribute exists only when ``oob_score`` is True.
+
+    oob_decision_function_ : ndarray of shape (n_samples, n_samples)
+        Affinity matrix computed with only out-of-bag estimate on the training
+        set. If n_estimators is small it might be possible that a data point
+        was never left out during the bootstrap. In this case,
+        `oob_decision_function_` might contain NaN. This attribute exists
+        only when ``oob_score`` is True.
+    """
+
+    def __init__(
+        self,
+        n_estimators=100,
+        *,
+        criterion="twomeans",
+        max_depth=None,
+        min_samples_split=2,
+        min_samples_leaf=1,
+        min_weight_fraction_leaf=0.0,
+        max_features="sqrt",
+        max_leaf_nodes=None,
+        min_impurity_decrease=0.0,
+        bootstrap=False,
+        oob_score=False,
+        n_jobs=None,
+        random_state=None,
+        verbose=0,
+        warm_start=False,
+        max_samples=None,
+        feature_combinations=1.5,
+        clustering_func=None,
+        clustering_func_args=None,
+    ) -> None:
+        super().__init__(
+            estimator=UnsupervisedObliqueDecisionTree(),  # type: ignore
+            n_estimators=n_estimators,
+            estimator_params=(
+                "criterion",
+                "max_depth",
+                "min_samples_split",
+                "min_samples_leaf",
+                "min_weight_fraction_leaf",
+                "max_features",
+                "max_leaf_nodes",
+                "min_impurity_decrease",
+                "feature_combinations",
+                "random_state",
+            ),
+            bootstrap=bootstrap,
+            oob_score=oob_score,
+            n_jobs=n_jobs,
+            random_state=random_state,
+            verbose=verbose,
+            warm_start=warm_start,
+            max_samples=max_samples,
+        )
+
+        self.criterion = criterion
+        self.max_depth = max_depth
+        self.min_samples_split = min_samples_split
+        self.min_samples_leaf = min_samples_leaf
+        self.min_weight_fraction_leaf = min_weight_fraction_leaf
+        self.max_features = max_features
+        self.max_leaf_nodes = max_leaf_nodes
+        self.min_impurity_decrease = min_impurity_decrease
+        self.feature_combinations = feature_combinations
         self.clustering_func = clustering_func
         self.clustering_func_args = clustering_func_args
