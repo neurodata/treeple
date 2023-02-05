@@ -55,9 +55,8 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         const DTYPE_t[:] Xf,
     ) nogil
 
-    cdef double sum_of_squares(
+    cdef void set_sample_pointers(
         self,
         SIZE_t start,
-        SIZE_t end,
-        double mean
+        SIZE_t end
     ) nogil
