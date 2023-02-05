@@ -1,0 +1,933 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sktree.tree._classes &#8212; scikit-tree 0.0.0dev0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../../../_static/styles/bootstrap.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/style.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94">
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94">
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/clipboard.min.js"></script>
+    <script src="../../../_static/copybutton.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sktree/tree/_classes';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
+    <script type="text/javascript" src="../../../_static/copybutton.js"></script>
+    <script type="text/javascript" src="../../../_static/scrollfix.js"></script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="docsearch:language" content="en">
+
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__primary" id="__primary">
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__secondary" id="__secondary">
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+      
+<form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+  </div>
+
+  
+  <nav class="bd-header navbar navbar-expand-lg bd-navbar" id="navbar-main"><div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+      <span class="fa-solid fa-bars"></span>
+  </label>
+  <div id="navbar-start">
+    
+    
+  
+
+
+<a class="navbar-brand logo" href="../../../index.html">
+
+  
+  
+  
+  
+  
+  
+  
+
+  
+  
+    <p class="title logo__title">scikit-tree 0.0.0dev0 documentation</p>
+  
+</a>
+    
+  </div>
+
+  
+  <div class="col-lg-9 navbar-header-items">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api.html">
+                        API Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../whats_new.html">
+                        Release History
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../install.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../use.html">
+                        Examples using scikit-tree
+                      </a>
+                    </li>
+                
+    </ul>
+</nav>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+        <div class="navbar-end-item navbar-persistent--container">
+          
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+        </div>
+      
+      
+      <div class="navbar-end-item">
+        <div class="dropdown">
+    <button type="button" class="btn btn-primary btn-sm navbar-btn dropdown-toggle" id="dLabelMore" data-toggle="dropdown">
+        v0.0.0dev0
+        <span class="caret"></span>
+    </button>
+    <div class="dropdown-menu list-group-flush py-0" aria-labelledby="dLabelMore">
+        <a class="list-group-item list-group-item-action py-1" href="https://pywhy.github.io/dodiscover/dev/index.html">v0.1 (devel)</a>
+    </div>
+</div>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-toggle="tooltip"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+
+
+  
+  
+    <div class="navbar-persistent--mobile">
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+    </div>
+  
+
+  
+  <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+  </label>
+  
+
+</div>
+  </nav>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api.html">
+                        API Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../whats_new.html">
+                        Release History
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../install.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../use.html">
+                        Examples using scikit-tree
+                      </a>
+                    </li>
+                
+    </ul>
+</nav>
+      </div>
+      
+      </div>
+    
+
+    
+    
+    <div class="sidebar-header-items__end">
+      
+      <div class="navbar-end-item">
+        <div class="dropdown">
+    <button type="button" class="btn btn-primary btn-sm navbar-btn dropdown-toggle" id="dLabelMore" data-toggle="dropdown">
+        v0.0.0dev0
+        <span class="caret"></span>
+    </button>
+    <div class="dropdown-menu list-group-flush py-0" aria-labelledby="dLabelMore">
+        <a class="list-group-item list-group-item-action py-1" href="https://pywhy.github.io/dodiscover/dev/index.html">v0.1 (devel)</a>
+    </div>
+</div>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-toggle="tooltip"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+    
+  </div>
+
+  
+
+  
+  <div class="sidebar-end-items sidebar-primary__section">
+    <div class="sidebar-end-items__item">
+    </div>
+  </div>
+
+  
+  <div id="rtd-footer-container"></div>
+
+      </div>
+      <main id="main-content" class="bd-main">
+        
+        
+        <div class="bd-content">
+          <div class="bd-article-container">
+            
+            <div class="bd-header-article">
+                
+            </div>
+            
+            
+            <article class="bd-article" role="main">
+              
+  <h1>Source code for sktree.tree._classes</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">copy</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">issparse</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">ClusterMixin</span><span class="p">,</span> <span class="n">TransformerMixin</span>
+<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">AgglomerativeClustering</span>
+<span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">BaseDecisionTree</span>
+<span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">_tree</span> <span class="k">as</span> <span class="n">_sklearn_tree</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">check_is_fitted</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_unsup_criterion</span><span class="p">,</span> <span class="n">_unsup_oblique_splitter</span><span class="p">,</span> <span class="n">_unsup_splitter</span>  <span class="c1"># type: ignore</span>
+<span class="kn">from</span> <span class="nn">._unsup_criterion</span> <span class="kn">import</span> <span class="n">UnsupervisedCriterion</span>
+<span class="kn">from</span> <span class="nn">._unsup_oblique_splitter</span> <span class="kn">import</span> <span class="n">UnsupervisedObliqueSplitter</span>
+<span class="kn">from</span> <span class="nn">._unsup_oblique_tree</span> <span class="kn">import</span> <span class="n">UnsupervisedObliqueTree</span>
+<span class="kn">from</span> <span class="nn">._unsup_splitter</span> <span class="kn">import</span> <span class="n">UnsupervisedSplitter</span>
+<span class="kn">from</span> <span class="nn">._unsup_tree</span> <span class="kn">import</span> <span class="p">(</span>  <span class="c1"># type: ignore</span>
+    <span class="n">UnsupervisedBestFirstTreeBuilder</span><span class="p">,</span>
+    <span class="n">UnsupervisedDepthFirstTreeBuilder</span><span class="p">,</span>
+    <span class="n">UnsupervisedTree</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">DTYPE</span> <span class="o">=</span> <span class="n">_sklearn_tree</span><span class="o">.</span><span class="n">DTYPE</span>
+<span class="n">DOUBLE</span> <span class="o">=</span> <span class="n">_sklearn_tree</span><span class="o">.</span><span class="n">DOUBLE</span>
+
+<span class="n">CRITERIA</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;twomeans&quot;</span><span class="p">:</span> <span class="n">_unsup_criterion</span><span class="o">.</span><span class="n">TwoMeans</span><span class="p">}</span>
+
+<span class="n">SPLITTERS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;best&quot;</span><span class="p">:</span> <span class="n">_unsup_splitter</span><span class="o">.</span><span class="n">BestUnsupervisedSplitter</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">OBLIQUE_SPLITTERS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;best&quot;</span><span class="p">:</span> <span class="n">_unsup_oblique_splitter</span><span class="o">.</span><span class="n">BestObliqueUnsupervisedSplitter</span><span class="p">}</span>
+
+
+<div class="viewcode-block" id="UnsupervisedDecisionTree"><a class="viewcode-back" href="../../../generated/sktree.tree.UnsupervisedDecisionTree.html#sktree.tree.UnsupervisedDecisionTree">[docs]</a><span class="k">class</span> <span class="nc">UnsupervisedDecisionTree</span><span class="p">(</span><span class="n">TransformerMixin</span><span class="p">,</span> <span class="n">ClusterMixin</span><span class="p">,</span> <span class="n">BaseDecisionTree</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Unsupervised decision tree.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    criterion : {&quot;twomeans&quot;, &quot;fastbic&quot;}, default=&quot;twomeans&quot;</span>
+<span class="sd">        The function to measure the quality of a split. Supported criteria are</span>
+<span class="sd">        &quot;twomeans&quot; for the variance impurity and &quot;fastbic&quot; for the</span>
+<span class="sd">        BIC criterion. If ``UnsupervisedCriterion`` instance is passed in, then</span>
+<span class="sd">        the user must abide by the Cython internal API. See source code.</span>
+<span class="sd">    splitter : {&quot;best&quot;, &quot;random&quot;}, default=&quot;best&quot;</span>
+<span class="sd">        The strategy used to choose the split at each node. Supported</span>
+<span class="sd">        strategies are &quot;best&quot; to choose the best split and &quot;random&quot; to choose</span>
+<span class="sd">        the best random split. If ``UnsupervisedSplitter`` instance is passed in, then</span>
+<span class="sd">        the user must abide by the Cython internal API. See source code.</span>
+<span class="sd">    max_depth : int, default=None</span>
+<span class="sd">        The maximum depth of the tree. If None, then nodes are expanded until</span>
+<span class="sd">        all leaves are pure or until all leaves contain less than</span>
+<span class="sd">        min_samples_split samples.</span>
+<span class="sd">    min_samples_split : int or float, default=2</span>
+<span class="sd">        The minimum number of samples required to split an internal node:</span>
+
+<span class="sd">        - If int, then consider `min_samples_split` as the minimum number.</span>
+<span class="sd">        - If float, then `min_samples_split` is a fraction and</span>
+<span class="sd">          `ceil(min_samples_split * n_samples)` are the minimum</span>
+<span class="sd">          number of samples for each split.</span>
+<span class="sd">    min_samples_leaf : int or float, default=1</span>
+<span class="sd">        The minimum number of samples required to be at a leaf node.</span>
+<span class="sd">        A split point at any depth will only be considered if it leaves at</span>
+<span class="sd">        least ``min_samples_leaf`` training samples in each of the left and</span>
+<span class="sd">        right branches.  This may have the effect of smoothing the model,</span>
+<span class="sd">        especially in regression.</span>
+
+<span class="sd">        - If int, then consider `min_samples_leaf` as the minimum number.</span>
+<span class="sd">        - If float, then `min_samples_leaf` is a fraction and</span>
+<span class="sd">          `ceil(min_samples_leaf * n_samples)` are the minimum</span>
+<span class="sd">          number of samples for each node.</span>
+<span class="sd">    min_weight_fraction_leaf : float, default=0.0</span>
+<span class="sd">        The minimum weighted fraction of the sum total of weights (of all</span>
+<span class="sd">        the input samples) required to be at a leaf node. Samples have</span>
+<span class="sd">        equal weight when sample_weight is not provided.</span>
+<span class="sd">    max_features : int, float or {&quot;auto&quot;, &quot;sqrt&quot;, &quot;log2&quot;}, default=None</span>
+<span class="sd">        The number of features to consider when looking for the best split:</span>
+
+<span class="sd">            - If int, then consider `max_features` features at each split.</span>
+<span class="sd">            - If float, then `max_features` is a fraction and</span>
+<span class="sd">              `max(1, int(max_features * n_features_in_))` features are considered at</span>
+<span class="sd">              each split.</span>
+<span class="sd">            - If &quot;auto&quot;, then `max_features=sqrt(n_features)`.</span>
+<span class="sd">            - If &quot;sqrt&quot;, then `max_features=sqrt(n_features)`.</span>
+<span class="sd">            - If &quot;log2&quot;, then `max_features=log2(n_features)`.</span>
+<span class="sd">            - If None, then `max_features=n_features`.</span>
+<span class="sd">    max_leaf_nodes : int, default=None</span>
+<span class="sd">        Grow a tree with ``max_leaf_nodes`` in best-first fashion.</span>
+<span class="sd">        Best nodes are defined as relative reduction in impurity.</span>
+<span class="sd">        If None then unlimited number of leaf nodes.</span>
+<span class="sd">    random_state : int, RandomState instance or None, default=None</span>
+<span class="sd">        Controls the randomness of the estimator. The features are always</span>
+<span class="sd">        randomly permuted at each split, even if ``splitter`` is set to</span>
+<span class="sd">        ``&quot;best&quot;``. When ``max_features &lt; n_features``, the algorithm will</span>
+<span class="sd">        select ``max_features`` at random at each split before finding the best</span>
+<span class="sd">        split among them. But the best found split may vary across different</span>
+<span class="sd">        runs, even if ``max_features=n_features``. That is the case, if the</span>
+<span class="sd">        improvement of the criterion is identical for several splits and one</span>
+<span class="sd">        split has to be selected at random. To obtain a deterministic behaviour</span>
+<span class="sd">        during fitting, ``random_state`` has to be fixed to an integer.</span>
+<span class="sd">        See how scikit-learn defines ``random_state`` for details.</span>
+<span class="sd">    min_impurity_decrease : float, default=0.0</span>
+<span class="sd">        A node will be split if this split induces a decrease of the impurity</span>
+<span class="sd">        greater than or equal to this value.</span>
+
+<span class="sd">        The weighted impurity decrease equation is the following::</span>
+
+<span class="sd">            N_t / N * (impurity - N_t_R / N_t * right_impurity</span>
+<span class="sd">                                - N_t_L / N_t * left_impurity)</span>
+
+<span class="sd">        where ``N`` is the total number of samples, ``N_t`` is the number of</span>
+<span class="sd">        samples at the current node, ``N_t_L`` is the number of samples in the</span>
+<span class="sd">        left child, and ``N_t_R`` is the number of samples in the right child.</span>
+
+<span class="sd">        ``N``, ``N_t``, ``N_t_R`` and ``N_t_L`` all refer to the weighted sum,</span>
+<span class="sd">        if ``sample_weight`` is passed.</span>
+<span class="sd">    clustering_func : callable</span>
+<span class="sd">        Scikit-learn compatible clustering function to take the affinity matrix</span>
+<span class="sd">        and return cluster labels. By default, :class:`sklearn.cluster.AgglomerativeClustering`.</span>
+<span class="sd">    clustering_func_args : dict</span>
+<span class="sd">        Clustering function class keyword arguments. Passed to `clustering_func`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">criterion</span><span class="o">=</span><span class="s2">&quot;twomeans&quot;</span><span class="p">,</span>
+        <span class="n">splitter</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">,</span>
+        <span class="n">max_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">min_samples_split</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">min_samples_leaf</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">min_weight_fraction_leaf</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">max_features</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">max_leaf_nodes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">min_impurity_decrease</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">clustering_func</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">clustering_func_args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">criterion</span><span class="o">=</span><span class="n">criterion</span><span class="p">,</span>
+            <span class="n">splitter</span><span class="o">=</span><span class="n">splitter</span><span class="p">,</span>
+            <span class="n">max_depth</span><span class="o">=</span><span class="n">max_depth</span><span class="p">,</span>
+            <span class="n">min_samples_split</span><span class="o">=</span><span class="n">min_samples_split</span><span class="p">,</span>
+            <span class="n">min_samples_leaf</span><span class="o">=</span><span class="n">min_samples_leaf</span><span class="p">,</span>
+            <span class="n">min_weight_fraction_leaf</span><span class="o">=</span><span class="n">min_weight_fraction_leaf</span><span class="p">,</span>
+            <span class="n">max_features</span><span class="o">=</span><span class="n">max_features</span><span class="p">,</span>
+            <span class="n">max_leaf_nodes</span><span class="o">=</span><span class="n">max_leaf_nodes</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">,</span>
+            <span class="n">min_impurity_decrease</span><span class="o">=</span><span class="n">min_impurity_decrease</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">clustering_func</span> <span class="o">=</span> <span class="n">clustering_func</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clustering_func_args</span> <span class="o">=</span> <span class="n">clustering_func_args</span>
+
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">check_input</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">check_input</span><span class="p">:</span>
+            <span class="c1"># TODO: allow X to be sparse</span>
+            <span class="n">check_X_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>  <span class="c1"># , accept_sparse=&quot;csc&quot;</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_data</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">validate_separately</span><span class="o">=</span><span class="p">(</span><span class="n">check_X_params</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">issparse</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+                <span class="n">X</span><span class="o">.</span><span class="n">sort_indices</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">intc</span> <span class="ow">or</span> <span class="n">X</span><span class="o">.</span><span class="n">indptr</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">intc</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No support for np.int64 index based sparse matrices&quot;</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">,</span> <span class="n">check_input</span><span class="p">)</span>
+
+        <span class="c1"># apply to the leaves</span>
+        <span class="n">n_samples</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">X_leaves</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+        <span class="c1"># now compute the affinity matrix and set it</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">affinity_matrix_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_affinity_matrix</span><span class="p">(</span><span class="n">X_leaves</span><span class="p">)</span>
+
+        <span class="c1"># compute the labels and set it</span>
+        <span class="k">if</span> <span class="n">n_samples</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">labels_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_assign_labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">affinity_matrix_</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">_build_tree</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">X</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">,</span>
+        <span class="n">sample_weight</span><span class="p">,</span>
+        <span class="n">is_classification</span><span class="p">,</span>
+        <span class="n">min_samples_leaf</span><span class="p">,</span>
+        <span class="n">min_weight_leaf</span><span class="p">,</span>
+        <span class="n">max_leaf_nodes</span><span class="p">,</span>
+        <span class="n">min_samples_split</span><span class="p">,</span>
+        <span class="n">max_depth</span><span class="p">,</span>
+        <span class="n">random_state</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">criterion</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">criterion</span><span class="p">,</span> <span class="n">UnsupervisedCriterion</span><span class="p">):</span>
+            <span class="n">criterion</span> <span class="o">=</span> <span class="n">CRITERIA</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">]()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Make a deepcopy in case the criterion has mutable attributes that</span>
+            <span class="c1"># might be shared and modified concurrently during parallel fitting</span>
+            <span class="n">criterion</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">criterion</span><span class="p">)</span>
+
+        <span class="n">splitter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splitter</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splitter</span><span class="p">,</span> <span class="n">UnsupervisedSplitter</span><span class="p">):</span>
+            <span class="n">splitter</span> <span class="o">=</span> <span class="n">SPLITTERS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">splitter</span><span class="p">](</span>
+                <span class="n">criterion</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">max_features_</span><span class="p">,</span>
+                <span class="n">min_samples_leaf</span><span class="p">,</span>
+                <span class="n">min_weight_leaf</span><span class="p">,</span>
+                <span class="n">random_state</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span> <span class="o">=</span> <span class="n">UnsupervisedTree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span><span class="p">)</span>
+
+        <span class="c1"># Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise</span>
+        <span class="k">if</span> <span class="n">max_leaf_nodes</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">builder</span> <span class="o">=</span> <span class="n">UnsupervisedDepthFirstTreeBuilder</span><span class="p">(</span>
+                <span class="n">splitter</span><span class="p">,</span>
+                <span class="n">min_samples_split</span><span class="p">,</span>
+                <span class="n">min_samples_leaf</span><span class="p">,</span>
+                <span class="n">min_weight_leaf</span><span class="p">,</span>
+                <span class="n">max_depth</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">builder</span> <span class="o">=</span> <span class="n">UnsupervisedBestFirstTreeBuilder</span><span class="p">(</span>
+                <span class="n">splitter</span><span class="p">,</span>
+                <span class="n">min_samples_split</span><span class="p">,</span>
+                <span class="n">min_samples_leaf</span><span class="p">,</span>
+                <span class="n">min_weight_leaf</span><span class="p">,</span>
+                <span class="n">max_depth</span><span class="p">,</span>
+                <span class="n">max_leaf_nodes</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">)</span>
+
+<div class="viewcode-block" id="UnsupervisedDecisionTree.predict"><a class="viewcode-back" href="../../../generated/sktree.tree.UnsupervisedDecisionTree.html#sktree.tree.UnsupervisedDecisionTree.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">check_input</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Assign labels based on clustering the affinity matrix.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : array-like of shape (n_samples, n_features)</span>
+<span class="sd">            Array to cluster.</span>
+<span class="sd">        check_input : bool, optional</span>
+<span class="sd">            Whether to validate input, by default True.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        labels : array-like of shape (n_samples,)</span>
+<span class="sd">            The assigned labels for each sample.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_X_predict</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">check_input</span><span class="o">=</span><span class="n">check_input</span><span class="p">)</span>
+        <span class="n">affinity_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+        <span class="c1"># compute the labels and set it</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_assign_labels</span><span class="p">(</span><span class="n">affinity_matrix</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UnsupervisedDecisionTree.transform"><a class="viewcode-back" href="../../../generated/sktree.tree.UnsupervisedDecisionTree.html#sktree.tree.UnsupervisedDecisionTree.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transform X to a cluster-distance space.</span>
+
+<span class="sd">        In the new space, each dimension is the distance to the cluster</span>
+<span class="sd">        centers. Note that even if X is sparse, the array returned by</span>
+<span class="sd">        `transform` will typically be dense.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : {array-like, sparse matrix} of shape (n_samples, n_features)</span>
+<span class="sd">            New data to transform.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        X_new : ndarray of shape (n_samples, n_samples)</span>
+<span class="sd">            X transformed in the new space.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="c1"># apply to the leaves</span>
+        <span class="n">X_leaves</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+        <span class="c1"># now compute the affinity matrix and set it</span>
+        <span class="n">affinity_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_affinity_matrix</span><span class="p">(</span><span class="n">X_leaves</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">affinity_matrix</span></div>
+
+    <span class="k">def</span> <span class="nf">_compute_affinity_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_leaves</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the proximity matrix of samples in X.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X_leaves : ndarray of shape (n_samples,)</span>
+<span class="sd">            For each datapoint x in X and for each tree in the forest,</span>
+<span class="sd">            is the index of the leaf x ends up in.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        prox_matrix : array-like of shape (n_samples, n_samples)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">n_samples</span> <span class="o">=</span> <span class="n">X_leaves</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">aff_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+
+        <span class="c1"># for every unique leaf in this dataset, count all co-occurrences of samples</span>
+        <span class="c1"># in the same leaf</span>
+        <span class="k">for</span> <span class="n">leaf</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">X_leaves</span><span class="p">):</span>
+            <span class="c1"># find out which samples occur with this leaf</span>
+            <span class="n">samples_in_leaf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">X_leaves</span> <span class="o">==</span> <span class="n">leaf</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">())</span>
+            <span class="n">aff_matrix</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">samples_in_leaf</span><span class="p">,</span> <span class="n">samples_in_leaf</span><span class="p">)]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">aff_matrix</span>
+
+    <span class="k">def</span> <span class="nf">_assign_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">affinity_matrix</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Assign cluster labels given X.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : ndarray of shape (n_samples, n_samples)</span>
+<span class="sd">            The affinity matrix.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        predict_labels : ndarray of shape (n_samples,)</span>
+<span class="sd">            The predicted cluster labels</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">clustering_func</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clustering_func_</span> <span class="o">=</span> <span class="n">AgglomerativeClustering</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clustering_func_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clustering_func</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">clustering_func_args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clustering_func_args_</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clustering_func_args_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clustering_func_args</span>
+        <span class="n">cluster</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clustering_func_</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">clustering_func_args_</span><span class="p">)</span>
+
+        <span class="c1"># apply agglomerative clustering to obtain cluster labels</span>
+        <span class="n">predict_labels</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">affinity_matrix</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">predict_labels</span></div>
+
+
+<div class="viewcode-block" id="UnsupervisedObliqueDecisionTree"><a class="viewcode-back" href="../../../generated/sktree.tree.UnsupervisedObliqueDecisionTree.html#sktree.tree.UnsupervisedObliqueDecisionTree">[docs]</a><span class="k">class</span> <span class="nc">UnsupervisedObliqueDecisionTree</span><span class="p">(</span><span class="n">UnsupervisedDecisionTree</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Unsupervised oblique decision tree.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    criterion : {&quot;twomeans&quot;, &quot;fastbic&quot;}, default=&quot;twomeans&quot;</span>
+<span class="sd">        The function to measure the quality of a split. Supported criteria are</span>
+<span class="sd">        &quot;twomeans&quot; for the variance impurity and &quot;fastbic&quot; for the</span>
+<span class="sd">        BIC criterion. If ``UnsupervisedCriterion`` instance is passed in, then</span>
+<span class="sd">        the user must abide by the Cython internal API. See source code.</span>
+<span class="sd">    splitter : {&quot;best&quot;, &quot;random&quot;}, default=&quot;best&quot;</span>
+<span class="sd">        The strategy used to choose the split at each node. Supported</span>
+<span class="sd">        strategies are &quot;best&quot; to choose the best split and &quot;random&quot; to choose</span>
+<span class="sd">        the best random split. If ``UnsupervisedSplitter`` instance is passed in, then</span>
+<span class="sd">        the user must abide by the Cython internal API. See source code.</span>
+<span class="sd">    max_depth : int, default=None</span>
+<span class="sd">        The maximum depth of the tree. If None, then nodes are expanded until</span>
+<span class="sd">        all leaves are pure or until all leaves contain less than</span>
+<span class="sd">        min_samples_split samples.</span>
+<span class="sd">    min_samples_split : int or float, default=2</span>
+<span class="sd">        The minimum number of samples required to split an internal node:</span>
+
+<span class="sd">        - If int, then consider `min_samples_split` as the minimum number.</span>
+<span class="sd">        - If float, then `min_samples_split` is a fraction and</span>
+<span class="sd">          `ceil(min_samples_split * n_samples)` are the minimum</span>
+<span class="sd">          number of samples for each split.</span>
+<span class="sd">    min_samples_leaf : int or float, default=1</span>
+<span class="sd">        The minimum number of samples required to be at a leaf node.</span>
+<span class="sd">        A split point at any depth will only be considered if it leaves at</span>
+<span class="sd">        least ``min_samples_leaf`` training samples in each of the left and</span>
+<span class="sd">        right branches.  This may have the effect of smoothing the model,</span>
+<span class="sd">        especially in regression.</span>
+
+<span class="sd">        - If int, then consider `min_samples_leaf` as the minimum number.</span>
+<span class="sd">        - If float, then `min_samples_leaf` is a fraction and</span>
+<span class="sd">          `ceil(min_samples_leaf * n_samples)` are the minimum</span>
+<span class="sd">          number of samples for each node.</span>
+<span class="sd">    min_weight_fraction_leaf : float, default=0.0</span>
+<span class="sd">        The minimum weighted fraction of the sum total of weights (of all</span>
+<span class="sd">        the input samples) required to be at a leaf node. Samples have</span>
+<span class="sd">        equal weight when sample_weight is not provided.</span>
+<span class="sd">    max_features : int, float or {&quot;auto&quot;, &quot;sqrt&quot;, &quot;log2&quot;}, default=None</span>
+<span class="sd">        The number of features to consider when looking for the best split:</span>
+
+<span class="sd">            - If int, then consider `max_features` features at each split.</span>
+<span class="sd">            - If float, then `max_features` is a fraction and</span>
+<span class="sd">              `max(1, int(max_features * n_features_in_))` features are considered at</span>
+<span class="sd">              each split.</span>
+<span class="sd">            - If &quot;auto&quot;, then `max_features=sqrt(n_features)`.</span>
+<span class="sd">            - If &quot;sqrt&quot;, then `max_features=sqrt(n_features)`.</span>
+<span class="sd">            - If &quot;log2&quot;, then `max_features=log2(n_features)`.</span>
+<span class="sd">            - If None, then `max_features=n_features`.</span>
+<span class="sd">    max_leaf_nodes : int, default=None</span>
+<span class="sd">        Grow a tree with ``max_leaf_nodes`` in best-first fashion.</span>
+<span class="sd">        Best nodes are defined as relative reduction in impurity.</span>
+<span class="sd">        If None then unlimited number of leaf nodes.</span>
+<span class="sd">    random_state : int, RandomState instance or None, default=None</span>
+<span class="sd">        Controls the randomness of the estimator. The features are always</span>
+<span class="sd">        randomly permuted at each split, even if ``splitter`` is set to</span>
+<span class="sd">        ``&quot;best&quot;``. When ``max_features &lt; n_features``, the algorithm will</span>
+<span class="sd">        select ``max_features`` at random at each split before finding the best</span>
+<span class="sd">        split among them. But the best found split may vary across different</span>
+<span class="sd">        runs, even if ``max_features=n_features``. That is the case, if the</span>
+<span class="sd">        improvement of the criterion is identical for several splits and one</span>
+<span class="sd">        split has to be selected at random. To obtain a deterministic behaviour</span>
+<span class="sd">        during fitting, ``random_state`` has to be fixed to an integer.</span>
+<span class="sd">        See how scikit-learn defines ``random_state`` for details.</span>
+<span class="sd">    min_impurity_decrease : float, default=0.0</span>
+<span class="sd">        A node will be split if this split induces a decrease of the impurity</span>
+<span class="sd">        greater than or equal to this value.</span>
+
+<span class="sd">        The weighted impurity decrease equation is the following::</span>
+
+<span class="sd">            N_t / N * (impurity - N_t_R / N_t * right_impurity</span>
+<span class="sd">                                - N_t_L / N_t * left_impurity)</span>
+
+<span class="sd">        where ``N`` is the total number of samples, ``N_t`` is the number of</span>
+<span class="sd">        samples at the current node, ``N_t_L`` is the number of samples in the</span>
+<span class="sd">        left child, and ``N_t_R`` is the number of samples in the right child.</span>
+
+<span class="sd">        ``N``, ``N_t``, ``N_t_R`` and ``N_t_L`` all refer to the weighted sum,</span>
+<span class="sd">        if ``sample_weight`` is passed.</span>
+<span class="sd">    feature_combinations : float, default=1.5</span>
+<span class="sd">        The number of features to combine on average at each split</span>
+<span class="sd">        of the decision trees.</span>
+<span class="sd">    clustering_func : callable</span>
+<span class="sd">        Scikit-learn compatible clustering function to take the affinity matrix</span>
+<span class="sd">        and return cluster labels. By default, :class:`sklearn.cluster.AgglomerativeClustering`.</span>
+<span class="sd">    clustering_func_args : dict</span>
+<span class="sd">        Clustering function class keyword arguments. Passed to `clustering_func`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">criterion</span><span class="o">=</span><span class="s2">&quot;twomeans&quot;</span><span class="p">,</span>
+        <span class="n">splitter</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">,</span>
+        <span class="n">max_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">min_samples_split</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">min_samples_leaf</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">min_weight_fraction_leaf</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">max_features</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">max_leaf_nodes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">min_impurity_decrease</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">feature_combinations</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+        <span class="n">clustering_func</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">clustering_func_args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">criterion</span><span class="o">=</span><span class="n">criterion</span><span class="p">,</span>
+            <span class="n">splitter</span><span class="o">=</span><span class="n">splitter</span><span class="p">,</span>
+            <span class="n">max_depth</span><span class="o">=</span><span class="n">max_depth</span><span class="p">,</span>
+            <span class="n">min_samples_split</span><span class="o">=</span><span class="n">min_samples_split</span><span class="p">,</span>
+            <span class="n">min_samples_leaf</span><span class="o">=</span><span class="n">min_samples_leaf</span><span class="p">,</span>
+            <span class="n">min_weight_fraction_leaf</span><span class="o">=</span><span class="n">min_weight_fraction_leaf</span><span class="p">,</span>
+            <span class="n">max_features</span><span class="o">=</span><span class="n">max_features</span><span class="p">,</span>
+            <span class="n">max_leaf_nodes</span><span class="o">=</span><span class="n">max_leaf_nodes</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">,</span>
+            <span class="n">min_impurity_decrease</span><span class="o">=</span><span class="n">min_impurity_decrease</span><span class="p">,</span>
+            <span class="n">clustering_func</span><span class="o">=</span><span class="n">clustering_func</span><span class="p">,</span>
+            <span class="n">clustering_func_args</span><span class="o">=</span><span class="n">clustering_func_args</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_combinations</span> <span class="o">=</span> <span class="n">feature_combinations</span>
+
+    <span class="k">def</span> <span class="nf">_build_tree</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">X</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">,</span>
+        <span class="n">sample_weight</span><span class="p">,</span>
+        <span class="n">is_classification</span><span class="p">,</span>
+        <span class="n">min_samples_leaf</span><span class="p">,</span>
+        <span class="n">min_weight_leaf</span><span class="p">,</span>
+        <span class="n">max_leaf_nodes</span><span class="p">,</span>
+        <span class="n">min_samples_split</span><span class="p">,</span>
+        <span class="n">max_depth</span><span class="p">,</span>
+        <span class="n">random_state</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">criterion</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">criterion</span><span class="p">,</span> <span class="n">UnsupervisedCriterion</span><span class="p">):</span>
+            <span class="n">criterion</span> <span class="o">=</span> <span class="n">CRITERIA</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">]()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Make a deepcopy in case the criterion has mutable attributes that</span>
+            <span class="c1"># might be shared and modified concurrently during parallel fitting</span>
+            <span class="n">criterion</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">criterion</span><span class="p">)</span>
+
+        <span class="n">splitter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splitter</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splitter</span><span class="p">,</span> <span class="n">UnsupervisedObliqueSplitter</span><span class="p">):</span>
+            <span class="n">splitter</span> <span class="o">=</span> <span class="n">OBLIQUE_SPLITTERS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">splitter</span><span class="p">](</span>
+                <span class="n">criterion</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">max_features_</span><span class="p">,</span>
+                <span class="n">min_samples_leaf</span><span class="p">,</span>
+                <span class="n">min_weight_leaf</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">feature_combinations</span><span class="p">,</span>
+                <span class="n">random_state</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span> <span class="o">=</span> <span class="n">UnsupervisedObliqueTree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span><span class="p">)</span>
+
+        <span class="c1"># Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise</span>
+        <span class="k">if</span> <span class="n">max_leaf_nodes</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">builder</span> <span class="o">=</span> <span class="n">UnsupervisedDepthFirstTreeBuilder</span><span class="p">(</span>
+                <span class="n">splitter</span><span class="p">,</span>
+                <span class="n">min_samples_split</span><span class="p">,</span>
+                <span class="n">min_samples_leaf</span><span class="p">,</span>
+                <span class="n">min_weight_leaf</span><span class="p">,</span>
+                <span class="n">max_depth</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">builder</span> <span class="o">=</span> <span class="n">UnsupervisedBestFirstTreeBuilder</span><span class="p">(</span>
+                <span class="n">splitter</span><span class="p">,</span>
+                <span class="n">min_samples_split</span><span class="p">,</span>
+                <span class="n">min_samples_leaf</span><span class="p">,</span>
+                <span class="n">min_weight_leaf</span><span class="p">,</span>
+                <span class="n">max_depth</span><span class="p">,</span>
+                <span class="n">max_leaf_nodes</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">)</span></div>
+</pre></div>
+
+            </article>
+            
+            
+            
+            <footer class="bd-footer-article">
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+            </footer>
+            
+          </div>
+          
+          
+          
+            <div class="bd-sidebar-secondary bd-toc">
+              
+<div class="toc-item">
+  
+<div id="searchbox"></div>
+</div>
+
+<div class="toc-item">
+  
+</div>
+
+<div class="toc-item">
+  
+</div>
+
+            </div>
+          
+          
+        </div>
+        <footer class="bd-footer-content">
+          <div class="bd-footer-content__inner">
+            
+          </div>
+        </footer>
+        
+      </main>
+    </div>
+  </div>
+
+  
+    
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94"></script>
+
+  <footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    
+<p class="copyright">
+
+    &copy; Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-02-05.<br>
+
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="theme-version">
+    Built with the
+    <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">
+        PyData Sphinx Theme
+    </a>
+    0.12.0.
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+  </footer>
+  </body>
+</html>
