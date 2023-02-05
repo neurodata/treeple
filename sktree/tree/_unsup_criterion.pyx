@@ -3,6 +3,7 @@
 import numpy as np
 
 cimport numpy as cnp
+from libc.math cimport log
 
 cnp.import_array()
 
@@ -213,6 +214,44 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         # set values at the address pointer is pointing to with the total value
         dest[0] = self.sum_total
 
+    cdef double sum_of_squares(
+        self,
+        SIZE_t start,
+        SIZE_t end,
+        double mean
+    ) nogil:
+        """Computes variance of feature vector from sample_indices[start:end].
+
+        See: https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Weighted_sample_variance.  # noqa
+
+        Parameters
+        ----------
+        start : SIZE_t
+            The start pointer
+        end : SIZE_t
+            The end pointer.
+        mean : double
+            The precomputed mean.
+
+        Returns
+        -------
+        ss : double
+            Sum of squares
+        """
+        cdef SIZE_t s_idx, p_idx        # initialize sample and pointer index
+        cdef double ss = 0.0            # sum-of-squares
+        cdef DOUBLE_t w = 1.0           # optional weight
+
+        # calculate variance for the sample_indices chosen start:end
+        for p_idx in range(start, end):
+            s_idx = self.sample_indices[p_idx]
+
+            # include optional weighted sum of squares
+            if self.sample_weight is not None:
+                w = self.sample_weight[s_idx]
+
+            ss += w * (self.Xf[s_idx] - mean) * (self.Xf[s_idx] - mean)
+        return ss
 
 cdef class TwoMeans(UnsupervisedCriterion):
     r"""Two means split impurity.
@@ -263,44 +302,6 @@ cdef class TwoMeans(UnsupervisedCriterion):
     pair minimizes the splitting criteria described in the following
     section
     """
-    cdef double sum_of_squares(
-        self,
-        SIZE_t start,
-        SIZE_t end,
-        double mean,
-    ) nogil:
-        """Computes variance of feature vector from sample_indices[start:end].
-
-        See: https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Weighted_sample_variance.  # noqa
-
-        Parameters
-        ----------
-        start : SIZE_t
-            The start pointer
-        end : SIZE_t
-            The end pointer.
-        mean : double
-            The precomputed mean.
-
-        Returns
-        -------
-        ss : double
-            Sum of squares
-        """
-        cdef SIZE_t s_idx, p_idx        # initialize sample and pointer index
-        cdef double ss = 0.0            # sum-of-squares
-        cdef DOUBLE_t w = 1.0           # optional weight
-
-        # calculate variance for the sample_indices chosen start:end
-        for p_idx in range(start, end):
-            s_idx = self.sample_indices[p_idx]
-
-            # include optional weighted sum of squares
-            if self.sample_weight is not None:
-                w = self.sample_weight[s_idx]
-
-            ss += w * (self.Xf[s_idx] - mean) * (self.Xf[s_idx] - mean)
-        return ss
 
     cdef double node_impurity(
         self
@@ -323,7 +324,7 @@ cdef class TwoMeans(UnsupervisedCriterion):
                 )
 
         # first compute mean
-        mean = self.sum_total / n_node_samples
+        mean = self.sum_total / self.weighted_n_node_samples
 
         # then compute the impurity as the variance
         impurity = self.sum_of_squares(
@@ -376,6 +377,157 @@ cdef class TwoMeans(UnsupervisedCriterion):
             end,
             mean_right
         ) / self.weighted_n_right
+
+    cdef void set_sample_pointers(
+        self,
+        SIZE_t start,
+        SIZE_t end
+    ) nogil:
+        """Set sample pointers in the criterion.
+
+        Set given start and end sample_indices. Also will update node statistics,
+        such as the `sum_total`, which tracks the total value within the current
+        node for sample_indices[start:end].
+
+        Parameters
+        ----------
+        start : SIZE_t
+            The start sample pointer.
+        end : SIZE_t
+            The end sample pointer.
+        """
+        self.n_node_samples = end - start
+        self.start = start
+        self.end = end
+
+cdef class FastBIC(UnsupervisedCriterion):
+    r"""Fast-BIC split criterion
+    
+    The Bayesian Information Criterion (BIC) is a popular model seleciton 
+    criteria that is based on the log likelihood of the model given data.
+
+    Fast-BIC is a method that combines the speed of the two-means clustering 
+    method with the model flexibility of Mclust-BIC. It sorts data for each 
+    feature and tries all possible splits to assign data points to one of 
+    two Gaussian distributions based on their position relative to the split.
+    The parameters for each cluster are estimated using maximum likelihood 
+    estimation (MLE).The method performs hard clustering rather than soft 
+    clustering like in GMM, resulting in a simpler calculation of the likelihood.
+    
+    \hat{L} = \sum_{n=1}^s[\log\hat{\pi}_1+\log{\mathcal{N}(x_n;\hat{\mu}_1,\hat{\sigma}_1^2)}]
+    + \sum_{n=s+1}^N[\log\hat{\pi}_2+\log{\mathcal{N}(x_n;\hat{\mu}_2,\hat{\sigma}_2^2)}]
+    
+    where the prior, mean, and variance are defined as follows, respectively:
+    \hat{\pi} = \frac{s}{N}
+    \hat{\mu} = \frac{1}{s}\sum_{n\le s}{x_n},
+    \hat{\sigma}^2 = \frac{1}{s}\sum_{n\le s}{||x_n-\hat{\mu_j}||^2}
+
+    Fast-BIC is gauranteed to obtain the global maximum likelihood estimator,
+    where as the Mclust-BIC is liable to find only a local maximum. Additionally,
+    Fast-BIC is substantially faster than the traditional BIC method.
+
+    Reference: https://arxiv.org/abs/1907.02844
+
+    """
+    cdef double node_impurity(
+        self
+    ) nogil:
+        """Evaluate the impurity of the current node.
+
+        Evaluate the FastBIC criterion impurity as estimated maximum log likelihood.
+        This is the maximum likelihood given prior, mean, and variance at s number of samples
+        Namely, this is the maximum likelihood of Xf[sample_indices[start:end]].
+        The smaller the impurity the better.
+
+        """
+        cdef double mean
+        cdef double impurity
+        cdef SIZE_t n_node_samples = self.n_node_samples
+
+        # If calling without setting the
+        if self.Xf is None:
+            with gil:
+                raise MemoryError(
+                    'Xf has not been set yet, so one must call init_feature_vec.'
+                )
+
+        # first compute mean
+        mean = self.sum_total / self.weighted_n_node_samples
+
+        # then compute the variance of the cluster
+        sig = self.sum_of_squares(
+            self.start,
+            self.end,
+            mean
+        ) / self.weighted_n_node_samples
+
+        # simplified equation of maximum log likelihood function at s=0
+        impurity = n_node_samples*log(2*sig/mean)
+
+        return impurity
+
+    cdef void children_impurity(
+        self,
+        double* impurity_left,
+        double* impurity_right
+    ) nogil:
+        """Evaluate the impurity in children nodes.
+
+        i.e. the impurity of the left child (sample_indices[start:pos]) and the
+        impurity the right child (sample_indices[pos:end]).
+
+        Parameters
+        ----------
+        impurity_left : double pointer
+            The memory address to save the impurity of the left node
+        impurity_right : double pointer
+            The memory address to save the impurity of the right node
+        """
+        cdef SIZE_t pos = self.pos
+        cdef SIZE_t start = self.start
+        cdef SIZE_t end = self.end
+        cdef SIZE_t s_l
+        cdef SIZE_t s_r
+        cdef double p_l
+        cdef double p_r
+        cdef double mean_left
+        cdef double mean_right
+        cdef double sig_left
+        cdef double sig_right
+        cdef double left_term
+        cdef double right_term
+
+        # number of samples of left and right
+        s_l = pos - start
+        s_r = end - pos
+
+        # compute prior (i.e. \hat{\pi_1} and \hat{\pi_2} in the paper)
+        p_l = s_l / self.n_node_samples
+        p_r = s_r / self.n_node_samples
+
+        # first compute mean of left and right
+        mean_left = self.sum_left / self.weighted_n_left
+        mean_right = self.sum_right / self.weighted_n_right
+
+        sig_left = self.sum_of_squares(
+            start,
+            pos,
+            mean_left
+        ) / self.weighted_n_left
+
+        sig_right = self.sum_of_squares(
+            pos,
+            end,
+            mean_right
+        ) / self.weighted_n_right
+
+        left_term = log(2*p_l*sig_left/mean_left)
+        right_term = log(2*p_r*sig_right/mean_right)
+
+        # simplified equation of maximum log likelihood function 
+        # at corresponding sample size for left and right child
+        impurity_left[0] = s_l*left_term + s_r*right_term
+        impurity_right[0] = s_r*left_term + s_l*right_term
 
     cdef void set_sample_pointers(
         self,
