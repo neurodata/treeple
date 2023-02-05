@@ -406,7 +406,7 @@ cdef class TwoMeans(UnsupervisedCriterion):
 cdef class FastBIC(TwoMeans):
     r"""Fast-BIC split criterion
     
-    The Bayesian Information Criterion (BIC) is a popular model seleciton 
+    The Bayesian Information Criterion (BIC) is a popular model selection 
     criteria that is based on the log likelihood of the model given data.
 
     Fast-BIC is a method that combines the speed of the two-means clustering 
@@ -465,7 +465,7 @@ cdef class FastBIC(TwoMeans):
         ) / self.weighted_n_node_samples
 
         # simplified equation of maximum log likelihood function at s=0
-        impurity = n_node_samples*log(2*sig/mean)
+        impurity = n_node_samples * log(2 * sig / mean)
 
         return impurity
 
