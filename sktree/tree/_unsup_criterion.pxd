@@ -54,3 +54,10 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         self,
         const DTYPE_t[:] Xf,
     ) nogil
+
+    cdef double sum_of_squares(
+        self,
+        SIZE_t start,
+        SIZE_t end,
+        double mean
+    ) nogil
