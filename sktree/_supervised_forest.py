@@ -171,14 +171,6 @@ class ObliqueRandomForestClassifier(ForestClassifier):
         Note that these weights will be multiplied with sample_weight (passed
         through the fit method) if sample_weight is specified.
 
-    ccp_alpha : non-negative float, default=0.0
-        Complexity parameter used for Minimal Cost-Complexity Pruning. The
-        subtree with the largest cost complexity that is smaller than
-        ``ccp_alpha`` will be chosen. By default, no pruning is performed. See
-        :ref:`minimal_cost_complexity_pruning` for details.
-
-        .. versionadded:: 0.22
-
     max_samples : int or float, default=None
         If bootstrap is True, the number of samples to draw from X
         to train each base estimator.
@@ -326,7 +318,6 @@ class ObliqueRandomForestClassifier(ForestClassifier):
         verbose=0,
         warm_start=False,
         class_weight=None,
-        ccp_alpha=0.0,
         max_samples=None,
         feature_combinations=1.5,
     ):
@@ -343,7 +334,6 @@ class ObliqueRandomForestClassifier(ForestClassifier):
                 "max_leaf_nodes",
                 "min_impurity_decrease",
                 "random_state",
-                "ccp_alpha",
                 "feature_combinations",
             ),
             bootstrap=bootstrap,
@@ -366,4 +356,3 @@ class ObliqueRandomForestClassifier(ForestClassifier):
         self.min_weight_fraction_leaf = min_weight_fraction_leaf
         self.max_leaf_nodes = max_leaf_nodes
         self.min_impurity_decrease = min_impurity_decrease
-        self.ccp_alpha = ccp_alpha
