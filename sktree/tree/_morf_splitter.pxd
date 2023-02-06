@@ -20,19 +20,21 @@ from sklearn.tree._tree cimport SIZE_t  # Type for indices and counters
 from sklearn.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
 from sklearn.utils._sorting cimport simultaneous_sort
 
-from ._oblique_splitter cimport ObliqueSplitRecord, ObliqueSplitter
+from ._oblique_splitter cimport ObliqueSplitRecord, BaseObliqueSplitter
 
 
-cdef class PatchSplitter(ObliqueSplitter):
-    # The splitter searches in the input space for a combination of features and a threshold
-    # to split the samples samples[start:end].
-    #
-    # The impurity computations are delegated to a criterion object.
+cdef class PatchSplitter(BaseObliqueSplitter):
+    # The PatchSplitter creates candidate feature values by sampling 2D patches from
+    # an input data vector. The input data is vectorized, so `data_height` and
+    # `data_width` are used to determine the vectorized indices corresponding to
+    # (x,y) coordinates in the original un-vectorized data.
 
-    # Oblique Splitting extra parameters
-    cdef vector[vector[DTYPE_t]] proj_mat_weights       # nonzero weights of sparse proj_mat matrix
-    cdef vector[vector[SIZE_t]] proj_mat_indices        # nonzero indices of sparse proj_mat matrix
-    cdef SIZE_t[::1] indices_to_sample                  # an array of indices to sample of size mtry X n_features
+    cdef public SIZE_t max_patch_height                 # Maximum height of the patch to sample
+    cdef public SIZE_t max_patch_width                  # Maximum width of the patch to sample
+    cdef public SIZE_t min_patch_height                 # Minimum height of the patch to sample
+    cdef public SIZE_t min_patch_width                  # Minimum width of the patch to sample
+    cdef public SIZE_t data_height                      # Height of the input data
+    cdef public SIZE_t data_width                       # Width of the input data
 
     # All oblique splitters (i.e. non-axis aligned splitters) require a
     # function to sample a projection matrix that is applied to the feature matrix

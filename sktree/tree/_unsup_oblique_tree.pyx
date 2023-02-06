@@ -6,10 +6,7 @@
 #
 # License: BSD 3 clause
 
-from cpython cimport Py_INCREF, PyObject, PyTypeObject
-from libc.math cimport fabs
 from libc.stdint cimport SIZE_MAX
-from libc.stdlib cimport free, malloc
 from libc.string cimport memcpy, memset
 
 import numpy as np
@@ -21,7 +18,7 @@ cnp.import_array()
 from scipy.sparse import csr_matrix, issparse
 
 from cython.operator cimport dereference as deref
-from sklearn.tree._utils cimport safe_realloc, sizet_ptr_to_ndarray
+from sklearn.tree._utils cimport safe_realloc
 
 
 # Gets Node dtype exposed inside oblique_tree.
@@ -130,7 +127,7 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
 
         if 'nodes' not in d:
             raise ValueError('You have loaded ObliqueTree version which '
-                            'cannot be imported')
+                             'cannot be imported')
 
         node_ndarray = d['nodes']
         value_ndarray = d['values']
@@ -160,9 +157,9 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
                 self.proj_vec_indices[i].push_back(j)
 
         nodes = memcpy(self.nodes, (<cnp.ndarray> node_ndarray).data,
-                    self.capacity * sizeof(Node))
+                       self.capacity * sizeof(Node))
         value = memcpy(self.value, (<cnp.ndarray> value_ndarray).data,
-                    self.capacity * self.value_stride * sizeof(double))
+                       self.capacity * self.value_stride * sizeof(double))
 
     cpdef cnp.ndarray get_projection_matrix(self):
         """Get the projection matrix of shape (node_count, n_features)."""
@@ -195,15 +192,15 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
         safe_realloc(&self.value, capacity * self.value_stride)
 
         # only thing added for oblique trees
-        # TODO: this could possibly be removed if we can add projection indices and weights to Node
+        # TODO: this could possibly be removed if we can add projection indices and
+        # weights to Node
         self.proj_vec_weights.resize(capacity)
         self.proj_vec_indices.resize(capacity)
 
         # value memory is initialised to 0 to enable classifier argmax
         if capacity > self.capacity:
             memset(<void*>(self.value + self.capacity * self.value_stride), 0,
-                (capacity - self.capacity) * self.value_stride *
-                sizeof(double))
+                   (capacity - self.capacity) * self.value_stride * sizeof(double))
 
         # if capacity smaller than node_count, adjust the counter
         if capacity < self.node_count:
@@ -216,7 +213,8 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
         """Set node data.
         """
         # Cython type cast split record into its inherited split record
-        # For reference, see: https://www.codementor.io/@arpitbhayani/powering-inheritance-in-c-using-structure-composition-176sygr724
+        # For reference, see:
+        # https://www.codementor.io/@arpitbhayani/powering-inheritance-in-c-using-structure-composition-176sygr724
         cdef ObliqueSplitRecord* oblique_split_node = <ObliqueSplitRecord*>(split_node)
         cdef SIZE_t node_id = self.node_count
 
@@ -225,11 +223,16 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
 
         # oblique trees store the projection indices and weights
         # inside the tree itself
-        self.proj_vec_weights[node_id] = deref(deref(oblique_split_node).proj_vec_weights)
-        self.proj_vec_indices[node_id] = deref(deref(oblique_split_node).proj_vec_indices)
+        self.proj_vec_weights[node_id] = deref(deref(oblique_split_node).proj_vec_weights)  # no-cython-lint
+        self.proj_vec_indices[node_id] = deref(deref(oblique_split_node).proj_vec_indices)  # no-cython-lint
         return 1
 
-    cdef DTYPE_t _compute_feature(self, const DTYPE_t[:, :] X_ndarray, SIZE_t sample_index, Node *node) nogil:
+    cdef DTYPE_t _compute_feature(
+        self,
+        const DTYPE_t[:, :] X_ndarray,
+        SIZE_t sample_index,
+        Node *node
+    ) nogil:
         """Compute feature from a given data matrix, X.
 
         In oblique-aligned trees, this is the projection of X.
@@ -239,8 +242,7 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
         cdef DTYPE_t weight = 0.0
         cdef SIZE_t j = 0
         cdef SIZE_t feature_index
-        cdef SIZE_t n_features = self.n_features
-        
+
         # get the index of the node
         cdef SIZE_t node_id = node - self.nodes
 
@@ -265,7 +267,7 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
         Node* node
     ) nogil:
         """Compute feature importances from a Node in the Tree.
-        
+
         Wrapped in a private function to allow subclassing that
         computes feature importances.
         """

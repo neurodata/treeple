@@ -895,8 +895,8 @@ class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
                 self.max_features_,
                 min_samples_leaf,
                 min_weight_leaf,
-                self.feature_combinations,
                 random_state,
+                self.feature_combinations,
             )
 
         if is_classifier(self):
