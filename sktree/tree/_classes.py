@@ -799,7 +799,6 @@ class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         max_leaf_nodes=None,
         min_impurity_decrease=0.0,
         class_weight=None,
-        ccp_alpha=0.0,
         feature_combinations=1.5,
     ):
         super().__init__(
@@ -814,7 +813,6 @@ class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
             class_weight=class_weight,
             random_state=random_state,
             min_impurity_decrease=min_impurity_decrease,
-            ccp_alpha=ccp_alpha,
         )
 
         self.feature_combinations = feature_combinations
@@ -935,3 +933,52 @@ class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         if self.n_outputs_ == 1 and is_classifier(self):
             self.n_classes_ = self.n_classes_[0]
             self.classes_ = self.classes_[0]
+
+
+class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
+    _parameter_constraints = {
+        **DecisionTreeClassifier._parameter_constraints,
+        "feature_combinations": [Interval(Real, 1.0, None, closed="left")],
+    }
+
+    def __init__(
+        self,
+        *,
+        criterion="gini",
+        splitter="best",
+        max_depth=None,
+        min_samples_split=2,
+        min_samples_leaf=1,
+        min_weight_fraction_leaf=0.0,
+        max_features=None,
+        random_state=None,
+        max_leaf_nodes=None,
+        min_impurity_decrease=0.0,
+        class_weight=None,
+        min_patch_height=1,
+        max_patch_height=5,
+        min_patch_width=1,
+        max_patch_width=5,
+        data_height=None,
+        data_width=None,
+    ):
+        super().__init__(
+            criterion=criterion,
+            splitter=splitter,
+            max_depth=max_depth,
+            min_samples_split=min_samples_split,
+            min_samples_leaf=min_samples_leaf,
+            min_weight_fraction_leaf=min_weight_fraction_leaf,
+            max_features=max_features,
+            max_leaf_nodes=max_leaf_nodes,
+            class_weight=class_weight,
+            random_state=random_state,
+            min_impurity_decrease=min_impurity_decrease,
+        )
+
+        self.min_patch_height = min_patch_height
+        self.max_patch_height = max_patch_height
+        self.min_patch_width = min_patch_width
+        self.max_patch_width = max_patch_width
+        self.data_height = data_height
+        self.data_width = data_width

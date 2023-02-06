@@ -20,7 +20,7 @@ from sklearn.tree._tree cimport SIZE_t  # Type for indices and counters
 from sklearn.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
 from sklearn.utils._sorting cimport simultaneous_sort
 
-from ._oblique_splitter cimport ObliqueSplitRecord, BaseObliqueSplitter
+from ._oblique_splitter cimport BaseObliqueSplitter, ObliqueSplitRecord
 
 
 cdef class PatchSplitter(BaseObliqueSplitter):
