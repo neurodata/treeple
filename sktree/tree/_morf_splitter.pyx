@@ -1,9 +1,12 @@
+# cython: cdivision=True
+
 import numpy as np
 
 cimport numpy as cnp
 
 cnp.import_array()
 
+from libc.math cimport floor
 from libcpp.vector cimport vector
 from sklearn.tree._criterion cimport Criterion
 from sklearn.tree._utils cimport rand_int
@@ -65,9 +68,6 @@ cdef class PatchSplitter(BaseObliqueSplitter):
     ) except -1:
         BaseObliqueSplitter.init(self, X, y, sample_weight)
 
-        # create a helper array for allowing efficient Fisher-Yates
-        self.indices_to_sample = np.arange(self.max_features * self.n_features,
-                                           dtype=np.intp)
         return 0
 
     cdef int node_reset(
@@ -156,13 +156,13 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
                 self.max_features,
                 self.min_samples_leaf,
                 self.min_weight_leaf,
+                self.random_state,
                 self.min_patch_height,
                 self.max_patch_height,
                 self.min_patch_width,
                 self.max_patch_width,
                 self.data_height,
                 self.data_width,
-                self.random_state
             ), self.__getstate__())
 
     # NOTE: vectors are passed by value, so & is needed to pass by reference
@@ -204,8 +204,8 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
 
         for proj_i in range(0, max_features):
             # compute random patch width and height
-            patch_height = rand_int(min_patch_height, max_patch_height, random_state)
-            patch_width = rand_int(min_patch_width, max_patch_width, random_state)
+            patch_height = rand_int(min_patch_height, max_patch_height + 1, random_state)
+            patch_width = rand_int(min_patch_width, max_patch_width + 1, random_state)
 
             # compute the difference between the image dimensions and the current random
             # patch dimensions for sampling
@@ -223,7 +223,7 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
             for feat_i in range(top_left_seed, patch_end_seed):
                 # now compute top-left point
                 vectorized_point = (feat_i % delta_width) + \
-                                    (data_width * feat_i // delta_width)
+                                    (data_width * <SIZE_t>floor(feat_i / delta_width))
 
                 # store the non-zero indices and non-zero weights of the data
                 proj_mat_indices[proj_i].push_back(vectorized_point)

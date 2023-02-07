@@ -187,7 +187,7 @@ cdef class ObliqueTree(Tree):
 
     cpdef cnp.ndarray get_projection_matrix(self):
         """Get the projection matrix of shape (node_count, n_features)."""
-        proj_vecs = np.zeros((self.node_count, self.n_features))
+        proj_vecs = np.zeros((self.node_count, self.n_features), dtype=np.float64)
         for i in range(0, self.node_count):
             for j in range(0, self.proj_vec_weights[i].size()):
                 weight = self.proj_vec_weights[i][j]

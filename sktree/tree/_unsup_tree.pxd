@@ -20,6 +20,7 @@ from sklearn.tree._tree cimport BaseTree, Node
 from ._unsup_splitter cimport UnsupervisedSplitter
 
 
+# TODO: copy changes from https://github.com/scikit-learn/scikit-learn/pull/25540/files
 cdef class UnsupervisedTree(BaseTree):
     # The Tree object is a binary tree structure constructed by the
     # TreeBuilder. The tree structure is used for predictions and

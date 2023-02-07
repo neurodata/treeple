@@ -364,16 +364,30 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
                     self.random_state
                 ), self.__getstate__())
 
-    # NOTE: vectors are passed by value, so & is needed to pass by reference
     cdef void sample_proj_mat(
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
         vector[vector[SIZE_t]]& proj_mat_indices
     ) nogil:
-        """
-        Sparse Oblique Projection matrix.
+        """Sample oblique projection matrix.
+
         Randomly sample features to put in randomly sampled projection vectors
-        weight = 1 or -1 with probability 0.5
+        weight = 1 or -1 with probability 0.5.
+
+        Note: vectors are passed by value, so & is needed to pass by reference.
+
+        Parameters
+        ----------
+        proj_mat_weights : vector of vectors reference
+            The memory address of projection matrix non-zero weights.
+        proj_mat_indices : vector of vectors reference
+            The memory address of projection matrix non-zero indices.
+
+        Notes
+        -----
+        Note that grid_size must be larger than or equal to n_non_zeros because
+        it is assumed ``feature_combinations`` is forced to be smaller than ``n_features``
+        before instantiating an oblique splitter.
         """
 
         cdef SIZE_t n_features = self.n_features
