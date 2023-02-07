@@ -10,6 +10,7 @@ from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from sktree.tree import (
     ObliqueDecisionTreeClassifier,
+    PatchObliqueDecisionTreeClassifier,
     UnsupervisedDecisionTree,
     UnsupervisedObliqueDecisionTree,
 )
@@ -25,11 +26,21 @@ iris.target = iris.target[perm]
 
 @parametrize_with_checks(
     [
+        ObliqueDecisionTreeClassifier(random_state=12),
+        PatchObliqueDecisionTreeClassifier(random_state=12),
+    ]
+)
+def test_sklearn_compatible_estimator(estimator, check):
+    check(estimator)
+
+
+@parametrize_with_checks(
+    [
         UnsupervisedDecisionTree(random_state=12),
         UnsupervisedObliqueDecisionTree(random_state=12),
     ]
 )
-def test_sklearn_compatible_estimator(estimator, check):
+def test_sklearn_compatible_transformer(estimator, check):
     if check.func.__name__ in [
         # Cannot apply agglomerative clustering on < 2 samples
         "check_methods_subset_invariance",
@@ -91,3 +102,8 @@ def test_oblique_tree_sampling():
     assert rc_cv_scores.mean() > ri_cv_scores.mean()
     assert rc_cv_scores.std() < ri_cv_scores.std()
     assert rc_cv_scores.mean() > 0.91
+
+
+def test_patch_tree_sampling():
+    """Test of performance of patch tree on image-like data."""
+    pass

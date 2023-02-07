@@ -1,5 +1,5 @@
 import copy
-from numbers import Real
+from numbers import Integral, Real
 
 import numpy as np
 from scipy.sparse import issparse
@@ -13,11 +13,13 @@ from sklearn.utils._param_validation import Interval
 from sklearn.utils.validation import check_is_fitted
 
 from . import (  # type: ignore
+    _morf_splitter,
     _oblique_splitter,
     _unsup_criterion,
     _unsup_oblique_splitter,
     _unsup_splitter,
 )
+from ._morf_splitter import PatchSplitter
 from ._oblique_splitter import ObliqueSplitter
 from ._oblique_tree import ObliqueTree
 from ._unsup_criterion import UnsupervisedCriterion
@@ -48,6 +50,10 @@ CRITERIA_REG = {
 
 OBLIQUE_DENSE_SPLITTERS = {
     "best": _oblique_splitter.BestObliqueSplitter,
+}
+
+PATCH_DENSE_SPLITTERS = {
+    "best": _morf_splitter.BestPatchSplitter,
 }
 
 UNSUPERVISED_CRITERIA = {"twomeans": _unsup_criterion.TwoMeans}
@@ -671,14 +677,6 @@ class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         Note that these weights will be multiplied with sample_weight (passed
         through the fit method) if sample_weight is specified.
 
-    ccp_alpha : non-negative float, default=0.0
-        Complexity parameter used for Minimal Cost-Complexity Pruning. The
-        subtree with the largest cost complexity that is smaller than
-        ``ccp_alpha`` will be chosen. By default, no pruning is performed. See
-        :ref:`minimal_cost_complexity_pruning` for details.
-
-        .. versionadded:: 0.22
-
     feature_combinations : float, default=1.5
         The number of features to combine on average at each split
         of the decision trees.
@@ -938,7 +936,12 @@ class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
 class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
     _parameter_constraints = {
         **DecisionTreeClassifier._parameter_constraints,
-        "feature_combinations": [Interval(Real, 1.0, None, closed="left")],
+        "min_patch_height": [Interval(Integral, 1, None, closed="left")],
+        "max_patch_height": [Interval(Integral, 1, None, closed="left")],
+        "min_patch_width": [Interval(Integral, 1, None, closed="left")],
+        "max_patch_width": [Interval(Integral, 1, None, closed="left")],
+        "data_width": [Interval(Integral, 1, None, closed="left")],
+        "data_height": [Interval(Integral, 1, None, closed="left")],
     }
 
     def __init__(
@@ -959,7 +962,7 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         max_patch_height=5,
         min_patch_width=1,
         max_patch_width=5,
-        data_height=None,
+        data_height=1,
         data_width=None,
     ):
         super().__init__(
@@ -982,3 +985,144 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         self.max_patch_width = max_patch_width
         self.data_height = data_height
         self.data_width = data_width
+
+    def fit(self, X, y, sample_weight=None, check_input=True):
+        # validate data height/width
+        if self.data_width is None:
+            self.data_width_ = X.shape[1]
+        else:
+            self.data_width_ = self.data_width
+        self.data_height_ = self.data_height
+
+        if self.data_height_ * self.data_width_ != X.shape[1]:
+            raise RuntimeError(
+                f"The passed in data height ({self.data_height}) and "
+                f"width ({self.data_width}) should equal the number of "
+                f"columns in X ({X.shape[1]})"
+            )
+
+        # validate patch parameters
+
+        return super().fit(X, y, sample_weight, check_input)
+
+    def _build_tree(
+        self,
+        X,
+        y,
+        sample_weight,
+        is_classification,
+        min_samples_leaf,
+        min_weight_leaf,
+        max_leaf_nodes,
+        min_samples_split,
+        max_depth,
+        random_state,
+    ):
+        """Build the actual tree.
+
+        Parameters
+        ----------
+        X : {array-like, sparse matrix} of shape (n_samples, n_features)
+            The training input samples. Internally, it will be converted to
+            ``dtype=np.float32`` and if a sparse matrix is provided
+            to a sparse ``csc_matrix``.
+        y : array-like of shape (n_samples,) or (n_samples, n_outputs)
+            The target values (class labels) as integers or strings.
+        sample_weight : array-like of shape (n_samples,), default=None
+            Sample weights. If None, then samples are equally weighted. Splits
+            that would create child nodes with net zero or negative weight are
+            ignored while searching for a split in each node. Splits are also
+            ignored if they would result in any single class carrying a
+            negative weight in either child node.
+        is_classification : bool
+            Whether or not is classification.
+        min_samples_leaf : int or float
+            The minimum number of samples required to be at a leaf node.
+        min_weight_leaf : float, default=0.0
+           The minimum weighted fraction of the sum total of weights.
+        max_leaf_nodes : int, default=None
+            Grow a tree with ``max_leaf_nodes`` in best-first fashion.
+        min_samples_split : int or float, default=2
+            The minimum number of samples required to split an internal node:
+        max_depth : int, default=None
+            The maximum depth of the tree. If None, then nodes are expanded until
+            all leaves are pure or until all leaves contain less than
+            min_samples_split samples.
+        random_state : int, RandomState instance or None, default=None
+            Controls the randomness of the estimator.
+        """
+
+        n_samples = X.shape[0]
+
+        # Build tree
+        criterion = self.criterion
+        if not isinstance(criterion, BaseCriterion):
+            if is_classification:
+                criterion = CRITERIA_CLF[self.criterion](self.n_outputs_, self.n_classes_)
+            else:
+                criterion = CRITERIA_REG[self.criterion](self.n_outputs_, n_samples)
+        else:
+            # Make a deepcopy in case the criterion has mutable attributes that
+            # might be shared and modified concurrently during parallel fitting
+            criterion = copy.deepcopy(criterion)
+
+        splitter = self.splitter
+        if issparse(X):
+            raise ValueError(
+                "Sparse input is not supported for oblique trees. "
+                "Please convert your data to a dense array."
+            )
+        else:
+            PATCH_SPLITTERS = PATCH_DENSE_SPLITTERS
+
+        if not isinstance(self.splitter, PatchSplitter):
+            splitter = PATCH_SPLITTERS[self.splitter](
+                criterion,
+                self.max_features_,
+                min_samples_leaf,
+                min_weight_leaf,
+                random_state,
+                self.min_patch_height,
+                self.max_patch_height,
+                self.min_patch_width,
+                self.max_patch_width,
+                self.data_height,
+                self.data_width,
+            )
+
+        if is_classifier(self):
+            self.tree_ = ObliqueTree(self.n_features_in_, self.n_classes_, self.n_outputs_)
+        else:
+            self.tree_ = ObliqueTree(
+                self.n_features_in_,
+                # TODO: tree shouldn't need this in this case
+                np.array([1] * self.n_outputs_, dtype=np.intp),
+                self.n_outputs_,
+            )
+
+        # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
+        if max_leaf_nodes < 0:
+            builder = DepthFirstTreeBuilder(
+                splitter,
+                min_samples_split,
+                min_samples_leaf,
+                min_weight_leaf,
+                max_depth,
+                self.min_impurity_decrease,
+            )
+        else:
+            builder = BestFirstTreeBuilder(
+                splitter,
+                min_samples_split,
+                min_samples_leaf,
+                min_weight_leaf,
+                max_depth,
+                max_leaf_nodes,
+                self.min_impurity_decrease,
+            )
+
+        builder.build(self.tree_, X, y, sample_weight)
+
+        if self.n_outputs_ == 1 and is_classifier(self):
+            self.n_classes_ = self.n_classes_[0]
+            self.classes_ = self.classes_[0]
