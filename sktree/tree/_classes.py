@@ -969,8 +969,8 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
 
         - If int, then consider `min_samples_split` as the minimum number.
         - If float, then `min_samples_split` is a fraction and
-        `ceil(min_samples_split * n_samples)` are the minimum
-        number of samples for each split.
+          `ceil(min_samples_split * n_samples)` are the minimum
+          number of samples for each split.
 
     min_samples_leaf : int or float, default=1
         The minimum number of samples required to be at a leaf node.
@@ -981,8 +981,8 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
 
         - If int, then consider `min_samples_leaf` as the minimum number.
         - If float, then `min_samples_leaf` is a fraction and
-        `ceil(min_samples_leaf * n_samples)` are the minimum
-        number of samples for each node.
+          `ceil(min_samples_leaf * n_samples)` are the minimum
+          number of samples for each node.
 
     min_weight_fraction_leaf : float, default=0.0
         The minimum weighted fraction of the sum total of weights (of all
@@ -994,8 +994,8 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
 
             - If int, then consider `max_features` features at each split.
             - If float, then `max_features` is a fraction and
-            `int(max_features * n_features)` features are considered at each
-            split.
+              `int(max_features * n_features)` features are considered at each
+              split.
             - If "auto", then `max_features=sqrt(n_features)`.
             - If "sqrt", then `max_features=sqrt(n_features)`.
             - If "log2", then `max_features=log2(n_features)`.
