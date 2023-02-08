@@ -480,9 +480,15 @@ class PatchObliqueRandomForestClassifier(ForestClassifier):
         - If float, then draw `max_samples * X.shape[0]` samples. Thus,
           `max_samples` should be in the interval `(0.0, 1.0]`.
 
-    feature_combinations : float, default=1.5
+    feature_combinations : float, default=None
         The number of features to combine on average at each split
-        of the decision trees.
+        of the decision trees. If ``None``, then will default to the minimum of
+        ``(1.5, n_features)``. This controls the number of non-zeros is the
+        projection matrix. Setting the value to 1.0 is equivalent to a
+        traditional decision-tree. ``feature_combinations * max_features``
+        gives the number of expected non-zeros in the projection matrix of shape
+        ``(max_features, n_features)``. Thus this value must always be less than
+        ``n_features`` in order to be valid.
 
     Attributes
     ----------

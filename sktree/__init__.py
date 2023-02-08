@@ -38,7 +38,7 @@ else:
     try:
         from . import tree
         from ._unsupervised_forest import UnsupervisedRandomForest, UnsupervisedObliqueRandomForest
-        from ._supervised_forest import ObliqueRandomForestClassifier
+        from ._supervised_forest import ObliqueRandomForestClassifier, PatchObliqueRandomForestClassifier
     except ImportError as e:
         msg = """Error importing scikit-tree: you cannot import scikit-tree while
         being in scikit-tree source directory; please exit the scikit-tree source
@@ -48,6 +48,7 @@ else:
     __all__ = [
         "tree",
         "ObliqueRandomForestClassifier",
+        "PatchObliqueRandomForestClassifier",
         "UnsupervisedRandomForest",
         "UnsupervisedObliqueRandomForest",
     ]

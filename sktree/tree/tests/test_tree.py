@@ -275,5 +275,4 @@ def test_patch_tree_compared():
     print(axis_tree_score)
     print(oblique_tree_score)
     print(patch_tree_score)
-    assert False
     assert np.mean(cross_val_score(clf, X, y, scoring="accuracy", cv=2)) > 0.7

@@ -216,7 +216,6 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
         X,
         y,
         sample_weight,
-        is_classification,
         min_samples_leaf,
         min_weight_leaf,
         max_leaf_nodes,
@@ -497,7 +496,6 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
         X,
         y,
         sample_weight,
-        is_classification,
         min_samples_leaf,
         min_weight_leaf,
         max_leaf_nodes,
@@ -682,12 +680,12 @@ class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
     feature_combinations : float, default=None
         The number of features to combine on average at each split
         of the decision trees. If ``None``, then will default to the minimum of
-        ``(1.5, n_features)``. This controls the number of non-zeros is the projection matrix.
-        Setting the value to 1.0 is equivalent to a traditional decision-tree.
-        ``feature_combinations * max_features`` gives the number of expected
-        non-zeros in the projection matrix of shape ``(max_features, n_features)``.
-        Thus this value must always be less than ``n_features`` in order to be
-        valid.
+        ``(1.5, n_features)``. This controls the number of non-zeros is the
+        projection matrix. Setting the value to 1.0 is equivalent to a
+        traditional decision-tree. ``feature_combinations * max_features``
+        gives the number of expected non-zeros in the projection matrix of shape
+        ``(max_features, n_features)``. Thus this value must always be less than
+        ``n_features`` in order to be valid.
 
     Attributes
     ----------
@@ -728,6 +726,9 @@ class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         The underlying Tree object. Please refer to
         ``help(sklearn.tree._tree.Tree)`` for
         attributes of Tree object.
+
+    feature_combinations_ : float
+        The number of feature combinations on average taken to fit the tree.
 
     See Also
     --------
@@ -827,7 +828,6 @@ class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         X,
         y,
         sample_weight,
-        is_classification,
         min_samples_leaf,
         min_weight_leaf,
         max_leaf_nodes,
@@ -851,8 +851,6 @@ class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
             ignored while searching for a split in each node. Splits are also
             ignored if they would result in any single class carrying a
             negative weight in either child node.
-        is_classification : bool
-            Whether or not is classification.
         min_samples_leaf : int or float
             The minimum number of samples required to be at a leaf node.
         min_weight_leaf : float, default=0.0
@@ -883,7 +881,7 @@ class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         # Build tree
         criterion = self.criterion
         if not isinstance(criterion, BaseCriterion):
-            if is_classification:
+            if is_classifier(self):
                 criterion = CRITERIA_CLF[self.criterion](self.n_outputs_, self.n_classes_)
             else:
                 criterion = CRITERIA_REG[self.criterion](self.n_outputs_, n_samples)
@@ -1229,7 +1227,6 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         X,
         y,
         sample_weight,
-        is_classification,
         min_samples_leaf,
         min_weight_leaf,
         max_leaf_nodes,
@@ -1253,8 +1250,6 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
             ignored while searching for a split in each node. Splits are also
             ignored if they would result in any single class carrying a
             negative weight in either child node.
-        is_classification : bool
-            Whether or not is classification.
         min_samples_leaf : int or float
             The minimum number of samples required to be at a leaf node.
         min_weight_leaf : float, default=0.0
@@ -1276,7 +1271,7 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         # Build tree
         criterion = self.criterion
         if not isinstance(criterion, BaseCriterion):
-            if is_classification:
+            if is_classifier(self):
                 criterion = CRITERIA_CLF[self.criterion](self.n_outputs_, self.n_classes_)
             else:
                 criterion = CRITERIA_REG[self.criterion](self.n_outputs_, n_samples)
