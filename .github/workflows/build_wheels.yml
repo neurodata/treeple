@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   build_wheels:
-    name: Build wheels on ${{ matrix.os }} with Python ${{ matrix.python[0] }}
+    name: Build wheels on ${{ matrix.os[1] }} - ${{ matrix.os[2] }} with Python ${{ matrix.python[0] }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
