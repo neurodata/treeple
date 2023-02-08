@@ -11,3 +11,4 @@ ipython
 nbsphinx
 memory_profiler
 pandas
+seaborn

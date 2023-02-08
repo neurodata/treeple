@@ -8,6 +8,7 @@ ignore =
     # line break before binary operator
     W503
     E241,E305,W504,W605,E731
+    E402
 
 exclude =
     .git
