@@ -113,22 +113,24 @@ jobs:
           echo "$PWD/build-install/"
           export INSTALLED_PATH=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages
 
-      - name: Setup build and install scikit-tree
+      - name: Run unit tests and coverage
         run: |
           ./dev.py coverage
-      
+          cp $PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages/coverage.xml ./coverage.xml
+
       - name: debug
         run: |
           ls $PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages/
           echo "Okay..."
           ls $PWD/build
+          ls ./
           
       - name: Upload coverage stats to codecov
         if: ${{ matrix.os == 'ubuntu-22.04' && matrix.python-version == '3.10'}}
         uses: codecov/codecov-action@v3
         with:
           # python dev.py goes into the INSTALLED path in order to run pytest
-          files: $PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages/coverage.xml
+          files: ./coverage.xml
           fail_ci_if_error: true
           verbose: true
 

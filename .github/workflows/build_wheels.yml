@@ -1,6 +1,14 @@
 name: Build Wheels
 
-on: [push, pull_request]
+on:
+  pull_request:
+    paths:
+      - "**.py"
+      - "**.pxd"
+      - "**.pyx"
+  push:
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
    contents: read  # to fetch code (actions/checkout)
