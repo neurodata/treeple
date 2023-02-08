@@ -553,7 +553,7 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
 class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
     """A decision tree classifier.
 
-    Read more in the :ref:`User Guide <tree>`.
+    Read more in the :ref:`User Guide <sklearn:tree>`.
 
     Parameters
     ----------
@@ -576,11 +576,8 @@ class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
 
         - If int, then consider `min_samples_split` as the minimum number.
         - If float, then `min_samples_split` is a fraction and
-        `ceil(min_samples_split * n_samples)` are the minimum
-        number of samples for each split.
-
-        .. versionchanged:: 0.18
-        Added float values for fractions.
+          `ceil(min_samples_split * n_samples)` are the minimum
+          number of samples for each split.
 
     min_samples_leaf : int or float, default=1
         The minimum number of samples required to be at a leaf node.
@@ -591,11 +588,8 @@ class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
 
         - If int, then consider `min_samples_leaf` as the minimum number.
         - If float, then `min_samples_leaf` is a fraction and
-        `ceil(min_samples_leaf * n_samples)` are the minimum
-        number of samples for each node.
-
-        .. versionchanged:: 0.18
-        Added float values for fractions.
+          `ceil(min_samples_leaf * n_samples)` are the minimum
+          number of samples for each node.
 
     min_weight_fraction_leaf : float, default=0.0
         The minimum weighted fraction of the sum total of weights (of all
@@ -607,8 +601,8 @@ class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
 
             - If int, then consider `max_features` features at each split.
             - If float, then `max_features` is a fraction and
-            `int(max_features * n_features)` features are considered at each
-            split.
+              `int(max_features * n_features)` features are considered at each
+              split.
             - If "auto", then `max_features=sqrt(n_features)`.
             - If "sqrt", then `max_features=sqrt(n_features)`.
             - If "log2", then `max_features=log2(n_features)`.
@@ -653,8 +647,6 @@ class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
 
         ``N``, ``N_t``, ``N_t_R`` and ``N_t_L`` all refer to the weighted sum,
         if ``sample_weight`` is passed.
-
-        .. versionadded:: 0.19
 
     class_weight : dict, list of dict or "balanced", default=None
         Weights associated with classes in the form ``{class_label: weight}``.
@@ -773,7 +765,7 @@ class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
     --------
     >>> from sklearn.datasets import load_iris
     >>> from sklearn.model_selection import cross_val_score
-    >>> from sklearn.tree import ObliqueDecisionTreeClassifier
+    >>> from sktree.tree import ObliqueDecisionTreeClassifier
     >>> clf = ObliqueDecisionTreeClassifier(random_state=0)
     >>> iris = load_iris()
     >>> cross_val_score(clf, iris.data, iris.target, cv=10)
@@ -1100,6 +1092,10 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
     decision tree, albeit with less efficiency optimizations. Therefore, it is always
     recommended to set the range of patch heights and widths based on the structure of your
     expected input data.
+
+    References
+    ----------
+    .. footbibliography::
     """
 
     _parameter_constraints = {
@@ -1155,6 +1151,26 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         self.data_width = data_width
 
     def fit(self, X, y, sample_weight=None, check_input=True):
+        """Fit tree.
+
+        Parameters
+        ----------
+        X : {array-like, sparse matrix} of shape (n_samples, n_features)
+            The training input samples. Internally, it will be converted to
+            ``dtype=np.float32`` and if a sparse matrix is provided
+            to a sparse ``csc_matrix``.
+        y : array-like of shape (n_samples,) or (n_samples, n_outputs)
+            The target values (class labels) as integers or strings.
+        sample_weight : array-like of shape (n_samples,), default=None
+            Sample weights. If None, then samples are equally weighted. Splits
+            that would create child nodes with net zero or negative weight are
+            ignored while searching for a split in each node. Splits are also
+            ignored if they would result in any single class carrying a
+            negative weight in either child node.
+        check_input : bool, optional
+            Whether or not to check input, by default True.
+        """
+
         if check_input:
             # Need to validate separately here.
             # We can't pass multi_output=True because that would allow y to be

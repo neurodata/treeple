@@ -37,8 +37,11 @@ if __sktree_SETUP__:
 else:
     try:
         from . import tree
-        from ._unsupervised_forest import UnsupervisedRandomForest, UnsupervisedObliqueRandomForest
-        from ._supervised_forest import (
+        from .ensemble._unsupervised_forest import (
+            UnsupervisedRandomForest,
+            UnsupervisedObliqueRandomForest,
+        )
+        from .ensemble._supervised_forest import (
             ObliqueRandomForestClassifier,
             PatchObliqueRandomForestClassifier,
         )

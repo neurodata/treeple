@@ -17,7 +17,7 @@ class ObliqueRandomForestClassifier(ForestClassifier):
     `bootstrap=True` (default), otherwise the whole dataset is used to build
     each tree.
 
-    Read more in the :ref:`User Guide <forest>`.
+    Read more in the :ref:`User Guide <sklearn:forest>`.
 
     Parameters
     ----------
@@ -220,7 +220,7 @@ class ObliqueRandomForestClassifier(ForestClassifier):
 
     See Also
     --------
-    sklearn.tree.ObliqueDecisionTreeClassifier : An oblique decision
+    sktree.tree.ObliqueDecisionTreeClassifier : An oblique decision
         tree classifier.
     sklearn.ensemble.RandomForestClassifier : An axis-aligned decision
         forest classifier.
@@ -246,7 +246,7 @@ class ObliqueRandomForestClassifier(ForestClassifier):
 
     Examples
     --------
-    >>> from sklearn.ensemble import ObliqueRandomForestClassifier
+    >>> from sktree.ensemble import ObliqueRandomForestClassifier
     >>> from sklearn.datasets import make_classification
     >>> X, y = make_classification(n_samples=1000, n_features=4,
     ...                            n_informative=2, n_redundant=0,
@@ -330,13 +330,13 @@ class ObliqueRandomForestClassifier(ForestClassifier):
 
 
 class PatchObliqueRandomForestClassifier(ForestClassifier):
-    """
-    A patch-oblique random forest classifier.
+    """A patch-oblique random forest classifier.
 
     A patch-oblique random forest is a meta estimator similar to a random
     forest that fits a number of patch oblique decision tree classifiers
     on various sub-samples of the dataset and uses averaging to
-    improve the predictive accuracy and control over-fitting.
+    improve the predictive accuracy and control over-fitting. For more
+    details, see :footcite:`Li2019manifold`.
 
     Parameters
     ----------
@@ -480,15 +480,20 @@ class PatchObliqueRandomForestClassifier(ForestClassifier):
         - If float, then draw `max_samples * X.shape[0]` samples. Thus,
           `max_samples` should be in the interval `(0.0, 1.0]`.
 
-    feature_combinations : float, default=None
-        The number of features to combine on average at each split
-        of the decision trees. If ``None``, then will default to the minimum of
-        ``(1.5, n_features)``. This controls the number of non-zeros is the
-        projection matrix. Setting the value to 1.0 is equivalent to a
-        traditional decision-tree. ``feature_combinations * max_features``
-        gives the number of expected non-zeros in the projection matrix of shape
-        ``(max_features, n_features)``. Thus this value must always be less than
-        ``n_features`` in order to be valid.
+    min_patch_height : int, optional
+        The minimum height of a patch, by default 1.
+    max_patch_height : int, optional
+        The maximum height of a patch, by default 1.
+    min_patch_width : int, optional
+        The minimum width of a patch, by default 1.
+    max_patch_width : int, optional
+        The maximum width of a patch, by default 1.
+    data_height : int, optional
+        The presumed height of the un-vectorized feature vector, by default 1.
+    data_width : int, optional
+        The presumed height of the un-vectorized feature vector, by default None.
+        If None, the data width will be presumed the number of columns in ``X``
+        passed to :meth:`fit`.
 
     Attributes
     ----------
@@ -545,7 +550,7 @@ class PatchObliqueRandomForestClassifier(ForestClassifier):
 
     See Also
     --------
-    sklearn.tree.ObliqueDecisionTreeClassifier : An oblique decision
+    sktree.tree.ObliqueDecisionTreeClassifier : An oblique decision
         tree classifier.
     sklearn.ensemble.RandomForestClassifier : An axis-aligned decision
         forest classifier.
@@ -567,20 +572,7 @@ class PatchObliqueRandomForestClassifier(ForestClassifier):
 
     References
     ----------
-    .. [1] L. Breiman, "Random Forests", Machine Learning, 45(1), 5-32, 2001.
-
-    Examples
-    --------
-    >>> from sklearn.ensemble import ObliqueRandomForestClassifier
-    >>> from sklearn.datasets import make_classification
-    >>> X, y = make_classification(n_samples=1000, n_features=4,
-    ...                            n_informative=2, n_redundant=0,
-    ...                            random_state=0, shuffle=False)
-    >>> clf = ObliqueRandomForestClassifier(max_depth=2, random_state=0)
-    >>> clf.fit(X, y)
-    ObliqueRandomForestClassifier(...)
-    >>> print(clf.predict([[0, 0, 0, 0]]))
-    [1]
+    .. footbibliography::
     """
 
     _parameter_constraints: dict = {
