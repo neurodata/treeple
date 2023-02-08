@@ -87,7 +87,7 @@ params = {
     "n_estimators": 50,
     "max_depth": None,
     "random_state": random_state,
-    "n_cv": 3,
+    "n_cv": 2,
     "n_repeats": 1,
 }
 

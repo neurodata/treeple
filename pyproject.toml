@@ -205,4 +205,15 @@ skips = ['B404', 'B603']
 
 [tool.devpy]
 package = 'sktree'
-commands = ['devpy.build', 'devpy.test']
+
+[tool.devpy.commands]
+Build = ["devpy.build", "devpy.test"]
+Environments = [
+    'devpy.shell',
+    'devpy.ipython',
+    'devpy.python',
+]
+Documentation = ['.devpy/cmds.py:docs']
+Metrics = [
+    '.devpy/cmds.py:coverage',
+]

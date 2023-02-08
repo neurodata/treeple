@@ -115,7 +115,16 @@ jobs:
 
       - name: Setup build and install scikit-tree
         run: |
-          python dev.py test -- --cov=sktree --cov-report=xml
+          ./dev.py coverage
+
+      - name: Upload coverage stats to codecov
+        if: ${{ matrix.os == 'ubuntu-22.04' && matrix.python-version == '3.10'}}
+        uses: codecov/codecov-action@v3
+        with:
+          # python dev.py goes into the INSTALLED path in order to run pytest
+          files: $PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages/coverage.xml
+          fail_ci_if_error: true
+          verbose: true
 
       - name: Save build
         uses: actions/upload-artifact@v3

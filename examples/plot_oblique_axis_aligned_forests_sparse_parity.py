@@ -71,7 +71,7 @@ params = [
     {"max_features": 40, "n_estimators": 100, "max_depth": 20},
 ]
 
-X, y = sparse_parity(n_samples=10000, random_seed=random_state)
+X, y = sparse_parity(n_samples=1000, random_seed=random_state)
 
 df = get_scores(X=X, y=y, n_cv=3, n_repeats=1, random_state=random_state, kwargs=params)
 t_d = (datetime.now() - t0).seconds
