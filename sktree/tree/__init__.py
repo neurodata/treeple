@@ -1,13 +1,3 @@
-from ._classes import (
-    ObliqueDecisionTreeClassifier,
-    PatchObliqueDecisionTreeClassifier,
-    UnsupervisedDecisionTree,
-    UnsupervisedObliqueDecisionTree,
-)
+from ._classes import UnsupervisedDecisionTree, UnsupervisedObliqueDecisionTree
 
-__all__ = [
-    "UnsupervisedDecisionTree",
-    "UnsupervisedObliqueDecisionTree",
-    "ObliqueDecisionTreeClassifier",
-    "PatchObliqueDecisionTreeClassifier",
-]
+__all__ = ["UnsupervisedDecisionTree", "UnsupervisedObliqueDecisionTree"]

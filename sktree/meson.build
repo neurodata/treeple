@@ -52,6 +52,7 @@ numpy_nodepr_api = '-DNPY_NO_DEPRECATED_API=NPY_1_9_API_VERSION'
 
 python_sources = [
   '__init__.py',
+  '_forest.py',
 ]
 
 py3.install_sources(
@@ -78,5 +79,4 @@ c_undefined_ok = ['-Wno-maybe-uninitialized']
 # cython_cpp_args = cython_c_args
 
 subdir('tree')
-subdir('ensemble')
 subdir('tests')

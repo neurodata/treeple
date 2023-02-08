@@ -21,7 +21,6 @@ tags
 docs/coverages
 docs/samples
 cover
-examples/*.jpg
 
 # Pycharm
 .idea/

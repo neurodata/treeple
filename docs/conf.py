@@ -81,9 +81,6 @@ nitpicky = False
 # TODO: figure out why these are raising an error?
 nitpick_ignore = [
     ('py:obj', 'UnsupervisedDecisionTree'),
-    ('py:obj', 'ObliqueDecisionTreeClassifier'),
-    ('py:obj', 'PatchObliqueDecisionTreeClassifier'),
-    ('py:obj', 'DecisionTreeClassifier'),
     ('py:mod', 'sktree.tree'),
 ]
 
@@ -158,6 +155,7 @@ numpydoc_xref_aliases = {
     # Python
     "Path": "pathlib.Path",
     "bool": ":class:`python:bool`",
+    # "UnsupervisedDecisionTree": ":class:`sktree.tree.UnsupervisedDecisionTree",
 }
 numpydoc_xref_ignore = {
     "of",
@@ -183,15 +181,6 @@ numpydoc_xref_ignore = {
     "matrix",
     'Ignored',
     'UnsupervisedSplitter',
-    # from sklearn
-    "such",
-    "arrays",
-    "if",
-    "DecisionTreeClassifier",
-    "dicts",
-    "a",
-    "Tree",
-    "_type_",
 }
 
 # validation
@@ -201,7 +190,6 @@ error_ignores = {
     "EX01",  # section 'Examples' not found
     "ES01",  # no extended summary found
     "SA01",  # section 'See Also' not found
-    "RT01",
     "RT02",  # The first line of the Returns section should contain only the type, unless multiple values are being returned  # noqa
     "PR09",  # ending with a . is not necessary
 }

@@ -128,7 +128,7 @@ _apply_version = 'semversioner release'
 
 type_check = 'mypy -p sktree --config-file pyproject.toml'
 unit_test = 'pytest ./sktree --cov=sktree --cov-report=xml --cov-config=pyproject.toml'
-build_docs = 'make -C docs/ clean html-noplot'
+build_docs = 'make -C docs/ clean html'
 clean = { shell = 'rm -rf builddir; rm -rf clean; rm -rf build; rm -rf _build; rm -rf dist;' }
 
 [[tool.poe.tasks.lint]]
@@ -163,6 +163,7 @@ extend-exclude = '''
     | \.github
     | setup.py
     | docs/
+    | examples/
 )
 '''
 
@@ -205,15 +206,4 @@ skips = ['B404', 'B603']
 
 [tool.devpy]
 package = 'sktree'
-
-[tool.devpy.commands]
-Build = ["devpy.build", "devpy.test"]
-Environments = [
-    'devpy.shell',
-    'devpy.ipython',
-    'devpy.python',
-]
-Documentation = ['.devpy/cmds.py:docs']
-Metrics = [
-    '.devpy/cmds.py:coverage',
-]
+commands = ['devpy.build', 'devpy.test']

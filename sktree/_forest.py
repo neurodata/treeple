@@ -25,7 +25,7 @@ from sklearn.tree._tree import DTYPE
 from sklearn.utils.parallel import Parallel, delayed
 from sklearn.utils.validation import _check_sample_weight, check_is_fitted, check_random_state
 
-from sktree.tree import UnsupervisedDecisionTree, UnsupervisedObliqueDecisionTree
+from .tree import UnsupervisedDecisionTree, UnsupervisedObliqueDecisionTree
 
 
 class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):

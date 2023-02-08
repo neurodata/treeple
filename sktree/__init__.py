@@ -37,24 +37,11 @@ if __sktree_SETUP__:
 else:
     try:
         from . import tree
-        from .ensemble._unsupervised_forest import (
-            UnsupervisedRandomForest,
-            UnsupervisedObliqueRandomForest,
-        )
-        from .ensemble._supervised_forest import (
-            ObliqueRandomForestClassifier,
-            PatchObliqueRandomForestClassifier,
-        )
+        from ._forest import UnsupervisedRandomForest, UnsupervisedObliqueRandomForest
     except ImportError as e:
         msg = """Error importing scikit-tree: you cannot import scikit-tree while
         being in scikit-tree source directory; please exit the scikit-tree source
         tree first and relaunch your Python interpreter."""
         raise ImportError(msg) from e
 
-    __all__ = [
-        "tree",
-        "ObliqueRandomForestClassifier",
-        "PatchObliqueRandomForestClassifier",
-        "UnsupervisedRandomForest",
-        "UnsupervisedObliqueRandomForest",
-    ]
+    __all__ = ["tree", "UnsupervisedRandomForest", "UnsupervisedObliqueRandomForest"]
