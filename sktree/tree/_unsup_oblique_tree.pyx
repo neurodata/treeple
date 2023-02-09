@@ -225,8 +225,12 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
 
         # oblique trees store the projection indices and weights
         # inside the tree itself
-        self.proj_vec_weights[node_id] = deref(deref(oblique_split_node).proj_vec_weights)  # no-cython-lint
-        self.proj_vec_indices[node_id] = deref(deref(oblique_split_node).proj_vec_indices)  # no-cython-lint
+        self.proj_vec_weights[node_id] = deref(
+            deref(oblique_split_node).proj_vec_weights
+        )
+        self.proj_vec_indices[node_id] = deref(
+            deref(oblique_split_node).proj_vec_indices
+        )
         return 1
 
     cdef DTYPE_t _compute_feature(

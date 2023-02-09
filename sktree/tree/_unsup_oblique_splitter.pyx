@@ -257,8 +257,9 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
                 # initialize the feature value to 0
                 Xf[idx] = 0
                 for jdx in range(0, current.proj_vec_indices.size()):
-                    Xf[idx] += self.X[samples[idx], deref(current.proj_vec_indices)[jdx]] *\
-                                      deref(current.proj_vec_weights)[jdx]
+                    Xf[idx] += self.X[
+                        samples[idx], deref(current.proj_vec_indices)[jdx]
+                    ] * deref(current.proj_vec_weights)[jdx]
 
             # Sort the samples
             sort(&Xf[start], &samples[start], end - start)

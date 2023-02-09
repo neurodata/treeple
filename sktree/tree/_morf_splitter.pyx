@@ -1,7 +1,5 @@
 # cython: cdivision=True
 
-import numpy as np
-
 cimport numpy as cnp
 
 cnp.import_array()
@@ -203,9 +201,11 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
 
         for proj_i in range(0, max_features):
             # compute random patch width and height
-            # Note: By constraining max patch height/width to be at least the min patch height/width
-            # this ensures that the minimum value of patch_height and patch_width is 1
-            patch_height = rand_int(min_patch_height, max_patch_height + 1, random_state)
+            # Note: By constraining max patch height/width to be at least the min patch
+            # height/width this ensures that the minimum value of patch_height and
+            # patch_width is 1
+            patch_height = rand_int(min_patch_height, max_patch_height + 1,
+                                    random_state)
             patch_width = rand_int(min_patch_width, max_patch_width + 1, random_state)
 
             # compute the difference between the image dimensions and the current random

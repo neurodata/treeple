@@ -89,8 +89,12 @@ cdef class ObliqueTree(Tree):
         weighted_n_node_samples[i] holds the weighted number of training samples
         reaching node i.
     """
-    def __cinit__(self, int n_features, cnp.ndarray[SIZE_t, ndim=1] n_classes,
-                int n_outputs):
+    def __cinit__(
+        self,
+        int n_features,
+        cnp.ndarray[SIZE_t, ndim=1] n_classes,
+        int n_outputs
+    ):
         """Constructor."""
         # Input/Output layout
         self.n_features = n_features
@@ -117,9 +121,11 @@ cdef class ObliqueTree(Tree):
 
     def __reduce__(self):
         """Reduce re-implementation, for pickling."""
-        return (ObliqueTree, (self.n_features,
-                       sizet_ptr_to_ndarray(self.n_classes, self.n_outputs),
-                       self.n_outputs), self.__getstate__())
+        return (ObliqueTree, (
+            self.n_features,
+            sizet_ptr_to_ndarray(self.n_classes, self.n_outputs),
+            self.n_outputs), self.__getstate__()
+            )
 
     def __getstate__(self):
         """Getstate re-implementation, for pickling."""
@@ -141,13 +147,12 @@ cdef class ObliqueTree(Tree):
 
         if 'nodes' not in d:
             raise ValueError('You have loaded ObliqueTree version which '
-                            'cannot be imported')
+                             'cannot be imported')
 
         node_ndarray = d['nodes']
         value_ndarray = d['values']
 
-        value_shape = (node_ndarray.shape[0], self.n_outputs,
-                    self.max_n_classes)
+        value_shape = (node_ndarray.shape[0], self.n_outputs, self.max_n_classes)
         if (node_ndarray.ndim != 1 or
                 node_ndarray.dtype != NODE_DTYPE or
                 not node_ndarray.flags.c_contiguous or
@@ -209,15 +214,15 @@ cdef class ObliqueTree(Tree):
         safe_realloc(&self.value, capacity * self.value_stride)
 
         # only thing added for oblique trees
-        # TODO: this could possibly be removed if we can add projection indices and weights to Node
+        # TODO: this could possibly be removed if we can add projection
+        # indices and weights to Node
         self.proj_vec_weights.resize(capacity)
         self.proj_vec_indices.resize(capacity)
 
         # value memory is initialised to 0 to enable classifier argmax
         if capacity > self.capacity:
             memset(<void*>(self.value + self.capacity * self.value_stride), 0,
-                (capacity - self.capacity) * self.value_stride *
-                sizeof(double))
+                   (capacity - self.capacity) * self.value_stride * sizeof(double))
 
         # if capacity smaller than node_count, adjust the counter
         if capacity < self.node_count:
@@ -230,7 +235,8 @@ cdef class ObliqueTree(Tree):
         """Set node data.
         """
         # Cython type cast split record into its inherited split record
-        # For reference, see: https://www.codementor.io/@arpitbhayani/powering-inheritance-in-c-using-structure-composition-176sygr724
+        # For reference, see: 
+        # https://www.codementor.io/@arpitbhayani/powering-inheritance-in-c-using-structure-composition-176sygr724
         cdef ObliqueSplitRecord* oblique_split_node = <ObliqueSplitRecord*>(split_node)
         cdef SIZE_t node_id = self.node_count
 
@@ -239,11 +245,20 @@ cdef class ObliqueTree(Tree):
 
         # oblique trees store the projection indices and weights
         # inside the tree itself
-        self.proj_vec_weights[node_id] = deref(deref(oblique_split_node).proj_vec_weights)
-        self.proj_vec_indices[node_id] = deref(deref(oblique_split_node).proj_vec_indices)
+        self.proj_vec_weights[node_id] = deref(
+            deref(oblique_split_node).proj_vec_weights
+        )
+        self.proj_vec_indices[node_id] = deref(
+            deref(oblique_split_node).proj_vec_indices
+        )
         return 1
 
-    cdef DTYPE_t _compute_feature(self, const DTYPE_t[:, :] X_ndarray, SIZE_t sample_index, Node *node) nogil:
+    cdef DTYPE_t _compute_feature(
+        self,
+        const DTYPE_t[:, :] X_ndarray,
+        SIZE_t sample_index,
+        Node *node
+    ) nogil:
         """Compute feature from a given data matrix, X.
 
         In oblique-aligned trees, this is the projection of X.
@@ -253,8 +268,7 @@ cdef class ObliqueTree(Tree):
         cdef DTYPE_t weight = 0.0
         cdef int j = 0
         cdef SIZE_t feature_index
-        cdef SIZE_t n_features = self.n_features
-        
+
         # get the index of the node
         cdef SIZE_t node_id = node - self.nodes
 
@@ -273,10 +287,13 @@ cdef class ObliqueTree(Tree):
 
         return proj_feat
 
-    cdef void _compute_feature_importances(self, cnp.float64_t[:] importances,
-                                Node* node) nogil:
+    cdef void _compute_feature_importances(
+        self,
+        cnp.float64_t[:] importances,
+        Node* node
+    ) nogil:
         """Compute feature importances from a Node in the Tree.
-        
+
         Wrapped in a private function to allow subclassing that
         computes feature importances.
         """

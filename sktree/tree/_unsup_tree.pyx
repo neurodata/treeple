@@ -111,10 +111,9 @@ cdef class UnsupervisedTreeBuilder:
             X = np.asfortranarray(X, dtype=DTYPE)
 
         if (sample_weight is not None and
-            (sample_weight.base.dtype != DOUBLE or
-            not sample_weight.base.flags.contiguous)):
-                sample_weight = np.asarray(sample_weight, dtype=DOUBLE,
-                                           order="C")
+            (sample_weight.base.dtype != DOUBLE or not
+             sample_weight.base.flags.contiguous)):
+            sample_weight = np.asarray(sample_weight, dtype=DOUBLE, order="C")
 
         return X, sample_weight
 

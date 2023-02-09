@@ -202,7 +202,9 @@ cdef class BaseObliqueSplitter(Splitter):
                 # initialize the feature value to 0
                 Xf[idx] = 0
                 for jdx in range(0, current.proj_vec_indices.size()):
-                    Xf[idx] += self.X[samples[idx], deref(current.proj_vec_indices)[jdx]] * deref(current.proj_vec_weights)[jdx] # no-cython-lint
+                    Xf[idx] += self.X[
+                        samples[idx], deref(current.proj_vec_indices)[jdx]
+                    ] * deref(current.proj_vec_weights)[jdx]
 
             # Sort the samples
             sort(&Xf[start], &samples[start], end - start)
@@ -230,7 +232,8 @@ cdef class BaseObliqueSplitter(Splitter):
                             (self.criterion.weighted_n_right < min_weight_leaf)):
                         continue
 
-                    current_proxy_improvement = self.criterion.proxy_impurity_improvement()  # no-cython-lint
+                    current_proxy_improvement = \
+                        self.criterion.proxy_impurity_improvement()
 
                     if current_proxy_improvement > best_proxy_improvement:
                         best_proxy_improvement = current_proxy_improvement
@@ -386,8 +389,8 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
         Notes
         -----
         Note that grid_size must be larger than or equal to n_non_zeros because
-        it is assumed ``feature_combinations`` is forced to be smaller than ``n_features``
-        before instantiating an oblique splitter.
+        it is assumed ``feature_combinations`` is forced to be smaller than
+        ``n_features`` before instantiating an oblique splitter.
         """
 
         cdef SIZE_t n_features = self.n_features
