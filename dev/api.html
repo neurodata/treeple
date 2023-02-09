@@ -49,7 +49,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'api';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="sktree.UnsupervisedRandomForest" href="generated/sktree.UnsupervisedRandomForest.html" />
+    <link rel="next" title="sktree.ObliqueRandomForestClassifier" href="generated/sktree.ObliqueRandomForestClassifier.html" />
     <link rel="prev" title="scikit-tree" href="index.html" />
     <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
     <script type="text/javascript" src="_static/copybutton.js"></script>
@@ -318,6 +318,14 @@
   </p>
   <div class="bd-toc-item navbar-nav">
     <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.ObliqueRandomForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ObliqueRandomForestClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.PatchObliqueRandomForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.PatchObliqueRandomForestClassifier</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.tree.ObliqueDecisionTreeClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.ObliqueDecisionTreeClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.tree.PatchObliqueDecisionTreeClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.PatchObliqueDecisionTreeClassifier</a></li>
+</ul>
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="generated/sktree.UnsupervisedRandomForest.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.UnsupervisedRandomForest</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sktree.UnsupervisedObliqueRandomForest.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.UnsupervisedObliqueRandomForest</a></li>
 </ul>
@@ -359,6 +367,38 @@
 <span id="id1"></span><h1>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this heading">#</a></h1>
 <p><a class="reference internal" href="#module-sktree" title="sktree"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code></a>:</p>
 <span class="target" id="module-sktree"></span><p>Scikit manifold oblique random forests.</p>
+<section id="supervised">
+<h2>Supervised<a class="headerlink" href="#supervised" title="Permalink to this heading">#</a></h2>
+<p>Decision-tree models are traditionally implemented with axis-aligned splits and
+storing the mean outcome (i.e. label) vote in the leaf nodes. However, more
+exotic splits are possible, called “oblique” splits, which are some function
+of multiple feature columns to create a “new feature value” to split on.</p>
+<p>This can take the form of a random (sparse) linear combination of feature columns,
+or even take advantage of the structure in the data (e.g. if it is an image) to
+sample feature indices in a manifold-aware fashion. This class of models generalizes
+the splitting function in the trees, while everything else is consistent with
+how scikit-learn builds trees.</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.ObliqueRandomForestClassifier.html#sktree.ObliqueRandomForestClassifier" title="sktree.ObliqueRandomForestClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ObliqueRandomForestClassifier</span></code></a>([...])</p></td>
+<td><p>An oblique random forest classifier.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.PatchObliqueRandomForestClassifier.html#sktree.PatchObliqueRandomForestClassifier" title="sktree.PatchObliqueRandomForestClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PatchObliqueRandomForestClassifier</span></code></a>([...])</p></td>
+<td><p>A patch-oblique random forest classifier.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.tree.ObliqueDecisionTreeClassifier.html#sktree.tree.ObliqueDecisionTreeClassifier" title="sktree.tree.ObliqueDecisionTreeClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tree.ObliqueDecisionTreeClassifier</span></code></a>(*[, ...])</p></td>
+<td><p>A decision tree classifier.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.tree.PatchObliqueDecisionTreeClassifier.html#sktree.tree.PatchObliqueDecisionTreeClassifier" title="sktree.tree.PatchObliqueDecisionTreeClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tree.PatchObliqueDecisionTreeClassifier</span></code></a>(*[, ...])</p></td>
+<td><p>A oblique decision tree classifier that operates over patches of data.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="unsupervised">
 <h2>Unsupervised<a class="headerlink" href="#unsupervised" title="Permalink to this heading">#</a></h2>
 <p>Decision-tree models are traditionally used for classification and regression.
@@ -404,10 +444,10 @@ on unsupervised criterion such as variance and BIC.</p>
           <p class="prev-next-title"><strong>scikit-tree</strong></p>
       </div>
   </a>
-  <a class='right-next' id="next-link" href="generated/sktree.UnsupervisedRandomForest.html" title="next page">
+  <a class='right-next' id="next-link" href="generated/sktree.ObliqueRandomForestClassifier.html" title="next page">
   <div class="prev-next-info">
       <p class="prev-next-subtitle">next</p>
-      <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.UnsupervisedRandomForest</p>
+      <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ObliqueRandomForestClassifier</p>
   </div>
   <i class="fa-solid fa-angle-right"></i>
   </a>
@@ -427,6 +467,13 @@ on unsupervised criterion such as variance and BIC.</p>
 </div>
 <nav id="bd-toc-nav" class="page-toc">
     <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#supervised">
+   Supervised
+  </a>
+  <ul class="nav section-nav flex-column">
+  </ul>
+ </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#unsupervised">
    Unsupervised
@@ -478,7 +525,7 @@ on unsupervised criterion such as variance and BIC.</p>
     
 <p class="copyright">
 
-    &copy; Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-02-05.<br>
+    &copy; Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-02-09.<br>
 
 </p>
 
