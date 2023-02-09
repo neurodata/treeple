@@ -37,13 +37,6 @@ digits.target = digits.target[perm]
     ]
 )
 def test_sklearn_compatible_estimator(estimator, check):
-    # TODO: investigate why this is the case, but not for oblique decision trees
-    if isinstance(estimator, PatchObliqueDecisionTreeClassifier) and check.func.__name__ in [
-        "check_methods_subset_invariance",
-        "check_methods_sample_order_invariance",
-    ]:
-        pytest.skip()
-
     # TODO: remove when we implement Regressor classes
     if check.func.__name__ in ["check_requires_y_none"]:
         pytest.skip()

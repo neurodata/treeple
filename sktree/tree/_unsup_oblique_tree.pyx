@@ -157,10 +157,10 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
                 self.proj_vec_indices[i].push_back(j)
 
         cdef Node[::1] node_memory_view = node_ndarray
-        cdef DOUBLE_t[:, :, ::1] value_memory_view = value_ndarray
+        cdef DOUBLE_t[:] value_memory_view = value_ndarray
         nodes = memcpy(self.nodes, &node_memory_view[0],
                        self.capacity * sizeof(Node))
-        value = memcpy(self.value, &value_memory_view[0, 0, 0],
+        value = memcpy(self.value, &value_memory_view[0],
                        self.capacity * self.value_stride * sizeof(double))
 
     cpdef cnp.ndarray get_projection_matrix(self):

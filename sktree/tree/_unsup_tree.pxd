@@ -85,7 +85,7 @@ cdef class UnsupervisedTreeBuilder:
         self,
         UnsupervisedTree tree,
         object X,
-        cnp.ndarray sample_weight=*
+        const DOUBLE_t[:] sample_weight=*
     )
     cdef _check_input(
         self,

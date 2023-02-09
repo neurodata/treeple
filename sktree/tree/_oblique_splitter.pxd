@@ -19,7 +19,8 @@ from sklearn.tree._tree cimport DTYPE_t  # Type of X
 from sklearn.tree._tree cimport INT32_t  # Signed 32 bit integer
 from sklearn.tree._tree cimport SIZE_t  # Type for indices and counters
 from sklearn.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
-from sklearn.utils._sorting cimport simultaneous_sort
+
+from ._sklearn_splitter cimport sort
 
 
 cdef struct ObliqueSplitRecord:

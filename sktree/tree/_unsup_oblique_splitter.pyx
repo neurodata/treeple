@@ -49,8 +49,8 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
         SIZE_t max_features,
         SIZE_t min_samples_leaf,
         double min_weight_leaf,
-        double feature_combinations,
         object random_state,
+        double feature_combinations,
         *argv
     ):
         """

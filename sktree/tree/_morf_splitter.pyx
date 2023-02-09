@@ -15,7 +15,7 @@ from sklearn.tree._utils cimport rand_int
 cdef class PatchSplitter(BaseObliqueSplitter):
     """Patch splitter.
 
-    TBD.
+    A convolutional 2D patch splitter.
     """
     def __cinit__(
         self,
@@ -139,7 +139,6 @@ cdef class BaseDensePatchSplitter(PatchSplitter):
         Returns -1 in case of failure to allocate memory (and raise MemoryError)
         or 0 otherwise.
         """
-
         # Call parent init
         PatchSplitter.init(self, X, y, sample_weight)
 
@@ -204,6 +203,8 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
 
         for proj_i in range(0, max_features):
             # compute random patch width and height
+            # Note: By constraining max patch height/width to be at least the min patch height/width
+            # this ensures that the minimum value of patch_height and patch_width is 1
             patch_height = rand_int(min_patch_height, max_patch_height + 1, random_state)
             patch_width = rand_int(min_patch_width, max_patch_width + 1, random_state)
 
@@ -216,9 +217,15 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
             # position in patch
             top_left_seed = rand_int(0, delta_width * delta_height, random_state)
 
-            # now we want to set the weights and indices for the patch in the
-            # vectorized position
-            patch_end_seed = top_left_seed + delta_width * delta_height
+            # Get the end-point of the patch
+            # Note: The end-point of the dataset might be less than the patch.
+            # This occurs if we sample a seed point at the edge of the "image".
+            # Therefore, we take the minimum between the end-point, or the last
+            # index in the vectorized image.
+            patch_end_seed = min(
+                top_left_seed + delta_width * delta_height,
+                self.n_features
+            )
 
             for feat_i in range(top_left_seed, patch_end_seed):
                 # now compute top-left point

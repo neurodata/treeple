@@ -520,8 +520,8 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
                 self.max_features_,
                 min_samples_leaf,
                 min_weight_leaf,
-                self.feature_combinations,
                 random_state,
+                self.feature_combinations,
             )
 
         self.tree_ = UnsupervisedObliqueTree(self.n_features_in_)

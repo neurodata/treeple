@@ -205,7 +205,7 @@ cdef class BaseObliqueSplitter(Splitter):
                     Xf[idx] += self.X[samples[idx], deref(current.proj_vec_indices)[jdx]] * deref(current.proj_vec_weights)[jdx] # no-cython-lint
 
             # Sort the samples
-            simultaneous_sort(&Xf[start], &samples[start], end - start)
+            sort(&Xf[start], &samples[start], end - start)
 
             # Evaluate all splits
             self.criterion.reset()
