@@ -42,7 +42,7 @@ incdir_numpy = run_command(py3,
 cc = meson.get_compiler('c')
 
 # Don't use the deprecated NumPy C API. Define this to a fixed version instead of
-# NPY_API_VERSION in order not to break compilation for released SciPy versions
+# NPY_API_VERSION in order not to break compilation for released versions
 # when NumPy introduces a new deprecation. Use in a meson.build file::
 #
 # py3.extension_module('_name',

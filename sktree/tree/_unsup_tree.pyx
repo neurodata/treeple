@@ -89,7 +89,11 @@ cdef class UnsupervisedTreeBuilder:
         """Build a decision tree from the training set X."""
         pass
 
-    cdef inline _check_input(self, object X, cnp.ndarray sample_weight):
+    cdef inline _check_input(
+        self,
+        object X,
+        const DOUBLE_t[:] sample_weight,
+    ):
         """Check input dtype, layout and format"""
         if issparse(X):
             X = X.tocsc()
@@ -106,9 +110,11 @@ cdef class UnsupervisedTreeBuilder:
             # since we have to copy we will make it fortran for efficiency
             X = np.asfortranarray(X, dtype=DTYPE)
 
-        if (sample_weight is not None) and \
-                (sample_weight.dtype != DOUBLE or not sample_weight.flags.contiguous):
-            sample_weight = np.asarray(sample_weight, dtype=DOUBLE, order="C")
+        if (sample_weight is not None and
+            (sample_weight.base.dtype != DOUBLE or
+            not sample_weight.base.flags.contiguous)):
+                sample_weight = np.asarray(sample_weight, dtype=DOUBLE,
+                                           order="C")
 
         return X, sample_weight
 
@@ -551,7 +557,7 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
 # Unsupervised Tree
 # =============================================================================
 
-cdef class UnsupervisedTree:
+cdef class UnsupervisedTree(BaseTree):
     """Array-based representation of a binary decision tree for unsupervised learning.
 
     This is essentially an exact copy of the corresponding Tree class in
@@ -707,12 +713,11 @@ cdef class UnsupervisedTree:
             expected_shape=value_shape
         )
 
-        self.capacity = node_ndarray.shape[0]
-        if self._resize_c(self.capacity) != 0:
-            raise MemoryError("resizing tree to %d" % self.capacity)
-        nodes = memcpy(self.nodes, (<cnp.ndarray> node_ndarray).data,
+        cdef Node[::1] node_memory_view = node_ndarray
+        cdef DOUBLE_t[:, :, ::1] value_memory_view = value_ndarray
+        nodes = memcpy(self.nodes, &node_memory_view[0],
                        self.capacity * sizeof(Node))
-        value = memcpy(self.value, (<cnp.ndarray> value_ndarray).data,
+        value = memcpy(self.value, &value_memory_view[0, 0, 0],
                        self.capacity * self.value_stride * sizeof(double))
 
     cdef int _set_split_node(
@@ -771,7 +776,7 @@ cdef class UnsupervisedTree:
 
     cdef void _compute_feature_importances(
         self,
-        DOUBLE_t* importance_data,
+        cnp.float64_t[:] importances,
         Node* node
     ) nogil:
         """Compute feature importances from a Node in the Tree.
@@ -794,7 +799,7 @@ cdef class UnsupervisedTree:
         left = &nodes[node.left_child]
         right = &nodes[node.right_child]
 
-        importance_data[node.feature] += (
+        importances[node.feature] += (
             node.weighted_n_node_samples * node.impurity -
             left.weighted_n_node_samples * left.impurity -
             right.weighted_n_node_samples * right.impurity)
@@ -830,7 +835,7 @@ cdef class UnsupervisedTree:
         arr = PyArray_NewFromDescr(<PyTypeObject *> cnp.ndarray,
                                    <cnp.dtype> NODE_DTYPE, 1, shape,
                                    strides, <void*> self.nodes,
-                                   cnp.NPY_DEFAULT, None)
+                                   cnp.NPY_ARRAY_DEFAULT, None)
         Py_INCREF(self)
         if PyArray_SetBaseObject(arr, <PyObject*> self) < 0:
             raise ValueError("Can't initialize array.")
