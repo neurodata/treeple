@@ -1,4 +1,5 @@
-#cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
+# cython: language_level=3
+# cython: boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
 
 from libc.stdlib cimport qsort
 from libc.string cimport memcpy

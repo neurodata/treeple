@@ -1,3 +1,4 @@
+# distutils: language=c++
 # cython: language_level=3
 # cython: boundscheck=False
 # cython: wraparound=False
@@ -11,10 +12,8 @@ cnp.import_array()
 
 from cython.operator cimport dereference as deref
 from libcpp.vector cimport vector
+from sklearn.tree._criterion cimport Criterion
 from sklearn.tree._utils cimport rand_int
-
-from ._sklearn_splitter cimport sort
-from ._unsup_criterion cimport UnsupervisedCriterion
 
 
 cdef double INFINITY = np.inf
@@ -35,21 +34,18 @@ cdef inline void _init_split(ObliqueSplitRecord* self, SIZE_t start_pos) nogil:
     self.threshold = 0.
     self.improvement = -INFINITY
 
-
-cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
+cdef class BaseObliqueSplitter(Splitter):
     """Abstract oblique splitter class.
 
     Splitters are called by tree builders to find the best splits on
     both sparse and dense data, one split at a time.
     """
-
     def __cinit__(
         self,
-        UnsupervisedCriterion criterion,
+        Criterion criterion,
         SIZE_t max_features,
         SIZE_t min_samples_leaf,
         double min_weight_leaf,
-        double feature_combinations,
         object random_state,
         *argv
     ):
@@ -72,11 +68,6 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
             The minimal weight each leaf can have, where the weight is the sum
             of the weights of each sample in it.
 
-        feature_combinations : double
-            The average number of features to combine in an oblique split.
-            Each feature is independently included with probability
-            ``feature_combination`` / ``n_features``.
-
         random_state : object
             The user inputted random state to be used for pseudo-randomness
         """
@@ -91,33 +82,15 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
         self.min_weight_leaf = min_weight_leaf
         self.random_state = random_state
 
-        # Oblique tree parameters
-        self.feature_combinations = feature_combinations
-
         # Sparse max_features x n_features projection matrix
         self.proj_mat_weights = vector[vector[DTYPE_t]](self.max_features)
         self.proj_mat_indices = vector[vector[SIZE_t]](self.max_features)
-
-        # or max w/ 1...
-        self.n_non_zeros = max(int(self.max_features * self.feature_combinations), 1)
 
     def __getstate__(self):
         return {}
 
     def __setstate__(self, d):
         pass
-
-    cdef int init(
-        self,
-        const DTYPE_t[:, :] X,
-        const DOUBLE_t[:] sample_weight
-    ) except -1:
-        UnsupervisedSplitter.init(self, X, sample_weight)
-
-        # create a helper array for allowing efficient Fisher-Yates
-        self.indices_to_sample = np.arange(self.max_features * self.n_features,
-                                           dtype=np.intp)
-        return 0
 
     cdef int node_reset(self, SIZE_t start, SIZE_t end,
                         double* weighted_n_node_samples) nogil except -1:
@@ -135,8 +108,17 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
         weighted_n_node_samples : ndarray, dtype=double pointer
             The total weight of those samples
         """
-        # call parent reset
-        UnsupervisedSplitter.node_reset(self, start, end, weighted_n_node_samples)
+
+        self.start = start
+        self.end = end
+
+        self.criterion.init(self.y,
+                            self.sample_weight,
+                            self.weighted_n_samples,
+                            self.samples)
+        self.criterion.set_sample_pointers(start, end)
+
+        weighted_n_node_samples[0] = self.criterion.weighted_n_node_samples
 
         # Clear all projection vectors
         for i in range(self.max_features):
@@ -144,9 +126,11 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
             self.proj_mat_indices[i].clear()
         return 0
 
-    cdef void sample_proj_mat(self,
-                              vector[vector[DTYPE_t]]& proj_mat_weights,
-                              vector[vector[SIZE_t]]& proj_mat_indices) nogil:
+    cdef void sample_proj_mat(
+        self,
+        vector[vector[DTYPE_t]]& proj_mat_weights,
+        vector[vector[SIZE_t]]& proj_mat_indices
+    ) nogil:
         """ Sample the projection vector.
 
         This is a placeholder method.
@@ -155,54 +139,15 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
 
     cdef int pointer_size(self) nogil:
         """Get size of a pointer to record for ObliqueSplitter."""
+
         return sizeof(ObliqueSplitRecord)
 
-
-cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
-    # NOTE: vectors are passed by value, so & is needed to pass by reference
-    cdef void sample_proj_mat(self,
-                              vector[vector[DTYPE_t]]& proj_mat_weights,
-                              vector[vector[SIZE_t]]& proj_mat_indices) nogil:
-        """
-        Sparse Oblique Projection matrix.
-        Randomly sample features to put in randomly sampled projection vectors
-        weight = 1 or -1 with probability 0.5
-        """
-        cdef SIZE_t n_features = self.n_features
-        cdef SIZE_t n_non_zeros = self.n_non_zeros
-        cdef UINT32_t* random_state = &self.rand_r_state
-
-        cdef int i, feat_i, proj_i, rand_vec_index
-        cdef DTYPE_t weight
-
-        # construct an array to sample from mTry x n_features set of indices
-        cdef SIZE_t[::1] indices_to_sample = self.indices_to_sample
-        cdef SIZE_t grid_size = self.max_features * self.n_features
-
-        # shuffle indices over the 2D grid to sample using Fisher-Yates
-        for i in range(0, grid_size):
-            j = rand_int(0, grid_size - i, random_state)
-            indices_to_sample[j], indices_to_sample[i] = \
-                indices_to_sample[i], indices_to_sample[j]
-
-        # sample 'n_non_zeros' in a mtry X n_features projection matrix
-        # which consists of +/- 1's chosen at a 1/2s rate
-        for i in range(0, n_non_zeros):
-            # get the next index from the shuffled index array
-            rand_vec_index = indices_to_sample[i]
-
-            # get the projection index and feature index
-            proj_i = rand_vec_index // n_features
-            feat_i = rand_vec_index % n_features
-
-            # sample a random weight
-            weight = 1 if (rand_int(0, 2, random_state) == 1) else -1
-
-            proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
-            proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
-
-    cdef int node_split(self, double impurity, SplitRecord* split,
-                        SIZE_t* n_constant_features) nogil except -1:
+    cdef int node_split(
+        self,
+        double impurity,
+        SplitRecord* split,
+        SIZE_t* n_constant_features
+    ) nogil except -1:
         """Find the best split on node samples[start:end]
 
         Returns -1 in case of failure to allocate memory (and raise MemoryError)
@@ -257,16 +202,10 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
                 # initialize the feature value to 0
                 Xf[idx] = 0
                 for jdx in range(0, current.proj_vec_indices.size()):
-                    Xf[idx] += self.X[samples[idx], deref(current.proj_vec_indices)[jdx]] *\
-                                      deref(current.proj_vec_weights)[jdx]
+                    Xf[idx] += self.X[samples[idx], deref(current.proj_vec_indices)[jdx]] * deref(current.proj_vec_weights)[jdx] # no-cython-lint
 
             # Sort the samples
-            sort(&Xf[start], &samples[start], end - start)
-
-            # initialize feature vector for criterion to evaluate
-            # GIL is needed since we are changing the criterion's internal memory
-            with gil:
-                self.criterion.init_feature_vec(Xf)
+            simultaneous_sort(&Xf[start], &samples[start], end - start)
 
             # Evaluate all splits
             self.criterion.reset()
@@ -291,8 +230,7 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
                             (self.criterion.weighted_n_right < min_weight_leaf)):
                         continue
 
-                    current_proxy_improvement = \
-                        self.criterion.proxy_impurity_improvement()
+                    current_proxy_improvement = self.criterion.proxy_impurity_improvement()  # no-cython-lint
 
                     if current_proxy_improvement > best_proxy_improvement:
                         best_proxy_improvement = current_proxy_improvement
@@ -345,3 +283,142 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
         deref(oblique_split).impurity_left = best.impurity_left
         deref(oblique_split).impurity_right = best.impurity_right
         return 0
+
+
+cdef class ObliqueSplitter(BaseObliqueSplitter):
+    def __cinit__(
+        self,
+        Criterion criterion,
+        SIZE_t max_features,
+        SIZE_t min_samples_leaf,
+        double min_weight_leaf,
+        object random_state,
+        double feature_combinations,
+        *argv
+    ):
+        """
+        Parameters
+        ----------
+        criterion : Criterion
+            The criterion to measure the quality of a split.
+
+        max_features : SIZE_t
+            The maximal number of randomly selected features which can be
+            considered for a split.
+
+        min_samples_leaf : SIZE_t
+            The minimal number of samples each leaf can have, where splits
+            which would result in having less samples in a leaf are not
+            considered.
+
+        min_weight_leaf : double
+            The minimal weight each leaf can have, where the weight is the sum
+            of the weights of each sample in it.
+
+        feature_combinations : double
+            The average number of features to combine in an oblique split.
+            Each feature is independently included with probability
+            ``feature_combination`` / ``n_features``.
+
+        random_state : object
+            The user inputted random state to be used for pseudo-randomness
+        """
+        # Oblique tree parameters
+        self.feature_combinations = feature_combinations
+
+        # or max w/ 1...
+        self.n_non_zeros = max(int(self.max_features * self.feature_combinations), 1)
+
+    def __getstate__(self):
+        return {}
+
+    def __setstate__(self, d):
+        pass
+
+    cdef int init(
+        self,
+        object X,
+        const DOUBLE_t[:, ::1] y,
+        const DOUBLE_t[:] sample_weight
+    ) except -1:
+        Splitter.init(self, X, y, sample_weight)
+
+        self.X = X
+
+        # create a helper array for allowing efficient Fisher-Yates
+        self.indices_to_sample = np.arange(self.max_features * self.n_features,
+                                           dtype=np.intp)
+        return 0
+
+
+cdef class BestObliqueSplitter(ObliqueSplitter):
+    def __reduce__(self):
+        """Enable pickling the splitter."""
+        return (BestObliqueSplitter,
+                (
+                    self.criterion,
+                    self.max_features,
+                    self.min_samples_leaf,
+                    self.min_weight_leaf,
+                    self.feature_combinations,
+                    self.random_state
+                ), self.__getstate__())
+
+    cdef void sample_proj_mat(
+        self,
+        vector[vector[DTYPE_t]]& proj_mat_weights,
+        vector[vector[SIZE_t]]& proj_mat_indices
+    ) nogil:
+        """Sample oblique projection matrix.
+
+        Randomly sample features to put in randomly sampled projection vectors
+        weight = 1 or -1 with probability 0.5.
+
+        Note: vectors are passed by value, so & is needed to pass by reference.
+
+        Parameters
+        ----------
+        proj_mat_weights : vector of vectors reference
+            The memory address of projection matrix non-zero weights.
+        proj_mat_indices : vector of vectors reference
+            The memory address of projection matrix non-zero indices.
+
+        Notes
+        -----
+        Note that grid_size must be larger than or equal to n_non_zeros because
+        it is assumed ``feature_combinations`` is forced to be smaller than ``n_features``
+        before instantiating an oblique splitter.
+        """
+
+        cdef SIZE_t n_features = self.n_features
+        cdef SIZE_t n_non_zeros = self.n_non_zeros
+        cdef UINT32_t* random_state = &self.rand_r_state
+
+        cdef int i, feat_i, proj_i, rand_vec_index
+        cdef DTYPE_t weight
+
+        # construct an array to sample from mTry x n_features set of indices
+        cdef SIZE_t[::1] indices_to_sample = self.indices_to_sample
+        cdef SIZE_t grid_size = self.max_features * self.n_features
+
+        # shuffle indices over the 2D grid to sample using Fisher-Yates
+        for i in range(0, grid_size):
+            j = rand_int(0, grid_size - i, random_state)
+            indices_to_sample[j], indices_to_sample[i] = \
+                indices_to_sample[i], indices_to_sample[j]
+
+        # sample 'n_non_zeros' in a mtry X n_features projection matrix
+        # which consists of +/- 1's chosen at a 1/2s rate
+        for i in range(0, n_non_zeros):
+            # get the next index from the shuffled index array
+            rand_vec_index = indices_to_sample[i]
+
+            # get the projection index and feature index
+            proj_i = rand_vec_index // n_features
+            feat_i = rand_vec_index % n_features
+
+            # sample a random weight
+            weight = 1 if (rand_int(0, 2, random_state) == 1) else -1
+
+            proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
+            proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero

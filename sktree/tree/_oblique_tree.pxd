@@ -1,10 +1,12 @@
 # distutils: language = c++
 
 # Authors: Adam Li <adam2392@gmail.com>
+#          Chester Huynh <chester.huynh924@gmail.com>
+#          Parth Vora <pvora4@jhu.edu>
 #
 # License: BSD 3 clause
 
-# See _unsup_oblique_tree.pyx for details.
+# See _oblique_tree.pyx for details.
 
 import numpy as np
 
@@ -16,13 +18,12 @@ from sklearn.tree._tree cimport DTYPE_t  # Type of X
 from sklearn.tree._tree cimport INT32_t  # Signed 32 bit integer
 from sklearn.tree._tree cimport SIZE_t  # Type for indices and counters
 from sklearn.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
-from sklearn.tree._tree cimport Node
+from sklearn.tree._tree cimport Node, Tree, TreeBuilder
 
 from ._oblique_splitter cimport ObliqueSplitRecord
-from ._unsup_tree cimport UnsupervisedTree
 
 
-cdef class UnsupervisedObliqueTree(UnsupervisedTree):
+cdef class ObliqueTree(Tree):
     cdef vector[vector[DTYPE_t]] proj_vec_weights # (capacity, n_features) array of projection vectors
     cdef vector[vector[SIZE_t]] proj_vec_indices  # (capacity, n_features) array of projection vectors
 

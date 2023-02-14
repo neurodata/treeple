@@ -56,7 +56,6 @@ commands:
             echo 'export DISPLAY=:99' >> $BASH_ENV
             echo 'BASH_ENV:'
             cat $BASH_ENV
-
   merge:
     steps:
       - run:
@@ -115,7 +114,7 @@ jobs:
           paths:
             - .
 
-  docs-build:
+  build_docs:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -167,7 +166,7 @@ jobs:
 
       - add_ssh_keys:
           fingerprints:
-            - "d6:88:6b:a0:80:bf:14:8e:80:2e:ed:11:52:26:37:68"
+            - "57:39:99:f3:09:80:6a:70:ca:c0:2a:06:14:16:ce:60"
 
       - run:
           # push built docs into the `dev` directory on the `gh-pages` branch
@@ -190,12 +189,12 @@ workflows:
   commit:
     jobs:
       - build_scikit-tree
-      - docs-build:
+      - build_docs:
           requires:
             - build_scikit-tree
       - docs-deploy:
           requires:
-            - docs-build
+            - build_docs
           filters:
             branches:
               only: main

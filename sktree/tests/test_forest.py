@@ -4,9 +4,22 @@ from sklearn.cluster import AgglomerativeClustering
 from sklearn.datasets import make_blobs
 from sklearn.metrics import adjusted_rand_score
 from sklearn.utils.estimator_checks import parametrize_with_checks
+from sklearn import datasets
 
 from sktree import UnsupervisedObliqueRandomForest, UnsupervisedRandomForest
 
+CLUSTER_CRITERIONS = ("twomeans", "fastbic")
+
+FOREST_CLUSTERS = {
+    "UnsupervisedRandomForest": UnsupervisedRandomForest,
+}
+
+# load iris dataset
+iris = datasets.load_iris()
+rng = np.random.RandomState(1)
+perm = rng.permutation(iris.target.size)
+iris.data = iris.data[perm]
+iris.target = iris.target[perm]
 
 @parametrize_with_checks(
     [
@@ -62,6 +75,22 @@ def test_urf(CLF_NAME, ESTIMATOR):
     predict_labels = cluster.fit_predict(sim_mat)
     score = adjusted_rand_score(y, predict_labels)
 
-    # XXX: This should be > 0.9 according to the UReRF. Hoewver, that could be because they used
+    # XXX: This should be > 0.9 according to the UReRF. However, that could be because they used
     # the oblique projections by default
     assert score > expected_score
+
+
+def check_iris_criterion(name, criterion):
+    # Check consistency on dataset iris.
+    ForestCluster = FOREST_CLUSTERS[name]
+    n_classes = 3
+    est = ForestCluster(criterion=criterion, random_state=12345)
+    est.fit(iris.data, iris.target)
+    sim_mat = est.affinity_matrix_
+
+    cluster = AgglomerativeClustering(n_clusters=n_classes).fit(sim_mat)
+    predict_labels = cluster.fit_predict(sim_mat)
+    score = adjusted_rand_score(iris.target, predict_labels)
+
+    # Two-means and fastBIC criterions perform similarly here
+    assert score > 0.2, "Failed with criterion %s and score = %f" % (criterion, score)

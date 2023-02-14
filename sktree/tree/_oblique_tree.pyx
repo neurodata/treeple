@@ -3,10 +3,12 @@
 # cython: wraparound=False
 
 # Authors: Adam Li <adam2392@gmail.com>
+#          Chester Huynh <chester.huynh924@gmail.com>
+#          Parth Vora <pvora4@jhu.edu>
 #
 # License: BSD 3 clause
 
-from libc.stdint cimport SIZE_MAX
+from libc.stdint cimport INTPTR_MAX
 from libc.string cimport memcpy, memset
 
 import numpy as np
@@ -18,12 +20,12 @@ cnp.import_array()
 from scipy.sparse import csr_matrix, issparse
 
 from cython.operator cimport dereference as deref
-from sklearn.tree._utils cimport safe_realloc
+from sklearn.tree._utils cimport safe_realloc, sizet_ptr_to_ndarray
 
 
 # Gets Node dtype exposed inside oblique_tree.
 # See "_tree.pyx" for more details.
-cdef Node dummy;
+cdef Node dummy;  # no-cython-lint
 NODE_DTYPE = np.asarray(<Node[:1]>(&dummy)).dtype
 
 # Mitigate precision differences between 32 bit and 64 bit
@@ -33,7 +35,7 @@ cdef DTYPE_t FEATURE_THRESHOLD = 1e-7
 # ObliqueTree
 # =============================================================================
 
-cdef class UnsupervisedObliqueTree(UnsupervisedTree):
+cdef class ObliqueTree(Tree):
     """Array-based representation of a binary oblique decision tree.
 
     The oblique decision tree is represented as a number of parallel arrays. The i-th
@@ -87,11 +89,25 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
         weighted_n_node_samples[i] holds the weighted number of training samples
         reaching node i.
     """
-    def __cinit__(self, int n_features):
+    def __cinit__(
+        self,
+        int n_features,
+        cnp.ndarray[SIZE_t, ndim=1] n_classes,
+        int n_outputs
+    ):
         """Constructor."""
         # Input/Output layout
         self.n_features = n_features
-        self.value_stride = 1
+        self.n_outputs = n_outputs
+        self.n_classes = NULL
+        safe_realloc(&self.n_classes, n_outputs)
+
+        self.max_n_classes = np.max(n_classes)
+        self.value_stride = n_outputs * self.max_n_classes
+
+        cdef SIZE_t k
+        for k in range(n_outputs):
+            self.n_classes[k] = n_classes[k]
 
         # Inner structures
         self.max_depth = 0
@@ -105,7 +121,11 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
 
     def __reduce__(self):
         """Reduce re-implementation, for pickling."""
-        return (UnsupervisedObliqueTree, (self.n_features,), self.__getstate__())
+        return (ObliqueTree, (
+            self.n_features,
+            sizet_ptr_to_ndarray(self.n_classes, self.n_outputs),
+            self.n_outputs
+        ), self.__getstate__())
 
     def __getstate__(self):
         """Getstate re-implementation, for pickling."""
@@ -132,7 +152,9 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
         node_ndarray = d['nodes']
         value_ndarray = d['values']
 
-        value_shape = (node_ndarray.shape[0],)
+        value_shape = (node_ndarray.shape[0],
+                       self.n_outputs,
+                       self.max_n_classes)
         if (node_ndarray.ndim != 1 or
                 node_ndarray.dtype != NODE_DTYPE or
                 not node_ndarray.flags.c_contiguous or
@@ -156,14 +178,16 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
                 self.proj_vec_weights[i].push_back(weight)
                 self.proj_vec_indices[i].push_back(j)
 
-        nodes = memcpy(self.nodes, (<cnp.ndarray> node_ndarray).data,
+        nodes = memcpy(self.nodes,
+                       (<cnp.ndarray> node_ndarray).data,
                        self.capacity * sizeof(Node))
-        value = memcpy(self.value, (<cnp.ndarray> value_ndarray).data,
+        value = memcpy(self.value,
+                       (<cnp.ndarray> value_ndarray).data,
                        self.capacity * self.value_stride * sizeof(double))
 
     cpdef cnp.ndarray get_projection_matrix(self):
         """Get the projection matrix of shape (node_count, n_features)."""
-        proj_vecs = np.zeros((self.node_count, self.n_features))
+        proj_vecs = np.zeros((self.node_count, self.n_features), dtype=np.float64)
         for i in range(0, self.node_count):
             for j in range(0, self.proj_vec_weights[i].size()):
                 weight = self.proj_vec_weights[i][j]
@@ -171,7 +195,7 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
                 proj_vecs[i, feat] = weight
         return proj_vecs
 
-    cdef int _resize_c(self, SIZE_t capacity=SIZE_MAX) nogil except -1:
+    cdef int _resize_c(self, SIZE_t capacity=INTPTR_MAX) nogil except -1:
         """Guts of _resize.
 
         Additionally resizes the projection indices and weights.
@@ -182,7 +206,7 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
         if capacity == self.capacity and self.nodes != NULL:
             return 0
 
-        if capacity == SIZE_MAX:
+        if capacity == INTPTR_MAX:
             if self.capacity == 0:
                 capacity = 3  # default initial value
             else:
@@ -192,8 +216,8 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
         safe_realloc(&self.value, capacity * self.value_stride)
 
         # only thing added for oblique trees
-        # TODO: this could possibly be removed if we can add projection indices and
-        # weights to Node
+        # TODO: this could possibly be removed if we can add projection indices
+        # and weights to Node
         self.proj_vec_weights.resize(capacity)
         self.proj_vec_indices.resize(capacity)
 
@@ -213,8 +237,7 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
         """Set node data.
         """
         # Cython type cast split record into its inherited split record
-        # For reference, see:
-        # https://www.codementor.io/@arpitbhayani/powering-inheritance-in-c-using-structure-composition-176sygr724
+        # For reference, see: https://www.codementor.io/@arpitbhayani/powering-inheritance-in-c-using-structure-composition-176sygr724
         cdef ObliqueSplitRecord* oblique_split_node = <ObliqueSplitRecord*>(split_node)
         cdef SIZE_t node_id = self.node_count
 
@@ -223,8 +246,8 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
 
         # oblique trees store the projection indices and weights
         # inside the tree itself
-        self.proj_vec_weights[node_id] = deref(deref(oblique_split_node).proj_vec_weights)  # no-cython-lint
-        self.proj_vec_indices[node_id] = deref(deref(oblique_split_node).proj_vec_indices)  # no-cython-lint
+        self.proj_vec_weights[node_id] = deref(deref(oblique_split_node).proj_vec_weights)
+        self.proj_vec_indices[node_id] = deref(deref(oblique_split_node).proj_vec_indices)
         return 1
 
     cdef DTYPE_t _compute_feature(
