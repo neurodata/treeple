@@ -35,9 +35,6 @@ from ._unsup_tree import (  # type: ignore
 DTYPE = _sklearn_tree.DTYPE
 DOUBLE = _sklearn_tree.DOUBLE
 
-CRITERIA = {"twomeans": _unsup_criterion.TwoMeans,
-            "fastbic": _unsup_criterion.FastBIC
-
 CRITERIA_CLF = {
     "gini": _criterion.Gini,
     "log_loss": _criterion.Entropy,
@@ -59,7 +56,7 @@ PATCH_DENSE_SPLITTERS = {
     "best": _morf_splitter.BestPatchSplitter,
 }
 
-UNSUPERVISED_CRITERIA = {"twomeans": _unsup_criterion.TwoMeans}
+UNSUPERVISED_CRITERIA = {"twomeans": _unsup_criterion.TwoMeans, "fastbic": _unsup_criterion.FastBIC}
 UNSUPERVISED_SPLITTERS = {
     "best": _unsup_splitter.BestUnsupervisedSplitter,
 }
@@ -523,8 +520,8 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
                 self.max_features_,
                 min_samples_leaf,
                 min_weight_leaf,
-                self.feature_combinations,
                 random_state,
+                self.feature_combinations,
             )
 
         self.tree_ = UnsupervisedObliqueTree(self.n_features_in_)

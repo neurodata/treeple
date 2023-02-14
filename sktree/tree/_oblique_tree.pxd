@@ -45,7 +45,7 @@ cdef class ObliqueTree(Tree):
     ) nogil
     cdef void _compute_feature_importances(
         self,
-        DOUBLE_t* importance_data,
+        cnp.float64_t[:] importances,
         Node* node
     ) nogil
 

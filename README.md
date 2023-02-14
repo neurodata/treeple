@@ -10,18 +10,25 @@ scikit-tree
 scikit-tree is a scikit-learn compatible API for building state-of-the-art decision trees. These include unsupervised trees, oblique trees, uncertainty trees, quantile trees and causal trees.
 
 We welcome contributions for modern tree-based algorithms. We use Cython to achieve fast C/C++ speeds, while abiding by a scikit-learn compatible (tested) API. Moreover, our Cython internals are easily extensible because they follow the internal Cython API
-of scikit-learn as well.
+of scikit-learn as well. 
 
-History of oblique trees
-========================
-In 2001, Leo Breiman proposed two types of Random Forests. One was known as ``Forest-RI``, which is the axis-aligned traditional random forest. One was known as ``Forest-RC``, which is the random oblique linear combinations random forest. This leveraged random combinations of features to perform splits. [MORF](1) builds upon ``Forest-RC`` by proposing additional functions to combine features.
+**Dependency on a fork of scikit-learn**
+Due to the current state of scikit-learn's internal Cython code for trees, we have to instead leverage a maintained fork of scikit-learn at https://github.com/neurodata/scikit-learn, where specifically, the `tree-featuresv2` branch is used to build and install this repo. We keep that fork well-maintained and up-to-date with respect to the main sklearn repo. The only difference is the refactoring of the `tree/` submodule.
+
+Currently, scikit-tree depends on a refactored fork of the scikit-learn codebase at https://github.com/neurodata/scikit-learn/, which will be maintained to not diverge from the upstream scikit-learn. Within this fork though, we will maintain a refactoring of the `tree/` submodule that more easily allows 3rd party trees to take advantage of the Cython and Python APIs. You will need to download scikit-learn from this fork following the installation instructions.
+
+Documentation
+=============
+
+See here for the documentation for our dev version: https://docs.neurodata.io/scikit-tree/dev/index.html
+
+Why oblique trees and why trees beyond those in scikit-learn?
+=============================================================
+In 2001, Leo Breiman proposed two types of Random Forests. One was known as ``Forest-RI``, which is the axis-aligned traditional random forest. One was known as ``Forest-RC``, which is the random oblique linear combinations random forest. This leveraged random combinations of features to perform splits. [MORF](1) builds upon ``Forest-RC`` by proposing additional functions to combine features. Other modern tree variants such as Canonical Correlation Forests (CCF), or unsupervised random forests are also important at solving real-world problems using robust decision tree models.
 
 Installation
 ------------
 Our installation will try to follow scikit-learn installation as close as possible, as we contain Cython code subclassed, or inspired by the scikit-learn tree submodule.
-
-**Dependency on a fork of scikit-learn**
-Currently, scikit-tree depends on a refactored fork of the scikit-learn codebase at https://github.com/neurodata/scikit-learn/, which will be maintained to not diverge from the upstream scikit-learn. Within this fork though, we will maintain a refactoring of the `tree/` submodule that more easily allows 3rd party trees to take advantage of the Cython and Python APIs. You will need to download scikit-learn from this fork following the installation instructions.
 
 AS OF NOW, scikit-tree is in development stage and the installation is still finicky due to the upstream scikit-learn's stalled refactoring PRs of the tree submodule. Once those
 are merged, the installation will be simpler. The current recommended installation is done locally with meson.
@@ -68,6 +75,9 @@ You can also do the same thing using the ``dev.py`` CLI:
 
     # run specific unit tests
     ./dev.py test -- sktree/tree/tests/test_tree.py
+
+    # you can bring up the CLI menu
+    ./dev.py --help
 
 References
 ----------

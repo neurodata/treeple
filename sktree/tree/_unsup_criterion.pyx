@@ -424,7 +424,7 @@ cdef class FastBIC(TwoMeans):
     \hat{\mu} = \frac{1}{s}\sum_{n\le s}{x_n},
     \hat{\sigma}^2 = \frac{1}{s}\sum_{n\le s}{||x_n-\hat{\mu_j}||^2}
 
-    Fast-BIC is gauranteed to obtain the global maximum likelihood estimator,
+    Fast-BIC is guaranteed to obtain the global maximum likelihood estimator,
     where as the Mclust-BIC is liable to find only a local maximum. Additionally,
     Fast-BIC is substantially faster than the traditional BIC method.
 

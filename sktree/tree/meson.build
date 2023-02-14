@@ -17,7 +17,7 @@ foreach ext: extensions
     include_directories: [incdir_numpy],
     # override_options : ['cython_language=cpp'],
     install: true,
-    subdir: 'sktree/tree'
+    subdir: 'sktree/tree',
   )
 endforeach
 

@@ -1,14 +1,16 @@
+import joblib
 import numpy as np
 import pytest
+from numpy.testing import assert_almost_equal, assert_array_almost_equal, assert_array_equal
 from sklearn import datasets
+from sklearn.base import is_classifier
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.datasets import make_blobs
 from sklearn.metrics import accuracy_score, adjusted_rand_score
 from sklearn.model_selection import cross_val_score
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree._tree import TREE_LEAF
 from sklearn.utils.estimator_checks import parametrize_with_checks
-from itertools import product, chain
-from sklearn import datasets
 
 from sktree.tree import (
     ObliqueDecisionTreeClassifier,
@@ -24,7 +26,63 @@ TREE_CLUSTERS = {
     "UnsupervisedObliqueDecisionTree": UnsupervisedObliqueDecisionTree,
 }
 
-# load iris dataset
+X_small = np.array(
+    [
+        [0, 0, 4, 0, 0, 0, 1, -14, 0, -4, 0, 0, 0, 0],
+        [0, 0, 5, 3, 0, -4, 0, 0, 1, -5, 0.2, 0, 4, 1],
+        [-1, -1, 0, 0, -4.5, 0, 0, 2.1, 1, 0, 0, -4.5, 0, 1],
+        [-1, -1, 0, -1.2, 0, 0, 0, 0, 0, 0, 0.2, 0, 0, 1],
+        [-1, -1, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 1],
+        [-1, -2, 0, 4, -3, 10, 4, 0, -3.2, 0, 4, 3, -4, 1],
+        [2.11, 0, -6, -0.5, 0, 11, 0, 0, -3.2, 6, 0.5, 0, -3, 1],
+        [2.11, 0, -6, -0.5, 0, 11, 0, 0, -3.2, 6, 0, 0, -2, 1],
+        [2.11, 8, -6, -0.5, 0, 11, 0, 0, -3.2, 6, 0, 0, -2, 1],
+        [2.11, 8, -6, -0.5, 0, 11, 0, 0, -3.2, 6, 0.5, 0, -1, 0],
+        [2, 8, 5, 1, 0.5, -4, 10, 0, 1, -5, 3, 0, 2, 0],
+        [2, 0, 1, 1, 1, -1, 1, 0, 0, -2, 3, 0, 1, 0],
+        [2, 0, 1, 2, 3, -1, 10, 2, 0, -1, 1, 2, 2, 0],
+        [1, 1, 0, 2, 2, -1, 1, 2, 0, -5, 1, 2, 3, 0],
+        [3, 1, 0, 3, 0, -4, 10, 0, 1, -5, 3, 0, 3, 1],
+        [2.11, 8, -6, -0.5, 0, 1, 0, 0, -3.2, 6, 0.5, 0, -3, 1],
+        [2.11, 8, -6, -0.5, 0, 1, 0, 0, -3.2, 6, 1.5, 1, -1, -1],
+        [2.11, 8, -6, -0.5, 0, 10, 0, 0, -3.2, 6, 0.5, 0, -1, -1],
+        [2, 0, 5, 1, 0.5, -2, 10, 0, 1, -5, 3, 1, 0, -1],
+        [2, 0, 1, 1, 1, -2, 1, 0, 0, -2, 0, 0, 0, 1],
+        [2, 1, 1, 1, 2, -1, 10, 2, 0, -1, 0, 2, 1, 1],
+        [1, 1, 0, 0, 1, -3, 1, 2, 0, -5, 1, 2, 1, 1],
+        [3, 1, 0, 1, 0, -4, 1, 0, 1, -2, 0, 0, 1, 0],
+    ]
+)
+
+y_small = [1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0]
+y_small_reg = [
+    1.0,
+    2.1,
+    1.2,
+    0.05,
+    10,
+    2.4,
+    3.1,
+    1.01,
+    0.01,
+    2.98,
+    3.1,
+    1.1,
+    0.0,
+    1.2,
+    2,
+    11,
+    0,
+    0,
+    4.5,
+    0.201,
+    1.06,
+    0.9,
+    0,
+]
+
+# also load the iris dataset
+# and randomly permute it
 iris = datasets.load_iris()
 rng = np.random.RandomState(1)
 perm = rng.permutation(iris.target.size)
@@ -38,6 +96,35 @@ digits.data = digits.data[perm]
 digits.target = digits.target[perm]
 
 
+def assert_tree_equal(d, s, message):
+    assert s.node_count == d.node_count, "{0}: inequal number of node ({1} != {2})".format(
+        message, s.node_count, d.node_count
+    )
+
+    assert_array_equal(d.children_right, s.children_right, message + ": inequal children_right")
+    assert_array_equal(d.children_left, s.children_left, message + ": inequal children_left")
+
+    external = d.children_right == TREE_LEAF
+    internal = np.logical_not(external)
+
+    assert_array_equal(d.feature[internal], s.feature[internal], message + ": inequal features")
+    assert_array_equal(
+        d.threshold[internal], s.threshold[internal], message + ": inequal threshold"
+    )
+    assert_array_equal(
+        d.n_node_samples.sum(),
+        s.n_node_samples.sum(),
+        message + ": inequal sum(n_node_samples)",
+    )
+    assert_array_equal(d.n_node_samples, s.n_node_samples, message + ": inequal n_node_samples")
+
+    assert_almost_equal(d.impurity, s.impurity, err_msg=message + ": inequal impurity")
+
+    assert_array_almost_equal(
+        d.value[external], s.value[external], err_msg=message + ": inequal value"
+    )
+
+
 @parametrize_with_checks(
     [
         ObliqueDecisionTreeClassifier(random_state=12),
@@ -45,13 +132,6 @@ digits.target = digits.target[perm]
     ]
 )
 def test_sklearn_compatible_estimator(estimator, check):
-    # TODO: investigate why this is the case, but not for oblique decision trees
-    if isinstance(estimator, PatchObliqueDecisionTreeClassifier) and check.func.__name__ in [
-        "check_methods_subset_invariance",
-        "check_methods_sample_order_invariance",
-    ]:
-        pytest.skip()
-
     # TODO: remove when we implement Regressor classes
     if check.func.__name__ in ["check_requires_y_none"]:
         pytest.skip()
@@ -84,9 +164,9 @@ def check_simulation(name, Tree, criterion):
     n_classes = 2
     X, y = make_blobs(n_samples=n_samples, centers=n_classes, n_features=6, random_state=1234)
 
-    est = Tree(criterion, random_state=1234)
+    est = Tree(criterion=criterion, random_state=1234)
     est.fit(X)
-    sim_mat = clf.affinity_matrix_
+    sim_mat = est.affinity_matrix_
 
     # all ones along the diagonal
     assert np.array_equal(sim_mat.diagonal(), np.ones(n_samples))
@@ -96,9 +176,9 @@ def check_simulation(name, Tree, criterion):
     score = adjusted_rand_score(y, predict_labels)
 
     # a single decision tree does not fit well, but should still have a positive score
-    assert score > 0.05, "Failed with {0}, criterion = {1} and score = {2}".format(
-    name, criterion, score)
-    assert score >= 0.0
+    assert score >= 0.0, "Blobs failed with {0}, criterion = {1} and score = {2}".format(
+        name, criterion, score
+    )
 
 
 def check_iris(name, Tree, criterion):
@@ -113,8 +193,9 @@ def check_iris(name, Tree, criterion):
     score = adjusted_rand_score(iris.target, predict_labels)
 
     # Two-means and fastBIC criterions doesn't perform well
-    assert score > -0.01, "Failed with {0}, criterion = {1} and score = {2}".format(
-    name, criterion, score)
+    assert score > -0.01, "Iris failed with {0}, criterion = {1} and score = {2}".format(
+        name, criterion, score
+    )
 
 
 @pytest.mark.parametrize("name,Tree", TREE_CLUSTERS.items())
@@ -306,3 +387,30 @@ def test_patch_tree_compared():
     print(oblique_tree_score)
     print(patch_tree_score)
     assert np.mean(cross_val_score(clf, X, y, scoring="accuracy", cv=2)) > 0.7
+
+
+@pytest.mark.parametrize(
+    "TREE",
+    [ObliqueDecisionTreeClassifier, UnsupervisedDecisionTree, UnsupervisedObliqueDecisionTree],
+)
+def test_tree_deserialization_from_read_only_buffer(tmpdir, TREE):
+    """Check that Trees can be deserialized with read only buffers.
+
+    Non-regression test for gh-25584.
+    """
+    pickle_path = str(tmpdir.join("clf.joblib"))
+    clf = TREE(random_state=0)
+
+    if is_classifier(TREE):
+        clf.fit(X_small, y_small)
+    else:
+        clf.fit(X_small)
+
+    joblib.dump(clf, pickle_path)
+    loaded_clf = joblib.load(pickle_path, mmap_mode="r")
+
+    assert_tree_equal(
+        loaded_clf.tree_,
+        clf.tree_,
+        "The trees of the original and loaded classifiers are not equal.",
+    )

@@ -1,10 +1,10 @@
 import numpy as np
 import pytest
+from sklearn import datasets
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.datasets import make_blobs
 from sklearn.metrics import adjusted_rand_score
 from sklearn.utils.estimator_checks import parametrize_with_checks
-from sklearn import datasets
 
 from sktree import UnsupervisedObliqueRandomForest, UnsupervisedRandomForest
 
@@ -20,6 +20,7 @@ rng = np.random.RandomState(1)
 perm = rng.permutation(iris.target.size)
 iris.data = iris.data[perm]
 iris.target = iris.target[perm]
+
 
 @parametrize_with_checks(
     [

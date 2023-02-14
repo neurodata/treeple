@@ -156,14 +156,14 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
                 self.proj_vec_weights[i].push_back(weight)
                 self.proj_vec_indices[i].push_back(j)
 
-        nodes = memcpy(self.nodes, (<cnp.ndarray> node_ndarray).data,
+        nodes = memcpy(self.nodes, cnp.PyArray_DATA(node_ndarray),
                        self.capacity * sizeof(Node))
-        value = memcpy(self.value, (<cnp.ndarray> value_ndarray).data,
+        value = memcpy(self.value, cnp.PyArray_DATA(value_ndarray),
                        self.capacity * self.value_stride * sizeof(double))
 
     cpdef cnp.ndarray get_projection_matrix(self):
         """Get the projection matrix of shape (node_count, n_features)."""
-        proj_vecs = np.zeros((self.node_count, self.n_features))
+        proj_vecs = np.zeros((self.node_count, self.n_features), dtype=np.float64)
         for i in range(0, self.node_count):
             for j in range(0, self.proj_vec_weights[i].size()):
                 weight = self.proj_vec_weights[i][j]
@@ -223,8 +223,12 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
 
         # oblique trees store the projection indices and weights
         # inside the tree itself
-        self.proj_vec_weights[node_id] = deref(deref(oblique_split_node).proj_vec_weights)  # no-cython-lint
-        self.proj_vec_indices[node_id] = deref(deref(oblique_split_node).proj_vec_indices)  # no-cython-lint
+        self.proj_vec_weights[node_id] = deref(
+            deref(oblique_split_node).proj_vec_weights
+        )
+        self.proj_vec_indices[node_id] = deref(
+            deref(oblique_split_node).proj_vec_indices
+        )
         return 1
 
     cdef DTYPE_t _compute_feature(
@@ -263,7 +267,7 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
 
     cdef void _compute_feature_importances(
         self,
-        DOUBLE_t* importance_data,
+        cnp.float64_t[:] importances,
         Node* node
     ) nogil:
         """Compute feature importances from a Node in the Tree.
@@ -289,7 +293,7 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
             if weight < 0:
                 weight *= -1
 
-            importance_data[feature_index] += weight * (
+            importances[feature_index] += weight * (
                 node.weighted_n_node_samples * node.impurity -
                 left.weighted_n_node_samples * left.impurity -
                 right.weighted_n_node_samples * right.impurity)
