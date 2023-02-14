@@ -176,11 +176,9 @@ cdef class ObliqueTree(Tree):
                 self.proj_vec_weights[i].push_back(weight)
                 self.proj_vec_indices[i].push_back(j)
 
-        cdef Node[::1] node_memory_view = node_ndarray
-        cdef DOUBLE_t[:, :, ::1] value_memory_view = value_ndarray
-        nodes = memcpy(self.nodes, &node_memory_view[0],
+        nodes = memcpy(self.nodes, cnp.PyArray_DATA(node_ndarray),
                        self.capacity * sizeof(Node))
-        value = memcpy(self.value, &value_memory_view[0, 0, 0],
+        value = memcpy(self.value, cnp.PyArray_DATA(value_ndarray),
                        self.capacity * self.value_stride * sizeof(double))
 
     cpdef cnp.ndarray get_projection_matrix(self):
