@@ -496,9 +496,15 @@
 <span class="sd">        - If float, then draw `max_samples * X.shape[0]` samples. Thus,</span>
 <span class="sd">          `max_samples` should be in the interval `(0.0, 1.0]`.</span>
 
-<span class="sd">    feature_combinations : float, default=1.5</span>
+<span class="sd">    feature_combinations : float, default=None</span>
 <span class="sd">        The number of features to combine on average at each split</span>
-<span class="sd">        of the decision trees.</span>
+<span class="sd">        of the decision trees. If ``None``, then will default to the minimum of</span>
+<span class="sd">        ``(1.5, n_features)``. This controls the number of non-zeros is the</span>
+<span class="sd">        projection matrix. Setting the value to 1.0 is equivalent to a</span>
+<span class="sd">        traditional decision-tree. ``feature_combinations * max_features``</span>
+<span class="sd">        gives the number of expected non-zeros in the projection matrix of shape</span>
+<span class="sd">        ``(max_features, n_features)``. Thus this value must always be less than</span>
+<span class="sd">        ``n_features`` in order to be valid.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -625,7 +631,7 @@
         <span class="n">warm_start</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">class_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">max_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">feature_combinations</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+        <span class="n">feature_combinations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">estimator</span><span class="o">=</span><span class="n">ObliqueDecisionTreeClassifier</span><span class="p">(),</span>
@@ -945,7 +951,7 @@
         <span class="n">min_patch_height</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">max_patch_height</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">min_patch_width</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">max_patch_width</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">max_patch_width</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">data_height</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">data_width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
@@ -962,7 +968,6 @@
                 <span class="s2">&quot;max_leaf_nodes&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;min_impurity_decrease&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;random_state&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;feature_combinations&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;min_patch_height&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;max_patch_height&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;min_patch_width&quot;</span><span class="p">,</span>
@@ -1053,7 +1058,7 @@
     
 <p class="copyright">
 
-    &copy; Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-02-09.<br>
+    &copy; Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-02-14.<br>
 
 </p>
 
