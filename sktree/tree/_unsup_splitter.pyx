@@ -163,12 +163,12 @@ cdef class UnsupervisedSplitter(BaseSplitter):
         self.criterion.node_value(dest)
 
     cdef double node_impurity(self) nogil:
-        """Return the impurity of the current node."""
+        """Return the impurity of the current_split node."""
 
         return self.criterion.node_impurity()
 
 cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
-    """Split in a best-first fashion.
+    """Split in a best_split-first fashion.
     """
     cdef int node_split(
         self,
@@ -176,7 +176,7 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
         SplitRecord* split,
         SIZE_t* n_constant_features
     ) nogil except -1:
-        """Find the best split on node samples[start:end].
+        """Find the best_split split on node samples[start:end].
 
         This is a placeholder method. The majority of computation will be done
         here.
@@ -188,7 +188,7 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
         exactly as is. We cannot inherit until scikit-learn enables this functions to
         be cimportable.
         """
-        # Find the best split
+        # Find the best_split split
         cdef SIZE_t[::1] samples = self.samples
         cdef SIZE_t start = self.start
         cdef SIZE_t end = self.end
@@ -205,7 +205,7 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
         # XXX: maybe need to rename to something else
         cdef double min_weight_leaf = self.min_weight_leaf
 
-        cdef SplitRecord best, current
+        cdef SplitRecord best_split, current_split
         cdef double current_proxy_improvement = -INFINITY
         cdef double best_proxy_improvement = -INFINITY
 
@@ -224,7 +224,7 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
         cdef SIZE_t n_total_constants = n_known_constants
         cdef SIZE_t partition_end
 
-        _init_split(&best, end)
+        _init_split(&best_split, end)
 
         # Sample up to max_features without replacement using a
         # Fisher-Yates-based algorithm (using the local variables `f_i` and
@@ -269,14 +269,14 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
             # f_j in the interval [n_known_constants, f_i - n_found_constants[
             f_j += n_found_constants
             # f_j in the interval [n_total_constants, f_i[
-            current.feature = features[f_j]
+            current_split.feature = features[f_j]
 
             # Sort samples along that feature; by
             # copying the values into an array and
             # sorting the array in a manner which utilizes the cache more
             # effectively.
             for i in range(start, end):
-                Xf[i] = self.X[samples[i], current.feature]
+                Xf[i] = self.X[samples[i], current_split.feature]
 
             sort(&Xf[start], &samples[start], end - start)
 
@@ -304,23 +304,23 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
                 while p + 1 < end and Xf[p + 1] <= Xf[p] + FEATURE_THRESHOLD:
                     p += 1
 
-                # (p + 1 >= end) or (X[samples[p + 1], current.feature] >
-                #                    X[samples[p], current.feature])
+                # (p + 1 >= end) or (X[samples[p + 1], current_split.feature] >
+                #                    X[samples[p], current_split.feature])
                 p += 1
-                # (p >= end) or (X[samples[p], current.feature] >
-                #                X[samples[p - 1], current.feature])
+                # (p >= end) or (X[samples[p], current_split.feature] >
+                #                X[samples[p - 1], current_split.feature])
 
                 if p >= end:
                     continue
 
-                current.pos = p
+                current_split.pos = p
 
                 # Reject if min_samples_leaf is not guaranteed
-                if (((current.pos - start) < min_samples_leaf) or
-                        ((end - current.pos) < min_samples_leaf)):
+                if (((current_split.pos - start) < min_samples_leaf) or
+                        ((end - current_split.pos) < min_samples_leaf)):
                     continue
 
-                self.criterion.update(current.pos)
+                self.criterion.update(current_split.pos)
 
                 # Reject if min_weight_leaf is not satisfied
                 if ((self.criterion.weighted_n_left < min_weight_leaf) or
@@ -332,24 +332,24 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
                 if current_proxy_improvement > best_proxy_improvement:
                     best_proxy_improvement = current_proxy_improvement
                     # sum of halves is used to avoid infinite value
-                    current.threshold = Xf[p - 1] / 2.0 + Xf[p] / 2.0
+                    current_split.threshold = Xf[p - 1] / 2.0 + Xf[p] / 2.0
 
                     if (
-                        current.threshold == Xf[p] or
-                        current.threshold == INFINITY or
-                        current.threshold == -INFINITY
+                        current_split.threshold == Xf[p] or
+                        current_split.threshold == INFINITY or
+                        current_split.threshold == -INFINITY
                     ):
-                        current.threshold = Xf[p - 1]
+                        current_split.threshold = Xf[p - 1]
 
-                    best = current  # copy
+                    best_split = current_split  # copy
 
-        # Reorganize into samples[start:best.pos] + samples[best.pos:end]
-        if best.pos < end:
+        # Reorganize into samples[start:best_split.pos] + samples[best_split.pos:end]
+        if best_split.pos < end:
             partition_end = end
             p = start
 
             while p < partition_end:
-                if self.X[samples[p], best.feature] <= best.threshold:
+                if self.X[samples[p], best_split.feature] <= best_split.threshold:
                     p += 1
 
                 else:
@@ -359,11 +359,11 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
                         samples[partition_end], samples[p]
 
             self.criterion.reset()
-            self.criterion.update(best.pos)
-            self.criterion.children_impurity(&best.impurity_left,
-                                             &best.impurity_right)
-            best.improvement = self.criterion.impurity_improvement(
-                impurity, best.impurity_left, best.impurity_right)
+            self.criterion.update(best_split.pos)
+            self.criterion.children_impurity(&best_split.impurity_left,
+                                             &best_split.impurity_right)
+            best_split.improvement = self.criterion.impurity_improvement(
+                impurity, best_split.impurity_left, best_split.impurity_right)
 
         # Respect invariant for constant features: the original order of
         # element in features[:n_known_constants] must be preserved for sibling
@@ -376,6 +376,6 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
                sizeof(SIZE_t) * n_found_constants)
 
         # Return values
-        split[0] = best
+        split[0] = best_split
         n_constant_features[0] = n_total_constants
         return 0

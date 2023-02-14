@@ -124,8 +124,8 @@ cdef class ObliqueTree(Tree):
         return (ObliqueTree, (
             self.n_features,
             sizet_ptr_to_ndarray(self.n_classes, self.n_outputs),
-            self.n_outputs
-        ), self.__getstate__())
+            self.n_outputs), self.__getstate__()
+            )
 
     def __getstate__(self):
         """Getstate re-implementation, for pickling."""
@@ -152,9 +152,7 @@ cdef class ObliqueTree(Tree):
         node_ndarray = d['nodes']
         value_ndarray = d['values']
 
-        value_shape = (node_ndarray.shape[0],
-                       self.n_outputs,
-                       self.max_n_classes)
+        value_shape = (node_ndarray.shape[0], self.n_outputs, self.max_n_classes)
         if (node_ndarray.ndim != 1 or
                 node_ndarray.dtype != NODE_DTYPE or
                 not node_ndarray.flags.c_contiguous or
@@ -178,11 +176,9 @@ cdef class ObliqueTree(Tree):
                 self.proj_vec_weights[i].push_back(weight)
                 self.proj_vec_indices[i].push_back(j)
 
-        nodes = memcpy(self.nodes,
-                       (<cnp.ndarray> node_ndarray).data,
+        nodes = memcpy(self.nodes, cnp.PyArray_DATA(node_ndarray),
                        self.capacity * sizeof(Node))
-        value = memcpy(self.value,
-                       (<cnp.ndarray> value_ndarray).data,
+        value = memcpy(self.value, cnp.PyArray_DATA(value_ndarray),
                        self.capacity * self.value_stride * sizeof(double))
 
     cpdef cnp.ndarray get_projection_matrix(self):
@@ -216,8 +212,8 @@ cdef class ObliqueTree(Tree):
         safe_realloc(&self.value, capacity * self.value_stride)
 
         # only thing added for oblique trees
-        # TODO: this could possibly be removed if we can add projection indices
-        # and weights to Node
+        # TODO: this could possibly be removed if we can add projection
+        # indices and weights to Node
         self.proj_vec_weights.resize(capacity)
         self.proj_vec_indices.resize(capacity)
 
@@ -237,7 +233,8 @@ cdef class ObliqueTree(Tree):
         """Set node data.
         """
         # Cython type cast split record into its inherited split record
-        # For reference, see: https://www.codementor.io/@arpitbhayani/powering-inheritance-in-c-using-structure-composition-176sygr724
+        # For reference, see: 
+        # https://www.codementor.io/@arpitbhayani/powering-inheritance-in-c-using-structure-composition-176sygr724
         cdef ObliqueSplitRecord* oblique_split_node = <ObliqueSplitRecord*>(split_node)
         cdef SIZE_t node_id = self.node_count
 
@@ -246,8 +243,12 @@ cdef class ObliqueTree(Tree):
 
         # oblique trees store the projection indices and weights
         # inside the tree itself
-        self.proj_vec_weights[node_id] = deref(deref(oblique_split_node).proj_vec_weights)
-        self.proj_vec_indices[node_id] = deref(deref(oblique_split_node).proj_vec_indices)
+        self.proj_vec_weights[node_id] = deref(
+            deref(oblique_split_node).proj_vec_weights
+        )
+        self.proj_vec_indices[node_id] = deref(
+            deref(oblique_split_node).proj_vec_indices
+        )
         return 1
 
     cdef DTYPE_t _compute_feature(
@@ -263,7 +264,7 @@ cdef class ObliqueTree(Tree):
         """
         cdef DTYPE_t proj_feat = 0.0
         cdef DTYPE_t weight = 0.0
-        cdef SIZE_t j = 0
+        cdef int j = 0
         cdef SIZE_t feature_index
 
         # get the index of the node
@@ -278,7 +279,7 @@ cdef class ObliqueTree(Tree):
             weight = self.proj_vec_weights[node_id][j]
 
             # skip a multiplication step if there is nothing to be done
-            if weight == 0:
+            if weight == 0.0:
                 continue
             proj_feat += X_ndarray[sample_index, feature_index] * weight
 
@@ -286,7 +287,7 @@ cdef class ObliqueTree(Tree):
 
     cdef void _compute_feature_importances(
         self,
-        DOUBLE_t* importance_data,
+        cnp.float64_t[:] importances,
         Node* node
     ) nogil:
         """Compute feature importances from a Node in the Tree.
@@ -312,7 +313,7 @@ cdef class ObliqueTree(Tree):
             if weight < 0:
                 weight *= -1
 
-            importance_data[feature_index] += weight * (
+            importances[feature_index] += weight * (
                 node.weighted_n_node_samples * node.impurity -
                 left.weighted_n_node_samples * left.impurity -
                 right.weighted_n_node_samples * right.impurity)
