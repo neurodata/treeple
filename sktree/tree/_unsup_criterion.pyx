@@ -1,7 +1,5 @@
 #cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
 
-import numpy as np
-
 cimport numpy as cnp
 from libc.math cimport log
 
@@ -406,7 +404,7 @@ cdef class TwoMeans(UnsupervisedCriterion):
 cdef class FastBIC(TwoMeans):
     r"""Fast-BIC split criterion
     
-    The Bayesian Information Criterion (BIC) is a popular model selection 
+    The Bayesian Information Criterion (BIC) is a popular model seleciton 
     criteria that is based on the log likelihood of the model given data.
 
     Fast-BIC is a method that combines the speed of the two-means clustering 
@@ -465,7 +463,7 @@ cdef class FastBIC(TwoMeans):
         ) / self.weighted_n_node_samples
 
         # simplified equation of maximum log likelihood function at s=0
-        impurity = n_node_samples * log(2 * sig / mean)
+        impurity = n_node_samples*log(2*sig/mean)
 
         return impurity
 
