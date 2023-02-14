@@ -6,7 +6,7 @@ from sklearn.metrics import adjusted_rand_score
 from sklearn.utils.estimator_checks import parametrize_with_checks
 from sklearn import datasets
 
-from sktree import UnsupervisedRandomForest
+from sktree import UnsupervisedObliqueRandomForest, UnsupervisedRandomForest
 
 CLUSTER_CRITERIONS = ("twomeans", "fastbic")
 
@@ -24,6 +24,7 @@ iris.target = iris.target[perm]
 @parametrize_with_checks(
     [
         UnsupervisedRandomForest(random_state=12345, n_estimators=50),
+        UnsupervisedObliqueRandomForest(random_state=12345, n_estimators=50),
     ]
 )
 def test_sklearn_compatible_estimator(estimator, check):
@@ -39,16 +40,33 @@ def test_sklearn_compatible_estimator(estimator, check):
     check(estimator)
 
 
-def check_simulation_criterion(name, criterion):
+@pytest.mark.parametrize(
+    "CLF_NAME, ESTIMATOR",
+    [
+        ("UnsupervisedRandomForest", UnsupervisedRandomForest),
+        ("UnsupervisedObliqueRandomForest", UnsupervisedObliqueRandomForest),
+    ],
+)
+def test_urf(CLF_NAME, ESTIMATOR):
     n_samples = 100
     n_classes = 2
-    ForestCluster = FOREST_CLUSTERS[name]
-    X, y = make_blobs(n_samples=n_samples, centers=n_classes, n_features=2, random_state=2**4)
 
-    est = ForestCluster(criterion=criterion, random_state=12345)
+    #
+    if CLF_NAME == "UnsupervisedRandomForest":
+        n_features = 5
+        n_estimators = 50
+        expected_score = 0.4
+    else:
+        n_features = 20
+        n_estimators = 20
+        expected_score = 0.9
+    X, y = make_blobs(
+        n_samples=n_samples, centers=n_classes, n_features=n_features, random_state=12345
+    )
 
-    est.fit(X)
-    sim_mat = est.affinity_matrix_
+    clf = ESTIMATOR(n_estimators=n_estimators, random_state=12345)
+    clf.fit(X)
+    sim_mat = clf.affinity_matrix_
 
     # all ones along the diagonal
     assert np.array_equal(sim_mat.diagonal(), np.ones(n_samples))
@@ -59,8 +77,7 @@ def check_simulation_criterion(name, criterion):
 
     # XXX: This should be > 0.9 according to the UReRF. However, that could be because they used
     # the oblique projections by default
-
-    assert score > 0.6
+    assert score > expected_score
 
 
 def check_iris_criterion(name, criterion):
@@ -77,11 +94,3 @@ def check_iris_criterion(name, criterion):
 
     # Two-means and fastBIC criterions perform similarly here
     assert score > 0.2, "Failed with criterion %s and score = %f" % (criterion, score)
-
-
-@pytest.mark.parametrize("name", FOREST_CLUSTERS)
-@pytest.mark.parametrize("criterion", CLUSTER_CRITERIONS)
-def test_clusters(name, criterion):
-    check_simulation_criterion(name, criterion)
-    check_iris_criterion(name, criterion)
-

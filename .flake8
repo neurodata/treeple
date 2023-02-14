@@ -8,6 +8,7 @@ ignore =
     # line break before binary operator
     W503
     E241,E305,W504,W605,E731
+    E402
 
 exclude =
     .git
@@ -23,6 +24,9 @@ exclude =
     docs/generated
     docs/auto_examples
     validation
+    build
+    build-install 
+    dist
 
 per-file-ignores =
     # __init__.py files are allowed to have unused imports

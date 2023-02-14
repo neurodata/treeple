@@ -1,4 +1,5 @@
-#cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
+# cython: language_level=3
+# cython: boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
 
 import numpy as np
 
@@ -35,7 +36,7 @@ cdef class UnsupervisedSplitter(BaseSplitter):
 
     def __cinit__(self, UnsupervisedCriterion criterion, SIZE_t max_features,
                   SIZE_t min_samples_leaf, double min_weight_leaf,
-                  object random_state):
+                  object random_state, *argv):
         """
         Parameters
         ----------
