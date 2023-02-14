@@ -45,10 +45,10 @@ def check_simulation_criterion(name, criterion):
     ForestCluster = FOREST_CLUSTERS[name]
     X, y = make_blobs(n_samples=n_samples, centers=n_classes, n_features=2, random_state=2**4)
 
-    clf = ForestCluster(criterion=criterion, random_state=12345)
+    est = ForestCluster(criterion=criterion, random_state=12345)
 
-    clf.fit(X)
-    sim_mat = clf.affinity_matrix_
+    est.fit(X)
+    sim_mat = est.affinity_matrix_
 
     # all ones along the diagonal
     assert np.array_equal(sim_mat.diagonal(), np.ones(n_samples))
@@ -67,9 +67,9 @@ def check_iris_criterion(name, criterion):
     # Check consistency on dataset iris.
     ForestCluster = FOREST_CLUSTERS[name]
     n_classes = 3
-    clf = ForestCluster(criterion=criterion, random_state=12345)
-    clf.fit(iris.data, iris.target)
-    sim_mat = clf.affinity_matrix_
+    est = ForestCluster(criterion=criterion, random_state=12345)
+    est.fit(iris.data, iris.target)
+    sim_mat = est.affinity_matrix_
 
     cluster = AgglomerativeClustering(n_clusters=n_classes).fit(sim_mat)
     predict_labels = cluster.fit_predict(sim_mat)
