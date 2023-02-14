@@ -57,7 +57,7 @@ cdef class UnsupervisedTree(BaseTree):
     ) nogil
     cdef void _compute_feature_importances(
         self,
-        DOUBLE_t* importance_data,
+        cnp.float64_t[:] importance_data,
         Node* node
     ) nogil
     

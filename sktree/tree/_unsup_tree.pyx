@@ -771,7 +771,7 @@ cdef class UnsupervisedTree:
 
     cdef void _compute_feature_importances(
         self,
-        DOUBLE_t* importance_data,
+        cnp.float64_t[:] importance_data,
         Node* node
     ) nogil:
         """Compute feature importances from a Node in the Tree.
