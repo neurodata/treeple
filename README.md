@@ -47,9 +47,24 @@ Make sure you have the necessary packages installed
     conda install -c conda-forge numpy scipy cython joblib threadpoolctl pytest compilers llvm-openmp
 
     # make sure we have our fork of scikit-learn
-    pip install scikit-learn@git+ssh://git@github.com/neurodata/scikit-learn.git@tree-featuresv2
+    pip install scikit-learn@git+https://git@github.com/neurodata/scikit-learn.git@tree-featuresv2
 
-Run the following to build the local files
+We use the ``dev.py`` CLI to abstract away build details:
+
+    # run the build using Meson/Ninja
+    ./dev.py build
+
+    # you will need to double check the build-install has the proper path 
+    # this might be different from machine to machine
+    export PYTHONPATH=${PWD}/build-install/usr/lib/python3.9/site-packages
+
+    # run specific unit tests
+    ./dev.py test -- sktree/tree/tests/test_tree.py
+
+    # you can bring up the CLI menu
+    ./dev.py --help
+
+You can also do the same thing using Meson/Ninja itself. Run the following to build the local files:
 
     # generate ninja make files
     meson build --prefix=$PWD/build
@@ -66,21 +81,6 @@ Run the following to build the local files
     cd docs;  
     python -c "from sktree import tree"
     python -c "import sklearn; print(sklearn.__version__);"
-
-You can also do the same thing using the ``dev.py`` CLI:
-
-    # run the build using Meson/Ninja
-    ./dev.py build
-
-    # you will need to double check the build-install has the proper path 
-    # this might be different from machine to machine
-    export PYTHONPATH=${PWD}/build-install/usr/lib/python3.9/site-packages
-
-    # run specific unit tests
-    ./dev.py test -- sktree/tree/tests/test_tree.py
-
-    # you can bring up the CLI menu
-    ./dev.py --help
 
 References
 ----------
