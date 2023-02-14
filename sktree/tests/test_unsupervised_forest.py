@@ -12,6 +12,7 @@ CLUSTER_CRITERIONS = ("twomeans", "fastbic")
 
 FOREST_CLUSTERS = {
     "UnsupervisedRandomForest": UnsupervisedRandomForest,
+    "UnsupervisedObliqueRandomForest": UnsupervisedObliqueRandomForest,
 }
 
 # load iris dataset
@@ -41,19 +42,14 @@ def test_sklearn_compatible_estimator(estimator, check):
     check(estimator)
 
 
-@pytest.mark.parametrize(
-    "CLF_NAME, ESTIMATOR",
-    [
-        ("UnsupervisedRandomForest", UnsupervisedRandomForest),
-        ("UnsupervisedObliqueRandomForest", UnsupervisedObliqueRandomForest),
-    ],
-)
-def test_urf(CLF_NAME, ESTIMATOR):
+@pytest.mark.parametrize("name, tree", FOREST_CLUSTERS.items())
+@pytest.mark.parametrize("criterion", CLUSTER_CRITERIONS)
+def test_check_simulation(name, tree, criterion):
     n_samples = 100
     n_classes = 2
 
     #
-    if CLF_NAME == "UnsupervisedRandomForest":
+    if name == "UnsupervisedRandomForest":
         n_features = 5
         n_estimators = 50
         expected_score = 0.4
@@ -65,7 +61,7 @@ def test_urf(CLF_NAME, ESTIMATOR):
         n_samples=n_samples, centers=n_classes, n_features=n_features, random_state=12345
     )
 
-    clf = ESTIMATOR(n_estimators=n_estimators, random_state=12345)
+    clf = tree(n_estimators=n_estimators, criterion=criterion, random_state=12345)
     clf.fit(X)
     sim_mat = clf.affinity_matrix_
 
@@ -78,14 +74,17 @@ def test_urf(CLF_NAME, ESTIMATOR):
 
     # XXX: This should be > 0.9 according to the UReRF. However, that could be because they used
     # the oblique projections by default
-    assert score > expected_score
+    assert (
+        score > expected_score
+    ), f"{name}-blobs failed with criterion {criterion} and score = {score}"
 
 
-def check_iris_criterion(name, criterion):
+@pytest.mark.parametrize("name, tree", FOREST_CLUSTERS.items())
+@pytest.mark.parametrize("criterion", CLUSTER_CRITERIONS)
+def test_check_iris(name, tree, criterion):
     # Check consistency on dataset iris.
-    ForestCluster = FOREST_CLUSTERS[name]
     n_classes = 3
-    est = ForestCluster(criterion=criterion, random_state=12345)
+    est = tree(criterion=criterion, random_state=12345)
     est.fit(iris.data, iris.target)
     sim_mat = est.affinity_matrix_
 
@@ -94,4 +93,4 @@ def check_iris_criterion(name, criterion):
     score = adjusted_rand_score(iris.target, predict_labels)
 
     # Two-means and fastBIC criterions perform similarly here
-    assert score > 0.2, "Failed with criterion %s and score = %f" % (criterion, score)
+    assert score > 0.2, f"{name}-iris failed with criterion {criterion} and score = {score}"

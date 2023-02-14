@@ -159,7 +159,9 @@ def test_sklearn_compatible_transformer(estimator, check):
     check(estimator)
 
 
-def check_simulation(name, Tree, criterion):
+@pytest.mark.parametrize("name,Tree", TREE_CLUSTERS.items())
+@pytest.mark.parametrize("criterion", CLUSTER_CRITERIONS)
+def test_check_simulation(name, Tree, criterion):
     n_samples = 10
     n_classes = 2
     X, y = make_blobs(n_samples=n_samples, centers=n_classes, n_features=6, random_state=1234)
@@ -176,12 +178,14 @@ def check_simulation(name, Tree, criterion):
     score = adjusted_rand_score(y, predict_labels)
 
     # a single decision tree does not fit well, but should still have a positive score
-    assert score >= 0.0, "Blobs failed with {0}, criterion = {1} and score = {2}".format(
+    assert score >= 0.05, "Blobs failed with {0}, criterion = {1} and score = {2}".format(
         name, criterion, score
     )
 
 
-def check_iris(name, Tree, criterion):
+@pytest.mark.parametrize("name,Tree", TREE_CLUSTERS.items())
+@pytest.mark.parametrize("criterion", CLUSTER_CRITERIONS)
+def test_check_iris(name, Tree, criterion):
     # Check consistency on dataset iris.
     n_classes = 3
     est = Tree(criterion=criterion, random_state=12345)
@@ -193,16 +197,9 @@ def check_iris(name, Tree, criterion):
     score = adjusted_rand_score(iris.target, predict_labels)
 
     # Two-means and fastBIC criterions doesn't perform well
-    assert score > -0.01, "Iris failed with {0}, criterion = {1} and score = {2}".format(
+    assert score > 0.01, "Iris failed with {0}, criterion = {1} and score = {2}".format(
         name, criterion, score
     )
-
-
-@pytest.mark.parametrize("name,Tree", TREE_CLUSTERS.items())
-@pytest.mark.parametrize("criterion", CLUSTER_CRITERIONS)
-def test_trees(name, Tree, criterion):
-    check_simulation(name, Tree, criterion)
-    check_iris(name, Tree, criterion)
 
 
 def test_oblique_tree_sampling():
