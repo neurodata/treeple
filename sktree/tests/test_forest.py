@@ -14,8 +14,7 @@ FOREST_CLUSTERS = {
     "UnsupervisedRandomForest": UnsupervisedRandomForest,
 }
 
-# also load the iris dataset
-# and randomly permute it
+# load iris dataset
 iris = datasets.load_iris()
 rng = np.random.RandomState(1)
 perm = rng.permutation(iris.target.size)
@@ -38,7 +37,6 @@ def test_sklearn_compatible_estimator(estimator, check):
     ]:
         pytest.skip()
     check(estimator)
-
 
 
 def check_simulation_criterion(name, criterion):

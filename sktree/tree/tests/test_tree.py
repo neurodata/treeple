@@ -15,8 +15,7 @@ TREE_CLUSTERS = {
     "UnsupervisedDecisionTree": UnsupervisedDecisionTree,
 }
 
-# also load the iris dataset
-# and randomly permute it
+# load iris dataset
 iris = datasets.load_iris()
 rng = np.random.RandomState(1)
 perm = rng.permutation(iris.target.size)
