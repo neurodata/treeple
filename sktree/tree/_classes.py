@@ -24,7 +24,9 @@ from sktree.tree._unsup_tree import (  # type: ignore
 DTYPE = _sklearn_tree.DTYPE
 DOUBLE = _sklearn_tree.DOUBLE
 
-CRITERIA = {"twomeans": _unsup_criterion.TwoMeans}
+CRITERIA = {"twomeans": _unsup_criterion.TwoMeans,
+            "fastbic": _unsup_criterion.FastBIC
+}
 
 SPLITTERS = {
     "best": _unsup_splitter.BestUnsupervisedSplitter,

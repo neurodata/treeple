@@ -8,7 +8,7 @@ from sklearn import datasets
 
 from sktree import UnsupervisedRandomForest
 
-CLF_CRITERIONS = ("twomeans", "fastbic")
+CLUSTER_CRITERIONS = ("twomeans", "fastbic")
 
 FOREST_CLUSTERS = {
     "UnsupervisedRandomForest": UnsupervisedRandomForest,
@@ -82,7 +82,7 @@ def check_iris_criterion(name, criterion):
 
 
 @pytest.mark.parametrize("name", FOREST_CLUSTERS)
-@pytest.mark.parametrize("criterion", ("twomeans", "fastbic"))
+@pytest.mark.parametrize("criterion", CLUSTER_CRITERIONS)
 def test_clusters(name, criterion):
     check_simulation_criterion(name, criterion)
     check_iris_criterion(name, criterion)
