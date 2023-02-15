@@ -464,7 +464,7 @@ cdef class FastBIC(TwoMeans):
         ) / self.weighted_n_node_samples
 
         # simplified equation of maximum log likelihood function at s=0
-        impurity = n_node_samples*log(2*sig/mean)
+        impurity = n_node_samples*log(mean/2*sig)/2
 
         return impurity
 
@@ -523,8 +523,8 @@ cdef class FastBIC(TwoMeans):
             mean_right
         ) / self.weighted_n_right
 
-        left_term = log(2*p_l*sig_left/mean_left)
-        right_term = log(2*p_r*sig_right/mean_right)
+        left_term = log(mean_left/2*p_l*sig_left)/2
+        right_term = log(mean_right/2*p_r*sig_right)/2
 
         # simplified equation of maximum log likelihood function 
         # at corresponding sample size for left and right child
