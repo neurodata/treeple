@@ -501,7 +501,7 @@ cdef class FastBIC(TwoMeans):
 
         # number of samples of left and right
         s_l = pos - start
-        s_r = end - pos
+        s_r = end - s_l
 
         # compute prior (i.e. \hat{\pi_1} and \hat{\pi_2} in the paper)
         p_l = s_l / self.n_node_samples
