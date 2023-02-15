@@ -9,13 +9,16 @@ scikit-tree
 
 scikit-tree is a scikit-learn compatible API for building state-of-the-art decision trees. These include unsupervised trees, oblique trees, uncertainty trees, quantile trees and causal trees.
 
-We welcome contributions for modern tree-based algorithms. We use Cython to achieve fast C/C++ speeds, while abiding by a scikit-learn compatible (tested) API. Moreover, our Cython internals are easily extensible because they follow the internal Cython API
-of scikit-learn as well. 
+We welcome contributions for modern tree-based algorithms. We use Cython to achieve fast C/C++ speeds, while abiding by a scikit-learn compatible (tested) API. Moreover, our Cython internals are easily extensible because they follow the internal Cython API of scikit-learn as well.
 
 **Dependency on a fork of scikit-learn**
 Due to the current state of scikit-learn's internal Cython code for trees, we have to instead leverage a maintained fork of scikit-learn at https://github.com/neurodata/scikit-learn, where specifically, the `tree-featuresv2` branch is used to build and install this repo. We keep that fork well-maintained and up-to-date with respect to the main sklearn repo. The only difference is the refactoring of the `tree/` submodule.
 
 Currently, scikit-tree depends on a refactored fork of the scikit-learn codebase at https://github.com/neurodata/scikit-learn/, which will be maintained to not diverge from the upstream scikit-learn. Within this fork though, we will maintain a refactoring of the `tree/` submodule that more easily allows 3rd party trees to take advantage of the Cython and Python APIs. You will need to download scikit-learn from this fork following the installation instructions.
+
+If you are developing for scikit-tree, we will always depend on the most up-to-date commit of `https://github.com/neurodata/scikit-learn/tree-featuresv2`. This branch is consistently maintained for changes upstream that occur in the scikit-learn tree submodule. This ensures that our fork maintains consistency and robustness due to bug fixes and improvements upstream. Thus if you are developing and contributing for scikit-tree, then you should clone the fork and pip install the latest commit of `https://github.com/neurodata/scikit-learn/tree-featuresv2`.
+
+On the other hand, releases of scikit-tree will occur simultaneously with a tagged version of https://github.com/neurodata/scikit-learn/ (for example https://github.com/neurodata/scikit-learn/v1.1-refactoredtrees), which will then install a tagged version of the sklearn fork. This ensures that any releases of scikit-tree always work, but will not be necessarily forwards/backwards compatible with `https://github.com/neurodata/scikit-learn/tree-featuresv2`.
 
 Documentation
 =============
@@ -41,12 +44,36 @@ Make sure you have the necessary packages installed
     pip install numpy scipy meson ninja meson-python Cython  # later scikit-learn
 
     # you may need these optional dependencies to build scikit-learn locally
-    conda install -c conda-forge numpy scipy cython joblib threadpoolctl pytest compilers llvm-openmp
+    conda install -c conda-forge joblib threadpoolctl pytest compilers llvm-openmp
 
     # make sure we have our fork of scikit-learn
-    pip install scikit-learn@git+ssh://git@github.com/neurodata/scikit-learn.git@tree-featuresv2
+    pip install scikit-learn@git+https://git@github.com/neurodata/scikit-learn.git@tree-featuresv2
 
-Run the following to build the local files
+We use the ``dev.py`` CLI to abstract away build details:
+
+    # run the build using Meson/Ninja
+    ./dev.py build
+        # you can run the following command to see what other options there are
+        ./dev.py --help
+        ./dev.py build --help
+        
+        # For example, you might want to start from a clean build
+        ./dev.py build --clean
+        
+        # or build in parallel for faster builds
+        ./dev.py build -j 2
+
+    # you will need to double check the build-install has the proper path 
+    # this might be different from machine to machine
+    export PYTHONPATH=${PWD}/build-install/usr/lib/python3.9/site-packages
+
+    # run specific unit tests
+    ./dev.py test -- sktree/tree/tests/test_tree.py
+
+    # you can bring up the CLI menu
+    ./dev.py --help
+
+You can also do the same thing using Meson/Ninja itself. Run the following to build the local files:
 
     # generate ninja make files
     meson build --prefix=$PWD/build
@@ -63,21 +90,6 @@ Run the following to build the local files
     cd docs;  
     python -c "from sktree import tree"
     python -c "import sklearn; print(sklearn.__version__);"
-
-You can also do the same thing using the ``dev.py`` CLI:
-
-    # run the build using Meson/Ninja
-    ./dev.py build
-
-    # you will need to double check the build-install has the proper path 
-    # this might be different from machine to machine
-    export PYTHONPATH=${PWD}/build-install/usr/lib/python3.9/site-packages
-
-    # run specific unit tests
-    ./dev.py test -- sktree/tree/tests/test_tree.py
-
-    # you can bring up the CLI menu
-    ./dev.py --help
 
 References
 ----------
