@@ -44,7 +44,7 @@ Make sure you have the necessary packages installed
     pip install numpy scipy meson ninja meson-python Cython  # later scikit-learn
 
     # you may need these optional dependencies to build scikit-learn locally
-    conda install -c conda-forge numpy scipy cython joblib threadpoolctl pytest compilers llvm-openmp
+    conda install -c conda-forge joblib threadpoolctl pytest compilers llvm-openmp
 
     # make sure we have our fork of scikit-learn
     pip install scikit-learn@git+https://git@github.com/neurodata/scikit-learn.git@tree-featuresv2
@@ -53,6 +53,15 @@ We use the ``dev.py`` CLI to abstract away build details:
 
     # run the build using Meson/Ninja
     ./dev.py build
+        # you can run the following command to see what other options there are
+        ./dev.py --help
+        ./dev.py build --help
+        
+        # For example, you might want to start from a clean build
+        ./dev.py build --clean
+        
+        # or build in parallel for faster builds
+        ./dev.py build -j 2
 
     # you will need to double check the build-install has the proper path 
     # this might be different from machine to machine
