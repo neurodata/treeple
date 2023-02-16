@@ -2,7 +2,7 @@
 #cython: boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
 
 cimport numpy as cnp
-from libc.math cimport log
+from libc.math cimport log, pi
 
 cnp.import_array()
 
@@ -464,7 +464,7 @@ cdef class FastBIC(TwoMeans):
         ) / self.weighted_n_node_samples
 
         # simplified equation of maximum log likelihood function at s=0
-        impurity = n_node_samples*log(mean/2*sig)/2
+        impurity = n_node_samples*log(mean/(2*sig))/2 #negative version
 
         return impurity
 
@@ -498,6 +498,13 @@ cdef class FastBIC(TwoMeans):
         cdef double sig_right
         cdef double left_term
         cdef double right_term
+        cdef double BIC_diff_var_l
+        cdef double BIC_diff_var_r
+        cdef double BIC_same_var_l
+        cdef double BIC_same_var_r
+        cdef double BIC_curr_l
+        cdef double BIC_curr_r
+
 
         # number of samples of left and right
         s_l = pos - start
@@ -523,10 +530,42 @@ cdef class FastBIC(TwoMeans):
             mean_right
         ) / self.weighted_n_right
 
-        left_term = log(mean_left/2*p_l*sig_left)/2
-        right_term = log(mean_right/2*p_r*sig_right)/2
+        sig_comb = sig_left + sig_right
+
+        # positive
+        # left_term = log(2*p_l*sig_left/mean_left)/2
+        # right_term = log(2*p_r*sig_right/mean_right)/2
+
+        # negative
+        # left_term = log(mean_left/(2*p_l*sig_left))/2
+        # right_term = log(mean_right/(2*p_r*sig_right))/2
+
+        # pseudocode
+        # left_term = log(p_l) - log(2*pi*sig_left)/2
+        # right_term = -log(p_r) + log(2*pi*sig_right)/2
+
+        BIC_diff_var_l = -2*(s_l*left_term + s_r*right_term)
+        BIC_diff_var_r = -2*(s_r*left_term + s_l*right_term)
+
+        # positive
+        # left_term = log(2*p_l*sig_comb/mean_left)/2
+        # right_term = log(2*p_r*sig_comb/mean_right)/2
+
+        # negative
+        left_term = log(mean_left/(2*p_l*sig_left))/2
+        right_term = log(mean_right/(2*p_r*sig_right))/2
+
+        # pseudocode
+        # left_term = log(p_l) - log(2*pi*sig_comb)/2
+        # right_term = -log(p_r) + log(2*pi*sig_comb)/2
+
+        BIC_same_var_l = -2*(s_l*left_term + s_r*right_term)
+        BIC_same_var_r = -2*(s_r*left_term + s_l*right_term)
+
+        BIC_curr_l = min(BIC_diff_var_l, BIC_same_var_l)
+        BIC_curr_r = min(BIC_diff_var_r, BIC_same_var_r)
 
         # simplified equation of maximum log likelihood function 
         # at corresponding sample size for left and right child
-        impurity_left[0] = s_l*left_term + s_r*right_term
-        impurity_right[0] = s_r*left_term + s_l*right_term
+        impurity_left[0] = BIC_curr_l#-2*(s_l*left_term + s_r*right_term)
+        impurity_right[0] = BIC_curr_r#-2*(s_r*left_term + s_l*right_term)
