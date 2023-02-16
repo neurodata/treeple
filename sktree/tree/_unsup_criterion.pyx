@@ -464,7 +464,8 @@ cdef class FastBIC(TwoMeans):
         ) / self.weighted_n_node_samples
 
         # simplified equation of maximum log likelihood function at s=0
-        impurity = n_node_samples*log(mean/(2*sig))/2 #negative version
+        impurity = n_node_samples*log(2*sig/mean)/2 #negative version
+        # impurity = n_node_samples*log(mean/(2*sig))/2 #negative version
 
         return impurity
 
@@ -508,7 +509,7 @@ cdef class FastBIC(TwoMeans):
 
         # number of samples of left and right
         s_l = pos - start
-        s_r = end - s_l
+        s_r = end - pos#s_l
 
         # compute prior (i.e. \hat{\pi_1} and \hat{\pi_2} in the paper)
         p_l = s_l / self.n_node_samples
@@ -537,8 +538,8 @@ cdef class FastBIC(TwoMeans):
         # right_term = log(2*p_r*sig_right/mean_right)/2
 
         # negative
-        # left_term = log(mean_left/(2*p_l*sig_left))/2
-        # right_term = log(mean_right/(2*p_r*sig_right))/2
+        left_term = log(mean_left/(2*p_l*sig_left))/2
+        right_term = log(mean_right/(2*p_r*sig_right))/2
 
         # pseudocode
         # left_term = log(p_l) - log(2*pi*sig_left)/2
@@ -552,8 +553,8 @@ cdef class FastBIC(TwoMeans):
         # right_term = log(2*p_r*sig_comb/mean_right)/2
 
         # negative
-        left_term = log(mean_left/(2*p_l*sig_left))/2
-        right_term = log(mean_right/(2*p_r*sig_right))/2
+        left_term = log(mean_left/(2*p_l*sig_comb))/2
+        right_term = log(mean_right/(2*p_r*sig_comb))/2
 
         # pseudocode
         # left_term = log(p_l) - log(2*pi*sig_comb)/2
