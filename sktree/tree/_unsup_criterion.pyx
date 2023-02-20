@@ -465,7 +465,6 @@ cdef class FastBIC(TwoMeans):
 
         # simplified equation of maximum log likelihood function at s=0
         impurity = n_node_samples*log(2*sig/mean)/2 #negative version
-        # impurity = n_node_samples*log(mean/(2*sig))/2 #negative version
 
         return impurity
 
@@ -497,19 +496,14 @@ cdef class FastBIC(TwoMeans):
         cdef double mean_right
         cdef double sig_left
         cdef double sig_right
-        cdef double left_term
-        cdef double right_term
         cdef double BIC_diff_var_l
         cdef double BIC_diff_var_r
         cdef double BIC_same_var_l
         cdef double BIC_same_var_r
-        cdef double BIC_curr_l
-        cdef double BIC_curr_r
-
 
         # number of samples of left and right
         s_l = pos - start
-        s_r = end - pos#s_l
+        s_r = end - pos
 
         # compute prior (i.e. \hat{\pi_1} and \hat{\pi_2} in the paper)
         p_l = s_l / self.n_node_samples
@@ -533,40 +527,17 @@ cdef class FastBIC(TwoMeans):
 
         sig_comb = sig_left + sig_right
 
-        # positive
-        # left_term = log(2*p_l*sig_left/mean_left)/2
-        # right_term = log(2*p_r*sig_right/mean_right)/2
+        # BIC score computed using left and right variances
+        # -2(n_1\log{\hat{w}_1}-\frac{n_1}{2}\log{2\pi\hat{\sigma}_{1}^2} - n_2\log{\hat{w}_2}+\frac{n_2}{2}\log{2\pi\hat{\sigma}_{2}^2})
+        BIC_diff_var_l = -2*(s_l*(log(p_l) - log(2*pi*sig_left)/2) + s_r*(-log(p_r) + log(2*pi*sig_right)/2))
+        BIC_diff_var_r = -2*(s_r*(log(p_l) - log(2*pi*sig_left)/2) + s_l*(-log(p_r) + log(2*pi*sig_right)/2))
 
-        # negative
-        left_term = log(mean_left/(2*p_l*sig_left))/2
-        right_term = log(mean_right/(2*p_r*sig_right))/2
-
-        # pseudocode
-        # left_term = log(p_l) - log(2*pi*sig_left)/2
-        # right_term = -log(p_r) + log(2*pi*sig_right)/2
-
-        BIC_diff_var_l = -2*(s_l*left_term + s_r*right_term)
-        BIC_diff_var_r = -2*(s_r*left_term + s_l*right_term)
-
-        # positive
-        # left_term = log(2*p_l*sig_comb/mean_left)/2
-        # right_term = log(2*p_r*sig_comb/mean_right)/2
-
-        # negative
-        left_term = log(mean_left/(2*p_l*sig_comb))/2
-        right_term = log(mean_right/(2*p_r*sig_comb))/2
-
-        # pseudocode
-        # left_term = log(p_l) - log(2*pi*sig_comb)/2
-        # right_term = -log(p_r) + log(2*pi*sig_comb)/2
-
-        BIC_same_var_l = -2*(s_l*left_term + s_r*right_term)
-        BIC_same_var_r = -2*(s_r*left_term + s_l*right_term)
-
-        BIC_curr_l = min(BIC_diff_var_l, BIC_same_var_l)
-        BIC_curr_r = min(BIC_diff_var_r, BIC_same_var_r)
+        # BIC score computed using combined variances
+        # -2(n_1\log{\hat{w}_1}-\frac{n_1}{2}\log{2\pi\hat{\sigma}_{comb}^2} - n_2\log{\hat{w}_2}+\frac{n_2}{2}\log{2\pi\hat{\sigma}_{comb}^2})
+        BIC_same_var_l = -2*(s_l*(log(p_l) - log(2*pi*sig_comb)/2) + s_r*(-log(p_r) + log(2*pi*sig_comb)/2))
+        BIC_same_var_r = -2*(s_r*(log(p_l) - log(2*pi*sig_comb)/2) + s_l*(-log(p_r) + log(2*pi*sig_comb)/2))
 
         # simplified equation of maximum log likelihood function 
         # at corresponding sample size for left and right child
-        impurity_left[0] = BIC_curr_l#-2*(s_l*left_term + s_r*right_term)
-        impurity_right[0] = BIC_curr_r#-2*(s_r*left_term + s_l*right_term)
+        impurity_left[0] = min(BIC_diff_var_l, BIC_same_var_l)
+        impurity_right[0] = min(BIC_diff_var_r, BIC_same_var_r)
