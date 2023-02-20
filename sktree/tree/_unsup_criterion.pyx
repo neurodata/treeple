@@ -41,7 +41,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
     cdef void init_feature_vec(
         self,
         const DTYPE_t[:] Xf,
-    ) nogil:
+    ) noexcept nogil:
         """Initialize the 1D feature vector, which is used for computing criteria.
 
         This function is used to set a read-only memoryview of a feature
@@ -83,7 +83,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         const DOUBLE_t[:] sample_weight,
         double weighted_n_samples,
         const SIZE_t[:] sample_indices,
-    ) nogil except -1:
+    ) except -1 nogil:
         """Initialize the unsuperivsed criterion.
 
         Returns -1 in case of failure to allocate memory (and raise MemoryError)
@@ -104,7 +104,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
 
         return 0
 
-    cdef int reset(self) nogil except -1:
+    cdef int reset(self) except -1 nogil:
         """Reset the criterion at pos=start.
 
         Returns -1 in case of failure to allocate memory (and raise MemoryError)
@@ -118,7 +118,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         self.sum_right = self.sum_total
         return 0
 
-    cdef int reverse_reset(self) nogil except -1:
+    cdef int reverse_reset(self) except -1 nogil:
         """Reset the criterion at pos=end.
 
         Returns -1 in case of failure to allocate memory (and raise MemoryError)
@@ -135,7 +135,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
     cdef int update(
         self,
         SIZE_t new_pos
-    ) nogil except -1:
+    ) except -1 nogil:
         """Updated statistics by moving sample_indices[pos:new_pos] to the left child.
 
         Returns -1 in case of failure to allocate memory (and raise MemoryError)
@@ -201,7 +201,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
     cdef void node_value(
         self,
         double* dest
-    ) nogil:
+    ) noexcept nogil:
         """Set the node value with sum_total and save it into dest.
 
         Parameters
@@ -267,7 +267,7 @@ cdef class TwoMeans(UnsupervisedCriterion):
         SIZE_t start,
         SIZE_t end,
         double mean,
-    ) nogil:
+    ) noexcept nogil:
         """Computes variance of feature vector from sample_indices[start:end].
 
         See: https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Weighted_sample_variance.  # noqa
@@ -303,7 +303,7 @@ cdef class TwoMeans(UnsupervisedCriterion):
 
     cdef double node_impurity(
         self
-    ) nogil:
+    ) noexcept nogil:
         """Evaluate the impurity of the current node.
 
         Evaluate the TwoMeans criterion impurity as variance of the current node,
@@ -336,7 +336,7 @@ cdef class TwoMeans(UnsupervisedCriterion):
         self,
         double* impurity_left,
         double* impurity_right
-    ) nogil:
+    ) noexcept nogil:
         """Evaluate the impurity in children nodes.
 
         i.e. the impurity of the left child (sample_indices[start:pos]) and the
@@ -380,7 +380,7 @@ cdef class TwoMeans(UnsupervisedCriterion):
         self,
         SIZE_t start,
         SIZE_t end
-    ) nogil:
+    ) noexcept nogil:
         """Set sample pointers in the criterion.
 
         Set given start and end sample_indices. Also will update node statistics,

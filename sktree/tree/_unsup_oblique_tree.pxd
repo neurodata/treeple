@@ -30,7 +30,7 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
     cdef int _resize_c(
         self,
         SIZE_t capacity=*
-    ) nogil except -1
+    ) except -1 nogil
     cdef int _set_split_node(
         self,
         SplitRecord* split_node,
@@ -41,11 +41,11 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
         const DTYPE_t[:, :] X_ndarray,
         SIZE_t sample_index,
         Node *node
-    ) nogil
+    ) noexcept nogil
     cdef void _compute_feature_importances(
         self,
         cnp.float64_t[:] importances,
         Node* node
-    ) nogil
+    ) noexcept nogil
 
     cpdef cnp.ndarray get_projection_matrix(self)

@@ -7,4 +7,4 @@ from sklearn.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
 # This defines c-importable functions for other cython files
 
 # TODO: remove these files when sklearn merges refactor defining these in pxd files
-cdef void sort(DTYPE_t* Xf, SIZE_t* samples, SIZE_t n) nogil
+cdef void sort(DTYPE_t* Xf, SIZE_t* samples, SIZE_t n) noexcept nogil

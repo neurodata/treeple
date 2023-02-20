@@ -53,15 +53,15 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
 
     # Redefined here since the new logic requires calling sample_proj_mat
     cdef int node_reset(self, SIZE_t start, SIZE_t end,
-                        double* weighted_n_node_samples) nogil except -1
+                        double* weighted_n_node_samples) except -1 nogil
                         
     cdef int node_split(self,
                         double impurity,   # Impurity of the node
                         SplitRecord* split,
-                        SIZE_t* n_constant_features) nogil except -1
+                        SIZE_t* n_constant_features) except -1 nogil
     cdef int init(
         self,
         const DTYPE_t[:, :] X,
         const DOUBLE_t[:] sample_weight
     ) except -1
-    cdef int pointer_size(self) nogil
+    cdef int pointer_size(self) noexcept nogil

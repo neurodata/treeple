@@ -27,7 +27,7 @@ cdef DTYPE_t FEATURE_THRESHOLD = 1e-7
 cdef DTYPE_t EXTRACT_NNZ_SWITCH = 0.1
 
 
-cdef inline void _init_split(ObliqueSplitRecord* self, SIZE_t start_pos) nogil:
+cdef inline void _init_split(ObliqueSplitRecord* self, SIZE_t start_pos) noexcept nogil:
     self.impurity_left = INFINITY
     self.impurity_right = INFINITY
     self.pos = start_pos
@@ -120,7 +120,7 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
         return 0
 
     cdef int node_reset(self, SIZE_t start, SIZE_t end,
-                        double* weighted_n_node_samples) nogil except -1:
+                        double* weighted_n_node_samples) except -1 nogil:
         """Reset splitter on node samples[start:end].
 
         Returns -1 in case of failure to allocate memory (and raise MemoryError)
@@ -146,14 +146,14 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
 
     cdef void sample_proj_mat(self,
                               vector[vector[DTYPE_t]]& proj_mat_weights,
-                              vector[vector[SIZE_t]]& proj_mat_indices) nogil:
+                              vector[vector[SIZE_t]]& proj_mat_indices) noexcept nogil:
         """ Sample the projection vector.
 
         This is a placeholder method.
         """
         pass
 
-    cdef int pointer_size(self) nogil:
+    cdef int pointer_size(self) noexcept nogil:
         """Get size of a pointer to record for ObliqueSplitter."""
         return sizeof(ObliqueSplitRecord)
 
@@ -162,7 +162,7 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
     # NOTE: vectors are passed by value, so & is needed to pass by reference
     cdef void sample_proj_mat(self,
                               vector[vector[DTYPE_t]]& proj_mat_weights,
-                              vector[vector[SIZE_t]]& proj_mat_indices) nogil:
+                              vector[vector[SIZE_t]]& proj_mat_indices) noexcept nogil:
         """
         Sparse Oblique Projection matrix.
         Randomly sample features to put in randomly sampled projection vectors
@@ -202,7 +202,7 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
             proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
 
     cdef int node_split(self, double impurity, SplitRecord* split,
-                        SIZE_t* n_constant_features) nogil except -1:
+                        SIZE_t* n_constant_features) except -1 nogil:
         """Find the best_split split on node samples[start:end]
 
         Returns -1 in case of failure to allocate memory (and raise MemoryError)

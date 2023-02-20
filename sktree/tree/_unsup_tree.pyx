@@ -153,7 +153,7 @@ cdef inline bool _compare_records(
 cdef inline void _add_to_frontier(
     FrontierRecord rec,
     vector[FrontierRecord]& frontier,
-) nogil:
+) noexcept nogil:
     """Adds record `rec` to the priority queue `frontier`."""
     frontier.push_back(rec)
     push_heap(frontier.begin(), frontier.end(), &_compare_records)
@@ -298,7 +298,7 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
         Node* parent,
         SIZE_t depth,
         FrontierRecord* res
-    ) nogil except -1:
+    ) except -1 nogil:
         """Adds node w/ partition ``[start, end)`` to the frontier. """
         # initialize record to keep track of split node data and a pointer to the
         # memory address containing the split node
@@ -725,7 +725,7 @@ cdef class UnsupervisedTree(BaseTree):
         self,
         SplitRecord* split_node,
         Node* node
-    ) nogil except -1:
+    ) except -1 nogil:
         """Set split node data.
 
         Parameters
@@ -744,7 +744,7 @@ cdef class UnsupervisedTree(BaseTree):
         self,
         SplitRecord* split_node,
         Node* node
-    ) nogil except -1:
+    ) except -1 nogil:
         """Set leaf node data.
 
         Parameters
@@ -765,7 +765,7 @@ cdef class UnsupervisedTree(BaseTree):
         const DTYPE_t[:, :] X_ndarray,
         SIZE_t sample_index,
         Node *node
-    ) nogil:
+    ) noexcept nogil:
         """Compute feature from a given data matrix, X.
 
         In axis-aligned trees, this is simply the value in the column of X
@@ -779,7 +779,7 @@ cdef class UnsupervisedTree(BaseTree):
         self,
         cnp.float64_t[:] importances,
         Node* node
-    ) nogil:
+    ) noexcept nogil:
         """Compute feature importances from a Node in the Tree.
 
         Wrapped in a private function to allow subclassing that

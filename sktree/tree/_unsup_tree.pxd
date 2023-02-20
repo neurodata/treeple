@@ -43,23 +43,23 @@ cdef class UnsupervisedTree(BaseTree):
         self,
         SplitRecord* split_node,
         Node* node
-    ) nogil except -1
+    ) except -1 nogil
     cdef int _set_leaf_node(
         self,
         SplitRecord* split_node,
         Node* node
-    ) nogil except -1
+    ) except -1 nogil
     cdef DTYPE_t _compute_feature(
         self,
         const DTYPE_t[:, :] X_ndarray,
         SIZE_t sample_index,
         Node *node
-    ) nogil
+    ) noexcept nogil
     cdef void _compute_feature_importances(
         self,
         cnp.float64_t[:] importances,
         Node* node
-    ) nogil
+    ) noexcept nogil
     
 # =============================================================================
 # Tree builder
