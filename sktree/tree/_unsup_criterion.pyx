@@ -464,7 +464,7 @@ cdef class FastBIC(TwoMeans):
         ) / self.weighted_n_node_samples
 
         # simplified equation of maximum log likelihood function at s=0
-        impurity = n_node_samples*log(2*sig/mean)/2 #negative version
+        impurity = -2*(n_node_samples*log(1)-log(2*pi*sig)/2)
 
         return impurity
 
