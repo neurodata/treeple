@@ -3,6 +3,7 @@
 
 cimport numpy as cnp
 from libc.math cimport log, pi
+from libc.stdio cimport printf
 
 cnp.import_array()
 
@@ -488,26 +489,27 @@ cdef class FastBIC(TwoMeans):
         cdef SIZE_t pos = self.pos
         cdef SIZE_t start = self.start
         cdef SIZE_t end = self.end
-        cdef SIZE_t s_l
-        cdef SIZE_t s_r
+        cdef double s_l
+        cdef double s_r
         cdef double p_l
         cdef double p_r
         cdef double mean_left
         cdef double mean_right
         cdef double sig_left
+        cdef double sig_left_pre
         cdef double sig_right
         cdef double BIC_diff_var_l
         cdef double BIC_diff_var_r
-        cdef double BIC_same_var_l
-        cdef double BIC_same_var_r
+        # cdef double BIC_same_var_l
+        # cdef double BIC_same_var_r
 
         # number of samples of left and right
-        s_l = pos - start
-        s_r = end - pos
+        s_l = <double>(pos - start)
+        s_r = <double>(end - pos)
 
         # compute prior (i.e. \hat{\pi_1} and \hat{\pi_2} in the paper)
-        p_l = s_l / self.n_node_samples
-        p_r = s_r / self.n_node_samples
+        p_l = s_l / <double>self.n_node_samples
+        p_r = s_r / <double>self.n_node_samples
 
         # first compute mean of left and right
         mean_left = self.sum_left / self.weighted_n_left
@@ -517,15 +519,15 @@ cdef class FastBIC(TwoMeans):
             start,
             pos,
             mean_left
-        ) / self.weighted_n_left
-
+        )
+        
         sig_right = self.sum_of_squares(
             pos,
             end,
             mean_right
-        ) / self.weighted_n_right
+        )
 
-        sig_comb = sig_left + sig_right
+        sig_comb = (sig_left + sig_right) / (self.weighted_n_left + self.weighted_n_right)
 
         # BIC score computed using left and right variances
         # -2(n_1\log{\hat{w}_1}-\frac{n_1}{2}\log{2\pi\hat{\sigma}_{1}^2} - n_2\log{\hat{w}_2}+\frac{n_2}{2}\log{2\pi\hat{\sigma}_{2}^2})
@@ -541,3 +543,35 @@ cdef class FastBIC(TwoMeans):
         # at corresponding sample size for left and right child
         impurity_left[0] = min(BIC_diff_var_l, BIC_same_var_l)
         impurity_right[0] = min(BIC_diff_var_r, BIC_same_var_r)
+
+        # TESTING BELOW
+
+        # printf("weighted_n_left %f \n", self.weighted_n_left)
+        # printf("sum_left %f \n", self.sum_left)
+        # printf("mean_left %f \n", mean_left)
+        # printf("sig_left  %f \n", sig_left_pre)
+        printf("sig_left  %f \n", sig_left)
+        printf("sig_right  %f \n", sig_right)
+        printf("BIC_diff_left  %f \n", BIC_diff_var_l)
+        printf("BIC_diff_right  %f \n", BIC_diff_var_r)
+        # printf("BIC_same_left  %f \n", BIC_same_var_l)
+        # printf("BIC_same_right  %f \n", BIC_same_var_r)
+        # printf("BIC_diff_left-zu  %f \n", BIC_diff_var_l)
+        # printf("BIC_diff_first_term  %f \n", s_l*(log(p_l) - log(2*pi*sig_left)/2))
+        # printf("BIC_diff_second_term  %f \n", s_r*(-log(p_r) + log(2*pi*sig_right)/2))
+        # printf("n_node_samples-f  %f \n", self.n_node_samples)
+        # printf("n_node_samples-d  %d \n", self.n_node_samples) #int not %f
+        # printf("p_l-d  %d \n", s_l / <int>self.n_node_samples)
+        printf("impurity_left  %f \n", impurity_left)
+        printf("impurity_right  %f \n", impurity_right)
+        # printf("impurity_left_raw  %f \n", min(BIC_diff_var_l, BIC_same_var_l))
+        # printf("impurity_right_raw  %f \n", min(BIC_diff_var_r, BIC_same_var_r))
+        # printf("pos  %zu \n", pos)
+        # printf("start  %zu \n", start)
+        # printf("end  %zu \n", end)
+        # printf("sample_left  %zu \n", s_l)
+        # printf("sample_left-zu  %zu \n", s_l*2)
+        # printf("sample_left-d  %d \n", s_l*2)
+        # printf("prior_left  %f \n", p_l)
+        # printf("log_left  %f \n", log(2*pi*sig_left))
+        printf("\n\n")
