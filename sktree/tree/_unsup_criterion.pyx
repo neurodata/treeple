@@ -529,8 +529,8 @@ cdef class FastBIC(TwoMeans):
 
         sig_comb = (sig_left + sig_right) / (self.weighted_n_left + self.weighted_n_right)
 
-        sig_left =/ self.weighted_n_left
-        sig_right =/ self.weighted_n_right
+        sig_left = sig_left / self.weighted_n_left
+        sig_right = sig_right / self.weighted_n_right
 
         # BIC score computed using left and right variances
         # -2(n_1\log{\hat{w}_1}-\frac{n_1}{2}\log{2\pi\hat{\sigma}_{1}^2} - n_2\log{\hat{w}_2}+\frac{n_2}{2}\log{2\pi\hat{\sigma}_{2}^2})
