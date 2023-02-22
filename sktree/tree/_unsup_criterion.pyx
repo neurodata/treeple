@@ -546,9 +546,6 @@ cdef class FastBIC(TwoMeans):
 
         # simplified equation of maximum log likelihood function 
         # at corresponding sample size for left and right child
-        # impurity_left[0] = min(BIC_diff_var_l, BIC_same_var_l)
-        # impurity_right[0] = min(BIC_diff_var_r, BIC_same_var_r)
-
         if BIC_diff_var_l - BIC_diff_var_r < BIC_same_var_l - BIC_same_var_r:
             impurity_left[0] = BIC_diff_var_l
             impurity_right[0] = BIC_diff_var_r
