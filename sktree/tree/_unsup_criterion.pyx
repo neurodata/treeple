@@ -558,8 +558,8 @@ cdef class FastBIC(TwoMeans):
         printf("sig_comb  %f \n", sig_comb)
         printf("BIC_diff  %f \n", BIC_diff_var)
         printf("BIC_same  %f \n", BIC_same_var)
-        printf("impurity_left  %f \n", impurity_left)
-        printf("impurity_right  %f \n", impurity_right)
+        printf("impurity_left  %f \n", impurity_left[0])
+        printf("impurity_right  %f \n", impurity_right[0])
         printf("\n\n")
 
         # printf("BIC_diff_left-zu  %f \n", BIC_diff_var_l)
