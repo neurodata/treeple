@@ -498,10 +498,8 @@ cdef class FastBIC(TwoMeans):
         cdef double sig_left
         cdef double sig_left_pre
         cdef double sig_right
-        cdef double BIC_diff_var_l
-        cdef double BIC_diff_var_r
-        # cdef double BIC_same_var_l
-        # cdef double BIC_same_var_r
+        cdef double BIC_diff_var
+        cdef double BIC_same_var
 
         # number of samples of left and right
         s_l = <double>(pos - start)
@@ -534,18 +532,16 @@ cdef class FastBIC(TwoMeans):
 
         # BIC score computed using left and right variances
         # -2(n_1\log{\hat{w}_1}-\frac{n_1}{2}\log{2\pi\hat{\sigma}_{1}^2} - n_2\log{\hat{w}_2}+\frac{n_2}{2}\log{2\pi\hat{\sigma}_{2}^2})
-        BIC_diff_var_l = -2*(s_l*(log(p_l) - log(2*pi*sig_left)/2) + s_r*(-log(p_r) + log(2*pi*sig_right)/2))
-        BIC_diff_var_r = -2*(s_r*(log(p_l) - log(2*pi*sig_left)/2) + s_l*(-log(p_r) + log(2*pi*sig_right)/2))
+        BIC_diff_var = -2*(s_l*(log(p_l) - log(2*pi*sig_left)/2) + s_r*(-log(p_r) + log(2*pi*sig_right)/2))
 
         # BIC score computed using combined variances
         # -2(n_1\log{\hat{w}_1}-\frac{n_1}{2}\log{2\pi\hat{\sigma}_{comb}^2} - n_2\log{\hat{w}_2}+\frac{n_2}{2}\log{2\pi\hat{\sigma}_{comb}^2})
-        BIC_same_var_l = -2*(s_l*(log(p_l) - log(2*pi*sig_comb)/2) + s_r*(-log(p_r) + log(2*pi*sig_comb)/2))
-        BIC_same_var_r = -2*(s_r*(log(p_l) - log(2*pi*sig_comb)/2) + s_l*(-log(p_r) + log(2*pi*sig_comb)/2))
+        BIC_same_var = -2*(s_l*(log(p_l) - log(2*pi*sig_comb)/2) + s_r*(-log(p_r) + log(2*pi*sig_comb)/2))
 
         # simplified equation of maximum log likelihood function 
         # at corresponding sample size for left and right child
-        impurity_left[0] = min(BIC_diff_var_l, BIC_same_var_l)
-        impurity_right[0] = min(BIC_diff_var_r, BIC_same_var_r)
+        impurity_left[0] = min(BIC_diff_var, BIC_same_var)
+        impurity_right[0] = min(BIC_diff_var, BIC_same_var)
 
         # TESTING BELOW
 
@@ -555,18 +551,18 @@ cdef class FastBIC(TwoMeans):
         # printf("sig_left  %f \n", sig_left_pre)
         printf("sig_left  %f \n", sig_left)
         printf("sig_right  %f \n", sig_right)
-        printf("BIC_diff_left  %f \n", BIC_diff_var_l)
-        printf("BIC_diff_right  %f \n", BIC_diff_var_r)
-        # printf("BIC_same_left  %f \n", BIC_same_var_l)
-        # printf("BIC_same_right  %f \n", BIC_same_var_r)
+        printf("sig_comb  %f \n", sig_comb)
+        printf("BIC_diff  %f \n", BIC_diff_var)
+        printf("BIC_same  %f \n", BIC_same_var)
+        printf("impurity_left  %f \n", impurity_left)
+        printf("impurity_right  %f \n", impurity_right)
+        printf("\n\n")
         # printf("BIC_diff_left-zu  %f \n", BIC_diff_var_l)
         # printf("BIC_diff_first_term  %f \n", s_l*(log(p_l) - log(2*pi*sig_left)/2))
         # printf("BIC_diff_second_term  %f \n", s_r*(-log(p_r) + log(2*pi*sig_right)/2))
         # printf("n_node_samples-f  %f \n", self.n_node_samples)
         # printf("n_node_samples-d  %d \n", self.n_node_samples) #int not %f
         # printf("p_l-d  %d \n", s_l / <int>self.n_node_samples)
-        printf("impurity_left  %f \n", impurity_left)
-        printf("impurity_right  %f \n", impurity_right)
         # printf("impurity_left_raw  %f \n", min(BIC_diff_var_l, BIC_same_var_l))
         # printf("impurity_right_raw  %f \n", min(BIC_diff_var_r, BIC_same_var_r))
         # printf("pos  %zu \n", pos)
@@ -577,4 +573,3 @@ cdef class FastBIC(TwoMeans):
         # printf("sample_left-d  %d \n", s_l*2)
         # printf("prior_left  %f \n", p_l)
         # printf("log_left  %f \n", log(2*pi*sig_left))
-        printf("\n\n")
