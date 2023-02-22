@@ -458,14 +458,17 @@ cdef class FastBIC(TwoMeans):
         mean = self.sum_total / self.weighted_n_node_samples
 
         # then compute the variance of the cluster
-        sig = self.sum_of_squares(
+        ss = self.sum_of_squares(
             self.start,
             self.end,
             mean
-        ) / self.weighted_n_node_samples
+        )
 
-        # simplified equation of maximum log likelihood function at s=0
-        impurity = -2*(n_node_samples*log(1)-log(2*pi*sig)/2)
+        sig = ss / self.weighted_n_node_samples
+
+        # simplified equation of maximum log likelihood function
+        # \text{N}\log{1}-\frac{\text{N}}{2}\log{2\pi\sigma^2}-\frac{\parallel x_{N}-\mu \parallel^2}{2\sigma^2}
+        impurity = n_node_samples*log(1)-n_node_samples/2*log(2*pi*sig)-(ss/(2*sig))
 
         return impurity
 
@@ -496,18 +499,17 @@ cdef class FastBIC(TwoMeans):
         cdef double mean_left
         cdef double mean_right
         cdef double sig_left
-        cdef double sig_left_pre
         cdef double sig_right
         cdef double BIC_diff_var
         cdef double BIC_same_var
 
         # number of samples of left and right
-        s_l = <double>(pos - start)
-        s_r = <double>(end - pos)
+        s_l = pos - start
+        s_r = end - pos
 
         # compute prior (i.e. \hat{\pi_1} and \hat{\pi_2} in the paper)
-        p_l = s_l / <double>self.n_node_samples
-        p_r = s_r / <double>self.n_node_samples
+        p_l = s_l / self.n_node_samples
+        p_r = s_r / self.n_node_samples
 
         # first compute mean of left and right
         mean_left = self.sum_left / self.weighted_n_left
@@ -545,10 +547,12 @@ cdef class FastBIC(TwoMeans):
 
         # TESTING BELOW
 
-        # printf("weighted_n_left %f \n", self.weighted_n_left)
-        # printf("sum_left %f \n", self.sum_left)
-        # printf("mean_left %f \n", mean_left)
-        # printf("sig_left  %f \n", sig_left_pre)
+        printf("s_l  %f \n", s_l)
+        printf("s_r  %f \n", s_r)
+        printf("p_l  %f \n", p_l)
+        printf("p_r  %f \n", p_r)
+        printf("mean_left %f \n", mean_left)
+        printf("mean_right %f \n", mean_right)
         printf("sig_left  %f \n", sig_left)
         printf("sig_right  %f \n", sig_right)
         printf("sig_comb  %f \n", sig_comb)
@@ -557,6 +561,7 @@ cdef class FastBIC(TwoMeans):
         printf("impurity_left  %f \n", impurity_left)
         printf("impurity_right  %f \n", impurity_right)
         printf("\n\n")
+
         # printf("BIC_diff_left-zu  %f \n", BIC_diff_var_l)
         # printf("BIC_diff_first_term  %f \n", s_l*(log(p_l) - log(2*pi*sig_left)/2))
         # printf("BIC_diff_second_term  %f \n", s_r*(-log(p_r) + log(2*pi*sig_right)/2))
