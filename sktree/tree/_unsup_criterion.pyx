@@ -500,10 +500,10 @@ cdef class FastBIC(TwoMeans):
         cdef double mean_right
         cdef double sig_left
         cdef double sig_right
-        cdef double BIC_diff_var_l
-        cdef double BIC_diff_var_r
-        cdef double BIC_same_var_l
-        cdef double BIC_same_var_r
+        cdef double BIC_diff_var_left
+        cdef double BIC_diff_var_right
+        cdef double BIC_same_var_left
+        cdef double BIC_same_var_right
 
         # number of samples of left and right
         s_l = pos - start
@@ -536,22 +536,22 @@ cdef class FastBIC(TwoMeans):
 
         # BIC score computed using left and right variances
         # -2(n_1\log{\hat{w}_1}-\frac{n_1}{2}\log{2\pi\hat{\sigma}_{1}^2} - n_2\log{\hat{w}_2}+\frac{n_2}{2}\log{2\pi\hat{\sigma}_{2}^2})
-        BIC_diff_var_l = -2*(s_l*(log(p_l) - log(2*pi*sig_left)/2))
-        BIC_diff_var_r = -2*(s_r*(log(p_r) - log(2*pi*sig_right)/2))
+        BIC_diff_var_left = -2*(s_l*(log(p_l) - log(2*pi*sig_left)/2))
+        BIC_diff_var_right = -2*(s_r*(log(p_r) - log(2*pi*sig_right)/2))
 
         # BIC score computed using combined variances
         # -2(n_1\log{\hat{w}_1}-\frac{n_1}{2}\log{2\pi\hat{\sigma}_{comb}^2} - n_2\log{\hat{w}_2}+\frac{n_2}{2}\log{2\pi\hat{\sigma}_{comb}^2})
-        BIC_same_var_l = -2*(s_l*(log(p_l) - log(2*pi*sig_comb)/2))
-        BIC_same_var_r = -2*(s_r*(log(p_r) - log(2*pi*sig_comb)/2))
+        BIC_same_var_left = -2*(s_l*(log(p_l) - log(2*pi*sig_comb)/2))
+        BIC_same_var_right = -2*(s_r*(log(p_r) - log(2*pi*sig_comb)/2))
 
         # simplified equation of maximum log likelihood function 
         # at corresponding sample size for left and right child
-        if BIC_diff_var_l - BIC_diff_var_r < BIC_same_var_l - BIC_same_var_r:
-            impurity_left[0] = BIC_diff_var_l
-            impurity_right[0] = BIC_diff_var_r
+        if BIC_diff_var_left - BIC_diff_var_right < BIC_same_var_left - BIC_same_var_right:
+            impurity_left[0] = BIC_diff_var_left
+            impurity_right[0] = BIC_diff_var_right
         else:
-            impurity_left[0] = BIC_same_var_l
-            impurity_right[0] = BIC_same_var_r
+            impurity_left[0] = BIC_same_var_left
+            impurity_right[0] = BIC_same_var_right
 
         # TESTING BELOW
 
@@ -564,10 +564,10 @@ cdef class FastBIC(TwoMeans):
         # printf("sig_left  %f \n", sig_left)
         # printf("sig_right  %f \n", sig_right)
         # printf("sig_comb  %f \n", sig_comb)
-        # printf("BIC_diff-l  %f \n", BIC_diff_var_l)
-        # printf("BIC_same-l  %f \n", BIC_same_var_l)
-        # printf("BIC_diff-r  %f \n", BIC_diff_var_r)
-        # printf("BIC_same-r  %f \n", BIC_same_var_r)
+        # printf("BIC_diff-l  %f \n", BIC_diff_var_left)
+        # printf("BIC_same-l  %f \n", BIC_same_var_left)
+        # printf("BIC_diff-r  %f \n", BIC_diff_var_right)
+        # printf("BIC_same-r  %f \n", BIC_same_var_right)
         # printf("impurity_left  %f \n", impurity_left[0])
         # printf("impurity_right  %f \n", impurity_right[0])
         # printf("\n\n")
