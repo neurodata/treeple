@@ -470,7 +470,7 @@ cdef class FastBIC(TwoMeans):
         # \text{N}\log{1}-\frac{\text{N}}{2}\log{2\pi\sigma^2}-\frac{\parallel x_{N}-\mu \parallel^2}{2\sigma^2}
         impurity = n_node_samples*log(1)-n_node_samples/2*log(2*pi*sig)-(ss/(2*sig))
 
-        return impurity
+        return -impurity
 
     cdef void children_impurity(
         self,
@@ -498,6 +498,8 @@ cdef class FastBIC(TwoMeans):
         cdef double p_r
         cdef double mean_left
         cdef double mean_right
+        cdef double ss_left
+        cdef double ss_right
         cdef double sig_left
         cdef double sig_right
         cdef double BIC_diff_var_left
@@ -517,41 +519,57 @@ cdef class FastBIC(TwoMeans):
         mean_left = self.sum_left / self.weighted_n_left
         mean_right = self.sum_right / self.weighted_n_right
 
-        sig_left = self.sum_of_squares(
+        ss_left = self.sum_of_squares(
             start,
             pos,
             mean_left
         )
 
-        sig_right = self.sum_of_squares(
+        ss_right = self.sum_of_squares(
             pos,
             end,
             mean_right
         )
 
-        sig_comb = (sig_left + sig_right) / (self.weighted_n_left + self.weighted_n_right)
+        sig_comb = (ss_left + ss_right) / (self.weighted_n_left + self.weighted_n_right)
 
-        sig_left = sig_left / self.weighted_n_left
-        sig_right = sig_right / self.weighted_n_right
+        sig_left = ss_left / self.weighted_n_left
+        sig_right = ss_right / self.weighted_n_right
 
         # BIC score computed using left and right variances
         # -2(n_1\log{\hat{w}_1}-\frac{n_1}{2}\log{2\pi\hat{\sigma}_{1}^2} - n_2\log{\hat{w}_2}+\frac{n_2}{2}\log{2\pi\hat{\sigma}_{2}^2})
-        BIC_diff_var_left = -2*(s_l*(log(p_l) - log(2*pi*sig_left)/2))
-        BIC_diff_var_right = -2*(s_r*(log(p_r) - log(2*pi*sig_right)/2))
+        # BIC_diff_var_left  = 2*(s_l*(log(p_l) - log(2*pi*sig_left)/2))
+        # BIC_diff_var_right = 2*(s_r*(log(p_r) - log(2*pi*sig_right)/2))
+
+        # Eq 10 Implementation
+        # BIC_diff_var_left  = -s_l*(log(p_l) + log(2*pi*sig_left)/2 + 1/2)
+        # BIC_diff_var_right = -s_r*(log(p_r) + log(2*pi*sig_right)/2 + 1/2)
+
+        # Eq 8 Implementation
+        BIC_same_var_left = s_l*(log(p_l) - log(2*pi*sig_left)/2 - ss_left/(2*sig_left))
+        BIC_same_var_right = s_r*(log(p_r) - log(2*pi*sig_right)/2 - ss_right/(2*sig_right))
 
         # BIC score computed using combined variances
         # -2(n_1\log{\hat{w}_1}-\frac{n_1}{2}\log{2\pi\hat{\sigma}_{comb}^2} - n_2\log{\hat{w}_2}+\frac{n_2}{2}\log{2\pi\hat{\sigma}_{comb}^2})
-        BIC_same_var_left = -2*(s_l*(log(p_l) - log(2*pi*sig_comb)/2))
-        BIC_same_var_right = -2*(s_r*(log(p_r) - log(2*pi*sig_comb)/2))
+        # BIC_same_var_left = 2*(s_l*(log(p_l) - log(2*pi*sig_comb)/2))
+        # BIC_same_var_right = 2*(s_r*(log(p_r) - log(2*pi*sig_comb)/2))
+        
+        # Eq 10 Implementation
+        # BIC_same_var_left = -s_l*(log(p_l) + log(2*pi*sig_comb)/2 + 1/2)
+        # BIC_same_var_right = -s_r*(log(p_r) + log(2*pi*sig_comb)/2 + 1/2)
+
+        # Eq 8 Implementation
+        BIC_same_var_left = s_l*(log(p_l) - log(2*pi*sig_comb)/2 - ss_left/(2*sig_comb))
+        BIC_same_var_right = s_r*(log(p_r) - log(2*pi*sig_comb)/2 - ss_right/(2*sig_comb))
 
         # simplified equation of maximum log likelihood function 
         # at corresponding sample size for left and right child
-        if BIC_diff_var_left - BIC_diff_var_right < BIC_same_var_left - BIC_same_var_right:
-            impurity_left[0] = BIC_diff_var_left
-            impurity_right[0] = BIC_diff_var_right
+        if BIC_diff_var_left + BIC_diff_var_right < BIC_same_var_left + BIC_same_var_right:
+            impurity_left[0] = -BIC_diff_var_left
+            impurity_right[0] = -BIC_diff_var_right
         else:
-            impurity_left[0] = BIC_same_var_left
-            impurity_right[0] = BIC_same_var_right
+            impurity_left[0] = -BIC_same_var_left
+            impurity_right[0] = -BIC_same_var_right
 
         # TESTING BELOW
 
