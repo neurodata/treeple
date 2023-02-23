@@ -2,7 +2,7 @@
 #cython: boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
 
 cimport numpy as cnp
-from libc.math cimport log, pi, fabs
+from libc.math cimport fabs, log, pi
 from libc.stdio cimport printf
 
 cnp.import_array()
@@ -432,6 +432,41 @@ cdef class FastBIC(TwoMeans):
     Reference: https://arxiv.org/abs/1907.02844
 
     """
+    cdef double bic_cluster(self, SIZE_t n_samples, double variance) noexcept nogil:
+        """Help compute the BIC from assigning to a specific cluster.
+        
+        Parameters
+        ----------
+        n_samples : SIZE_t
+            The number of samples assigned cluster.
+        variance : double
+            The plug-in variance for assigning to specific cluster.
+
+        Notes
+        -----
+        Computes the following:
+
+        :math:`-2 * (n_i log(w_i) - n_i/2 log(2 \pi \sigma_i^2))
+
+        where ``n_i`` is the number of samples assigned to cluster i,
+        ``w_i`` is the probability of choosing cluster i at random (or also known
+        as the prior) and ``\sigma_i^2`` is the variance estimate for cluster i.
+
+        Note that ``\sigma_i^2`` in the Fast-BIC derivation may be the
+        variance of the cluster itself, or the estimated combined variance
+        from both clusters.
+        """
+        cdef SIZE_t n_node_samples = self.n_node_samples
+
+        # chances of choosing the cluster based on how many samples are hard-assigned to cluster
+        # i.e. the prior
+        # cast to double, so we do not round to integers
+        cdef double w_cluster = <double>(n_samples) / n_node_samples
+
+        # add to prevent taking log of 0 when there is a degenerate cluster (i.e. single sample, or no variance)
+        return -2. * (n_samples * log(w_cluster) + 0.5 * n_samples * log(2. * pi * variance + 1.e-7))
+
+
     cdef double node_impurity(
         self
     ) nogil:
@@ -444,6 +479,7 @@ cdef class FastBIC(TwoMeans):
 
         """
         cdef double mean
+        cdef double variance
         cdef double impurity
         cdef SIZE_t n_node_samples = self.n_node_samples
 
@@ -458,18 +494,16 @@ cdef class FastBIC(TwoMeans):
         mean = self.sum_total / self.weighted_n_node_samples
 
         # then compute the variance of the cluster
-        ss = self.sum_of_squares(
+        variance = self.sum_of_squares(
             self.start,
             self.end,
             mean
-        )
+        ) / self.weighted_n_node_samples
 
-        sig = ss / self.weighted_n_node_samples
-
-        # simplified equation of maximum log likelihood function
-        # \text{N}\log{1}-\frac{\text{N}}{2}\log{2\pi\sigma^2}-\frac{\parallel x_{N}-\mu \parallel^2}{2\sigma^2}
-        impurity = n_node_samples*log(1)-n_node_samples/2*log(2*pi*sig)-(ss/(2*sig))
-
+        # Compute the BIC of the current set of samples
+        # Note: we do not compute the BIC_diff_var and BIC_same_var because
+        # they are equivalent in the single cluster setting
+        impurity = self.bic_cluster(n_node_samples, variance)
         return impurity
 
     cdef void children_impurity(
@@ -492,99 +526,56 @@ cdef class FastBIC(TwoMeans):
         cdef SIZE_t pos = self.pos
         cdef SIZE_t start = self.start
         cdef SIZE_t end = self.end
-        cdef double s_l
-        cdef double s_r
-        cdef double p_l
-        cdef double p_r
-        cdef double mean_left
-        cdef double mean_right
-        cdef double sig_left
-        cdef double sig_right
-        cdef double BIC_diff_var_left
-        cdef double BIC_diff_var_right
-        cdef double BIC_same_var_left
-        cdef double BIC_same_var_right
+        cdef SIZE_t n_samples_left, n_samples_right
+
+        cdef double mean_left, mean_right
+        cdef double ss_left, ss_right, variance_left, variance_right, variance_comb
+        cdef double BIC_diff_var_left, BIC_diff_var_right
+        cdef double BIC_same_var_left, BIC_same_var_right
+        cdef double BIC_same_var, BIC_diff_var
 
         # number of samples of left and right
-        s_l = pos - start
-        s_r = end - pos
-
-        # compute prior (i.e. \hat{\pi_1} and \hat{\pi_2} in the paper)
-        p_l = s_l / self.n_node_samples
-        p_r = s_r / self.n_node_samples
+        n_samples_left = pos - start
+        n_samples_right = end - pos
 
         # first compute mean of left and right
         mean_left = self.sum_left / self.weighted_n_left
         mean_right = self.sum_right / self.weighted_n_right
 
-        sig_left = self.sum_of_squares(
+        # compute the estimated variance of the left and right children
+        ss_left = self.sum_of_squares(
             start,
             pos,
             mean_left
         )
-
-        sig_right = self.sum_of_squares(
+        ss_right = self.sum_of_squares(
             pos,
             end,
             mean_right
         )
+        variance_left = ss_left / self.weighted_n_left
+        variance_right = ss_right / self.weighted_n_right
+        
+        # compute the estimated combined variance
+        variance_comb = (ss_left + ss_right) / (self.weighted_n_left + self.weighted_n_right)
 
-        sig_comb = (sig_left + sig_right) / (self.weighted_n_left + self.weighted_n_right)
+        # Compute the BIC using different variances for left and right 
+        BIC_diff_var_left = self.bic_cluster(n_samples_left, variance_left)
+        BIC_diff_var_right = self.bic_cluster(n_samples_right, variance_right)
 
-        sig_left = sig_left / self.weighted_n_left
-        sig_right = sig_right / self.weighted_n_right
+        # Compute the BIC using different variances for left and right 
+        BIC_same_var_left = self.bic_cluster(n_samples_left, variance_comb)
+        BIC_same_var_right = self.bic_cluster(n_samples_right, variance_comb)
 
-        # BIC score computed using left and right variances
-        # -2(n_1\log{\hat{w}_1}-\frac{n_1}{2}\log{2\pi\hat{\sigma}_{1}^2} - n_2\log{\hat{w}_2}+\frac{n_2}{2}\log{2\pi\hat{\sigma}_{2}^2})
-        BIC_diff_var_left = -2*(s_l*(log(p_l) - log(2*pi*sig_left)/2))
-        BIC_diff_var_right = -2*(s_r*(log(p_r) - log(2*pi*sig_right)/2))
+        BIC_same_var = BIC_same_var_left - BIC_same_var_right
+        BIC_diff_var = BIC_diff_var_left - BIC_diff_var_right
 
-        # BIC score computed using combined variances
-        # -2(n_1\log{\hat{w}_1}-\frac{n_1}{2}\log{2\pi\hat{\sigma}_{comb}^2} - n_2\log{\hat{w}_2}+\frac{n_2}{2}\log{2\pi\hat{\sigma}_{comb}^2})
-        BIC_same_var_left = -2*(s_l*(log(p_l) - log(2*pi*sig_comb)/2))
-        BIC_same_var_right = -2*(s_r*(log(p_r) - log(2*pi*sig_comb)/2))
-
-        # simplified equation of maximum log likelihood function 
-        # at corresponding sample size for left and right child
-        if BIC_diff_var_left - BIC_diff_var_right < BIC_same_var_left - BIC_same_var_right:
-            impurity_left[0] = BIC_diff_var_left
-            impurity_right[0] = BIC_diff_var_right
+        # (N1 / 2) * log(2 * 3.14 * sig1) + N1 / 2
+        # choose the BIC formulation that gives us the smallest values
+        # (i.e. min of (BIC_diff, BIC_same) in the paper)
+        if BIC_diff_var < BIC_same_var:
+            impurity_left[0] = -BIC_diff_var_left
+            impurity_right[0] = -BIC_diff_var_right
         else:
-            impurity_left[0] = BIC_same_var_left
-            impurity_right[0] = BIC_same_var_right
-
-        # TESTING BELOW
-
-        # printf("s_l  %f \n", s_l)
-        # printf("s_r  %f \n", s_r)
-        # printf("p_l  %f \n", p_l)
-        # printf("p_r  %f \n", p_r)
-        # printf("mean_left %f \n", mean_left)
-        # printf("mean_right %f \n", mean_right)
-        # printf("sig_left  %f \n", sig_left)
-        # printf("sig_right  %f \n", sig_right)
-        # printf("sig_comb  %f \n", sig_comb)
-        # printf("BIC_diff-l  %f \n", BIC_diff_var_left)
-        # printf("BIC_same-l  %f \n", BIC_same_var_left)
-        # printf("BIC_diff-r  %f \n", BIC_diff_var_right)
-        # printf("BIC_same-r  %f \n", BIC_same_var_right)
-        # printf("impurity_left  %f \n", impurity_left[0])
-        # printf("impurity_right  %f \n", impurity_right[0])
-        # printf("\n\n")
-
-        # printf("BIC_diff_left-zu  %f \n", BIC_diff_var_l)
-        # printf("BIC_diff_first_term  %f \n", s_l*(log(p_l) - log(2*pi*sig_left)/2))
-        # printf("BIC_diff_second_term  %f \n", s_r*(-log(p_r) + log(2*pi*sig_right)/2))
-        # printf("n_node_samples-f  %f \n", self.n_node_samples)
-        # printf("n_node_samples-d  %d \n", self.n_node_samples) #int not %f
-        # printf("p_l-d  %d \n", s_l / <int>self.n_node_samples)
-        # printf("impurity_left_raw  %f \n", min(BIC_diff_var_l, BIC_same_var_l))
-        # printf("impurity_right_raw  %f \n", min(BIC_diff_var_r, BIC_same_var_r))
-        # printf("pos  %zu \n", pos)
-        # printf("start  %zu \n", start)
-        # printf("end  %zu \n", end)
-        # printf("sample_left  %zu \n", s_l)
-        # printf("sample_left-zu  %zu \n", s_l*2)
-        # printf("sample_left-d  %d \n", s_l*2)
-        # printf("prior_left  %f \n", p_l)
-        # printf("log_left  %f \n", log(2*pi*sig_left))
+            impurity_left[0] = -BIC_same_var_left
+            impurity_right[0] = -BIC_same_var_right

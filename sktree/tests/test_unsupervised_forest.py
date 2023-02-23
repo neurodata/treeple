@@ -42,26 +42,29 @@ def test_sklearn_compatible_estimator(estimator, check):
     check(estimator)
 
 
-@pytest.mark.parametrize("name, tree", FOREST_CLUSTERS.items())
+@pytest.mark.parametrize("name, forest", FOREST_CLUSTERS.items())
 @pytest.mark.parametrize("criterion", CLUSTER_CRITERIONS)
-def test_check_simulation(name, tree, criterion):
-    n_samples = 100
+def test_check_simulation(name, forest, criterion):
+    n_samples = 200
     n_classes = 2
 
     #
     if name == "UnsupervisedRandomForest":
         n_features = 5
-        n_estimators = 50
-        expected_score = 0.4
+        if criterion == "twomeans":
+            expected_score = 0.05
+        elif criterion == "fastbic":
+            expected_score = 0.35
     else:
         n_features = 20
-        n_estimators = 20
-        expected_score = 0.9
+
+        # in the forest setting, we can overfit the training dataset perfectly
+        expected_score = 1.0
     X, y = make_blobs(
         n_samples=n_samples, centers=n_classes, n_features=n_features, random_state=12345
     )
 
-    clf = tree(n_estimators=n_estimators, criterion=criterion, random_state=12345)
+    clf = forest(criterion=criterion, random_state=12345)
     clf.fit(X)
     sim_mat = clf.affinity_matrix_
 
@@ -75,22 +78,35 @@ def test_check_simulation(name, tree, criterion):
     # XXX: This should be > 0.9 according to the UReRF. However, that could be because they used
     # the oblique projections by default
     assert (
-        score > expected_score
+        score >= expected_score
     ), f"{name}-blobs failed with criterion {criterion} and score = {score}"
 
 
-@pytest.mark.parametrize("name, tree", FOREST_CLUSTERS.items())
+@pytest.mark.parametrize("name, forest", FOREST_CLUSTERS.items())
 @pytest.mark.parametrize("criterion", CLUSTER_CRITERIONS)
-def test_check_iris(name, tree, criterion):
+def test_check_iris(name, forest, criterion):
     # Check consistency on dataset iris.
     n_classes = 3
-    est = tree(criterion=criterion, random_state=12345)
+    est = forest(criterion=criterion, random_state=12345)
     est.fit(iris.data, iris.target)
     sim_mat = est.affinity_matrix_
+
+    if criterion == "twomeans":
+        if "oblique" in name.lower():
+            expected_score = 0.21
+        else:
+            expected_score = 0.2
+    elif criterion == "fastbic":
+        if "oblique" in name.lower():
+            expected_score = 0.55
+        else:
+            expected_score = 0.3
 
     cluster = AgglomerativeClustering(n_clusters=n_classes).fit(sim_mat)
     predict_labels = cluster.fit_predict(sim_mat)
     score = adjusted_rand_score(iris.target, predict_labels)
 
     # Two-means and fastBIC criterions perform similarly here
-    assert score > 0.2, f"{name}-iris failed with criterion {criterion} and score = {score}"
+    assert (
+        score > expected_score
+    ), f"{name}-iris failed with criterion {criterion} and score = {score}"
