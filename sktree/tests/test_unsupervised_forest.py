@@ -58,6 +58,7 @@ def test_check_simulation(name, forest, criterion):
     elif name == 'UnsupervisedObliqueRandomForest':
         n_features = 20
         n_estimators = 20
+        # This should be > 0.9 according to the UReRF
         if criterion == 'twomeans':
             expected_score = 0.95
         elif criterion == 'fastbic':
@@ -81,8 +82,6 @@ def test_check_simulation(name, forest, criterion):
     score = adjusted_rand_score(y, predict_labels)
     print(f'For forest on simulation data: {name} - {criterion}: {score}')
 
-    # XXX: This should be > 0.9 according to the UReRF. However, that could be because they used
-    # the oblique projections by default
     assert (
         score > expected_score
     ), f"{name}-blobs failed with criterion {criterion} and score = {score}"
@@ -115,5 +114,4 @@ def test_check_iris(name, forest, criterion):
     score = adjusted_rand_score(iris.target, predict_labels)
     print(f'For forest on iris: {name} - {criterion}: {score}')
 
-    # Two-means and fastBIC criterions perform similarly here
     assert score > expected_score, f"{name}-iris failed with criterion {criterion} and score = {score}"
