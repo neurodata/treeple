@@ -42,26 +42,34 @@ def test_sklearn_compatible_estimator(estimator, check):
     check(estimator)
 
 
-@pytest.mark.parametrize("name, tree", FOREST_CLUSTERS.items())
+@pytest.mark.parametrize("name, forest", FOREST_CLUSTERS.items())
 @pytest.mark.parametrize("criterion", CLUSTER_CRITERIONS)
-def test_check_simulation(name, tree, criterion):
+def test_check_simulation(name, forest, criterion):
     n_samples = 100
     n_classes = 2
 
-    #
     if name == "UnsupervisedRandomForest":
         n_features = 5
         n_estimators = 50
-        expected_score = 0.4
-    else:
+        if criterion == 'twomeans':
+            expected_score = 0.45
+        elif criterion == 'fastbic':
+            expected_score = 0.95
+    elif name == 'UnsupervisedObliqueRandomForest':
         n_features = 20
         n_estimators = 20
-        expected_score = 0.9
+        if criterion == 'twomeans':
+            expected_score = 0.95
+        elif criterion == 'fastbic':
+            expected_score = 0.95
+    else:
+        raise ValueError(f'{name} does not exist')
+
     X, y = make_blobs(
         n_samples=n_samples, centers=n_classes, n_features=n_features, random_state=12345
     )
 
-    clf = tree(n_estimators=n_estimators, criterion=criterion, random_state=12345)
+    clf = forest(n_estimators=n_estimators, criterion=criterion, random_state=12345)
     clf.fit(X)
     sim_mat = clf.affinity_matrix_
 
@@ -71,6 +79,7 @@ def test_check_simulation(name, tree, criterion):
     cluster = AgglomerativeClustering(n_clusters=n_classes).fit(sim_mat)
     predict_labels = cluster.fit_predict(sim_mat)
     score = adjusted_rand_score(y, predict_labels)
+    print(f'For forest on simulation data: {name} - {criterion}: {score}')
 
     # XXX: This should be > 0.9 according to the UReRF. However, that could be because they used
     # the oblique projections by default
@@ -79,18 +88,32 @@ def test_check_simulation(name, tree, criterion):
     ), f"{name}-blobs failed with criterion {criterion} and score = {score}"
 
 
-@pytest.mark.parametrize("name, tree", FOREST_CLUSTERS.items())
+@pytest.mark.parametrize("name, forest", FOREST_CLUSTERS.items())
 @pytest.mark.parametrize("criterion", CLUSTER_CRITERIONS)
-def test_check_iris(name, tree, criterion):
+def test_check_iris(name, forest, criterion):
     # Check consistency on dataset iris.
+    if name == 'UnsupervisedRandomForest':
+        if criterion == 'twomeans':
+            expected_score = 0.2
+        elif criterion == 'fastbic':
+            expected_score = 0.35
+    elif name == 'UnsupervisedObliqueRandomForest':
+        if criterion == 'twomeans':
+            expected_score = 0.2
+        elif criterion == 'fastbic':
+            expected_score = 0.55
+    else:
+        raise ValueError(f'{name} does not exist')
+
     n_classes = 3
-    est = tree(criterion=criterion, random_state=12345)
+    est = forest(criterion=criterion, random_state=12345)
     est.fit(iris.data, iris.target)
     sim_mat = est.affinity_matrix_
 
     cluster = AgglomerativeClustering(n_clusters=n_classes).fit(sim_mat)
     predict_labels = cluster.fit_predict(sim_mat)
     score = adjusted_rand_score(iris.target, predict_labels)
+    print(f'For forest on iris: {name} - {criterion}: {score}')
 
     # Two-means and fastBIC criterions perform similarly here
-    assert score > 0.2, f"{name}-iris failed with criterion {criterion} and score = {score}"
+    assert score > expected_score, f"{name}-iris failed with criterion {criterion} and score = {score}"

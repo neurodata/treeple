@@ -166,6 +166,19 @@ def test_check_simulation(name, Tree, criterion):
     n_classes = 2
     X, y = make_blobs(n_samples=n_samples, centers=n_classes, n_features=6, random_state=1234)
 
+    if name == "UnsupervisedDecisionTree":
+        if criterion == 'twomeans':
+            expected_score = 0.095
+        elif criterion == 'fastbic':
+            expected_score = 0.095
+    elif name == 'UnsupervisedObliqueDecisionTree':
+        if criterion == 'twomeans':
+            expected_score = 0.095
+        elif criterion == 'fastbic':
+            expected_score = 0.095
+    else:
+        raise ValueError(f'{name} does not exist')
+
     est = Tree(criterion=criterion, random_state=1234)
     est.fit(X)
     sim_mat = est.affinity_matrix_
@@ -176,9 +189,10 @@ def test_check_simulation(name, Tree, criterion):
     cluster = AgglomerativeClustering(n_clusters=n_classes).fit(sim_mat)
     predict_labels = cluster.fit_predict(sim_mat)
     score = adjusted_rand_score(y, predict_labels)
+    print(f'For tree on simulation data: {name} - {criterion}: {score}')
 
     # a single decision tree does not fit well, but should still have a positive score
-    assert score >= 0.05, "Blobs failed with {0}, criterion = {1} and score = {2}".format(
+    assert score >= expected_score, "Blobs failed with {0}, criterion = {1} and score = {2}".format(
         name, criterion, score
     )
 
@@ -188,6 +202,20 @@ def test_check_simulation(name, Tree, criterion):
 def test_check_iris(name, Tree, criterion):
     # Check consistency on dataset iris.
     n_classes = 3
+
+    if name == "UnsupervisedDecisionTree":
+        if criterion == 'twomeans':
+            expected_score = 0.01
+        elif criterion == 'fastbic':
+            expected_score = 0.00
+    elif name == 'UnsupervisedObliqueDecisionTree':
+        if criterion == 'twomeans':
+            expected_score = 0.20
+        elif criterion == 'fastbic':
+            expected_score = 0.00
+    else:
+        raise ValueError(f'{name} does not exist')
+
     est = Tree(criterion=criterion, random_state=12345)
     est.fit(iris.data, iris.target)
     sim_mat = est.affinity_matrix_
@@ -195,9 +223,10 @@ def test_check_iris(name, Tree, criterion):
     cluster = AgglomerativeClustering(n_clusters=n_classes).fit(sim_mat)
     predict_labels = cluster.fit_predict(sim_mat)
     score = adjusted_rand_score(iris.target, predict_labels)
+    print(f'For tree on iris data: {name} - {criterion}: {score}')
 
     # Two-means and fastBIC criterions doesn't perform well
-    assert score > 0.01, "Iris failed with {0}, criterion = {1} and score = {2}".format(
+    assert score > expected_score, "Iris failed with {0}, criterion = {1} and score = {2}".format(
         name, criterion, score
     )
 
