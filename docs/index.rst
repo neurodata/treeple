@@ -8,7 +8,7 @@
    :maxdepth: 2
    :caption: Getting started:
 
+   modules/get_started/index.rst
    api
    whats_new
-   install
    use
