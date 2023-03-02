@@ -44,7 +44,7 @@ jobs:
           sudo apt-get install -y libopenblas-dev libatlas-base-dev liblapack-dev
 
       - name: Install Poetry ${{ matrix.poetry-version }}
-        uses: abatilo/actions-poetry@v2.2.0
+        uses: abatilo/actions-poetry@v2.3.0
         with:
           poetry-version: ${{ matrix.poetry-version }}
       - name: Install Poetry Dynamic Versioning Plugin
