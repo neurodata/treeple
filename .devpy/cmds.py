@@ -30,8 +30,7 @@ def docs(build_dir, clean=False):
 
 
 @click.command()
-@click.option("--build-dir", default="build", help="Build directory; default is `$PWD/build`")
-def coverage(build_dir):
+def coverage():
     """📊 Generate coverage report"""
     util.run(
         [
@@ -39,8 +38,6 @@ def coverage(build_dir):
             "-m",
             "devpy",
             "test",
-            "--build-dir",
-            build_dir,
             "--",
             "-o",
             "python_functions=test_*",
