@@ -9,6 +9,6 @@
    :caption: Getting started:
 
    modules/get_started/index.rst
-   api
-   whats_new
-   use
+   modules/user_guide/index.rst
+   modules/api/index.rst
+   modules/whats_new/index.rst
