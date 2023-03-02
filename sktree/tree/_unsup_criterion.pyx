@@ -408,26 +408,29 @@ cdef class FastBIC(TwoMeans):
     
     The Bayesian Information Criterion (BIC) is a popular model seleciton 
     criteria that is based on the log likelihood of the model given data.
+    MClust-BIC is a method in the R-package 'mclust' that uses BIC as a splitting
+    criterion.
+    See: https://stats.stackexchange.com/questions/237220/mclust-model-selection
 
     Fast-BIC is a method that combines the speed of the two-means clustering 
     method with the model flexibility of Mclust-BIC. It sorts data for each 
     feature and tries all possible splits to assign data points to one of 
     two Gaussian distributions based on their position relative to the split.
     The parameters for each cluster are estimated using maximum likelihood 
-    estimation (MLE).The method performs hard clustering rather than soft 
+    estimation (MLE). The method performs hard clustering rather than soft 
     clustering like in GMM, resulting in a simpler calculation of the likelihood.
     
     \hat{L} = \sum_{n=1}^s[\log\hat{\pi}_1+\log{\mathcal{N}(x_n;\hat{\mu}_1,\hat{\sigma}_1^2)}]
     + \sum_{n=s+1}^N[\log\hat{\pi}_2+\log{\mathcal{N}(x_n;\hat{\mu}_2,\hat{\sigma}_2^2)}]
     
     where the prior, mean, and variance are defined as follows, respectively:
-    \hat{\pi} = \frac{s}{N}
-    \hat{\mu} = \frac{1}{s}\sum_{n\le s}{x_n},
-    \hat{\sigma}^2 = \frac{1}{s}\sum_{n\le s}{||x_n-\hat{\mu_j}||^2}
+    
+    - \hat{\pi} = \frac{s}{N}
+    - \hat{\mu} = \frac{1}{s}\sum_{n\le s}{x_n},
+    - \hat{\sigma}^2 = \frac{1}{s}\sum_{n\le s}{||x_n-\hat{\mu_j}||^2}
 
-    Fast-BIC is guaranteed to obtain the global maximum likelihood estimator,
-    where as the Mclust-BIC is liable to find only a local maximum. Additionally,
-    Fast-BIC is substantially faster than the traditional BIC method.
+    Fast-BIC is guaranteed to obtain the global maximum likelihood estimator.
+    Additionally, Fast-BIC is substantially faster than the traditional BIC method.
 
     Reference: https://arxiv.org/abs/1907.02844
 
@@ -476,7 +479,6 @@ cdef class FastBIC(TwoMeans):
         This is the maximum likelihood given prior, mean, and variance at s number of samples
         Namely, this is the maximum likelihood of Xf[sample_indices[start:end]].
         The smaller the impurity the better.
-
         """
         cdef double mean
         cdef double variance
@@ -566,13 +568,12 @@ cdef class FastBIC(TwoMeans):
         # Compute the BIC using different variances for left and right 
         BIC_same_var_left = self.bic_cluster(n_samples_left, variance_comb)
         BIC_same_var_right = self.bic_cluster(n_samples_right, variance_comb)
-
         BIC_same_var = BIC_same_var_left - BIC_same_var_right
         BIC_diff_var = BIC_diff_var_left - BIC_diff_var_right
 
-        # (N1 / 2) * log(2 * 3.14 * sig1) + N1 / 2
         # choose the BIC formulation that gives us the smallest values
-        # (i.e. min of (BIC_diff, BIC_same) in the paper)
+        # (i.e. min of (BIC_diff, BIC_same) in the paper) and then
+        # assign the left and right child BIC values by reference
         if BIC_diff_var < BIC_same_var:
             impurity_left[0] = -BIC_diff_var_left
             impurity_right[0] = -BIC_diff_var_right
