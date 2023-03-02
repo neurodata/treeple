@@ -7,6 +7,7 @@ sphinxcontrib-bibtex
 sphinx-issues
 sphinx-copybutton
 sphinx-gallery
+myst-parser
 ipython
 nbsphinx
 memory_profiler
