@@ -7,9 +7,10 @@ concurrency:
 on:
   pull_request:
     paths:
-      - "**.py"
-      - "**.pxd"
-      - "**.pyx"
+      - "**"
+    #   - "**.py"
+    #   - "**.pxd"
+    #   - "**.pyx"
   push:
     branches: [main]
     paths:
