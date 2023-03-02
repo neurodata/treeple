@@ -41,7 +41,7 @@ copyright = f"2022-{td.year}, scikit-tree Developers. Last updated on {td.isofor
 version = sktree.__version__
 
 # The full version, including alpha/beta/rc tags.
-# release = version
+release = version
 
 
 gh_url = "https://github.com/neurodata/scikit-tree"
@@ -103,7 +103,6 @@ default_role = "literal"
 html_show_sourcelink = False
 html_copy_source = False
 html_show_sphinx = False
-# html_extra_path = []
 html_title = "scikit-tree"
 html_theme = "pydata_sphinx_theme"
 
