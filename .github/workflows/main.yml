@@ -49,11 +49,6 @@ jobs:
           cache: "pip"
           cache-dependency-path: "requirements.txt"
 
-      # Make sure the @v0.7.0 matches the current version of the action
-      # - name: webfactory/ssh-agent
-      #   uses: webfactory/ssh-agent@v0.7.0
-      #   with:
-      #     ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: show-gcc
         run: |
@@ -153,11 +148,6 @@ jobs:
         with:
           submodules: recursive
 
-      # makes sure that SSH key allows you to pull from another repository
-      # Make sure the @v0.7.0 matches the current version of the action
-      # - uses: webfactory/ssh-agent@v0.7.0
-      #   with:
-      #     ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Setup Python
         uses: actions/setup-python@v4.5.0
