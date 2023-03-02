@@ -116,6 +116,8 @@ jobs:
 
       - name: Run unit tests and coverage
         run: |
+          ./dev.py --help
+          ./dev.py coverage --help
           python dev.py coverage
           cp $PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages/coverage.xml ./coverage.xml
 
