@@ -368,6 +368,7 @@ cdef class TwoMeans(UnsupervisedCriterion):
         self,
         SIZE_t start,
         SIZE_t end,
+        double mean,
     ) noexcept nogil:
         """Computes variance of feature vector from sample_indices[start:end].
 
