@@ -463,7 +463,7 @@ cdef class FastBIC(TwoMeans):
         # chances of choosing the cluster based on how many samples are hard-assigned to cluster
         # i.e. the prior
         # cast to double, so we do not round to integers
-        cdef double w_cluster = <double>(n_samples) / n_node_samples
+        cdef double w_cluster = (n_samples + 0.0) / n_node_samples
 
         # add to prevent taking log of 0 when there is a degenerate cluster (i.e. single sample, or no variance)
         return -2. * (n_samples * log(w_cluster) + 0.5 * n_samples * log(2. * pi * variance + 1.e-7))
