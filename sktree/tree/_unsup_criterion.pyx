@@ -2,8 +2,7 @@
 #cython: boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
 
 cimport numpy as cnp
-from libc.math cimport fabs, log, pi
-from libc.stdio cimport printf
+from libc.math cimport log, pi
 
 cnp.import_array()
 
