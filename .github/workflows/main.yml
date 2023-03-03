@@ -173,16 +173,26 @@ jobs:
           wget https://github.com/scipy/scipy-ci-artifacts/raw/main/openblas_32_if.zip
           unzip -d c:\ openblas_32_if.zip
           echo "PKG_CONFIG_PATH=c:\opt\openblas\if_32\64\lib\pkgconfig;" >> $env:GITHUB_ENV
-      - name: meson-configure
+      # - name: meson-configure
+      #   run: |
+      #     meson setup build --prefix=$PWD\build
+      # - name: meson-build
+      #   run: |
+      #     ninja -j 2 -C build
+      # - name: meson-install
+      #   run: |
+      #     cd build
+      #     meson install
+      - name: build
         run: |
-          meson setup build --prefix=$PWD\build
-      - name: meson-build
-        run: |
-          ninja -j 2 -C build
-      - name: meson-install
-        run: |
+          python dev.py build -j 2
+          # following steps are required because the build step does not put
+          # the *.pyd files in build-install! Furthermore the --win-cp-openblas
+          # option does not seem to copy libopenblas*.dll, so manually copy it.
           cd build
           meson install
+          cd ..
+          
       - name: build-path
         run: |
           echo "installed_path=$PWD\build\Lib\site-packages" >> $env:GITHUB_ENV
