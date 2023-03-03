@@ -73,7 +73,7 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         SIZE_t start,
         SIZE_t end,
         double* weighted_n_node_samples
-    ) nogil except -1:
+    ) except -1 nogil:
         """Reset splitter on node samples[start:end].
 
         Returns -1 in case of failure to allocate memory (and raise MemoryError)
@@ -110,7 +110,7 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
         vector[vector[SIZE_t]]& proj_mat_indices
-    ) nogil:
+    ) noexcept nogil:
         """ Sample the projection vector.
 
         This is a placeholder method.
@@ -118,7 +118,7 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         """
         pass
 
-    cdef int pointer_size(self) nogil:
+    cdef int pointer_size(self) noexcept nogil:
         """Get size of a pointer to record for ObliqueSplitter."""
 
         return sizeof(ObliqueSplitRecord)
@@ -167,7 +167,7 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
         vector[vector[SIZE_t]]& proj_mat_indices
-    ) nogil:
+    ) noexcept nogil:
         """Sample projection matrix using a contiguous patch.
 
         Randomly sample patches with weight of 1.

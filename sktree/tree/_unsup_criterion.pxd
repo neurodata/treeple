@@ -48,7 +48,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         const DOUBLE_t[:] sample_weight,
         double weighted_n_samples, 
         const SIZE_t[:] samples,
-    ) nogil except -1
+    ) except -1 nogil
 
     cdef void init_feature_vec(
         self,

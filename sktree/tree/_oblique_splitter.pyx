@@ -26,7 +26,7 @@ cdef DTYPE_t FEATURE_THRESHOLD = 1e-7
 cdef DTYPE_t EXTRACT_NNZ_SWITCH = 0.1
 
 
-cdef inline void _init_split(ObliqueSplitRecord* self, SIZE_t start_pos) nogil:
+cdef inline void _init_split(ObliqueSplitRecord* self, SIZE_t start_pos) noexcept nogil:
     self.impurity_left = INFINITY
     self.impurity_right = INFINITY
     self.pos = start_pos
@@ -93,7 +93,7 @@ cdef class BaseObliqueSplitter(Splitter):
         pass
 
     cdef int node_reset(self, SIZE_t start, SIZE_t end,
-                        double* weighted_n_node_samples) nogil except -1:
+                        double* weighted_n_node_samples) except -1 nogil:
         """Reset splitter on node samples[start:end].
 
         Returns -1 in case of failure to allocate memory (and raise MemoryError)
@@ -130,14 +130,14 @@ cdef class BaseObliqueSplitter(Splitter):
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
         vector[vector[SIZE_t]]& proj_mat_indices
-    ) nogil:
+    ) noexcept nogil:
         """ Sample the projection vector.
 
         This is a placeholder method.
         """
         pass
 
-    cdef int pointer_size(self) nogil:
+    cdef int pointer_size(self) noexcept nogil:
         """Get size of a pointer to record for ObliqueSplitter."""
 
         return sizeof(ObliqueSplitRecord)
@@ -147,7 +147,7 @@ cdef class BaseObliqueSplitter(Splitter):
         double impurity,
         SplitRecord* split,
         SIZE_t* n_constant_features
-    ) nogil except -1:
+    ) except -1 nogil:
         """Find the best_split split on node samples[start:end]
 
         Returns -1 in case of failure to allocate memory (and raise MemoryError)
@@ -371,7 +371,7 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
         vector[vector[SIZE_t]]& proj_mat_indices
-    ) nogil:
+    ) noexcept nogil:
         """Sample oblique projection matrix.
 
         Randomly sample features to put in randomly sampled projection vectors

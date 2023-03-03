@@ -191,7 +191,7 @@ cdef class ObliqueTree(Tree):
                 proj_vecs[i, feat] = weight
         return proj_vecs
 
-    cdef int _resize_c(self, SIZE_t capacity=INTPTR_MAX) nogil except -1:
+    cdef int _resize_c(self, SIZE_t capacity=INTPTR_MAX) except -1 nogil:
         """Guts of _resize.
 
         Additionally resizes the projection indices and weights.
@@ -229,7 +229,7 @@ cdef class ObliqueTree(Tree):
         self.capacity = capacity
         return 0
 
-    cdef int _set_split_node(self, SplitRecord* split_node, Node *node) nogil except -1:
+    cdef int _set_split_node(self, SplitRecord* split_node, Node *node) except -1 nogil:
         """Set node data.
         """
         # Cython type cast split record into its inherited split record
@@ -256,7 +256,7 @@ cdef class ObliqueTree(Tree):
         const DTYPE_t[:, :] X_ndarray,
         SIZE_t sample_index,
         Node *node
-    ) nogil:
+    ) noexcept nogil:
         """Compute feature from a given data matrix, X.
 
         In oblique-aligned trees, this is the projection of X.
@@ -289,7 +289,7 @@ cdef class ObliqueTree(Tree):
         self,
         cnp.float64_t[:] importances,
         Node* node
-    ) nogil:
+    ) noexcept nogil:
         """Compute feature importances from a Node in the Tree.
 
         Wrapped in a private function to allow subclassing that
