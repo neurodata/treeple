@@ -163,6 +163,7 @@ jobs:
       - name: pip-packages
         run: |
           pip install -r build_requirements.txt
+          pip install git+https://github.com/scientific-python/devpy
       - name: openblas-libs
         run: |
           # Download and install pre-built OpenBLAS library
@@ -192,7 +193,7 @@ jobs:
           cd build
           meson install
           cd ..
-          
+
       - name: build-path
         run: |
           echo "installed_path=$PWD\build\Lib\site-packages" >> $env:GITHUB_ENV
