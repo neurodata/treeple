@@ -1,11 +1,14 @@
+# distutils: language = c++
 #cython: language_level=3
 #cython: boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
 
 cimport numpy as cnp
-from libc.math cimport log, pi
+import numpy as np
+from libc.math cimport log
 
 cnp.import_array()
 
+cdef DTYPE_t PI = np.pi
 
 cdef class UnsupervisedCriterion(BaseCriterion):
     """Abstract criterion for unsupervised learning.
@@ -466,7 +469,7 @@ cdef class FastBIC(TwoMeans):
         cdef double w_cluster = (n_samples + 0.0) / n_node_samples
 
         # add to prevent taking log of 0 when there is a degenerate cluster (i.e. single sample, or no variance)
-        return -2. * (n_samples * log(w_cluster) + 0.5 * n_samples * log(2. * pi * variance + 1.e-7))
+        return -2. * (n_samples * log(w_cluster) + 0.5 * n_samples * log(2. * PI * variance + 1.e-7))
 
 
     cdef double node_impurity(
