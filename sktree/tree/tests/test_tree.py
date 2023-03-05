@@ -19,6 +19,13 @@ from sktree.tree import (
     UnsupervisedObliqueDecisionTree,
 )
 
+CLUSTER_CRITERIONS = ("twomeans", "fastbic")
+
+TREE_CLUSTERS = {
+    "UnsupervisedDecisionTree": UnsupervisedDecisionTree,
+    "UnsupervisedObliqueDecisionTree": UnsupervisedObliqueDecisionTree,
+}
+
 X_small = np.array(
     [
         [0, 0, 4, 0, 0, 0, 1, -14, 0, -4, 0, 0, 0, 0],
@@ -152,17 +159,29 @@ def test_sklearn_compatible_transformer(estimator, check):
     check(estimator)
 
 
-@pytest.mark.parametrize("ESTIMATOR", [UnsupervisedDecisionTree, UnsupervisedObliqueDecisionTree])
-def test_unsupervisedtree(ESTIMATOR):
-    n_samples = 10
+@pytest.mark.parametrize("name,Tree", TREE_CLUSTERS.items())
+@pytest.mark.parametrize("criterion", CLUSTER_CRITERIONS)
+def test_check_simulation(name, Tree, criterion):
+    """Test axis-aligned Gaussian blobs."""
+    n_samples = 100
     n_classes = 2
     X, y = make_blobs(n_samples=n_samples, centers=n_classes, n_features=6, random_state=1234)
 
-    clf = ESTIMATOR(random_state=1234)
-    clf.fit(X)
-    sim_mat = clf.affinity_matrix_
+    est = Tree(criterion=criterion, random_state=1234)
+    est.fit(X)
+    sim_mat = est.affinity_matrix_
 
-    print(sim_mat)
+    # there is quite a bit of variance in the performance at the tree level
+    if criterion == "twomeans":
+        if "oblique" in name.lower():
+            expected_score = 0.02
+        else:
+            expected_score = 0.3
+    elif criterion == "fastbic":
+        if "oblique" in name.lower():
+            expected_score = 0.01
+        else:
+            expected_score = 0.4
 
     # all ones along the diagonal
     assert np.array_equal(sim_mat.diagonal(), np.ones(n_samples))
@@ -172,7 +191,79 @@ def test_unsupervisedtree(ESTIMATOR):
     score = adjusted_rand_score(y, predict_labels)
 
     # a single decision tree does not fit well, but should still have a positive score
-    assert score > 0.05
+    assert score >= expected_score, "Blobs failed with {0}, criterion = {1} and score = {2}".format(
+        name, criterion, score
+    )
+
+
+@pytest.mark.parametrize("name,Tree", TREE_CLUSTERS.items())
+@pytest.mark.parametrize("criterion", CLUSTER_CRITERIONS)
+def test_check_rotated_blobs(name, Tree, criterion):
+    """Test rotated axis-aligned Gaussian blobs, which should make oblique trees perform better."""
+    n_samples = 100
+    n_classes = 2
+    X, y = make_blobs(n_samples=n_samples, centers=n_classes, n_features=6, random_state=1234)
+
+    # apply rotation matrix to X
+
+    est = Tree(criterion=criterion, random_state=1234)
+    est.fit(X)
+    sim_mat = est.affinity_matrix_
+
+    # there is quite a bit of variance in the performance at the tree level
+    if criterion == "twomeans":
+        if "oblique" in name.lower():
+            expected_score = 0.02
+        else:
+            expected_score = 0.3
+    elif criterion == "fastbic":
+        if "oblique" in name.lower():
+            expected_score = 0.01
+        else:
+            expected_score = 0.4
+
+    # all ones along the diagonal
+    assert np.array_equal(sim_mat.diagonal(), np.ones(n_samples))
+
+    cluster = AgglomerativeClustering(n_clusters=n_classes).fit(sim_mat)
+    predict_labels = cluster.fit_predict(sim_mat)
+    score = adjusted_rand_score(y, predict_labels)
+
+    # a single decision tree does not fit well, but should still have a positive score
+    assert score >= expected_score, "Blobs failed with {0}, criterion = {1} and score = {2}".format(
+        name, criterion, score
+    )
+
+
+@pytest.mark.parametrize("name,Tree", TREE_CLUSTERS.items())
+@pytest.mark.parametrize("criterion", CLUSTER_CRITERIONS)
+def test_check_iris(name, Tree, criterion):
+    # Check consistency on dataset iris.
+    n_classes = len(np.unique(iris.target))
+    est = Tree(criterion=criterion, random_state=12345)
+    est.fit(iris.data, iris.target)
+    sim_mat = est.affinity_matrix_
+
+    # there is quite a bit of variance in the performance at the tree level
+    if criterion == "twomeans":
+        if "oblique" in name.lower():
+            expected_score = 0.2
+        else:
+            expected_score = 0.01
+    elif criterion == "fastbic":
+        if "oblique" in name.lower():
+            expected_score = 0.001
+        else:
+            expected_score = 0.2
+
+    cluster = AgglomerativeClustering(n_clusters=n_classes).fit(sim_mat)
+    predict_labels = cluster.fit_predict(sim_mat)
+    score = adjusted_rand_score(iris.target, predict_labels)
+
+    # Two-means and fastBIC criterions doesn't perform well
+    assert score > expected_score, "Iris failed with {0}, criterion = {1} and score = {2}".format(
+        name, criterion, score
+    )
 
 
 def test_oblique_tree_sampling():

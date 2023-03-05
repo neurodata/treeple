@@ -56,7 +56,7 @@ PATCH_DENSE_SPLITTERS = {
     "best": _morf_splitter.BestPatchSplitter,
 }
 
-UNSUPERVISED_CRITERIA = {"twomeans": _unsup_criterion.TwoMeans}
+UNSUPERVISED_CRITERIA = {"twomeans": _unsup_criterion.TwoMeans, "fastbic": _unsup_criterion.FastBIC}
 UNSUPERVISED_SPLITTERS = {
     "best": _unsup_splitter.BestUnsupervisedSplitter,
 }
@@ -159,7 +159,7 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
         criterion="twomeans",
         splitter="best",
         max_depth=None,
-        min_samples_split=2,
+        min_samples_split=5,
         min_samples_leaf=1,
         min_weight_fraction_leaf=0.0,
         max_features=None,
@@ -464,7 +464,7 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
         criterion="twomeans",
         splitter="best",
         max_depth=None,
-        min_samples_split=2,
+        min_samples_split=5,
         min_samples_leaf=1,
         min_weight_fraction_leaf=0,
         max_features=None,

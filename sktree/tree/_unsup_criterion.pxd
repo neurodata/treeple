@@ -54,3 +54,9 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         self,
         const DTYPE_t[:] Xf,
     ) nogil
+
+    cdef void set_sample_pointers(
+        self,
+        SIZE_t start,
+        SIZE_t end
+    ) nogil

@@ -148,7 +148,6 @@ jobs:
         with:
           submodules: recursive
 
-
       - name: Setup Python
         uses: actions/setup-python@v4.5.0
         with:
@@ -163,6 +162,7 @@ jobs:
       - name: pip-packages
         run: |
           pip install -r build_requirements.txt
+          pip install git+https://github.com/scientific-python/devpy
       - name: openblas-libs
         run: |
           # Download and install pre-built OpenBLAS library
@@ -183,6 +183,15 @@ jobs:
         run: |
           cd build
           meson install
+      # - name: build
+      #   run: |
+      #     python dev.py build -j 2
+      #     # following steps are required because the build step does not put
+      #     # the *.pyd files in build-install! Furthermore the --win-cp-openblas
+      #     # option does not seem to copy libopenblas*.dll, so manually copy it.
+      #     cd build
+      #     meson install
+      #     cd ..
       - name: build-path
         run: |
           echo "installed_path=$PWD\build\Lib\site-packages" >> $env:GITHUB_ENV

@@ -1,10 +1,14 @@
-# cython: language_level=3
-# cython: boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
+# distutils: language = c++
+#cython: language_level=3
+#cython: boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
 
 cimport numpy as cnp
+import numpy as np
+from libc.math cimport log
 
 cnp.import_array()
 
+cdef DTYPE_t PI = np.pi
 
 cdef class UnsupervisedCriterion(BaseCriterion):
     """Abstract criterion for unsupervised learning.
@@ -212,6 +216,28 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         # set values at the address pointer is pointing to with the total value
         dest[0] = self.sum_total
 
+    cdef void set_sample_pointers(
+        self,
+        SIZE_t start,
+        SIZE_t end
+    ) nogil:
+        """Set sample pointers in the criterion.
+
+        Set given start and end sample_indices. Also will update node statistics,
+        such as the `sum_total`, which tracks the total value within the current
+        node for sample_indices[start:end].
+
+        Parameters
+        ----------
+        start : SIZE_t
+            The start sample pointer.
+        end : SIZE_t
+            The end sample pointer.
+        """
+        self.n_node_samples = end - start
+        self.start = start
+        self.end = end
+
 
 cdef class TwoMeans(UnsupervisedCriterion):
     r"""Two means split impurity.
@@ -262,48 +288,10 @@ cdef class TwoMeans(UnsupervisedCriterion):
     pair minimizes the splitting criteria described in the following
     section
     """
-    cdef double sum_of_squares(
-        self,
-        SIZE_t start,
-        SIZE_t end,
-        double mean,
-    ) noexcept nogil:
-        """Computes variance of feature vector from sample_indices[start:end].
-
-        See: https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Weighted_sample_variance.  # noqa
-
-        Parameters
-        ----------
-        start : SIZE_t
-            The start pointer
-        end : SIZE_t
-            The end pointer.
-        mean : double
-            The precomputed mean.
-
-        Returns
-        -------
-        ss : double
-            Sum of squares
-        """
-        cdef SIZE_t s_idx, p_idx        # initialize sample and pointer index
-        cdef double ss = 0.0            # sum-of-squares
-        cdef DOUBLE_t w = 1.0           # optional weight
-
-        # calculate variance for the sample_indices chosen start:end
-        for p_idx in range(start, end):
-            s_idx = self.sample_indices[p_idx]
-
-            # include optional weighted sum of squares
-            if self.sample_weight is not None:
-                w = self.sample_weight[s_idx]
-
-            ss += w * (self.Xf[s_idx] - mean) * (self.Xf[s_idx] - mean)
-        return ss
 
     cdef double node_impurity(
         self
-    ) noexcept nogil:
+    ) nogil:
         """Evaluate the impurity of the current node.
 
         Evaluate the TwoMeans criterion impurity as variance of the current node,
@@ -322,7 +310,7 @@ cdef class TwoMeans(UnsupervisedCriterion):
                 )
 
         # first compute mean
-        mean = self.sum_total / n_node_samples
+        mean = self.sum_total / self.weighted_n_node_samples
 
         # then compute the impurity as the variance
         impurity = self.sum_of_squares(
@@ -332,11 +320,12 @@ cdef class TwoMeans(UnsupervisedCriterion):
         ) / self.weighted_n_node_samples
         return impurity
 
+
     cdef void children_impurity(
         self,
         double* impurity_left,
         double* impurity_right
-    ) noexcept nogil:
+    ) nogil:
         """Evaluate the impurity in children nodes.
 
         i.e. the impurity of the left child (sample_indices[start:pos]) and the
@@ -376,24 +365,220 @@ cdef class TwoMeans(UnsupervisedCriterion):
             mean_right
         ) / self.weighted_n_right
 
-    cdef void set_sample_pointers(
+
+    cdef double sum_of_squares(
         self,
         SIZE_t start,
-        SIZE_t end
+        SIZE_t end,
+        double mean,
     ) noexcept nogil:
-        """Set sample pointers in the criterion.
+        """Computes variance of feature vector from sample_indices[start:end].
 
-        Set given start and end sample_indices. Also will update node statistics,
-        such as the `sum_total`, which tracks the total value within the current
-        node for sample_indices[start:end].
+        See: https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Weighted_sample_variance.  # noqa
 
         Parameters
         ----------
         start : SIZE_t
-            The start sample pointer.
+            The start pointer
         end : SIZE_t
-            The end sample pointer.
+            The end pointer.
+        mean : double
+            The precomputed mean.
+
+        Returns
+        -------
+        ss : double
+            Sum of squares
         """
-        self.n_node_samples = end - start
-        self.start = start
-        self.end = end
+        cdef SIZE_t s_idx, p_idx        # initialize sample and pointer index
+        cdef double ss = 0.0            # sum-of-squares
+        cdef DOUBLE_t w = 1.0           # optional weight
+
+        # calculate variance for the sample_indices chosen start:end
+        for p_idx in range(start, end):
+            s_idx = self.sample_indices[p_idx]
+
+            # include optional weighted sum of squares
+            if self.sample_weight is not None:
+                w = self.sample_weight[s_idx]
+
+            ss += w * (self.Xf[s_idx] - mean) * (self.Xf[s_idx] - mean)
+        return ss
+
+cdef class FastBIC(TwoMeans):
+    r"""Fast-BIC split criterion
+    
+    The Bayesian Information Criterion (BIC) is a popular model seleciton 
+    criteria that is based on the log likelihood of the model given data.
+    MClust-BIC is a method in the R-package 'mclust' that uses BIC as a splitting
+    criterion.
+    See: https://stats.stackexchange.com/questions/237220/mclust-model-selection
+
+    Fast-BIC is a method that combines the speed of the two-means clustering 
+    method with the model flexibility of Mclust-BIC. It sorts data for each 
+    feature and tries all possible splits to assign data points to one of 
+    two Gaussian distributions based on their position relative to the split.
+    The parameters for each cluster are estimated using maximum likelihood 
+    estimation (MLE). The method performs hard clustering rather than soft 
+    clustering like in GMM, resulting in a simpler calculation of the likelihood.
+    
+    \hat{L} = \sum_{n=1}^s[\log\hat{\pi}_1+\log{\mathcal{N}(x_n;\hat{\mu}_1,\hat{\sigma}_1^2)}]
+    + \sum_{n=s+1}^N[\log\hat{\pi}_2+\log{\mathcal{N}(x_n;\hat{\mu}_2,\hat{\sigma}_2^2)}]
+    
+    where the prior, mean, and variance are defined as follows, respectively:
+    
+    - \hat{\pi} = \frac{s}{N}
+    - \hat{\mu} = \frac{1}{s}\sum_{n\le s}{x_n},
+    - \hat{\sigma}^2 = \frac{1}{s}\sum_{n\le s}{||x_n-\hat{\mu_j}||^2}
+
+    Fast-BIC is guaranteed to obtain the global maximum likelihood estimator.
+    Additionally, Fast-BIC is substantially faster than the traditional BIC method.
+
+    Reference: https://arxiv.org/abs/1907.02844
+
+    """
+    cdef double bic_cluster(self, SIZE_t n_samples, double variance) noexcept nogil:
+        """Help compute the BIC from assigning to a specific cluster.
+        
+        Parameters
+        ----------
+        n_samples : SIZE_t
+            The number of samples assigned cluster.
+        variance : double
+            The plug-in variance for assigning to specific cluster.
+
+        Notes
+        -----
+        Computes the following:
+
+        :math:`-2 * (n_i log(w_i) - n_i/2 log(2 \pi \sigma_i^2))
+
+        where ``n_i`` is the number of samples assigned to cluster i,
+        ``w_i`` is the probability of choosing cluster i at random (or also known
+        as the prior) and ``\sigma_i^2`` is the variance estimate for cluster i.
+
+        Note that ``\sigma_i^2`` in the Fast-BIC derivation may be the
+        variance of the cluster itself, or the estimated combined variance
+        from both clusters.
+        """
+        cdef SIZE_t n_node_samples = self.n_node_samples
+
+        # chances of choosing the cluster based on how many samples are hard-assigned to cluster
+        # i.e. the prior
+        # cast to double, so we do not round to integers
+        cdef double w_cluster = (n_samples + 0.0) / n_node_samples
+
+        # add to prevent taking log of 0 when there is a degenerate cluster (i.e. single sample, or no variance)
+        return -2. * (n_samples * log(w_cluster) + 0.5 * n_samples * log(2. * PI * variance + 1.e-7))
+
+
+    cdef double node_impurity(
+        self
+    ) noexcept nogil:
+        """Evaluate the impurity of the current node.
+
+        Evaluate the FastBIC criterion impurity as estimated maximum log likelihood.
+        This is the maximum likelihood given prior, mean, and variance at s number of samples
+        Namely, this is the maximum likelihood of Xf[sample_indices[start:end]].
+        The smaller the impurity the better.
+        """
+        cdef double mean
+        cdef double variance
+        cdef double impurity
+        cdef SIZE_t n_node_samples = self.n_node_samples
+
+        # If calling without setting the
+        if self.Xf is None:
+            with gil:
+                raise MemoryError(
+                    'Xf has not been set yet, so one must call init_feature_vec.'
+                )
+
+        # first compute mean
+        mean = self.sum_total / self.weighted_n_node_samples
+
+        # then compute the variance of the cluster
+        variance = self.sum_of_squares(
+            self.start,
+            self.end,
+            mean
+        ) / self.weighted_n_node_samples
+
+        # Compute the BIC of the current set of samples
+        # Note: we do not compute the BIC_diff_var and BIC_same_var because
+        # they are equivalent in the single cluster setting
+        impurity = self.bic_cluster(n_node_samples, variance)
+        return impurity
+
+    cdef void children_impurity(
+        self,
+        double* impurity_left,
+        double* impurity_right
+    ) noexcept nogil:
+        """Evaluate the impurity in children nodes.
+
+        i.e. the impurity of the left child (sample_indices[start:pos]) and the
+        impurity the right child (sample_indices[pos:end]).
+
+        Parameters
+        ----------
+        impurity_left : double pointer
+            The memory address to save the impurity of the left node
+        impurity_right : double pointer
+            The memory address to save the impurity of the right node
+        """
+        cdef SIZE_t pos = self.pos
+        cdef SIZE_t start = self.start
+        cdef SIZE_t end = self.end
+        cdef SIZE_t n_samples_left, n_samples_right
+
+        cdef double mean_left, mean_right
+        cdef double ss_left, ss_right, variance_left, variance_right, variance_comb
+        cdef double BIC_diff_var_left, BIC_diff_var_right
+        cdef double BIC_same_var_left, BIC_same_var_right
+        cdef double BIC_same_var, BIC_diff_var
+
+        # number of samples of left and right
+        n_samples_left = pos - start
+        n_samples_right = end - pos
+
+        # first compute mean of left and right
+        mean_left = self.sum_left / self.weighted_n_left
+        mean_right = self.sum_right / self.weighted_n_right
+
+        # compute the estimated variance of the left and right children
+        ss_left = self.sum_of_squares(
+            start,
+            pos,
+            mean_left
+        )
+        ss_right = self.sum_of_squares(
+            pos,
+            end,
+            mean_right
+        )
+        variance_left = ss_left / self.weighted_n_left
+        variance_right = ss_right / self.weighted_n_right
+        
+        # compute the estimated combined variance
+        variance_comb = (ss_left + ss_right) / (self.weighted_n_left + self.weighted_n_right)
+
+        # Compute the BIC using different variances for left and right 
+        BIC_diff_var_left = self.bic_cluster(n_samples_left, variance_left)
+        BIC_diff_var_right = self.bic_cluster(n_samples_right, variance_right)
+
+        # Compute the BIC using different variances for left and right 
+        BIC_same_var_left = self.bic_cluster(n_samples_left, variance_comb)
+        BIC_same_var_right = self.bic_cluster(n_samples_right, variance_comb)
+        BIC_same_var = BIC_same_var_left - BIC_same_var_right
+        BIC_diff_var = BIC_diff_var_left - BIC_diff_var_right
+
+        # choose the BIC formulation that gives us the smallest values
+        # (i.e. min of (BIC_diff, BIC_same) in the paper) and then
+        # assign the left and right child BIC values by reference
+        if BIC_diff_var < BIC_same_var:
+            impurity_left[0] = -BIC_diff_var_left
+            impurity_right[0] = -BIC_diff_var_right
+        else:
+            impurity_left[0] = -BIC_same_var_left
+            impurity_right[0] = -BIC_same_var_right
