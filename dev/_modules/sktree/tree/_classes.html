@@ -429,7 +429,7 @@ document.write(`
     <span class="s2">&quot;best&quot;</span><span class="p">:</span> <span class="n">_morf_splitter</span><span class="o">.</span><span class="n">BestPatchSplitter</span><span class="p">,</span>
 <span class="p">}</span>
 
-<span class="n">UNSUPERVISED_CRITERIA</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;twomeans&quot;</span><span class="p">:</span> <span class="n">_unsup_criterion</span><span class="o">.</span><span class="n">TwoMeans</span><span class="p">}</span>
+<span class="n">UNSUPERVISED_CRITERIA</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;twomeans&quot;</span><span class="p">:</span> <span class="n">_unsup_criterion</span><span class="o">.</span><span class="n">TwoMeans</span><span class="p">,</span> <span class="s2">&quot;fastbic&quot;</span><span class="p">:</span> <span class="n">_unsup_criterion</span><span class="o">.</span><span class="n">FastBIC</span><span class="p">}</span>
 <span class="n">UNSUPERVISED_SPLITTERS</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;best&quot;</span><span class="p">:</span> <span class="n">_unsup_splitter</span><span class="o">.</span><span class="n">BestUnsupervisedSplitter</span><span class="p">,</span>
 <span class="p">}</span>
@@ -532,7 +532,7 @@ document.write(`
         <span class="n">criterion</span><span class="o">=</span><span class="s2">&quot;twomeans&quot;</span><span class="p">,</span>
         <span class="n">splitter</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">,</span>
         <span class="n">max_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">min_samples_split</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">min_samples_split</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
         <span class="n">min_samples_leaf</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">min_weight_fraction_leaf</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
         <span class="n">max_features</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -837,7 +837,7 @@ document.write(`
         <span class="n">criterion</span><span class="o">=</span><span class="s2">&quot;twomeans&quot;</span><span class="p">,</span>
         <span class="n">splitter</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">,</span>
         <span class="n">max_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">min_samples_split</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">min_samples_split</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
         <span class="n">min_samples_leaf</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">min_weight_fraction_leaf</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">max_features</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1767,7 +1767,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-03-03.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-03-05.
       <br/>
     
   </p>
