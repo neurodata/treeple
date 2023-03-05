@@ -20,8 +20,11 @@ concurrency:
 jobs:
   build_wheels:
     name: Build wheels on ${{ matrix.os[1] }} - ${{ matrix.os[2] }} with Python ${{ matrix.python[0] }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os[0] }}
+    
     strategy:
+      # Ensure that a wheel builder finishes even if another fails
+      fail-fast: false
       matrix:
         os: # see scipy wheels.yml GH actions
           - [ubuntu-22.04, manylinux, x86_64]
