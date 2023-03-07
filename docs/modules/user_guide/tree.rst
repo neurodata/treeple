@@ -11,7 +11,7 @@ or structure in data without using labeled examples. Clustering is a common
 unsupervised learning technique that groups similar examples together 
 based on their features. In clustering settings, there may be no natural 
 notion of “true” class-labels, thus the efficacy of the clustering scheme is 
-often measured based on distance based metrics such as :func:`adjusted_rand_score`.
+often measured based on distance based metrics such as :func:`sklearn.metrics.adjusted_rand_score`.
 
 One way to combine clustering with decision trees is to use a clustering 
 algorithm to partition the data into groups, and then build a decision tree 
@@ -46,20 +46,20 @@ pre-processed data using unsupervised learning techniques.
 Cluster criteria
 ----------------
 
-Clustering criterion for :class:`UnsupervisedDecisionTree` is a technique that combines clustering 
+Clustering criterion for :class:`sktree.tree.UnsupervisedDecisionTree` is a technique that combines clustering 
 and decision tree algorithms to produce a set of decision rules. The clustering 
 criterion can be used to identify clusters of data that have similar 
 characteristics, and then construct decision rules based on the clustering 
 results.
 
-One common clustering criterion for decision trees is the :class:`KMeans` algorithm. 
-The :class:`KMeans` algorithm partitions the data into K clusters based on the 
+One common clustering criterion for decision trees is the :class:`sklearn.cluster.KMeans` algorithm. 
+The :class:`sklearn.cluster.KMeans` algorithm partitions the data into K clusters based on the 
 distance between the data points. The algorithm then constructs a decision 
 tree on each cluster, using the same process as a standard decision tree 
 algorithm.
 
-Another clustering criterion for decision trees is the :class:`AgglomerativeClustering`
-algorithm. :class:`AgglomerativeClustering` is a bottom-up clustering method that starts 
+Another clustering criterion for decision trees is the :class:`sklearn.cluster.AgglomerativeClustering`
+algorithm. Agglomerative Clustering is a bottom-up clustering method that starts 
 with each data point as a cluster and then iteratively merges the closest 
 pairs of clusters until all the data points are in a single cluster. 
 The resulting tree structure can be used to construct a decision tree by 
@@ -86,12 +86,12 @@ from cluster 1 and cluster 2 are minimal.
 where x is a N-dimensional feature vector, N is the number of sample_indices and
 the \mu terms are the estimated means of each cluster 1 and 2.
 
-FastBIC
-~~~~~~~
+Fast-BIC
+~~~~~~~~
 
 The Bayesian Information Criterion (BIC) is a popular model seleciton 
 criteria that is based on the log likelihood of the model given data.
-:class:`FastBIC` is a method that combines the speed of the :class:`TwoMeans` clustering 
+Fast-BIC is a method that combines the speed of the :class:`sklearn.cluster.KMeans` clustering 
 method with the model flexibility of Mclust-BIC. It sorts data for each 
 feature and tries all possible splits to assign data points to one of 
 two Gaussian distributions based on their position relative to the split.
