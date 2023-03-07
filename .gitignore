@@ -14,7 +14,7 @@ docs/generated/
 docs/auto_examples/
 docs/auto_tutorials/
 docs/modules/generated/
-docs/modules/api/generated
+docs/modules/api/generated/
 docs/sphinxext/cachedir
 pip-log.txt
 .coverage
