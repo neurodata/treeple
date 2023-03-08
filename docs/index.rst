@@ -6,7 +6,7 @@
 .. toctree::
    :hidden:
    :maxdepth: 2
-   :caption: Getting started:
+   :caption: Getting started
 
    modules/get_started/index.rst
    modules/user_guide/index.rst
