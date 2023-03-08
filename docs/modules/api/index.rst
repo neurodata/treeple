@@ -25,13 +25,13 @@ how scikit-learn builds trees.
 
 .. currentmodule:: sktree
 .. autosummary::
-   :toctree: generated/
+   :toctree: ../generated/
 
    ObliqueRandomForestClassifier
    PatchObliqueRandomForestClassifier
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: ../generated/
 
    tree.ObliqueDecisionTreeClassifier
    tree.PatchObliqueDecisionTreeClassifier
@@ -46,13 +46,13 @@ on unsupervised criterion such as variance and BIC.
 
 .. currentmodule:: sktree
 .. autosummary::
-   :toctree: generated/
+   :toctree: ../generated/
    
    UnsupervisedRandomForest
    UnsupervisedObliqueRandomForest
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: ../generated/
    
    tree.UnsupervisedDecisionTree
    tree.UnsupervisedObliqueDecisionTree
