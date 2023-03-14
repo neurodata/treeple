@@ -207,11 +207,11 @@ skips = ['B404', 'B603']
 package = 'sktree'
 
 [tool.devpy.commands]
-Build = ["devpy.build", "devpy.test"]
+Build = ["devpy.cmds.meson.build", "devpy.cmds.meson.test"]
 Environments = [
-    'devpy.shell',
-    'devpy.ipython',
-    'devpy.python',
+    'devpy.cmds.meson.shell',
+    'devpy.cmds.meson.ipython',
+    'devpy.cmds.meson.python',
 ]
 Documentation = ['.devpy/cmds.py:docs']
 Metrics = [
