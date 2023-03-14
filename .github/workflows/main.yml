@@ -68,7 +68,7 @@ jobs:
       - name: Install Python packages
         run: |
           python -m pip install -r build_requirements.txt
-          python -m pip install git+https://github.com/scientific-python/devpy
+          python -m pip install git+https://github.com/scientific-python/devpy@v0.1
           python -m pip install -r test_requirements.txt
 
       - name: Prepare compiler cache
@@ -162,7 +162,7 @@ jobs:
       - name: pip-packages
         run: |
           pip install -r build_requirements.txt
-          pip install git+https://github.com/scientific-python/devpy
+          pip install git+https://github.com/scientific-python/devpy@v0.1
       - name: openblas-libs
         run: |
           # Download and install pre-built OpenBLAS library
