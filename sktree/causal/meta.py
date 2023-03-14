@@ -1,36 +1,27 @@
-from itertools import product
 import numbers
+from itertools import product
+
 import numpy as np
-from sklearn.base import MetaEstimatorMixin, BaseEstimator, is_classifier, clone
-from sklearn.utils import check_random_state
-from sklearn.model_selection import GridSearchCV
-from sklearn.model_selection import check_cv, KFold, StratifiedKFold
-from sklearn.utils.validation import indexable, check_is_fitted, _check_fit_params
-
-from sklearn.linear_model import LassoCV, LogisticRegressionCV
-
-
 from joblib import Parallel, delayed
-
-class BaseCausal:
-    def conditional_effect(self, X=None, *, T0, T1):
-        pass
-
-    def marginal_effect(self, T, X=None):
-        pass
+from sklearn.base import BaseEstimator, MetaEstimatorMixin, clone, is_classifier
+from sklearn.linear_model import LassoCV, LogisticRegressionCV
+from sklearn.model_selection import GridSearchCV, KFold, StratifiedKFold, check_cv
+from sklearn.utils import check_random_state
+from sklearn.utils.validation import _check_fit_params, check_is_fitted, indexable
 
 
-def _parallel_crossfit_nuisance(estimator_treatment,
-                    estimator_outcome,
-                    X,
-                    y,
-                    t,
-                    sample_weight,
-                    train,
-                    test,
-                    verbose,
-                    split_progress=None, #(split_idx, n_splits),
-                ):
+def _parallel_crossfit_nuisance(
+    estimator_treatment,
+    estimator_outcome,
+    X,
+    y,
+    t,
+    sample_weight,
+    train,
+    test,
+    verbose,
+    split_progress=None,  # (split_idx, n_splits),
+):
     """Crossfitting nuisance functions in parallel.
 
     Parameters
@@ -92,7 +83,7 @@ def _parallel_crossfit_nuisance(estimator_treatment,
         start_msg = f"[CV{progress_msg}] START {params_msg}"
         print(f"{start_msg}{(80 - len(start_msg)) * '.'}")
 
-    # fit the nuisance functions on the 
+    # fit the nuisance functions on the
     X_train, X_test = X[train, :], X[test, :]
     y_train, y_test = y[train, :], y[test, :]
     t_train, t_test = t[train, :], t[test, :]
@@ -105,10 +96,10 @@ def _parallel_crossfit_nuisance(estimator_treatment,
     t_residuals = t_test - t_pred
 
     result = dict()
-    result['estimator_outcome'] = estimator_outcome
-    result['estimator_treatment'] = estimator_treatment
-    result['y_residuals'] = y_residuals
-    result['t_residuals'] = t_residuals
+    result["estimator_outcome"] = estimator_outcome
+    result["estimator_treatment"] = estimator_treatment
+    result["y_residuals"] = y_residuals
+    result["t_residuals"] = t_residuals
 
     return result
 
@@ -133,19 +124,21 @@ def check_outcome_estimator(estimator_outcome, y, random_state):
     if estimator_outcome is None:
         return LassoCV(random_state=random_state)
     else:
-        if not hasattr(estimator_outcome, 'fit') or not hasattr(estimator_outcome, 'predict'):
-            raise RuntimeError('All outcome estimator models must have the `fit` and `predict` functions implemented.')
+        if not hasattr(estimator_outcome, "fit") or not hasattr(estimator_outcome, "predict"):
+            raise RuntimeError(
+                "All outcome estimator models must have the `fit` and `predict` functions implemented."
+            )
 
         estimator_outcome = clone(estimator_outcome)
     # XXX: run some checks on y being compatible with the estimator
     if is_classifier(estimator_outcome) and not issubclass(y.type, numbers.Integral):
         raise RuntimeError(
-            'Treatment array is not integers, but the treatment estimator is classification based. '
-            'If treatment array is discrete, then treatment estimator should be a classifier. '
-            'If treatment array is continuous, thent treatment estimator should be a regressor.'
+            "Treatment array is not integers, but the treatment estimator is classification based. "
+            "If treatment array is discrete, then treatment estimator should be a classifier. "
+            "If treatment array is continuous, thent treatment estimator should be a regressor."
         )
     return estimator_outcome
-    
+
 
 def check_treatment_estimator(estimator_treatment, t, random_state):
     """Check treatment estimator and error-check.
@@ -167,17 +160,19 @@ def check_treatment_estimator(estimator_treatment, t, random_state):
     if estimator_treatment is None:
         estimator_treatment = LogisticRegressionCV(random_state=random_state)
     else:
-        if not hasattr(estimator_treatment, 'fit') or not hasattr(estimator_treatment, 'predict'):
-            raise RuntimeError('All treatment estimator models must have the `fit` and `predict` functions implemented.')
-        
+        if not hasattr(estimator_treatment, "fit") or not hasattr(estimator_treatment, "predict"):
+            raise RuntimeError(
+                "All treatment estimator models must have the `fit` and `predict` functions implemented."
+            )
+
         estimator_treatment = clone(estimator_treatment)
 
     # XXX: run some checks on t being compatible with the estimator. i.e. discrete -> classifier, otw regressor
     if is_classifier(estimator_treatment) and not issubclass(t.type, numbers.Integral):
         raise RuntimeError(
-            'Treatment array is not integers, but the treatment estimator is classification based. '
-            'If treatment array is discrete, then treatment estimator should be a classifier. '
-            'If treatment array is continuous, thent treatment estimator should be a regressor.'
+            "Treatment array is not integers, but the treatment estimator is classification based. "
+            "If treatment array is discrete, then treatment estimator should be a classifier. "
+            "If treatment array is continuous, thent treatment estimator should be a regressor."
         )
 
     return estimator_treatment
@@ -255,8 +250,8 @@ class DML(MetaEstimatorMixin, BaseEstimator):
     model :footcite:`chernozhukov2018double`. See the User-guide for a description of two-stage learners, specifically on orthogonal
     learning and doubly-robust learning. The two-stage procedure of DML follows the two steps:
 
-    **1. Estimate nuissance functions**
-    There are two nuissance functions that need to be estimated, :math:`q(X, W) = E[Y | X, W]` and
+    **1. Estimate nuisance functions**
+    There are two nuisance functions that need to be estimated, :math:`q(X, W) = E[Y | X, W]` and
     :math:`f(X, W) = E[T | X, W]`, which are the models for the outcome and treatment
     respectively. Here, one needs to run a regression (or classification model if treatments/outcomes
     are discrete), that predicts outcomes and treatments given the covariates and control features.
@@ -296,16 +291,17 @@ class DML(MetaEstimatorMixin, BaseEstimator):
     ----------
     .. footbibliography::
     """
+
     def __init__(
-            self,
-            estimator,
-            estimator_outcome=None,
-            estimator_treatment=None,
-            cv=None,
-            random_state=None,
-            n_jobs=None,
-            verbose=False,
-        ) -> None:
+        self,
+        estimator,
+        estimator_outcome=None,
+        estimator_treatment=None,
+        cv=None,
+        random_state=None,
+        n_jobs=None,
+        verbose=False,
+    ) -> None:
         super().__init__()
         self.estimator = estimator
         self.estimator_outcome = estimator_outcome
@@ -320,15 +316,11 @@ class DML(MetaEstimatorMixin, BaseEstimator):
         random_state = check_random_state(self.random_state)
 
         # run checks on input data
-        X, y = self._validate_data(
-                X, y, multi_output=True, accept_sparse=False
-            )
-        self._validate_data(
-                y=t, multi_output=True, accept_sparse=False
-            )
+        X, y = self._validate_data(X, y, multi_output=True, accept_sparse=False)
+        self._validate_data(y=t, multi_output=True, accept_sparse=False)
         X, y, t, groups = indexable(X, y, t, groups)
         fit_params = _check_fit_params(X, fit_params)
-        sample_weight = fit_params.get('sample_weight', None)
+        sample_weight = fit_params.get("sample_weight", None)
 
         # Determine output settings
         _, self.n_features_in_ = X.shape
@@ -346,10 +338,14 @@ class DML(MetaEstimatorMixin, BaseEstimator):
         final_stage_estimator = clone(self.estimator)
 
         # initialize the models for treatment and outcome
-        estimator_outcome = check_outcome_estimator(estimator_outcome=self.estimator_outcome, y=y, random_state=random_state)
-        estimator_treatment = check_treatment_estimator(estimator_treatment=self.estimator_treatment, t=t, random_state=random_state)
+        estimator_outcome = check_outcome_estimator(
+            estimator_outcome=self.estimator_outcome, y=y, random_state=random_state
+        )
+        estimator_treatment = check_treatment_estimator(
+            estimator_treatment=self.estimator_treatment, t=t, random_state=random_state
+        )
 
-        # fit the nuissance functions in parallel
+        # fit the nuisance functions in parallel
         parallel = Parallel(n_jobs=self.n_jobs)
         with parallel:
             out = parallel(
@@ -373,9 +369,9 @@ class DML(MetaEstimatorMixin, BaseEstimator):
             t_residuals = np.zeros(t.shape)
 
             for result in out:
-                test = result['test_idx']
-                y_residuals[test, :] = result['y_residuals']
-                t_residuals[test, :] = result['t_residuals']
+                test = result["test_idx"]
+                y_residuals[test, :] = result["y_residuals"]
+                t_residuals[test, :] = result["t_residuals"]
 
         # now fit the final stage estimator
         final_stage_estimator.fit(X=X, y=y_residuals, t=t_residuals, **fit_params)
@@ -391,7 +387,7 @@ class DML(MetaEstimatorMixin, BaseEstimator):
         pass
 
     def conditional_effect(self, X, t=None):
-        """Compute conditional effect of 
+        """Compute conditional effect of
 
         Parameters
         ----------
@@ -401,5 +397,3 @@ class DML(MetaEstimatorMixin, BaseEstimator):
             _description_, by default None
         """
         pass
-
-    

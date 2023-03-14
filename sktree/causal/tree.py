@@ -1,11 +1,12 @@
 from sklearn.base import BaseEstimator
-
 from sklearn.ensemble._forest import BaseForest, ForestRegressor
-from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+from sklearn.tree import BaseDecisionTree, DecisionTreeClassifier, DecisionTreeRegressor
 
 
 class CausalTree(BaseEstimator):
-    def __init__(self, 
+    def __init__(
+        self,
+        tree=None,
         criterion="gini",
         splitter="best",
         max_depth=None,
@@ -19,7 +20,58 @@ class CausalTree(BaseEstimator):
         class_weight=None,
         ccp_alpha=0.0,
         honest_ratio=0.5,
+        **tree_params,
     ) -> None:
+        """A causal tree.
+
+        A causal tree is a decision tree model that operates over not only
+        ``(X, y)`` tuple of arrays, but also includes the treatment groups.
+        It is an estimator model that has a graphical model of the form
+        :math:`T \\rightarrow Y` with :math:`T \\leftarrow X \\rightarrow Y`.
+
+        Parameters
+        ----------
+        tree : _type_, optional
+            _description_, by default None
+        criterion : str, optional
+            _description_, by default "gini"
+        splitter : str, optional
+            _description_, by default "best"
+        max_depth : _type_, optional
+            _description_, by default None
+        min_samples_split : int, optional
+            _description_, by default 2
+        min_samples_leaf : int, optional
+            _description_, by default 1
+        min_weight_fraction_leaf : float, optional
+            _description_, by default 0.0
+        max_features : _type_, optional
+            _description_, by default None
+        random_state : _type_, optional
+            _description_, by default None
+        max_leaf_nodes : _type_, optional
+            _description_, by default None
+        min_impurity_decrease : float, optional
+            _description_, by default 0.0
+        class_weight : _type_, optional
+            _description_, by default None
+        ccp_alpha : float, optional
+            _description_, by default 0.0
+        honest_ratio : float, optional
+            _description_, by default 0.5
+
+        Notes
+        -----
+        Compared to a normal decision tree model, which estimates the value :math:`E[Y | X]`,
+        a causal decision tree splits the data in such a way to estimate the value
+        :math:`E[Y | do(T), X]`. This is a causal effect, and thus requires causal assumptions.
+        The core assumption is that of unconfoundedness, where the outcomes, ``Y``, and the
+        treatments, ``T`` are not confounded by any other non-observed variables. That is ``X``
+        captures all possible confounders. This is typically a strong assumption, but is realized
+        in well-designed observational studies and randomized control trials, where the treatment
+        assignment is randomized.
+        """
+        self.tree = tree
         self.criterion = criterion
         self.splitter = splitter
         self.max_depth = max_depth
@@ -33,27 +85,52 @@ class CausalTree(BaseEstimator):
         self.class_weight = class_weight
         self.ccp_alpha = ccp_alpha
         self.honest_ratio = honest_ratio
+        self.tree_params = tree_params
 
     def fit(self, X, y, sample_weight=None, T=None):
         # initialize the tree estimator
-        self.estimator_ = DecisionTreeClassifier(
-            criterion=self.criterion,
-            splitter=self.splitter,
-            max_depth=self.max_depth,
-            min_samples_split=self.min_samples_split,
-            min_samples_leaf=self.min_samples_leaf,
-            min_weight_fraction_leaf=self.min_weight_fraction_leaf,
-            max_features=self.max_features,
-            random_state=self.random_state,
-            max_leaf_nodes=self.max_leaf_nodes,
-            min_impurity_decrease=self.min_impurity_decrease,
-            class_weight=self.class_weight,
-            ccp_alpha=self.ccp_alpha,
-            honest_ratio=1.0,
-        )
-        
+        if self.tree is None:
+            self.estimator_ = DecisionTreeClassifier(
+                criterion=self.criterion,
+                splitter=self.splitter,
+                max_depth=self.max_depth,
+                min_samples_split=self.min_samples_split,
+                min_samples_leaf=self.min_samples_leaf,
+                min_weight_fraction_leaf=self.min_weight_fraction_leaf,
+                max_features=self.max_features,
+                random_state=self.random_state,
+                max_leaf_nodes=self.max_leaf_nodes,
+                min_impurity_decrease=self.min_impurity_decrease,
+                class_weight=self.class_weight,
+                ccp_alpha=self.ccp_alpha,
+                honest_ratio=1.0,
+                **self.tree_params,
+            )
+        else:
+            if not issubclass(self.tree, BaseDecisionTree):
+                raise RuntimeError(
+                    "The type of tree must be a subclass of sklearn.tree.BaseDecisionTree."
+                )
+
+            self.estimator_ = self.tree(
+                criterion=self.criterion,
+                splitter=self.splitter,
+                max_depth=self.max_depth,
+                min_samples_split=self.min_samples_split,
+                min_samples_leaf=self.min_samples_leaf,
+                min_weight_fraction_leaf=self.min_weight_fraction_leaf,
+                max_features=self.max_features,
+                random_state=self.random_state,
+                max_leaf_nodes=self.max_leaf_nodes,
+                min_impurity_decrease=self.min_impurity_decrease,
+                class_weight=self.class_weight,
+                ccp_alpha=self.ccp_alpha,
+                honest_ratio=1.0,
+                **self.tree_params,
+            )
+
         # fit the decision tree using only the treatment groups
-        self.estimator_.fit(X, T, sample_weight=sample_weight)
+        self.estimator_.fit(X, y=T, sample_weight=sample_weight)
 
         # re-fit the tree leaves using the outcomes
         refit_leaves(self.estimator_, X, y)
@@ -66,7 +143,7 @@ class CausalTree(BaseEstimator):
 
     def predict_proba(self, X):
         return self.estimator_.predict_proba(X)
-    
+
     def decision_path(self, X):
         return self.estimator_.decision_path(X)
 
@@ -89,7 +166,6 @@ class CausalTree(BaseEstimator):
             (Gini importance).
         """
         return self.estimator_.feature_importances_
-    
 
 
 class ForestCausalRegressor(BaseForest):
@@ -158,8 +234,7 @@ class ForestCausalRegressor(BaseForest):
         # Parallel loop
         lock = threading.Lock()
         Parallel(n_jobs=n_jobs, verbose=self.verbose, require="sharedmem")(
-            delayed(_accumulate_prediction)(e.predict, X, [y_hat], lock)
-            for e in self.estimators_
+            delayed(_accumulate_prediction)(e.predict, X, [y_hat], lock) for e in self.estimators_
         )
 
         y_hat /= len(self.estimators_)
@@ -231,16 +306,12 @@ class ForestCausalRegressor(BaseForest):
             The value of the partial dependence function on each grid point.
         """
         grid = np.asarray(grid, dtype=DTYPE, order="C")
-        averaged_predictions = np.zeros(
-            shape=grid.shape[0], dtype=np.float64, order="C"
-        )
+        averaged_predictions = np.zeros(shape=grid.shape[0], dtype=np.float64, order="C")
 
         for tree in self.estimators_:
             # Note: we don't sum in parallel because the GIL isn't released in
             # the fast method.
-            tree.tree_.compute_partial_dependence(
-                grid, target_features, averaged_predictions
-            )
+            tree.tree_.compute_partial_dependence(grid, target_features, averaged_predictions)
         # Average over the forest
         averaged_predictions /= len(self.estimators_)
 
