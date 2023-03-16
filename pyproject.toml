@@ -203,17 +203,17 @@ precision = 2
 exclude_dirs = ["sktree/tests", "sktree/tree/tests", 'sktree/_build_utils/*']
 skips = ['B404', 'B603']
 
-[tool.devpy]
+[tool.spin]
 package = 'sktree'
 
-[tool.devpy.commands]
-Build = ["devpy.cmds.meson.build", "devpy.cmds.meson.test"]
+[tool.spin.commands]
+Build = ["spin.cmds.meson.build", "spin.cmds.meson.test"]
 Environments = [
-    'devpy.cmds.meson.shell',
-    'devpy.cmds.meson.ipython',
-    'devpy.cmds.meson.python',
+    'spin.cmds.meson.shell',
+    'spin.cmds.meson.ipython',
+    'spin.cmds.meson.python',
 ]
-Documentation = ['.devpy/cmds.py:docs']
+Documentation = ['.spin/cmds.py:docs']
 Metrics = [
-    '.devpy/cmds.py:coverage',
+    '.spin/cmds.py:coverage',
 ]

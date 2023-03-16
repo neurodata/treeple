@@ -45,13 +45,13 @@ Then run installation of build packages
 .. code-block:: bash
 
     pip install -r build_requirements.txt
-    pip install git+https://github.com/scientific-python/devpy
+    pip install spin
     
-    # use dev.py CLI to run Meson build locally
-    ./dev.py build -j 2
+    # use spin CLI to run Meson build locally
+    ./spin build -j 2
 
     # you can now run tests
-    ./dev.py test 
+    ./spin test 
 
 via pip, you will be able to install in editable mode (pending Meson-Python support).
 
