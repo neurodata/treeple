@@ -23,8 +23,267 @@ from ._utils cimport matinv_, pinv_
 
 cdef double INFINITY = np.inf
 
+# TODO: OPEN QUESTIONS
+# 1. why is alpha = y * T and y * Z in CATE and iV forests?
+# 2. why is pointJ = T x T and T x Z?
 
-cdef class MomentCriterion(RegressionCriterion):
+cdef class GeneralizedMomentCriterion(RegressionCriterion):
+    """A generalization of the regression criterion in scikit-learn.
+
+    Generalized criterion with moment equations was introduced in the generalized
+    random forest paper, which shows how many common forests are trained using this
+    framework of criterion.
+
+    A criterion class that estimates local parameters defined via moment equations
+    of the form::
+
+        E[ m(J, A; theta(x)) | X=x]
+
+    where our specific instance is a linear moment equation::
+        
+        E[ J * theta(x) - A | X=x] = 0
+
+    where:
+
+    - m(J, A; theta(x)) is the moment equation that is specified per modeling setup.
+    - J is the Jacobian array of shape (n_outputs, n_outputs) per sample
+    - A is the alpha weights of shape (n_outputs) per sample
+    - theta(x) is the parameters we are interested in of shape (n_outputs) per sample
+    - X is the data matrix of shape (n_samples, n_features)
+
+    We have the following given points:
+
+    - alpha is the weights per sample of shape (n_samples, n_outputs)
+    - pointJ is the pointwise Jacobian array per sample of shape (n_samples, n_outputs, n_outputs)
+    
+    Then we have the following estimating equations:
+
+    J(Node) := E[J[i] | X[i] in Node] = sum_{i in Node} w[i] J[i]
+    moment[i] := J[i] * theta(Node) - A[i]
+    rho[i] := - J(Node)^{-1} (J[i] * theta(Node) - A[i])
+    theta_pre(node) := E[A[i] | X[i] in Node] weight(node) = sum_{i in Node} w[i] A[i]
+    theta(Node) := J(Node)^{-1} E[A[i] | X[i] in Node] = J(node)^{-1} theta_pre(node)
+
+    Notes
+    -----
+    Calculates impurity based on heterogeneity induced on the estimated parameters, based on
+    the proxy score defined in :footcite:`Athey2016GeneralizedRF`.
+
+    Specifically, we compute node, proxy and children impurity similarly to a
+    mean-squared error setting, where these are in general "proxies" for the true
+    criterion:
+
+        n_{C1} * n_{C2} / n_P^2 (\hat{\\theta}_{C1} - \hat{\\theta}_{C2})^2
+
+    as specified in Equation 5 of the paper :footcite:`Athey2016GeneralizedRF`.
+    The proxy is computed with Equation 9 of the paper:
+
+        1/n_{C1} (\sum_{i \in C1} \\rho_i)^2 + 1/n_{C2} (\sum_{i \in C2} \\rho_i)^2
+
+    where :math:`\\rho_i` is the pseudo-label for the ith sample.
+    """
+    def __cinit__(
+        self,
+        SIZE_t n_outputs,
+        SIZE_t n_samples,
+        SIZE_t n_relevant_outputs,
+        SIZE_t n_y,
+    ):
+        """Initialize parameters for this criterion. Parent `__cinit__` is always called before children.
+        So we only perform extra initializations that were not perfomed by the parent classes.
+
+        Parameters
+        ----------
+        n_outputs : SIZE_t
+            The number of parameters/values to be estimated
+        n_samples : SIZE_t
+            The total number of rows in the 2d matrix y.
+            The total number of samples to fit on.
+        n_relevant_outputs : SIZE_t
+            We only care about the first n_relevant_outputs of these parameters/values
+        n_y : SIZE_t
+            The first n_y columns of the 2d matrix y, contain the raw labels y_{ik}, the rest are auxiliary variables
+        """
+        # Most initializations are handled by __cinit__ of RegressionCriterion
+        # which is always called in cython. We initialize the extras.
+        if n_y > 1:
+            raise AttributeError("LinearMomentGRFCriterion currently only supports a scalar y")
+
+        self.proxy_children_impurity = True     # The children_impurity() only returns an approximate proxy
+
+        self.n_outputs = 
+        self.n_relevant_outputs = n_relevant_outputs
+        self.n_y = n_y
+
+        # Allocate memory for the proxy for y, which rho in the generalized random forest
+        # Since rho is node dependent it needs to be re-calculated and stored for each sample
+        # in the node for every node we are investigating
+        self.rho = np.zeros((n_samples, n_outputs), dtype=np.float64)
+        self.moment = np.zeros((n_samples, n_outputs), dtype=np.float64)
+        self.J = np.zeros((n_outputs, n_outputs), dtype=np.float64)
+        self.invJ = np.zeros((n_outputs, n_outputs), dtype=np.float64)
+        self.parameter = np.zeros(n_outputs, dtype=np.float64)
+        self.parameter_pre = np.zeros(n_outputs, dtype=np.float64)
+
+    cdef int init(
+        self,
+        const DOUBLE_t[:, ::1] y,
+        const DOUBLE_t[:] sample_weight,
+        double weighted_n_samples,
+        const SIZE_t[:] sample_indices
+    ) nogil except -1:
+        """Initialize the criterion object with data.
+        
+        Parameters
+        ----------
+        y : DOUBLE_t 2D memoryview of shape (n_samples, n_y + n_outputs + n_outputs * n_outputs)
+            The input y array.
+        sample_weight : ndarray, dtype=DOUBLE_t
+            The weight of each sample stored as a Cython memoryview.
+        weighted_n_samples : double
+            The total weight of the samples being considered
+        sample_indices : ndarray, dtype=SIZE_t
+            A mask on the samples. Indices of the samples in X and y we want to use,
+            where sample_indices[start:end] correspond to the samples in this node.
+
+        Notes
+        -----
+        For generalized criterion, the y array has columns associated with the
+        actual 'y' in the first `n_y` columns, and the next `n_outputs` columns are associated
+        with the alpha vectors and the next `n_outputs * n_outputs` columns are
+        associated with the estimated sample Jacobian vectors.
+
+        `n_relevant_outputs` is a number less than or equal to `n_outputs`, which
+        tracks the relevant outputs.
+        """
+        # Initialize fields
+        self.y = y
+        self.sample_weight = sample_weight
+        self.sample_indices = sample_indices
+        self.weighted_n_samples = weighted_n_samples
+
+        cdef SIZE_t n_features = self.n_features
+        cdef SIZE_t n_outputs = self.n_outputs
+        cdef SIZE_t n_y = self.n_y
+
+        self.y = y[:, :n_y]                     # The first n_y columns of y are the original raw outcome
+        self.alpha = y[:, n_y:(n_y + n_outputs)]        # A[i] part of the moment is the next n_outputs columns
+        # J[i] part of the moment is the next n_outputs * n_outputs columns, stored in Fortran contiguous format
+        self.pointJ = y[:, (n_y + n_outputs):(n_y + n_outputs + n_outputs * n_outputs)]
+        self.sample_weight = sample_weight      # Store the sample_weight locally
+        self.samples = samples                  # Store the sample index structure used and updated by the splitter
+        self.weighted_n_samples = weighted_n_samples    # Store total weight of all samples computed by splitter
+
+        return 0
+
+    cdef double node_impurity(
+        self
+    ) noexcept nogil:
+        """Evaluate the impurity of the current node, i.e. the impurity of
+        samples[start:end].
+        
+        This sums up the relevant metric over all "relevant outputs" (`n_relevant_outputs`)
+        for samples in the node and then normalizes to get the average impurity of the node.
+        Similarly, `sum_total` stores an (`n_outputs`,) array and should have been computed apriori.
+
+        This distinctly generalizes the scikit-learn Regression Criterion, as the `n_outputs`
+        contains both `n_relevant_outputs` and extra outputs that are nuisance parameters. But
+        otherwise, the node impurity calculation follows that of a regression.
+        """
+
+        cdef double* sum_total = self.sum_total
+        cdef double impurity
+        cdef SIZE_t k
+
+        impurity = self.sq_sum_total / self.weighted_n_node_samples
+        for k in range(self.n_relevant_outputs):
+            impurity -= (sum_total[k] / self.weighted_n_node_samples)**2.0
+
+        return impurity / self.n_relevant_outputs
+
+    cdef double proxy_impurity_improvement(
+        self
+    ) noexcept nogil:
+        """Compute a proxy of the impurity reduction.
+
+        This method is used to speed up the search for the best split. It is a proxy quantity such that the
+        split that maximizes this value also maximizes the impurity improvement. It neglects all constant terms
+        of the impurity decrease for a given split. The absolute impurity improvement is only computed by the
+        impurity_improvement method once the best split has been found.
+
+        This sums up the relevant metric over all "relevant outputs" (`n_relevant_outputs`)
+        for samples in the node and then normalizes to get the average impurity of the node.
+        Similarly, `sum_left` and `sum_right` stores an (`n_outputs`,) array and should have
+        been computed apriori.
+
+        This distinctly generalizes the scikit-learn Regression Criterion, as the `n_outputs`
+        contains both `n_relevant_outputs` and extra outputs that are nuisance parameters. But
+        otherwise, the node impurity calculation follows that of a regression.
+        """
+
+        cdef double* sum_left = self.sum_left
+        cdef double* sum_right = self.sum_right
+
+        cdef SIZE_t k
+        cdef double proxy_impurity_left = 0.0
+        cdef double proxy_impurity_right = 0.0
+
+        for k in range(self.n_relevant_outputs):
+            proxy_impurity_left += sum_left[k] * sum_left[k]
+            proxy_impurity_right += sum_right[k] * sum_right[k]
+
+        return (proxy_impurity_left / self.weighted_n_left +
+                proxy_impurity_right / self.weighted_n_right)
+
+    cdef void children_impurity(
+        self,
+        double* impurity_left,
+        double* impurity_right
+    ) noexept nogil:
+        """Evaluate the impurity in children nodes, i.e. the impurity of the
+        left child (samples[start:pos]) and the impurity the right child
+        (samples[pos:end]). Here we use the proxy child impurity:
+            impurity_child[k] = sum_{i in child} w[i] rho[i, k]^2 / weight(child)
+                                - (sum_{i in child} w[i] * rho[i, k] / weight(child))^2
+            impurity_child = sum_{k in n_relevant_outputs} impurity_child[k] / n_relevant_outputs
+        """
+        cdef SIZE_t pos = self.pos
+        cdef SIZE_t start = self.start
+        cdef DOUBLE_t y_ik
+
+        cdef double sq_sum_left = 0.0
+        cdef double sq_sum_right
+
+        cdef SIZE_t i, p, k, offset
+        cdef DOUBLE_t w = 1.0
+
+        # We calculate: sq_sum_left = sum_{i in child} w[i] rho[i, k]^2
+        for p in range(start, pos):
+            i = self.sample_indices[p]
+
+            if self.sample_weight is not None:
+                w = self.sample_weight[i]
+
+            for k in range(self.n_relevant_outputs):
+                y_ik = self.rho[i, k]
+                sq_sum_left += w * y_ik * y_ik
+        # We calculate sq_sum_right = sq_sum_total - sq_sum_left
+        sq_sum_right = self.sq_sum_total - sq_sum_left
+
+        # We normalize each sq_sum_child by the weight of that child
+        impurity_left[0] = sq_sum_left / self.weighted_n_left
+        impurity_right[0] = sq_sum_right / self.weighted_n_right
+
+        # We subtract from the impurity_child, the quantity:
+        # sum_{k in n_relevant_outputs} (sum_{i in child} w[i] * rho[i, k] / weight(child))^2
+        #   = sum_{k in n_relevant_outputs} (sum_child[k] / weight(child))^2
+        for k in range(self.n_relevant_outputs):
+            impurity_left[0] -= (self.sum_left[k] / self.weighted_n_left) ** 2.0
+            impurity_right[0] -= (self.sum_right[k] / self.weighted_n_right) ** 2.0
+
+        impurity_left[0] /= self.n_relevant_outputs
+        impurity_right[0] /= self.n_relevant_outputs
+
     cdef int compute_sample_preparameter(
         self,
         DOUBLE_t[:] parameter_pre,
@@ -183,8 +442,8 @@ cdef class MomentCriterion(RegressionCriterion):
         cdef SIZE_t j, k
 
         # Calculate un-normalized empirical jacobian
-        for k in range(self.n_outputs):
-            for j in range(self.n_outputs):
+        for j in range(self.n_outputs):
+            for k in range(self.n_outputs):
                 J[j, k] += w * pointJ[sample_index, j, k]
 
         return 0
@@ -396,288 +655,6 @@ cdef class MomentCriterion(RegressionCriterion):
         return 0
 
 
-cdef class LinearMomentCriterion(RegressionCriterion):
-    r"""Criterion based on the solution of a linear moment equation.
-    
-    A criterion class that estimates local parameters defined via linear moment equations
-    of the form::
-
-        E[ m(J, A; theta(x)) | X=x]
-
-    where our specific instance is a linear moment equation::
-        
-        E[ J * theta(x) - A | X=x] = 0
-
-    where:
-
-    - m( . ; theta(x)) is the moment parametrized by J and A
-    - J is the jacobian of the node: J(Node) = E[J | X in Node]
-    - A is the random vector of the linear moment equation for each sample: A[i]
-    - theta(x): parameters
-    - X=x: instance of covariates
-
-    Calculates impurity based on heterogeneity induced on the estimated parameters, based on
-    the proxy score defined in :footcite:`Athey2016GeneralizedRF`.
-
-    Calculates proxy labels for each sample::
-
-        rho[i] := - J(Node)^{-1} (J[i] * theta(Node) - A[i])
-        J(Node) := E[J[i] | X[i] in Node]
-        theta(Node) := J(Node)^{-1} E[A[i] | X[i] in Node]
-
-    Then uses as proxy_impurity_improvement for a split (Left, Right) the quantity::
-
-        sum_{k=1}^{n_relevant_outputs} E[rho[i, k] | X[i] in Left]^2 + E[rho[i, k] | X[i] in Right]^2
-
-    Stores as node impurity the quantity::
-
-        sum_{k=1}^{n_relevant_outputs} Var(rho[i, k] | X[i] in Node)
-         = sum_{k=1}^{n_relevant_outputs} E[rho[i, k]^2 | X[i] in Node] - E[rho[i, k] | X[i] in Node]^2
-
-    """
-
-    def __cinit__(
-        self,
-        SIZE_t n_outputs,
-        SIZE_t n_samples,
-        SIZE_t n_relevant_outputs,
-        SIZE_t n_y,
-    ):
-        """Initialize parameters for this criterion. Parent `__cinit__` is always called before children.
-        So we only perform extra initializations that were not perfomed by the parent classes.
-
-        Parameters
-        ----------
-        n_outputs : SIZE_t
-            The number of parameters/values to be estimated
-        n_samples : SIZE_t
-            The total number of rows in the 2d matrix y.
-            The total number of samples to fit on.
-        n_relevant_outputs : SIZE_t
-            We only care about the first n_relevant_outputs of these parameters/values
-        n_y : SIZE_t
-            The first n_y columns of the 2d matrix y, contain the raw labels y_{ik}, the rest are auxiliary variables
-        """
-
-        # Most initializations are handled by __cinit__ of RegressionCriterion
-        # which is always called in cython. We initialize the extras.
-        if n_y > 1:
-            raise AttributeError("LinearMomentGRFCriterion currently only supports a scalar y")
-
-        self.proxy_children_impurity = True     # The children_impurity() only returns an approximate proxy
-
-        self.n_relevant_outputs = n_relevant_outputs
-        self.n_y = n_y
-        
-        # Allocate memory for the proxy for y, which rho in the generalized random forest
-        # Since rho is node dependent it needs to be re-calculated and stored for each sample
-        # in the node for every node we are investigating
-        self.rho = np.zeros((n_samples, n_outputs), dtype=np.float64)
-        self.moment = np.zeros((n_samples, n_outputs), dtype=np.float64)
-        self.J = np.zeros((n_outputs, n_outputs), dtype=np.float64)
-        self.invJ = np.zeros((n_outputs, n_outputs), dtype=np.float64)
-        self.parameter = np.zeros(n_outputs, dtype=np.float64)
-        self.parameter_pre = np.zeros(n_outputs, dtype=np.float64)
-
-
-    cdef int init(
-        self,
-        const DOUBLE_t[:, ::1] y,
-        const DOUBLE_t[:] sample_weight,
-        double weighted_n_samples,
-        const SIZE_t[:] sample_indices
-    ) nogil except -1:
-        # Initialize fields
-        self.y = y
-        self.sample_weight = sample_weight
-        self.sample_indices = sample_indices
-        self.weighted_n_samples = weighted_n_samples
-
-        cdef SIZE_t n_features = self.n_features
-        cdef SIZE_t n_outputs = self.n_outputs
-        cdef SIZE_t n_y = self.n_y
-
-        self.y = y[:, :n_y]                     # The first n_y columns of y are the original raw outcome
-        self.alpha = y[:, n_y:(n_y + n_outputs)]        # A[i] part of the moment is the next n_outputs columns
-        # J[i] part of the moment is the next n_outputs * n_outputs columns, stored in Fortran contiguous format
-        self.pointJ = y[:, (n_y + n_outputs):(n_y + n_outputs + n_outputs * n_outputs)]
-        self.sample_weight = sample_weight      # Store the sample_weight locally
-        self.samples = samples                  # Store the sample index structure used and updated by the splitter
-        self.weighted_n_samples = weighted_n_samples    # Store total weight of all samples computed by splitter
-
-        return 0
-
-    cdef double node_impurity(self) nogil:
-        """Evaluate the impurity of the current node, i.e. the impurity of
-        samples[start:end]. We use as node_impurity the proxy quantity:
-        sum_{k=1}^{n_relevant_outputs} Var(rho[i, k] | i in Node) / n_relevant_outputs
-        = sum_{k=1}^{n_relevant_outputs} (E[rho[i, k]^2 | i in Node] - E[rho[i, k] | i in Node]^2) / n_relevant_outputs
-        """
-
-        cdef double* sum_total = self.sum_total
-        cdef double impurity
-        cdef SIZE_t k
-
-        impurity = self.sq_sum_total / self.weighted_n_node_samples
-        for k in range(self.n_relevant_outputs):
-            impurity -= (sum_total[k] / self.weighted_n_node_samples)**2.0
-
-        return impurity / self.n_relevant_outputs
-
-    cdef double proxy_impurity_improvement(self) nogil:
-        """Compute a proxy of the impurity reduction.
-
-        This method is used to speed up the search for the best split. It is a proxy quantity such that the
-        split that maximizes this value also maximizes the impurity improvement. It neglects all constant terms
-        of the impurity decrease for a given split. The absolute impurity improvement is only computed by the
-        impurity_improvement method once the best split has been found.
-
-        Here we use the quantity:
-            sum_{k=1}^{n_relevant_outputs} sum_{child in {Left, Right}} weight(child) * E[rho[i, k] | i in child]^2
-        Since:
-            E[rho[i, k] | i in child] = sum_{i in child} w[i] rhp[i, k] / weight(child) = sum_child[k] / weight(child)
-        This simplifies to:
-            sum_{k=1}^{n_relevant_outputs} sum_{child in {Left, Right}} sum_child[k]^2 / weight(child)
-        """
-
-        cdef double* sum_left = self.sum_left
-        cdef double* sum_right = self.sum_right
-
-        cdef SIZE_t k
-        cdef double proxy_impurity_left = 0.0
-        cdef double proxy_impurity_right = 0.0
-
-        for k in range(self.n_relevant_outputs):
-            proxy_impurity_left += sum_left[k] * sum_left[k]
-            proxy_impurity_right += sum_right[k] * sum_right[k]
-
-        return (proxy_impurity_left / self.weighted_n_left +
-                proxy_impurity_right / self.weighted_n_right)
-
-    cdef void children_impurity(self, double* impurity_left,
-                                double* impurity_right) nogil:
-        """Evaluate the impurity in children nodes, i.e. the impurity of the
-        left child (samples[start:pos]) and the impurity the right child
-        (samples[pos:end]). Here we use the proxy child impurity:
-            impurity_child[k] = sum_{i in child} w[i] rho[i, k]^2 / weight(child)
-                                - (sum_{i in child} w[i] * rho[i, k] / weight(child))^2
-            impurity_child = sum_{k in n_relevant_outputs} impurity_child[k] / n_relevant_outputs
-        """
-
-        cdef DOUBLE_t* sample_weight = self.sample_weight
-        cdef SIZE_t* samples = self.samples
-        cdef SIZE_t* node_index_mapping = self.node_index_mapping
-        cdef SIZE_t pos = self.pos
-        cdef SIZE_t start = self.start
-
-        cdef double* sum_left = self.sum_left
-        cdef double* sum_right = self.sum_right
-        cdef DOUBLE_t y_ik
-
-        cdef double sq_sum_left = 0.0
-        cdef double sq_sum_right
-
-        cdef SIZE_t i, p, k, offset
-        cdef DOUBLE_t w = 1.0
-
-        # We calculate: sq_sum_left = sum_{i in child} w[i] rho[i, k]^2
-        for p in range(start, pos):
-            i = samples[p]
-            offset = node_index_mapping[i]
-
-            if sample_weight != NULL:
-                w = sample_weight[i]
-
-            for k in range(self.n_relevant_outputs):
-                y_ik = self.rho[offset * self.n_outputs + k]
-                sq_sum_left += w * y_ik * y_ik
-        # We calculate sq_sum_right = sq_sum_total - sq_sum_left
-        sq_sum_right = self.sq_sum_total - sq_sum_left
-
-        # We normalize each sq_sum_child by the weight of that child
-        impurity_left[0] = sq_sum_left / self.weighted_n_left
-        impurity_right[0] = sq_sum_right / self.weighted_n_right
-
-        # We subtract from the impurity_child, the quantity:
-        # sum_{k in n_relevant_outputs} (sum_{i in child} w[i] * rho[i, k] / weight(child))^2
-        #   = sum_{k in n_relevant_outputs} (sum_child[k] / weight(child))^2
-        for k in range(self.n_relevant_outputs):
-            impurity_left[0] -= (sum_left[k] / self.weighted_n_left) ** 2.0
-            impurity_right[0] -= (sum_right[k] / self.weighted_n_right) ** 2.0
-
-        impurity_left[0] /= self.n_relevant_outputs
-        impurity_right[0] /= self.n_relevant_outputs
-
-    cdef int update(self, SIZE_t new_pos) except -1 nogil:
-        """Updated statistics by moving samples[pos:new_pos] to the left."""
-        cdef const DOUBLE_t[:] sample_weight = self.sample_weight
-        cdef const SIZE_t[:] sample_indices = self.sample_indices
-
-        cdef SIZE_t* node_index_mapping = self.node_index_mapping
-
-        cdef SIZE_t pos = self.pos
-        cdef SIZE_t end = self.end
-        cdef SIZE_t i, p, k
-        cdef DOUBLE_t w = 1.0
-
-        cdef SIZE_t offset
-
-        # Update statistics up to new_pos
-        #
-        # Given that
-        #           sum_left[x] + sum_right[x] = sum_total[x]
-        #           var_left[x] + var_right[x] = var_total[x]
-        # and that sum_total and var_total are known, we are going to update
-        # sum_left and var_left from the direction that require the least amount
-        # of computations, i.e. from pos to new_pos or from end to new_pos.
-        
-        # The invariance of the update is that:
-        #   sum_left[k] = sum_{i in Left} w[i] rho[i, k]
-        #   var_left[k] = sum_{i in Left} w[i] pointJ[i, k, k]
-        # and similarly for the right child. Notably, the second is un-normalized,
-        # so to be used for further calculations it needs to be normalized by the child weight.
-        if (new_pos - pos) <= (end - new_pos):
-            for p in range(pos, new_pos):
-                i = samples[p]
-                offset = node_index_mapping[i]
-
-                if sample_weight != NULL:
-                    w = sample_weight[i]
-
-                for k in range(self.n_outputs):
-                    # we add w[i] * rho[i, k] to sum_left[k]
-                    self.sum_left[k] += w * self.rho[i, k]
-                    # we add w[i] * J[i, k, k] to var_left[k]
-                    self.var_left[k] += w * self.pointJ[i, k, k]
-
-                self.weighted_n_left += w
-        else:
-            self.reverse_reset()
-
-            for p in range(end - 1, new_pos - 1, -1):
-                i = sample_indices[p]
-                offset = node_index_mapping[i]
-
-                if sample_weight != NULL:
-                    w = sample_weight[i]
-
-                for k in range(self.n_outputs):
-                    # we subtract w[i] * rho[i, k] from sum_left[k]
-                    self.sum_left[k] -= w * self.rho[i, k]
-                    # we subtract w[i] * J[i, k, k] from var_left[k]
-                    self.var_left[k] -= w * self.pointJ[i, k, k]
-
-                self.weighted_n_left -= w
-
-        self.weighted_n_right = (self.weighted_n_node_samples -
-                                 self.weighted_n_left)
-        for k in range(self.n_outputs):
-            self.sum_right[k] = self.sum_total[k] - self.sum_left[k]
-            self.var_right[k] = self.var_total[k] - self.var_left[k]
-
-        self.pos = new_pos
-        return 0
-
     cdef void node_value(self, double* dest) nogil:
         """Return the estimated node parameter of samples[start:end] into dest."""
         memcpy(dest, self.parameter, self.n_outputs * sizeof(double))
@@ -690,7 +667,7 @@ cdef class LinearMomentCriterion(RegressionCriterion):
         cdef SIZE_t n_outputs = self.n_outputs
         for i in range(n_outputs):
             for j in range(n_outputs):
-                dest[i * n_outputs + j] = self.J[i + j * n_outputs] / self.weighted_n_node_samples
+                dest[i * n_outputs + j] = self.J[i, j] / self.weighted_n_node_samples
         
     cdef void node_precond(self, double* dest) nogil:
         """Return the normalized node preconditioned value of samples[start:end] into dest."""
@@ -730,8 +707,6 @@ cdef class LinearMomentCriterion(RegressionCriterion):
             if abs < min:
                 min = abs
         return min / self.weighted_n_right
-
-
 
 
 cdef void _fast_invJ(DOUBLE_t* J, DOUBLE_t* invJ, SIZE_t n, double clip) nogil:
