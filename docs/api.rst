@@ -56,3 +56,40 @@ on unsupervised criterion such as variance and BIC.
    
    tree.UnsupervisedDecisionTree
    tree.UnsupervisedObliqueDecisionTree
+
+
+Distance Metrics
+----------------
+Trees inherently produce a "distance-like" metric. We provide an API for
+extracting pairwise distances from the trees that include a correction
+that turns the "tree-distance" into a proper distance metric.
+
+.. currentmodule:: sktree.ensemble
+.. autosummary::
+   :toctree: generated/
+
+   pairwise_forest_distance
+
+Experimental Functionality
+--------------------------
+We also include experimental functionality that is works in progress.
+
+.. currentmodule:: sktree.experimental
+.. autosummary::
+   :toctree: generated/
+
+   mutual_info_ksg
+
+We also include functions that help simulate and evaluate mutual information (MI)
+and conditional mutual information (CMI) estimators. Specifically, functions that
+help simulate multivariate gaussian data and compute the analytical solutions
+for the entropy, MI and CMI of the Gaussian distributions.
+
+.. currentmodule:: sktree.experimental
+.. autosummary::
+   :toctree: generated/
+
+   mi_gaussian
+   cmi_gaussian
+   entropy_gaussian
+   simulate_multivariate_gaussian

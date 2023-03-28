@@ -49,13 +49,13 @@ endif
 # https://mesonbuild.com/Python-module.html
 py3_mod = import('python')
 
+# py3_mod.install_env('venv')
 # NOTE: with Meson >=0.64.0 we can add `pure: false` here and remove that line
 # everywhere else, see https://github.com/mesonbuild/meson/pull/10783.
 py3 = py3_mod.find_installation(
   'python3',
-  pure: false  # Will be installed next to binaries
+  pure: false,  # Will be installed next to binaries
 )
-# py3.install_env('venv')
 
 # print some debugging output
 message(py3.full_path())

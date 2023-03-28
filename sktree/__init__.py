@@ -36,7 +36,7 @@ if __sktree_SETUP__:
     # process, as it may not be compiled yet
 else:
     try:
-        from . import tree
+        from . import tree, ensemble, experimental
         from .ensemble._unsupervised_forest import (
             UnsupervisedRandomForest,
             UnsupervisedObliqueRandomForest,
@@ -50,11 +50,3 @@ else:
         being in scikit-tree source directory; please exit the scikit-tree source
         tree first and relaunch your Python interpreter."""
         raise ImportError(msg) from e
-
-    __all__ = [
-        "tree",
-        "ObliqueRandomForestClassifier",
-        "PatchObliqueRandomForestClassifier",
-        "UnsupervisedRandomForest",
-        "UnsupervisedObliqueRandomForest",
-    ]

@@ -159,7 +159,7 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
         criterion="twomeans",
         splitter="best",
         max_depth=None,
-        min_samples_split=5,
+        min_samples_split="sqrt",
         min_samples_leaf=1,
         min_weight_fraction_leaf=0.0,
         max_features=None,
@@ -196,10 +196,15 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
                 if X.indices.dtype != np.intc or X.indptr.dtype != np.intc:
                     raise ValueError("No support for np.int64 index based sparse matrices")
 
+        n_samples = X.shape[0]
+
+        # over-ride base behavior for min samples split
+        if self.min_samples_split == "sqrt":
+            self.min_samples_split = np.sqrt(2 * n_samples)
+
         super().fit(X, None, sample_weight, check_input)
 
         # apply to the leaves
-        n_samples = X.shape[0]
         X_leaves = self.apply(X)
 
         # now compute the affinity matrix and set it
@@ -464,7 +469,7 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
         criterion="twomeans",
         splitter="best",
         max_depth=None,
-        min_samples_split=5,
+        min_samples_split="sqrt",
         min_samples_leaf=1,
         min_weight_fraction_leaf=0,
         max_features=None,

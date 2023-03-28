@@ -20,12 +20,112 @@ from sklearn.ensemble._forest import (
     _get_n_samples_bootstrap,
     _parallel_build_trees,
 )
-from sklearn.metrics import calinski_harabasz_score
+from sklearn.metrics import calinski_harabasz_score, pairwise_distances
 from sklearn.tree._tree import DTYPE
 from sklearn.utils.parallel import Parallel, delayed
 from sklearn.utils.validation import _check_sample_weight, check_is_fitted, check_random_state
 
 from sktree.tree import UnsupervisedDecisionTree, UnsupervisedObliqueDecisionTree
+
+
+def pairwise_forest_distance(est, X, epsilon=1e-6, n_jobs=None):
+    """Compute pairwise distance matrix using a forest.
+
+    The distances/dissimilarities computed using a forest are not necessarily
+    a proper distance metric due to the violation of the definiteness property
+    and the triangle inequality property. In order to overcome that, we utilize
+    the adjustment proposed in :footcite:`marx2021estimating`, where the distance
+    between samples :math:`x_i` and :math:`x_j` is defined as:
+
+    - :math:`d_F(x_i, x_j)` if :math:`d_F(x_i, x_j) > 0`
+    - :math:`\\frac{d_2(x_i, x_j)}{c(T + \\epsilon)}` otherwise
+
+    where :math:`d_F(x_i, x_j)` is the dissimilarity matrix computed using the forest,
+    :math:`d_2(x_i, x_j)` is the Euclidean distance metric, ``c`` is the maximum L2-norm
+    between any two pairs i, j, ``T`` is the number of trees and a small constant
+    :math:`\\epsilon > 0`.
+
+    Parameters
+    ----------
+    est : BaseForest
+        An instance of an unsupervised forest. If not fitted already, then
+        will fit on ``X``.
+    X : ndarray of shape (n_samples_X, n_features)
+        Array of pairwise distances between samples.
+    epsilon : float, optional
+        The epsilon value to add, by default 1e-6.
+    n_jobs : int, default=None
+        The number of jobs to use for the computation. This works by breaking
+        down the pairwise matrix into n_jobs even slices and computing them in
+        parallel.
+
+        ``None`` means 1 unless in a :obj:`joblib.parallel_backend` context.
+        ``-1`` means using all processors. See :term:`Glossary <n_jobs>`
+        for more details.
+
+    Returns
+    -------
+    D : ndarray of shape (n_samples_X, n_samples_X)
+        A distance matrix D such that D_{i, j} is the distance between the
+        ith and jth vectors of the given matrix X.
+    """
+    if not isinstance(est, BaseForest):
+        raise RuntimeError(f"Must use a forest, not {est}.")
+
+    if not check_is_fitted(est):
+        # fit the forest
+        est.fit(X)
+
+    # compute pairwise affinity array
+    aff_arr = _compute_affinity_matrix(est, X)
+
+    # convert to a dissimilarity array
+    D = 1.0 - aff_arr
+
+    # compute pairwise Euclidean distance matrix
+    l2_matrix = pairwise_distances(X, metric="l2", n_jobs=n_jobs)
+    c_constant = max(l2_matrix)
+
+    # apply conversion to turn dissimilarity array into a proper distance matrix
+    z_indices = np.argwhere(np.triu(D, -1) == 0)
+    D[z_indices] = l2_matrix[z_indices] / (c_constant * (est.n_estimators + epsilon))
+    return D
+
+
+def _compute_affinity_matrix(est: BaseForest, X):
+    """Compute the proximity matrix of samples in X.
+
+    Parameters
+    ----------
+    X : ndarray of shape (n_samples, n_features)
+        Data array that we want to compute pairwise affinity matrix of.
+
+    Returns
+    -------
+    prox_matrix : array-like of shape (n_samples, n_samples)
+        This is the proximity matrix, or counts the number of times other samples
+        fall in the same leaf over the entire forest. This is normalized by the
+        total number of trees in the entire forest.
+    """
+    # apply to the leaves
+    # For each datapoint x in X and for each tree in the forest,
+    # the index of the leaf x ends up in.
+    X_leaves = est.apply(X)
+
+    n_samples = X_leaves.shape[0]
+    aff_matrix = np.zeros((n_samples, n_samples), dtype=np.float32)
+
+    # fill the main diagonal with 1's
+    # np.fill_diagonal(aff_matrix, 1.0)
+    for idx in range(est.n_estimators):
+        for unique_leaf in np.unique(X_leaves[:, idx]):
+            # find all samples
+            samples_in_leaf = np.atleast_1d(np.argwhere(X_leaves[:, idx] == unique_leaf).squeeze())
+            aff_matrix[np.ix_(samples_in_leaf, samples_in_leaf)] += 1
+
+    # normalize by the number of trees
+    aff_matrix = np.divide(aff_matrix, est.n_estimators)
+    return aff_matrix
 
 
 class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):
@@ -59,8 +159,7 @@ class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):
         )
 
     def fit(self, X, y=None, sample_weight=None):
-        """
-        Fit estimator.
+        """Fit estimator.
 
         Parameters
         ----------
@@ -231,40 +330,10 @@ class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):
             X transformed in the new space.
         """
         check_is_fitted(self)
-        # apply to the leaves
-        X_leaves = self.apply(X)
 
         # now compute the affinity matrix and set it
-        affinity_matrix = self._compute_affinity_matrix(X_leaves)
+        affinity_matrix = _compute_affinity_matrix(self, X)
         return affinity_matrix
-
-    def _compute_affinity_matrix(self, X):
-        """Compute the proximity matrix of samples in X.
-
-        Parameters
-        ----------
-        X : ndarray of shape (n_samples, n_estimators)
-            For each datapoint x in X and for each tree in the forest,
-            is the index of the leaf x ends up in.
-
-        Returns
-        -------
-        prox_matrix : array-like of shape (n_samples, n_samples)
-        """
-        n_samples = X.shape[0]
-        aff_matrix = np.zeros((n_samples, n_samples), dtype=np.float32)
-
-        # fill the main diagonal with 1's
-        # np.fill_diagonal(aff_matrix, 1.0)
-        for idx in range(self.n_estimators):
-            for unique_leaf in np.unique(X[:, idx]):
-                # find all samples
-                samples_in_leaf = np.atleast_1d(np.argwhere(X[:, idx] == unique_leaf).squeeze())
-                aff_matrix[np.ix_(samples_in_leaf, samples_in_leaf)] += 1
-
-        # normalize by the number of trees
-        aff_matrix = np.divide(aff_matrix, self.n_estimators)
-        return aff_matrix
 
     def _assign_labels(self, affinity_matrix):
         """Assign cluster labels given X.
@@ -430,13 +499,15 @@ class UnsupervisedRandomForest(ForestCluster):
         all leaves are pure or until all leaves contain less than
         min_samples_split samples.
 
-    min_samples_split : int or float, default=2
+    min_samples_split : int or float, default='sqrt'
         The minimum number of samples required to split an internal node:
 
         - If int, then consider `min_samples_split` as the minimum number.
         - If float, then `min_samples_split` is a fraction and
           `ceil(min_samples_split * n_samples)` are the minimum
           number of samples for each split.
+        - If 'sqrt', then considered :math:`\\sqrt{2n}`, where n is the number
+          of samples in the dataset, ``X``.
 
     min_samples_leaf : int or float, default=1
         The minimum number of samples required to be at a leaf node.
@@ -576,7 +647,7 @@ class UnsupervisedRandomForest(ForestCluster):
         *,
         criterion="twomeans",
         max_depth=None,
-        min_samples_split=2,
+        min_samples_split="sqrt",
         min_samples_leaf=1,
         min_weight_fraction_leaf=0.0,
         max_features="sqrt",
