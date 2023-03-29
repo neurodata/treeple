@@ -79,4 +79,5 @@ c_undefined_ok = ['-Wno-maybe-uninitialized']
 
 subdir('tree')
 subdir('ensemble')
+subdir('experimental')
 subdir('tests')

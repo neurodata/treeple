@@ -106,6 +106,33 @@ def simulate_helix(
 
 
 def simulate_sphere(radius=1, noise_func=None, n_samples=1000, random_seed=None):
+    """Simulate samples generated on a sphere.
+
+    Parameters
+    ----------
+    radius : int, optional
+        The radius of the sphere, by default 1.
+    noise_func : callable, optional
+        The noise function to call to add to samples, by default None,
+        which defaults to sampling from the uniform distribution [-0.005, 0.005].
+    n_samples : int, optional
+        Number of samples to generate, by default 1000.
+    random_seed : int, optional
+        Random seed, by default None.
+
+    Returns
+    -------
+    latitude : float
+        Latitude.
+    longitude : float
+        Longitude.
+    Y1 : array-like of shape (n_samples,)
+        The X coordinate.
+    Y2 : array-like of shape (n_samples,)
+        The Y coordinate.
+    Y3 : array-like of shape (n_samples,)
+        The Z coordinate.
+    """
     rng = np.random.default_rng(random_seed)
     if noise_func is None:
         noise_func = lambda: rng.uniform(-0.005, 0.005)
@@ -302,7 +329,10 @@ def cmi_from_entropy(hxz, hyz, hz, hxyz):
 
 
 def mutual_info_ksg(
-    X, Y, Z=None, k: float = 0.2, n_jobs: int = -1, transform: str = "rank", random_seed: int = None
+    X, Y, Z=None, k: float = 0.2,
+    metric = "forest",
+    algorithm = "kd_tree",
+    n_jobs: int = -1, transform: str = "rank",random_seed: int = None
 ):
     """Compute the generalized (conditional) mutual information KSG estimate.
 
@@ -317,6 +347,12 @@ def mutual_info_ksg(
         If Z is defined, then the CMI is computed.
     k : float, optional
         The number of neighbors to use in defining the radius, by default 0.2.
+    metric : str
+        Any distance metric accepted by :class:`sklearn.neighbors.NearestNeighbors`.
+        If 'forest' (default), then uses an :class:`UnsupervisedObliqueRandomForest` to compute
+        geodesic distances.
+    algorithm : str, optional
+        Method to use, by default 'knn'. Can be ('ball_tree', 'kd_tree', 'brute').
     n_jobs : int, optional
         Number of parallel jobs, by default -1.
     transform : one of {'rank', 'standardize', 'uniform'}
@@ -387,8 +423,6 @@ def mutual_info_ksg(
     else:
         knn_here = max(1, int(k))
 
-    metric = "forest"
-    algorithm = "kd_tree"
     if Z is not None:
         val = _cmi_ksg(data, X, Y, Z, metric, algorithm, knn_here, n_jobs)
     else:
