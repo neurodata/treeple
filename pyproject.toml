@@ -35,7 +35,7 @@ requires = [
     "setuptools<=65.5",
     "packaging",
     "Cython>=0.29.24",
-    "scikit-learn@git+https://git@github.com/neurodata/scikit-learn.git@tree-featuresv2",
+    "scikit-learn@git+https://git@github.com/neurodata/scikit-learn.git",
     # "scikit-learn" = { git = "https://github.com/neurodata/scikit-learn.git", branch = 'split' },
     "lazy_loader>=0.1",
 
