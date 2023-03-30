@@ -74,6 +74,58 @@ The quality of a candidate split of node :math:`m` is then computed using an
 impurity function or loss function :math:`H()`, in the same exact manner as
 decision trees.
 
+Classification, regression and multi-output problems
+----------------------------------------------------
+
+OTs can be used for both classification and regression, and can handle multi-output
+problems in the same manner as DTs.
+
+Complexity
+----------
+
+The run time cost to construct an OT will be similar to that of a DT, with the
+added complexity of a (possibly sparse) matrix multiplication to combine random
+data columns into candidate split values. The cost at each node is
+:math:`O(n_{features}n_{samples}\log(n_{samples}) + n_{features}n_{samples}max\_features \lambda)`
+where the additional :math:`n_{features}n_{samples}max\_features \lambda` term
+comes from the (possibly sparse) matrix multiplication controlled by both the
+number of candidate splits to generate ("max_features") and the sparsity of
+the projection matrix that combines the data features (":math:`\lambda`").
+
+Another consideration is space-complexity.
+
+Space-complexity and storing the OT pickled on disc is also a consideration. OTs
+at every node need to store an additional vector of feature indices and vector of
+feature weights that are used together to form the candidate splits.
+
+Tips on practical use
+---------------------
+
+Similar to DTs, the intuition for most parameters are the same. Therefore refer
+to :ref:`tips for using decision trees <tree_tips_usage>` for information on standard
+tree parameters. Specific parameters, such as ``max_features`` and
+``feature_combinations`` are different or special to OTs. 
+
+  * As specified earlier, ``max_features`` is not constrained to ``n_features``
+    as it is in DTs. Setting ``max_features`` higher requires more computation time because
+    the algorithm needs to sample more candidate splits at every node. However, it also possibly
+    lets the user to sample more informative splits, thereby improving the model fit. This
+    presents a tradeoff between runtime resources and improvements to the model. In practice,
+    we found that sampling more splits, say up to ``max_features=n_features**2``, is desirable
+    if one is willing to spend the computational resources. 
+
+  * ``feature_combinations`` is the :math:`\lambda` term presented in the complexity
+    analysis, which specifies how sparse our combination of features is. If
+    ``feature_combinations=n_features``, then OT is the ``Forest-RC`` version. However,
+    in practice, ``feature_combinations`` can be set much lower, therefore improving runtime
+    and storage complexity.
+
+Finally, when asking the question of when to use OTs vs DTs, scikit-learn recommends
+always trying both model using some type of cross-validation procedure and hyperparameter
+optimization (e.g. `GridSearchCV`). If one has prior knowledge about how the data is
+distributed along its features, such as data being axis-aligned, then one might use a DT.
+Other considerations are runtime and space complexity.
+
 Limitations compared to decision trees
 --------------------------------------
 
