@@ -17,7 +17,7 @@ KSG-estimator for MI and CMI (based on kNN statistics).
 We will perform two simulation illustrating the robustness of using tree-based models
 to estimate pairwise distances. For each simulation, we will generate data from
 the data generating model and then augment the dataset with artificial number of
-noise dimensions. 
+noise dimensions.
 
 For MI, this means in one, or both of the variables, ``X``, or ``Y``, the dimensionality
 will be very high. For CMI, we will also additionally augment the conditioning variable
@@ -77,22 +77,26 @@ data = np.concatenate((data, data_noise), axis=1)
 # we have the luxury of knowing the true analytical solution of the
 # MI and CMI values. We will compare the KSG estimate with that of the
 # forest-KSG estimate.
-ksg_mi = mutual_info_ksg(data[:, 0], data[:, 1:],
-                         metric='l2', algorithm='kd_tree',
-                         k=k, n_jobs=n_jobs, 
-                         random_seed=seed)
+ksg_mi = mutual_info_ksg(
+    data[:, 0], data[:, 1:], metric="l2", algorithm="kd_tree", k=k, n_jobs=n_jobs, random_seed=seed
+)
 
-forestksg_mi = mutual_info_ksg(data[:, 0], data[:, 1:],
-                         metric='forest', algorithm='kd_tree',
-                         k=k, n_jobs=n_jobs, 
-                         random_seed=seed)
+forestksg_mi = mutual_info_ksg(
+    data[:, 0],
+    data[:, 1:],
+    metric="forest",
+    algorithm="kd_tree",
+    k=k,
+    n_jobs=n_jobs,
+    random_seed=seed,
+)
 
 ksg_error = ksg_mi - true_mi
 forestksg_error = forestksg_mi - true_mi
 
-print(f'Ground truth MI, KSG estimate and Forest-KSG estimate: {true_mi}, {ksg_mi}, {forestksg_mi}')
-print(f'KSG MI estimate error: {ksg_error}')
-print(f'Forest-KSG MI estimate error: {forestksg_error}')
+print(f"Ground truth MI, KSG estimate and Forest-KSG estimate: {true_mi}, {ksg_mi}, {forestksg_mi}")
+print(f"KSG MI estimate error: {ksg_error}")
+print(f"Forest-KSG MI estimate error: {forestksg_error}")
 
 # %%
 # Generate Dataset Showing Robustness to Manifold Structure

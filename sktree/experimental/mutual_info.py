@@ -279,7 +279,8 @@ def cmi_gaussian(cov, x_index, y_index, z_index):
 
     Notes
     -----
-    Analytical solution for conditional mutual information, :math:`I(X;Y|Z)` of a multivariate Gaussian is given by::
+    Analytical solution for conditional mutual information, :math:`I(X;Y|Z)` of a
+    multivariate Gaussian is given by::
 
         I(X;Y | Z) = H(X, Z) + H(Y, Z) - H(Z) - H(X, Y, Z)
 
@@ -329,10 +330,15 @@ def cmi_from_entropy(hxz, hyz, hz, hxyz):
 
 
 def mutual_info_ksg(
-    X, Y, Z=None, k: float = 0.2,
-    metric = "forest",
-    algorithm = "kd_tree",
-    n_jobs: int = -1, transform: str = "rank",random_seed: int = None
+    X,
+    Y,
+    Z=None,
+    k: float = 0.2,
+    metric="forest",
+    algorithm="kd_tree",
+    n_jobs: int = -1,
+    transform: str = "rank",
+    random_seed: int = None,
 ):
     """Compute the generalized (conditional) mutual information KSG estimate.
 
