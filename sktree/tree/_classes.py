@@ -9,7 +9,8 @@ from sklearn.tree import BaseDecisionTree, DecisionTreeClassifier, _criterion
 from sklearn.tree import _tree as _sklearn_tree
 from sklearn.tree._criterion import BaseCriterion
 from sklearn.tree._tree import BestFirstTreeBuilder, DepthFirstTreeBuilder
-from sklearn.utils._param_validation import Interval
+from sklearn.utils._param_validation import Interval, StrOptions
+from sklearn.utils._param_validation import RealNotInt
 from sklearn.utils.validation import check_is_fitted
 
 from . import (  # type: ignore
@@ -153,13 +154,21 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
         Clustering function class keyword arguments. Passed to `clustering_func`.
     """
 
+    _parameter_constraints: dict = {
+        key: val for key, val in BaseDecisionTree._parameter_constraints.items() if key != 'min_samples_split'
+    }
+    _parameter_constraints["min_samples_split"] = [
+            StrOptions({"sqrt", "log2"}),
+            Interval(Integral, 2, None, closed="left"),
+            Interval(RealNotInt, 0.0, 1.0, closed="right"),
+        ]
     def __init__(
         self,
         *,
         criterion="twomeans",
         splitter="best",
         max_depth=None,
-        min_samples_split="sqrt",
+        min_samples_split=2,
         min_samples_leaf=1,
         min_weight_fraction_leaf=0.0,
         max_features=None,
@@ -197,10 +206,6 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
                     raise ValueError("No support for np.int64 index based sparse matrices")
 
         n_samples = X.shape[0]
-
-        # over-ride base behavior for min samples split
-        if self.min_samples_split == "sqrt":
-            self.min_samples_split = np.sqrt(2 * n_samples)
 
         super().fit(X, None, sample_weight, check_input)
 
@@ -469,7 +474,7 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
         criterion="twomeans",
         splitter="best",
         max_depth=None,
-        min_samples_split="sqrt",
+        min_samples_split=2,
         min_samples_leaf=1,
         min_weight_fraction_leaf=0,
         max_features=None,

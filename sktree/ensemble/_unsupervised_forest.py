@@ -275,11 +275,8 @@ class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):
             else:
                 self._set_oob_score_and_attributes(X)
 
-        # apply to the leaves
-        X_leaves = self.apply(X)
-
         # now compute the affinity matrix and set it
-        self.affinity_matrix_ = self._compute_affinity_matrix(X_leaves)
+        self.affinity_matrix_ = _compute_affinity_matrix(self, X)
 
         # compute the labels and set it
         self.labels_ = self._assign_labels(self.affinity_matrix_)
@@ -641,13 +638,17 @@ class UnsupervisedRandomForest(ForestCluster):
         only when ``oob_score`` is True.
     """
 
+    _parameter_constraints: dict = {
+        **ForestCluster._parameter_constraints,
+        **UnsupervisedDecisionTree._parameter_constraints,
+    }
     def __init__(
         self,
         n_estimators=100,
         *,
         criterion="twomeans",
         max_depth=None,
-        min_samples_split="sqrt",
+        min_samples_split=5,
         min_samples_leaf=1,
         min_weight_fraction_leaf=0.0,
         max_features="sqrt",
@@ -863,6 +864,10 @@ class UnsupervisedObliqueRandomForest(ForestCluster):
         `oob_decision_function_` might contain NaN. This attribute exists
         only when ``oob_score`` is True.
     """
+    _parameter_constraints: dict = {
+        **ForestCluster._parameter_constraints,
+        **UnsupervisedObliqueDecisionTree._parameter_constraints,
+    }
 
     def __init__(
         self,
@@ -870,10 +875,10 @@ class UnsupervisedObliqueRandomForest(ForestCluster):
         *,
         criterion="twomeans",
         max_depth=None,
-        min_samples_split=2,
+        min_samples_split=5,
         min_samples_leaf=1,
         min_weight_fraction_leaf=0.0,
-        max_features="sqrt",
+        max_features=10,
         max_leaf_nodes=None,
         min_impurity_decrease=0.0,
         bootstrap=False,
