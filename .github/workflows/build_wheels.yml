@@ -62,8 +62,8 @@ jobs:
         # build then needs to use that directory. This can be done with pip
         # using a command like:
         # python -m pip wheel --config-settings builddir=build .
-        if: >-
-          ( ! contains(matrix.os[2], 'arm64' ) )
+        # if: >-
+        #   ( ! contains(matrix.os[2], 'arm64' ) )
         env:
           CIBW_BUILD: ${{ matrix.python[0] }}-${{ matrix.os[1] }}*
           CIBW_ARCHS: ${{ matrix.os[2] }}
