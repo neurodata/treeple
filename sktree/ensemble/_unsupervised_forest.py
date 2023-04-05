@@ -571,6 +571,10 @@ class UnsupervisedRandomForest(ForestCluster):
         was never left out during the bootstrap. In this case,
         `oob_decision_function_` might contain NaN. This attribute exists
         only when ``oob_score`` is True.
+
+    References
+    ----------
+    .. footbibliography::
     """
 
     def __init__(
