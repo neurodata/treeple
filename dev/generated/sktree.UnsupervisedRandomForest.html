@@ -19,12 +19,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
@@ -38,8 +38,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/style.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -431,6 +431,8 @@ min_samples_split samples.</p>
 <code class="docutils literal notranslate"><span class="pre">ceil(min_samples_split</span> <span class="pre">*</span> <span class="pre">n_samples)</span></code> are the minimum
 number of samples for each split.</p></li>
 </ul>
+<p>In unsupervised trees, it is recommended by <a class="footnote-reference brackets" href="#footcite-meghana2019-geodesicrf" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>
+to use the sqrt of two times the number of samples in the dataset.</p>
 </dd>
 <dt><strong>min_samples_leaf</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, default=1</span></dt><dd><p>The minimum number of samples required to be at a leaf node.
 A split point at any depth will only be considered if it leaves at
@@ -515,8 +517,18 @@ and return cluster labels. By default, <a class="reference external" href="https
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Attributes<span class="colon">:</span></dt>
-<dd class="field-even"><dl>
+</dl>
+<p class="rubric">References</p>
+<div class="docutils container" id="id2">
+<aside class="footnote brackets" id="footcite-meghana2019-geodesicrf" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Meghana Madhyastha, Percy Li, James Browne, Veronika Strnadova-Neeley, Carey E. Priebe, Randal Burns, and Joshua T. Vogelstein. Geodesic forests. In <em>Proceedings of the 26th ACM SIGKDD International Conference on Knowledge Discovery &amp; Data Mining</em>, KDD ‘20, 513–523. New York, NY, USA, 2020. Association for Computing Machinery. URL: <a class="reference external" href="https://doi.org/10.1145/3394486.3403094">https://doi.org/10.1145/3394486.3403094</a>, <a class="reference external" href="https://doi.org/10.1145/3394486.3403094">doi:10.1145/3394486.3403094</a>.</p>
+</aside>
+</aside>
+</div>
+<dl class="field-list">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
 <dt><strong>estimator_</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UnsupervisedDecisionTree</span></code></span></dt><dd><p>The child estimator template used to create the collection of fitted
 sub-estimators.</p>
 </dd>
@@ -872,7 +884,10 @@ array of zeros.</p>
               
               
                 <footer class="bd-footer-article">
-                  <!-- Previous / next buttons -->
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
        href="sktree.tree.PatchObliqueDecisionTreeClassifier.html"
@@ -892,7 +907,10 @@ array of zeros.</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
+</div></div>
+  
 </div>
+
                 </footer>
               
             </div>
@@ -930,7 +948,7 @@ array of zeros.</p>
             
           </div>
           <footer class="bd-footer-content">
-            <div class="bd-footer-content__inner"></div>
+            
           </footer>
         
       </main>
@@ -938,8 +956,8 @@ array of zeros.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -949,7 +967,7 @@ array of zeros.</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-03-14.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-04-06.
       <br/>
     
   </p>
@@ -961,7 +979,7 @@ array of zeros.</p>
     <div class="footer-items__end">
       
         <div class="footer-item"><p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
 </p></div>
       
     </div>
