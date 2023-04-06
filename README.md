@@ -49,6 +49,8 @@ Make sure you have the necessary packages installed
     # make sure we have our fork of scikit-learn
     pip install scikit-learn@git+https://git@github.com/neurodata/scikit-learn.git@fork
 
+    pip install spin
+
 After you have installed the relevant dependencies and also installed the scikit-learn fork, you can build the package locally. We use the ``dev.py`` CLI to abstract away build details:
 
     # run the build using Meson/Ninja
