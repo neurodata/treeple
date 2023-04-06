@@ -553,7 +553,8 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
 class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
     """A decision tree classifier.
 
-    Read more in the :ref:`User Guide <sklearn:tree>`.
+    Read more in the :ref:`User Guide <sklearn:tree>`. The implementation follows
+    that of :footcite:`breiman2001random` and :footcite:`TomitaSPORF2020`.
 
     Parameters
     ----------
