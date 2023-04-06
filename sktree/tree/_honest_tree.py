@@ -8,12 +8,13 @@
 import numpy as np
 from sklearn.base import MetaEstimatorMixin
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree._classes import BaseDecisionTree
 from sklearn.utils.validation import check_is_fitted
 from sklearn.utils.validation import check_X_y
 from sklearn.utils.multiclass import check_classification_targets
 
 
-class HonestTreeClassifier(MetaEstimatorMixin):
+class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
     """
     A deecision tree classifier with honest predictions.
 
