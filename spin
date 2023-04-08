@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Example stub for running `python -m dev.py`
+# Example stub for running `python -m spin`
 #
 # Copy this into your project root.
 
@@ -10,9 +10,9 @@ import sys
 
 sys.path.remove(os.path.abspath(os.path.dirname(sys.argv[0])))
 try:
-    runpy.run_module("devpy", run_name="__main__")
+    runpy.run_module("spin", run_name="__main__")
 except ImportError:
-    print("Cannot import devpy; please install it using")
+    print("Cannot import spin; please install it using")
     print()
     print("  pip install spin")
     print()
