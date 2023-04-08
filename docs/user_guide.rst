@@ -14,5 +14,6 @@ User Guide
    :numbered:
    :maxdepth: 3
 
-   modules/unsupervised.rst
-   modules/supervised.rst
+   modules/supervised_tree
+   modules/unsupervised_tree
+   modules/ensemble
