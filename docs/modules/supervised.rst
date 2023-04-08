@@ -1,15 +1,19 @@
-.. _tree:
+.. _supervised_tree:
 
-===========================
-Unsupervised Decision Trees
-===========================
+=========================
+Supervised Decision Trees
+=========================
 
 .. currentmodule:: sklearn.tree
 
 In unsupervised learning, the goal is to identify patterns 
 or structure in data without using labeled examples. Clustering is a common 
 unsupervised learning technique that groups similar examples together 
-based on their features. 
+based on their features. Unsupervised tree models are an adaptive way of generating
+clusters of samples. For information on supervised tree models, see :ref:`supervised_tree`
+
+In this guide, we overview the :ref:`unsup_criterion` used for splitting unsupervised trees,
+and methods for evaluating the quality of the tree model in :ref:`unsup_evaluation`.
 
 .. _unsup_criterion:
 Unsupervised Criterion
