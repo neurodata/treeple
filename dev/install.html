@@ -410,13 +410,13 @@ conda<span class="w"> </span>activate<span class="w"> </span>sklearn-dev
 </div>
 <p>Then run installation of build packages</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>build_requirements.txt
-pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com/scientific-python/devpy
+pip<span class="w"> </span>install<span class="w"> </span>spin
 
-<span class="c1"># use dev.py CLI to run Meson build locally</span>
-./dev.py<span class="w"> </span>build<span class="w"> </span>-j<span class="w"> </span><span class="m">2</span>
+<span class="c1"># use spin CLI to run Meson build locally</span>
+./spin<span class="w"> </span>build<span class="w"> </span>-j<span class="w"> </span><span class="m">2</span>
 
 <span class="c1"># you can now run tests</span>
-./dev.py<span class="w"> </span><span class="nb">test</span>
+./spin<span class="w"> </span><span class="nb">test</span>
 </pre></div>
 </div>
 <p>via pip, you will be able to install in editable mode (pending Meson-Python support).</p>
@@ -538,7 +538,7 @@ pip install -e .</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-04-06.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-04-08.
       <br/>
     
   </p>
