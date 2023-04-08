@@ -68,7 +68,7 @@ jobs:
       - name: Install Python packages
         run: |
           python -m pip install -r build_requirements.txt
-          python -m pip install git+https://github.com/scientific-python/devpy@v0.1
+          python -m pip install spin
           python -m pip install -r test_requirements.txt
 
       - name: Prepare compiler cache
@@ -98,7 +98,7 @@ jobs:
 
       - name: Setup build and install scikit-tree
         run: |
-          python dev.py build -j 2
+          python spin build -j 2
 
       - name: Ccache performance
         shell: bash -l {0}
@@ -111,10 +111,10 @@ jobs:
 
       - name: Run unit tests and coverage
         run: |
-          ./dev.py --help
-          ./dev.py coverage --help
-          ./dev.py test --help
-          python dev.py coverage
+          ./spin --help
+          ./spin coverage --help
+          ./spin test --help
+          python spin coverage
           cp $PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages/coverage.xml ./coverage.xml
 
       - name: debug
@@ -128,7 +128,7 @@ jobs:
         if: ${{ matrix.os == 'ubuntu-22.04' && matrix.python-version == '3.10'}}
         uses: codecov/codecov-action@v3
         with:
-          # python dev.py goes into the INSTALLED path in order to run pytest
+          # python spin goes into the INSTALLED path in order to run pytest
           files: ./coverage.xml
           fail_ci_if_error: true
           verbose: true
@@ -162,7 +162,7 @@ jobs:
       - name: pip-packages
         run: |
           pip install -r build_requirements.txt
-          pip install git+https://github.com/scientific-python/devpy@v0.1
+          pip install spin
       - name: openblas-libs
         run: |
           # Download and install pre-built OpenBLAS library
@@ -185,7 +185,7 @@ jobs:
           meson install
       # - name: build
       #   run: |
-      #     python dev.py build -j 2
+      #     python spin build -j 2
       #     # following steps are required because the build step does not put
       #     # the *.pyd files in build-install! Furthermore the --win-cp-openblas
       #     # option does not seem to copy libopenblas*.dll, so manually copy it.

@@ -49,32 +49,30 @@ Make sure you have the necessary packages installed
     # make sure we have our fork of scikit-learn
     pip install scikit-learn@git+https://git@github.com/neurodata/scikit-learn.git@fork
 
-    pip install spin
-
-After you have installed the relevant dependencies and also installed the scikit-learn fork, you can build the package locally. We use the ``dev.py`` CLI to abstract away build details:
+We use the ``spin`` CLI to abstract away build details:
 
     # run the build using Meson/Ninja
-    ./dev.py build
-
+    ./spin build
+    
     # you can run the following command to see what other options there are
-    ./dev.py --help
-    ./dev.py build --help
+    ./spin --help
+    ./spin build --help
     
     # For example, you might want to start from a clean build
-    ./dev.py build --clean
+    ./spin build --clean
     
     # or build in parallel for faster builds
-    ./dev.py build -j 2
+    ./spin build -j 2
 
     # you will need to double check the build-install has the proper path 
     # this might be different from machine to machine
     export PYTHONPATH=${PWD}/build-install/usr/lib/python3.9/site-packages
 
     # run specific unit tests
-    ./dev.py test -- sktree/tree/tests/test_tree.py
+    ./spin test -- sktree/tree/tests/test_tree.py
 
     # you can bring up the CLI menu
-    ./dev.py --help
+    ./spin --help
 
 You can also do the same thing using Meson/Ninja itself. Run the following to build the local files:
 
