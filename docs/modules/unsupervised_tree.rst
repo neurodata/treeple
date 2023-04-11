@@ -16,8 +16,11 @@ In this guide, we overview the :ref:`unsup_criterion` used for splitting unsuper
 and methods for evaluating the quality of the tree model in :ref:`unsup_evaluation`.
 
 .. _unsup_criterion:
+
 Unsupervised Criterion
 ----------------------
+
+Unsupervised tree models use a variety of criteria to split nodes.
 
 Two-Means
 ~~~~~~~~~

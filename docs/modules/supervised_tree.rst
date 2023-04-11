@@ -41,9 +41,8 @@ as follows:
     >>> clf = tree.ObliqueDecisionTreeClassifier()
     >>> clf = clf.fit(X, y)
 
-.. figure:: ../auto_examples/tree/images/sphx_glr_plot_iris_dtc_002.png
-   :target: ../auto_examples/tree/plot_iris_dtc.html
-   :scale: 75
+.. figure:: ../auto_examples/images/sphx_glr_plot_iris_dtc_002.png
+   :target: ../auto_examples/plot_iris_dtc.html
    :align: center
 
 Another major difference to DTs is that OTs can by definition sample more candidate
@@ -112,7 +111,8 @@ Tips on practical use
 ---------------------
 
 Similar to DTs, the intuition for most parameters are the same. Therefore refer
-to :ref:`tips for using decision trees <tree_tips_usage>` for information on standard
+to `tips for using decision trees <https://scikit-learn.org/stable/modules/tree.html#tips-on-practical-use>`_
+for information on standard
 tree parameters. Specific parameters, such as ``max_features`` and
 ``feature_combinations`` are different or special to OTs. 
 
@@ -150,18 +150,15 @@ Limitations compared to decision trees
 
 .. topic:: References:
 
-    .. [BRE] L. Breiman, J. Friedman, R. Olshen, and C. Stone. Classification
-      and Regression Trees. Wadsworth, Belmont, CA, 1984.
+  .. [RF] L. Breiman. Random Forests. Machine Learning 45, 5–32 (2001).
+    https://doi.org/10.1023/A:1010933404324.
     
-    .. [RF] L. Breiman. Random Forests. Machine Learning 45, 5–32 (2001).
-      https://doi.org/10.1023/A:1010933404324.
-      
-    * https://en.wikipedia.org/wiki/Decision_tree_learning
+  * https://en.wikipedia.org/wiki/Decision_tree_learning
 
-    * https://en.wikipedia.org/wiki/Predictive_analytics
+  * https://en.wikipedia.org/wiki/Predictive_analytics
 
-    * J.R. Quinlan. C4. 5: programs for machine learning. Morgan
-      Kaufmann, 1993.
+  * J.R. Quinlan. C4. 5: programs for machine learning. Morgan
+    Kaufmann, 1993.
 
-    * T. Hastie, R. Tibshirani and J. Friedman. Elements of Statistical
-      Learning, Springer, 2009.
+  * T. Hastie, R. Tibshirani and J. Friedman. Elements of Statistical
+    Learning, Springer, 2009.

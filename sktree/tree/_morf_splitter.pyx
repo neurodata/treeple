@@ -1,5 +1,6 @@
 # cython: cdivision=True
 
+import numpy as np
 cimport numpy as cnp
 
 cnp.import_array()
@@ -51,6 +52,12 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         self.max_patch_width = max_patch_width
         self.data_height = data_height
         self.data_width = data_width
+
+        # initialize state to allow generalization to higher-dimensional tensors
+        self.ndim = 2
+        self.data_dims = np.zeros(self.ndim, dtype=np.int32)
+        self.data_dims[0] = data_width
+        self.data_dims[1] = data_height
 
     def __getstate__(self):
         return {}
@@ -175,7 +182,8 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
         cdef SIZE_t max_features = self.max_features
         cdef UINT32_t* random_state = &self.rand_r_state
 
-        cdef int feat_i, proj_i
+        cdef int feat_seed, proj_i, idx
+        cdef int dim_idx, dim
 
         # weights are default to 1
         cdef DTYPE_t weight = 1.
@@ -204,8 +212,7 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
             # Note: By constraining max patch height/width to be at least the min patch
             # height/width this ensures that the minimum value of patch_height and
             # patch_width is 1
-            patch_height = rand_int(min_patch_height, max_patch_height + 1,
-                                    random_state)
+            patch_height = rand_int(min_patch_height, max_patch_height + 1, random_state)
             patch_width = rand_int(min_patch_width, max_patch_width + 1, random_state)
 
             # compute the difference between the image dimensions and the current random
@@ -227,11 +234,16 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
                 self.n_features
             )
 
-            for feat_i in range(top_left_seed, patch_end_seed):
-                # now compute top-left point
-                vectorized_point = (feat_i % delta_width) + \
-                                    (data_width * <SIZE_t>floor(feat_i / delta_width))
-
+            # need to extract an array of size of the sampled patch
+            for feat_seed in range(top_left_seed, patch_end_seed):
+                # now compute vectorized point from 
+                # get the row-idx and col-idx of the patch in the original structured 2D array
+                vectorized_point = 0
+                for idx in range(self.ndim):
+                    dim = self.data_dims[idx]
+                    dim_idx = <SIZE_t>floor(feat_seed / dim)
+                    vectorized_point += dim_idx * dim
+                    
                 # store the non-zero indices and non-zero weights of the data
                 proj_mat_indices[proj_i].push_back(vectorized_point)
                 proj_mat_weights[proj_i].push_back(weight)
