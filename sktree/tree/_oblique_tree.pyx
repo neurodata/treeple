@@ -313,6 +313,10 @@ cdef class ObliqueTree(Tree):
             if weight < 0:
                 weight *= -1
 
+            # XXX: This should not be necessary as the sample_proj_mat should protect against this
+            if feature_index >= self.n_features:
+                continue
+
             importances[feature_index] += weight * (
                 node.weighted_n_node_samples * node.impurity -
                 left.weighted_n_node_samples * left.impurity -
