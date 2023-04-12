@@ -236,7 +236,8 @@ def test_oblique_forest_trunk():
     "criterion",
     ["gini", "log_loss"],
 )
-def test_check_importances(criterion, dtype):
+@pytest.mark.parametrize("feature_combinations", (2, 5))
+def test_check_importances_oblique(criterion, dtype, feature_combinations):
     """Test checking feature importances for oblique trees."""
     tolerance = 0.01
 
@@ -244,7 +245,12 @@ def test_check_importances(criterion, dtype):
     X = X_large.astype(dtype, copy=False)
     y = y_large.astype(dtype, copy=False)
 
-    est = ObliqueRandomForestClassifier(n_estimators=10, criterion=criterion, random_state=0)
+    est = ObliqueRandomForestClassifier(
+        n_estimators=10,
+        criterion=criterion,
+        random_state=0,
+        feature_combinations=feature_combinations,
+    )
     est.fit(X, y)
     importances = est.feature_importances_
 
@@ -252,7 +258,10 @@ def test_check_importances(criterion, dtype):
     # dataset are informative:
     n_important = np.sum(importances > 0.1)
     assert importances.shape[0] == 10
-    assert n_important == 3
+    if feature_combinations == 2:
+        assert n_important == 3
+    else:
+        assert n_important >= 3
     assert np.all(importances[:3] > 0.1)
 
     # Check with parallel
@@ -263,13 +272,88 @@ def test_check_importances(criterion, dtype):
 
     # Check with sample weights
     sample_weight = check_random_state(0).randint(1, 10, len(X))
-    est = ObliqueRandomForestClassifier(n_estimators=10, random_state=0, criterion=criterion)
+    est = ObliqueRandomForestClassifier(
+        n_estimators=10,
+        random_state=0,
+        criterion=criterion,
+        feature_combinations=feature_combinations,
+    )
     est.fit(X, y, sample_weight=sample_weight)
     importances = est.feature_importances_
     assert np.all(importances >= 0.0)
 
     for scale in [0.5, 100]:
-        est = ObliqueRandomForestClassifier(n_estimators=10, random_state=0, criterion=criterion)
+        est = ObliqueRandomForestClassifier(
+            n_estimators=10,
+            random_state=0,
+            criterion=criterion,
+            feature_combinations=feature_combinations,
+        )
+        est.fit(X, y, sample_weight=scale * sample_weight)
+        importances_bis = est.feature_importances_
+        assert np.abs(importances - importances_bis).mean() < tolerance
+
+
+@pytest.mark.parametrize("dtype", (np.float64, np.float32))
+@pytest.mark.parametrize(
+    "criterion",
+    ["gini", "log_loss"],
+)
+def test_check_importances_patch(criterion, dtype):
+    """Test checking feature importances for oblique trees."""
+    tolerance = 0.01
+
+    # cast as dype
+    X = X_large.astype(dtype, copy=False)
+    y = y_large.astype(dtype, copy=False)
+
+    est = PatchObliqueRandomForestClassifier(
+        n_estimators=50,
+        criterion=criterion,
+        random_state=0,
+        max_patch_height=2,
+        max_patch_width=2,
+        data_height=2,
+        data_width=5,
+    )
+    est.fit(X, y)
+    importances = est.feature_importances_
+
+    # The forest estimator can detect that only the first 3 features of the
+    # dataset are informative:
+    n_important = np.sum(importances > 0.1)
+    assert importances.shape[0] == 10
+    assert n_important >= 3
+
+    # Check with parallel
+    importances = est.feature_importances_
+    est.set_params(n_jobs=2)
+    importances_parallel = est.feature_importances_
+    assert_array_almost_equal(importances, importances_parallel)
+
+    # Check with sample weights
+    sample_weight = check_random_state(0).randint(1, 10, len(X))
+    est = PatchObliqueRandomForestClassifier(
+        n_estimators=10,
+        random_state=0,
+        criterion=criterion,
+        max_patch_height=5,
+        data_height=5,
+        data_width=2,
+    )
+    est.fit(X, y, sample_weight=sample_weight)
+    importances = est.feature_importances_
+    assert np.all(importances >= 0.0)
+
+    for scale in [0.5, 100]:
+        est = PatchObliqueRandomForestClassifier(
+            n_estimators=10,
+            random_state=0,
+            criterion=criterion,
+            max_patch_height=5,
+            data_height=5,
+            data_width=2,
+        )
         est.fit(X, y, sample_weight=scale * sample_weight)
         importances_bis = est.feature_importances_
         assert np.abs(importances - importances_bis).mean() < tolerance

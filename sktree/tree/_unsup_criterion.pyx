@@ -563,11 +563,11 @@ cdef class FastBIC(TwoMeans):
         # compute the estimated combined variance
         variance_comb = (ss_left + ss_right) / (self.weighted_n_left + self.weighted_n_right)
 
-        # Compute the BIC using different variances for left and right 
+        # Compute the BIC using different variances for left and right
         BIC_diff_var_left = self.bic_cluster(n_samples_left, variance_left)
         BIC_diff_var_right = self.bic_cluster(n_samples_right, variance_right)
 
-        # Compute the BIC using different variances for left and right 
+        # Compute the BIC using different variances for left and right
         BIC_same_var_left = self.bic_cluster(n_samples_left, variance_comb)
         BIC_same_var_right = self.bic_cluster(n_samples_right, variance_comb)
         BIC_same_var = BIC_same_var_left - BIC_same_var_right
