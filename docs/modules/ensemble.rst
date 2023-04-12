@@ -43,16 +43,17 @@ respect to the predictability of the target variable. Features used at
 the top of the tree contribute to the final prediction decision of a
 larger fraction of the input samples. The **expected fraction of the
 samples** they contribute to can thus be used as an estimate of the
-**relative importance of the features**. In scikit-learn, the fraction of
+**relative importance of the features**. In scikit-tree, the fraction of
 samples a feature contributes to is combined with the decrease in impurity
 from splitting them to create a normalized estimate of the predictive power
-of that feature.
+of that feature. This is essentially exactly the same it is done in scikit-learn.
 
 By **averaging** the estimates of predictive ability over several randomized
 trees one can **reduce the variance** of such an estimate and use it
 for feature selection. This is known as the mean decrease in impurity, or MDI.
 Refer to [L2014]_ for more information on MDI and feature importance
-evaluation with Random Forests.
+evaluation with Random Forests. We implement the approach taken in [Li2019]_
+and [Tomita2015]_.
 
 .. warning::
 
@@ -62,10 +63,10 @@ evaluation with Random Forests.
   not necessarily inform us on which features are most important to make good
   predictions on held-out dataset**. Secondly, **they favor high cardinality
   features**, that is features with many unique values.
-  :ref:`permutation_importance` is an alternative to impurity-based feature
+  :ref:`sklearn:permutation_importance` is an alternative to impurity-based feature
   importance that does not suffer from these flaws. These two methods of
   obtaining feature importance are explored in:
-  :ref:`sphx_glr_auto_examples_inspection_plot_permutation_importance.py`.
+  :ref:`sklearn:sphx_glr_auto_examples_inspection_plot_permutation_importance.py`.
 
 In practice those estimates are stored as an attribute named
 ``feature_importances_`` on the fitted model. This is an array with shape
@@ -78,3 +79,9 @@ to the prediction function.
  .. [L2014] G. Louppe, :arxiv:`"Understanding Random Forests: From Theory to
     Practice" <1407.7502>`,
     PhD Thesis, U. of Liege, 2014.
+
+ .. [Li2019] Li, Adam, et al. :arxiv:`"Manifold Oblique Random Forests: Towards
+    Closing the Gap on Convolutional Deep Networks."` arXiv preprint arXiv:1909.11799 (2019).
+
+ .. [Tomita2015] Tomita, Tyler M., et al. :arxiv:`"Sparse Projection Oblique Randomer Forests."`
+    arXiv preprint arXiv:1506.03410 (2015).

@@ -15,8 +15,8 @@ Oblique Trees
 =============
 
 Similar to DTs, **Oblique Trees (OTs)** are a non-parametric supervised learning
-method used for :ref:`classification <tree_classification>` and :ref:`regression
-<tree_regression>`. It was originally described as ``Forest-RC`` in Breiman's
+method used for :ref:`:ref: classification <sklearn:tree_classification>` and :ref:`:ref: regression
+<sklearn:tree_regression>`. It was originally described as ``Forest-RC`` in Breiman's
 landmark paper on Random Forests [RF]_. Breiman found that combining data features
 empirically outperforms DTs on a variety of data sets.
 
@@ -41,7 +41,7 @@ as follows:
     >>> clf = tree.ObliqueDecisionTreeClassifier()
     >>> clf = clf.fit(X, y)
 
-.. figure:: ../auto_examples/images/sphx_glr_plot_iris_dtc_002.png
+.. figure:: ../auto_examples/images/thumb/sphx_glr_plot_iris_dtc_thumb.png
    :target: ../auto_examples/plot_iris_dtc.html
    :align: center
 
