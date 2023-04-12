@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>What’s new? &#8212; scikit-tree 0.0.0dev0 documentation</title>
+    <title>2. Unsupervised Decision Trees &#8212; scikit-tree 0.0.0dev0 documentation</title>
   
   
   
@@ -50,11 +50,12 @@
     <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'whats_new/v0.1';</script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'modules/unsupervised_tree';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Installation" href="../install.html" />
-    <link rel="prev" title="Release History" href="../whats_new.html" />
+    <link rel="next" title="3. Oblique Random Forests" href="ensemble.html" />
+    <link rel="prev" title="1. Supervised Decision Trees" href="supervised_tree.html" />
     <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
     <script type="text/javascript" src="../_static/copybutton.js"></script>
     <script type="text/javascript" src="../_static/scrollfix.js"></script>
@@ -148,14 +149,14 @@
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item current active">
                       <a class="nav-link nav-internal" href="../user_guide.html">
                         User Guide
                       </a>
                     </li>
                 
 
-                    <li class="nav-item current active">
+                    <li class="nav-item">
                       <a class="nav-link nav-internal" href="../whats_new.html">
                         Release History
                       </a>
@@ -274,14 +275,14 @@ document.write(`
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item current active">
                       <a class="nav-link nav-internal" href="../user_guide.html">
                         User Guide
                       </a>
                     </li>
                 
 
-                    <li class="nav-item current active">
+                    <li class="nav-item">
                       <a class="nav-link nav-internal" href="../whats_new.html">
                         Release History
                       </a>
@@ -345,7 +346,9 @@ document.write(`
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">What’s new?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="supervised_tree.html">1. Supervised Decision Trees</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">2. Unsupervised Decision Trees</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ensemble.html">3. Oblique Random Forests</a></li>
 
 </ul>
 </div>
@@ -385,9 +388,9 @@ document.write(`
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="../whats_new.html" class="nav-link">Release History</a></li>
+    <li class="breadcrumb-item"><a href="../user_guide.html" class="nav-link">User Guide</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">What’s new?</li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="section-number">2. </span>Unsupervised Decision Trees</li>
   </ul>
 </nav>
 </div>
@@ -404,30 +407,54 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="what-s-new">
-<span id="changes-0-1"></span><h1>What’s new?<a class="headerlink" href="#what-s-new" title="Permalink to this heading">#</a></h1>
-<p>Here we list a changelog of scikit-tree.</p>
+  <section id="unsupervised-decision-trees">
+<span id="unsupervised-tree"></span><h1><span class="section-number">2. </span>Unsupervised Decision Trees<a class="headerlink" href="#unsupervised-decision-trees" title="Permalink to this heading">#</a></h1>
+<p>In unsupervised learning, the goal is to identify patterns
+or structure in data without using labeled examples. Clustering is a common
+unsupervised learning technique that groups similar examples together
+based on their features. Unsupervised tree models are an adaptive way of generating
+clusters of samples. For information on supervised tree models, see <a class="reference internal" href="supervised_tree.html#supervised-tree"><span class="std std-ref">Supervised Decision Trees</span></a></p>
+<p>In this guide, we overview the <a class="reference internal" href="#unsup-criterion"><span class="std std-ref">Unsupervised Criterion</span></a> used for splitting unsupervised trees,
+and methods for evaluating the quality of the tree model in <a class="reference internal" href="#unsup-evaluation"><span class="std std-ref">Evaluating Unsupervised Trees</span></a>.</p>
+<section id="unsupervised-criterion">
+<span id="unsup-criterion"></span><h2><span class="section-number">2.1. </span>Unsupervised Criterion<a class="headerlink" href="#unsupervised-criterion" title="Permalink to this heading">#</a></h2>
+<p>Unsupervised tree models use a variety of criteria to split nodes.</p>
+<section id="two-means">
+<h3><span class="section-number">2.1.1. </span>Two-Means<a class="headerlink" href="#two-means" title="Permalink to this heading">#</a></h3>
+<p>The two means split finds the cutpoint that minimizes the one-dimensional
+2-means objective, which is finding the cutoff point where the total variance
+from cluster 1 and cluster 2 are minimal.</p>
+<div class="math notranslate nohighlight">
+\[\min_s \sum_{i=1}^s (x_i - \hat{\mu}_1)^2 + \sum_{i=s+1}^N (x_i - \hat{\mu}_2)^2\]</div>
+<p>where x is a N-dimensional feature vector, N is the number of sample_indices and
+the mu terms are the estimated means of each cluster 1 and 2.</p>
 </section>
-<section id="version-0-1">
-<span id="current"></span><h1>Version 0.1<a class="headerlink" href="#version-0-1" title="Permalink to this heading">#</a></h1>
-<p><strong>In Development</strong></p>
-<section id="changelog">
-<h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this heading">#</a></h2>
-<ul class="simple">
-<li><p><span class="raw-html"><span class="badge badge-success">Feature</span></span>  Implementation of the two-means Unsupervised Random Forest, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/9">#9</a>)</p></li>
-<li><p><span class="raw-html"><span class="badge badge-success">Feature</span></span>  Implementation of oblique Unsupervised Random Forest, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/11">#11</a>)</p></li>
-<li><p><span class="raw-html"><span class="badge badge-success">Feature</span></span>  Implementation of manifold oblique Random Forest, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/21">#21</a>)</p></li>
-<li><p><span class="raw-html"><span class="badge badge-success">Feature</span></span>  Implementation of fastBIC criterion for unsupervised tree models, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> and <a class="reference external" href="https://github.com/jshinm">Jong Shin</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/45">#45</a>)</p></li>
-<li><p><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  Fix a bug in Patch oblique random forest that samples outside the data boundaries and adds a user guide, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/61">#61</a>)</p></li>
-</ul>
+<section id="fast-bic">
+<h3><span class="section-number">2.1.2. </span>Fast-BIC<a class="headerlink" href="#fast-bic" title="Permalink to this heading">#</a></h3>
+<p>The Bayesian Information Criterion (BIC) is a popular model seleciton
+criteria that is based on the log likelihood of the model given data.
+Fast-BIC is a method that combines the speed of the <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html#sklearn.cluster.KMeans" title="(in scikit-learn v1.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.cluster.KMeans</span></code></a> clustering
+method with the model flexibility of Mclust-BIC. It sorts data for each
+feature and tries all possible splits to assign data points to one of
+two Gaussian distributions based on their position relative to the split.
+The parameters for each cluster are estimated using maximum likelihood
+estimation (MLE).The method performs hard clustering rather than soft
+clustering like in GMM, resulting in a simpler calculation of the likelihood.</p>
+<div class="math notranslate nohighlight">
+\[\hat{L} = \sum_{n=1}^s[\log\hat{\pi}_1+\log{\mathcal{N}(x_n;\hat{\mu}_1,\hat{\sigma}_1^2)}]
++ \sum_{n=s+1}^N[\log\hat{\pi}_2+\log{\mathcal{N}(x_n;\hat{\mu}_2,\hat{\sigma}_2^2)}]\]</div>
+<p>where the prior, mean, and variance are defined as follows, respectively:</p>
+<div class="math notranslate nohighlight">
+\[\hat{\pi} = \frac{s}{N},\quad\quad
+\hat{\mu} = \frac{1}{s}\sum_{n\le s}{x_n},\quad\quad
+\hat{\sigma}^2 = \frac{1}{s}\sum_{n\le s}{||x_n-\hat{\mu_j}||^2}\]</div>
 </section>
-<section id="code-and-documentation-contributors">
-<h2>Code and Documentation Contributors<a class="headerlink" href="#code-and-documentation-contributors" title="Permalink to this heading">#</a></h2>
-<p>Thanks to everyone who has contributed to the maintenance and improvement of
-the project since version inception, including:</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://adam2392.github.io">Adam Li</a></p></li>
-</ul>
+</section>
+<section id="evaluating-unsupervised-trees">
+<span id="unsup-evaluation"></span><h2><span class="section-number">2.2. </span>Evaluating Unsupervised Trees<a class="headerlink" href="#evaluating-unsupervised-trees" title="Permalink to this heading">#</a></h2>
+<p>In clustering settings, there may be no natural
+notion of “true” class-labels, thus the efficacy of the clustering scheme is
+often measured based on distance based metrics such as <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.adjusted_rand_score.html#sklearn.metrics.adjusted_rand_score" title="(in scikit-learn v1.2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.metrics.adjusted_rand_score()</span></code></a>.</p>
 </section>
 </section>
 
@@ -443,20 +470,20 @@ the project since version inception, including:</p>
     <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../whats_new.html"
+       href="supervised_tree.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Release History</p>
+        <p class="prev-next-title"><span class="section-number">1. </span>Supervised Decision Trees</p>
       </div>
     </a>
     <a class="right-next"
-       href="../install.html"
+       href="ensemble.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Installation</p>
+        <p class="prev-next-title"><span class="section-number">3. </span>Oblique Random Forests</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -478,14 +505,13 @@ the project since version inception, including:</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">What’s new?</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#version-0-1">Version 0.1</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#changelog">Changelog</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#code-and-documentation-contributors">Code and Documentation Contributors</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#unsupervised-criterion">2.1. Unsupervised Criterion</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#two-means">2.1.1. Two-Means</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fast-bic">2.1.2. Fast-BIC</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluating-unsupervised-trees">2.2. Evaluating Unsupervised Trees</a></li>
 </ul>
-
   </nav></div>
 
 </div></div>
