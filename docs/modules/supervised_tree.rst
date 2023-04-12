@@ -41,7 +41,7 @@ as follows:
     >>> clf = tree.ObliqueDecisionTreeClassifier()
     >>> clf = clf.fit(X, y)
 
-.. figure:: ../auto_examples/images/thumb/sphx_glr_plot_iris_dtc_thumb.png
+.. figure:: ../auto_examples/images/sphx_glr_plot_iris_dtc_002.png
    :target: ../auto_examples/plot_iris_dtc.html
    :align: center
 
