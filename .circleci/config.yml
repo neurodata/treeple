@@ -140,11 +140,11 @@ jobs:
           destination: dev
       
       - store_artifacts:
-          path: doc/_build/html_stable/
+          path: docs/_build/html_stable/
           destination: stable
           
       - persist_to_workspace:
-          root: doc/_build
+          root: docs/_build
           paths:
             - html
             - html_stable

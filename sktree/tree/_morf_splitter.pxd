@@ -37,7 +37,11 @@ cdef class PatchSplitter(BaseObliqueSplitter):
     cdef public SIZE_t data_width                       # Width of the input data
 
     cdef public SIZE_t ndim                       # The number of dimensions of the input data
+    
     cdef SIZE_t[:] data_dims                      # The dimensions of the input data
+    cdef SIZE_t[:] patch_dims_buff                # The dimensions of the sampled patch
+    cdef SIZE_t[:] min_patch_dims
+    cdef SIZE_t[:] max_patch_dims
 
     # All oblique splitters (i.e. non-axis aligned splitters) require a
     # function to sample a projection matrix that is applied to the feature matrix
