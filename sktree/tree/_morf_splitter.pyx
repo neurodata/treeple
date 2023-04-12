@@ -55,7 +55,7 @@ cdef class PatchSplitter(BaseObliqueSplitter):
 
         # initialize state to allow generalization to higher-dimensional tensors
         self.ndim = 2
-        self.data_dims = np.zeros(self.ndim, dtype=np.int32)
+        self.data_dims = np.zeros(self.ndim, dtype=np.intp)
         self.data_dims[0] = data_width
         self.data_dims[1] = data_height
 
