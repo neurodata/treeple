@@ -54,3 +54,7 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         vector[vector[DTYPE_t]]& proj_mat_weights,
         vector[vector[SIZE_t]]& proj_mat_indices
     ) nogil 
+    
+    # Testing functions in Python
+    cpdef sample_projection_matrix(self)
+    cpdef init_test(self, X, y, sample_weight)

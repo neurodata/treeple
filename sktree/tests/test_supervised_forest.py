@@ -311,10 +311,8 @@ def test_check_importances_patch(criterion, dtype):
         n_estimators=50,
         criterion=criterion,
         random_state=0,
-        max_patch_height=2,
-        max_patch_width=2,
-        data_height=2,
-        data_width=5,
+        max_patch_dims=(2, 2),
+        data_dims=(2, 5),
     )
     est.fit(X, y)
     importances = est.feature_importances_
@@ -337,9 +335,8 @@ def test_check_importances_patch(criterion, dtype):
         n_estimators=10,
         random_state=0,
         criterion=criterion,
-        max_patch_height=5,
-        data_height=5,
-        data_width=2,
+        max_patch_dims=(1, 5),
+        data_dims=(2, 5),
     )
     est.fit(X, y, sample_weight=sample_weight)
     importances = est.feature_importances_
@@ -350,9 +347,8 @@ def test_check_importances_patch(criterion, dtype):
             n_estimators=10,
             random_state=0,
             criterion=criterion,
-            max_patch_height=5,
-            data_height=5,
-            data_width=2,
+            max_patch_dims=(1, 5),
+            data_dims=(2, 5),
         )
         est.fit(X, y, sample_weight=scale * sample_weight)
         importances_bis = est.feature_importances_

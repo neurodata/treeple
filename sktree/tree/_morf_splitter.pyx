@@ -135,6 +135,11 @@ cdef class PatchSplitter(BaseObliqueSplitter):
 
         return sizeof(ObliqueSplitRecord)
 
+    cpdef sample_projection_matrix(self):
+        pass
+
+    cpdef init_test(self, X, y, sample_weight):
+        pass
 
 cdef class BaseDensePatchSplitter(PatchSplitter):
     # XXX: currently BaseOblique class defines this, which shouldn't be the case
@@ -176,7 +181,8 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
         # now get the top-left seed that is used to then determine the top-left
         # position in patch
         # compute top-left seed for the multi-dimensional patch
-        cdef SIZE_t top_left_patch_seed = 1
+        cdef SIZE_t top_left_patch_seed
+        cdef SIZE_t ndim_ravel_boundary = 1
         cdef SIZE_t patch_size = 1
 
         cdef UINT32_t* random_state = &self.rand_r_state
@@ -184,6 +190,9 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
         # define parameters for the random patch
         cdef SIZE_t patch_dim
         cdef SIZE_t delta_patch_dim
+
+        cdef SIZE_t jdx
+        cdef SIZE_t idx
 
         for idx in range(self.ndim):
             # compute random patch width and height
@@ -202,9 +211,14 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
             
             # compute the difference between the image dimensions and the current
             # random patch dimensions for sampling
-            delta_patch_dim = self.data_dims[idx] - patch_dim + 1
-            top_left_patch_seed *= delta_patch_dim
-        top_left_patch_seed = rand_int(0, top_left_patch_seed, random_state)
+            delta_patch_dim = (self.data_dims[idx] - patch_dim) + 1
+            top_left_patch_seed = rand_int(0, delta_patch_dim, random_state)
+            self.unraveled_patch_point[idx] = top_left_patch_seed
+
+        top_left_patch_seed = ravel_multi_index_cython(
+            self.unraveled_patch_point,
+            self.data_dims
+        )
         return top_left_patch_seed, patch_size
 
     cdef void sample_proj_mat(
@@ -220,23 +234,26 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
         cdef UINT32_t* random_state = &self.rand_r_state
 
         cdef int proj_i, idx, jdx
-        cdef SIZE_t patch_idx
         cdef SIZE_t dim_idx
     
         # weights are default to 1
         cdef DTYPE_t weight = 1.
 
-        # size of the sampled patch
-        cdef SIZE_t patch_size
-
         # define parameters for vectorized points in the original data shape
         # and top-left seed
         cdef SIZE_t vectorized_point
         cdef SIZE_t top_left_patch_seed
-        cdef SIZE_t vectorized_offset
+        cdef SIZE_t vectorized_point_offset
+
+        # size of the sampled patch, which is just the size of the n-dim patch
+        # (\prod_i self.patch_dims_buff[i])
+        cdef SIZE_t patch_size
+
+        # iterates over the size of the patch
+        cdef SIZE_t patch_idx
 
         # stores how many patches we have iterated so far
-        cdef int patch_dim_sofar
+        cdef int vectorized_patch_offset
 
         for proj_i in range(0, max_features):
             # now get the top-left seed that is used to then determine the top-left
@@ -244,29 +261,136 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
             # compute top-left seed for the multi-dimensional patch
             top_left_patch_seed, patch_size = self.sample_top_left_seed()
 
-            # push the first point onto the vector
-            vectorized_point = top_left_patch_seed
+            self.sample_proj_vec(
+                proj_mat_weights,
+                proj_mat_indices,
+                proj_i,
+                patch_size,
+                top_left_patch_seed,
+                self.patch_dims_buff
+            )
+
+    cdef void sample_proj_vec(
+        self,
+        vector[vector[DTYPE_t]]& proj_mat_weights,
+        vector[vector[SIZE_t]]& proj_mat_indices,
+        SIZE_t proj_i,
+        SIZE_t patch_size,
+        SIZE_t top_left_patch_seed,
+        const SIZE_t[:] patch_dims,
+    ) noexcept nogil:
+        # iterates over the size of the patch
+        cdef SIZE_t patch_idx
+
+        # stores how many patches we have iterated so far
+        cdef int vectorized_patch_offset
+        cdef SIZE_t vectorized_point_offset
+        cdef SIZE_t vectorized_point
+
+        cdef SIZE_t dim_idx
+    
+        # weights are default to 1
+        cdef DTYPE_t weight = 1.
+
+        for patch_idx in range(patch_size):
+            # keep track of which dimensions of the patch we have iterated over
+            vectorized_patch_offset = 1
+
+            # Once the vectorized top-left-seed is unraveled, you can add the patch
+            # points in the array structure and compute their vectorized (unraveled)
+            # points, which are added to the projection vector
+            unravel_index_cython(top_left_patch_seed, self.data_dims, self.unraveled_patch_point)
+
+            for dim_idx in range(self.ndim):
+                # compute the offset from the top-left patch seed based on:
+                # 1. the current patch index
+                # 2. the patch dimension indexed by `dim_idx`
+                # 3. and the vectorized patch dimensions that we have seen so far
+                vectorized_point_offset = (patch_idx // (vectorized_patch_offset)) % patch_dims[dim_idx]
+
+                # the `vectorized_point_offset` is the offset from the top-left vectorized seed for this dimension
+
+                # then we compute the actual point in the original data shape
+                self.unraveled_patch_point[dim_idx] = self.unraveled_patch_point[dim_idx] + vectorized_point_offset
+                vectorized_patch_offset *= patch_dims[dim_idx]
+
+            # ravel the patch point into the original data dimensions
+            vectorized_point = ravel_multi_index_cython(self.unraveled_patch_point, self.data_dims)
             proj_mat_indices[proj_i].push_back(vectorized_point)
             proj_mat_weights[proj_i].push_back(weight)
 
-            for patch_idx in range(patch_size):
-                # keep track of which dimensions of the patch we have iterated over
-                patch_dim_sofar = 1
+    cpdef sample_top_left_seed_cpdef(self):
+        top_left_patch_seed, patch_size = self.sample_top_left_seed()
+        patch_dims = np.array(self.patch_dims_buff, dtype=np.intp)
+        return top_left_patch_seed, patch_size, patch_dims
 
-                # Once the vectorized top-left-seed is unraveled, you can add the patch
-                # points in the array structure and compute their vectorized (unraveled)
-                # points, which are added to the projection vector
-                unravel_index_cython(top_left_patch_seed, self.data_dims, self.unraveled_patch_point)
+    cpdef sample_projection_vector(self,
+        SIZE_t proj_i,
+        SIZE_t patch_size,
+        SIZE_t top_left_patch_seed,
+        SIZE_t[:] patch_dims,
+        ):
+        cdef vector[vector[DTYPE_t]] proj_mat_weights = vector[vector[DTYPE_t]](self.max_features)
+        cdef vector[vector[SIZE_t]] proj_mat_indices = vector[vector[SIZE_t]](self.max_features)
+        cdef SIZE_t i, j
 
-                for dim_idx in range(self.ndim):
-                    # compute the offset from the top-left patch seed
-                    vectorized_offset = (patch_idx // (patch_dim_sofar)) % self.patch_dims_buff[dim_idx]
+        # sample projection matrix in C/C++
+        self.sample_proj_vec(
+            proj_mat_weights,
+            proj_mat_indices,
+            proj_i,
+            patch_size,
+            top_left_patch_seed,
+            patch_dims
+        )
 
-                    # then we compute the actual point in the original data shape
-                    self.unraveled_patch_point[dim_idx] = self.unraveled_patch_point[dim_idx] + vectorized_offset
-                    patch_dim_sofar *= self.patch_dims_buff[dim_idx]
+        # convert the projection matrix to something that can be used in Python
+        proj_vecs = np.zeros((1, self.n_features), dtype=np.float64)
+        for i in range(0, 1):
+            for j in range(0, proj_mat_weights[i].size()):
+                weight = proj_mat_weights[i][j]
+                feat = proj_mat_indices[i][j]
+                proj_vecs[i, feat] = weight
+        return proj_vecs
 
-                # ravel the patch point into the original data dimensions
-                vectorized_point = ravel_multi_index_cython(self.unraveled_patch_point, self.data_dims)
-                proj_mat_indices[proj_i].push_back(vectorized_point)
-                proj_mat_weights[proj_i].push_back(weight)
+    cpdef sample_projection_matrix(self):
+        """Sample projection matrix using a patch.
+
+        Used for testing purposes.
+
+        Randomly sample patches with weight of 1.
+        """
+        cdef vector[vector[DTYPE_t]] proj_mat_weights = vector[vector[DTYPE_t]](self.max_features)
+        cdef vector[vector[SIZE_t]] proj_mat_indices = vector[vector[SIZE_t]](self.max_features)
+        cdef SIZE_t i, j
+
+        # sample projection matrix in C/C++
+        self.sample_proj_mat(proj_mat_weights, proj_mat_indices)
+
+        # convert the projection matrix to something that can be used in Python
+        proj_vecs = np.zeros((self.max_features, self.n_features), dtype=np.float64)
+        for i in range(0, self.max_features):
+            for j in range(0, proj_mat_weights[i].size()):
+                weight = proj_mat_weights[i][j]
+                feat = proj_mat_indices[i][j]
+
+                proj_vecs[i, feat] = weight
+
+        return proj_vecs
+
+    cpdef init_test(self, X, y, sample_weight):
+        """Initializes the state of the splitter.
+        
+        Used for testing purposes.
+
+        Parameters
+        ----------
+        X : array-like, shape (n_samples, n_features)
+            The input samples.
+        y : array-like, shape (n_samples,)
+            The target values (class labels in classification, real numbers in
+            regression).
+        sample_weight : array-like, shape (n_samples,)
+            Sample weights.
+        """
+        self.init(X, y, sample_weight)

@@ -1,5 +1,5 @@
 import copy
-from numbers import Integral, Real
+from numbers import Real
 
 import numpy as np
 from scipy.sparse import issparse
