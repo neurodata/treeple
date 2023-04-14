@@ -44,7 +44,8 @@ cdef class PatchSplitter(BaseObliqueSplitter):
     cdef cnp.uint8_t[:] dim_contiguous            # A boolean array indicating whether each dimension is contiguous
     
     # TODO: check if this works and is necessary for discontiguous data
-    cdef SIZE_t[:] stride_offsets                 # The stride offsets for each dimension
+    # cdef SIZE_t[:] stride_offsets                # The stride offsets for each dimension
+    cdef bint _discontiguous
 
     cdef SIZE_t[:] patch_dims_buff                # A buffer to store the dimensions of the sampled patch
     cdef SIZE_t[:] unraveled_patch_point          # A buffer to store the unraveled patch point

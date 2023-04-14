@@ -201,40 +201,45 @@ plt.show()
 # and the patches are discontiguous in the channel dimension, but contiguous
 # in the time dimension. Here, we show an example patch.
 
+# initialize some dummy data
+X = np.repeat(np.arange(25).astype(np.float32), 5).reshape(5, -1)
+y = np.array([0, 0, 0, 1, 1]).reshape(-1, 1).astype(np.float64)
+sample_weight = np.ones(5)
+
 # TODO: this is not working yet...
 # We will make the patch 2D, which samples multiple rows contiguously. This is
 # a 2D patch of size 3 in the columns and 2 in the rows.
-# min_patch_dims = np.array((1, 1))
-# max_patch_dims = np.array((3, 3))
-# dim_contiguous = np.ascontiguousarray((False, False))
-# data_dims = np.array((5, 5))
+min_patch_dims = np.array((3, 1))
+max_patch_dims = np.array((3, 5))
+dim_contiguous = np.array((False, True))
+data_dims = np.array((5, 5))
 
-# splitter = BestPatchSplitterTester(
-#     criterion,
-#     max_features,
-#     min_samples_leaf,
-#     min_weight_leaf,
-#     random_state,
-#     min_patch_dims,
-#     max_patch_dims,
-#     dim_contiguous,
-#     data_dims,
-# )
-# splitter.init_test(X, y, sample_weight)
+splitter = BestPatchSplitterTester(
+    criterion,
+    max_features,
+    min_samples_leaf,
+    min_weight_leaf,
+    random_state,
+    min_patch_dims,
+    max_patch_dims,
+    dim_contiguous,
+    data_dims,
+)
+splitter.init_test(X, y, sample_weight)
 
-# # sample the projection matrix that consists of 1D patches
-# proj_mat = splitter.sample_projection_matrix()
+# sample the projection matrix that consists of 1D patches
+proj_mat = splitter.sample_projection_matrix()
 
-# # Visualize 2D patches
-# fig, axs = plt.subplots(nrows=2, ncols=3, figsize=(12, 8), sharex=True, sharey=True, squeeze=True)
-# axs = axs.flatten()
-# for idx, ax in enumerate(axs):
-#     ax.imshow(proj_mat[idx, :].reshape(data_dims), cmap="viridis")
-#     ax.set(
-#         xlim=(-1, data_dims[1]),
-#         ylim=(-1, data_dims[0]),
-#         title=f"Patch {idx}",
-#     )
+# Visualize 2D patches
+fig, axs = plt.subplots(nrows=2, ncols=3, figsize=(12, 8), sharex=True, sharey=True, squeeze=True)
+axs = axs.flatten()
+for idx, ax in enumerate(axs):
+    ax.imshow(proj_mat[idx, :].reshape(data_dims), cmap="viridis")
+    ax.set(
+        xlim=(-1, data_dims[1]),
+        ylim=(-1, data_dims[0]),
+        title=f"Patch {idx}",
+    )
 
-# fig.suptitle("2D Discontiguous Patch Visualization")
-# plt.show()
+fig.suptitle("2D Discontiguous Patch Visualization")
+plt.show()

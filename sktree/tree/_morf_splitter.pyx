@@ -64,10 +64,12 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         self.min_patch_dims = min_patch_dims
         self.max_patch_dims = max_patch_dims
         self.dim_contiguous = dim_contiguous
+        
+        if not all(self.dim_contiguous):
+            self._discontiguous = True
+        else:
+            self._discontiguous = False
 
-        # initialize stride offsets
-        self.stride_offsets = np.zeros(self.ndim, dtype=np.intp)
-    
     def __getstate__(self):
         return {}
 
@@ -259,14 +261,24 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
             # compute top-left seed for the multi-dimensional patch
             top_left_patch_seed, patch_size = self.sample_top_left_seed()
 
-            self.sample_proj_vec(
-                proj_mat_weights,
-                proj_mat_indices,
-                proj_i,
-                patch_size,
-                top_left_patch_seed,
-                self.patch_dims_buff
-            )
+            if self._discontiguous:
+                self.sample_proj_vec_discontiguous(
+                    proj_mat_weights,
+                    proj_mat_indices,
+                    proj_i,
+                    patch_size,
+                    top_left_patch_seed,
+                    self.patch_dims_buff
+                )
+            else:
+                self.sample_proj_vec(
+                    proj_mat_weights,
+                    proj_mat_indices,
+                    proj_i,
+                    patch_size,
+                    top_left_patch_seed,
+                    self.patch_dims_buff
+                )
 
     cdef void sample_proj_vec(
         self,
@@ -329,23 +341,43 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
             proj_mat_weights[proj_i].push_back(weight)
 
     # TODO: what is our policy to sample discontiguous points.
-    # cdef void sample_proj_vec_discontiguous(self):
-    #     cdef SIZE_t dim_idx
+    # - this does not work yet...
+    cdef void sample_proj_vec_discontiguous(self,
+        vector[vector[DTYPE_t]]& proj_mat_weights,
+        vector[vector[SIZE_t]]& proj_mat_indices,
+        SIZE_t proj_i,
+        SIZE_t patch_size,
+        SIZE_t top_left_patch_seed,
+        const SIZE_t[:] patch_dims,
+    ) noexcept nogil:
+        cdef DTYPE_t weight = 1.
+        cdef SIZE_t vectorized_point
+        cdef UINT32_t* random_state = &self.rand_r_state
 
-    #     # fill with values 0, 1, ..., dimension - 1
-    #     cdef int i
-    #     cdef vector[int] dim_inds = vector[int](self.data_dims[dim_idx])
-    #     for i in range(self.data_dims[dim_idx]):
-    #         dim_inds.push_back(i)
+        # fill with values 0, 1, ..., dimension - 1
+        cdef int i
+        cdef vector[int] dim_inds = vector[int](self.data_dims[0])
+        for i in range(self.data_dims[0]):
+            dim_inds.push_back(i)
         
-    #     # shuffle indices
-    #     cdef int num_rows = dim_inds.size()
-    #     for i in range(num_rows - 1, 0, -1):
-    #         j = rand_int(0, i + 1, random_state)
-    #         dim_inds[i], dim_inds[j] = dim_inds[j], dim_inds[i]
+        cdef vector[int] row_inds = vector[int](patch_dims[0])
+        # shuffle indices
+        cdef int num_rows = dim_inds.size()
+        for i in range(num_rows - 1, -1, -1):
+            j = rand_int(0, i + 1, random_state)
+            dim_inds[i], dim_inds[j] = dim_inds[j], dim_inds[i]
 
-        # pick first numRowsInPatch entries
-        # cdef vector[int] selected_dim_inds(dim_inds.begin(), dim_inds.begin() + patch_dims[dim_idx])
+        for i in range(num_rows):
+            row_inds.push_back(dim_inds[i])
+
+        cdef int row
+        cdef int col
+        for row in range(patch_dims[0]):
+            for col in range(patch_dims[1]):
+                # ravel the patch point into the original data dimensions
+                vectorized_point = (top_left_patch_seed % patch_dims[1]) + col + (row_inds[row] * patch_dims[1])
+                proj_mat_indices[proj_i].push_back(vectorized_point)
+                proj_mat_weights[proj_i].push_back(weight)
 
     
 cdef class BestPatchSplitterTester(BestPatchSplitter):
