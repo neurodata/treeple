@@ -26,6 +26,7 @@ from sklearn.utils.parallel import Parallel, delayed
 from sklearn.utils.validation import _check_sample_weight, check_is_fitted, check_random_state
 
 from sktree.tree import UnsupervisedDecisionTree, UnsupervisedObliqueDecisionTree
+from sktree._neighbors import _sim_matrix
 
 
 class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):
@@ -255,11 +256,7 @@ class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):
         -------
         prox_matrix : array-like of shape (n_samples, n_samples)
         """
-        aff_matrix = sum(np.equal.outer(X[:, i], X[:, i]) for i in range(self.n_estimators))
-
-        # normalize by the number of trees
-        aff_matrix = np.divide(aff_matrix, self.n_estimators)
-        return aff_matrix
+        return _sim_matrix(X, self.n_estimators)
 
     def _assign_labels(self, affinity_matrix):
         """Assign cluster labels given X.

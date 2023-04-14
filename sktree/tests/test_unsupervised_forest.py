@@ -110,3 +110,25 @@ def test_check_iris(name, forest, criterion):
     assert (
         score > expected_score
     ), f"{name}-iris failed with criterion {criterion} and score = {score}"
+
+
+@pytest.mark.parametrize("name, forest", FOREST_CLUSTERS.items())
+def test_similarity_matrix(name, forest):
+    n_samples = 200
+    n_classes = 2
+
+    #
+    if name == "UnsupervisedRandomForest":
+        n_features = 5
+    else:
+        n_features = 20
+    X, y = make_blobs(
+        n_samples=n_samples, centers=n_classes, n_features=n_features, random_state=12345
+    )
+
+    clf = forest(random_state=12345)
+    clf.fit(X)
+    sim_mat = clf.affinity_matrix_
+
+    assert np.allclose(sim_mat, sim_mat.T)
+    assert np.all((sim_mat.diagonal() == 1))
