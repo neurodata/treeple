@@ -11,6 +11,7 @@ cimport numpy as cnp
 
 cnp.import_array()
 
+from libc.stdlib cimport RAND_MAX, rand, srand
 from libcpp.vector cimport vector
 from sklearn.tree._criterion cimport Criterion
 from sklearn.tree._utils cimport rand_int
@@ -64,6 +65,9 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         self.max_patch_dims = max_patch_dims
         self.dim_contiguous = dim_contiguous
 
+        # initialize stride offsets
+        self.stride_offsets = np.zeros(self.ndim, dtype=np.intp)
+    
     def __getstate__(self):
         return {}
 
@@ -134,12 +138,6 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         """Get size of a pointer to record for ObliqueSplitter."""
 
         return sizeof(ObliqueSplitRecord)
-
-    cpdef sample_projection_matrix(self):
-        pass
-
-    cpdef init_test(self, X, y, sample_weight):
-        pass
 
 cdef class BaseDensePatchSplitter(PatchSplitter):
     # XXX: currently BaseOblique class defines this, which shouldn't be the case
@@ -279,6 +277,7 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
         SIZE_t top_left_patch_seed,
         const SIZE_t[:] patch_dims,
     ) noexcept nogil:
+        cdef UINT32_t* random_state = &self.rand_r_state
         # iterates over the size of the patch
         cdef SIZE_t patch_idx
 
@@ -291,6 +290,17 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
     
         # weights are default to 1
         cdef DTYPE_t weight = 1.
+
+        # TODO: make discontiguous work
+        # An ineffiecient algorithm would loop through the patch dimensions
+        # compute stride offsets if any dimensions are not contiguous
+        # cdef SIZE_t stride_offset
+        # for dim_idx in range(self.ndim):
+        #     if self.dim_contiguous[dim_idx] == 0:
+        #         stride_offset = rand_int(0, self.data_dims[dim_idx], random_state)
+        #     else:
+        #         stride_offset = 1
+        #     self.stride_offsets[dim_idx] = stride_offset
 
         for patch_idx in range(patch_size):
             # keep track of which dimensions of the patch we have iterated over
@@ -306,9 +316,8 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
                 # 1. the current patch index
                 # 2. the patch dimension indexed by `dim_idx`
                 # 3. and the vectorized patch dimensions that we have seen so far
-                vectorized_point_offset = (patch_idx // (vectorized_patch_offset)) % patch_dims[dim_idx]
-
                 # the `vectorized_point_offset` is the offset from the top-left vectorized seed for this dimension
+                vectorized_point_offset = (patch_idx // (vectorized_patch_offset)) % patch_dims[dim_idx]
 
                 # then we compute the actual point in the original data shape
                 self.unraveled_patch_point[dim_idx] = self.unraveled_patch_point[dim_idx] + vectorized_point_offset
@@ -319,6 +328,28 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
             proj_mat_indices[proj_i].push_back(vectorized_point)
             proj_mat_weights[proj_i].push_back(weight)
 
+    # TODO: what is our policy to sample discontiguous points.
+    # cdef void sample_proj_vec_discontiguous(self):
+    #     cdef SIZE_t dim_idx
+
+    #     # fill with values 0, 1, ..., dimension - 1
+    #     cdef int i
+    #     cdef vector[int] dim_inds = vector[int](self.data_dims[dim_idx])
+    #     for i in range(self.data_dims[dim_idx]):
+    #         dim_inds.push_back(i)
+        
+    #     # shuffle indices
+    #     cdef int num_rows = dim_inds.size()
+    #     for i in range(num_rows - 1, 0, -1):
+    #         j = rand_int(0, i + 1, random_state)
+    #         dim_inds[i], dim_inds[j] = dim_inds[j], dim_inds[i]
+
+        # pick first numRowsInPatch entries
+        # cdef vector[int] selected_dim_inds(dim_inds.begin(), dim_inds.begin() + patch_dims[dim_idx])
+
+    
+cdef class BestPatchSplitterTester(BestPatchSplitter):
+    """A class to expose a Python interface for testing."""
     cpdef sample_top_left_seed_cpdef(self):
         top_left_patch_seed, patch_size = self.sample_top_left_seed()
         patch_dims = np.array(self.patch_dims_buff, dtype=np.intp)

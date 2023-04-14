@@ -33,7 +33,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from sklearn.tree._criterion import Gini
-from sktree.tree._morf_splitter import BestPatchSplitter
+from sktree.tree._morf_splitter import BestPatchSplitterTester
 
 # %%
 # Initialize patch splitter
@@ -53,64 +53,20 @@ X = np.repeat(np.arange(25).astype(np.float32), 5).reshape(5, -1)
 y = np.array([0, 0, 0, 1, 1]).reshape(-1, 1).astype(np.float64)
 sample_weight = np.ones(5)
 
-# print(X.shape, y.shape, sample_weight.shape)
+print("The shape of our dataset is: ", X.shape, y.shape, sample_weight.shape)
 
 # %%
 # Generate 1D patches
 # -------------------
 # Now that we have th patch splitter initialized, we can generate some patches
-# and visualize how they appear on the data.
-
-# We will make the patch 1D, which samples multiple rows contiguously. This is
-# a 1D patch of size 3.
-# min_patch_dims = np.array((1, 1))
-# max_patch_dims = np.array((3, 1))
-# dim_contiguous = np.array((True, True))
-# data_dims = np.array((5, 5))
-
-# splitter = BestPatchSplitter(
-#     criterion,
-#     max_features,
-#     min_samples_leaf,
-#     min_weight_leaf,
-#     random_state,
-#     min_patch_dims,
-#     max_patch_dims,
-#     dim_contiguous,
-#     data_dims,
-# )
-# splitter.init_test(X, y, sample_weight)
-
-# # sample the projection matrix that consists of 1D patches
-# proj_mat = splitter.sample_projection_matrix()
-# print(proj_mat.shape)
-
-# # Visualize 1D patches
-# fig, axs = plt.subplots(nrows=2, ncols=3, figsize=(12, 8), sharex=True, sharey=True, squeeze=True)
-# axs = axs.flatten()
-# for idx, ax in enumerate(axs):
-#     ax.imshow(proj_mat[idx, :].reshape(data_dims), cmap='viridis')
-#     ax.set(
-#         xlim=(-1, data_dims[1]),
-#         ylim=(-1, data_dims[0]),
-#         title=f"Patch {idx}",
-#     )
-
-# fig.suptitle("1D Patch Visualization")
-# plt.show()
-
-# %%
-# Generate 2D patches
-# -------------------
-
-# We will make the patch 2D, which samples multiple rows contiguously. This is
-# a 2D patch of size 3 in the columns and 2 in the rows.
+# and visualize how they appear on the data. We will make the patch 1D, which
+# samples multiple rows contiguously. This is a 1D patch of size 3.
 min_patch_dims = np.array((1, 1))
-max_patch_dims = np.array((3, 3))
+max_patch_dims = np.array((3, 1))
 dim_contiguous = np.array((True, True))
 data_dims = np.array((5, 5))
 
-splitter = BestPatchSplitter(
+splitter = BestPatchSplitterTester(
     criterion,
     max_features,
     min_samples_leaf,
@@ -125,7 +81,48 @@ splitter.init_test(X, y, sample_weight)
 
 # sample the projection matrix that consists of 1D patches
 proj_mat = splitter.sample_projection_matrix()
-# print(proj_mat.shape)
+print(proj_mat.shape)
+
+# Visualize 1D patches
+fig, axs = plt.subplots(nrows=2, ncols=3, figsize=(12, 8), sharex=True, sharey=True, squeeze=True)
+axs = axs.flatten()
+for idx, ax in enumerate(axs):
+    ax.imshow(proj_mat[idx, :].reshape(data_dims), cmap="viridis")
+    ax.set(
+        xlim=(-1, data_dims[1]),
+        ylim=(-1, data_dims[0]),
+        title=f"Patch {idx}",
+    )
+
+fig.suptitle("1D Patch Visualization")
+plt.show()
+
+# %%
+# Generate 2D patches
+# -------------------
+# We will make the patch 2D, which samples multiple rows contiguously. This is
+# a 2D patch of size 3 in the columns and 2 in the rows.
+
+min_patch_dims = np.array((1, 1))
+max_patch_dims = np.array((3, 3))
+dim_contiguous = np.array((True, True))
+data_dims = np.array((5, 5))
+
+splitter = BestPatchSplitterTester(
+    criterion,
+    max_features,
+    min_samples_leaf,
+    min_weight_leaf,
+    random_state,
+    min_patch_dims,
+    max_patch_dims,
+    dim_contiguous,
+    data_dims,
+)
+splitter.init_test(X, y, sample_weight)
+
+# sample the projection matrix that consists of 1D patches
+proj_mat = splitter.sample_projection_matrix()
 
 # Visualize 2D patches
 fig, axs = plt.subplots(nrows=2, ncols=3, figsize=(12, 8), sharex=True, sharey=True, squeeze=True)
@@ -141,7 +138,6 @@ for idx, ax in enumerate(axs):
 fig.suptitle("2D Patch Visualization")
 plt.show()
 
-
 # %%
 # Generate 3D patches
 # -------------------
@@ -151,8 +147,6 @@ X = np.repeat(np.arange(25 * 5).astype(np.float32), 5).reshape(5, -1)
 y = np.array([0, 0, 0, 1, 1]).reshape(-1, 1).astype(np.float64)
 sample_weight = np.ones(5)
 
-print(X.shape, y.shape, sample_weight.shape)
-
 # We will make the patch 3D, which samples multiple rows contiguously. This is
 # a 3D patch of size 3 in the columns and 2 in the rows.
 min_patch_dims = np.array((1, 2, 1))
@@ -160,7 +154,7 @@ max_patch_dims = np.array((3, 2, 4))
 dim_contiguous = np.array((True, True, True))
 data_dims = np.array((5, 5, 5))
 
-splitter = BestPatchSplitter(
+splitter = BestPatchSplitterTester(
     criterion,
     max_features,
     min_samples_leaf,
@@ -178,7 +172,6 @@ proj_mat = splitter.sample_projection_matrix()
 print(proj_mat.shape)
 
 fig = plt.figure()
-# Visualize 3D patches
 for idx in range(3 * 2):
     ax = fig.add_subplot(2, 3, idx + 1, projection="3d")
 
@@ -188,10 +181,6 @@ for idx in range(3 * 2):
 
     # Customize the z axis.
     ax.set_zlim(-1.01, data_dims[2])
-    # ax.zaxis.set_major_locator(LinearLocator(10))
-    # A StrMethodFormatter is used automatically
-    # ax.zaxis.set_major_formatter('{x:.02f}')
-
     ax.set(
         xlim=(-1, data_dims[1]),
         ylim=(-1, data_dims[0]),
@@ -200,3 +189,52 @@ for idx in range(3 * 2):
 
 fig.suptitle("3D Patch Visualization")
 plt.show()
+
+
+# %%
+# Discontiguous Patches
+# ---------------------
+# We can also generate patches that are not contiguous. This is useful for
+# analyzing data that is structured, but not necessarily contiguous in certain
+# dimensions. For example, we can generate patches that sample the data in a
+# multivariate time series, where the data consists of ``(n_channels, n_times)``
+# and the patches are discontiguous in the channel dimension, but contiguous
+# in the time dimension. Here, we show an example patch.
+
+# TODO: this is not working yet...
+# We will make the patch 2D, which samples multiple rows contiguously. This is
+# a 2D patch of size 3 in the columns and 2 in the rows.
+# min_patch_dims = np.array((1, 1))
+# max_patch_dims = np.array((3, 3))
+# dim_contiguous = np.ascontiguousarray((False, False))
+# data_dims = np.array((5, 5))
+
+# splitter = BestPatchSplitterTester(
+#     criterion,
+#     max_features,
+#     min_samples_leaf,
+#     min_weight_leaf,
+#     random_state,
+#     min_patch_dims,
+#     max_patch_dims,
+#     dim_contiguous,
+#     data_dims,
+# )
+# splitter.init_test(X, y, sample_weight)
+
+# # sample the projection matrix that consists of 1D patches
+# proj_mat = splitter.sample_projection_matrix()
+
+# # Visualize 2D patches
+# fig, axs = plt.subplots(nrows=2, ncols=3, figsize=(12, 8), sharex=True, sharey=True, squeeze=True)
+# axs = axs.flatten()
+# for idx, ax in enumerate(axs):
+#     ax.imshow(proj_mat[idx, :].reshape(data_dims), cmap="viridis")
+#     ax.set(
+#         xlim=(-1, data_dims[1]),
+#         ylim=(-1, data_dims[0]),
+#         title=f"Patch {idx}",
+#     )
+
+# fig.suptitle("2D Discontiguous Patch Visualization")
+# plt.show()

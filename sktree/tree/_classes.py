@@ -1066,6 +1066,8 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         The minimum dimensions of a patch, by default 1 along all dimensions.
     max_patch_dims : array-like, optional
         The maximum dimensions of a patch, by default 1 along all dimensions.
+    dim_contiguous : array-like of bool, optional
+        Whether or not each patch is sampled contiguously along this dimension.
     data_dims : array-like, optional
         The presumed dimensions of the un-vectorized feature vector, by default
         will be a 1D vector with (1, n_features) shape.

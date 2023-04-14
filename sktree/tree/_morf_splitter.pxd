@@ -39,12 +39,15 @@ cdef class PatchSplitter(BaseObliqueSplitter):
     cdef public SIZE_t ndim                       # The number of dimensions of the input data
     
     cdef SIZE_t[:] data_dims                      # The dimensions of the input data
-    cdef SIZE_t[:] min_patch_dims
-    cdef SIZE_t[:] max_patch_dims
-    cdef cnp.uint8_t[::1] dim_contiguous                   #
+    cdef SIZE_t[:] min_patch_dims                 # The minimum size of the patch to sample in each dimension
+    cdef SIZE_t[:] max_patch_dims                 # The maximum size of the patch to sample in each dimension
+    cdef cnp.uint8_t[:] dim_contiguous            # A boolean array indicating whether each dimension is contiguous
     
+    # TODO: check if this works and is necessary for discontiguous data
+    cdef SIZE_t[:] stride_offsets                 # The stride offsets for each dimension
+
     cdef SIZE_t[:] patch_dims_buff                # A buffer to store the dimensions of the sampled patch
-    cdef SIZE_t[:] unraveled_patch_point
+    cdef SIZE_t[:] unraveled_patch_point          # A buffer to store the unraveled patch point
 
     # All oblique splitters (i.e. non-axis aligned splitters) require a
     # function to sample a projection matrix that is applied to the feature matrix
@@ -54,7 +57,3 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         vector[vector[DTYPE_t]]& proj_mat_weights,
         vector[vector[SIZE_t]]& proj_mat_indices
     ) nogil 
-    
-    # Testing functions in Python
-    cpdef sample_projection_matrix(self)
-    cpdef init_test(self, X, y, sample_weight)

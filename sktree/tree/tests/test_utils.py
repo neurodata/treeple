@@ -5,7 +5,7 @@ import numpy as np
 from numpy.testing import assert_equal
 from sklearn.tree._criterion import Gini
 
-from .._morf_splitter import BestPatchSplitter
+from .._morf_splitter import BestPatchSplitterTester
 from .._utils import ravel_multi_index, unravel_index
 
 
@@ -92,7 +92,7 @@ def test_best_patch_splitter_contiguous():
     max_patch_dims = np.array((2, 3, 6))
     dim_contiguous = np.array((True, True, True))
 
-    splitter = BestPatchSplitter(
+    splitter = BestPatchSplitterTester(
         criterion,
         max_features,
         min_samples_leaf,
