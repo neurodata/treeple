@@ -151,7 +151,11 @@ class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):
             # that case. However, for joblib 0.12+ we respect any
             # parallel_backend contexts set at a higher level,
             # since correctness does not rely on using threads.
-            trees = Parallel(n_jobs=self.n_jobs, verbose=self.verbose, prefer="threads",)(
+            trees = Parallel(
+                n_jobs=self.n_jobs,
+                verbose=self.verbose,
+                prefer="threads",
+            )(
                 delayed(_parallel_build_trees)(
                     t,
                     self.bootstrap,
@@ -251,9 +255,7 @@ class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):
         -------
         prox_matrix : array-like of shape (n_samples, n_samples)
         """
-        aff_matrix = sum(
-            np.equal.outer(X[:, i], X[:, i]) for i in range(self.n_estimators) 
-        )
+        aff_matrix = sum(np.equal.outer(X[:, i], X[:, i]) for i in range(self.n_estimators))
 
         # normalize by the number of trees
         aff_matrix = np.divide(aff_matrix, self.n_estimators)
