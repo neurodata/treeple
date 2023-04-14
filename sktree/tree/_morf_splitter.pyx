@@ -65,6 +65,11 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         self.max_patch_dims = max_patch_dims
         self.dim_contiguous = dim_contiguous
         
+        # initialize a buffer to allow for Fisher-Yates
+        self._index_patch_buffer = np.zeros(np.max(self.max_patch_dims), dtype=np.intp)
+        self._index_data_buffer = np.zeros(np.max(self.data_dims), dtype=np.intp)
+
+        # whether or not to perform some discontinuous sampling
         if not all(self.dim_contiguous):
             self._discontiguous = True
         else:
@@ -261,24 +266,15 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
             # compute top-left seed for the multi-dimensional patch
             top_left_patch_seed, patch_size = self.sample_top_left_seed()
 
-            if self._discontiguous:
-                self.sample_proj_vec_discontiguous(
-                    proj_mat_weights,
-                    proj_mat_indices,
-                    proj_i,
-                    patch_size,
-                    top_left_patch_seed,
-                    self.patch_dims_buff
-                )
-            else:
-                self.sample_proj_vec(
-                    proj_mat_weights,
-                    proj_mat_indices,
-                    proj_i,
-                    patch_size,
-                    top_left_patch_seed,
-                    self.patch_dims_buff
-                )
+            # sample a projection vector given the top-left seed point in n-dimensional space
+            self.sample_proj_vec(
+                proj_mat_weights,
+                proj_mat_indices,
+                proj_i,
+                patch_size,
+                top_left_patch_seed,
+                self.patch_dims_buff
+            )
 
     cdef void sample_proj_vec(
         self,
@@ -303,16 +299,25 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
         # weights are default to 1
         cdef DTYPE_t weight = 1.
 
-        # TODO: make discontiguous work
-        # An ineffiecient algorithm would loop through the patch dimensions
-        # compute stride offsets if any dimensions are not contiguous
-        # cdef SIZE_t stride_offset
-        # for dim_idx in range(self.ndim):
-        #     if self.dim_contiguous[dim_idx] == 0:
-        #         stride_offset = rand_int(0, self.data_dims[dim_idx], random_state)
-        #     else:
-        #         stride_offset = 1
-        #     self.stride_offsets[dim_idx] = stride_offset
+        # XXX: still unsure if it works yet
+        # XXX: THIS ONLY WORKS FOR THE FIRST DIMENSION THAT IS DISCONTIGUOUS.
+        cdef SIZE_t other_dims_offset
+        cdef SIZE_t row_index
+
+        if self._discontiguous:
+            # fill with values 0, 1, ..., dimension - 1
+            cdef SIZE_t i
+            for i in range(0, self.data_dims[0]):
+                self._index_data_buffer[i] = i
+            # then shuffle indices using Fisher-Yates
+            cdef int num_rows = self.data_dims[0]
+            for i in range(num_rows):
+                j = rand_int(0, num_rows - i, random_state)
+                self._index_data_buffer[i], self._index_data_buffer[j] = \
+                    self._index_data_buffer[j], self._index_data_buffer[i]
+            # now select the first `patch_dims[0]` indices
+            for i in range(num_rows):
+                self._index_patch_buffer[i] = self._index_data_buffer[i]
 
         for patch_idx in range(patch_size):
             # keep track of which dimensions of the patch we have iterated over
@@ -335,51 +340,27 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
                 self.unraveled_patch_point[dim_idx] = self.unraveled_patch_point[dim_idx] + vectorized_point_offset
                 vectorized_patch_offset *= patch_dims[dim_idx]
 
+            # if any dimensions are discontiguous, we want to migrate the entire axis a fixed amount
+            # based on the shuffling
+            if self._discontiguous is True:
+                for dim_idx in range(self.ndim):
+                    if self.dim_contiguous[dim_idx] is True:
+                        continue
+
+                    # determine the "row" we are currently on
+                    other_dims_offset = 1
+                    for idx in range(dim_idx + 1, self.ndim):
+                        other_dims_offset *= self.data_dims[idx]
+                    row_index = self.unraveled_patch_point[dim_idx] % other_dims_offset
+
+                    # assign random row index now
+                    self.unraveled_patch_point[dim_idx] = self._index_patch_buffer[row_index]
+
             # ravel the patch point into the original data dimensions
             vectorized_point = ravel_multi_index_cython(self.unraveled_patch_point, self.data_dims)
             proj_mat_indices[proj_i].push_back(vectorized_point)
             proj_mat_weights[proj_i].push_back(weight)
 
-    # TODO: what is our policy to sample discontiguous points.
-    # - this does not work yet...
-    cdef void sample_proj_vec_discontiguous(self,
-        vector[vector[DTYPE_t]]& proj_mat_weights,
-        vector[vector[SIZE_t]]& proj_mat_indices,
-        SIZE_t proj_i,
-        SIZE_t patch_size,
-        SIZE_t top_left_patch_seed,
-        const SIZE_t[:] patch_dims,
-    ) noexcept nogil:
-        cdef DTYPE_t weight = 1.
-        cdef SIZE_t vectorized_point
-        cdef UINT32_t* random_state = &self.rand_r_state
-
-        # fill with values 0, 1, ..., dimension - 1
-        cdef int i
-        cdef vector[int] dim_inds = vector[int](self.data_dims[0])
-        for i in range(self.data_dims[0]):
-            dim_inds.push_back(i)
-        
-        cdef vector[int] row_inds = vector[int](patch_dims[0])
-        # shuffle indices
-        cdef int num_rows = dim_inds.size()
-        for i in range(num_rows - 1, -1, -1):
-            j = rand_int(0, i + 1, random_state)
-            dim_inds[i], dim_inds[j] = dim_inds[j], dim_inds[i]
-
-        for i in range(num_rows):
-            row_inds.push_back(dim_inds[i])
-
-        cdef int row
-        cdef int col
-        for row in range(patch_dims[0]):
-            for col in range(patch_dims[1]):
-                # ravel the patch point into the original data dimensions
-                vectorized_point = (top_left_patch_seed % patch_dims[1]) + col + (row_inds[row] * patch_dims[1])
-                proj_mat_indices[proj_i].push_back(vectorized_point)
-                proj_mat_weights[proj_i].push_back(weight)
-
-    
 cdef class BestPatchSplitterTester(BestPatchSplitter):
     """A class to expose a Python interface for testing."""
     cpdef sample_top_left_seed_cpdef(self):

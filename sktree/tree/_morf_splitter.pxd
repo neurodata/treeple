@@ -47,6 +47,8 @@ cdef class PatchSplitter(BaseObliqueSplitter):
     # cdef SIZE_t[:] stride_offsets                # The stride offsets for each dimension
     cdef bint _discontiguous
 
+    cdef SIZE_t[::1] _index_data_buffer
+    cdef SIZE_t[::1] _index_patch_buffer
     cdef SIZE_t[:] patch_dims_buff                # A buffer to store the dimensions of the sampled patch
     cdef SIZE_t[:] unraveled_patch_point          # A buffer to store the unraveled patch point
 

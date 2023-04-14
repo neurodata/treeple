@@ -205,12 +205,12 @@ plt.show()
 X = np.repeat(np.arange(25).astype(np.float32), 5).reshape(5, -1)
 y = np.array([0, 0, 0, 1, 1]).reshape(-1, 1).astype(np.float64)
 sample_weight = np.ones(5)
+max_features = 9
 
-# TODO: this is not working yet...
 # We will make the patch 2D, which samples multiple rows contiguously. This is
 # a 2D patch of size 3 in the columns and 2 in the rows.
-min_patch_dims = np.array((3, 1))
-max_patch_dims = np.array((3, 5))
+min_patch_dims = np.array((2, 2))
+max_patch_dims = np.array((3, 4))
 dim_contiguous = np.array((False, True))
 data_dims = np.array((5, 5))
 
@@ -231,7 +231,7 @@ splitter.init_test(X, y, sample_weight)
 proj_mat = splitter.sample_projection_matrix()
 
 # Visualize 2D patches
-fig, axs = plt.subplots(nrows=2, ncols=3, figsize=(12, 8), sharex=True, sharey=True, squeeze=True)
+fig, axs = plt.subplots(nrows=3, ncols=3, figsize=(12, 8), sharex=True, sharey=True, squeeze=True)
 axs = axs.flatten()
 for idx, ax in enumerate(axs):
     ax.imshow(proj_mat[idx, :].reshape(data_dims), cmap="viridis")
