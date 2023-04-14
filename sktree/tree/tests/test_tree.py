@@ -8,7 +8,7 @@ from numpy.testing import (
     assert_array_equal,
 )
 from sklearn import datasets
-from sklearn.base import is_classifier, is_regressor
+from sklearn.base import is_classifier
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.datasets import make_blobs
 from sklearn.metrics import (
@@ -142,9 +142,6 @@ X_sparse_pos[X_sparse_pos <= 0.8] = 0.0
 y_random = random_state.randint(0, 4, size=(20,))
 X_sparse_mix = _sparse_random_matrix(20, 10, density=0.25, random_state=0).toarray()
 
-
-for name in DATASETS:
-    DATASETS[name]["X_sparse"] = csc_matrix(DATASETS[name]["X"])
 
 def assert_tree_equal(d, s, message):
     assert s.node_count == d.node_count, "{0}: inequal number of node ({1} != {2})".format(
@@ -406,6 +403,7 @@ def test_patch_tree_errors():
     with pytest.raises(RuntimeError, match="Data dimensions"):
         clf = PatchObliqueDecisionTreeClassifier(
             data_dims=(8, 9),
+            data_dims=(8, 9),
         )
         clf.fit(X, y)
 
@@ -416,12 +414,17 @@ def test_patch_tree_errors():
             min_patch_dims=(2, 1),
             max_patch_dims=(1, 1),
             data_dims=(8, 8),
+            min_patch_dims=(2, 1),
+            max_patch_dims=(1, 1),
+            data_dims=(8, 8),
         )
         clf.fit(X, y)
 
     # the maximum patch height/width should not exceed the data height/width
     with pytest.raises(RuntimeError, match="The maximum patch width"):
         clf = PatchObliqueDecisionTreeClassifier(
+            max_patch_dims=(9, 1),
+            data_dims=(8, 8),
             max_patch_dims=(9, 1),
             data_dims=(8, 8),
         )
@@ -565,63 +568,6 @@ def test_diabetes_underfit(name, Tree, criterion, max_depth, metric, max_loss):
     assert 0 < loss < max_loss
 
 
-@pytest.mark.parametrize("Tree", REG_TREES.values())
-@pytest.mark.parametrize("criterion", REG_CRITERIONS)
-def test_regression_toy(Tree, criterion):
-    # Check regression on a toy dataset.
-    if criterion == "poisson":
-        # make target positive while not touching the original y and
-        # true_result
-        a = np.abs(np.min(y)) + 1
-        y_train = np.array(y) + a
-        y_test = np.array(true_result) + a
-    else:
-        y_train = y
-        y_test = true_result
-
-    regressor = Tree(criterion=criterion, random_state=1)
-    regressor.fit(X, y_train)
-    assert_allclose(regressor.predict(T), y_test)
-
-    regressor = Tree(criterion=criterion, max_features=1, random_state=1)
-    regressor.fit(X, y_train)
-    assert_allclose(regressor.predict(T), y_test)
-
-
-@pytest.mark.parametrize("name, Tree", REG_TREES.items())
-@pytest.mark.parametrize("criterion", REG_CRITERIONS)
-def test_diabetes_overfit(name, Tree, criterion):
-    # check consistency of overfitted trees on the diabetes dataset
-    # since the trees will overfit, we expect an MSE of 0
-    reg = Tree(criterion=criterion, random_state=0)
-    reg.fit(diabetes.data, diabetes.target)
-    score = mean_squared_error(diabetes.target, reg.predict(diabetes.data))
-    assert score == pytest.approx(
-        0
-    ), f"Failed with {name}, criterion = {criterion} and score = {score}"
-
-
-@skip_if_32bit
-@pytest.mark.parametrize("name, Tree", REG_TREES.items())
-@pytest.mark.parametrize(
-    "criterion, max_depth, metric, max_loss",
-    [
-        ("squared_error", 15, mean_squared_error, 60),
-        ("absolute_error", 20, mean_squared_error, 60),
-        ("friedman_mse", 15, mean_squared_error, 60),
-        ("poisson", 15, mean_poisson_deviance, 30),
-    ],
-)
-def test_diabetes_underfit(name, Tree, criterion, max_depth, metric, max_loss):
-    # check consistency of trees when the depth and the number of features are
-    # limited
-
-    reg = Tree(criterion=criterion, max_depth=max_depth, max_features=6, random_state=0)
-    reg.fit(diabetes.data, diabetes.target)
-    loss = metric(diabetes.target, reg.predict(diabetes.data))
-    assert 0 < loss < max_loss
-
-
 def test_numerical_stability():
     # Check numerical stability.
     X = np.array(
@@ -653,7 +599,6 @@ def test_balance_property(criterion, Tree):
     # Test that sum(y_pred)=sum(y_true) on training set.
     # This works if the mean is predicted (should even be true for each leaf).
     # MAE predicts the median and is therefore excluded from this test.
-
     # Choose a training set with non-negative targets (for poisson)
     X, y = diabetes.data, diabetes.target
     reg = Tree(criterion=criterion)
