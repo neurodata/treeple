@@ -1,5 +1,5 @@
 import copy
-from numbers import Integral, Real
+from numbers import Real
 
 import numpy as np
 from scipy.sparse import issparse
@@ -1429,31 +1429,75 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
 
             For multi-output, the weights of each column of y will be multiplied.
 
-            Note that these weights will be multiplied with sample_weight (passed
-            through the fit method) if sample_weight is specified.
-        min_patch_height : int, optional
-            The minimum height of a patch, by default 1.
-        max_patch_height : int, optional
-            The maximum height of a patch, by default 1.
-        min_patch_width : int, optional
-            The minimum width of a patch, by default 1.
-        max_patch_width : int, optional
-            The maximum width of a patch, by default 1.
-        data_height : int, optional
-            The presumed height of the un-vectorized feature vector, by default 1.
-        data_width : int, optional
-            The presumed height of the un-vectorized feature vector, by default None.
-            If None, the data width will be presumed the number of columns in ``X``
-            passed to :meth:`fit`.
+        Note that these weights will be multiplied with sample_weight (passed
+        through the fit method) if sample_weight is specified.
+    min_patch_dims : array-like, optional
+        The minimum dimensions of a patch, by default 1 along all dimensions.
+    max_patch_dims : array-like, optional
+        The maximum dimensions of a patch, by default 1 along all dimensions.
+    dim_contiguous : array-like of bool, optional
+        Whether or not each patch is sampled contiguously along this dimension.
+    data_dims : array-like, optional
+        The presumed dimensions of the un-vectorized feature vector, by default
+        will be a 1D vector with (1, n_features) shape.
 
-        Notes
-        -----
-        Patches are 2D masks that are applied onto the data matrix. Following sklearn
-        API standards, ``X`` is always a ``(n_samples, n_features)`` array even if
-        X is comprised of images, or multivariate-time series. The ``data_width`` and
-        ``data_height`` parameters are used to inform the ``PatchObliqueDecisionTreeClassifier``
-        of the original structure of the data. It is required that
-        ``data_width * data_height = n_features``.
+    Attributes
+    ----------
+    classes_ : ndarray of shape (n_classes,) or list of ndarray
+        The classes labels (single output problem),
+        or a list of arrays of class labels (multi-output problem).
+
+    feature_importances_ : ndarray of shape (n_features,)
+        The impurity-based feature importances.
+        The higher, the more important the feature.
+        The importance of a feature is computed as the (normalized)
+        total reduction of the criterion brought by that feature.  It is also
+        known as the Gini importance [4]_.
+
+        Warning: impurity-based feature importances can be misleading for
+        high cardinality features (many unique values). See
+        :func:`sklearn.inspection.permutation_importance` as an alternative.
+
+    max_features_ : int
+        The inferred value of max_features.
+
+    n_classes_ : int or list of int
+        The number of classes (for single output problems),
+        or a list containing the number of classes for each
+        output (for multi-output problems).
+
+    n_features_in_ : int
+        Number of features seen during :term:`fit`.
+
+    feature_names_in_ : ndarray of shape (`n_features_in_`,)
+        Names of features seen during :term:`fit`. Defined only when `X`
+        has feature names that are all strings.
+
+    n_outputs_ : int
+        The number of outputs when ``fit`` is performed.
+
+    tree_ : Tree instance
+        The underlying Tree object. Please refer to
+        ``help(sklearn.tree._tree.Tree)`` for
+        attributes of Tree object.
+
+    min_patch_dims_ : array-like
+        The minimum dimensions of a patch.
+
+    max_patch_dims_ : array-like
+        The maximum dimensions of a patch.
+
+    data_dims_ : array-like
+        The presumed dimensions of the un-vectorized feature vector.
+
+    Notes
+    -----
+    Patches can be 2D masks that are applied onto the data matrix. Following sklearn
+    API standards, ``X`` is always a ``(n_samples, n_features)`` array even if
+    X is comprised of images, or multivariate-time series. The ``data_width`` and
+    ``data_height`` parameters are used to inform the ``PatchObliqueDecisionTreeClassifier``
+    of the original structure of the data. It is required that
+    ``data_width * data_height = n_features``.
 
         When users pass in ``X`` to :meth:`fit`, tt is presumed that all vectorization operations
         are done C-contiguously (i.e. the last axis is contiguous).
@@ -1483,12 +1527,10 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
 
     _parameter_constraints = {
         **DecisionTreeClassifier._parameter_constraints,
-        "min_patch_height": [Interval(Integral, 1, None, closed="left")],
-        "max_patch_height": [Interval(Integral, 1, None, closed="left")],
-        "min_patch_width": [Interval(Integral, 1, None, closed="left")],
-        "max_patch_width": [Interval(Integral, 1, None, closed="left")],
-        "data_width": [Interval(Integral, 1, None, closed="left"), None],
-        "data_height": [Interval(Integral, 1, None, closed="left")],
+        "min_patch_dims": ["array-like", None],
+        "max_patch_dims": ["array-like", None],
+        "data_dims": ["array-like", None],
+        "dim_contiguous": ["array-like", None],
     }
 
     def __init__(
@@ -1505,12 +1547,10 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         max_leaf_nodes=None,
         min_impurity_decrease=0.0,
         class_weight=None,
-        min_patch_height=1,
-        max_patch_height=1,
-        min_patch_width=1,
-        max_patch_width=1,
-        data_height=1,
-        data_width=None,
+        min_patch_dims=None,
+        max_patch_dims=None,
+        dim_contiguous=None,
+        data_dims=None,
     ):
         super().__init__(
             criterion=criterion,
@@ -1526,12 +1566,10 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
             min_impurity_decrease=min_impurity_decrease,
         )
 
-        self.min_patch_height = min_patch_height
-        self.max_patch_height = max_patch_height
-        self.min_patch_width = min_patch_width
-        self.max_patch_width = max_patch_width
-        self.data_height = data_height
-        self.data_width = data_width
+        self.min_patch_dims = min_patch_dims
+        self.max_patch_dims = max_patch_dims
+        self.dim_contiguous = dim_contiguous
+        self.data_dims = data_dims
 
     def fit(self, X, y, sample_weight=None, check_input=True):
         """Fit tree.
@@ -1583,41 +1621,56 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
                         "Sum of y is not positive which is " "necessary for Poisson regression."
                     )
 
-        # validate data height/width
-        if self.data_width is None:
-            self.data_width_ = X.shape[1]
+        if self.data_dims is None:
+            self.data_dims_ = np.array((1, X.shape[1]))
         else:
-            self.data_width_ = self.data_width
-        self.data_height_ = self.data_height
+            if np.prod(self.data_dims) != X.shape[1]:
+                raise RuntimeError(f"Data dimensions {self.data_dims} do not match {X.shape[1]}.")
+            self.data_dims_ = np.array(self.data_dims)
+        ndim = len(self.data_dims_)
 
-        if self.data_height_ * self.data_width_ != X.shape[1]:
-            raise RuntimeError(
-                f"The passed in data height ({self.data_height}) and "
-                f"width ({self.data_width}) does not equal the number of "
-                f"columns in X ({X.shape[1]})"
-            )
+        # validate contiguous parameter
+        if self.dim_contiguous is None:
+            self.dim_contiguous_ = np.ones((ndim,), dtype=np.bool_)
+        else:
+            if len(self.dim_contiguous) != ndim:
+                raise ValueError(f"Contiguous dimensions should equal {ndim} dimensions.")
+            self.dim_contiguous_ = np.array(self.dim_contiguous).astype(np.bool_)
+
+        # validate data height/width
+        if self.min_patch_dims is None:
+            self.min_patch_dims_ = np.ones((ndim,), dtype=np.intp)
+        else:
+            self.min_patch_dims_ = np.array(self.min_patch_dims)
+
+        if self.max_patch_dims is None:
+            self.max_patch_dims_ = np.ones((ndim,), dtype=np.intp)
+            self.max_patch_dims_[-1] = X.shape[1]
+        else:
+            self.max_patch_dims_ = np.array(self.max_patch_dims)
+
+        if len(self.min_patch_dims_) != ndim:
+            raise ValueError(f"Minimum patch dimensions should equal {ndim} dimensions.")
+        if len(self.max_patch_dims_) != ndim:
+            raise ValueError(f"Maximum patch dimensions should equal {ndim} dimensions.")
 
         # validate patch parameters
-        if self.min_patch_height > self.max_patch_height:
-            raise RuntimeError(
-                f"The minimum patch height {self.min_patch_height} is "
-                f"greater than the maximum patch height {self.max_patch_height}"
-            )
-        if self.min_patch_width > self.max_patch_width:
-            raise RuntimeError(
-                f"The minimum patch width {self.min_patch_width} is "
-                f"greater than the maximum patch width {self.max_patch_width}"
-            )
-        if self.max_patch_width > self.data_width_:
-            raise RuntimeError(
-                f"The maximum patch width {self.max_patch_width} is "
-                f"greater than the data width {self.data_width_}"
-            )
-        if self.max_patch_height > self.data_height_:
-            raise RuntimeError(
-                f"The maximum patch height {self.max_patch_height} is "
-                f"greater than the data height {self.data_height_}"
-            )
+        for idx in range(ndim):
+            if self.min_patch_dims_[idx] > self.max_patch_dims_[idx]:
+                raise RuntimeError(
+                    f"The minimum patch width {self.min_patch_dims_[idx]} is "
+                    f"greater than the maximum patch width {self.max_patch_dims_[idx]}"
+                )
+            if self.min_patch_dims_[idx] > self.data_dims_[idx]:
+                raise RuntimeError(
+                    f"The minimum patch width {self.min_patch_dims_[idx]} is "
+                    f"greater than the data width {self.data_dims_[idx]}"
+                )
+            if self.max_patch_dims_[idx] > self.data_dims_[idx]:
+                raise RuntimeError(
+                    f"The maximum patch width {self.max_patch_dims_[idx]} is "
+                    f"greater than the data width {self.data_dims_[idx]}"
+                )
 
         return super().fit(X, y, sample_weight, check_input=False)
 
@@ -1695,12 +1748,10 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
                 min_samples_leaf,
                 min_weight_leaf,
                 random_state,
-                self.min_patch_height,
-                self.max_patch_height,
-                self.min_patch_width,
-                self.max_patch_width,
-                self.data_height_,
-                self.data_width_,
+                self.min_patch_dims_,
+                self.max_patch_dims_,
+                self.dim_contiguous_,
+                self.data_dims_,
             )
 
         if is_classifier(self):
@@ -1873,10 +1924,10 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
 
     Notes
     -----
-    Patches are 2D masks that are applied onto the data matrix. Following sklearn
+    Patches can be 2D masks that are applied onto the data matrix. Following sklearn
     API standards, ``X`` is always a ``(n_samples, n_features)`` array even if
     X is comprised of images, or multivariate-time series. The ``data_width`` and
-    ``data_height`` parameters are used to inform the ``PatchObliqueDecisionTreeRegressor``
+    ``data_height`` parameters are used to inform the ``PatchObliqueDecisionTreeClassifier``
     of the original structure of the data. It is required that
     ``data_width * data_height = n_features``.
 
@@ -1906,12 +1957,10 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
 
     _parameter_constraints = {
         **DecisionTreeRegressor._parameter_constraints,
-        "min_patch_height": [Interval(Integral, 1, None, closed="left")],
-        "max_patch_height": [Interval(Integral, 1, None, closed="left")],
-        "min_patch_width": [Interval(Integral, 1, None, closed="left")],
-        "max_patch_width": [Interval(Integral, 1, None, closed="left")],
-        "data_width": [Interval(Integral, 1, None, closed="left"), None],
-        "data_height": [Interval(Integral, 1, None, closed="left")],
+        "min_patch_dims": ["array-like", None],
+        "max_patch_dims": ["array-like", None],
+        "data_dims": ["array-like", None],
+        "dim_contiguous": ["array-like", None],
     }
 
     def __init__(
@@ -1928,12 +1977,10 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         max_leaf_nodes=None,
         min_impurity_decrease=0.0,
         ccp_alpha=0.0,
-        min_patch_height=1,
-        max_patch_height=1,
-        min_patch_width=1,
-        max_patch_width=1,
-        data_height=1,
-        data_width=None,
+        min_patch_dims=None,
+        max_patch_dims=None,
+        dim_contiguous=None,
+        data_dims=None,
     ):
         super().__init__(
             criterion=criterion,
@@ -1949,12 +1996,10 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
             ccp_alpha=ccp_alpha,
         )
 
-        self.min_patch_height = min_patch_height
-        self.max_patch_height = max_patch_height
-        self.min_patch_width = min_patch_width
-        self.max_patch_width = max_patch_width
-        self.data_height = data_height
-        self.data_width = data_width
+        self.min_patch_dims = min_patch_dims
+        self.max_patch_dims = max_patch_dims
+        self.dim_contiguous = dim_contiguous
+        self.data_dims = data_dims
 
     def fit(self, X, y, sample_weight=None, check_input=True):
         """Fit tree.
@@ -2006,41 +2051,56 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
                         "Sum of y is not positive which is " "necessary for Poisson regression."
                     )
 
-        # validate data height/width
-        if self.data_width is None:
-            self.data_width_ = X.shape[1]
+        if self.data_dims is None:
+            self.data_dims_ = np.array((1, X.shape[1]))
         else:
-            self.data_width_ = self.data_width
-        self.data_height_ = self.data_height
+            if np.prod(self.data_dims) != X.shape[1]:
+                raise RuntimeError(f"Data dimensions {self.data_dims} do not match {X.shape[1]}.")
+            self.data_dims_ = np.array(self.data_dims)
+        ndim = len(self.data_dims_)
 
-        if self.data_height_ * self.data_width_ != X.shape[1]:
-            raise RuntimeError(
-                f"The passed in data height ({self.data_height}) and "
-                f"width ({self.data_width}) does not equal the number of "
-                f"columns in X ({X.shape[1]})"
-            )
+        # validate contiguous parameter
+        if self.dim_contiguous is None:
+            self.dim_contiguous_ = np.ones((ndim,), dtype=np.bool_)
+        else:
+            if len(self.dim_contiguous) != ndim:
+                raise ValueError(f"Contiguous dimensions should equal {ndim} dimensions.")
+            self.dim_contiguous_ = np.array(self.dim_contiguous).astype(np.bool_)
+
+        # validate data height/width
+        if self.min_patch_dims is None:
+            self.min_patch_dims_ = np.ones((ndim,), dtype=np.intp)
+        else:
+            self.min_patch_dims_ = np.array(self.min_patch_dims)
+
+        if self.max_patch_dims is None:
+            self.max_patch_dims_ = np.ones((ndim,), dtype=np.intp)
+            self.max_patch_dims_[-1] = X.shape[1]
+        else:
+            self.max_patch_dims_ = np.array(self.max_patch_dims)
+
+        if len(self.min_patch_dims_) != ndim:
+            raise ValueError(f"Minimum patch dimensions should equal {ndim} dimensions.")
+        if len(self.max_patch_dims_) != ndim:
+            raise ValueError(f"Maximum patch dimensions should equal {ndim} dimensions.")
 
         # validate patch parameters
-        if self.min_patch_height > self.max_patch_height:
-            raise RuntimeError(
-                f"The minimum patch height {self.min_patch_height} is "
-                f"greater than the maximum patch height {self.max_patch_height}"
-            )
-        if self.min_patch_width > self.max_patch_width:
-            raise RuntimeError(
-                f"The minimum patch width {self.min_patch_width} is "
-                f"greater than the maximum patch width {self.max_patch_width}"
-            )
-        if self.max_patch_width > self.data_width_:
-            raise RuntimeError(
-                f"The maximum patch width {self.max_patch_width} is "
-                f"greater than the data width {self.data_width_}"
-            )
-        if self.max_patch_height > self.data_height_:
-            raise RuntimeError(
-                f"The maximum patch height {self.max_patch_height} is "
-                f"greater than the data height {self.data_height_}"
-            )
+        for idx in range(ndim):
+            if self.min_patch_dims_[idx] > self.max_patch_dims_[idx]:
+                raise RuntimeError(
+                    f"The minimum patch width {self.min_patch_dims_[idx]} is "
+                    f"greater than the maximum patch width {self.max_patch_dims_[idx]}"
+                )
+            if self.min_patch_dims_[idx] > self.data_dims_[idx]:
+                raise RuntimeError(
+                    f"The minimum patch width {self.min_patch_dims_[idx]} is "
+                    f"greater than the data width {self.data_dims_[idx]}"
+                )
+            if self.max_patch_dims_[idx] > self.data_dims_[idx]:
+                raise RuntimeError(
+                    f"The maximum patch width {self.max_patch_dims_[idx]} is "
+                    f"greater than the data width {self.data_dims_[idx]}"
+                )
 
         return super().fit(X, y, sample_weight, check_input=False)
 
@@ -2119,12 +2179,10 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
                 min_samples_leaf,
                 min_weight_leaf,
                 random_state,
-                self.min_patch_height,
-                self.max_patch_height,
-                self.min_patch_width,
-                self.max_patch_width,
-                self.data_height_,
-                self.data_width_,
+                self.min_patch_dims_,
+                self.max_patch_dims_,
+                self.dim_contiguous_,
+                self.data_dims_,
             )
 
         if is_classifier(self):
