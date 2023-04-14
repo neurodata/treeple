@@ -304,13 +304,13 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
         cdef SIZE_t other_dims_offset
         cdef SIZE_t row_index
 
+        cdef SIZE_t i
+        cdef int num_rows = self.data_dims[0]
         if self._discontiguous:
             # fill with values 0, 1, ..., dimension - 1
-            cdef SIZE_t i
             for i in range(0, self.data_dims[0]):
                 self._index_data_buffer[i] = i
             # then shuffle indices using Fisher-Yates
-            cdef int num_rows = self.data_dims[0]
             for i in range(num_rows):
                 j = rand_int(0, num_rows - i, random_state)
                 self._index_data_buffer[i], self._index_data_buffer[j] = \
