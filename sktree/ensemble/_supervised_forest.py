@@ -485,21 +485,15 @@ class PatchObliqueRandomForestClassifier(ForestClassifier):
         - If int, then draw `max_samples` samples.
         - If float, then draw `max_samples * X.shape[0]` samples. Thus,
           `max_samples` should be in the interval `(0.0, 1.0]`.
-
-    min_patch_height : int, optional
-        The minimum height of a patch, by default 1.
-    max_patch_height : int, optional
-        The maximum height of a patch, by default 1.
-    min_patch_width : int, optional
-        The minimum width of a patch, by default 1.
-    max_patch_width : int, optional
-        The maximum width of a patch, by default 1.
-    data_height : int, optional
-        The presumed height of the un-vectorized feature vector, by default 1.
-    data_width : int, optional
-        The presumed height of the un-vectorized feature vector, by default None.
-        If None, the data width will be presumed the number of columns in ``X``
-        passed to :meth:`fit`.
+    min_patch_dims : array-like, optional
+        The minimum dimensions of a patch, by default 1 along all dimensions.
+    max_patch_dims : array-like, optional
+        The maximum dimensions of a patch, by default 1 along all dimensions.
+    dim_contiguous : array-like of bool, optional
+        Whether or not each patch is sampled contiguously along this dimension.
+    data_dims : array-like, optional
+        The presumed dimensions of the un-vectorized feature vector, by default
+        will be a 1D vector with (1, n_features) shape.
 
     Attributes
     ----------
@@ -613,12 +607,10 @@ class PatchObliqueRandomForestClassifier(ForestClassifier):
         warm_start=False,
         class_weight=None,
         max_samples=None,
-        min_patch_height=1,
-        max_patch_height=1,
-        min_patch_width=1,
-        max_patch_width=1,
-        data_height=1,
-        data_width=None,
+        min_patch_dims=None,
+        max_patch_dims=None,
+        dim_contiguous=None,
+        data_dims=None,
     ):
         super().__init__(
             estimator=PatchObliqueDecisionTreeClassifier(),
@@ -633,12 +625,10 @@ class PatchObliqueRandomForestClassifier(ForestClassifier):
                 "max_leaf_nodes",
                 "min_impurity_decrease",
                 "random_state",
-                "min_patch_height",
-                "max_patch_height",
-                "min_patch_width",
-                "max_patch_width",
-                "data_width",
-                "data_height",
+                "min_patch_dims",
+                "max_patch_dims",
+                "dim_contiguous",
+                "data_dims",
             ),
             bootstrap=bootstrap,
             oob_score=oob_score,
@@ -655,12 +645,10 @@ class PatchObliqueRandomForestClassifier(ForestClassifier):
         self.min_samples_leaf = min_samples_leaf
         self.max_features = max_features
 
-        self.min_patch_height = min_patch_height
-        self.max_patch_height = max_patch_height
-        self.min_patch_width = min_patch_width
-        self.max_patch_width = max_patch_width
-        self.data_height = data_height
-        self.data_width = data_width
+        self.min_patch_dims = min_patch_dims
+        self.max_patch_dims = max_patch_dims
+        self.dim_contiguous = dim_contiguous
+        self.data_dims = data_dims
 
         # unused by oblique forests
         self.min_weight_fraction_leaf = min_weight_fraction_leaf

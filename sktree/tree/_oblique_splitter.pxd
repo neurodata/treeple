@@ -56,7 +56,7 @@ cdef class BaseObliqueSplitter(Splitter):
         self, 
         vector[vector[DTYPE_t]]& proj_mat_weights,
         vector[vector[SIZE_t]]& proj_mat_indices
-    ) nogil 
+    ) noexcept nogil 
 
     # Redefined here since the new logic requires calling sample_proj_mat
     cdef int node_reset(

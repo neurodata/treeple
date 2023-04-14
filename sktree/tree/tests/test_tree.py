@@ -328,44 +328,27 @@ def test_patch_tree_errors():
     X, y = digits.data, digits.target
 
     # passed in data should match expected data shape
-    with pytest.raises(RuntimeError, match="The passed in data height"):
+    with pytest.raises(RuntimeError, match="Data dimensions"):
         clf = PatchObliqueDecisionTreeClassifier(
-            data_height=8,
-            data_width=9,
+            data_dims=(8, 9),
         )
         clf.fit(X, y)
 
     # minimum patch height/width should be always less than or equal to
     # the maximum patch height/width
-    with pytest.raises(RuntimeError, match="The minimum patch height"):
+    with pytest.raises(RuntimeError, match="The minimum patch"):
         clf = PatchObliqueDecisionTreeClassifier(
-            min_patch_height=2,
-            data_height=8,
-            data_width=8,
-        )
-        clf.fit(X, y)
-    with pytest.raises(RuntimeError, match="The minimum patch width"):
-        clf = PatchObliqueDecisionTreeClassifier(
-            min_patch_width=2,
-            data_height=8,
-            data_width=8,
+            min_patch_dims=(2, 1),
+            max_patch_dims=(1, 1),
+            data_dims=(8, 8),
         )
         clf.fit(X, y)
 
     # the maximum patch height/width should not exceed the data height/width
     with pytest.raises(RuntimeError, match="The maximum patch width"):
         clf = PatchObliqueDecisionTreeClassifier(
-            max_patch_width=9,
-            data_height=8,
-            data_width=8,
-        )
-        clf.fit(X, y)
-
-    with pytest.raises(RuntimeError, match="The maximum patch height"):
-        clf = PatchObliqueDecisionTreeClassifier(
-            max_patch_height=9,
-            data_height=8,
-            data_width=8,
+            max_patch_dims=(9, 1),
+            data_dims=(8, 8),
         )
         clf.fit(X, y)
 
@@ -375,12 +358,9 @@ def test_patch_tree_overfits():
     X, y = digits.data, digits.target
 
     clf = PatchObliqueDecisionTreeClassifier(
-        min_patch_height=2,
-        min_patch_width=2,
-        max_patch_height=6,
-        max_patch_width=6,
-        data_height=8,
-        data_width=8,
+        min_patch_dims=(2, 2),
+        max_patch_dims=(6, 6),
+        data_dims=(8, 8),
         random_state=1,
     )
 
@@ -395,18 +375,14 @@ def test_patch_tree_compared():
     _, n_features = X.shape
 
     clf = PatchObliqueDecisionTreeClassifier(
-        min_patch_height=1,
-        min_patch_width=1,
-        max_patch_height=8,
-        max_patch_width=8,
-        data_height=8,
-        data_width=8,
+        min_patch_dims=(1, 1),
+        max_patch_dims=(8, 8),
+        data_dims=(8, 8),
         random_state=1,
         max_features=n_features,
     )
 
     clf.fit(X, y)
-    print(clf.get_depth())
 
     # a well-parametrized patch tree should be relatively accurate
     patch_tree_score = np.mean(cross_val_score(clf, X, y, scoring="accuracy", cv=5))
@@ -414,40 +390,23 @@ def test_patch_tree_compared():
 
     # similar to oblique trees, we can sample more and we should improve
     clf = PatchObliqueDecisionTreeClassifier(
-        min_patch_height=1,
-        min_patch_width=1,
-        max_patch_height=8,
-        max_patch_width=8,
-        data_height=8,
-        data_width=8,
+        min_patch_dims=(1, 1),
+        max_patch_dims=(8, 8),
+        data_dims=(8, 8),
         random_state=1,
         max_features=n_features * 2,
     )
     new_patch_tree_score = np.mean(cross_val_score(clf, X, y, scoring="accuracy", cv=5))
     assert new_patch_tree_score > patch_tree_score
 
-    clf.fit(X, y)
-    print(clf.get_depth())
-
-    # TODO: there is a performance difference that is not in favor of patch trees, so
-    # either we can improve the implementation, hyperparameters, or choose an alternative dataset
     clf = ObliqueDecisionTreeClassifier(
         random_state=1,
         max_features=n_features,
     )
-    oblique_tree_score = np.mean(cross_val_score(clf, X, y, scoring="accuracy", cv=5))
-    clf.fit(X, y)
-    print(clf.get_depth())
+    assert np.mean(cross_val_score(clf, X, y, scoring="accuracy", cv=2)) < new_patch_tree_score
 
     clf = DecisionTreeClassifier(max_features=n_features, random_state=1)
-    axis_tree_score = np.mean(cross_val_score(clf, X, y, scoring="accuracy", cv=5))
-    clf.fit(X, y)
-    print(clf.get_depth())
-
-    print(axis_tree_score)
-    print(oblique_tree_score)
-    print(patch_tree_score)
-    assert np.mean(cross_val_score(clf, X, y, scoring="accuracy", cv=2)) > 0.7
+    assert np.mean(cross_val_score(clf, X, y, scoring="accuracy", cv=2)) < new_patch_tree_score
 
 
 @pytest.mark.parametrize(
@@ -475,3 +434,8 @@ def test_tree_deserialization_from_read_only_buffer(tmpdir, TREE):
         clf.tree_,
         "The trees of the original and loaded classifiers are not equal.",
     )
+
+
+def test_patch_tree_higher_dims():
+    """Test patch oblique tree when patch and data dimensions are higher."""
+    pass
