@@ -251,16 +251,9 @@ class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):
         -------
         prox_matrix : array-like of shape (n_samples, n_samples)
         """
-        n_samples = X.shape[0]
-        aff_matrix = np.zeros((n_samples, n_samples), dtype=np.float32)
-
-        # fill the main diagonal with 1's
-        # np.fill_diagonal(aff_matrix, 1.0)
-        for idx in range(self.n_estimators):
-            for unique_leaf in np.unique(X[:, idx]):
-                # find all samples
-                samples_in_leaf = np.atleast_1d(np.argwhere(X[:, idx] == unique_leaf).squeeze())
-                aff_matrix[np.ix_(samples_in_leaf, samples_in_leaf)] += 1
+        aff_matrix = sum(
+            np.equal.outer(X[:, i], X[:, i]) for i in range(self.n_estimators) 
+        )
 
         # normalize by the number of trees
         aff_matrix = np.divide(aff_matrix, self.n_estimators)
