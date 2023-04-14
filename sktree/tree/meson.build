@@ -8,6 +8,7 @@ extensions = [
   '_oblique_splitter',
   '_oblique_tree',
   '_morf_splitter',
+  '_utils',
 ]
 
 foreach ext: extensions
