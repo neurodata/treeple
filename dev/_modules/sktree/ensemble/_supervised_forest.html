@@ -873,21 +873,15 @@ document.write(`
 <span class="sd">        - If int, then draw `max_samples` samples.</span>
 <span class="sd">        - If float, then draw `max_samples * X.shape[0]` samples. Thus,</span>
 <span class="sd">          `max_samples` should be in the interval `(0.0, 1.0]`.</span>
-
-<span class="sd">    min_patch_height : int, optional</span>
-<span class="sd">        The minimum height of a patch, by default 1.</span>
-<span class="sd">    max_patch_height : int, optional</span>
-<span class="sd">        The maximum height of a patch, by default 1.</span>
-<span class="sd">    min_patch_width : int, optional</span>
-<span class="sd">        The minimum width of a patch, by default 1.</span>
-<span class="sd">    max_patch_width : int, optional</span>
-<span class="sd">        The maximum width of a patch, by default 1.</span>
-<span class="sd">    data_height : int, optional</span>
-<span class="sd">        The presumed height of the un-vectorized feature vector, by default 1.</span>
-<span class="sd">    data_width : int, optional</span>
-<span class="sd">        The presumed height of the un-vectorized feature vector, by default None.</span>
-<span class="sd">        If None, the data width will be presumed the number of columns in ``X``</span>
-<span class="sd">        passed to :meth:`fit`.</span>
+<span class="sd">    min_patch_dims : array-like, optional</span>
+<span class="sd">        The minimum dimensions of a patch, by default 1 along all dimensions.</span>
+<span class="sd">    max_patch_dims : array-like, optional</span>
+<span class="sd">        The maximum dimensions of a patch, by default 1 along all dimensions.</span>
+<span class="sd">    dim_contiguous : array-like of bool, optional</span>
+<span class="sd">        Whether or not each patch is sampled contiguously along this dimension.</span>
+<span class="sd">    data_dims : array-like, optional</span>
+<span class="sd">        The presumed dimensions of the un-vectorized feature vector, by default</span>
+<span class="sd">        will be a 1D vector with (1, n_features) shape.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -1001,12 +995,10 @@ document.write(`
         <span class="n">warm_start</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">class_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">max_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">min_patch_height</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">max_patch_height</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">min_patch_width</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">max_patch_width</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">data_height</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">data_width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">min_patch_dims</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">max_patch_dims</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">dim_contiguous</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">data_dims</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">estimator</span><span class="o">=</span><span class="n">PatchObliqueDecisionTreeClassifier</span><span class="p">(),</span>
@@ -1021,12 +1013,10 @@ document.write(`
                 <span class="s2">&quot;max_leaf_nodes&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;min_impurity_decrease&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;random_state&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;min_patch_height&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;max_patch_height&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;min_patch_width&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;max_patch_width&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;data_width&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;data_height&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;min_patch_dims&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;max_patch_dims&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;dim_contiguous&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;data_dims&quot;</span><span class="p">,</span>
             <span class="p">),</span>
             <span class="n">bootstrap</span><span class="o">=</span><span class="n">bootstrap</span><span class="p">,</span>
             <span class="n">oob_score</span><span class="o">=</span><span class="n">oob_score</span><span class="p">,</span>
@@ -1043,12 +1033,10 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">min_samples_leaf</span> <span class="o">=</span> <span class="n">min_samples_leaf</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_features</span> <span class="o">=</span> <span class="n">max_features</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">min_patch_height</span> <span class="o">=</span> <span class="n">min_patch_height</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_height</span> <span class="o">=</span> <span class="n">max_patch_height</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">min_patch_width</span> <span class="o">=</span> <span class="n">min_patch_width</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_width</span> <span class="o">=</span> <span class="n">max_patch_width</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data_height</span> <span class="o">=</span> <span class="n">data_height</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data_width</span> <span class="o">=</span> <span class="n">data_width</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims</span> <span class="o">=</span> <span class="n">min_patch_dims</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims</span> <span class="o">=</span> <span class="n">max_patch_dims</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim_contiguous</span> <span class="o">=</span> <span class="n">dim_contiguous</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_dims</span> <span class="o">=</span> <span class="n">data_dims</span>
 
         <span class="c1"># unused by oblique forests</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_weight_fraction_leaf</span> <span class="o">=</span> <span class="n">min_weight_fraction_leaf</span>
@@ -1098,7 +1086,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-04-12.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-04-15.
       <br/>
     
   </p>
