@@ -941,7 +941,7 @@ class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
 
 
 class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
-    """A decision tree classifier.
+    """A decision tree Regressor.
 
     Read more in the :ref:`User Guide <sklearn:tree>`. The implementation follows
     that of :footcite:`breiman2001random` and :footcite:`TomitaSPORF2020`.
@@ -1152,16 +1152,16 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
 
     Examples
     --------
-    >>> from sklearn.datasets import load_iris
+    >>> from sklearn.datasets import load_diabetes
     >>> from sklearn.model_selection import cross_val_score
-    >>> from sktree.tree import ObliqueDecisionTreeClassifier
-    >>> clf = ObliqueDecisionTreeClassifier(random_state=0)
-    >>> iris = load_iris()
-    >>> cross_val_score(clf, iris.data, iris.target, cv=10)
-    ...                             # doctest: +SKIP
+    >>> from sklearn.tree import DecisionTreeRegressor
+    >>> X, y = load_diabetes(return_X_y=True)
+    >>> regressor = DecisionTreeRegressor(random_state=0)
+    >>> cross_val_score(regressor, X, y, cv=10)
+    ...                    # doctest: +SKIP
     ...
-    array([ 1.     ,  0.93...,  0.86...,  0.93...,  0.93...,
-            0.93...,  0.93...,  1.     ,  0.93...,  1.      ])
+    array([-0.39..., -0.46...,  0.02...,  0.06..., -0.50...,
+           0.16...,  0.11..., -0.73..., -0.30..., -0.00...])
     """
 
     _parameter_constraints = {
@@ -1175,7 +1175,7 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
     def __init__(
         self,
         *,
-        criterion="square_error",
+        criterion="squared_error",
         splitter="best",
         max_depth=None,
         min_samples_split=2,
@@ -1185,7 +1185,6 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         random_state=None,
         max_leaf_nodes=None,
         min_impurity_decrease=0.0,
-        class_weight=None,
         feature_combinations=None,
     ):
         super().__init__(
@@ -1197,7 +1196,6 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
             min_weight_fraction_leaf=min_weight_fraction_leaf,
             max_features=max_features,
             max_leaf_nodes=max_leaf_nodes,
-            class_weight=class_weight,
             random_state=random_state,
             min_impurity_decrease=min_impurity_decrease,
         )
@@ -1744,7 +1742,7 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
 
 
 class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
-    """A oblique decision tree classifier that operates over patches of data.
+    """A oblique decision tree regressor that operates over patches of data.
 
     A patch oblique decision tree is also known as a manifold oblique decision tree
     (called MORF in :footcite:`Li2019manifold`), where the splitter is aware of

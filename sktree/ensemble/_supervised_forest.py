@@ -1,4 +1,4 @@
-from sklearn.ensemble._forest import ForestRegressor, ForestRegressor
+from sklearn.ensemble._forest import ForestClassifier, ForestRegressor
 from sklearn.utils._param_validation import StrOptions
 
 from sktree.tree import ObliqueDecisionTreeClassifier, ObliqueDecisionTreeRegressor,\
@@ -559,26 +559,20 @@ class ObliqueRandomForestRegressor(ForestRegressor):
     Examples
     --------
     >>> from sktree.ensemble import ObliqueRandomForestRegressor
-    >>> from sklearn.datasets import make_classification
-    >>> X, y = make_classification(n_samples=1000, n_features=4,
-    ...                            n_informative=2, n_redundant=0,
-    ...                            random_state=0, shuffle=False)
-    >>> clf = ObliqueRandomForestRegressor(max_depth=2, random_state=0)
-    >>> clf.fit(X, y)
+    >>> from sklearn.datasets import make_regression
+    >>> X, y = make_regression(n_features=4, n_informative=2,
+    ...                        random_state=0, shuffle=False)
+    >>> regr = ObliqueRandomForestRegressor(max_depth=2, random_state=0)
+    >>> regr.fit(X, y)
     ObliqueRandomForestRegressor(...)
-    >>> print(clf.predict([[0, 0, 0, 0]]))
-    [1]
+    >>> print(regr.predict([[0, 0, 0, 0]]))
+    # TODO: Add example output
+    # [1]
     """
 
     _parameter_constraints: dict = {
         **ForestRegressor._parameter_constraints,
         **ObliqueDecisionTreeRegressor._parameter_constraints,
-        "class_weight": [
-            StrOptions({"balanced_subsample", "balanced"}),
-            dict,
-            list,
-            None,
-        ],
     }
     _parameter_constraints.pop("splitter")
 
@@ -586,12 +580,12 @@ class ObliqueRandomForestRegressor(ForestRegressor):
         self,
         n_estimators=100,
         *,
-        criterion="gini",
+        criterion="squared_error",
         max_depth=None,
         min_samples_split=2,
         min_samples_leaf=1,
         min_weight_fraction_leaf=0.0,
-        max_features="sqrt",
+        max_features=1.0,
         max_leaf_nodes=None,
         min_impurity_decrease=0.0,
         bootstrap=True,
@@ -600,8 +594,8 @@ class ObliqueRandomForestRegressor(ForestRegressor):
         random_state=None,
         verbose=0,
         warm_start=False,
-        class_weight=None,
         max_samples=None,
+        max_bins=None,
         feature_combinations=None,
     ):
         super().__init__(
@@ -625,20 +619,24 @@ class ObliqueRandomForestRegressor(ForestRegressor):
             random_state=random_state,
             verbose=verbose,
             warm_start=warm_start,
-            class_weight=class_weight,
             max_samples=max_samples,
+            max_bins=max_bins,
         )
         self.criterion = criterion
         self.max_depth = max_depth
         self.min_samples_split = min_samples_split
         self.min_samples_leaf = min_samples_leaf
+        self.min_weight_fraction_leaf = min_weight_fraction_leaf
         self.max_features = max_features
+        self.max_leaf_nodes = max_leaf_nodes
+        self.min_impurity_decrease = min_impurity_decrease
         self.feature_combinations = feature_combinations
 
         # unused by oblique forests
         self.min_weight_fraction_leaf = min_weight_fraction_leaf
         self.max_leaf_nodes = max_leaf_nodes
         self.min_impurity_decrease = min_impurity_decrease
+
 
 class PatchObliqueRandomForestClassifier(ForestClassifier):
     """A patch-oblique random forest classifier.
@@ -1191,8 +1189,21 @@ class PatchObliqueRandomForestRegressor(ForestRegressor):
     References
     ----------
     .. footbibliography::
-    """
 
+    Examples
+    --------
+    >>> from sktree.ensemble import PatchObliqueRandomForestRegressor
+    >>> from sklearn.datasets import make_regression
+    >>> X, y = make_regression(n_features=4, n_informative=2,
+    ...                        random_state=0, shuffle=False)
+    >>> regr = PatchObliqueRandomForestRegressor(max_depth=2, random_state=0)
+    >>> regr.fit(X, y)
+    PatchObliqueRandomForestRegressor(...)
+    >>> print(regr.predict([[0, 0, 0, 0]]))
+    # TODO: Fix the output
+    #[-8.32987858]
+    """
+    
     _parameter_constraints: dict = {
         **ForestRegressor._parameter_constraints,
         **PatchObliqueDecisionTreeRegressor._parameter_constraints,
@@ -1203,12 +1214,12 @@ class PatchObliqueRandomForestRegressor(ForestRegressor):
         self,
         n_estimators=100,
         *,
-        criterion="sqared_error",
+        criterion="squared_error",
         max_depth=None,
         min_samples_split=2,
         min_samples_leaf=1,
         min_weight_fraction_leaf=0.0,
-        max_features="sqrt",
+        max_features=1.0,
         max_leaf_nodes=None,
         min_impurity_decrease=0.0,
         bootstrap=True,
