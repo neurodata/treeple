@@ -1317,7 +1317,7 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         the structure in the data. For example, in an image, a patch would be contiguous
         along the rows and columns of the image. In a multivariate time-series, a patch
         would be contiguous over time, but possibly discontiguous over the sensors.
-    `
+
         Parameters
         ----------
         criterion : {"gini", "entropy"}, default="gini"
