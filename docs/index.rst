@@ -18,6 +18,7 @@ Contents
    :caption: Getting started:
 
    api
+   User Guide<user_guide>
    whats_new
    install
    use

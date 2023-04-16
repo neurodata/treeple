@@ -1,6 +1,7 @@
 # cython: language_level=3
 # cython: boundscheck=False
 # cython: wraparound=False, initializedcheck=False, cdivision=True
+# meson: define_macros=NPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION
 
 # Authors: Adam Li <adam2392@gmail.com>
 #          Jong Shin <jshinm@gmail.com>
@@ -20,13 +21,10 @@ from libcpp.vector cimport vector
 import struct
 
 import numpy as np
-
 cimport numpy as cnp
-
 cnp.import_array()
 
 from scipy.sparse import csr_matrix, issparse
-
 
 cdef extern from "numpy/arrayobject.h":
     object PyArray_NewFromDescr(PyTypeObject* subtype, cnp.dtype descr,

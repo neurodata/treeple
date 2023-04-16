@@ -1,20 +1,20 @@
 # cython: cdivision=True
 # cython: boundscheck=False
 # cython: wraparound=False
+# distutils: define_macros=NPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION
 
 # Authors: Adam Li <adam2392@gmail.com>
 #          Chester Huynh <chester.huynh924@gmail.com>
 #          Parth Vora <pvora4@jhu.edu>
 #
 # License: BSD 3 clause
+from cpython cimport Py_INCREF, PyObject, PyTypeObject
 
 from libc.stdint cimport INTPTR_MAX
 from libc.string cimport memcpy, memset
 
 import numpy as np
-
 cimport numpy as cnp
-
 cnp.import_array()
 
 from scipy.sparse import csr_matrix, issparse
@@ -22,6 +22,12 @@ from scipy.sparse import csr_matrix, issparse
 from cython.operator cimport dereference as deref
 from sklearn.tree._utils cimport safe_realloc, sizet_ptr_to_ndarray
 
+cdef extern from "numpy/arrayobject.h":
+    object PyArray_NewFromDescr(PyTypeObject* subtype, cnp.dtype descr,
+                                int nd, cnp.npy_intp* dims,
+                                cnp.npy_intp* strides,
+                                void* data, int flags, object obj)
+    int PyArray_SetBaseObject(cnp.ndarray arr, PyObject* obj)
 
 # Gets Node dtype exposed inside oblique_tree.
 # See "_tree.pyx" for more details.

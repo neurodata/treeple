@@ -506,6 +506,9 @@ class UnsupervisedRandomForest(ForestCluster):
         - If 'sqrt', then considered :math:`\\sqrt{2n}`, where n is the number
           of samples in the dataset, ``X``.
 
+        In unsupervised trees, it is recommended by :footcite:`Meghana2019_geodesicrf`
+        to use the sqrt of two times the number of samples in the dataset.
+
     min_samples_leaf : int or float, default=1
         The minimum number of samples required to be at a leaf node.
         A split point at any depth will only be considered if it leaves at
@@ -636,6 +639,10 @@ class UnsupervisedRandomForest(ForestCluster):
         was never left out during the bootstrap. In this case,
         `oob_decision_function_` might contain NaN. This attribute exists
         only when ``oob_score`` is True.
+
+    References
+    ----------
+    .. footbibliography::
     """
 
     _parameter_constraints: dict = {
@@ -729,6 +736,9 @@ class UnsupervisedObliqueRandomForest(ForestCluster):
         - If float, then `min_samples_split` is a fraction and
           `ceil(min_samples_split * n_samples)` are the minimum
           number of samples for each split.
+
+        In unsupervised trees, it is recommended by :footcite:`Meghana2019_geodesicrf`
+        to use the sqrt of two times the number of samples in the dataset.
 
     min_samples_leaf : int or float, default=1
         The minimum number of samples required to be at a leaf node.

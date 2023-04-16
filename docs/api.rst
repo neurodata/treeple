@@ -51,6 +51,8 @@ on unsupervised criterion such as variance and BIC.
    UnsupervisedRandomForest
    UnsupervisedObliqueRandomForest
 
+The trees that comprise those forests are also available as standalone classes.
+
 .. autosummary::
    :toctree: generated/
    

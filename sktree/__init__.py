@@ -50,3 +50,12 @@ else:
         being in scikit-tree source directory; please exit the scikit-tree source
         tree first and relaunch your Python interpreter."""
         raise ImportError(msg) from e
+
+    __all__ = [
+        "tree",
+        "ensemble",
+        "ObliqueRandomForestClassifier",
+        "PatchObliqueRandomForestClassifier",
+        "UnsupervisedRandomForest",
+        "UnsupervisedObliqueRandomForest",
+    ]

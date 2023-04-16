@@ -1,6 +1,16 @@
 % Encoding: UTF-8
 % Try to keep this list in alphabetical order based on citing name
 
+@article{breiman2001random,
+  title     = {Random forests},
+  author    = {Breiman, Leo},
+  journal   = {Machine learning},
+  volume    = {45},
+  pages     = {5--32},
+  year      = {2001},
+  publisher = {Springer}
+}
+
 @article{Li2019manifold,
   title   = {Manifold Oblique Random Forests: Towards Closing the Gap on Convolutional Deep Networks},
   author  = {Li, Adam and Perry, Ronan and Huynh, Chester and Tomita, Tyler M and Mehta, Ronak and Arroyo, Jesus and Patsolic, Jesse and Falk, Benjamin and Vogelstein, Joshua T},
@@ -8,59 +18,32 @@
   year    = {2019}
 }
 
-@inproceedings{marx2021estimating,
-  title        = {Estimating conditional mutual information for discrete-continuous mixtures using multi-dimensional adaptive histograms},
-  author       = {Marx, Alexander and Yang, Lincen and van Leeuwen, Matthijs},
-  booktitle    = {Proceedings of the 2021 SIAM International Conference on Data Mining (SDM)},
-  pages        = {387--395},
-  year         = {2021},
-  organization = {SIAM}
-}
-
-@article{Meghana2019_geodesicrf,
-  doi       = {10.48550/ARXIV.1907.02844},
-  url       = {https://arxiv.org/abs/1907.02844},
+@inproceedings{Meghana2019_geodesicrf,
   author    = {Madhyastha, Meghana and Li, Percy and Browne, James and Strnadova-Neeley, Veronika and Priebe, Carey E. and Burns, Randal and Vogelstein, Joshua T.},
-  keywords  = {Machine Learning (stat.ML), Information Retrieval (cs.IR), Machine Learning (cs.LG), Methodology (stat.ME), FOS: Computer and information sciences, FOS: Computer and information sciences},
-  title     = {Geodesic Learning via Unsupervised Decision Forests},
-  publisher = {arXiv},
-  year      = {2019},
-  copyright = {arXiv.org perpetual, non-exclusive license}
+  title     = {Geodesic Forests},
+  year      = {2020},
+  isbn      = {9781450379984},
+  publisher = {Association for Computing Machinery},
+  address   = {New York, NY, USA},
+  url       = {https://doi.org/10.1145/3394486.3403094},
+  doi       = {10.1145/3394486.3403094},
+  abstract  = {Together with the curse of dimensionality, nonlinear dependencies in large data sets persist as major challenges in data mining tasks. A reliable way to accurately preserve nonlinear structure is to compute geodesic distances between data points. Manifold learning methods, such as Isomap, aim to preserve geodesic distances in a Riemannian manifold. However, as manifold learning algorithms operate on the ambient dimensionality of the data, the essential step of geodesic distance computation is sensitive to high-dimensional noise. Therefore, a direct application of these algorithms to high-dimensional, noisy data often yields unsatisfactory results and does not accurately capture nonlinear structure.We propose an unsupervised random forest approach called geodesic forests (GF) to geodesic distance estimation in linear and nonlinear manifolds with noise. GF operates on low-dimensional sparse linear combinations of features, rather than the full observed dimensionality. To choose the optimal split in a computationally efficient fashion, we developed Fast-BIC, a fast Bayesian Information Criterion statistic for Gaussian mixture models.We additionally propose geodesic precision and geodesic recall as novel evaluation metrics that quantify how well the geodesic distances of a latent manifold are preserved. Empirical results on simulated and real data demonstrate that GF is robust to high-dimensional noise, whereas other methods, such as Isomap, UMAP, and FLANN, quickly deteriorate in such settings. Notably, GF is able to estimate geodesic distances better than other approaches on a real connectome dataset.},
+  booktitle = {Proceedings of the 26th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining},
+  pages     = {513–523},
+  numpages  = {11},
+  keywords  = {random forest, noisy data, unsupervised, manifold learning},
+  location  = {Virtual Event, CA, USA},
+  series    = {KDD '20}
 }
 
-% Experimental
 
-@article{Darbellay1999Entropy,
-  author  = {Darbellay, G.A. and Vajda, I.},
-  journal = {IEEE Transactions on Information Theory},
-  title   = {Estimation of the information by an adaptive partitioning of the observation space},
-  year    = {1999},
-  volume  = {45},
-  number  = {4},
-  pages   = {1315-1321},
-  doi     = {10.1109/18.761290}
-}
-
-@article{Frenzel2007,
-  author  = {Frenzel, Stefan and Pompe, Bernd},
-  year    = {2007},
-  month   = {12},
-  pages   = {204101},
-  title   = {Partial Mutual Information for Coupling Analysis of Multivariate Time Series},
-  volume  = {99},
-  journal = {Physical review letters},
-  doi     = {10.1103/PhysRevLett.99.204101}
-}
-
-@article{Kraskov_2004,
-  doi       = {10.1103/physreve.69.066138},
-  url       = {https://doi.org/10.1103%2Fphysreve.69.066138},
-  year      = 2004,
-  month     = {jun},
-  publisher = {American Physical Society ({APS})},
-  volume    = {69},
-  number    = {6},
-  author    = {Alexander Kraskov and Harald Stögbauer and Peter Grassberger},
-  title     = {Estimating mutual information},
-  journal   = {Physical Review E}
+@article{TomitaSPORF2020,
+  author  = {Tyler M. Tomita and James Browne and Cencheng Shen and Jaewon Chung and Jesse L. Patsolic and Benjamin Falk and Carey E. Priebe and Jason Yim and Randal Burns and Mauro Maggioni and Joshua T. Vogelstein},
+  title   = {Sparse Projection Oblique Randomer Forests},
+  journal = {Journal of Machine Learning Research},
+  year    = {2020},
+  volume  = {21},
+  number  = {104},
+  pages   = {1--39},
+  url     = {http://jmlr.org/papers/v21/18-664.html}
 }

@@ -89,14 +89,14 @@ jobs:
           name: setup Python venv
           command: |
             pip install -r build_requirements.txt
-            pip install git+https://github.com/scientific-python/devpy@v0.1
+            pip install spin
             pip install -r doc_requirements.txt
             # extra benchmark deps
             pip install pytest
       - run:
           name: build scikit-tree
           command: |
-            python dev.py build -j2
+            python spin build -j2
       - save_cache:
           key: deps_ccache-{{ .Branch }}
           paths:
@@ -137,12 +137,17 @@ jobs:
 
       - store_artifacts:
           path: docs/_build/html
-          destination: html
-
+          destination: dev
+      
+      - store_artifacts:
+          path: docs/_build/html_stable/
+          destination: stable
+          
       - persist_to_workspace:
           root: docs/_build
           paths:
             - html
+            - html_stable
 
   docs-deploy:
     docker:

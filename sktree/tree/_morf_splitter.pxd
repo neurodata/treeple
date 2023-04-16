@@ -23,6 +23,8 @@ from sklearn.utils._sorting cimport simultaneous_sort
 from ._oblique_splitter cimport BaseObliqueSplitter, ObliqueSplitRecord
 
 
+# https://github.com/cython/cython/blob/master/Cython/Includes/libcpp/algorithm.pxd
+# shows how to include standard library functions in Cython
 cdef extern from "<algorithm>" namespace "std" nogil:
     void shuffle[RandomIt, URBG](RandomIt first, RandomIt last, URBG&& g) except +
 
@@ -38,6 +40,22 @@ cdef class PatchSplitter(BaseObliqueSplitter):
     cdef public SIZE_t min_patch_width                  # Minimum width of the patch to sample
     cdef public SIZE_t data_height                      # Height of the input data
     cdef public SIZE_t data_width                       # Width of the input data
+
+    cdef public SIZE_t ndim                       # The number of dimensions of the input data
+    
+    cdef SIZE_t[:] data_dims                      # The dimensions of the input data
+    cdef SIZE_t[:] min_patch_dims                 # The minimum size of the patch to sample in each dimension
+    cdef SIZE_t[:] max_patch_dims                 # The maximum size of the patch to sample in each dimension
+    cdef cnp.uint8_t[:] dim_contiguous            # A boolean array indicating whether each dimension is contiguous
+    
+    # TODO: check if this works and is necessary for discontiguous data
+    # cdef SIZE_t[:] stride_offsets                # The stride offsets for each dimension
+    cdef bint _discontiguous
+
+    cdef SIZE_t[::1] _index_data_buffer
+    cdef SIZE_t[::1] _index_patch_buffer
+    cdef SIZE_t[:] patch_dims_buff                # A buffer to store the dimensions of the sampled patch
+    cdef SIZE_t[:] unraveled_patch_point          # A buffer to store the unraveled patch point
 
     # All oblique splitters (i.e. non-axis aligned splitters) require a
     # function to sample a projection matrix that is applied to the feature matrix
