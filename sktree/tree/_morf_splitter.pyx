@@ -10,6 +10,9 @@ from sklearn.tree._criterion cimport Criterion
 from sklearn.tree._utils cimport rand_int
 
 
+cdef extern from 
+
+
 cdef class PatchSplitter(BaseObliqueSplitter):
     """Patch splitter.
 
@@ -232,6 +235,160 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
                 vectorized_point = (feat_i % delta_width) + \
                                     (data_width * <SIZE_t>floor(feat_i / delta_width))
 
+<<<<<<< Updated upstream
                 # store the non-zero indices and non-zero weights of the data
                 proj_mat_indices[proj_i].push_back(vectorized_point)
                 proj_mat_weights[proj_i].push_back(weight)
+=======
+        # stores how many patches we have iterated so far
+        cdef int vectorized_patch_offset
+        cdef SIZE_t vectorized_point_offset
+        cdef SIZE_t vectorized_point
+
+        cdef SIZE_t dim_idx
+    
+        # weights are default to 1
+        cdef DTYPE_t weight = 1.
+
+        # XXX: still unsure if it works yet
+        # XXX: THIS ONLY WORKS FOR THE FIRST DIMENSION THAT IS DISCONTIGUOUS.
+        cdef SIZE_t other_dims_offset
+        cdef SIZE_t row_index
+
+        cdef SIZE_t i
+        cdef int num_rows = self.data_dims[0]
+        if self._discontiguous:
+            # fill with values 0, 1, ..., dimension - 1
+            for i in range(0, self.data_dims[0]):
+                self._index_data_buffer[i] = i
+
+            shuffle()
+            # then shuffle indices using Fisher-Yates
+            # for i in range(num_rows):
+            #     j = rand_int(0, num_rows - i, random_state)
+            #     self._index_data_buffer[i], self._index_data_buffer[j] = \
+            #         self._index_data_buffer[j], self._index_data_buffer[i]
+            # now select the first `patch_dims[0]` indices
+            for i in range(num_rows):
+                self._index_patch_buffer[i] = self._index_data_buffer[i]
+
+        for patch_idx in range(patch_size):
+            # keep track of which dimensions of the patch we have iterated over
+            vectorized_patch_offset = 1
+
+            # Once the vectorized top-left-seed is unraveled, you can add the patch
+            # points in the array structure and compute their vectorized (unraveled)
+            # points, which are added to the projection vector
+            unravel_index_cython(top_left_patch_seed, self.data_dims, self.unraveled_patch_point)
+
+            for dim_idx in range(self.ndim):
+                # compute the offset from the top-left patch seed based on:
+                # 1. the current patch index
+                # 2. the patch dimension indexed by `dim_idx`
+                # 3. and the vectorized patch dimensions that we have seen so far
+                # the `vectorized_point_offset` is the offset from the top-left vectorized seed for this dimension
+                vectorized_point_offset = (patch_idx // (vectorized_patch_offset)) % patch_dims[dim_idx]
+
+                # then we compute the actual point in the original data shape
+                self.unraveled_patch_point[dim_idx] = self.unraveled_patch_point[dim_idx] + vectorized_point_offset
+                vectorized_patch_offset *= patch_dims[dim_idx]
+
+            # if any dimensions are discontiguous, we want to migrate the entire axis a fixed amount
+            # based on the shuffling
+            if self._discontiguous is True:
+                for dim_idx in range(self.ndim):
+                    if self.dim_contiguous[dim_idx] is True:
+                        continue
+
+                    # determine the "row" we are currently on
+                    other_dims_offset = 1
+                    for idx in range(dim_idx + 1, self.ndim):
+                        other_dims_offset *= self.data_dims[idx]
+                    row_index = self.unraveled_patch_point[dim_idx] % other_dims_offset
+
+                    # assign random row index now
+                    self.unraveled_patch_point[dim_idx] = self._index_patch_buffer[row_index]
+
+            # ravel the patch point into the original data dimensions
+            vectorized_point = ravel_multi_index_cython(self.unraveled_patch_point, self.data_dims)
+            proj_mat_indices[proj_i].push_back(vectorized_point)
+            proj_mat_weights[proj_i].push_back(weight)
+
+cdef class BestPatchSplitterTester(BestPatchSplitter):
+    """A class to expose a Python interface for testing."""
+    cpdef sample_top_left_seed_cpdef(self):
+        top_left_patch_seed, patch_size = self.sample_top_left_seed()
+        patch_dims = np.array(self.patch_dims_buff, dtype=np.intp)
+        return top_left_patch_seed, patch_size, patch_dims
+
+    cpdef sample_projection_vector(self,
+        SIZE_t proj_i,
+        SIZE_t patch_size,
+        SIZE_t top_left_patch_seed,
+        SIZE_t[:] patch_dims,
+        ):
+        cdef vector[vector[DTYPE_t]] proj_mat_weights = vector[vector[DTYPE_t]](self.max_features)
+        cdef vector[vector[SIZE_t]] proj_mat_indices = vector[vector[SIZE_t]](self.max_features)
+        cdef SIZE_t i, j
+
+        # sample projection matrix in C/C++
+        self.sample_proj_vec(
+            proj_mat_weights,
+            proj_mat_indices,
+            proj_i,
+            patch_size,
+            top_left_patch_seed,
+            patch_dims
+        )
+
+        # convert the projection matrix to something that can be used in Python
+        proj_vecs = np.zeros((1, self.n_features), dtype=np.float64)
+        for i in range(0, 1):
+            for j in range(0, proj_mat_weights[i].size()):
+                weight = proj_mat_weights[i][j]
+                feat = proj_mat_indices[i][j]
+                proj_vecs[i, feat] = weight
+        return proj_vecs
+
+    cpdef sample_projection_matrix(self):
+        """Sample projection matrix using a patch.
+
+        Used for testing purposes.
+
+        Randomly sample patches with weight of 1.
+        """
+        cdef vector[vector[DTYPE_t]] proj_mat_weights = vector[vector[DTYPE_t]](self.max_features)
+        cdef vector[vector[SIZE_t]] proj_mat_indices = vector[vector[SIZE_t]](self.max_features)
+        cdef SIZE_t i, j
+
+        # sample projection matrix in C/C++
+        self.sample_proj_mat(proj_mat_weights, proj_mat_indices)
+
+        # convert the projection matrix to something that can be used in Python
+        proj_vecs = np.zeros((self.max_features, self.n_features), dtype=np.float64)
+        for i in range(0, self.max_features):
+            for j in range(0, proj_mat_weights[i].size()):
+                weight = proj_mat_weights[i][j]
+                feat = proj_mat_indices[i][j]
+
+                proj_vecs[i, feat] = weight
+
+        return proj_vecs
+
+    cpdef init_test(self, X, y, sample_weight):
+        """Initializes the state of the splitter.
+        
+        Used for testing purposes.
+
+        Parameters
+        ----------
+        X : array-like, shape (n_samples, n_features)
+            The input samples.
+        y : array-like, shape (n_samples,)
+            The target values (class labels in classification, real numbers in
+            regression).
+        sample_weight : array-like, shape (n_samples,)
+            Sample weights.
+        """
+        self.init(X, y, sample_weight)
+>>>>>>> Stashed changes

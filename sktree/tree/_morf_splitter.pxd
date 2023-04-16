@@ -23,6 +23,9 @@ from sklearn.utils._sorting cimport simultaneous_sort
 from ._oblique_splitter cimport BaseObliqueSplitter, ObliqueSplitRecord
 
 
+cdef extern from "<algorithm>" namespace "std" nogil:
+    void shuffle[RandomIt, URBG](RandomIt first, RandomIt last, URBG&& g) except +
+
 cdef class PatchSplitter(BaseObliqueSplitter):
     # The PatchSplitter creates candidate feature values by sampling 2D patches from
     # an input data vector. The input data is vectorized, so `data_height` and
