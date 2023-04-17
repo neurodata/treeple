@@ -45,6 +45,10 @@ REG_TREES = {
     "ObliqueDecisionTreeRegressor": ObliqueDecisionTreeRegressor,
     "PatchObliqueDecisionTreeRegressor": PatchObliqueDecisionTreeRegressor,
 }
+CLF_TREES = {
+    "ObliqueDecisionTreeClassifier": ObliqueDecisionTreeClassifier,
+    "PatchObliqueTreeClassifier": PatchObliqueDecisionTreeClassifier,
+}
 
 X_small = np.array(
     [
@@ -139,6 +143,9 @@ y_random = random_state.randint(0, 4, size=(20,))
 X_sparse_mix = _sparse_random_matrix(20, 10, density=0.25, random_state=0).toarray()
 
 
+for name in DATASETS:
+    DATASETS[name]["X_sparse"] = csc_matrix(DATASETS[name]["X"])
+
 def assert_tree_equal(d, s, message):
     assert s.node_count == d.node_count, "{0}: inequal number of node ({1} != {2})".format(
         message, s.node_count, d.node_count
@@ -167,6 +174,7 @@ def assert_tree_equal(d, s, message):
         d.value[external], s.value[external], err_msg=message + ": inequal value"
     )
 
+
 @pytest.mark.parametrize("Tree", REG_TREES.values())
 @pytest.mark.parametrize("criterion", REG_CRITERIONS)
 def test_regression_toy(Tree, criterion):
@@ -188,6 +196,7 @@ def test_regression_toy(Tree, criterion):
     clf = Tree(criterion=criterion, max_features=1, random_state=1)
     clf.fit(X, y_train)
     assert_allclose(reg.predict(T), y_test)
+
 
 @parametrize_with_checks(
     [
@@ -520,6 +529,40 @@ def test_patch_oblique_tree_feature_weights():
 def test_patch_tree_higher_dims():
     """Test patch oblique tree when patch and data dimensions are higher."""
     pass
+
+
+@pytest.mark.parametrize("name, Tree", REG_TREES.items())
+@pytest.mark.parametrize("criterion", REG_CRITERIONS)
+def test_diabetes_overfit(name, Tree, criterion):
+    # check consistency of overfitted trees on the diabetes dataset
+    # since the trees will overfit, we expect an MSE of 0
+    reg = Tree(criterion=criterion, random_state=0)
+    reg.fit(diabetes.data, diabetes.target)
+    score = mean_squared_error(diabetes.target, reg.predict(diabetes.data))
+    assert score == pytest.approx(
+        0
+    ), f"Failed with {name}, criterion = {criterion} and score = {score}"
+
+
+@skip_if_32bit
+@pytest.mark.parametrize("name, Tree", REG_TREES.items())
+@pytest.mark.parametrize(
+    "criterion, max_depth, metric, max_loss",
+    [
+        ("squared_error", 15, mean_squared_error, 60),
+        ("absolute_error", 20, mean_squared_error, 60),
+        ("friedman_mse", 15, mean_squared_error, 60),
+        ("poisson", 15, mean_poisson_deviance, 30),
+    ],
+)
+def test_diabetes_underfit(name, Tree, criterion, max_depth, metric, max_loss):
+    # check consistency of trees when the depth and the number of features are
+    # limited
+
+    reg = Tree(criterion=criterion, max_depth=max_depth, max_features=6, random_state=0)
+    reg.fit(diabetes.data, diabetes.target)
+    loss = metric(diabetes.target, reg.predict(diabetes.data))
+    assert 0 < loss < max_loss
 
 
 @pytest.mark.parametrize("Tree", REG_TREES.values())
