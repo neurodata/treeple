@@ -1,8 +1,12 @@
 from sklearn.ensemble._forest import ForestClassifier, ForestRegressor
 from sklearn.utils._param_validation import StrOptions
 
-from sktree.tree import ObliqueDecisionTreeClassifier, ObliqueDecisionTreeRegressor,\
-    PatchObliqueDecisionTreeClassifier, PatchObliqueDecisionTreeRegressor
+from sktree.tree import (
+    ObliqueDecisionTreeClassifier,
+    ObliqueDecisionTreeRegressor,
+    PatchObliqueDecisionTreeClassifier,
+    PatchObliqueDecisionTreeRegressor,
+)
 
 
 class ObliqueRandomForestClassifier(ForestClassifier):
@@ -1156,13 +1160,9 @@ class PatchObliqueRandomForestRegressor(ForestRegressor):
         Score of the training dataset obtained using an out-of-bag estimate.
         This attribute exists only when ``oob_score`` is True.
 
-    oob_decision_function_ : ndarray of shape (n_samples, n_classes) or \
-            (n_samples, n_classes, n_outputs)
-        Decision function computed with out-of-bag estimate on the training
-        set. If n_estimators is small it might be possible that a data point
-        was never left out during the bootstrap. In this case,
-        `oob_decision_function_` might contain NaN. This attribute exists
-        only when ``oob_score`` is True.
+    oob_prediction_ : ndarray of shape (n_samples,) or (n_samples, n_outputs)
+        Prediction computed with out-of-bag estimate on the training set.
+        This attribute exists only when ``oob_score`` is True.
 
     See Also
     --------
@@ -1196,12 +1196,11 @@ class PatchObliqueRandomForestRegressor(ForestRegressor):
     >>> from sklearn.datasets import make_regression
     >>> X, y = make_regression(n_features=4, n_informative=2,
     ...                        random_state=0, shuffle=False)
-    >>> regr = PatchObliqueRandomForestRegressor(max_depth=2, random_state=0)
-    >>> regr.fit(X, y)
+    >>> regressor = PatchObliqueRandomForestRegressor(max_depth=2, random_state=0)
+    >>> rregressor.fit(X, y)
     PatchObliqueRandomForestRegressor(...)
-    >>> print(regr.predict([[0, 0, 0, 0]]))
-    # TODO: Fix the output
-    #[-8.32987858]
+    >>> print(rregressor.predict([[0, 0, 0, 0]]))
+    [-5.82818509]
     """
     
     _parameter_constraints: dict = {

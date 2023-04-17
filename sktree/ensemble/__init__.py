@@ -1,10 +1,7 @@
 from ._supervised_forest import (
     ObliqueRandomForestClassifier,
-    PatchObliqueRandomForestClassifier,
     ObliqueRandomForestRegressor,
+    PatchObliqueRandomForestClassifier,
     PatchObliqueRandomForestRegressor,
 )
-from ._unsupervised_forest import (
-    UnsupervisedObliqueRandomForest,
-    UnsupervisedRandomForest
-)
+from ._unsupervised_forest import UnsupervisedObliqueRandomForest, UnsupervisedRandomForest

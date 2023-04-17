@@ -3,7 +3,7 @@ from numbers import Integral, Real
 
 import numpy as np
 from scipy.sparse import issparse
-from sklearn.base import ClusterMixin, TransformerMixin, is_classifier
+from sklearn.base import ClusterMixin, TransformerMixin, is_classifier, is_regressor
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.tree import BaseDecisionTree, DecisionTreeClassifier, DecisionTreeRegressor, _criterion
 from sklearn.tree import _tree as _sklearn_tree
@@ -1046,26 +1046,11 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         ``N``, ``N_t``, ``N_t_R`` and ``N_t_L`` all refer to the weighted sum,
         if ``sample_weight`` is passed.
 
-    class_weight : dict, list of dict or "balanced", default=None
-        Weights associated with classes in the form ``{class_label: weight}``.
-        If None, all classes are supposed to have weight one. For
-        multi-output problems, a list of dicts can be provided in the same
-        order as the columns of y.
-
-        Note that for multioutput (including multilabel) weights should be
-        defined for each class of every column in its own dict. For example,
-        for four-class multilabel classification weights should be
-        [{0: 1, 1: 1}, {0: 1, 1: 5}, {0: 1, 1: 1}, {0: 1, 1: 1}] instead of
-        [{1:1}, {2:5}, {3:1}, {4:1}].
-
-        The "balanced" mode uses the values of y to automatically adjust
-        weights inversely proportional to class frequencies in the input data
-        as ``n_samples / (n_classes * np.bincount(y))``
-
-        For multi-output, the weights of each column of y will be multiplied.
-
-        Note that these weights will be multiplied with sample_weight (passed
-        through the fit method) if sample_weight is specified.
+    ccp_alpha : non-negative float, default=0.0
+        Complexity parameter used for Minimal Cost-Complexity Pruning. The
+        subtree with the largest cost complexity that is smaller than
+        ``ccp_alpha`` will be chosen. By default, no pruning is performed. See
+        :ref:`minimal_cost_complexity_pruning` for details.
 
     feature_combinations : float, default=None
         The number of features to combine on average at each split
@@ -1154,14 +1139,14 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
     --------
     >>> from sklearn.datasets import load_diabetes
     >>> from sklearn.model_selection import cross_val_score
-    >>> from sklearn.tree import DecisionTreeRegressor
+    >>> from sklearn.tree import ObliqueDecisionTreeRegressor
     >>> X, y = load_diabetes(return_X_y=True)
     >>> regressor = DecisionTreeRegressor(random_state=0)
     >>> cross_val_score(regressor, X, y, cv=10)
     ...                    # doctest: +SKIP
     ...
-    array([-0.39..., -0.46...,  0.02...,  0.06..., -0.50...,
-           0.16...,  0.11..., -0.73..., -0.30..., -0.00...])
+    array([-0.68908909, -0.35854406,  0.35223873, -0.03616902, -0.56008907,
+            0.32235221,  0.06945264, -1.1465216 ,  0.34597007, -0.15308512])
     """
 
     _parameter_constraints = {
@@ -1186,6 +1171,7 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         max_leaf_nodes=None,
         min_impurity_decrease=0.0,
         feature_combinations=None,
+        ccp_alpha=0.0,
     ):
         super().__init__(
             criterion=criterion,
@@ -1198,6 +1184,7 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
             max_leaf_nodes=max_leaf_nodes,
             random_state=random_state,
             min_impurity_decrease=min_impurity_decrease,
+            ccp_alpha=ccp_alpha,
         )
 
         self.feature_combinations = feature_combinations
@@ -1261,6 +1248,7 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         criterion = self.criterion
         if not isinstance(criterion, BaseCriterion):
             if is_classifier(self):
+                # TODO: is this needed?
                 criterion = CRITERIA_CLF[self.criterion](self.n_outputs_, self.n_classes_)
             else:
                 criterion = CRITERIA_REG[self.criterion](self.n_outputs_, n_samples)
@@ -1289,9 +1277,8 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
             )
 
         if is_classifier(self):
-            # TODO: why is this needed?
-            self.tree_ = ObliqueTree(self.n_features_in_, self.n_classes_, self.n_outputs_)
-        else:
+            raise ValueError("Please use the ObliqueDecisionTreeClassifier for classification")
+        elif is_regressor(self):
             self.tree_ = ObliqueTree(
                 self.n_features_in_,
                 np.array([1] * self.n_outputs_, dtype=np.intp),
@@ -1325,160 +1312,173 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
 class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
     """A oblique decision tree classifier that operates over patches of data.
 
-    A patch oblique decision tree is also known as a manifold oblique decision tree
-    (called MORF in :footcite:`Li2019manifold`), where the splitter is aware of
-    the structure in the data. For example, in an image, a patch would be contiguous
-    along the rows and columns of the image. In a multivariate time-series, a patch
-    would be contiguous over time, but possibly discontiguous over the sensors.
-`
-    Parameters
-    ----------
-    criterion : {"gini", "entropy"}, default="gini"
-        The function to measure the quality of a split. Supported criteria are
-        "gini" for the Gini impurity and "entropy" for the information gain.
+        A patch oblique decision tree is also known as a manifold oblique decision tree
+        (called MORF in :footcite:`Li2019manifold`), where the splitter is aware of
+        the structure in the data. For example, in an image, a patch would be contiguous
+        along the rows and columns of the image. In a multivariate time-series, a patch
+        would be contiguous over time, but possibly discontiguous over the sensors.
+    `
+        Parameters
+        ----------
+        criterion : {"gini", "entropy"}, default="gini"
+            The function to measure the quality of a split. Supported criteria are
+            "gini" for the Gini impurity and "entropy" for the information gain.
 
-    splitter : {"best", "random"}, default="best"
-        The strategy used to choose the split at each node. Supported
-        strategies are "best" to choose the best split and "random" to choose
-        the best random split.
+        splitter : {"best", "random"}, default="best"
+            The strategy used to choose the split at each node. Supported
+            strategies are "best" to choose the best split and "random" to choose
+            the best random split.
 
-    max_depth : int, default=None
-        The maximum depth of the tree. If None, then nodes are expanded until
-        all leaves are pure or until all leaves contain less than
-        min_samples_split samples.
+        max_depth : int, default=None
+            The maximum depth of the tree. If None, then nodes are expanded until
+            all leaves are pure or until all leaves contain less than
+            min_samples_split samples.
 
-    min_samples_split : int or float, default=2
-        The minimum number of samples required to split an internal node:
+        min_samples_split : int or float, default=2
+            The minimum number of samples required to split an internal node:
 
-        - If int, then consider `min_samples_split` as the minimum number.
-        - If float, then `min_samples_split` is a fraction and
-          `ceil(min_samples_split * n_samples)` are the minimum
-          number of samples for each split.
+            - If int, then consider `min_samples_split` as the minimum number.
+            - If float, then `min_samples_split` is a fraction and
+              `ceil(min_samples_split * n_samples)` are the minimum
+              number of samples for each split.
 
-    min_samples_leaf : int or float, default=1
-        The minimum number of samples required to be at a leaf node.
-        A split point at any depth will only be considered if it leaves at
-        least ``min_samples_leaf`` training samples in each of the left and
-        right branches.  This may have the effect of smoothing the model,
-        especially in regression.
+        min_samples_leaf : int or float, default=1
+            The minimum number of samples required to be at a leaf node.
+            A split point at any depth will only be considered if it leaves at
+            least ``min_samples_leaf`` training samples in each of the left and
+            right branches.  This may have the effect of smoothing the model,
+            especially in regression.
 
-        - If int, then consider `min_samples_leaf` as the minimum number.
-        - If float, then `min_samples_leaf` is a fraction and
-          `ceil(min_samples_leaf * n_samples)` are the minimum
-          number of samples for each node.
+            - If int, then consider `min_samples_leaf` as the minimum number.
+            - If float, then `min_samples_leaf` is a fraction and
+              `ceil(min_samples_leaf * n_samples)` are the minimum
+              number of samples for each node.
 
-    min_weight_fraction_leaf : float, default=0.0
-        The minimum weighted fraction of the sum total of weights (of all
-        the input samples) required to be at a leaf node. Samples have
-        equal weight when sample_weight is not provided.
+        min_weight_fraction_leaf : float, default=0.0
+            The minimum weighted fraction of the sum total of weights (of all
+            the input samples) required to be at a leaf node. Samples have
+            equal weight when sample_weight is not provided.
 
-    max_features : int, float or {"auto", "sqrt", "log2"}, default=None
-        The number of features to consider when looking for the best split:
+        max_features : int, float or {"auto", "sqrt", "log2"}, default=None
+            The number of features to consider when looking for the best split:
 
-            - If int, then consider `max_features` features at each split.
-            - If float, then `max_features` is a fraction and
-              `int(max_features * n_features)` features are considered at each
-              split.
-            - If "auto", then `max_features=sqrt(n_features)`.
-            - If "sqrt", then `max_features=sqrt(n_features)`.
-            - If "log2", then `max_features=log2(n_features)`.
-            - If None, then `max_features=n_features`.
+                - If int, then consider `max_features` features at each split.
+                - If float, then `max_features` is a fraction and
+                  `int(max_features * n_features)` features are considered at each
+                  split.
+                - If "auto", then `max_features=sqrt(n_features)`.
+                - If "sqrt", then `max_features=sqrt(n_features)`.
+                - If "log2", then `max_features=log2(n_features)`.
+                - If None, then `max_features=n_features`.
 
-        Note: the search for a split does not stop until at least one
-        valid partition of the node samples is found, even if it requires to
-        effectively inspect more than ``max_features`` features.
+            Note: the search for a split does not stop until at least one
+            valid partition of the node samples is found, even if it requires to
+            effectively inspect more than ``max_features`` features.
 
-        Note: Compared to axis-aligned Random Forests, one can set
-        max_features to a number greater then ``n_features``.
+            Note: Compared to axis-aligned Random Forests, one can set
+            max_features to a number greater then ``n_features``.
 
-    random_state : int, RandomState instance or None, default=None
-        Controls the randomness of the estimator. The features are always
-        randomly permuted at each split, even if ``splitter`` is set to
-        ``"best"``. When ``max_features < n_features``, the algorithm will
-        select ``max_features`` at random at each split before finding the best
-        split among them. But the best found split may vary across different
-        runs, even if ``max_features=n_features``. That is the case, if the
-        improvement of the criterion is identical for several splits and one
-        split has to be selected at random. To obtain a deterministic behaviour
-        during fitting, ``random_state`` has to be fixed to an integer.
-        See :term:`Glossary <random_state>` for details.
+        random_state : int, RandomState instance or None, default=None
+            Controls the randomness of the estimator. The features are always
+            randomly permuted at each split, even if ``splitter`` is set to
+            ``"best"``. When ``max_features < n_features``, the algorithm will
+            select ``max_features`` at random at each split before finding the best
+            split among them. But the best found split may vary across different
+            runs, even if ``max_features=n_features``. That is the case, if the
+            improvement of the criterion is identical for several splits and one
+            split has to be selected at random. To obtain a deterministic behaviour
+            during fitting, ``random_state`` has to be fixed to an integer.
+            See :term:`Glossary <random_state>` for details.
 
-    max_leaf_nodes : int, default=None
-        Grow a tree with ``max_leaf_nodes`` in best-first fashion.
-        Best nodes are defined as relative reduction in impurity.
-        If None then unlimited number of leaf nodes.
+        max_leaf_nodes : int, default=None
+            Grow a tree with ``max_leaf_nodes`` in best-first fashion.
+            Best nodes are defined as relative reduction in impurity.
+            If None then unlimited number of leaf nodes.
 
-    min_impurity_decrease : float, default=0.0
-        A node will be split if this split induces a decrease of the impurity
-        greater than or equal to this value.
+        min_impurity_decrease : float, default=0.0
+            A node will be split if this split induces a decrease of the impurity
+            greater than or equal to this value.
 
-        The weighted impurity decrease equation is the following::
+            The weighted impurity decrease equation is the following::
 
-            N_t / N * (impurity - N_t_R / N_t * right_impurity
-                                - N_t_L / N_t * left_impurity)
+                N_t / N * (impurity - N_t_R / N_t * right_impurity
+                                    - N_t_L / N_t * left_impurity)
 
-        where ``N`` is the total number of samples, ``N_t`` is the number of
-        samples at the current node, ``N_t_L`` is the number of samples in the
-        left child, and ``N_t_R`` is the number of samples in the right child.
+            where ``N`` is the total number of samples, ``N_t`` is the number of
+            samples at the current node, ``N_t_L`` is the number of samples in the
+            left child, and ``N_t_R`` is the number of samples in the right child.
 
-        ``N``, ``N_t``, ``N_t_R`` and ``N_t_L`` all refer to the weighted sum,
-        if ``sample_weight`` is passed.
+            ``N``, ``N_t``, ``N_t_R`` and ``N_t_L`` all refer to the weighted sum,
+            if ``sample_weight`` is passed.
 
-    class_weight : dict, list of dict or "balanced", default=None
-        Weights associated with classes in the form ``{class_label: weight}``.
-        If None, all classes are supposed to have weight one. For
-        multi-output problems, a list of dicts can be provided in the same
-        order as the columns of y.
+        class_weight : dict, list of dict or "balanced", default=None
+            Weights associated with classes in the form ``{class_label: weight}``.
+            If None, all classes are supposed to have weight one. For
+            multi-output problems, a list of dicts can be provided in the same
+            order as the columns of y.
 
-        Note that for multioutput (including multilabel) weights should be
-        defined for each class of every column in its own dict. For example,
-        for four-class multilabel classification weights should be
-        [{0: 1, 1: 1}, {0: 1, 1: 5}, {0: 1, 1: 1}, {0: 1, 1: 1}] instead of
-        [{1:1}, {2:5}, {3:1}, {4:1}].
+            Note that for multioutput (including multilabel) weights should be
+            defined for each class of every column in its own dict. For example,
+            for four-class multilabel classification weights should be
+            [{0: 1, 1: 1}, {0: 1, 1: 5}, {0: 1, 1: 1}, {0: 1, 1: 1}] instead of
+            [{1:1}, {2:5}, {3:1}, {4:1}].
 
-        The "balanced" mode uses the values of y to automatically adjust
-        weights inversely proportional to class frequencies in the input data
-        as ``n_samples / (n_classes * np.bincount(y))``
+            The "balanced" mode uses the values of y to automatically adjust
+            weights inversely proportional to class frequencies in the input data
+            as ``n_samples / (n_classes * np.bincount(y))``
 
-        For multi-output, the weights of each column of y will be multiplied.
+            For multi-output, the weights of each column of y will be multiplied.
 
-        Note that these weights will be multiplied with sample_weight (passed
-        through the fit method) if sample_weight is specified.
-    min_patch_height : int, optional
-        The minimum height of a patch, by default 1.
-    max_patch_height : int, optional
-        The maximum height of a patch, by default 1.
-    min_patch_width : int, optional
-        The minimum width of a patch, by default 1.
-    max_patch_width : int, optional
-        The maximum width of a patch, by default 1.
-    data_height : int, optional
-        The presumed height of the un-vectorized feature vector, by default 1.
-    data_width : int, optional
-        The presumed height of the un-vectorized feature vector, by default None.
-        If None, the data width will be presumed the number of columns in ``X``
-        passed to :meth:`fit`.
+            Note that these weights will be multiplied with sample_weight (passed
+            through the fit method) if sample_weight is specified.
+        min_patch_height : int, optional
+            The minimum height of a patch, by default 1.
+        max_patch_height : int, optional
+            The maximum height of a patch, by default 1.
+        min_patch_width : int, optional
+            The minimum width of a patch, by default 1.
+        max_patch_width : int, optional
+            The maximum width of a patch, by default 1.
+        data_height : int, optional
+            The presumed height of the un-vectorized feature vector, by default 1.
+        data_width : int, optional
+            The presumed height of the un-vectorized feature vector, by default None.
+            If None, the data width will be presumed the number of columns in ``X``
+            passed to :meth:`fit`.
 
-    Notes
-    -----
-    Patches are 2D masks that are applied onto the data matrix. Following sklearn
-    API standards, ``X`` is always a ``(n_samples, n_features)`` array even if
-    X is comprised of images, or multivariate-time series. The ``data_width`` and
-    ``data_height`` parameters are used to inform the ``PatchObliqueDecisionTreeClassifier``
-    of the original structure of the data. It is required that
-    ``data_width * data_height = n_features``.
+        Notes
+        -----
+        Patches are 2D masks that are applied onto the data matrix. Following sklearn
+        API standards, ``X`` is always a ``(n_samples, n_features)`` array even if
+        X is comprised of images, or multivariate-time series. The ``data_width`` and
+        ``data_height`` parameters are used to inform the ``PatchObliqueDecisionTreeClassifier``
+        of the original structure of the data. It is required that
+        ``data_width * data_height = n_features``.
 
-    When users pass in ``X`` to :meth:`fit`, tt is presumed that all vectorization operations
-    are done C-contiguously (i.e. the last axis is contiguous).
+        When users pass in ``X`` to :meth:`fit`, tt is presumed that all vectorization operations
+        are done C-contiguously (i.e. the last axis is contiguous).
 
-    Note that for a patch height and width of size 1, the tree is exactly the same as the
-    decision tree, albeit with less efficiency optimizations. Therefore, it is always
-    recommended to set the range of patch heights and widths based on the structure of your
-    expected input data.
+        Note that for a patch height and width of size 1, the tree is exactly the same as the
+        decision tree, albeit with less efficiency optimizations. Therefore, it is always
+        recommended to set the range of patch heights and widths based on the structure of your
+        expected input data.
 
-    References
-    ----------
-    .. footbibliography::
+        References
+        ----------
+        .. footbibliography::
+
+        Examples
+        --------
+        >>> from sklearn.datasets import load_diabetes
+        >>> from sklearn.model_selection import cross_val_score
+        >>> X, y = load_diabetes(return_X_y=True)
+        >>> from sktree.tree import PatchObliqueDecisionTreeRegressor
+        >>> regressor = PatchObliqueDecisionTreeRegressor(random_state=0)
+        >>> cross_val_score(regressor, X, y, cv=10)
+        ...                     # doctest: +SKIP
+        ...
+        array([1.        , 0.93333333, 1.        , 0.93333333, 0.93333333,
+               0.86666667, 0.93333333, 0.93333333, 1.        , 1.        ])
     """
 
     _parameter_constraints = {
@@ -1850,6 +1850,12 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         ``N``, ``N_t``, ``N_t_R`` and ``N_t_L`` all refer to the weighted sum,
         if ``sample_weight`` is passed.
 
+    ccp_alpha : non-negative float, default=0.0
+        Complexity parameter used for Minimal Cost-Complexity Pruning. The
+        subtree with the largest cost complexity that is smaller than
+        ``ccp_alpha`` will be chosen. By default, no pruning is performed. See
+        :ref:`minimal_cost_complexity_pruning` for details.
+
     min_patch_height : int, optional
         The minimum height of a patch, by default 1.
     max_patch_height : int, optional
@@ -1885,6 +1891,17 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
     References
     ----------
     .. footbibliography::
+
+    >>> from sklearn.datasets import load_diabetes
+    >>> from sklearn.model_selection import cross_val_score
+    >>> X, y = load_diabetes(return_X_y=True)
+    >>> from sktree.tree import PatchObliqueDecisionTreeRegressor as RGS
+    >>> regressor = RGS(random_state=0)
+    >>> cross_val_score(regressor, X, y, cv=10)
+    ...                    # doctest: +SKIP
+    ...
+    array([-0.10163671, -0.78786738,  0.01490768,  0.32737289, -0.24816698,
+            0.41881754,  0.0588273 , -1.48722913, -0.07927208, -0.15600762])
     """
 
     _parameter_constraints = {
@@ -1910,6 +1927,7 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         random_state=None,
         max_leaf_nodes=None,
         min_impurity_decrease=0.0,
+        ccp_alpha=0.0,
         min_patch_height=1,
         max_patch_height=1,
         min_patch_width=1,
@@ -1928,6 +1946,7 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
             max_leaf_nodes=max_leaf_nodes,
             random_state=random_state,
             min_impurity_decrease=min_impurity_decrease,
+            ccp_alpha=ccp_alpha,
         )
 
         self.min_patch_height = min_patch_height
@@ -2075,8 +2094,9 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         criterion = self.criterion
         if not isinstance(criterion, BaseCriterion):
             if is_classifier(self):
+                # TODO: is this needed?
                 criterion = CRITERIA_CLF[self.criterion](self.n_outputs_, self.n_classes_)
-            else:
+            elif is_regressor(self):
                 criterion = CRITERIA_REG[self.criterion](self.n_outputs_, n_samples)
         else:
             # Make a deepcopy in case the criterion has mutable attributes that
@@ -2108,9 +2128,11 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
             )
 
         if is_classifier(self):
-            # TODO: Why is this needed?
-            self.tree_ = ObliqueTree(self.n_features_in_, self.n_classes_, self.n_outputs_)
-        else:
+            raise ValueError(
+                "Please use the PatchObliqueDecisionTreeClassifier for classification."
+            )
+
+        elif is_regressor(self):
             self.tree_ = ObliqueTree(
                 self.n_features_in_,
                 np.array([1] * self.n_outputs_, dtype=np.intp),

@@ -1,25 +1,37 @@
 import joblib
 import numpy as np
 import pytest
-from numpy.testing import assert_almost_equal, assert_array_almost_equal, assert_array_equal
+from numpy.testing import assert_almost_equal, assert_array_almost_equal, assert_array_equal, assert_allclose
 from sklearn import datasets
-from sklearn.base import is_classifier
+from sklearn.base import is_classifier, is_regressor
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.datasets import make_blobs
-from sklearn.metrics import accuracy_score, adjusted_rand_score
+from sklearn.metrics import accuracy_score, adjusted_rand_score, mean_poisson_deviance, mean_squared_error
 from sklearn.model_selection import cross_val_score
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.tree._tree import TREE_LEAF
+from sklearn.tree._classes import CRITERIA_CLF, CRITERIA_REG, DENSE_SPLITTERS, SPARSE_SPLITTERS 
 from sklearn.utils.estimator_checks import parametrize_with_checks
+from sklearn.utils import compute_sample_weight
+from sklearn.utils.validation import check_random_state
+from sklearn.utils._testing import skip_if_32bit
 
 from sktree.tree import (
     ObliqueDecisionTreeClassifier,
     PatchObliqueDecisionTreeClassifier,
+    ObliqueDecisionTreeRegressor,
+    PatchObliqueDecisionTreeRegressor,
     UnsupervisedDecisionTree,
     UnsupervisedObliqueDecisionTree,
 )
 
 CLUSTER_CRITERIONS = ("twomeans", "fastbic")
+
+REG_CRITERIONS = ("squared_error", "absolute_error", "friedman_mse", "poisson")
+REG_TREES = {
+    "ObliqueDecisionTreeRegressor": ObliqueDecisionTreeRegressor,
+    "PatchObliqueDecisionTreeRegressor": PatchObliqueDecisionTreeRegressor,
+}
 
 TREE_CLUSTERS = {
     "UnsupervisedDecisionTree": UnsupervisedDecisionTree,
@@ -81,6 +93,12 @@ y_small_reg = [
     0,
 ]
 
+# toy sample
+X = [[-2, -1], [-1, -1], [-1, -2], [1, 1], [1, 2], [2, 1]]
+y = [-1, -1, -1, 1, 1, 1]
+T = [[-1, -1], [2, 2], [3, 2]]
+true_result = [-1, 1, 1]
+
 # also load the iris dataset
 # and randomly permute it
 iris = datasets.load_iris()
@@ -89,12 +107,33 @@ perm = rng.permutation(iris.target.size)
 iris.data = iris.data[perm]
 iris.target = iris.target[perm]
 
+# also load the diabetes dataset
+# and randomly permute it
+diabetes = datasets.load_diabetes()
+perm = rng.permutation(diabetes.target.size)
+diabetes.data = diabetes.data[perm]
+diabetes.target = diabetes.target[perm]
+
 # load digits dataset and randomly permute it
 digits = datasets.load_digits()
 perm = rng.permutation(digits.target.size)
 digits.data = digits.data[perm]
 digits.target = digits.target[perm]
 
+random_state = check_random_state(0)
+X_multilabel, y_multilabel = datasets.make_multilabel_classification(
+    random_state=0, n_samples=30, n_features=10
+)
+
+DATASETS = {
+    "iris": {"X": iris.data, "y": iris.target},
+    "diabetes": {"X": diabetes.data, "y": diabetes.target},
+    "digits": {"X": digits.data, "y": digits.target},
+    "toy": {"X": X, "y": y},
+    "clf_small": {"X": X_small, "y": y_small},
+    "reg_small": {"X": X_small, "y": y_small_reg},
+    "multilabel": {"X": X_multilabel, "y": y_multilabel},
+}
 
 def assert_tree_equal(d, s, message):
     assert s.node_count == d.node_count, "{0}: inequal number of node ({1} != {2})".format(
@@ -124,6 +163,27 @@ def assert_tree_equal(d, s, message):
         d.value[external], s.value[external], err_msg=message + ": inequal value"
     )
 
+@pytest.mark.parametrize("Tree", REG_TREES.values())
+@pytest.mark.parametrize("criterion", REG_CRITERIONS)
+def test_regression_toy(Tree, criterion):
+    # Check regression on a toy dataset.
+    if criterion == "poisson":
+        # make target positive while not touching the original y and
+        # true_result
+        a = np.abs(np.min(y)) + 1
+        y_train = np.array(y) + a
+        y_test = np.array(true_result) + a
+    else:
+        y_train = y
+        y_test = true_result
+
+    reg = Tree(criterion=criterion, random_state=1)
+    reg.fit(X, y_train)
+    assert_allclose(reg.predict(T), y_test)
+
+    clf = Tree(criterion=criterion, max_features=1, random_state=1)
+    clf.fit(X, y_train)
+    assert_allclose(reg.predict(T), y_test)
 
 @parametrize_with_checks(
     [
@@ -475,3 +535,134 @@ def test_tree_deserialization_from_read_only_buffer(tmpdir, TREE):
         clf.tree_,
         "The trees of the original and loaded classifiers are not equal.",
     )
+
+####################
+# Test regressors  #
+####################
+
+@pytest.mark.parametrize("name, Tree", REG_TREES.items())
+@pytest.mark.parametrize("criterion", REG_CRITERIONS)
+def test_diabetes_overfit(name, Tree, criterion):
+    # check consistency of overfitted trees on the diabetes dataset
+    # since the trees will overfit, we expect an MSE of 0
+    reg = Tree(criterion=criterion, random_state=0)
+    reg.fit(diabetes.data, diabetes.target)
+    score = mean_squared_error(diabetes.target, reg.predict(diabetes.data))
+    assert score == pytest.approx(
+        0
+    ), f"Failed with {name}, criterion = {criterion} and score = {score}"
+
+@skip_if_32bit
+@pytest.mark.parametrize("name, Tree", REG_TREES.items())
+@pytest.mark.parametrize(
+    "criterion, max_depth, metric, max_loss",
+    [
+        ("squared_error", 15, mean_squared_error, 60),
+        ("absolute_error", 20, mean_squared_error, 60),
+        ("friedman_mse", 15, mean_squared_error, 60),
+        ("poisson", 15, mean_poisson_deviance, 30),
+    ],
+)
+
+def test_diabetes_underfit(name, Tree, criterion, max_depth, metric, max_loss):
+    # check consistency of trees when the depth and the number of features are
+    # limited
+
+    reg = Tree(criterion=criterion, max_depth=max_depth, max_features=6, random_state=0)
+    reg.fit(diabetes.data, diabetes.target)
+    loss = metric(diabetes.target, reg.predict(diabetes.data))
+    assert 0 < loss < max_loss
+
+
+@pytest.mark.parametrize("tree_type", sorted(set(SPARSE_TREES).intersection(REG_TREES)))
+@pytest.mark.parametrize("dataset", ["diabetes", "reg_small"])
+def test_sparse_input_reg_trees(tree_type, dataset):
+    # Due to numerical instability of MSE and too strict test, we limit the
+    # maximal depth
+    check_sparse_input(tree_type, dataset, 2)
+
+
+def check_sparse_parameters(tree, dataset):
+    TreeEstimator = ALL_TREES[tree]
+    X = DATASETS[dataset]["X"]
+    X_sparse = DATASETS[dataset]["X_sparse"]
+    y = DATASETS[dataset]["y"]
+
+    # Check max_features
+    d = TreeEstimator(random_state=0, max_features=1, max_depth=2).fit(X, y)
+    s = TreeEstimator(random_state=0, max_features=1, max_depth=2).fit(X_sparse, y)
+    assert_tree_equal(
+        d.tree_,
+        s.tree_,
+        "{0} with dense and sparse format gave different trees".format(tree),
+    )
+    assert_array_almost_equal(s.predict(X), d.predict(X))
+
+    # Check min_samples_split
+    d = TreeEstimator(random_state=0, max_features=1, min_samples_split=10).fit(X, y)
+    s = TreeEstimator(random_state=0, max_features=1, min_samples_split=10).fit(
+        X_sparse, y
+    )
+    assert_tree_equal(
+        d.tree_,
+        s.tree_,
+        "{0} with dense and sparse format gave different trees".format(tree),
+    )
+    assert_array_almost_equal(s.predict(X), d.predict(X))
+
+    # Check min_samples_leaf
+    d = TreeEstimator(random_state=0, min_samples_leaf=X_sparse.shape[0] // 2).fit(X, y)
+    s = TreeEstimator(random_state=0, min_samples_leaf=X_sparse.shape[0] // 2).fit(
+        X_sparse, y
+    )
+    assert_tree_equal(
+        d.tree_,
+        s.tree_,
+        "{0} with dense and sparse format gave different trees".format(tree),
+    )
+    assert_array_almost_equal(s.predict(X), d.predict(X))
+
+    # Check best-first search
+    d = TreeEstimator(random_state=0, max_leaf_nodes=3).fit(X, y)
+    s = TreeEstimator(random_state=0, max_leaf_nodes=3).fit(X_sparse, y)
+    assert_tree_equal(
+        d.tree_,
+        s.tree_,
+        "{0} with dense and sparse format gave different trees".format(tree),
+    )
+    assert_array_almost_equal(s.predict(X), d.predict(X))
+
+
+def check_sparse_criterion(tree, dataset):
+    TreeEstimator = REG_TREES[tree]
+    X = DATASETS[dataset]["X"]
+    X_sparse = DATASETS[dataset]["X_sparse"]
+    y = DATASETS[dataset]["y"]
+
+    # Check various criterion
+    for criterion in REG_CRITERIONS:
+        d = TreeEstimator(random_state=0, max_depth=3, criterion=criterion).fit(X, y)
+        s = TreeEstimator(random_state=0, max_depth=3, criterion=criterion).fit(
+            X_sparse, y
+        )
+
+        assert_tree_equal(
+            d.tree_,
+            s.tree_,
+            "{0} with dense and sparse format gave different trees".format(tree),
+        )
+        assert_array_almost_equal(s.predict(X), d.predict(X))
+
+
+@pytest.mark.parametrize("criterion", ["squared_error", "friedman_mse", "poisson"])
+@pytest.mark.parametrize("Tree", REG_TREES.values())
+def test_balance_property(criterion, Tree):
+    # Test that sum(y_pred)=sum(y_true) on training set.
+    # This works if the mean is predicted (should even be true for each leaf).
+    # MAE predicts the median and is therefore excluded from this test.
+
+    # Choose a training set with non-negative targets (for poisson)
+    X, y = diabetes.data, diabetes.target
+    reg = Tree(criterion=criterion)
+    reg.fit(X, y)
+    assert np.sum(reg.predict(X)) == pytest.approx(np.sum(y))
