@@ -196,6 +196,7 @@ def assert_tree_equal(d, s, message):
         d.value[external], s.value[external], err_msg=message + ": inequal value"
     )
 
+
 @pytest.mark.parametrize("Tree", REG_TREES.values())
 @pytest.mark.parametrize("criterion", REG_CRITERIONS)
 def test_regression_toy(Tree, criterion):
@@ -557,6 +558,7 @@ def test_patch_tree_higher_dims():
     pass
 
 
+
 @pytest.mark.parametrize("name, Tree", REG_TREES.items())
 @pytest.mark.parametrize("criterion", REG_CRITERIONS)
 def test_diabetes_overfit(name, Tree, criterion):
@@ -568,6 +570,7 @@ def test_diabetes_overfit(name, Tree, criterion):
     assert score == pytest.approx(
         0
     ), f"Failed with {name}, criterion = {criterion} and score = {score}"
+
 
 @skip_if_32bit
 @pytest.mark.parametrize("name, Tree", REG_TREES.items())
