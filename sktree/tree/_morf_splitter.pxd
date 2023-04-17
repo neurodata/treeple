@@ -22,6 +22,17 @@ from sklearn.utils._sorting cimport simultaneous_sort
 
 from ._oblique_splitter cimport BaseObliqueSplitter, ObliqueSplitRecord
 
+# https://github.com/cython/cython/blob/master/Cython/Includes/libcpp/algorithm.pxd
+# shows how to include standard library functions in Cython
+# This includes the discrete_distribution C++ class, which can be used
+# to generate samples from a discrete distribution with non-uniform probabilities.
+# cdef extern from "<discrete_distribution>" namespace "std" nogil:
+#     cdef cppclass discrete_distribution[T]
+#         ctypedef T int_type
+#         ctypedef G generator_type
+#         discrete_distribution(T first, T last) except +
+#         operator()(&G) except +
+
 
 cdef class PatchSplitter(BaseObliqueSplitter):
     # The PatchSplitter creates candidate feature values by sampling 2D patches from
