@@ -8,7 +8,7 @@ from numpy.testing import (
     assert_array_equal,
 )
 from sklearn import datasets
-from sklearn.base import is_classifier
+from sklearn.base import is_classifier, is_regressor
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.datasets import make_blobs
 from sklearn.metrics import (
@@ -167,6 +167,27 @@ def assert_tree_equal(d, s, message):
         d.value[external], s.value[external], err_msg=message + ": inequal value"
     )
 
+@pytest.mark.parametrize("Tree", REG_TREES.values())
+@pytest.mark.parametrize("criterion", REG_CRITERIONS)
+def test_regression_toy(Tree, criterion):
+    # Check regression on a toy dataset.
+    if criterion == "poisson":
+        # make target positive while not touching the original y and
+        # true_result
+        a = np.abs(np.min(y)) + 1
+        y_train = np.array(y) + a
+        y_test = np.array(true_result) + a
+    else:
+        y_train = y
+        y_test = true_result
+
+    reg = Tree(criterion=criterion, random_state=1)
+    reg.fit(X, y_train)
+    assert_allclose(reg.predict(T), y_test)
+
+    clf = Tree(criterion=criterion, max_features=1, random_state=1)
+    clf.fit(X, y_train)
+    assert_allclose(reg.predict(T), y_test)
 
 @parametrize_with_checks(
     [

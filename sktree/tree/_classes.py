@@ -2274,8 +2274,9 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         criterion = self.criterion
         if not isinstance(criterion, BaseCriterion):
             if is_classifier(self):
+                # TODO: is this needed?
                 criterion = CRITERIA_CLF[self.criterion](self.n_outputs_, self.n_classes_)
-            else:
+            elif is_regressor(self):
                 criterion = CRITERIA_REG[self.criterion](self.n_outputs_, n_samples)
         else:
             # Make a deepcopy in case the criterion has mutable attributes that
