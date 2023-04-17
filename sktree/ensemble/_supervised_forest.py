@@ -1202,7 +1202,7 @@ class PatchObliqueRandomForestRegressor(ForestRegressor):
     >>> print(rregressor.predict([[0, 0, 0, 0]]))
     [-5.82818509]
     """
-    
+
     _parameter_constraints: dict = {
         **ForestRegressor._parameter_constraints,
         **PatchObliqueDecisionTreeRegressor._parameter_constraints,

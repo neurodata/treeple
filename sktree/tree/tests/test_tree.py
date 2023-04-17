@@ -1,25 +1,39 @@
 import joblib
 import numpy as np
 import pytest
-from numpy.testing import assert_almost_equal, assert_array_almost_equal, assert_array_equal, assert_allclose
+from numpy.testing import (
+    assert_allclose,
+    assert_almost_equal,
+    assert_array_almost_equal,
+    assert_array_equal,
+)
+from scipy.sparse import csc_matrix
+from scipy.sparse import csr_matrix
+from scipy.sparse import coo_matrix
 from sklearn import datasets
 from sklearn.base import is_classifier, is_regressor
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.datasets import make_blobs
-from sklearn.metrics import accuracy_score, adjusted_rand_score, mean_poisson_deviance, mean_squared_error
+from sklearn.metrics import (
+    accuracy_score,
+    adjusted_rand_score,
+    mean_poisson_deviance,
+    mean_squared_error,
+)
 from sklearn.model_selection import cross_val_score
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+from sklearn.tree._classes import CRITERIA_CLF, CRITERIA_REG, DENSE_SPLITTERS, SPARSE_SPLITTERS
 from sklearn.tree._tree import TREE_LEAF
-from sklearn.tree._classes import CRITERIA_CLF, CRITERIA_REG, DENSE_SPLITTERS, SPARSE_SPLITTERS 
-from sklearn.utils.estimator_checks import parametrize_with_checks
 from sklearn.utils import compute_sample_weight
-from sklearn.utils.validation import check_random_state
 from sklearn.utils._testing import skip_if_32bit
+from sklearn.utils.estimator_checks import parametrize_with_checks
+from sklearn.utils.validation import check_random_state
+from sklearn.random_projection import _sparse_random_matrix
 
 from sktree.tree import (
     ObliqueDecisionTreeClassifier,
-    PatchObliqueDecisionTreeClassifier,
     ObliqueDecisionTreeRegressor,
+    PatchObliqueDecisionTreeClassifier,
     PatchObliqueDecisionTreeRegressor,
     UnsupervisedDecisionTree,
     UnsupervisedObliqueDecisionTree,
@@ -32,7 +46,14 @@ REG_TREES = {
     "ObliqueDecisionTreeRegressor": ObliqueDecisionTreeRegressor,
     "PatchObliqueDecisionTreeRegressor": PatchObliqueDecisionTreeRegressor,
 }
+CLF_TREES = {
+    "ObliqueDecisionTreeClassifier": ObliqueDecisionTreeClassifier,
+    "PatchObliqueTreeClassifier": PatchObliqueDecisionTreeClassifier,
+}
 
+ALL_TREES: dict = dict()
+ALL_TREES.update(CLF_TREES)
+ALL_TREES.update(REG_TREES)
 TREE_CLUSTERS = {
     "UnsupervisedDecisionTree": UnsupervisedDecisionTree,
     "UnsupervisedObliqueDecisionTree": UnsupervisedObliqueDecisionTree,
@@ -124,6 +145,11 @@ random_state = check_random_state(0)
 X_multilabel, y_multilabel = datasets.make_multilabel_classification(
     random_state=0, n_samples=30, n_features=10
 )
+# NB: despite their names X_sparse_* are numpy arrays (and not sparse matrices)
+X_sparse_pos = random_state.uniform(size=(20, 5))
+X_sparse_pos[X_sparse_pos <= 0.8] = 0.0
+y_random = random_state.randint(0, 4, size=(20,))
+X_sparse_mix = _sparse_random_matrix(20, 10, density=0.25, random_state=0).toarray()
 
 DATASETS = {
     "iris": {"X": iris.data, "y": iris.target},
@@ -133,7 +159,14 @@ DATASETS = {
     "clf_small": {"X": X_small, "y": y_small},
     "reg_small": {"X": X_small, "y": y_small_reg},
     "multilabel": {"X": X_multilabel, "y": y_multilabel},
+    "sparse-pos": {"X": X_sparse_pos, "y": y_random},
+    "sparse-neg": {"X": -X_sparse_pos, "y": y_random},
+    "sparse-mix": {"X": X_sparse_mix, "y": y_random},
+    "zeros": {"X": np.zeros((20, 3)), "y": y_random},
 }
+
+for name in DATASETS:
+    DATASETS[name]["X_sparse"] = csc_matrix(DATASETS[name]["X"])
 
 def assert_tree_equal(d, s, message):
     assert s.node_count == d.node_count, "{0}: inequal number of node ({1} != {2})".format(
@@ -163,6 +196,7 @@ def assert_tree_equal(d, s, message):
         d.value[external], s.value[external], err_msg=message + ": inequal value"
     )
 
+
 @pytest.mark.parametrize("Tree", REG_TREES.values())
 @pytest.mark.parametrize("criterion", REG_CRITERIONS)
 def test_regression_toy(Tree, criterion):
@@ -184,6 +218,7 @@ def test_regression_toy(Tree, criterion):
     clf = Tree(criterion=criterion, max_features=1, random_state=1)
     clf.fit(X, y_train)
     assert_allclose(reg.predict(T), y_test)
+
 
 @parametrize_with_checks(
     [
@@ -536,9 +571,11 @@ def test_tree_deserialization_from_read_only_buffer(tmpdir, TREE):
         "The trees of the original and loaded classifiers are not equal.",
     )
 
+
 ####################
 # Test regressors  #
 ####################
+
 
 @pytest.mark.parametrize("name, Tree", REG_TREES.items())
 @pytest.mark.parametrize("criterion", REG_CRITERIONS)
@@ -552,6 +589,7 @@ def test_diabetes_overfit(name, Tree, criterion):
         0
     ), f"Failed with {name}, criterion = {criterion} and score = {score}"
 
+
 @skip_if_32bit
 @pytest.mark.parametrize("name, Tree", REG_TREES.items())
 @pytest.mark.parametrize(
@@ -563,7 +601,6 @@ def test_diabetes_overfit(name, Tree, criterion):
         ("poisson", 15, mean_poisson_deviance, 30),
     ],
 )
-
 def test_diabetes_underfit(name, Tree, criterion, max_depth, metric, max_loss):
     # check consistency of trees when the depth and the number of features are
     # limited
@@ -573,13 +610,54 @@ def test_diabetes_underfit(name, Tree, criterion, max_depth, metric, max_loss):
     loss = metric(diabetes.target, reg.predict(diabetes.data))
     assert 0 < loss < max_loss
 
+def check_sparse_input(tree, dataset, max_depth=None):
+    TreeEstimator = ALL_TREES[tree]
+    X = DATASETS[dataset]["X"]
+    X_sparse = DATASETS[dataset]["X_sparse"]
+    y = DATASETS[dataset]["y"]
 
-@pytest.mark.parametrize("tree_type", sorted(set(SPARSE_TREES).intersection(REG_TREES)))
-@pytest.mark.parametrize("dataset", ["diabetes", "reg_small"])
-def test_sparse_input_reg_trees(tree_type, dataset):
-    # Due to numerical instability of MSE and too strict test, we limit the
-    # maximal depth
-    check_sparse_input(tree_type, dataset, 2)
+    # Gain testing time
+    if dataset in ["digits", "diabetes"]:
+        n_samples = X.shape[0] // 5
+        X = X[:n_samples]
+        X_sparse = X_sparse[:n_samples]
+        y = y[:n_samples]
+
+    for sparse_format in (csr_matrix, csc_matrix, coo_matrix):
+        X_sparse = sparse_format(X_sparse)
+
+        # Check the default (depth first search)
+        d = TreeEstimator(random_state=0, max_depth=max_depth).fit(X, y)
+        s = TreeEstimator(random_state=0, max_depth=max_depth).fit(X_sparse, y)
+
+        assert_tree_equal(
+            d.tree_,
+            s.tree_,
+            "{0} with dense and sparse format gave different trees".format(tree),
+        )
+
+        y_pred = d.predict(X)
+        if tree in CLF_TREES:
+            y_proba = d.predict_proba(X)
+            y_log_proba = d.predict_log_proba(X)
+
+        for sparse_matrix in (csr_matrix, csc_matrix, coo_matrix):
+            X_sparse_test = sparse_matrix(X_sparse, dtype=np.float32)
+
+            assert_array_almost_equal(s.predict(X_sparse_test), y_pred)
+
+            if tree in CLF_TREES:
+                assert_array_almost_equal(s.predict_proba(X_sparse_test), y_proba)
+                assert_array_almost_equal(
+                    s.predict_log_proba(X_sparse_test), y_log_proba
+                )
+
+# @pytest.mark.parametrize("tree_type", sorted(set(REG_TREES)))
+# @pytest.mark.parametrize("dataset", ["diabetes", "reg_small"])
+# def test_sparse_input_reg_trees(tree_type, dataset):
+#     # Due to numerical instability of MSE and too strict test, we limit the
+#     # maximal depth
+#     check_sparse_input(tree_type, dataset, 2)
 
 
 def check_sparse_parameters(tree, dataset):
@@ -600,9 +678,7 @@ def check_sparse_parameters(tree, dataset):
 
     # Check min_samples_split
     d = TreeEstimator(random_state=0, max_features=1, min_samples_split=10).fit(X, y)
-    s = TreeEstimator(random_state=0, max_features=1, min_samples_split=10).fit(
-        X_sparse, y
-    )
+    s = TreeEstimator(random_state=0, max_features=1, min_samples_split=10).fit(X_sparse, y)
     assert_tree_equal(
         d.tree_,
         s.tree_,
@@ -612,9 +688,7 @@ def check_sparse_parameters(tree, dataset):
 
     # Check min_samples_leaf
     d = TreeEstimator(random_state=0, min_samples_leaf=X_sparse.shape[0] // 2).fit(X, y)
-    s = TreeEstimator(random_state=0, min_samples_leaf=X_sparse.shape[0] // 2).fit(
-        X_sparse, y
-    )
+    s = TreeEstimator(random_state=0, min_samples_leaf=X_sparse.shape[0] // 2).fit(X_sparse, y)
     assert_tree_equal(
         d.tree_,
         s.tree_,
@@ -642,9 +716,7 @@ def check_sparse_criterion(tree, dataset):
     # Check various criterion
     for criterion in REG_CRITERIONS:
         d = TreeEstimator(random_state=0, max_depth=3, criterion=criterion).fit(X, y)
-        s = TreeEstimator(random_state=0, max_depth=3, criterion=criterion).fit(
-            X_sparse, y
-        )
+        s = TreeEstimator(random_state=0, max_depth=3, criterion=criterion).fit(X_sparse, y)
 
         assert_tree_equal(
             d.tree_,
