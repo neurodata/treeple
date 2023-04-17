@@ -7,7 +7,7 @@
     "project": "scikit-tree",
 
     // The project's homepage
-    "project_url": "scikit-learn.org/",
+    "project_url": "https://docs.neurodata.io/scikit-tree/",
 
     // The URL or local path of the source code repository for the
     // project being benchmarked
