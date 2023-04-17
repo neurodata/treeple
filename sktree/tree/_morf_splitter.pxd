@@ -55,8 +55,17 @@ cdef class PatchSplitter(BaseObliqueSplitter):
     # All oblique splitters (i.e. non-axis aligned splitters) require a
     # function to sample a projection matrix that is applied to the feature matrix
     # to quickly obtain the sampled projections for candidate splits.
+    cdef (SIZE_t, SIZE_t) sample_top_left_seed(
+        self
+    ) noexcept nogil
+
     cdef void sample_proj_mat(
         self, 
         vector[vector[DTYPE_t]]& proj_mat_weights,
         vector[vector[SIZE_t]]& proj_mat_indices
     ) nogil 
+
+
+cdef class UserKernelSplitter(PatchSplitter):
+    """An class to hold user-specified kernels."""
+    cdef vector[DTYPE_t[:, ::1]] kernel_dictionary  # A list of C-contiguous 2D kernels

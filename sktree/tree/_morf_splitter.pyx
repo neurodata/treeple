@@ -141,15 +141,15 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         """
         pass
 
+    cdef (SIZE_t, SIZE_t) sample_top_left_seed(self) noexcept nogil:
+        pass
+
     cdef int pointer_size(self) noexcept nogil:
         """Get size of a pointer to record for ObliqueSplitter."""
 
         return sizeof(ObliqueSplitRecord)
 
 cdef class BaseDensePatchSplitter(PatchSplitter):
-    # XXX: currently BaseOblique class defines this, which shouldn't be the case
-    # cdef const DTYPE_t[:, :] X
-
     cdef int init(self,
                   object X,
                   const DOUBLE_t[:, ::1] y,
@@ -183,6 +183,15 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
             ), self.__getstate__())
 
     cdef (SIZE_t, SIZE_t) sample_top_left_seed(self) noexcept nogil:
+        """Sample the top-left seed for the n-dim patch.
+        
+        Returns
+        -------
+        top_left_seed : SIZE_t
+            The top-left seed vectorized (i.e. raveled) for the n-dim patch.
+        patch_size : SIZE_t
+            The total size of the n-dim patch (i.e. the volume).
+        """
         # now get the top-left seed that is used to then determine the top-left
         # position in patch
         # compute top-left seed for the multi-dimensional patch
