@@ -557,8 +557,6 @@ def test_patch_tree_higher_dims():
     """Test patch oblique tree when patch and data dimensions are higher."""
     pass
 
-
-
 @pytest.mark.parametrize("name, Tree", REG_TREES.items())
 @pytest.mark.parametrize("criterion", REG_CRITERIONS)
 def test_diabetes_overfit(name, Tree, criterion):

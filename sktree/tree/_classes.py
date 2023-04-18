@@ -1801,7 +1801,7 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
     the structure in the data. For example, in an image, a patch would be contiguous
     along the rows and columns of the image. In a multivariate time-series, a patch
     would be contiguous over time, but possibly discontiguous over the sensors.
-`
+
     Parameters
     ----------
     criterion : {"squared_error", "friedman_mse", "absolute_error", \
@@ -1965,6 +1965,70 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
     data_dims_ : array-like
         The presumed dimensions of the un-vectorized feature vector.
 
+        Note that these weights will be multiplied with sample_weight (passed
+        through the fit method) if sample_weight is specified.
+        
+    min_patch_dims : array-like, optional
+        The minimum dimensions of a patch, by default 1 along all dimensions.
+        
+    max_patch_dims : array-like, optional
+        The maximum dimensions of a patch, by default 1 along all dimensions.
+        
+    dim_contiguous : array-like of bool, optional
+        Whether or not each patch is sampled contiguously along this dimension.
+        
+    data_dims : array-like, optional
+        The presumed dimensions of the un-vectorized feature vector, by default
+        will be a 1D vector with (1, n_features) shape.
+
+    Attributes
+    ----------
+    classes_ : ndarray of shape (n_classes,) or list of ndarray
+        The classes labels (single output problem),
+        or a list of arrays of class labels (multi-output problem).
+
+    feature_importances_ : ndarray of shape (n_features,)
+        The impurity-based feature importances.
+        The higher, the more important the feature.
+        The importance of a feature is computed as the (normalized)
+        total reduction of the criterion brought by that feature.  It is also
+        known as the Gini importance [4]_.
+
+        Warning: impurity-based feature importances can be misleading for
+        high cardinality features (many unique values). See
+        :func:`sklearn.inspection.permutation_importance` as an alternative.
+
+    max_features_ : int
+        The inferred value of max_features.
+
+    n_classes_ : int or list of int
+        The number of classes (for single output problems),
+        or a list containing the number of classes for each
+        output (for multi-output problems).
+
+    n_features_in_ : int
+        Number of features seen during :term:`fit`.
+
+    feature_names_in_ : ndarray of shape (`n_features_in_`,)
+        Names of features seen during :term:`fit`. Defined only when `X`
+        has feature names that are all strings.
+
+    n_outputs_ : int
+        The number of outputs when ``fit`` is performed.
+
+    tree_ : Tree instance
+        The underlying Tree object. Please refer to
+        ``help(sklearn.tree._tree.Tree)`` for
+        attributes of Tree object.
+
+    min_patch_dims_ : array-like
+        The minimum dimensions of a patch.
+
+    max_patch_dims_ : array-like
+        The maximum dimensions of a patch.
+
+    data_dims_ : array-like
+        The presumed dimensions of the un-vectorized feature vector.
 
     Notes
     -----
