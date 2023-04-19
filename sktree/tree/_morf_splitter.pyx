@@ -205,6 +205,8 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
         cdef SIZE_t patch_dim
         cdef SIZE_t delta_patch_dim
 
+        cdef SIZE_t dim
+
         cdef SIZE_t jdx
         cdef SIZE_t idx
 
@@ -218,15 +220,36 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
                 self.max_patch_dims[idx] + 1,
                 random_state
             )
-
-            # write to buffer
-            self.patch_dims_buff[idx] = patch_dim
-            patch_size *= patch_dim
             
-            # compute the difference between the image dimensions and the current
-            # random patch dimensions for sampling
-            delta_patch_dim = (self.data_dims[idx] - patch_dim) + 1
-            top_left_patch_seed = rand_int(0, delta_patch_dim, random_state)
+            # sample the top-left index and patch size for this dimension based on boundary effects
+            if self.boundary is None:
+                # compute the difference between the image dimensions and the current
+                # random patch dimensions for sampling
+                delta_patch_dim = (self.data_dims[idx] - patch_dim) + 1
+                top_left_patch_seed = rand_int(0, delta_patch_dim, random_state)
+
+                # write to buffer
+                self.patch_dims_buff[idx] = patch_dim
+                patch_size *= patch_dim
+            elif self.boundary == 'wrap':
+                # add circular boundary conditions
+                delta_patch_dim = self.data_dims[idx] + 2 * (patch_dim - 1)
+
+                # sample the top left index for this dimension
+                top_left_patch_seed = rand_int(0, delta_patch_dim, random_state)
+
+                # resample the patch dimension due to padding
+                dim = top_left_patch_seed % delta_patch_dim
+
+                # resample the patch dimension due to padding
+                patch_dim = min(patch_dim, min(dim+1, self.data_dims[idx] + patch_dim - dim - 1))
+                self.patch_dims_buff[idx] = patch_dim
+                patch_size *= patch_dim
+
+                # TODO: make this work
+                # Convert the top-left-seed value to it's appropriate index in the full image. 
+                top_left_patch_seed = max(0, dim - patch_dim + 1)
+
             self.unraveled_patch_point[idx] = top_left_patch_seed
 
         top_left_patch_seed = ravel_multi_index_cython(
