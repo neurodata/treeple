@@ -143,6 +143,7 @@ y_random = random_state.randint(0, 4, size=(20,))
 X_sparse_mix = _sparse_random_matrix(20, 10, density=0.25, random_state=0).toarray()
 
 
+
 def assert_tree_equal(d, s, message):
     assert s.node_count == d.node_count, "{0}: inequal number of node ({1} != {2})".format(
         message, s.node_count, d.node_count
@@ -566,6 +567,30 @@ def test_diabetes_underfit(name, Tree, criterion, max_depth, metric, max_loss):
     reg.fit(diabetes.data, diabetes.target)
     loss = metric(diabetes.target, reg.predict(diabetes.data))
     assert 0 < loss < max_loss
+
+def test_numerical_stability():
+    # Check numerical stability.
+    X = np.array(
+        [
+            [152.08097839, 140.40744019, 129.75102234, 159.90493774],
+            [142.50700378, 135.81935120, 117.82884979, 162.75781250],
+            [127.28772736, 140.40744019, 129.75102234, 159.90493774],
+            [132.37025452, 143.71923828, 138.35694885, 157.84558105],
+            [103.10237122, 143.71928406, 138.35696411, 157.84559631],
+            [127.71276855, 143.71923828, 138.35694885, 157.84558105],
+            [120.91514587, 140.40744019, 129.75102234, 159.90493774],
+        ]
+    )
+
+    y = np.array([1.0, 0.70209277, 0.53896582, 0.0, 0.90914464, 0.48026916, 0.49622521])
+
+    with np.errstate(all="raise"):
+        for name, Tree in REG_TREES.items():
+            reg = Tree(random_state=0)
+            reg.fit(X, y)
+            reg.fit(X, -y)
+            reg.fit(-X, y)
+            reg.fit(-X, -y)
 
 
 def test_numerical_stability():

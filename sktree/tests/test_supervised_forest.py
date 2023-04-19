@@ -7,7 +7,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.utils._testing import assert_array_almost_equal
-from sklearn.utils.estimator_checks import check_estimator
+from sklearn.utils.estimator_checks import check_estimator, parametrize_with_checks
 from sklearn.utils.validation import check_random_state
 
 from sktree import (
@@ -27,6 +27,9 @@ X_large, y_large = make_classification(
     shuffle=False,
     random_state=0,
 )
+
+# Make regression dataset
+X_reg, y_reg = make_regression(n_samples=500, n_features=10, random_state=0)
 
 # Larger regression sample used for testing feature importances
 X_large_reg, y_large_reg = make_regression(
@@ -216,6 +219,16 @@ def test_regression_patch(criterion, dtype):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=n_test, random_state=0)
     estimator.fit(X_train, y_train)
     assert estimator.score(X_test, y_test) > 0.88
+@parametrize_with_checks(
+    [
+        ObliqueRandomForestClassifier(random_state=12345, n_estimators=10),
+        PatchObliqueRandomForestClassifier(random_state=12345, n_estimators=10),
+        ObliqueRandomForestRegressor(random_state=12345, n_estimators=10),
+        PatchObliqueRandomForestRegressor(random_state=12345, n_estimators=10),
+    ]
+)
+def test_sklearn_compatible_estimator(estimator, check):
+    check(estimator)
 
 
 def test_oblique_forest_sparse_parity():
@@ -437,3 +450,182 @@ def test_check_importances_patch(estimator, criterion, dtype):
         est.fit(X, y, sample_weight=scale * sample_weight)
         importances_bis = est.feature_importances_
         assert np.abs(importances - importances_bis).mean() < tolerance
+
+
+def test_oblique_regressor_forest_orthant():
+    """Test oblique forests on orthant problem.
+
+    It is expected that axis-aligned and oblique-aligned
+    forests will perform similarly.
+    """
+    n = 500
+    X, y = _orthant(n, p=6, random_state=0)
+    n_test = 0.3
+    X_train, X_test, y_train, y_test = train_test_split(
+        X,
+        y,
+        test_size=n_test,
+        random_state=0,
+    )
+    rc_rgs = ObliqueRandomForestRegressor(max_features=None, random_state=0)
+    rc_rgs.fit(X_train, y_train)
+    y_hat = rc_rgs.predict(X_test)
+    rc_mse = mean_squared_error(y_test, y_hat)
+
+    ri_rgs = RandomForestRegressor(random_state=0)
+    ri_rgs.fit(X_train, y_train)
+    y_hat = ri_rgs.predict(X_test)
+    ri_mse = mean_squared_error(y_test, y_hat)
+
+    assert ri_mse < rc_mse
+    assert ri_mse > 0.85
+    assert rc_mse > 0.85
+
+
+def test_oblique_regressor_forest_trunk():
+    """Test oblique vs axis-aligned forests on Trunk."""
+    n = 1000
+    X, y = _trunk(n, p=100, random_state=0)
+    n_test = 0.2
+    X_train, X_test, y_train, y_test = train_test_split(
+        X,
+        y,
+        test_size=n_test,
+        random_state=0,
+    )
+
+    rc_rgs = ObliqueRandomForestRegressor(random_state=0)
+    rc_rgs.fit(X_train, y_train)
+    y_hat = rc_rgs.predict(X_test)
+    rc_mse = mean_squared_error(y_test, y_hat)
+
+    ri_rgs = RandomForestRegressor(random_state=0)
+    ri_rgs.fit(X_train, y_train)
+    y_hat = ri_rgs.predict(X_test)
+    ri_mse = mean_squared_error(y_test, y_hat)
+
+    assert ri_mse < rc_mse
+
+
+@pytest.mark.parametrize("dtype", (np.float64, np.float32))
+@pytest.mark.parametrize(
+    "criterion",
+    ["squared_error", "absolute_error", "friedman_mse"],
+)
+@pytest.mark.parametrize("feature_combinations", (2, 5))
+def test_check_importances_oblique_regressor(criterion, dtype, feature_combinations):
+    """Test checking feature importances for oblique trees."""
+    tolerance = 0.01
+
+    # cast as dype
+    X = X_large.astype(dtype, copy=False)
+    y = y_large.astype(dtype, copy=False)
+
+    est = ObliqueRandomForestRegressor(
+        n_estimators=10,
+        criterion=criterion,
+        random_state=0,
+        feature_combinations=feature_combinations,
+    )
+    est.fit(X, y)
+    importances = est.feature_importances_
+
+    # The forest estimator can detect that only the first 3 features of the
+    # dataset are informative:
+    n_important = np.sum(importances > 0.1)
+    assert importances.shape[0] == 10
+    if feature_combinations == 2:
+        assert n_important == 3
+    else:
+        assert n_important >= 3
+    assert np.all(importances[:3] > 0.1)
+
+    # Check with parallel
+    importances = est.feature_importances_
+    est.set_params(n_jobs=2)
+    importances_parallel = est.feature_importances_
+    assert_array_almost_equal(importances, importances_parallel)
+
+    # Check with sample weights
+    sample_weight = check_random_state(0).randint(1, 10, len(X))
+    est = ObliqueRandomForestRegressor(
+        n_estimators=10,
+        random_state=0,
+        criterion=criterion,
+        feature_combinations=feature_combinations,
+    )
+    est.fit(X, y, sample_weight=sample_weight)
+    importances = est.feature_importances_
+    assert np.all(importances >= 0.0)
+
+    for scale in [0.5, 100]:
+        est = ObliqueRandomForestRegressor(
+            n_estimators=10,
+            random_state=0,
+            criterion=criterion,
+            feature_combinations=feature_combinations,
+        )
+        est.fit(X, y, sample_weight=scale * sample_weight)
+        importances_bis = est.feature_importances_
+        assert np.mean(importances - importances_bis) < tolerance
+
+
+@pytest.mark.parametrize("dtype", (np.float64, np.float32))
+@pytest.mark.parametrize(
+    "criterion",
+    ["squared_error", "absolute_error", "friedman_mse"],
+)
+def test_check_importances_patch_regressor(criterion, dtype):
+    """Test checking feature importances for oblique trees."""
+    tolerance = 0.01
+
+    # cast as dype
+    X = X_large.astype(dtype, copy=False)
+    y = y_large.astype(dtype, copy=False)
+
+    est = PatchObliqueRandomForestRegressor(
+        n_estimators=50,
+        criterion=criterion,
+        random_state=0,
+        max_patch_dims=(2, 2),
+        data_dims=(2, 5),
+    )
+    est.fit(X, y)
+    importances = est.feature_importances_
+
+    # The forest estimator can detect that only the first 3 features of the
+    # dataset are informative:
+    n_important = np.sum(importances > 0.1)
+    assert importances.shape[0] == 10
+    assert n_important >= 3
+
+    # Check with parallel
+    importances = est.feature_importances_
+    est.set_params(n_jobs=2)
+    importances_parallel = est.feature_importances_
+    assert_array_almost_equal(importances, importances_parallel)
+
+    # Check with sample weights
+    sample_weight = check_random_state(0).randint(1, 10, len(X))
+    est = PatchObliqueRandomForestRegressor(
+        n_estimators=10,
+        random_state=0,
+        criterion=criterion,
+        max_patch_dims=(1, 5),
+        data_dims=(2, 5),
+    )
+    est.fit(X, y, sample_weight=sample_weight)
+    importances = est.feature_importances_
+    assert np.all(importances >= 0.0)
+
+    for scale in [0.5, 100]:
+        est = PatchObliqueRandomForestRegressor(
+            n_estimators=10,
+            random_state=0,
+            criterion=criterion,
+            max_patch_dims=(1, 5),
+            data_dims=(2, 5),
+        )
+        est.fit(X, y, sample_weight=scale * sample_weight)
+        importances_bis = est.feature_importances_
+        assert np.mean(importances - importances_bis) < tolerance
