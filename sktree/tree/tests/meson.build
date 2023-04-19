@@ -1,6 +1,7 @@
 python_sources = [
   '__init__.py',
   'test_tree.py',
+  'test_utils.py'
 ]
 
 py3.install_sources(

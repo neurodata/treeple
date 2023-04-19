@@ -35,8 +35,7 @@ requires = [
     "setuptools<=65.5",
     "packaging",
     "Cython>=0.29.24",
-    "scikit-learn@git+https://git@github.com/neurodata/scikit-learn.git@tree-featuresv2",
-    # "scikit-learn" = { git = "https://github.com/neurodata/scikit-learn.git", branch = 'split' },
+    "scikit-learn-tree>=1.2.2",
     "lazy_loader>=0.1",
 
     # We follow scipy for much of these pinnings
@@ -72,7 +71,7 @@ files = ["sktree/__init__.py"]
 python = ">=3.8,<3.11"
 numpy = "^1.23.0"
 scipy = "^1.9.0"
-scikit-learn = { git = "https://github.com/neurodata/scikit-learn.git", branch = 'newtreev2' }
+scikit-learn-tree = "^1.2.2"
 importlib-resources = { version = "*", python = "<3.9" }
 
 [tool.poetry.group.test]
@@ -128,18 +127,19 @@ _apply_version = 'semversioner release'
 
 type_check = 'mypy -p sktree --config-file pyproject.toml'
 unit_test = 'pytest ./sktree --cov=sktree --cov-report=xml --cov-config=pyproject.toml'
-build_docs = 'make -C docs/ clean html-noplot'
+build_docs = 'make -C docs/ clean html'
+build_docs_noplot = 'make -C docs/ clean html-noplot'
 clean = { shell = 'rm -rf builddir; rm -rf clean; rm -rf build; rm -rf _build; rm -rf dist;' }
 
 [[tool.poe.tasks.lint]]
 sequence = ['_flake8', '_bandit', '_codespell', '_pydocstyle']
 ignore_fail = 'return_non_zero'
 
-[[tool.poe.tasks.apply_format]]
+[[tool.poe.tasks.format]]
 sequence = ['_black', '_isort']
 ignore_fail = 'return_non_zero'
 
-[[tool.poe.tasks.check_format]]
+[[tool.poe.tasks.format_check]]
 sequence = ['_black_check', '_isort_check']
 ignore_fail = 'return_non_zero'
 
@@ -147,7 +147,7 @@ ignore_fail = 'return_non_zero'
 # a standard verification sequence for use in pull requests
 #
 [[tool.poe.tasks.verify]]
-sequence = ['apply_format', 'lint', 'type_check', 'unit_test']
+sequence = ['format', 'lint', 'type_check', 'unit_test']
 ignore_fail = "return_non_zero"
 
 [[tool.poe.tasks.release]]
@@ -203,17 +203,17 @@ precision = 2
 exclude_dirs = ["sktree/tests", "sktree/tree/tests", 'sktree/_build_utils/*']
 skips = ['B404', 'B603']
 
-[tool.devpy]
+[tool.spin]
 package = 'sktree'
 
-[tool.devpy.commands]
-Build = ["devpy.cmds.meson.build", "devpy.cmds.meson.test"]
+[tool.spin.commands]
+Build = ["spin.cmds.meson.build", "spin.cmds.meson.test"]
 Environments = [
-    'devpy.cmds.meson.shell',
-    'devpy.cmds.meson.ipython',
-    'devpy.cmds.meson.python',
+    'spin.cmds.meson.shell',
+    'spin.cmds.meson.ipython',
+    'spin.cmds.meson.python',
 ]
-Documentation = ['.devpy/cmds.py:docs']
+Documentation = ['.spin/cmds.py:docs']
 Metrics = [
-    '.devpy/cmds.py:coverage',
+    '.spin/cmds.py:coverage',
 ]

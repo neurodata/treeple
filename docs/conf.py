@@ -17,12 +17,10 @@ from sphinx_gallery.sorting import ExampleTitleSortKey
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 curdir = os.path.dirname(__file__)
 sys.path.append(os.path.abspath(os.path.join(curdir, "../build-install/usr/lib/python3.9/site-packages/")))
-
+sys.path.insert(0, os.path.abspath("sphinxext"))
 import sktree
-import sktree.tree
-from sktree import UnsupervisedRandomForest
-from sktree.tree import UnsupervisedDecisionTree
-# sys.path.append(os.path.abspath(os.path.join(curdir, "..", "sktree")))
+
+sys.path.append(os.path.abspath(os.path.join(curdir, "..", "sktree")))
 
 # -- project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -69,6 +67,10 @@ extensions = [
     "sphinxcontrib.bibtex",
     "sphinx_copybutton",
     "sphinx_gallery.gen_gallery",
+    "doi_role",
+    "add_toctree_functions",
+    "allow_nan_estimators",
+    "matplotlib.sphinxext.plot_directive",
     "numpydoc",
 ]
 

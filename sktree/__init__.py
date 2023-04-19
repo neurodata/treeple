@@ -36,7 +36,7 @@ if __sktree_SETUP__:
     # process, as it may not be compiled yet
 else:
     try:
-        from . import tree
+        from . import tree, ensemble
         from .ensemble._unsupervised_forest import (
             UnsupervisedRandomForest,
             UnsupervisedObliqueRandomForest,
@@ -53,6 +53,7 @@ else:
 
     __all__ = [
         "tree",
+        "ensemble",
         "ObliqueRandomForestClassifier",
         "PatchObliqueRandomForestClassifier",
         "UnsupervisedRandomForest",
