@@ -163,6 +163,10 @@ cdef class BaseDensePatchSplitter(PatchSplitter):
         PatchSplitter.init(self, X, y, sample_weight)
 
         self.X = X
+
+        # XXX: idk if this works, but you can check it
+        feature_weights = np.sum(self.X, axis=0)
+
         return 0
 
 cdef class BestPatchSplitter(BaseDensePatchSplitter):

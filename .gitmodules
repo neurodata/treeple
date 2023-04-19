@@ -1,0 +1,3 @@
+[submodule "sktree/sklearn_fork"]
+	path = sktree/sklearn_fork
+	url = https://github.com/scikit-learn/scikit-learn

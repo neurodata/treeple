@@ -42,12 +42,15 @@ cdef class BaseObliqueSplitter(Splitter):
     # Base class for oblique splitting, where additional data structures and API is defined.
     #
 
-    # Oblique Splitting extra parameters
+    # Oblique Splitting extra parameters (mtry, n_dims) matrix
     cdef vector[vector[DTYPE_t]] proj_mat_weights       # nonzero weights of sparse proj_mat matrix
     cdef vector[vector[SIZE_t]] proj_mat_indices        # nonzero indices of sparse proj_mat matrix
 
     # TODO: assumes all oblique splitters only work with dense data
     cdef const DTYPE_t[:, :] X
+    
+    # feature weights across (n_dims,)
+    cdef DTYPE_t[:] feature_weights
 
     # All oblique splitters (i.e. non-axis aligned splitters) require a
     # function to sample a projection matrix that is applied to the feature matrix

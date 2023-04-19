@@ -162,7 +162,7 @@ cdef class BaseObliqueSplitter(Splitter):
         cdef SIZE_t end = self.end
 
         # pointer array to store feature values to split on
-        cdef DTYPE_t[::1]  Xf = self.feature_values
+        cdef DTYPE_t[::1]  feature_values = self.feature_values
         cdef SIZE_t max_features = self.max_features
         cdef SIZE_t min_samples_leaf = self.min_samples_leaf
         cdef double min_weight_leaf = self.min_weight_leaf
@@ -184,6 +184,9 @@ cdef class BaseObliqueSplitter(Splitter):
         # Sample the projection matrix
         self.sample_proj_mat(self.proj_mat_weights, self.proj_mat_indices)
 
+        # initialize feature weight to normalize across patch
+        cdef DTYPE_t patch_weight
+
         # For every vector in the projection matrix
         for feat_i in range(max_features):
             # Projection vector has no nonzeros
@@ -199,21 +202,41 @@ cdef class BaseObliqueSplitter(Splitter):
             # Compute linear combination of features and then
             # sort samples according to the feature values.
             for idx in range(start, end):
+                patch_weight = 0.0
+                
                 # initialize the feature value to 0
-                Xf[idx] = 0
+                feature_values[idx] = 0
                 for jdx in range(0, current_split.proj_vec_indices.size()):
-                    Xf[idx] += self.X[
+                    feature_values[idx] += self.X[
                         samples[idx], deref(current_split.proj_vec_indices)[jdx]
                     ] * deref(current_split.proj_vec_weights)[jdx]
+                    
+                    # gets the feature weight for this specific column from X
+                    # the default of feature_weights[i] is (1/n_features) for all i
+                    patch_weight += self.feature_weights[deref(current_split.proj_vec_indices)[jdx]]
+                
+                feature_values[idx] /= patch_weight
+                # for one row in X:
+                # X (values): 0.1 | 0.01 | 0.2
+                # freqs: 1/10 | 1/100 | 1/5 
+                # samples: 1 | 1 | 1
+                # 
+                # MORF currently would do: 0.1 + 0.01 + 0.2 = 0.31
+                # What we want is: "element-wise addition" 1/10 + 1/100 + 1/5 = 3/115 = 0.0261
+
+                # In actuality, X is (10, 3)
+                # total samples in column: 10 | 100 | 5
+                # feature_weight is (n_features,)
+                # if we pass in column weights, 
 
             # Sort the samples
-            sort(&Xf[start], &samples[start], end - start)
+            sort(&feature_values[start], &samples[start], end - start)
 
             # Evaluate all splits
             self.criterion.reset()
             p = start
             while p < end:
-                while (p + 1 < end and Xf[p + 1] <= Xf[p] + FEATURE_THRESHOLD):
+                while (p + 1 < end and feature_values[p + 1] <= feature_values[p] + FEATURE_THRESHOLD):
                     p += 1
 
                 p += 1
@@ -238,14 +261,14 @@ cdef class BaseObliqueSplitter(Splitter):
                     if current_proxy_improvement > best_proxy_improvement:
                         best_proxy_improvement = current_proxy_improvement
                         # sum of halves is used to avoid infinite value
-                        current_split.threshold = Xf[p - 1] / 2.0 + Xf[p] / 2.0
+                        current_split.threshold = feature_values[p - 1] / 2.0 + feature_values[p] / 2.0
 
                         if (
-                            (current_split.threshold == Xf[p]) or
+                            (current_split.threshold == feature_values[p]) or
                             (current_split.threshold == INFINITY) or
                             (current_split.threshold == -INFINITY)
                         ):
-                            current_split.threshold = Xf[p - 1]
+                            current_split.threshold = feature_values[p - 1]
 
                         best_split = current_split  # copy
 
@@ -351,6 +374,9 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         # create a helper array for allowing efficient Fisher-Yates
         self.indices_to_sample = np.arange(self.max_features * self.n_features,
                                            dtype=np.intp)
+
+        # XXX: Just to initialize stuff
+        self.feature_weights = np.ones((self.n_features,), dtype=DTYPE_t) / self.n_features
         return 0
 
 

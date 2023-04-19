@@ -11,7 +11,9 @@
 import numpy as np
 
 cimport numpy as cnp
+
 from libcpp.vector cimport vector
+
 from sklearn.tree._splitter cimport SplitRecord
 from sklearn.tree._tree cimport DOUBLE_t  # Type of y, sample_weight
 from sklearn.tree._tree cimport DTYPE_t  # Type of X
