@@ -7,11 +7,9 @@ from numpy.testing import (
     assert_array_almost_equal,
     assert_array_equal,
 )
-from scipy.sparse import csc_matrix
-from scipy.sparse import csr_matrix
-from scipy.sparse import coo_matrix
+from scipy.sparse import coo_matrix, csc_matrix, csr_matrix
 from sklearn import datasets
-from sklearn.base import is_classifier, is_regressor
+from sklearn.base import is_classifier
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.datasets import make_blobs
 from sklearn.metrics import (
@@ -21,14 +19,12 @@ from sklearn.metrics import (
     mean_squared_error,
 )
 from sklearn.model_selection import cross_val_score
-from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
-from sklearn.tree._classes import CRITERIA_CLF, CRITERIA_REG, DENSE_SPLITTERS, SPARSE_SPLITTERS
+from sklearn.random_projection import _sparse_random_matrix
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.tree._tree import TREE_LEAF
-from sklearn.utils import compute_sample_weight
 from sklearn.utils._testing import skip_if_32bit
 from sklearn.utils.estimator_checks import parametrize_with_checks
 from sklearn.utils.validation import check_random_state
-from sklearn.random_projection import _sparse_random_matrix
 
 from sktree.tree import (
     ObliqueDecisionTreeClassifier,
