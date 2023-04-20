@@ -128,6 +128,8 @@ splitter = BestPatchSplitterTester(
     max_patch_dims,
     dim_contiguous,
     data_dims,
+    False,
+    None,
 )
 splitter.init_test(X, y, sample_weight)
 
