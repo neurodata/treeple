@@ -15,15 +15,13 @@ cimport numpy as cnp
 
 cnp.import_array()
 
-from scipy.sparse import csr_matrix, issparse
-
 from cython.operator cimport dereference as deref
 from sklearn.tree._utils cimport safe_realloc
 
 
 # Gets Node dtype exposed inside oblique_tree.
 # See "_tree.pyx" for more details.
-cdef Node dummy;
+cdef Node dummy
 NODE_DTYPE = np.asarray(<Node[:1]>(&dummy)).dtype
 
 # Mitigate precision differences between 32 bit and 64 bit
@@ -156,10 +154,10 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
                 self.proj_vec_weights[i].push_back(weight)
                 self.proj_vec_indices[i].push_back(j)
 
-        nodes = memcpy(self.nodes, cnp.PyArray_DATA(node_ndarray),
-                       self.capacity * sizeof(Node))
-        value = memcpy(self.value, cnp.PyArray_DATA(value_ndarray),
-                       self.capacity * self.value_stride * sizeof(double))
+        memcpy(self.nodes, cnp.PyArray_DATA(node_ndarray),
+               self.capacity * sizeof(Node))
+        memcpy(self.value, cnp.PyArray_DATA(value_ndarray),
+               self.capacity * self.value_stride * sizeof(double))
 
     cpdef cnp.ndarray get_projection_matrix(self):
         """Get the projection matrix of shape (node_count, n_features)."""

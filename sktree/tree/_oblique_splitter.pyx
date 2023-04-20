@@ -142,6 +142,32 @@ cdef class BaseObliqueSplitter(Splitter):
 
         return sizeof(ObliqueSplitRecord)
 
+    cdef void compute_features_over_samples(
+        self,
+        SIZE_t start,
+        SIZE_t end,
+        const SIZE_t[:] samples,
+        DTYPE_t[:] feature_values,
+        vector[DTYPE_t]* proj_vec_weights,  # weights of the vector (max_features,)
+        vector[SIZE_t]* proj_vec_indices    # indices of the features (max_features,)
+    ) noexcept nogil:
+        """Compute the feature values for the samples[start:end] range.
+
+        Returns -1 in case of failure to allocate memory (and raise MemoryError)
+        or 0 otherwise.
+        """
+        cdef SIZE_t idx, jdx
+
+        # Compute linear combination of features and then
+        # sort samples according to the feature values.
+        for idx in range(start, end):
+            # initialize the feature value to 0
+            feature_values[idx] = 0
+            for jdx in range(0, proj_vec_indices.size()):
+                feature_values[idx] += self.X[
+                    samples[idx], deref(proj_vec_indices)[jdx]
+                ] * deref(proj_vec_weights)[jdx]
+
     cdef int node_split(
         self,
         double impurity,
@@ -174,7 +200,6 @@ cdef class BaseObliqueSplitter(Splitter):
         cdef double best_proxy_improvement = -INFINITY
 
         cdef SIZE_t feat_i, p       # index over computed features and start/end
-        cdef SIZE_t idx, jdx        # index over max_feature, and
         cdef SIZE_t partition_end
         cdef DTYPE_t temp_d         # to compute a projection feature value
 
@@ -183,9 +208,6 @@ cdef class BaseObliqueSplitter(Splitter):
 
         # Sample the projection matrix
         self.sample_proj_mat(self.proj_mat_weights, self.proj_mat_indices)
-
-        # initialize feature weight to normalize across patch
-        cdef DTYPE_t patch_weight
 
         # For every vector in the projection matrix
         for feat_i in range(max_features):
@@ -201,33 +223,14 @@ cdef class BaseObliqueSplitter(Splitter):
 
             # Compute linear combination of features and then
             # sort samples according to the feature values.
-            for idx in range(start, end):
-                patch_weight = 0.0
-                
-                # initialize the feature value to 0
-                feature_values[idx] = 0
-                for jdx in range(0, current_split.proj_vec_indices.size()):
-                    feature_values[idx] += self.X[
-                        samples[idx], deref(current_split.proj_vec_indices)[jdx]
-                    ] * deref(current_split.proj_vec_weights)[jdx]
-                    
-                    # gets the feature weight for this specific column from X
-                    # the default of feature_weights[i] is (1/n_features) for all i
-                    patch_weight += self.feature_weights[deref(current_split.proj_vec_indices)[jdx]]
-                
-                feature_values[idx] /= patch_weight
-                # for one row in X:
-                # X (values): 0.1 | 0.01 | 0.2
-                # freqs: 1/10 | 1/100 | 1/5 
-                # samples: 1 | 1 | 1
-                # 
-                # MORF currently would do: 0.1 + 0.01 + 0.2 = 0.31
-                # What we want is: "element-wise addition" 1/10 + 1/100 + 1/5 = 3/115 = 0.0261
-
-                # In actuality, X is (10, 3)
-                # total samples in column: 10 | 100 | 5
-                # feature_weight is (n_features,)
-                # if we pass in column weights, 
+            self.compute_features_over_samples(
+                start,
+                end,
+                samples,
+                feature_values,
+                &self.proj_mat_weights[feat_i],
+                &self.proj_mat_indices[feat_i]
+            )
 
             # Sort the samples
             sort(&feature_values[start], &samples[start], end - start)
@@ -376,7 +379,7 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
                                            dtype=np.intp)
 
         # XXX: Just to initialize stuff
-        self.feature_weights = np.ones((self.n_features,), dtype=DTYPE_t) / self.n_features
+        # self.feature_weights = np.ones((self.n_features,), dtype=DTYPE_t) / self.n_features
         return 0
 
 

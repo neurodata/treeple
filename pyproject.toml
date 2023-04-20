@@ -217,3 +217,24 @@ Documentation = ['.spin/cmds.py:docs']
 Metrics = [
     '.spin/cmds.py:coverage',
 ]
+
+[tool.cython-lint]
+# Ignore the same error codes as flake8
+# + E501 (line too long) because keeping it < 88 in cython
+# often makes code less readable.
+ignore = [
+    # check ignored by default in flake8. Meaning unclear.
+    'E24',
+    # space before : (needed for how black formats slicing)
+    'E203',
+    # line too long
+    'E501',
+    # do not assign a lambda expression, use a def
+    'E731',
+    # do not use variables named 'l', 'O', or 'I'
+    'E741',
+    # line break before binary operator
+    'W503',
+    # line break after binary operator
+    'W504',
+]

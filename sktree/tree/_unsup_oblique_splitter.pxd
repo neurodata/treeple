@@ -14,14 +14,14 @@ from ._unsup_splitter cimport UnsupervisedSplitter
 
 cdef struct ObliqueSplitRecord:
     # Data to track sample split
-    SIZE_t feature         # Which feature to split on.
-    SIZE_t pos             # Split samples array at the given position,
-                           # i.e. count of samples below threshold for feature.
-                           # pos is >= end if the node is a leaf.
-    double threshold       # Threshold to split at.
-    double improvement     # Impurity improvement given parent node.
-    double impurity_left   # Impurity of the left split.
-    double impurity_right  # Impurity of the right split.
+    SIZE_t feature              # Which feature to split on.
+    SIZE_t pos                  # Split samples array at the given position,
+    #                           # i.e. count of samples below threshold for feature.
+    #                           # pos is >= end if the node is a leaf.
+    double threshold            # Threshold to split at.
+    double improvement          # Impurity improvement given parent node.
+    double impurity_left        # Impurity of the left split.
+    double impurity_right       # Impurity of the right split.
 
     vector[DTYPE_t]* proj_vec_weights   # weights of the vector (max_features,)
     vector[SIZE_t]* proj_vec_indices    # indices of the features (max_features,)
@@ -47,14 +47,14 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
     # All oblique splitters (i.e. non-axis aligned splitters) require a
     # function to sample a projection matrix that is applied to the feature matrix
     # to quickly obtain the sampled projections for candidate splits.
-    cdef void sample_proj_mat(self, 
+    cdef void sample_proj_mat(self,
                               vector[vector[DTYPE_t]]& proj_mat_weights,
-                              vector[vector[SIZE_t]]& proj_mat_indices) nogil 
+                              vector[vector[SIZE_t]]& proj_mat_indices) nogil
 
     # Redefined here since the new logic requires calling sample_proj_mat
     cdef int node_reset(self, SIZE_t start, SIZE_t end,
                         double* weighted_n_node_samples) except -1 nogil
-                        
+
     cdef int node_split(self,
                         double impurity,   # Impurity of the node
                         SplitRecord* split,

@@ -1071,6 +1071,12 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
     data_dims : array-like, optional
         The presumed dimensions of the un-vectorized feature vector, by default
         will be a 1D vector with (1, n_features) shape.
+    normalize_columns : bool, optional
+        Whether or not to normalize the columns of the feature vector, by
+        default False.
+    boundary : optional, str in {'wrap'}
+        The boundary condition to use when sampling patches, by default None.
+        'wrap' corresponds to the boundary condition as is in numpy and scipy.
 
     Attributes
     ----------
@@ -1149,6 +1155,8 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         "max_patch_dims": ["array-like", None],
         "data_dims": ["array-like", None],
         "dim_contiguous": ["array-like", None],
+        "normalize_columns": ["bool"],
+        "boundary": ["str", None],
     }
 
     def __init__(
@@ -1169,6 +1177,8 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         max_patch_dims=None,
         dim_contiguous=None,
         data_dims=None,
+        normalize_columns=False,
+        boundary=None,
     ):
         super().__init__(
             criterion=criterion,
@@ -1188,6 +1198,8 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         self.max_patch_dims = max_patch_dims
         self.dim_contiguous = dim_contiguous
         self.data_dims = data_dims
+        self.normalize_columns = normalize_columns
+        self.boundary = boundary
 
     def fit(self, X, y, sample_weight=None, check_input=True):
         """Fit tree.
@@ -1370,6 +1382,8 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
                 self.max_patch_dims_,
                 self.dim_contiguous_,
                 self.data_dims_,
+                self.normalize_columns,
+                self.boundary,
             )
 
         if is_classifier(self):

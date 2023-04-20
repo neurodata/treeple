@@ -23,8 +23,8 @@ from ._unsup_tree cimport UnsupervisedTree
 
 
 cdef class UnsupervisedObliqueTree(UnsupervisedTree):
-    cdef vector[vector[DTYPE_t]] proj_vec_weights # (capacity, n_features) array of projection vectors
-    cdef vector[vector[SIZE_t]] proj_vec_indices  # (capacity, n_features) array of projection vectors
+    cdef vector[vector[DTYPE_t]] proj_vec_weights  # (capacity, n_features) array of projection vectors
+    cdef vector[vector[SIZE_t]] proj_vec_indices   # (capacity, n_features) array of projection vectors
 
     # overridden methods
     cdef int _resize_c(

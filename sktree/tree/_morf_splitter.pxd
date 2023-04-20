@@ -11,9 +11,7 @@
 import numpy as np
 
 cimport numpy as cnp
-
 from libcpp.vector cimport vector
-
 from sklearn.tree._splitter cimport SplitRecord
 from sklearn.tree._tree cimport DOUBLE_t  # Type of y, sample_weight
 from sklearn.tree._tree cimport DTYPE_t  # Type of X
@@ -50,15 +48,18 @@ cdef class PatchSplitter(BaseObliqueSplitter):
     cdef public SIZE_t data_width                       # Width of the input data
 
     cdef public SIZE_t ndim                       # The number of dimensions of the input data
-    
+
     cdef SIZE_t[:] data_dims                      # The dimensions of the input data
     cdef SIZE_t[:] min_patch_dims                 # The minimum size of the patch to sample in each dimension
     cdef SIZE_t[:] max_patch_dims                 # The maximum size of the patch to sample in each dimension
     cdef cnp.uint8_t[:] dim_contiguous            # A boolean array indicating whether each dimension is contiguous
-    
+
     # TODO: check if this works and is necessary for discontiguous data
     # cdef SIZE_t[:] stride_offsets                # The stride offsets for each dimension
     cdef bint _discontiguous
+
+    cdef str boundary                            # how to sample the patch with boundary in mind
+    cdef bint normalize_columns                  # Whether or not to normalize each column of X when adding in a patch
 
     cdef SIZE_t[::1] _index_data_buffer
     cdef SIZE_t[::1] _index_patch_buffer
@@ -73,10 +74,10 @@ cdef class PatchSplitter(BaseObliqueSplitter):
     ) noexcept nogil
 
     cdef void sample_proj_mat(
-        self, 
+        self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
         vector[vector[SIZE_t]]& proj_mat_indices
-    ) nogil 
+    ) nogil
 
 
 cdef class UserKernelSplitter(PatchSplitter):

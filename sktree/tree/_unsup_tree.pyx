@@ -19,14 +19,13 @@ from libcpp.vector cimport vector
 
 import struct
 
+from scipy.sparse import issparse
+
 import numpy as np
 
 cimport numpy as cnp
 
 cnp.import_array()
-
-from scipy.sparse import csr_matrix, issparse
-
 
 cdef extern from "numpy/arrayobject.h":
     object PyArray_NewFromDescr(PyTypeObject* subtype, cnp.dtype descr,
@@ -716,10 +715,10 @@ cdef class UnsupervisedTree(BaseTree):
         if self._resize_c(self.capacity) != 0:
             raise MemoryError("resizing tree to %d" % self.capacity)
 
-        nodes = memcpy(self.nodes, cnp.PyArray_DATA(node_ndarray),
-                       self.capacity * sizeof(Node))
-        value = memcpy(self.value, cnp.PyArray_DATA(value_ndarray),
-                       self.capacity * self.value_stride * sizeof(double))
+        memcpy(self.nodes, cnp.PyArray_DATA(node_ndarray),
+               self.capacity * sizeof(Node))
+        memcpy(self.value, cnp.PyArray_DATA(value_ndarray),
+               self.capacity * self.value_stride * sizeof(double))
 
     cdef int _set_split_node(
         self,

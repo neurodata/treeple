@@ -37,7 +37,7 @@ cdef class UnsupervisedTree(BaseTree):
     # Methods
     cdef cnp.ndarray _get_value_ndarray(self)
     cdef cnp.ndarray _get_node_ndarray(self)
-    
+
     # Overridden Methods
     cdef int _set_split_node(
         self,
@@ -60,7 +60,7 @@ cdef class UnsupervisedTree(BaseTree):
         cnp.float64_t[:] importances,
         Node* node
     ) noexcept nogil
-    
+
 # =============================================================================
 # Tree builder
 # =============================================================================
