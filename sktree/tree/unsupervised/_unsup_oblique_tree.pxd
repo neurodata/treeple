@@ -18,7 +18,7 @@ from sklearn.tree._tree cimport SIZE_t  # Type for indices and counters
 from sklearn.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
 from sklearn.tree._tree cimport Node
 
-from ._oblique_splitter cimport ObliqueSplitRecord
+from .._oblique_splitter cimport ObliqueSplitRecord
 from ._unsup_tree cimport UnsupervisedTree
 
 

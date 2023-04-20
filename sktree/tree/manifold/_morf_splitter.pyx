@@ -16,7 +16,7 @@ from libcpp.vector cimport vector
 from sklearn.tree._criterion cimport Criterion
 from sklearn.tree._utils cimport rand_int
 
-from ._utils cimport ravel_multi_index_cython, unravel_index_cython
+from .._utils cimport ravel_multi_index_cython, unravel_index_cython
 
 
 cdef class PatchSplitter(BaseObliqueSplitter):

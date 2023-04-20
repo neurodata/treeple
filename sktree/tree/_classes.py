@@ -12,21 +12,17 @@ from sklearn.tree._tree import BestFirstTreeBuilder, DepthFirstTreeBuilder
 from sklearn.utils._param_validation import Interval
 from sklearn.utils.validation import check_is_fitted
 
-from . import (  # type: ignore
-    _morf_splitter,
-    _oblique_splitter,
-    _unsup_criterion,
-    _unsup_oblique_splitter,
-    _unsup_splitter,
-)
-from ._morf_splitter import PatchSplitter
+from . import _oblique_splitter
 from ._oblique_splitter import ObliqueSplitter
 from ._oblique_tree import ObliqueTree
-from ._unsup_criterion import UnsupervisedCriterion
-from ._unsup_oblique_splitter import UnsupervisedObliqueSplitter
-from ._unsup_oblique_tree import UnsupervisedObliqueTree
-from ._unsup_splitter import UnsupervisedSplitter
-from ._unsup_tree import (  # type: ignore
+from .manifold import _morf_splitter
+from .manifold._morf_splitter import PatchSplitter
+from .unsupervised import _unsup_criterion, _unsup_oblique_splitter, _unsup_splitter
+from .unsupervised._unsup_criterion import UnsupervisedCriterion
+from .unsupervised._unsup_oblique_splitter import UnsupervisedObliqueSplitter
+from .unsupervised._unsup_oblique_tree import UnsupervisedObliqueTree
+from .unsupervised._unsup_splitter import UnsupervisedSplitter
+from .unsupervised._unsup_tree import (  # type: ignore
     UnsupervisedBestFirstTreeBuilder,
     UnsupervisedDepthFirstTreeBuilder,
     UnsupervisedTree,
@@ -1155,8 +1151,8 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         "max_patch_dims": ["array-like", None],
         "data_dims": ["array-like", None],
         "dim_contiguous": ["array-like", None],
-        "normalize_columns": ["bool"],
-        "boundary": ["str", None],
+        "normalize_columns": [bool],
+        "boundary": [str, None],
     }
 
     def __init__(

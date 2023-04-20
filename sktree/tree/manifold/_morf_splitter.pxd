@@ -20,7 +20,7 @@ from sklearn.tree._tree cimport SIZE_t  # Type for indices and counters
 from sklearn.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
 from sklearn.utils._sorting cimport simultaneous_sort
 
-from ._oblique_splitter cimport BaseObliqueSplitter, ObliqueSplitRecord
+from .._oblique_splitter cimport BaseObliqueSplitter, ObliqueSplitRecord
 
 # https://github.com/cython/cython/blob/master/Cython/Includes/libcpp/algorithm.pxd
 # shows how to include standard library functions in Cython
@@ -81,5 +81,20 @@ cdef class PatchSplitter(BaseObliqueSplitter):
 
 
 cdef class UserKernelSplitter(PatchSplitter):
-    """An class to hold user-specified kernels."""
+    """A class to hold user-specified kernels."""
     cdef vector[DTYPE_t[:, ::1]] kernel_dictionary  # A list of C-contiguous 2D kernels
+
+
+cdef class GaussianKernelSplitter(PatchSplitter):
+    """A class to hold Gaussian kernels.
+    
+    Overrides the weights that are generated to be sampled from a Gaussian distribution.
+    See: https://www.tutorialspoint.com/gaussian-filter-generation-in-cplusplus
+    See: https://gist.github.com/thomasaarholt/267ec4fff40ca9dff1106490ea3b7567
+    """
+
+    cdef void sample_proj_mat(
+        self,
+        vector[vector[DTYPE_t]]& proj_mat_weights,
+        vector[vector[SIZE_t]]& proj_mat_indices
+    ) nogil
