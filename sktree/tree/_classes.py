@@ -1969,6 +1969,7 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
     data_dims : array-like, optional
         The presumed dimensions of the un-vectorized feature vector, by default
         will be a 1D vector with (1, n_features) shape.
+<<<<<<< HEAD
     boundary : optional, str {'wrap'}
         The boundary condition to use when sampling patches, by default None.
         'wrap' corresponds to the boundary condition as is in numpy and scipy.
@@ -1978,6 +1979,8 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         patches that are generated. The feature weights are used
         as follows: for every patch that is sampled, the feature weights over
         the entire patch is summed and normalizes the patch.
+=======
+>>>>>>> 5f8d515 (fix tests for regressor trees/forests)
 
     Attributes
     ----------
