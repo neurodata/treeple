@@ -52,3 +52,8 @@ We use type checking to check for possible runtime errors due to mismatched type
 In order for any code to be added to the repository, we require unit tests to pass. Any new code should be accompanied by unit tests.
 
     poetry run poe unit_test
+
+# Cython and C++
+The general design of scikit-tree follows that of the tree-models inside scikit-learn, where tree-based models are inherently Cythonized, or written with C++. Then the actual forest (e.g. RandomForest, or ExtraForest) is just a Python API wrapper that creates an ensemble of the trees.
+
+In order to develop new tree models, generally Cython and C++ code will need to be written in order to optimize the tree building process, otherwise fitting a single forest model would take very long.
