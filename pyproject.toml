@@ -26,7 +26,7 @@ include = [
 [build-system]
 build-backend = "mesonpy"
 requires = [
-    "meson-python>=0.12.0",
+    "meson-python>=0.13.0",
     'ninja',
     # `wheel` is needed for non-isolated builds, given that `meson-python`
     # doesn't list it as a runtime requirement (at least in 0.10.0)
@@ -118,6 +118,7 @@ _flake8 = 'flake8'
 _bandit = 'bandit -r sktree -c pyproject.toml'
 _black = 'black .'
 _isort = 'isort .'
+_cythonlint = 'cython-lint sktree/'
 _black_check = 'black --check sktree examples'
 _isort_check = 'isort --check .'
 _pydocstyle = 'pydocstyle ./sktree'
@@ -132,7 +133,7 @@ build_docs_noplot = 'make -C docs/ clean html-noplot'
 clean = { shell = 'rm -rf builddir; rm -rf clean; rm -rf build; rm -rf _build; rm -rf dist;' }
 
 [[tool.poe.tasks.lint]]
-sequence = ['_flake8', '_bandit', '_codespell', '_pydocstyle']
+sequence = ['_flake8', '_bandit', '_codespell', '_pydocstyle', '_cythonlint']
 ignore_fail = 'return_non_zero'
 
 [[tool.poe.tasks.format]]

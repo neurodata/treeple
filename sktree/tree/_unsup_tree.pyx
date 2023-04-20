@@ -19,9 +19,8 @@ from libcpp.vector cimport vector
 
 import struct
 
-from scipy.sparse import issparse
-
 import numpy as np
+from scipy.sparse import issparse
 
 cimport numpy as cnp
 
