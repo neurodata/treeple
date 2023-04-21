@@ -494,6 +494,13 @@ class PatchObliqueRandomForestClassifier(ForestClassifier):
     data_dims : array-like, optional
         The presumed dimensions of the un-vectorized feature vector, by default
         will be a 1D vector with (1, n_features) shape.
+    boundary : optional, str {'wrap'}
+        The boundary condition to use when sampling patches, by default None.
+        'wrap' corresponds to the boundary condition as is in numpy and scipy.
+    normalize_columns : bool, optional
+        Whether or not to normalize the columns of the feature vector, by
+        default False. XXX: this is not really a good way to implement this,
+        so don't use it unless you know what's going on.
 
     Attributes
     ----------
@@ -611,6 +618,8 @@ class PatchObliqueRandomForestClassifier(ForestClassifier):
         max_patch_dims=None,
         dim_contiguous=None,
         data_dims=None,
+        boundary=None,
+        normalize_columns=False,
     ):
         super().__init__(
             estimator=PatchObliqueDecisionTreeClassifier(),
@@ -629,6 +638,8 @@ class PatchObliqueRandomForestClassifier(ForestClassifier):
                 "max_patch_dims",
                 "dim_contiguous",
                 "data_dims",
+                "boundary",
+                "normalize_columns",
             ),
             bootstrap=bootstrap,
             oob_score=oob_score,
@@ -649,6 +660,8 @@ class PatchObliqueRandomForestClassifier(ForestClassifier):
         self.max_patch_dims = max_patch_dims
         self.dim_contiguous = dim_contiguous
         self.data_dims = data_dims
+        self.boundary = boundary
+        self.normalize_columns = normalize_columns
 
         # unused by oblique forests
         self.min_weight_fraction_leaf = min_weight_fraction_leaf
