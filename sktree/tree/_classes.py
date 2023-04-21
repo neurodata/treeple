@@ -1070,7 +1070,7 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
     normalize_columns : bool, optional
         Whether or not to normalize the columns of the feature vector, by
         default False.
-    boundary : optional, str in {'wrap'}
+    boundary : optional, str {'wrap'}
         The boundary condition to use when sampling patches, by default None.
         'wrap' corresponds to the boundary condition as is in numpy and scipy.
 
