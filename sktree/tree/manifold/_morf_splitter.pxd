@@ -87,7 +87,7 @@ cdef class UserKernelSplitter(PatchSplitter):
 
 cdef class GaussianKernelSplitter(PatchSplitter):
     """A class to hold Gaussian kernels.
-    
+
     Overrides the weights that are generated to be sampled from a Gaussian distribution.
     See: https://www.tutorialspoint.com/gaussian-filter-generation-in-cplusplus
     See: https://gist.github.com/thomasaarholt/267ec4fff40ca9dff1106490ea3b7567
