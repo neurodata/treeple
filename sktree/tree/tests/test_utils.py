@@ -5,8 +5,8 @@ import numpy as np
 from numpy.testing import assert_equal
 from sklearn.tree._criterion import Gini
 
-from ..manifold._morf_splitter import BestPatchSplitterTester
 from .._utils import ravel_multi_index, unravel_index
+from ..manifold._morf_splitter import BestPatchSplitterTester
 
 
 def is_contiguous_patch(patch_arr, patch_indices, data_dims):
