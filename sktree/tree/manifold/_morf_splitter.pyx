@@ -35,8 +35,8 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         SIZE_t[:] max_patch_dims,
         cnp.uint8_t[::1] dim_contiguous,
         SIZE_t[:] data_dims,
-        bint normalize_columns,
         str boundary,
+        DTYPE_t[:] feature_weight,
         *argv
     ):
         self.criterion = criterion
@@ -78,7 +78,7 @@ cdef class PatchSplitter(BaseObliqueSplitter):
             self._discontiguous = False
 
         self.boundary = boundary
-        self.normalize_columns = normalize_columns
+        self.feature_weight = feature_weight
 
     def __getstate__(self):
         return {}
@@ -94,10 +94,6 @@ cdef class PatchSplitter(BaseObliqueSplitter):
     ) except -1:
         BaseObliqueSplitter.init(self, X, y, sample_weight)
 
-        if self.normalize_columns:
-            self.feature_weights = np.sum(X, axis=0)
-        else:
-            self.feature_weights = None
         return 0
 
     cdef int node_reset(
@@ -417,12 +413,12 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
                     samples[idx], deref(proj_vec_indices)[jdx]
                 ] * deref(proj_vec_weights)[jdx]
 
-                if self.normalize_columns:
+                if self.feature_weight is not None:
                     # gets the feature weight for this specific column from X
                     # the default of feature_weights[i] is (1/n_features) for all i
-                    patch_weight += self.feature_weights[deref(proj_vec_indices)[jdx]]
+                    patch_weight += self.feature_weight[deref(proj_vec_indices)[jdx]]
 
-            if self.normalize_columns:
+            if self.feature_weight is not None:
                 feature_values[idx] /= patch_weight
 
 

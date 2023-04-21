@@ -59,7 +59,7 @@ cdef class PatchSplitter(BaseObliqueSplitter):
     cdef bint _discontiguous
 
     cdef str boundary                            # how to sample the patch with boundary in mind
-    cdef bint normalize_columns                  # Whether or not to normalize each column of X when adding in a patch
+    cdef DTYPE_t[:] feature_weight               # Whether or not to normalize each column of X when adding in a patch
 
     cdef SIZE_t[::1] _index_data_buffer
     cdef SIZE_t[::1] _index_patch_buffer

@@ -92,6 +92,9 @@ def test_best_patch_splitter_contiguous():
     max_patch_dims = np.array((2, 3, 6))
     dim_contiguous = np.array((True, True, True))
 
+    boundary = None
+    feature_weight = None
+
     splitter = BestPatchSplitterTester(
         criterion,
         max_features,
@@ -102,8 +105,8 @@ def test_best_patch_splitter_contiguous():
         max_patch_dims,
         dim_contiguous,
         data_dims,
-        False,
-        None,
+        boundary,
+        feature_weight,
     )
     splitter.init_test(X, y, sample_weight)
 

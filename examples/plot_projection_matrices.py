@@ -58,6 +58,9 @@ min_samples_leaf = 1
 min_weight_leaf = 0.0
 random_state = np.random.RandomState(100)
 
+boundary = None
+feature_weight = None
+
 # initialize some dummy data
 X = np.repeat(np.arange(25).astype(np.float32), 5).reshape(5, -1)
 y = np.array([0, 0, 0, 1, 1]).reshape(-1, 1).astype(np.float64)
@@ -86,8 +89,8 @@ splitter = BestPatchSplitterTester(
     max_patch_dims,
     dim_contiguous,
     data_dims,
-    False,
-    None,
+    boundary,
+    feature_weight,
 )
 splitter.init_test(X, y, sample_weight)
 
@@ -130,8 +133,8 @@ splitter = BestPatchSplitterTester(
     max_patch_dims,
     dim_contiguous,
     data_dims,
-    False,
-    None,
+    boundary,
+    feature_weight,
 )
 splitter.init_test(X, y, sample_weight)
 
@@ -178,8 +181,8 @@ splitter = BestPatchSplitterTester(
     max_patch_dims,
     dim_contiguous,
     data_dims,
-    False,
-    None,
+    boundary,
+    feature_weight,
 )
 splitter.init_test(X, y, sample_weight)
 
@@ -240,8 +243,8 @@ splitter = BestPatchSplitterTester(
     max_patch_dims,
     dim_contiguous,
     data_dims,
-    False,
-    None,
+    boundary,
+    feature_weight,
 )
 splitter.init_test(X, y, sample_weight)
 

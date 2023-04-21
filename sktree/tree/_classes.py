@@ -1070,9 +1070,11 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
     boundary : optional, str {'wrap'}
         The boundary condition to use when sampling patches, by default None.
         'wrap' corresponds to the boundary condition as is in numpy and scipy.
-    normalize_columns : bool, optional
-        Whether or not to normalize the columns of the feature vector, by
-        default False.
+    feature_weight : array-like of shape (n_features,), default=None
+        Feature weights. If None, then features are equally weighted as is.
+        If provided, then the feature weights are used to weight the
+        patches that are generated. The feature weights are used
+        as follows:
 
     Attributes
     ----------
@@ -1151,8 +1153,8 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         "max_patch_dims": ["array-like", None],
         "data_dims": ["array-like", None],
         "dim_contiguous": ["array-like", None],
-        "normalize_columns": [bool],
         "boundary": [str, None],
+        "feature_weight": ["array-like", None],
     }
 
     def __init__(
@@ -1174,7 +1176,7 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         dim_contiguous=None,
         data_dims=None,
         boundary=None,
-        normalize_columns=False,
+        feature_weight=None,
     ):
         super().__init__(
             criterion=criterion,
@@ -1195,7 +1197,7 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         self.dim_contiguous = dim_contiguous
         self.data_dims = data_dims
         self.boundary = boundary
-        self.normalize_columns = normalize_columns
+        self.feature_weight = feature_weight
 
     def fit(self, X, y, sample_weight=None, check_input=True):
         """Fit tree.
@@ -1217,7 +1219,6 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         check_input : bool, optional
             Whether or not to check input, by default True.
         """
-
         if check_input:
             # Need to validate separately here.
             # We can't pass multi_output=True because that would allow y to be
@@ -1230,6 +1231,15 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
                 )
             else:
                 X = self._validate_data(X, **check_X_params)
+            if self.feature_weight is not None:
+                self.feature_weight = self._validate_data(
+                    self.feature_weight, ensure_2d=False, dtype=DTYPE
+                )
+                if self.feature_weight.shape[0] != X.shape[1]:
+                    raise ValueError(
+                        f"feature_weight has shape {self.feature_weight.shape} but X has "
+                        f"shape {X.shape}"
+                    )
             if issparse(X):
                 X.sort_indices()
 
@@ -1378,8 +1388,8 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
                 self.max_patch_dims_,
                 self.dim_contiguous_,
                 self.data_dims_,
-                self.normalize_columns,
                 self.boundary,
+                self.feature_weight,
             )
 
         if is_classifier(self):
