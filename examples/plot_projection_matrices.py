@@ -43,7 +43,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from sklearn.tree._criterion import Gini
-from sktree.tree._morf_splitter import BestPatchSplitterTester
+from sktree.tree.manifold._morf_splitter import BestPatchSplitterTester
 
 # %%
 # Initialize patch splitter
@@ -86,6 +86,8 @@ splitter = BestPatchSplitterTester(
     max_patch_dims,
     dim_contiguous,
     data_dims,
+    False,
+    None,
 )
 splitter.init_test(X, y, sample_weight)
 
@@ -176,6 +178,8 @@ splitter = BestPatchSplitterTester(
     max_patch_dims,
     dim_contiguous,
     data_dims,
+    False,
+    None,
 )
 splitter.init_test(X, y, sample_weight)
 
@@ -236,6 +240,8 @@ splitter = BestPatchSplitterTester(
     max_patch_dims,
     dim_contiguous,
     data_dims,
+    False,
+    None,
 )
 splitter.init_test(X, y, sample_weight)
 
