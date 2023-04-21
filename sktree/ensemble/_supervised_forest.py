@@ -497,6 +497,12 @@ class PatchObliqueRandomForestClassifier(ForestClassifier):
     boundary : optional, str {'wrap'}
         The boundary condition to use when sampling patches, by default None.
         'wrap' corresponds to the boundary condition as is in numpy and scipy.
+    feature_weight : array-like of shape (n_features,), default=None
+        Feature weights. If None, then features are equally weighted as is.
+        If provided, then the feature weights are used to weight the
+        patches that are generated. The feature weights are used
+        as follows: for every patch that is sampled, the feature weights over
+        the entire patch is summed and normalizes the patch.
 
     Attributes
     ----------

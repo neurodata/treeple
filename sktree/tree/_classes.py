@@ -1074,7 +1074,8 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         Feature weights. If None, then features are equally weighted as is.
         If provided, then the feature weights are used to weight the
         patches that are generated. The feature weights are used
-        as follows:
+        as follows: for every patch that is sampled, the feature weights over
+        the entire patch is summed and normalizes the patch.
 
     Attributes
     ----------
