@@ -436,6 +436,21 @@ def test_tree_deserialization_from_read_only_buffer(tmpdir, TREE):
     )
 
 
+def test_patch_oblique_tree_feature_weights():
+    """Test patch oblique tree when feature weights are passed in."""
+    X, y = digits.data, digits.target
+
+    with pytest.raises(ValueError, match="feature_weight has shape"):
+        clf = PatchObliqueDecisionTreeClassifier(
+            min_patch_dims=(2, 2),
+            max_patch_dims=(6, 6),
+            data_dims=(8, 8),
+            random_state=1,
+            feature_weight=[1, 1],
+        )
+        clf.fit(X, y)
+
+
 def test_patch_tree_higher_dims():
     """Test patch oblique tree when patch and data dimensions are higher."""
     pass
