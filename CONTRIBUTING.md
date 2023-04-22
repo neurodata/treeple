@@ -1,7 +1,6 @@
 # Contributing
 
 Thanks for considering contributing! Please read this document to learn the various ways you can contribute to this project and how to go about doing it.
-`
 ## Bug reports and feature requests
 
 ### Did you find a bug?
