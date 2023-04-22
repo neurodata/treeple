@@ -1,4 +1,4 @@
 numpy
 scipy
 scikit-learn-tree>=1.2.2
-# scikit-learn-tree@git+https://github.com/neurodata/scikit-learn@fork
+scikit-learn

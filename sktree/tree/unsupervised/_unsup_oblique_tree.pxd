@@ -10,13 +10,13 @@ import numpy as np
 
 cimport numpy as cnp
 from libcpp.vector cimport vector
-from sklearn.tree._splitter cimport SplitRecord
 from sklearn.tree._tree cimport DOUBLE_t  # Type of y, sample_weight
 from sklearn.tree._tree cimport DTYPE_t  # Type of X
 from sklearn.tree._tree cimport INT32_t  # Signed 32 bit integer
 from sklearn.tree._tree cimport SIZE_t  # Type for indices and counters
 from sklearn.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
-from sklearn.tree._tree cimport Node
+from sklearn_fork.tree._splitter cimport SplitRecord
+from sklearn_fork.tree._tree cimport Node
 
 from .._oblique_splitter cimport ObliqueSplitRecord
 from ._unsup_tree cimport UnsupervisedTree

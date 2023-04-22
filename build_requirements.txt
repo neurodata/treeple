@@ -4,6 +4,7 @@ cython
 ninja
 numpy
 scikit-learn-tree@git+https://git@github.com/neurodata/scikit-learn.git@fork
+scikit-learn
 click
 rich-click
 doit

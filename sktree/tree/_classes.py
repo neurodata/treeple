@@ -5,12 +5,12 @@ import numpy as np
 from scipy.sparse import issparse
 from sklearn.base import ClusterMixin, TransformerMixin, is_classifier
 from sklearn.cluster import AgglomerativeClustering
-from sklearn.tree import BaseDecisionTree, DecisionTreeClassifier, _criterion
-from sklearn.tree import _tree as _sklearn_tree
-from sklearn.tree._criterion import BaseCriterion
-from sklearn.tree._tree import BestFirstTreeBuilder, DepthFirstTreeBuilder
 from sklearn.utils._param_validation import Interval
 from sklearn.utils.validation import check_is_fitted
+from sklearn_fork.tree import BaseDecisionTree, DecisionTreeClassifier, _criterion
+from sklearn_fork.tree import _tree as _sklearn_tree
+from sklearn_fork.tree._criterion import BaseCriterion
+from sklearn_fork.tree._tree import BestFirstTreeBuilder, DepthFirstTreeBuilder
 
 from . import _oblique_splitter
 from ._oblique_splitter import ObliqueSplitter

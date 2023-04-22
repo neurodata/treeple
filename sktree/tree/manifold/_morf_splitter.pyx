@@ -13,8 +13,8 @@ cnp.import_array()
 
 from cython.operator cimport dereference as deref
 from libcpp.vector cimport vector
-from sklearn.tree._criterion cimport Criterion
 from sklearn.tree._utils cimport rand_int
+from sklearn_fork.tree._criterion cimport Criterion
 
 from .._utils cimport ravel_multi_index_cython, unravel_index_cython
 

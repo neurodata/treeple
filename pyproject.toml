@@ -35,6 +35,7 @@ requires = [
     "setuptools<=65.5",
     "packaging",
     "Cython>=0.29.24",
+    "scikit-learn",
     "scikit-learn-tree>=1.2.2",
     "lazy_loader>=0.1",
 
