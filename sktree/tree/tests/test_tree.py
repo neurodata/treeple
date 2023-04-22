@@ -45,10 +45,13 @@ REG_TREES = {
     "ObliqueDecisionTreeRegressor": ObliqueDecisionTreeRegressor,
     "PatchObliqueDecisionTreeRegressor": PatchObliqueDecisionTreeRegressor,
 }
+<<<<<<< HEAD
 CLF_TREES = {
     "ObliqueDecisionTreeClassifier": ObliqueDecisionTreeClassifier,
     "PatchObliqueTreeClassifier": PatchObliqueDecisionTreeClassifier,
 }
+=======
+>>>>>>> d4fe5bc (add unit test for ObliqueRFRegressor, revert err, fix typos)
 
 X_small = np.array(
     [
@@ -170,29 +173,6 @@ def assert_tree_equal(d, s, message):
     assert_array_almost_equal(
         d.value[external], s.value[external], err_msg=message + ": inequal value"
     )
-
-
-@pytest.mark.parametrize("Tree", REG_TREES.values())
-@pytest.mark.parametrize("criterion", REG_CRITERIONS)
-def test_regression_toy(Tree, criterion):
-    # Check regression on a toy dataset.
-    if criterion == "poisson":
-        # make target positive while not touching the original y and
-        # true_result
-        a = np.abs(np.min(y)) + 1
-        y_train = np.array(y) + a
-        y_test = np.array(true_result) + a
-    else:
-        y_train = y
-        y_test = true_result
-
-    reg = Tree(criterion=criterion, random_state=1)
-    reg.fit(X, y_train)
-    assert_allclose(reg.predict(T), y_test)
-
-    clf = Tree(criterion=criterion, max_features=1, random_state=1)
-    clf.fit(X, y_train)
-    assert_allclose(reg.predict(T), y_test)
 
 
 @parametrize_with_checks(
@@ -532,6 +512,29 @@ def test_patch_oblique_tree_feature_weights():
 def test_patch_tree_higher_dims():
     """Test patch oblique tree when patch and data dimensions are higher."""
     pass
+
+
+@pytest.mark.parametrize("Tree", REG_TREES.values())
+@pytest.mark.parametrize("criterion", REG_CRITERIONS)
+def test_regression_toy(Tree, criterion):
+    # Check regression on a toy dataset.
+    if criterion == "poisson":
+        # make target positive while not touching the original y and
+        # true_result
+        a = np.abs(np.min(y)) + 1
+        y_train = np.array(y) + a
+        y_test = np.array(true_result) + a
+    else:
+        y_train = y
+        y_test = true_result
+
+    regressor = Tree(criterion=criterion, random_state=1)
+    regressor.fit(X, y_train)
+    assert_allclose(regressor.predict(T), y_test)
+
+    regressor = Tree(criterion=criterion, max_features=1, random_state=1)
+    regressor.fit(X, y_train)
+    assert_allclose(regressor.predict(T), y_test)
 
 
 @pytest.mark.parametrize("name, Tree", REG_TREES.items())

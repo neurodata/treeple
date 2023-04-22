@@ -1969,7 +1969,6 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
     data_dims : array-like, optional
         The presumed dimensions of the un-vectorized feature vector, by default
         will be a 1D vector with (1, n_features) shape.
-<<<<<<< HEAD
     boundary : optional, str {'wrap'}
         The boundary condition to use when sampling patches, by default None.
         'wrap' corresponds to the boundary condition as is in numpy and scipy.
@@ -1979,8 +1978,6 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         patches that are generated. The feature weights are used
         as follows: for every patch that is sampled, the feature weights over
         the entire patch is summed and normalizes the patch.
-=======
->>>>>>> 5f8d515 (fix tests for regressor trees/forests)
 
     Attributes
     ----------
@@ -2070,11 +2067,8 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         "max_patch_dims": ["array-like", None],
         "data_dims": ["array-like", None],
         "dim_contiguous": ["array-like", None],
-<<<<<<< HEAD
         "boundary": [str, None],
         "feature_weight": ["array-like", None],
-=======
->>>>>>> bcfca28 ([ENH] MORF can now sample n-dimensional data with n-dimensional patches (#63))
     }
 
     def __init__(
@@ -2095,11 +2089,8 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         max_patch_dims=None,
         dim_contiguous=None,
         data_dims=None,
-<<<<<<< HEAD
         boundary=None,
         feature_weight=None,
-=======
->>>>>>> bcfca28 ([ENH] MORF can now sample n-dimensional data with n-dimensional patches (#63))
     ):
         super().__init__(
             criterion=criterion,
@@ -2119,11 +2110,8 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         self.max_patch_dims = max_patch_dims
         self.dim_contiguous = dim_contiguous
         self.data_dims = data_dims
-<<<<<<< HEAD
         self.boundary = boundary
         self.feature_weight = feature_weight
-=======
->>>>>>> bcfca28 ([ENH] MORF can now sample n-dimensional data with n-dimensional patches (#63))
 
     def fit(self, X, y, sample_weight=None, check_input=True):
         """Fit tree.
@@ -2315,11 +2303,8 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
                 self.max_patch_dims_,
                 self.dim_contiguous_,
                 self.data_dims_,
-<<<<<<< HEAD
                 self.boundary,
                 self.feature_weight,
-=======
->>>>>>> bcfca28 ([ENH] MORF can now sample n-dimensional data with n-dimensional patches (#63))
             )
 
         self.tree_ = ObliqueTree(

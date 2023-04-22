@@ -61,8 +61,13 @@ Make sure you have the necessary packages installed
     # you may need these optional dependencies to build scikit-learn locally
     conda install -c conda-forge joblib threadpoolctl pytest compilers llvm-openmp
 
+<<<<<<< HEAD
     # (caution only if you know what you're doing) or if you're a developer and need some latest changes on the fork:
     pip install scikit-learn-tree@git+https://git@github.com/neurodata/scikit-learn.git@fork
+=======
+    # make sure we have our fork of scikit-learn
+    pip install scikit-learn@git+https://git@github.com/neurodata/scikit-learn.git@fork
+>>>>>>> d4fe5bc (add unit test for ObliqueRFRegressor, revert err, fix typos)
 
 We use the ``spin`` CLI to abstract away build details:
 
