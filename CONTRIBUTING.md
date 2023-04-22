@@ -1,7 +1,7 @@
 # Contributing
 
 Thanks for considering contributing! Please read this document to learn the various ways you can contribute to this project and how to go about doing it.
-
+`
 ## Bug reports and feature requests
 
 ### Did you find a bug?
@@ -132,86 +132,7 @@ When you're ready to contribute code to address an open issue, please follow the
 
     </details>
 
-### Installing locally with Meson
-Meson is a modern build system with a lot of nice features, which is why we use it for our build system to compile the Cython/C++ code.
-However, there are some intricacies that might be new to a pure Python developer.
-
-In general, the steps to build scikit-tree are:
-
-- install scikit-learn fork (the wheels are released on pypi, so it should be ideally trivial).
-- build and install scikit-tree locally using `spin`
-
-Example would be:
-        
-        pip uninstall scikit-learn
-
-        # install the fork of scikit-learn
-        # Note: make sure you do not have actual scikit-learn installed
-        pip install scikit-learn-tree
-
-        # build
-        ./spin build -j 4
-
-The above code assumes you have installed all the relevant build packages. See the repo's README for more info. A lot of the build packages might differ from OS to OS. We recommend following scikit-learn's documentation on building locally.
-
-The most common errors come from the following:
-
-1. clashing sklearn: if they have scikit-learn main installed for another project in the same virtual env, then they should start with a clean virtual env. There is unfortunately no easy way around this rn. Maybe if we vendor the scikit-learn-fork changes, we can get around this in the future.
-2. not all necessary compile-time packages installed: e.g. cython, compilers, etc. See scikit-learn documentation on building and installing from source.
-3. not using spin CLI: scikit-tree uses Meson for its build because that’s what numpy/scipy uses and it’s actually quite robust. However, it has a few limitations. We use spin CLI to run commands such as testing, shell that has sktree installed, etc.  This is because the Python PATH cannot differentiate between sktree/ in your repo directory vs the sktree/ it sees installed. So if you really want to run something in your teminal that is not using spin, then you have to change directories.
-4. Not having certain computer packages installed, such as gcc, etc.: Scikit-tree requires compiling Cython and C++ code. Therefore, if you have outdated C/C++ compilers, prolly can be the issue.
-
-The CI files for github actions shows how to build and install for each OS.
-
-
 ### Writing docstrings
 
 We use [Sphinx](https://www.sphinx-doc.org/en/master/index.html) to build our API docs, which automatically parses all docstrings
 of public classes and methods. All docstrings should adhere to the [Numpy styling convention](https://www.sphinx-doc.org/en/master/usage/extensions/example_numpy.html).
-
-### Testing Changes Locally With Poetry
-With poetry installed, we have included a few convenience functions to check your code. These checks must pass and will be checked by the PR's continuous integration services. You can install the various different developer dependencies with poetry:
-
-    poetry install --with style, docs, test
-
-You can verify that your code will pass certain style, formatting and lint checks by running:
-
-    poetry run poe verify
-
-``verify`` runs a sequence of tests that can also be run individually. For example, you can check code formatting with black:
-
-    poetry run poe format_check
-
-If you would like to automatically black format your changes:
-
-    poetry run poe format
-
-You can then check for code style and general linting:
-
-    poetry run poe lint
-
-Finally, you should run some mypy type checks:
-
-    poetry run poe type_check
-
-### Documentation
-
-If you need to build the documentation locally and check for doc errors:
-
-    poetry run poe build_docs
-
-### Dependency Changes
-
-If you need to add new, or remove old dependencies, then you need to modify the ``pyproject.toml`` file and then also update the ``poetry.lock`` file, which version-controls all necessary dependencies. If you alter any dependency in the ``pyproject.toml`` file, you must run:
-
-    poetry update
-
-To update the lock file.
-
----
-
-The Project abides by the Organization's [code of conduct](https://github.com/py-why/governance/blob/main/CODE-OF-CONDUCT.md) and [trademark policy](https://github.com/py-why/governance/blob/main/TRADEMARKS.md).
-
----
-Part of MVG-0.1-beta.
-Made with love by GitHub. Licensed under the [CC-BY 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/).

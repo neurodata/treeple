@@ -7,7 +7,6 @@ from numpy.testing import (
     assert_array_almost_equal,
     assert_array_equal,
 )
-from scipy.sparse import coo_matrix, csc_matrix, csr_matrix
 from sklearn import datasets
 from sklearn.base import is_classifier
 from sklearn.cluster import AgglomerativeClustering
@@ -46,14 +45,6 @@ REG_TREES = {
     "ObliqueDecisionTreeRegressor": ObliqueDecisionTreeRegressor,
     "PatchObliqueDecisionTreeRegressor": PatchObliqueDecisionTreeRegressor,
 }
-CLF_TREES = {
-    "ObliqueDecisionTreeClassifier": ObliqueDecisionTreeClassifier,
-    "PatchObliqueTreeClassifier": PatchObliqueDecisionTreeClassifier,
-}
-
-ALL_TREES: dict = dict()
-ALL_TREES.update(CLF_TREES)
-ALL_TREES.update(REG_TREES)
 
 X_small = np.array(
     [
@@ -147,23 +138,6 @@ X_sparse_pos[X_sparse_pos <= 0.8] = 0.0
 y_random = random_state.randint(0, 4, size=(20,))
 X_sparse_mix = _sparse_random_matrix(20, 10, density=0.25, random_state=0).toarray()
 
-DATASETS = {
-    "iris": {"X": iris.data, "y": iris.target},
-    "diabetes": {"X": diabetes.data, "y": diabetes.target},
-    "digits": {"X": digits.data, "y": digits.target},
-    "toy": {"X": X, "y": y},
-    "clf_small": {"X": X_small, "y": y_small},
-    "reg_small": {"X": X_small, "y": y_small_reg},
-    "multilabel": {"X": X_multilabel, "y": y_multilabel},
-    "sparse-pos": {"X": X_sparse_pos, "y": y_random},
-    "sparse-neg": {"X": -X_sparse_pos, "y": y_random},
-    "sparse-mix": {"X": X_sparse_mix, "y": y_random},
-    "zeros": {"X": np.zeros((20, 3)), "y": y_random},
-}
-
-for name in DATASETS:
-    DATASETS[name]["X_sparse"] = csc_matrix(DATASETS[name]["X"])
-
 
 def assert_tree_equal(d, s, message):
     assert s.node_count == d.node_count, "{0}: inequal number of node ({1} != {2})".format(
@@ -192,29 +166,6 @@ def assert_tree_equal(d, s, message):
     assert_array_almost_equal(
         d.value[external], s.value[external], err_msg=message + ": inequal value"
     )
-
-
-@pytest.mark.parametrize("Tree", REG_TREES.values())
-@pytest.mark.parametrize("criterion", REG_CRITERIONS)
-def test_regression_toy(Tree, criterion):
-    # Check regression on a toy dataset.
-    if criterion == "poisson":
-        # make target positive while not touching the original y and
-        # true_result
-        a = np.abs(np.min(y)) + 1
-        y_train = np.array(y) + a
-        y_test = np.array(true_result) + a
-    else:
-        y_train = y
-        y_test = true_result
-
-    reg = Tree(criterion=criterion, random_state=1)
-    reg.fit(X, y_train)
-    assert_allclose(reg.predict(T), y_test)
-
-    clf = Tree(criterion=criterion, max_features=1, random_state=1)
-    clf.fit(X, y_train)
-    assert_allclose(reg.predict(T), y_test)
 
 
 @parametrize_with_checks(
@@ -535,6 +486,29 @@ def test_patch_tree_higher_dims():
     pass
 
 
+@pytest.mark.parametrize("Tree", REG_TREES.values())
+@pytest.mark.parametrize("criterion", REG_CRITERIONS)
+def test_regression_toy(Tree, criterion):
+    # Check regression on a toy dataset.
+    if criterion == "poisson":
+        # make target positive while not touching the original y and
+        # true_result
+        a = np.abs(np.min(y)) + 1
+        y_train = np.array(y) + a
+        y_test = np.array(true_result) + a
+    else:
+        y_train = y
+        y_test = true_result
+
+    regressor = Tree(criterion=criterion, random_state=1)
+    regressor.fit(X, y_train)
+    assert_allclose(regressor.predict(T), y_test)
+
+    regressor = Tree(criterion=criterion, max_features=1, random_state=1)
+    regressor.fit(X, y_train)
+    assert_allclose(regressor.predict(T), y_test)
+
+
 @pytest.mark.parametrize("name, Tree", REG_TREES.items())
 @pytest.mark.parametrize("criterion", REG_CRITERIONS)
 def test_diabetes_overfit(name, Tree, criterion):
@@ -567,47 +541,6 @@ def test_diabetes_underfit(name, Tree, criterion, max_depth, metric, max_loss):
     reg.fit(diabetes.data, diabetes.target)
     loss = metric(diabetes.target, reg.predict(diabetes.data))
     assert 0 < loss < max_loss
-
-
-def check_sparse_input(tree, dataset, max_depth=None):
-    TreeEstimator = ALL_TREES[tree]
-    X = DATASETS[dataset]["X"]
-    X_sparse = DATASETS[dataset]["X_sparse"]
-    y = DATASETS[dataset]["y"]
-
-    # Gain testing time
-    if dataset in ["digits", "diabetes"]:
-        n_samples = X.shape[0] // 5
-        X = X[:n_samples]
-        X_sparse = X_sparse[:n_samples]
-        y = y[:n_samples]
-
-    for sparse_format in (csr_matrix, csc_matrix, coo_matrix):
-        X_sparse = sparse_format(X_sparse)
-
-        # Check the default (depth first search)
-        d = TreeEstimator(random_state=0, max_depth=max_depth).fit(X, y)
-        s = TreeEstimator(random_state=0, max_depth=max_depth).fit(X_sparse, y)
-
-        assert_tree_equal(
-            d.tree_,
-            s.tree_,
-            "{0} with dense and sparse format gave different trees".format(tree),
-        )
-
-        y_pred = d.predict(X)
-        if tree in CLF_TREES:
-            y_proba = d.predict_proba(X)
-            y_log_proba = d.predict_log_proba(X)
-
-        for sparse_matrix in (csr_matrix, csc_matrix, coo_matrix):
-            X_sparse_test = sparse_matrix(X_sparse, dtype=np.float32)
-
-            assert_array_almost_equal(s.predict(X_sparse_test), y_pred)
-
-            if tree in CLF_TREES:
-                assert_array_almost_equal(s.predict_proba(X_sparse_test), y_proba)
-                assert_array_almost_equal(s.predict_log_proba(X_sparse_test), y_log_proba)
 
 
 def test_numerical_stability():

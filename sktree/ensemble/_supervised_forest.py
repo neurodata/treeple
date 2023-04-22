@@ -1183,9 +1183,9 @@ class PatchObliqueRandomForestRegressor(ForestRegressor):
     >>> X, y = make_regression(n_features=4, n_informative=2,
     ...                        random_state=0, shuffle=False)
     >>> regressor = PatchObliqueRandomForestRegressor(max_depth=2, random_state=0)
-    >>> rregressor.fit(X, y)
+    >>> regressor.fit(X, y)
     PatchObliqueRandomForestRegressor(...)
-    >>> print(rregressor.predict([[0, 0, 0, 0]]))
+    >>> print(regressor.predict([[0, 0, 0, 0]]))
     [-5.82818509]
     """
 
