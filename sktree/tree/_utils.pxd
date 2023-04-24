@@ -4,12 +4,12 @@ cimport numpy as cnp
 
 cnp.import_array()
 
-from sklearn.tree._tree cimport DOUBLE_t  # Type of y, sample_weight
-from sklearn.tree._tree cimport DTYPE_t  # Type of X
-from sklearn.tree._tree cimport INT32_t  # Signed 32 bit integer
-from sklearn.tree._tree cimport SIZE_t  # Type for indices and counters
-from sklearn.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
 from sklearn_fork.tree._splitter cimport SplitRecord
+from sklearn_fork.tree._tree cimport DOUBLE_t  # Type of y, sample_weight
+from sklearn_fork.tree._tree cimport DTYPE_t  # Type of X
+from sklearn_fork.tree._tree cimport INT32_t  # Signed 32 bit integer
+from sklearn_fork.tree._tree cimport SIZE_t  # Type for indices and counters
+from sklearn_fork.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
 
 
 cpdef unravel_index(

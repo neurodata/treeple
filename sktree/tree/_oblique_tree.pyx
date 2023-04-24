@@ -23,7 +23,7 @@ from sklearn.tree._utils cimport safe_realloc, sizet_ptr_to_ndarray
 
 # Gets Node dtype exposed inside oblique_tree.
 # See "_tree.pyx" for more details.
-cdef Node dummy;  # no-cython-lint
+cdef Node dummy
 NODE_DTYPE = np.asarray(<Node[:1]>(&dummy)).dtype
 
 # Mitigate precision differences between 32 bit and 64 bit

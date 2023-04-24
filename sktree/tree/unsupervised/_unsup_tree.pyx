@@ -68,7 +68,7 @@ cdef SIZE_t _TREE_UNDEFINED = TREE_UNDEFINED
 # This works by casting `dummy` to an array of Node of length 1, which numpy
 # can construct a `dtype`-object for. See https://stackoverflow.com/q/62448946
 # for a more detailed explanation.
-cdef Node dummy;  # no-cython-lint
+cdef Node dummy
 NODE_DTYPE = np.asarray(<Node[:1]>(&dummy)).dtype
 
 # =============================================================================
