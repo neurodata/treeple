@@ -1,5 +1,5 @@
-from sklearn.utils._param_validation import StrOptions
 from sklearn_fork.ensemble._forest import ForestClassifier
+from sklearn_fork.utils._param_validation import StrOptions
 
 from sktree.tree import ObliqueDecisionTreeClassifier, PatchObliqueDecisionTreeClassifier
 

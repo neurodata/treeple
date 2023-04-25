@@ -20,10 +20,10 @@ from sklearn.ensemble._forest import (
     _parallel_build_trees,
 )
 from sklearn.metrics import calinski_harabasz_score
-from sklearn.tree._tree import DTYPE
 from sklearn.utils.parallel import Parallel, delayed
-from sklearn.utils.validation import _check_sample_weight, check_is_fitted, check_random_state
 from sklearn_fork.ensemble._forest import BaseForest
+from sklearn_fork.tree._tree import DTYPE
+from sklearn_fork.utils.validation import _check_sample_weight, check_is_fitted, check_random_state
 
 from sktree.tree import UnsupervisedDecisionTree, UnsupervisedObliqueDecisionTree
 

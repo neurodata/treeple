@@ -3,14 +3,14 @@ from numbers import Real
 
 import numpy as np
 from scipy.sparse import issparse
-from sklearn.base import ClusterMixin, TransformerMixin, is_classifier
+from sklearn.base import ClusterMixin, TransformerMixin
 from sklearn.cluster import AgglomerativeClustering
-from sklearn.utils._param_validation import Interval
-from sklearn.utils.validation import check_is_fitted
 from sklearn_fork.tree import BaseDecisionTree, DecisionTreeClassifier, _criterion
 from sklearn_fork.tree import _tree as _sklearn_tree
 from sklearn_fork.tree._criterion import BaseCriterion
 from sklearn_fork.tree._tree import BestFirstTreeBuilder, DepthFirstTreeBuilder
+from sklearn_fork.utils._param_validation import Interval
+from sklearn_fork.utils.validation import check_is_fitted
 
 from . import _oblique_splitter
 from ._oblique_splitter import ObliqueSplitter
@@ -855,7 +855,7 @@ class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         random_state : int, RandomState instance or None, default=None
             Controls the randomness of the estimator.
         """
-        n_samples, n_features = X.shape
+        _, n_features = X.shape
 
         if self.feature_combinations is None:
             self.feature_combinations_ = min(n_features, 1.5)
@@ -870,10 +870,7 @@ class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         # Build tree
         criterion = self.criterion
         if not isinstance(criterion, BaseCriterion):
-            if is_classifier(self):
-                criterion = CRITERIA_CLF[self.criterion](self.n_outputs_, self.n_classes_)
-            else:
-                criterion = CRITERIA_REG[self.criterion](self.n_outputs_, n_samples)
+            criterion = CRITERIA_CLF[self.criterion](self.n_outputs_, self.n_classes_)
         else:
             # Make a deepcopy in case the criterion has mutable attributes that
             # might be shared and modified concurrently during parallel fitting
@@ -898,15 +895,7 @@ class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
                 self.feature_combinations_,
             )
 
-        if is_classifier(self):
-            self.tree_ = ObliqueTree(self.n_features_in_, self.n_classes_, self.n_outputs_)
-        else:
-            self.tree_ = ObliqueTree(
-                self.n_features_in_,
-                # TODO: tree shouldn't need this in this case
-                np.array([1] * self.n_outputs_, dtype=np.intp),
-                self.n_outputs_,
-            )
+        self.tree_ = ObliqueTree(self.n_features_in_, self.n_classes_, self.n_outputs_)
 
         # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
         if max_leaf_nodes < 0:
@@ -931,7 +920,7 @@ class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
 
         builder.build(self.tree_, X, y, sample_weight)
 
-        if self.n_outputs_ == 1 and is_classifier(self):
+        if self.n_outputs_ == 1:
             self.n_classes_ = self.n_classes_[0]
             self.classes_ = self.classes_[0]
 
@@ -1354,16 +1343,10 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         random_state : int, RandomState instance or None, default=None
             Controls the randomness of the estimator.
         """
-
-        n_samples = X.shape[0]
-
         # Build tree
         criterion = self.criterion
         if not isinstance(criterion, BaseCriterion):
-            if is_classifier(self):
-                criterion = CRITERIA_CLF[self.criterion](self.n_outputs_, self.n_classes_)
-            else:
-                criterion = CRITERIA_REG[self.criterion](self.n_outputs_, n_samples)
+            criterion = CRITERIA_CLF[self.criterion](self.n_outputs_, self.n_classes_)
         else:
             # Make a deepcopy in case the criterion has mutable attributes that
             # might be shared and modified concurrently during parallel fitting
@@ -1393,15 +1376,7 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
                 self.feature_weight,
             )
 
-        if is_classifier(self):
-            self.tree_ = ObliqueTree(self.n_features_in_, self.n_classes_, self.n_outputs_)
-        else:
-            self.tree_ = ObliqueTree(
-                self.n_features_in_,
-                # TODO: tree shouldn't need this in this case
-                np.array([1] * self.n_outputs_, dtype=np.intp),
-                self.n_outputs_,
-            )
+        self.tree_ = ObliqueTree(self.n_features_in_, self.n_classes_, self.n_outputs_)
 
         # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
         if max_leaf_nodes < 0:
@@ -1426,6 +1401,6 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
 
         builder.build(self.tree_, X, y, sample_weight)
 
-        if self.n_outputs_ == 1 and is_classifier(self):
+        if self.n_outputs_ == 1:
             self.n_classes_ = self.n_classes_[0]
             self.classes_ = self.classes_[0]
