@@ -1,22 +1,21 @@
 """Configure details for documentation with sphinx."""
 
-import inspect
 import os
+import re
 import subprocess
 import sys
 from datetime import date
-from importlib import import_module
-from typing import Dict, Optional
 
 import sphinx_gallery  # noqa: F401
 from sphinx_gallery.sorting import ExampleTitleSortKey
-
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 curdir = os.path.dirname(__file__)
-sys.path.append(os.path.abspath(os.path.join(curdir, "../build-install/usr/lib/python3.9/site-packages/")))
+sys.path.append(
+    os.path.abspath(os.path.join(curdir, "../build-install/usr/lib/python3.9/site-packages/"))
+)
 sys.path.insert(0, os.path.abspath("sphinxext"))
 import sktree
 
@@ -82,11 +81,11 @@ nitpicky = False
 
 # TODO: figure out why these are raising an error?
 nitpick_ignore = [
-    ('py:obj', 'UnsupervisedDecisionTree'),
-    ('py:obj', 'ObliqueDecisionTreeClassifier'),
-    ('py:obj', 'PatchObliqueDecisionTreeClassifier'),
-    ('py:obj', 'DecisionTreeClassifier'),
-    ('py:mod', 'sktree.tree'),
+    ("py:obj", "UnsupervisedDecisionTree"),
+    ("py:obj", "ObliqueDecisionTreeClassifier"),
+    ("py:obj", "PatchObliqueDecisionTreeClassifier"),
+    ("py:obj", "DecisionTreeClassifier"),
+    ("py:mod", "sktree.tree"),
 ]
 
 # The name of a reST role (builtin or Sphinx extension) to use as the default
@@ -162,11 +161,13 @@ numpydoc_xref_aliases = {
     # Python
     "Path": "pathlib.Path",
     "bool": ":class:`python:bool`",
-    "sklearn_fork": "sklearn",
+    "~sklearn_fork": "~sklearn",
+    # "sklearn_fork.pipeline.Pipeline": "sklearn.pipeline.Pipeline",
+    # "sklearn_fork.inspection.permutation_importance": "sklearn.inspection.permutation_importance",
 }
 numpydoc_xref_ignore = {
     "of",
-    'or',
+    "or",
     "shape",
     "n_components",
     "n_pixels",
@@ -178,16 +179,16 @@ numpydoc_xref_ignore = {
     "pandas",
     "n_samples",
     "n_features",
-    'n_features_new',
+    "n_features_new",
     "n_estimators",
-    'n_outputs',
+    "n_outputs",
     "n_nodes",
     "X",
     "default",
     "sparse",
     "matrix",
-    'Ignored',
-    'UnsupervisedSplitter',
+    "Ignored",
+    "UnsupervisedSplitter",
     # from sklearn
     "such",
     "arrays",
@@ -334,3 +335,23 @@ issues_github_path = "neurodata/scikit-tree"
 #     fname = fname.split("/scikit-tree/")[1]
 #     url = f"{gh_url}/blob/{branch}/scikit-tree/{fname}#{lines}"
 #     return url
+
+
+def replace_sklearn_fork_with_sklearn(app, what, name, obj, options, lines):
+    """
+    This function replaces all instances of 'sklearn_fork' with 'sklearn'
+    in the docstring content.
+    """
+    # Convert the list of lines to a string
+    content = "\n".join(lines)
+
+    # Use regular expressions to replace 'sklearn_fork' with 'sklearn'
+    content = re.sub(r"`~sklearn_fork\.", r"`~sklearn.", content)
+    content = re.sub(r"`sklearn_fork\.", r"`sklearn.", content)
+
+    # Convert the modified string back to a list of lines
+    lines[:] = content.split("\n")
+
+
+def setup(app):
+    app.connect("autodoc-process-docstring", replace_sklearn_fork_with_sklearn)

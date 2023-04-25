@@ -32,6 +32,8 @@ For details on how to use the hyperparameters related to the patches, see
 :class:`sktree.tree.PatchObliqueDecisionTreeClassifier`.
 """
 
+import matplotlib.pyplot as plt
+
 # import modules
 # .. note:: We use a private Cython module here to demonstrate what the patches
 #           look like. This is not part of the public API. The Cython module used
@@ -40,9 +42,8 @@ For details on how to use the hyperparameters related to the patches, see
 #           To use the actual splitter, one should use the public API for the
 #           relevant tree/forests class.
 import numpy as np
-import matplotlib.pyplot as plt
-
 from sklearn_fork.tree._criterion import Gini
+
 from sktree.tree.manifold._morf_splitter import BestPatchSplitterTester
 
 # %%

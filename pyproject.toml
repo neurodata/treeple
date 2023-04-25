@@ -164,8 +164,6 @@ extend-exclude = '''
 (
       __pycache__
     | \.github
-    | setup.py
-    | docs/
 )
 '''
 
@@ -174,7 +172,7 @@ profile = 'black'
 multi_line_output = 3
 line_length = 100
 py_version = 38
-extend_skip_glob = ['setup.py', 'docs/*', 'examples/*', 'sktree/__init__.py']
+extend_skip_glob = ['sktree/__init__.py']
 
 [tool.pydocstyle]
 convention = 'numpy'
