@@ -146,7 +146,9 @@ autoclass_content = "class"
 autodoc_typehints = "none"
 autodoc_member_order = "groupwise"
 autodoc_warningiserror = False
-autodoc_default_options = {"inherited-members": None}
+autodoc_default_options = {
+    "inherited-members": None,
+}
 
 # -- numpydoc ----------------------------------------------------------------
 
@@ -160,6 +162,7 @@ numpydoc_xref_aliases = {
     # Python
     "Path": "pathlib.Path",
     "bool": ":class:`python:bool`",
+    "sklearn_fork": "sklearn",
 }
 numpydoc_xref_ignore = {
     "of",
