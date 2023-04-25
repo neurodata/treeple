@@ -42,7 +42,7 @@ For details on how to use the hyperparameters related to the patches, see
 import numpy as np
 import matplotlib.pyplot as plt
 
-from sklearn.tree._criterion import Gini
+from sklearn_fork.tree._criterion import Gini
 from sktree.tree.manifold._morf_splitter import BestPatchSplitterTester
 
 # %%
