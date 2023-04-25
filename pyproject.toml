@@ -36,7 +36,7 @@ requires = [
     "packaging",
     "Cython>=0.29.24",
     "scikit-learn",
-    "scikit-learn-tree>=1.2.2",
+    "scikit-learn-tree>=1.2.3",
     "lazy_loader>=0.1",
 
     # We follow scipy for much of these pinnings

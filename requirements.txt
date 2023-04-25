@@ -1,4 +1,4 @@
 numpy
 scipy
 scikit-learn
-scikit-learn-tree>=1.2.2
+scikit-learn-tree>=1.2.3
