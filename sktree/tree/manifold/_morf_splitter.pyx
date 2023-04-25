@@ -36,7 +36,7 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         cnp.uint8_t[::1] dim_contiguous,
         SIZE_t[:] data_dims,
         str boundary,
-        DTYPE_t[:] feature_weight,
+        DTYPE_t[:, :] feature_weight,
         *argv
     ):
         self.criterion = criterion
@@ -416,7 +416,7 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
                 if self.feature_weight is not None:
                     # gets the feature weight for this specific column from X
                     # the default of feature_weights[i] is (1/n_features) for all i
-                    patch_weight += self.feature_weight[deref(proj_vec_indices)[jdx]]
+                    patch_weight += self.feature_weight[samples[idx], deref(proj_vec_indices)[jdx]]
 
             if self.feature_weight is not None:
                 feature_values[idx] /= patch_weight

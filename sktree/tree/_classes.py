@@ -1059,7 +1059,7 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
     boundary : optional, str {'wrap'}
         The boundary condition to use when sampling patches, by default None.
         'wrap' corresponds to the boundary condition as is in numpy and scipy.
-    feature_weight : array-like of shape (n_features,), default=None
+    feature_weight : array-like of shape (n_samples,n_features,), default=None
         Feature weights. If None, then features are equally weighted as is.
         If provided, then the feature weights are used to weight the
         patches that are generated. The feature weights are used
@@ -1223,9 +1223,9 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
                 X = self._validate_data(X, **check_X_params)
             if self.feature_weight is not None:
                 self.feature_weight = self._validate_data(
-                    self.feature_weight, ensure_2d=False, dtype=DTYPE
+                    self.feature_weight, ensure_2d=True, dtype=DTYPE
                 )
-                if self.feature_weight.shape[0] != X.shape[1]:
+                if self.feature_weight.shape != X.shape:
                     raise ValueError(
                         f"feature_weight has shape {self.feature_weight.shape} but X has "
                         f"shape {X.shape}"

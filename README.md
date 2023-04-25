@@ -62,7 +62,7 @@ Make sure you have the necessary packages installed
     conda install -c conda-forge joblib threadpoolctl pytest compilers llvm-openmp
 
     # (caution only if you know what you're doing) or if you're a developer and need some latest changes on the fork:
-    pip install scikit-learn@git+https://git@github.com/neurodata/scikit-learn.git@fork
+    pip install scikit-learn-tree@git+https://git@github.com/neurodata/scikit-learn.git@fork
 
 We use the ``spin`` CLI to abstract away build details:
 

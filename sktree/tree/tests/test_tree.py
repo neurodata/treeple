@@ -446,7 +446,7 @@ def test_patch_oblique_tree_feature_weights():
             max_patch_dims=(6, 6),
             data_dims=(8, 8),
             random_state=1,
-            feature_weight=[1, 1],
+            feature_weight=np.ones((X.shape[0], 2)),
         )
         clf.fit(X, y)
 
