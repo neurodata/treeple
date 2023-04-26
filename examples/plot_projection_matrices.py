@@ -32,6 +32,8 @@ For details on how to use the hyperparameters related to the patches, see
 :class:`sktree.tree.PatchObliqueDecisionTreeClassifier`.
 """
 
+import matplotlib.pyplot as plt
+
 # import modules
 # .. note:: We use a private Cython module here to demonstrate what the patches
 #           look like. This is not part of the public API. The Cython module used
@@ -40,10 +42,9 @@ For details on how to use the hyperparameters related to the patches, see
 #           To use the actual splitter, one should use the public API for the
 #           relevant tree/forests class.
 import numpy as np
-import matplotlib.pyplot as plt
+from sklearn_fork.tree._criterion import Gini
 
-from sklearn.tree._criterion import Gini
-from sktree.tree._morf_splitter import BestPatchSplitterTester
+from sktree.tree.manifold._morf_splitter import BestPatchSplitterTester
 
 # %%
 # Initialize patch splitter
@@ -57,6 +58,9 @@ max_features = 6
 min_samples_leaf = 1
 min_weight_leaf = 0.0
 random_state = np.random.RandomState(100)
+
+boundary = None
+feature_weight = None
 
 # initialize some dummy data
 X = np.repeat(np.arange(25).astype(np.float32), 5).reshape(5, -1)
@@ -86,6 +90,8 @@ splitter = BestPatchSplitterTester(
     max_patch_dims,
     dim_contiguous,
     data_dims,
+    boundary,
+    feature_weight,
 )
 splitter.init_test(X, y, sample_weight)
 
@@ -128,6 +134,8 @@ splitter = BestPatchSplitterTester(
     max_patch_dims,
     dim_contiguous,
     data_dims,
+    boundary,
+    feature_weight,
 )
 splitter.init_test(X, y, sample_weight)
 
@@ -174,6 +182,8 @@ splitter = BestPatchSplitterTester(
     max_patch_dims,
     dim_contiguous,
     data_dims,
+    boundary,
+    feature_weight,
 )
 splitter.init_test(X, y, sample_weight)
 
@@ -234,6 +244,8 @@ splitter = BestPatchSplitterTester(
     max_patch_dims,
     dim_contiguous,
     data_dims,
+    boundary,
+    feature_weight,
 )
 splitter.init_test(X, y, sample_weight)
 

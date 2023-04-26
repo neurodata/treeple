@@ -19,11 +19,11 @@ from sklearn.metrics import (
 )
 from sklearn.model_selection import cross_val_score
 from sklearn.random_projection import _sparse_random_matrix
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.tree._tree import TREE_LEAF
 from sklearn.utils._testing import skip_if_32bit
-from sklearn.utils.estimator_checks import parametrize_with_checks
 from sklearn.utils.validation import check_random_state
+from sklearn.tree._tree import TREE_LEAF
+from sklearn_fork.tree import DecisionTreeClassifier
+from sklearn_fork.utils.estimator_checks import parametrize_with_checks
 
 from sktree.tree import (
     ObliqueDecisionTreeClassifier,
@@ -479,6 +479,21 @@ def test_tree_deserialization_from_read_only_buffer(tmpdir, TREE):
         clf.tree_,
         "The trees of the original and loaded classifiers are not equal.",
     )
+
+
+def test_patch_oblique_tree_feature_weights():
+    """Test patch oblique tree when feature weights are passed in."""
+    X, y = digits.data, digits.target
+
+    with pytest.raises(ValueError, match="feature_weight has shape"):
+        clf = PatchObliqueDecisionTreeClassifier(
+            min_patch_dims=(2, 2),
+            max_patch_dims=(6, 6),
+            data_dims=(8, 8),
+            random_state=1,
+            feature_weight=np.ones((X.shape[0], 2)),
+        )
+        clf.fit(X, y)
 
 
 def test_patch_tree_higher_dims():

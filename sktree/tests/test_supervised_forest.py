@@ -2,6 +2,7 @@ from typing import Any, Dict
 
 import numpy as np
 import pytest
+
 from sklearn.datasets import make_classification, make_regression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
@@ -9,6 +10,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.utils._testing import assert_array_almost_equal
 from sklearn.utils.estimator_checks import check_estimator
 from sklearn.utils.validation import check_random_state
+from sklearn_fork.ensemble import RandomForestClassifier
+from sklearn_fork.utils.estimator_checks import parametrize_with_checks
 
 from sktree import (
     ObliqueRandomForestClassifier,

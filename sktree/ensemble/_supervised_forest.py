@@ -1,5 +1,5 @@
-from sklearn.ensemble._forest import ForestClassifier, ForestRegressor
 from sklearn.utils._param_validation import StrOptions
+from sklearn_fork.ensemble._forest import ForestClassifier, ForestRegressor
 
 from sktree.tree import (
     ObliqueDecisionTreeClassifier,
@@ -1108,6 +1108,15 @@ class PatchObliqueRandomForestRegressor(ForestRegressor):
     data_dims : array-like, optional
         The presumed dimensions of the un-vectorized feature vector, by default
         will be a 1D vector with (1, n_features) shape.
+    boundary : optional, str {'wrap'}
+        The boundary condition to use when sampling patches, by default None.
+        'wrap' corresponds to the boundary condition as is in numpy and scipy.
+    feature_weight : array-like of shape (n_features,), default=None
+        Feature weights. If None, then features are equally weighted as is.
+        If provided, then the feature weights are used to weight the
+        patches that are generated. The feature weights are used
+        as follows: for every patch that is sampled, the feature weights over
+        the entire patch is summed and normalizes the patch.
 
     Attributes
     ----------
@@ -1218,6 +1227,8 @@ class PatchObliqueRandomForestRegressor(ForestRegressor):
         max_patch_dims=None,
         dim_contiguous=None,
         data_dims=None,
+        boundary=None,
+        feature_weight=None,
     ):
         super().__init__(
             estimator=PatchObliqueDecisionTreeRegressor(),
@@ -1236,6 +1247,8 @@ class PatchObliqueRandomForestRegressor(ForestRegressor):
                 "max_patch_dims",
                 "dim_contiguous",
                 "data_dims",
+                "boundary",
+                "feature_weight",
             ),
             bootstrap=bootstrap,
             oob_score=oob_score,
@@ -1255,6 +1268,8 @@ class PatchObliqueRandomForestRegressor(ForestRegressor):
         self.max_patch_dims = max_patch_dims
         self.dim_contiguous = dim_contiguous
         self.data_dims = data_dims
+        self.boundary = boundary
+        self.feature_weight = feature_weight
 
         # unused by oblique forests
         self.min_weight_fraction_leaf = min_weight_fraction_leaf
