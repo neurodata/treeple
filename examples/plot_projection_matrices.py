@@ -28,19 +28,10 @@ is ``(5, 5)``, then the patch will only sample indices within the data.
 
 We also allow each dimension to be arbitrarily discontiguous.
 
-For details on how to use the hyperparameters related to the patches, see
-:class:`sktree.tree.PatchObliqueDecisionTreeClassifier`.
 """
 
 import matplotlib.pyplot as plt
 
-# import modules
-# .. note:: We use a private Cython module here to demonstrate what the patches
-#           look like. This is not part of the public API. The Cython module used
-#           is just a Python wrapper for the underlying Cython code and is not the
-#           same as the Cython splitter used in the actual implementation.
-#           To use the actual splitter, one should use the public API for the
-#           relevant tree/forests class.
 import numpy as np
 from sklearn_fork.tree._criterion import Gini
 

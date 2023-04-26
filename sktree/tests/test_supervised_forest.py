@@ -2,8 +2,12 @@ from typing import Any, Dict
 
 import numpy as np
 import pytest
+<<<<<<< HEAD
 
 from sklearn.datasets import make_classification, make_regression
+=======
+from sklearn.datasets import load_diabetes, make_classification, make_regression
+>>>>>>> 251884e (docs update, revert rebase err)
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
@@ -30,6 +34,7 @@ X_large, y_large = make_classification(
     shuffle=False,
     random_state=0,
 )
+
 # Larger regression sample used for testing feature importances
 X_large_reg, y_large_reg = make_regression(
     n_samples=500,
@@ -38,6 +43,14 @@ X_large_reg, y_large_reg = make_regression(
     shuffle=False,
     random_state=0,
 )
+
+# load the diabetes dataset
+# and randomly permute it
+rng = np.random.RandomState(1)
+diabetes = load_diabetes()
+perm = rng.permutation(diabetes.target.size)
+diabetes.data = diabetes.data[perm]
+diabetes.target = diabetes.target[perm]
 
 FOREST_CLASSIFIERS = {
     "ObliqueRandomForestClassifier": ObliqueRandomForestClassifier,
@@ -182,6 +195,21 @@ def test_sklearn_compatible_estimator(name):
 @pytest.mark.parametrize("dtype", [np.float32, np.float64])
 def test_regression(forest, criterion, dtype):
     estimator = forest(n_estimators=10, criterion=criterion, random_state=0)
+    n_test = 0.1
+    X = X_large_reg.astype(dtype, copy=False)
+    y = y_large_reg.astype(dtype, copy=False)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=n_test, random_state=0)
+    estimator.fit(X_train, y_train)
+    assert estimator.score(X_test, y_test) > 0.88
+
+
+# Unit test for PatchObliqueRandomForestRegressor
+@pytest.mark.parametrize("criterion", REG_CRITERIONS)
+@pytest.mark.parametrize("dtype", [np.float32, np.float64])
+def test_regression_patch(criterion, dtype):
+    estimator = PatchObliqueRandomForestRegressor(
+        n_estimators=10, criterion=criterion, random_state=0
+    )
     n_test = 0.1
     X = X_large_reg.astype(dtype, copy=False)
     y = y_large_reg.astype(dtype, copy=False)
