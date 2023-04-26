@@ -17,12 +17,12 @@ from sklearn.metrics import (
     mean_poisson_deviance,
     mean_squared_error,
 )
-from sklearn.model_selection import cross_val_score
 from sklearn.random_projection import _sparse_random_matrix
-from sklearn.tree._tree import TREE_LEAF
 from sklearn.utils._testing import skip_if_32bit
 from sklearn.utils.validation import check_random_state
 from sklearn_fork.tree import DecisionTreeClassifier
+from sklearn_fork.model_selection import cross_val_score
+from sklearn_fork.tree._tree import TREE_LEAF
 from sklearn_fork.utils.estimator_checks import parametrize_with_checks
 
 from sktree.tree import (
@@ -45,13 +45,10 @@ REG_TREES = {
     "ObliqueDecisionTreeRegressor": ObliqueDecisionTreeRegressor,
     "PatchObliqueDecisionTreeRegressor": PatchObliqueDecisionTreeRegressor,
 }
-<<<<<<< HEAD
 CLF_TREES = {
     "ObliqueDecisionTreeClassifier": ObliqueDecisionTreeClassifier,
     "PatchObliqueTreeClassifier": PatchObliqueDecisionTreeClassifier,
 }
-=======
->>>>>>> d4fe5bc (add unit test for ObliqueRFRegressor, revert err, fix typos)
 
 X_small = np.array(
     [

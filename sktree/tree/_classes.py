@@ -5,24 +5,23 @@ import numpy as np
 from scipy.sparse import issparse
 from sklearn.base import ClusterMixin, TransformerMixin, is_classifier, is_regressor
 from sklearn.cluster import AgglomerativeClustering
-from sklearn_fork.tree import (
-    BaseDecisionTree,
-    DecisionTreeClassifier,
-    DecisionTreeRegressor,
-    _criterion,
-)
-from sklearn_fork.tree import _tree as _sklearn_tree
-from sklearn_fork.tree._criterion import BaseCriterion
-from sklearn_fork.tree._tree import BestFirstTreeBuilder, DepthFirstTreeBuilder
-from sklearn_fork.utils._param_validation import Interval
-from sklearn_fork.utils.validation import check_is_fitted
+from sklearn.tree import BaseDecisionTree, DecisionTreeClassifier, DecisionTreeRegressor, _criterion
+from sklearn.tree import _tree as _sklearn_tree
+from sklearn.tree._criterion import BaseCriterion
+from sklearn.tree._tree import BestFirstTreeBuilder, DepthFirstTreeBuilder
+from sklearn.utils._param_validation import Interval
+from sklearn.utils.validation import check_is_fitted
 
-from . import _oblique_splitter
+from . import (  # type: ignore
+    _morf_splitter,
+    _oblique_splitter,
+    _unsup_criterion,
+    _unsup_oblique_splitter,
+    _unsup_splitter,
+)
+from ._morf_splitter import PatchSplitter
 from ._oblique_splitter import ObliqueSplitter
 from ._oblique_tree import ObliqueTree
-from .manifold import _morf_splitter
-from .manifold._morf_splitter import PatchSplitter
-from .unsupervised import _unsup_criterion, _unsup_oblique_splitter, _unsup_splitter
 from .unsupervised._unsup_criterion import UnsupervisedCriterion
 from .unsupervised._unsup_oblique_splitter import UnsupervisedObliqueSplitter
 from .unsupervised._unsup_oblique_tree import UnsupervisedObliqueTree
@@ -860,7 +859,7 @@ class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         random_state : int, RandomState instance or None, default=None
             Controls the randomness of the estimator.
         """
-        _, n_features = X.shape
+        n_samples, n_features = X.shape
 
         if self.feature_combinations is None:
             self.feature_combinations_ = min(n_features, 1.5)
@@ -900,7 +899,15 @@ class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
                 self.feature_combinations_,
             )
 
-        self.tree_ = ObliqueTree(self.n_features_in_, self.n_classes_, self.n_outputs_)
+        if is_classifier(self):
+            self.tree_ = ObliqueTree(self.n_features_in_, self.n_classes_, self.n_outputs_)
+        else:
+            self.tree_ = ObliqueTree(
+                self.n_features_in_,
+                # TODO: tree shouldn't need this in this case
+                np.array([1] * self.n_outputs_, dtype=np.intp),
+                self.n_outputs_,
+            )
 
         # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
         if max_leaf_nodes < 0:
@@ -1419,18 +1426,26 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
 
             For multi-output, the weights of each column of y will be multiplied.
 
-            Note that these weights will be multiplied with sample_weight (passed
-            through the fit method) if sample_weight is specified.
-
-        min_patch_dims : array-like, optional
-            The minimum dimensions of a patch, by default 1 along all dimensions.
-        max_patch_dims : array-like, optional
-            The maximum dimensions of a patch, by default 1 along all dimensions.
-        dim_contiguous : array-like of bool, optional
-            Whether or not each patch is sampled contiguously along this dimension.
-        data_dims : array-like, optional
-            The presumed dimensions of the un-vectorized feature vector, by default
-            will be a 1D vector with (1, n_features) shape.
+        Note that these weights will be multiplied with sample_weight (passed
+        through the fit method) if sample_weight is specified.
+    min_patch_dims : array-like, optional
+        The minimum dimensions of a patch, by default 1 along all dimensions.
+    max_patch_dims : array-like, optional
+        The maximum dimensions of a patch, by default 1 along all dimensions.
+    dim_contiguous : array-like of bool, optional
+        Whether or not each patch is sampled contiguously along this dimension.
+    data_dims : array-like, optional
+        The presumed dimensions of the un-vectorized feature vector, by default
+        will be a 1D vector with (1, n_features) shape.
+    boundary : optional, str {'wrap'}
+        The boundary condition to use when sampling patches, by default None.
+        'wrap' corresponds to the boundary condition as is in numpy and scipy.
+    feature_weight : array-like of shape (n_samples,n_features,), default=None
+        Feature weights. If None, then features are equally weighted as is.
+        If provided, then the feature weights are used to weight the
+        patches that are generated. The feature weights are used
+        as follows: for every patch that is sampled, the feature weights over
+        the entire patch is summed and normalizes the patch.
 
     Attributes
     ----------
@@ -1522,6 +1537,8 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         "max_patch_dims": ["array-like", None],
         "data_dims": ["array-like", None],
         "dim_contiguous": ["array-like", None],
+        "boundary": [str, None],
+        "feature_weight": ["array-like", None],
     }
 
     def __init__(
@@ -1542,6 +1559,8 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         max_patch_dims=None,
         dim_contiguous=None,
         data_dims=None,
+        boundary=None,
+        feature_weight=None,
     ):
         super().__init__(
             criterion=criterion,
@@ -1561,6 +1580,8 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         self.max_patch_dims = max_patch_dims
         self.dim_contiguous = dim_contiguous
         self.data_dims = data_dims
+        self.boundary = boundary
+        self.feature_weight = feature_weight
 
     def fit(self, X, y, sample_weight=None, check_input=True):
         """Fit tree.
@@ -1582,7 +1603,6 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         check_input : bool, optional
             Whether or not to check input, by default True.
         """
-
         if check_input:
             # Need to validate separately here.
             # We can't pass multi_output=True because that would allow y to be
@@ -1595,6 +1615,15 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
                 )
             else:
                 X = self._validate_data(X, **check_X_params)
+            if self.feature_weight is not None:
+                self.feature_weight = self._validate_data(
+                    self.feature_weight, ensure_2d=True, dtype=DTYPE
+                )
+                if self.feature_weight.shape != X.shape:
+                    raise ValueError(
+                        f"feature_weight has shape {self.feature_weight.shape} but X has "
+                        f"shape {X.shape}"
+                    )
             if issparse(X):
                 X.sort_indices()
 
@@ -1708,7 +1737,6 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         random_state : int, RandomState instance or None, default=None
             Controls the randomness of the estimator.
         """
-
         n_samples = X.shape[0]
 
         # Build tree
@@ -1718,7 +1746,7 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
                 criterion = CRITERIA_CLF[self.criterion](self.n_outputs_, self.n_classes_)
             else:
                 criterion = CRITERIA_REG[self.criterion](self.n_outputs_, n_samples)
-        else:
+        else: 
             # Make a deepcopy in case the criterion has mutable attributes that
             # might be shared and modified concurrently during parallel fitting
             criterion = copy.deepcopy(criterion)
@@ -1743,17 +1771,11 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
                 self.max_patch_dims_,
                 self.dim_contiguous_,
                 self.data_dims_,
+                self.boundary,
+                self.feature_weight,
             )
 
-        if is_classifier(self):
-            self.tree_ = ObliqueTree(self.n_features_in_, self.n_classes_, self.n_outputs_)
-        else:
-            self.tree_ = ObliqueTree(
-                self.n_features_in_,
-                # TODO: tree shouldn't need this in this case
-                np.array([1] * self.n_outputs_, dtype=np.intp),
-                self.n_outputs_,
-            )
+        self.tree_ = ObliqueTree(self.n_features_in_, self.n_classes_, self.n_outputs_)
 
         # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
         if max_leaf_nodes < 0:
@@ -1778,7 +1800,7 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
 
         builder.build(self.tree_, X, y, sample_weight)
 
-        if self.n_outputs_ == 1 and is_classifier(self):
+        if self.n_outputs_ == 1:
             self.n_classes_ = self.n_classes_[0]
             self.classes_ = self.classes_[0]
 
@@ -1891,11 +1913,6 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         ``N``, ``N_t``, ``N_t_R`` and ``N_t_L`` all refer to the weighted sum,
         if ``sample_weight`` is passed.
 
-    ccp_alpha : non-negative float, default=0.0
-        Complexity parameter used for Minimal Cost-Complexity Pruning. The
-        subtree with the largest cost complexity that is smaller than
-        ``ccp_alpha`` will be chosen. By default, no pruning is performed. See
-        :ref:`minimal_cost_complexity_pruning` for details.
 
     min_patch_dims : array-like, optional
         The minimum dimensions of a patch, by default 1 along all dimensions.
@@ -2084,7 +2101,6 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         random_state=None,
         max_leaf_nodes=None,
         min_impurity_decrease=0.0,
-        ccp_alpha=0.0,
         min_patch_dims=None,
         max_patch_dims=None,
         dim_contiguous=None,
@@ -2103,7 +2119,7 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
             max_leaf_nodes=max_leaf_nodes,
             random_state=random_state,
             min_impurity_decrease=min_impurity_decrease,
-            ccp_alpha=ccp_alpha,
+
         )
 
         self.min_patch_dims = min_patch_dims
