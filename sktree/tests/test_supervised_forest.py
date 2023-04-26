@@ -15,8 +15,6 @@ from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.utils._testing import assert_array_almost_equal
 from sklearn.utils.validation import check_random_state
-from sklearn_fork.ensemble import RandomForestClassifier
-from sklearn_fork.utils.estimator_checks import parametrize_with_checks
 
 from sktree import (
     ObliqueRandomForestClassifier,
@@ -237,8 +235,15 @@ def test_regression_patch(criterion, dtype):
         n_estimators=10, criterion=criterion, random_state=0
     )
     n_test = 0.1
-    X = X_large_reg.astype(dtype, copy=False)
-    y = y_large_reg.astype(dtype, copy=False)
+    X_reg, y_reg = make_regression(
+        n_samples=500,
+        n_features=10,
+        n_informative=3,
+        shuffle=False,
+        random_state=0,
+    )
+    X = X_reg.astype(dtype, copy=False)
+    y = y_reg.astype(dtype, copy=False)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=n_test, random_state=0)
     estimator.fit(X_train, y_train)
     assert estimator.score(X_test, y_test) > 0.88
