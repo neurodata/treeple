@@ -1407,7 +1407,7 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
 
 
 class KernelDecisionTreeClassifier(PatchObliqueDecisionTreeClassifier):
-    """Oblique decision tree classifier over patches of data that are combined with a Gaussian kernel.
+    """Oblique decision tree classifier over data patches combined with Gaussian kernels.
 
     Parameters
     ----------
@@ -1540,9 +1540,11 @@ class KernelDecisionTreeClassifier(PatchObliqueDecisionTreeClassifier):
         patches that are generated. The feature weights are used
         as follows: for every patch that is sampled, the feature weights over
         the entire patch is summed and normalizes the patch.
+    kernel : str {'gaussian', 'uniform'}, default='gaussian'
+        The kernel to use.
     n_kernels : int, optional
         The number of different kernels to generate. This number should be very high
-        as this generates kernels 
+        as this generates kernels
 
     Attributes
     ----------
@@ -1606,6 +1608,7 @@ class KernelDecisionTreeClassifier(PatchObliqueDecisionTreeClassifier):
         "dim_contiguous": ["array-like", None],
         "boundary": [str, None],
         "feature_weight": ["array-like", None],
+        "kernel": ["str"],
         "n_kernels": [int, None],
     }
 
@@ -1629,6 +1632,7 @@ class KernelDecisionTreeClassifier(PatchObliqueDecisionTreeClassifier):
         data_dims=None,
         boundary=None,
         feature_weight=None,
+        kernel="gaussian",
         n_kernels=None,
     ):
         super().__init__(
@@ -1651,6 +1655,8 @@ class KernelDecisionTreeClassifier(PatchObliqueDecisionTreeClassifier):
         self.data_dims = data_dims
         self.boundary = boundary
         self.feature_weight = feature_weight
+
+        self.kernel = kernel
         self.n_kernel = n_kernels
 
     def _build_tree(
@@ -1715,7 +1721,7 @@ class KernelDecisionTreeClassifier(PatchObliqueDecisionTreeClassifier):
             PATCH_SPLITTERS = PATCH_DENSE_SPLITTERS
 
         # compute user-defined Kernel library before
-        kernel_library = self._sample_kernel_library(X, y)
+        kernel_library, kernel_dims, kernel_params = self._sample_kernel_library(X, y)
 
         # Note: users cannot define a splitter themselves
         splitter = PATCH_SPLITTERS[self.splitter](
@@ -1730,7 +1736,7 @@ class KernelDecisionTreeClassifier(PatchObliqueDecisionTreeClassifier):
             self.data_dims_,
             self.boundary,
             self.feature_weight,
-            kernel_library
+            kernel_library,
         )
 
         self.tree_ = ObliqueTree(self.n_features_in_, self.n_classes_, self.n_outputs_)
@@ -1758,10 +1764,14 @@ class KernelDecisionTreeClassifier(PatchObliqueDecisionTreeClassifier):
 
         builder.build(self.tree_, X, y, sample_weight)
 
+        # TODO: set some attributes based on what kernel indices were used in each tree
+        # - construct a tree-nodes like array and set it as a Python attribute, so it is
+        # - exposed to the Python interface
+
         if self.n_outputs_ == 1:
             self.n_classes_ = self.n_classes_[0]
             self.classes_ = self.classes_[0]
-    
+
     def _sample_kernel_library(self, X, y, sample_weight):
         """Samples the dictionary library that is sampled from in the random forest.
 
