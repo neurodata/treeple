@@ -391,30 +391,26 @@ document.write(`
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">issparse</span>
-<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">ClusterMixin</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">,</span> <span class="n">is_classifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">ClusterMixin</span><span class="p">,</span> <span class="n">TransformerMixin</span>
 <span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">AgglomerativeClustering</span>
-<span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">BaseDecisionTree</span><span class="p">,</span> <span class="n">DecisionTreeClassifier</span><span class="p">,</span> <span class="n">_criterion</span>
-<span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">_tree</span> <span class="k">as</span> <span class="n">_sklearn_tree</span>
-<span class="kn">from</span> <span class="nn">sklearn.tree._criterion</span> <span class="kn">import</span> <span class="n">BaseCriterion</span>
-<span class="kn">from</span> <span class="nn">sklearn.tree._tree</span> <span class="kn">import</span> <span class="n">BestFirstTreeBuilder</span><span class="p">,</span> <span class="n">DepthFirstTreeBuilder</span>
-<span class="kn">from</span> <span class="nn">sklearn.utils._param_validation</span> <span class="kn">import</span> <span class="n">Interval</span>
-<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">check_is_fitted</span>
+<span class="kn">from</span> <span class="nn">sklearn_fork.tree</span> <span class="kn">import</span> <span class="n">BaseDecisionTree</span><span class="p">,</span> <span class="n">DecisionTreeClassifier</span><span class="p">,</span> <span class="n">_criterion</span>
+<span class="kn">from</span> <span class="nn">sklearn_fork.tree</span> <span class="kn">import</span> <span class="n">_tree</span> <span class="k">as</span> <span class="n">_sklearn_tree</span>
+<span class="kn">from</span> <span class="nn">sklearn_fork.tree._criterion</span> <span class="kn">import</span> <span class="n">BaseCriterion</span>
+<span class="kn">from</span> <span class="nn">sklearn_fork.tree._tree</span> <span class="kn">import</span> <span class="n">BestFirstTreeBuilder</span><span class="p">,</span> <span class="n">DepthFirstTreeBuilder</span>
+<span class="kn">from</span> <span class="nn">sklearn_fork.utils._param_validation</span> <span class="kn">import</span> <span class="n">Interval</span>
+<span class="kn">from</span> <span class="nn">sklearn_fork.utils.validation</span> <span class="kn">import</span> <span class="n">check_is_fitted</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="p">(</span>  <span class="c1"># type: ignore</span>
-    <span class="n">_morf_splitter</span><span class="p">,</span>
-    <span class="n">_oblique_splitter</span><span class="p">,</span>
-    <span class="n">_unsup_criterion</span><span class="p">,</span>
-    <span class="n">_unsup_oblique_splitter</span><span class="p">,</span>
-    <span class="n">_unsup_splitter</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span> <span class="nn">._morf_splitter</span> <span class="kn">import</span> <span class="n">PatchSplitter</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_oblique_splitter</span>
 <span class="kn">from</span> <span class="nn">._oblique_splitter</span> <span class="kn">import</span> <span class="n">ObliqueSplitter</span>
 <span class="kn">from</span> <span class="nn">._oblique_tree</span> <span class="kn">import</span> <span class="n">ObliqueTree</span>
-<span class="kn">from</span> <span class="nn">._unsup_criterion</span> <span class="kn">import</span> <span class="n">UnsupervisedCriterion</span>
-<span class="kn">from</span> <span class="nn">._unsup_oblique_splitter</span> <span class="kn">import</span> <span class="n">UnsupervisedObliqueSplitter</span>
-<span class="kn">from</span> <span class="nn">._unsup_oblique_tree</span> <span class="kn">import</span> <span class="n">UnsupervisedObliqueTree</span>
-<span class="kn">from</span> <span class="nn">._unsup_splitter</span> <span class="kn">import</span> <span class="n">UnsupervisedSplitter</span>
-<span class="kn">from</span> <span class="nn">._unsup_tree</span> <span class="kn">import</span> <span class="p">(</span>  <span class="c1"># type: ignore</span>
+<span class="kn">from</span> <span class="nn">.manifold</span> <span class="kn">import</span> <span class="n">_morf_splitter</span>
+<span class="kn">from</span> <span class="nn">.manifold._morf_splitter</span> <span class="kn">import</span> <span class="n">PatchSplitter</span>
+<span class="kn">from</span> <span class="nn">.unsupervised</span> <span class="kn">import</span> <span class="n">_unsup_criterion</span><span class="p">,</span> <span class="n">_unsup_oblique_splitter</span><span class="p">,</span> <span class="n">_unsup_splitter</span>
+<span class="kn">from</span> <span class="nn">.unsupervised._unsup_criterion</span> <span class="kn">import</span> <span class="n">UnsupervisedCriterion</span>
+<span class="kn">from</span> <span class="nn">.unsupervised._unsup_oblique_splitter</span> <span class="kn">import</span> <span class="n">UnsupervisedObliqueSplitter</span>
+<span class="kn">from</span> <span class="nn">.unsupervised._unsup_oblique_tree</span> <span class="kn">import</span> <span class="n">UnsupervisedObliqueTree</span>
+<span class="kn">from</span> <span class="nn">.unsupervised._unsup_splitter</span> <span class="kn">import</span> <span class="n">UnsupervisedSplitter</span>
+<span class="kn">from</span> <span class="nn">.unsupervised._unsup_tree</span> <span class="kn">import</span> <span class="p">(</span>  <span class="c1"># type: ignore</span>
     <span class="n">UnsupervisedBestFirstTreeBuilder</span><span class="p">,</span>
     <span class="n">UnsupervisedDepthFirstTreeBuilder</span><span class="p">,</span>
     <span class="n">UnsupervisedTree</span><span class="p">,</span>
@@ -1247,7 +1243,7 @@ document.write(`
 <span class="sd">        random_state : int, RandomState instance or None, default=None</span>
 <span class="sd">            Controls the randomness of the estimator.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">n_samples</span><span class="p">,</span> <span class="n">n_features</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">n_features</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_combinations</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">feature_combinations_</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">n_features</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span>
@@ -1262,10 +1258,7 @@ document.write(`
         <span class="c1"># Build tree</span>
         <span class="n">criterion</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">criterion</span><span class="p">,</span> <span class="n">BaseCriterion</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">is_classifier</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-                <span class="n">criterion</span> <span class="o">=</span> <span class="n">CRITERIA_CLF</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">criterion</span> <span class="o">=</span> <span class="n">CRITERIA_REG</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)</span>
+            <span class="n">criterion</span> <span class="o">=</span> <span class="n">CRITERIA_CLF</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Make a deepcopy in case the criterion has mutable attributes that</span>
             <span class="c1"># might be shared and modified concurrently during parallel fitting</span>
@@ -1290,15 +1283,7 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">feature_combinations_</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">is_classifier</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span> <span class="o">=</span> <span class="n">ObliqueTree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span> <span class="o">=</span> <span class="n">ObliqueTree</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span><span class="p">,</span>
-                <span class="c1"># TODO: tree shouldn&#39;t need this in this case</span>
-                <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">,</span>
-            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span> <span class="o">=</span> <span class="n">ObliqueTree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">)</span>
 
         <span class="c1"># Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise</span>
         <span class="k">if</span> <span class="n">max_leaf_nodes</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -1323,7 +1308,7 @@ document.write(`
 
         <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">is_classifier</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 
@@ -1459,6 +1444,15 @@ document.write(`
 <span class="sd">    data_dims : array-like, optional</span>
 <span class="sd">        The presumed dimensions of the un-vectorized feature vector, by default</span>
 <span class="sd">        will be a 1D vector with (1, n_features) shape.</span>
+<span class="sd">    boundary : optional, str {&#39;wrap&#39;}</span>
+<span class="sd">        The boundary condition to use when sampling patches, by default None.</span>
+<span class="sd">        &#39;wrap&#39; corresponds to the boundary condition as is in numpy and scipy.</span>
+<span class="sd">    feature_weight : array-like of shape (n_samples,n_features,), default=None</span>
+<span class="sd">        Feature weights. If None, then features are equally weighted as is.</span>
+<span class="sd">        If provided, then the feature weights are used to weight the</span>
+<span class="sd">        patches that are generated. The feature weights are used</span>
+<span class="sd">        as follows: for every patch that is sampled, the feature weights over</span>
+<span class="sd">        the entire patch is summed and normalizes the patch.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -1537,6 +1531,8 @@ document.write(`
         <span class="s2">&quot;max_patch_dims&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;array-like&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
         <span class="s2">&quot;data_dims&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;array-like&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
         <span class="s2">&quot;dim_contiguous&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;array-like&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+        <span class="s2">&quot;boundary&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+        <span class="s2">&quot;feature_weight&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;array-like&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
     <span class="p">}</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -1557,6 +1553,8 @@ document.write(`
         <span class="n">max_patch_dims</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">dim_contiguous</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">data_dims</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">boundary</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">feature_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">criterion</span><span class="o">=</span><span class="n">criterion</span><span class="p">,</span>
@@ -1576,6 +1574,8 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims</span> <span class="o">=</span> <span class="n">max_patch_dims</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dim_contiguous</span> <span class="o">=</span> <span class="n">dim_contiguous</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_dims</span> <span class="o">=</span> <span class="n">data_dims</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">boundary</span> <span class="o">=</span> <span class="n">boundary</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span> <span class="o">=</span> <span class="n">feature_weight</span>
 
 <div class="viewcode-block" id="PatchObliqueDecisionTreeClassifier.fit"><a class="viewcode-back" href="../../../generated/sktree.tree.PatchObliqueDecisionTreeClassifier.html#sktree.tree.PatchObliqueDecisionTreeClassifier.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">check_input</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Fit tree.</span>
@@ -1597,7 +1597,6 @@ document.write(`
 <span class="sd">        check_input : bool, optional</span>
 <span class="sd">            Whether or not to check input, by default True.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="k">if</span> <span class="n">check_input</span><span class="p">:</span>
             <span class="c1"># Need to validate separately here.</span>
             <span class="c1"># We can&#39;t pass multi_output=True because that would allow y to be</span>
@@ -1610,6 +1609,15 @@ document.write(`
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_data</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="o">**</span><span class="n">check_X_params</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_data</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span><span class="p">,</span> <span class="n">ensure_2d</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;feature_weight has shape </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> but X has &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;shape </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
             <span class="k">if</span> <span class="n">issparse</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
                 <span class="n">X</span><span class="o">.</span><span class="n">sort_indices</span><span class="p">()</span>
 
@@ -1723,16 +1731,10 @@ document.write(`
 <span class="sd">        random_state : int, RandomState instance or None, default=None</span>
 <span class="sd">            Controls the randomness of the estimator.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">n_samples</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
         <span class="c1"># Build tree</span>
         <span class="n">criterion</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">criterion</span><span class="p">,</span> <span class="n">BaseCriterion</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">is_classifier</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-                <span class="n">criterion</span> <span class="o">=</span> <span class="n">CRITERIA_CLF</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">criterion</span> <span class="o">=</span> <span class="n">CRITERIA_REG</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)</span>
+            <span class="n">criterion</span> <span class="o">=</span> <span class="n">CRITERIA_CLF</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Make a deepcopy in case the criterion has mutable attributes that</span>
             <span class="c1"># might be shared and modified concurrently during parallel fitting</span>
@@ -1758,17 +1760,11 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">dim_contiguous_</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">boundary</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">is_classifier</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span> <span class="o">=</span> <span class="n">ObliqueTree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span> <span class="o">=</span> <span class="n">ObliqueTree</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span><span class="p">,</span>
-                <span class="c1"># TODO: tree shouldn&#39;t need this in this case</span>
-                <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">,</span>
-            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span> <span class="o">=</span> <span class="n">ObliqueTree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">)</span>
 
         <span class="c1"># Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise</span>
         <span class="k">if</span> <span class="n">max_leaf_nodes</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -1793,7 +1789,7 @@ document.write(`
 
         <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">is_classifier</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 </pre></div>
@@ -1840,7 +1836,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-04-15.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-04-26.
       <br/>
     
   </p>

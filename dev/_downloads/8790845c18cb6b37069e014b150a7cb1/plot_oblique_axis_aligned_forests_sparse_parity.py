@@ -16,11 +16,12 @@ otherwise the label is defined as 0. The simulation is further detailed
 in this [publication](https://epubs.siam.org/doi/epdf/10.1137/1.9781611974973.56).
 """
 
+from datetime import datetime
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from datetime import datetime
 import seaborn as sns
-import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import RepeatedKFold, cross_validate
 

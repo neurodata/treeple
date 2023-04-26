@@ -27,13 +27,24 @@ data structure. For example, if the patch size is ``(3, 3)`` and the data struct
 is ``(5, 5)``, then the patch will only sample indices within the data.
 
 We also allow each dimension to be arbitrarily discontiguous.
+
+For details on how to use the hyperparameters related to the patches, see
+:class:`sktree.tree.PatchObliqueDecisionTreeClassifier`.
 """
 
-import numpy as np
 import matplotlib.pyplot as plt
 
-from sklearn.tree._criterion import Gini
-from sktree.tree._morf_splitter import BestPatchSplitterTester
+# import modules
+# .. note:: We use a private Cython module here to demonstrate what the patches
+#           look like. This is not part of the public API. The Cython module used
+#           is just a Python wrapper for the underlying Cython code and is not the
+#           same as the Cython splitter used in the actual implementation.
+#           To use the actual splitter, one should use the public API for the
+#           relevant tree/forests class.
+import numpy as np
+from sklearn_fork.tree._criterion import Gini
+
+from sktree.tree.manifold._morf_splitter import BestPatchSplitterTester
 
 # %%
 # Initialize patch splitter
@@ -47,6 +58,9 @@ max_features = 6
 min_samples_leaf = 1
 min_weight_leaf = 0.0
 random_state = np.random.RandomState(100)
+
+boundary = None
+feature_weight = None
 
 # initialize some dummy data
 X = np.repeat(np.arange(25).astype(np.float32), 5).reshape(5, -1)
@@ -76,6 +90,8 @@ splitter = BestPatchSplitterTester(
     max_patch_dims,
     dim_contiguous,
     data_dims,
+    boundary,
+    feature_weight,
 )
 splitter.init_test(X, y, sample_weight)
 
@@ -118,6 +134,8 @@ splitter = BestPatchSplitterTester(
     max_patch_dims,
     dim_contiguous,
     data_dims,
+    boundary,
+    feature_weight,
 )
 splitter.init_test(X, y, sample_weight)
 
@@ -164,6 +182,8 @@ splitter = BestPatchSplitterTester(
     max_patch_dims,
     dim_contiguous,
     data_dims,
+    boundary,
+    feature_weight,
 )
 splitter.init_test(X, y, sample_weight)
 
@@ -224,6 +244,8 @@ splitter = BestPatchSplitterTester(
     max_patch_dims,
     dim_contiguous,
     data_dims,
+    boundary,
+    feature_weight,
 )
 splitter.init_test(X, y, sample_weight)
 

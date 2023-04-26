@@ -386,8 +386,8 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for sktree.ensemble._supervised_forest</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">sklearn.ensemble._forest</span> <span class="kn">import</span> <span class="n">ForestClassifier</span>
-<span class="kn">from</span> <span class="nn">sklearn.utils._param_validation</span> <span class="kn">import</span> <span class="n">StrOptions</span>
+<span></span><span class="kn">from</span> <span class="nn">sklearn_fork.ensemble._forest</span> <span class="kn">import</span> <span class="n">ForestClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn_fork.utils._param_validation</span> <span class="kn">import</span> <span class="n">StrOptions</span>
 
 <span class="kn">from</span> <span class="nn">sktree.tree</span> <span class="kn">import</span> <span class="n">ObliqueDecisionTreeClassifier</span><span class="p">,</span> <span class="n">PatchObliqueDecisionTreeClassifier</span>
 
@@ -882,6 +882,15 @@ document.write(`
 <span class="sd">    data_dims : array-like, optional</span>
 <span class="sd">        The presumed dimensions of the un-vectorized feature vector, by default</span>
 <span class="sd">        will be a 1D vector with (1, n_features) shape.</span>
+<span class="sd">    boundary : optional, str {&#39;wrap&#39;}</span>
+<span class="sd">        The boundary condition to use when sampling patches, by default None.</span>
+<span class="sd">        &#39;wrap&#39; corresponds to the boundary condition as is in numpy and scipy.</span>
+<span class="sd">    feature_weight : array-like of shape (n_features,), default=None</span>
+<span class="sd">        Feature weights. If None, then features are equally weighted as is.</span>
+<span class="sd">        If provided, then the feature weights are used to weight the</span>
+<span class="sd">        patches that are generated. The feature weights are used</span>
+<span class="sd">        as follows: for every patch that is sampled, the feature weights over</span>
+<span class="sd">        the entire patch is summed and normalizes the patch.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -999,6 +1008,8 @@ document.write(`
         <span class="n">max_patch_dims</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">dim_contiguous</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">data_dims</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">boundary</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">feature_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">estimator</span><span class="o">=</span><span class="n">PatchObliqueDecisionTreeClassifier</span><span class="p">(),</span>
@@ -1017,6 +1028,8 @@ document.write(`
                 <span class="s2">&quot;max_patch_dims&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;dim_contiguous&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;data_dims&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;boundary&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;feature_weight&quot;</span><span class="p">,</span>
             <span class="p">),</span>
             <span class="n">bootstrap</span><span class="o">=</span><span class="n">bootstrap</span><span class="p">,</span>
             <span class="n">oob_score</span><span class="o">=</span><span class="n">oob_score</span><span class="p">,</span>
@@ -1037,6 +1050,8 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims</span> <span class="o">=</span> <span class="n">max_patch_dims</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dim_contiguous</span> <span class="o">=</span> <span class="n">dim_contiguous</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_dims</span> <span class="o">=</span> <span class="n">data_dims</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">boundary</span> <span class="o">=</span> <span class="n">boundary</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span> <span class="o">=</span> <span class="n">feature_weight</span>
 
         <span class="c1"># unused by oblique forests</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_weight_fraction_leaf</span> <span class="o">=</span> <span class="n">min_weight_fraction_leaf</span>
@@ -1086,7 +1101,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-04-15.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-04-26.
       <br/>
     
   </p>
