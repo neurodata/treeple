@@ -12,20 +12,20 @@ import numpy as np
 
 cimport numpy as cnp
 from libcpp.vector cimport vector
-from sklearn.tree._splitter cimport SplitRecord
-from sklearn.tree._tree cimport DOUBLE_t  # Type of y, sample_weight
-from sklearn.tree._tree cimport DTYPE_t  # Type of X
-from sklearn.tree._tree cimport INT32_t  # Signed 32 bit integer
-from sklearn.tree._tree cimport SIZE_t  # Type for indices and counters
-from sklearn.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
-from sklearn.tree._tree cimport Node, Tree, TreeBuilder
+from sklearn_fork.tree._splitter cimport SplitRecord
+from sklearn_fork.tree._tree cimport DOUBLE_t  # Type of y, sample_weight
+from sklearn_fork.tree._tree cimport DTYPE_t  # Type of X
+from sklearn_fork.tree._tree cimport INT32_t  # Signed 32 bit integer
+from sklearn_fork.tree._tree cimport SIZE_t  # Type for indices and counters
+from sklearn_fork.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
+from sklearn_fork.tree._tree cimport Node, Tree, TreeBuilder
 
 from ._oblique_splitter cimport ObliqueSplitRecord
 
 
 cdef class ObliqueTree(Tree):
-    cdef vector[vector[DTYPE_t]] proj_vec_weights # (capacity, n_features) array of projection vectors
-    cdef vector[vector[SIZE_t]] proj_vec_indices  # (capacity, n_features) array of projection vectors
+    cdef vector[vector[DTYPE_t]] proj_vec_weights  # (capacity, n_features) array of projection vectors
+    cdef vector[vector[SIZE_t]] proj_vec_indices   # (capacity, n_features) array of projection vectors
 
     # overridden methods
     cdef int _resize_c(

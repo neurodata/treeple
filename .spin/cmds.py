@@ -27,7 +27,7 @@ def docs(build_dir, clean=False):
 
     os.environ["SPHINXOPTS"] = "-W"
     os.environ["PYTHONPATH"] = f'{site_path}{os.sep}:{os.environ.get("PYTHONPATH", "")}'
-    util.run(["make", "-C", "docs", "html-noplot"], replace=True)
+    util.run(["make", "-C", "docs", "clean", "html-noplot"], replace=True)
 
 
 @click.command()
