@@ -15,15 +15,15 @@ from sklearn.base import ClusterMixin, TransformerMixin
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.ensemble._forest import (
     MAX_INT,
-    BaseForest,
     _generate_unsampled_indices,
     _get_n_samples_bootstrap,
     _parallel_build_trees,
 )
 from sklearn.metrics import calinski_harabasz_score, pairwise_distances
-from sklearn.tree._tree import DTYPE
 from sklearn.utils.parallel import Parallel, delayed
-from sklearn.utils.validation import _check_sample_weight, check_is_fitted, check_random_state
+from sklearn_fork.ensemble._forest import BaseForest
+from sklearn_fork.tree._tree import DTYPE
+from sklearn_fork.utils.validation import _check_sample_weight, check_is_fitted, check_random_state
 
 from sktree.tree import UnsupervisedDecisionTree, UnsupervisedObliqueDecisionTree
 

@@ -26,7 +26,7 @@ include = [
 [build-system]
 build-backend = "mesonpy"
 requires = [
-    "meson-python>=0.12.0",
+    "meson-python>=0.13.0",
     'ninja',
     # `wheel` is needed for non-isolated builds, given that `meson-python`
     # doesn't list it as a runtime requirement (at least in 0.10.0)
@@ -35,7 +35,8 @@ requires = [
     "setuptools<=65.5",
     "packaging",
     "Cython>=0.29.24",
-    "scikit-learn-tree>=1.2.2",
+    "scikit-learn",
+    "scikit-learn-tree>=1.2.3",
     "lazy_loader>=0.1",
 
     # We follow scipy for much of these pinnings
@@ -94,6 +95,7 @@ bandit = "^1.7.4"
 pydocstyle = "^6.1.1"
 codespell = "^2.1.0"
 toml = "^0.10.2"
+cython-lint = "^0.3.0"
 
 [tool.poetry.group.docs]
 optional = true
@@ -118,6 +120,7 @@ _flake8 = 'flake8'
 _bandit = 'bandit -r sktree -c pyproject.toml'
 _black = 'black .'
 _isort = 'isort .'
+_cythonlint = 'cython-lint sktree/'
 _black_check = 'black --check sktree examples'
 _isort_check = 'isort --check .'
 _pydocstyle = 'pydocstyle ./sktree'
@@ -132,7 +135,7 @@ build_docs_noplot = 'make -C docs/ clean html-noplot'
 clean = { shell = 'rm -rf builddir; rm -rf clean; rm -rf build; rm -rf _build; rm -rf dist;' }
 
 [[tool.poe.tasks.lint]]
-sequence = ['_flake8', '_bandit', '_codespell', '_pydocstyle']
+sequence = ['_flake8', '_bandit', '_codespell', '_pydocstyle', '_cythonlint']
 ignore_fail = 'return_non_zero'
 
 [[tool.poe.tasks.format]]
@@ -161,8 +164,6 @@ extend-exclude = '''
 (
       __pycache__
     | \.github
-    | setup.py
-    | docs/
 )
 '''
 
@@ -171,7 +172,7 @@ profile = 'black'
 multi_line_output = 3
 line_length = 100
 py_version = 38
-extend_skip_glob = ['setup.py', 'docs/*', 'examples/*', 'sktree/__init__.py']
+extend_skip_glob = ['sktree/__init__.py']
 
 [tool.pydocstyle]
 convention = 'numpy'
@@ -216,4 +217,25 @@ Environments = [
 Documentation = ['.spin/cmds.py:docs']
 Metrics = [
     '.spin/cmds.py:coverage',
+]
+
+[tool.cython-lint]
+# Ignore the same error codes as flake8
+# + E501 (line too long) because keeping it < 88 in cython
+# often makes code less readable.
+ignore = [
+    # check ignored by default in flake8. Meaning unclear.
+    'E24',
+    # space before : (needed for how black formats slicing)
+    'E203',
+    # line too long
+    'E501',
+    # do not assign a lambda expression, use a def
+    'E731',
+    # do not use variables named 'l', 'O', or 'I'
+    'E741',
+    # line break before binary operator
+    'W503',
+    # line break after binary operator
+    'W504',
 ]

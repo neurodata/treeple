@@ -1,9 +1,9 @@
-from operator import attrgetter
 import inspect
-import subprocess
 import os
+import subprocess
 import sys
 from functools import partial
+from operator import attrgetter
 
 REVISION_CMD = "git rev-parse --short HEAD"
 
@@ -79,6 +79,4 @@ def make_linkcode_resolve(package, url_fmt):
                                    '{path}#L{lineno}')
     """
     revision = _get_git_revision()
-    return partial(
-        _linkcode_resolve, revision=revision, package=package, url_fmt=url_fmt
-    )
+    return partial(_linkcode_resolve, revision=revision, package=package, url_fmt=url_fmt)

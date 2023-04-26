@@ -8,8 +8,8 @@ import numpy as np
 
 from cython.operator cimport dereference as deref
 from libcpp.vector cimport vector
-from sklearn.tree._criterion cimport Criterion
 from sklearn.tree._utils cimport rand_int
+from sklearn_fork.tree._criterion cimport Criterion
 
 
 cdef double INFINITY = np.inf
@@ -138,6 +138,32 @@ cdef class BaseObliqueSplitter(Splitter):
 
         return sizeof(ObliqueSplitRecord)
 
+    cdef void compute_features_over_samples(
+        self,
+        SIZE_t start,
+        SIZE_t end,
+        const SIZE_t[:] samples,
+        DTYPE_t[:] feature_values,
+        vector[DTYPE_t]* proj_vec_weights,  # weights of the vector (max_features,)
+        vector[SIZE_t]* proj_vec_indices    # indices of the features (max_features,)
+    ) noexcept nogil:
+        """Compute the feature values for the samples[start:end] range.
+
+        Returns -1 in case of failure to allocate memory (and raise MemoryError)
+        or 0 otherwise.
+        """
+        cdef SIZE_t idx, jdx
+
+        # Compute linear combination of features and then
+        # sort samples according to the feature values.
+        for idx in range(start, end):
+            # initialize the feature value to 0
+            feature_values[idx] = 0
+            for jdx in range(0, proj_vec_indices.size()):
+                feature_values[idx] += self.X[
+                    samples[idx], deref(proj_vec_indices)[jdx]
+                ] * deref(proj_vec_weights)[jdx]
+
     cdef int node_split(
         self,
         double impurity,
@@ -158,7 +184,7 @@ cdef class BaseObliqueSplitter(Splitter):
         cdef SIZE_t end = self.end
 
         # pointer array to store feature values to split on
-        cdef DTYPE_t[::1]  Xf = self.feature_values
+        cdef DTYPE_t[::1]  feature_values = self.feature_values
         cdef SIZE_t max_features = self.max_features
         cdef SIZE_t min_samples_leaf = self.min_samples_leaf
         cdef double min_weight_leaf = self.min_weight_leaf
@@ -170,7 +196,6 @@ cdef class BaseObliqueSplitter(Splitter):
         cdef double best_proxy_improvement = -INFINITY
 
         cdef SIZE_t feat_i, p       # index over computed features and start/end
-        cdef SIZE_t idx, jdx        # index over max_feature, and
         cdef SIZE_t partition_end
         cdef DTYPE_t temp_d         # to compute a projection feature value
 
@@ -194,22 +219,23 @@ cdef class BaseObliqueSplitter(Splitter):
 
             # Compute linear combination of features and then
             # sort samples according to the feature values.
-            for idx in range(start, end):
-                # initialize the feature value to 0
-                Xf[idx] = 0
-                for jdx in range(0, current_split.proj_vec_indices.size()):
-                    Xf[idx] += self.X[
-                        samples[idx], deref(current_split.proj_vec_indices)[jdx]
-                    ] * deref(current_split.proj_vec_weights)[jdx]
+            self.compute_features_over_samples(
+                start,
+                end,
+                samples,
+                feature_values,
+                &self.proj_mat_weights[feat_i],
+                &self.proj_mat_indices[feat_i]
+            )
 
             # Sort the samples
-            sort(&Xf[start], &samples[start], end - start)
+            sort(&feature_values[start], &samples[start], end - start)
 
             # Evaluate all splits
             self.criterion.reset()
             p = start
             while p < end:
-                while (p + 1 < end and Xf[p + 1] <= Xf[p] + FEATURE_THRESHOLD):
+                while (p + 1 < end and feature_values[p + 1] <= feature_values[p] + FEATURE_THRESHOLD):
                     p += 1
 
                 p += 1
@@ -234,14 +260,14 @@ cdef class BaseObliqueSplitter(Splitter):
                     if current_proxy_improvement > best_proxy_improvement:
                         best_proxy_improvement = current_proxy_improvement
                         # sum of halves is used to avoid infinite value
-                        current_split.threshold = Xf[p - 1] / 2.0 + Xf[p] / 2.0
+                        current_split.threshold = feature_values[p - 1] / 2.0 + feature_values[p] / 2.0
 
                         if (
-                            (current_split.threshold == Xf[p]) or
+                            (current_split.threshold == feature_values[p]) or
                             (current_split.threshold == INFINITY) or
                             (current_split.threshold == -INFINITY)
                         ):
-                            current_split.threshold = Xf[p - 1]
+                            current_split.threshold = feature_values[p - 1]
 
                         best_split = current_split  # copy
 
@@ -347,6 +373,9 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         # create a helper array for allowing efficient Fisher-Yates
         self.indices_to_sample = np.arange(self.max_features * self.n_features,
                                            dtype=np.intp)
+
+        # XXX: Just to initialize stuff
+        # self.feature_weights = np.ones((self.n_features,), dtype=DTYPE_t) / self.n_features
         return 0
 
 

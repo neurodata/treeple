@@ -17,10 +17,8 @@ import numpy as np
 cimport numpy as cnp
 cnp.import_array()
 
-from scipy.sparse import csr_matrix, issparse
-
 from cython.operator cimport dereference as deref
-from sklearn.tree._utils cimport safe_realloc, sizet_ptr_to_ndarray
+from sklearn_fork.tree._utils cimport safe_realloc, sizet_ptr_to_ndarray
 
 cdef extern from "numpy/arrayobject.h":
     object PyArray_NewFromDescr(PyTypeObject* subtype, cnp.dtype descr,
@@ -31,7 +29,7 @@ cdef extern from "numpy/arrayobject.h":
 
 # Gets Node dtype exposed inside oblique_tree.
 # See "_tree.pyx" for more details.
-cdef Node dummy;  # no-cython-lint
+cdef Node dummy
 NODE_DTYPE = np.asarray(<Node[:1]>(&dummy)).dtype
 
 # Mitigate precision differences between 32 bit and 64 bit
@@ -182,10 +180,10 @@ cdef class ObliqueTree(Tree):
                 self.proj_vec_weights[i].push_back(weight)
                 self.proj_vec_indices[i].push_back(j)
 
-        nodes = memcpy(self.nodes, cnp.PyArray_DATA(node_ndarray),
-                       self.capacity * sizeof(Node))
-        value = memcpy(self.value, cnp.PyArray_DATA(value_ndarray),
-                       self.capacity * self.value_stride * sizeof(double))
+        memcpy(self.nodes, cnp.PyArray_DATA(node_ndarray),
+               self.capacity * sizeof(Node))
+        memcpy(self.value, cnp.PyArray_DATA(value_ndarray),
+               self.capacity * self.value_stride * sizeof(double))
 
     cpdef cnp.ndarray get_projection_matrix(self):
         """Get the projection matrix of shape (node_count, n_features)."""
@@ -239,7 +237,7 @@ cdef class ObliqueTree(Tree):
         """Set node data.
         """
         # Cython type cast split record into its inherited split record
-        # For reference, see: 
+        # For reference, see:
         # https://www.codementor.io/@arpitbhayani/powering-inheritance-in-c-using-structure-composition-176sygr724
         cdef ObliqueSplitRecord* oblique_split_node = <ObliqueSplitRecord*>(split_node)
         cdef SIZE_t node_id = self.node_count

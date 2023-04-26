@@ -12,15 +12,26 @@ import numpy as np
 
 cimport numpy as cnp
 from libcpp.vector cimport vector
-from sklearn.tree._splitter cimport SplitRecord
-from sklearn.tree._tree cimport DOUBLE_t  # Type of y, sample_weight
-from sklearn.tree._tree cimport DTYPE_t  # Type of X
-from sklearn.tree._tree cimport INT32_t  # Signed 32 bit integer
-from sklearn.tree._tree cimport SIZE_t  # Type for indices and counters
-from sklearn.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
 from sklearn.utils._sorting cimport simultaneous_sort
+from sklearn_fork.tree._splitter cimport SplitRecord
+from sklearn_fork.tree._tree cimport DOUBLE_t  # Type of y, sample_weight
+from sklearn_fork.tree._tree cimport DTYPE_t  # Type of X
+from sklearn_fork.tree._tree cimport INT32_t  # Signed 32 bit integer
+from sklearn_fork.tree._tree cimport SIZE_t  # Type for indices and counters
+from sklearn_fork.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
 
-from ._oblique_splitter cimport BaseObliqueSplitter, ObliqueSplitRecord
+from .._oblique_splitter cimport BaseObliqueSplitter, ObliqueSplitRecord
+
+# https://github.com/cython/cython/blob/master/Cython/Includes/libcpp/algorithm.pxd
+# shows how to include standard library functions in Cython
+# This includes the discrete_distribution C++ class, which can be used
+# to generate samples from a discrete distribution with non-uniform probabilities.
+# cdef extern from "<discrete_distribution>" namespace "std" nogil:
+#     cdef cppclass discrete_distribution[T]
+#         ctypedef T int_type
+#         ctypedef G generator_type
+#         discrete_distribution(T first, T last) except +
+#         operator()(&G) except +
 
 
 # https://github.com/cython/cython/blob/master/Cython/Includes/libcpp/algorithm.pxd
@@ -42,15 +53,18 @@ cdef class PatchSplitter(BaseObliqueSplitter):
     cdef public SIZE_t data_width                       # Width of the input data
 
     cdef public SIZE_t ndim                       # The number of dimensions of the input data
-    
+
     cdef SIZE_t[:] data_dims                      # The dimensions of the input data
     cdef SIZE_t[:] min_patch_dims                 # The minimum size of the patch to sample in each dimension
     cdef SIZE_t[:] max_patch_dims                 # The maximum size of the patch to sample in each dimension
     cdef cnp.uint8_t[:] dim_contiguous            # A boolean array indicating whether each dimension is contiguous
-    
+
     # TODO: check if this works and is necessary for discontiguous data
     # cdef SIZE_t[:] stride_offsets                # The stride offsets for each dimension
     cdef bint _discontiguous
+
+    cdef str boundary                            # how to sample the patch with boundary in mind
+    cdef DTYPE_t[:, :] feature_weight               # Whether or not to normalize each column of X when adding in a patch
 
     cdef SIZE_t[::1] _index_data_buffer
     cdef SIZE_t[::1] _index_patch_buffer
@@ -60,8 +74,32 @@ cdef class PatchSplitter(BaseObliqueSplitter):
     # All oblique splitters (i.e. non-axis aligned splitters) require a
     # function to sample a projection matrix that is applied to the feature matrix
     # to quickly obtain the sampled projections for candidate splits.
+    cdef (SIZE_t, SIZE_t) sample_top_left_seed(
+        self
+    ) noexcept nogil
+
     cdef void sample_proj_mat(
-        self, 
+        self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
         vector[vector[SIZE_t]]& proj_mat_indices
-    ) nogil 
+    ) nogil
+
+
+cdef class UserKernelSplitter(PatchSplitter):
+    """A class to hold user-specified kernels."""
+    cdef vector[DTYPE_t[:, ::1]] kernel_dictionary  # A list of C-contiguous 2D kernels
+
+
+cdef class GaussianKernelSplitter(PatchSplitter):
+    """A class to hold Gaussian kernels.
+
+    Overrides the weights that are generated to be sampled from a Gaussian distribution.
+    See: https://www.tutorialspoint.com/gaussian-filter-generation-in-cplusplus
+    See: https://gist.github.com/thomasaarholt/267ec4fff40ca9dff1106490ea3b7567
+    """
+
+    cdef void sample_proj_mat(
+        self,
+        vector[vector[DTYPE_t]]& proj_mat_weights,
+        vector[vector[SIZE_t]]& proj_mat_indices
+    ) nogil

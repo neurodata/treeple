@@ -3,10 +3,10 @@ from itertools import product
 
 import numpy as np
 from numpy.testing import assert_equal
-from sklearn.tree._criterion import Gini
+from sklearn_fork.tree._criterion import Gini
 
-from .._morf_splitter import BestPatchSplitterTester
 from .._utils import ravel_multi_index, unravel_index
+from ..manifold._morf_splitter import BestPatchSplitterTester
 
 
 def is_contiguous_patch(patch_arr, patch_indices, data_dims):
@@ -92,6 +92,9 @@ def test_best_patch_splitter_contiguous():
     max_patch_dims = np.array((2, 3, 6))
     dim_contiguous = np.array((True, True, True))
 
+    boundary = None
+    feature_weight = None
+
     splitter = BestPatchSplitterTester(
         criterion,
         max_features,
@@ -102,6 +105,8 @@ def test_best_patch_splitter_contiguous():
         max_patch_dims,
         dim_contiguous,
         data_dims,
+        boundary,
+        feature_weight,
     )
     splitter.init_test(X, y, sample_weight)
 
