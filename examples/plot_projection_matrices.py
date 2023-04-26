@@ -31,12 +31,7 @@ We also allow each dimension to be arbitrarily discontiguous.
 For details on how to use the hyperparameters related to the patches, see
 :class:`sktree.tree.PatchObliqueDecisionTreeClassifier`.
 """
-<<<<<<< HEAD
-=======
 
-import matplotlib.pyplot as plt
-
->>>>>>> a89a791 ([ENH] Enhance discontiguous sampled patch trees (#67))
 # import modules
 # .. note:: We use a private Cython module here to demonstrate what the patches
 #           look like. This is not part of the public API. The Cython module used
@@ -45,13 +40,8 @@ import matplotlib.pyplot as plt
 #           To use the actual splitter, one should use the public API for the
 #           relevant tree/forests class.
 import numpy as np
-<<<<<<< HEAD
 import matplotlib.pyplot as plt
 from sklearn_fork.tree._criterion import Gini
-=======
-from sklearn_fork.tree._criterion import Gini
-
->>>>>>> a89a791 ([ENH] Enhance discontiguous sampled patch trees (#67))
 from sktree.tree.manifold._morf_splitter import BestPatchSplitterTester
 
 # %%

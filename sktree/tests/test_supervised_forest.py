@@ -8,6 +8,7 @@ from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.metrics import accuracy_score, mean_squared_error
 =======
 from sklearn.datasets import make_classification, make_regression
+from sklearn.datasets import load_diabetes, make_classification, make_regression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 >>>>>>> d4fe5bc (add unit test for ObliqueRFRegressor, revert err, fix typos)
@@ -34,6 +35,7 @@ X_large, y_large = make_classification(
     shuffle=False,
     random_state=0,
 )
+
 # Larger regression sample used for testing feature importances
 X_large_reg, y_large_reg = make_regression(
     n_samples=500,
@@ -225,6 +227,21 @@ def test_regression_patch(criterion, dtype):
     assert estimator.score(X_test, y_test) > 0.88
 =======
 >>>>>>> d4fe5bc (add unit test for ObliqueRFRegressor, revert err, fix typos)
+
+
+# Unit test for PatchObliqueRandomForestRegressor
+@pytest.mark.parametrize("criterion", REG_CRITERIONS)
+@pytest.mark.parametrize("dtype", [np.float32, np.float64])
+def test_regression_patch(criterion, dtype):
+    estimator = PatchObliqueRandomForestRegressor(
+        n_estimators=10, criterion=criterion, random_state=0
+    )
+    n_test = 0.1
+    X = X_large_reg.astype(dtype, copy=False)
+    y = y_large_reg.astype(dtype, copy=False)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=n_test, random_state=0)
+    estimator.fit(X_train, y_train)
+    assert estimator.score(X_test, y_test) > 0.88
 
 
 def test_oblique_forest_sparse_parity():
