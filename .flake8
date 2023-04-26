@@ -18,8 +18,6 @@ exclude =
     .pytest_cache
     .circleci
     paper
-    setup.py
-    docs
     docs/_build
     docs/generated
     docs/auto_examples

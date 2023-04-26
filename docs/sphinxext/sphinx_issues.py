@@ -77,9 +77,7 @@ def cve_role(name, rawtext, text, lineno, inliner, options=None, content=None):
 class IssueRole(object):
     EXTERNAL_REPO_REGEX = re.compile(r"^(\w+)/(.+)([#@])([\w]+)$")
 
-    def __init__(
-        self, uri_config_option, format_kwarg, github_uri_template, format_text=None
-    ):
+    def __init__(self, uri_config_option, format_kwarg, github_uri_template, format_text=None):
         self.uri_config_option = uri_config_option
         self.format_kwarg = format_kwarg
         self.github_uri_template = github_uri_template
@@ -96,9 +94,7 @@ class IssueRole(object):
         if repo_match:  # External repo
             username, repo, symbol, issue = repo_match.groups()
             if name not in name_map:
-                raise ValueError(
-                    "External repo linking not supported for :{}:".format(name)
-                )
+                raise ValueError("External repo linking not supported for :{}:".format(name))
             path = name_map.get(name)
             ref = "https://github.com/{issues_github_path}/{path}/{n}".format(
                 issues_github_path="{}/{}".format(username, repo), path=path, n=issue
@@ -118,9 +114,7 @@ class IssueRole(object):
                 )
             else:
                 raise ValueError(
-                    "Neither {} nor issues_github_path is set".format(
-                        self.uri_config_option
-                    )
+                    "Neither {} nor issues_github_path is set".format(self.uri_config_option)
                 )
             issue_text = self.format_text(issue_no)
             link = nodes.reference(text=issue_text, refuri=ref, **options)
@@ -128,9 +122,7 @@ class IssueRole(object):
             link = None
         return link
 
-    def __call__(
-        self, name, rawtext, text, lineno, inliner, options=None, content=None
-    ):
+    def __call__(self, name, rawtext, text, lineno, inliner, options=None, content=None):
         options = options or {}
         content = content or []
         issue_nos = [each.strip() for each in utils.unescape(text).split(",")]

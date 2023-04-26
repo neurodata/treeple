@@ -5,7 +5,6 @@
 # cython: wraparound=False
 # cython: profile=True
 
-import cython
 import numpy as np
 
 cimport numpy as cnp
@@ -82,7 +81,7 @@ cdef void unravel_index_cython(SIZE_t index, const SIZE_t[:] shape, SIZE_t[:] co
         An array of coordinate arrays, with each coordinate array having the same shape as the input `shape`.
     """
     cdef SIZE_t ndim = shape.shape[0]
-    cdef SIZE_t i, j, size
+    cdef SIZE_t j, size
 
     for j in range(ndim - 1, -1, -1):
         size = shape[j]

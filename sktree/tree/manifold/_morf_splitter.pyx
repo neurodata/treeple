@@ -11,12 +11,12 @@ cimport numpy as cnp
 
 cnp.import_array()
 
-from libc.stdlib cimport RAND_MAX, rand, srand
+from cython.operator cimport dereference as deref
 from libcpp.vector cimport vector
-from sklearn.tree._criterion cimport Criterion
 from sklearn.tree._utils cimport rand_int
+from sklearn_fork.tree._criterion cimport Criterion
 
-from ._utils cimport ravel_multi_index_cython, unravel_index_cython
+from .._utils cimport ravel_multi_index_cython, unravel_index_cython
 
 
 cdef class PatchSplitter(BaseObliqueSplitter):
@@ -35,6 +35,8 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         SIZE_t[:] max_patch_dims,
         cnp.uint8_t[::1] dim_contiguous,
         SIZE_t[:] data_dims,
+        str boundary,
+        DTYPE_t[:, :] feature_weight,
         *argv
     ):
         self.criterion = criterion
@@ -64,7 +66,7 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         self.min_patch_dims = min_patch_dims
         self.max_patch_dims = max_patch_dims
         self.dim_contiguous = dim_contiguous
-        
+
         # initialize a buffer to allow for Fisher-Yates
         self._index_patch_buffer = np.zeros(np.max(self.max_patch_dims), dtype=np.intp)
         self._index_data_buffer = np.zeros(np.max(self.data_dims), dtype=np.intp)
@@ -74,6 +76,9 @@ cdef class PatchSplitter(BaseObliqueSplitter):
             self._discontiguous = True
         else:
             self._discontiguous = False
+
+        self.boundary = boundary
+        self.feature_weight = feature_weight
 
     def __getstate__(self):
         return {}
@@ -141,15 +146,15 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         """
         pass
 
+    cdef (SIZE_t, SIZE_t) sample_top_left_seed(self) noexcept nogil:
+        pass
+
     cdef int pointer_size(self) noexcept nogil:
         """Get size of a pointer to record for ObliqueSplitter."""
 
         return sizeof(ObliqueSplitRecord)
 
 cdef class BaseDensePatchSplitter(PatchSplitter):
-    # XXX: currently BaseOblique class defines this, which shouldn't be the case
-    # cdef const DTYPE_t[:, :] X
-
     cdef int init(self,
                   object X,
                   const DOUBLE_t[:, ::1] y,
@@ -183,11 +188,19 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
             ), self.__getstate__())
 
     cdef (SIZE_t, SIZE_t) sample_top_left_seed(self) noexcept nogil:
+        """Sample the top-left seed for the n-dim patch.
+
+        Returns
+        -------
+        top_left_seed : SIZE_t
+            The top-left seed vectorized (i.e. raveled) for the n-dim patch.
+        patch_size : SIZE_t
+            The total size of the n-dim patch (i.e. the volume).
+        """
         # now get the top-left seed that is used to then determine the top-left
         # position in patch
         # compute top-left seed for the multi-dimensional patch
         cdef SIZE_t top_left_patch_seed
-        cdef SIZE_t ndim_ravel_boundary = 1
         cdef SIZE_t patch_size = 1
 
         cdef UINT32_t* random_state = &self.rand_r_state
@@ -196,7 +209,8 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
         cdef SIZE_t patch_dim
         cdef SIZE_t delta_patch_dim
 
-        cdef SIZE_t jdx
+        cdef SIZE_t dim
+
         cdef SIZE_t idx
 
         for idx in range(self.ndim):
@@ -210,14 +224,35 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
                 random_state
             )
 
-            # write to buffer
-            self.patch_dims_buff[idx] = patch_dim
-            patch_size *= patch_dim
-            
-            # compute the difference between the image dimensions and the current
-            # random patch dimensions for sampling
-            delta_patch_dim = (self.data_dims[idx] - patch_dim) + 1
-            top_left_patch_seed = rand_int(0, delta_patch_dim, random_state)
+            # sample the top-left index and patch size for this dimension based on boundary effects
+            if self.boundary is None:
+                # compute the difference between the image dimensions and the current
+                # random patch dimensions for sampling
+                delta_patch_dim = (self.data_dims[idx] - patch_dim) + 1
+                top_left_patch_seed = rand_int(0, delta_patch_dim, random_state)
+
+                # write to buffer
+                self.patch_dims_buff[idx] = patch_dim
+                patch_size *= patch_dim
+            elif self.boundary == 'wrap':
+                # add circular boundary conditions
+                delta_patch_dim = self.data_dims[idx] + 2 * (patch_dim - 1)
+
+                # sample the top left index for this dimension
+                top_left_patch_seed = rand_int(0, delta_patch_dim, random_state)
+
+                # resample the patch dimension due to padding
+                dim = top_left_patch_seed % delta_patch_dim
+
+                # resample the patch dimension due to padding
+                patch_dim = min(patch_dim, min(dim+1, self.data_dims[idx] + patch_dim - dim - 1))
+                self.patch_dims_buff[idx] = patch_dim
+                patch_size *= patch_dim
+
+                # TODO: make this work
+                # Convert the top-left-seed value to it's appropriate index in the full image.
+                top_left_patch_seed = max(0, dim - patch_dim + 1)
+
             self.unraveled_patch_point[idx] = top_left_patch_seed
 
         top_left_patch_seed = ravel_multi_index_cython(
@@ -236,29 +271,15 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
         Randomly sample patches with weight of 1.
         """
         cdef SIZE_t max_features = self.max_features
-        cdef UINT32_t* random_state = &self.rand_r_state
-
-        cdef int proj_i, idx, jdx
-        cdef SIZE_t dim_idx
-    
-        # weights are default to 1
-        cdef DTYPE_t weight = 1.
+        cdef int proj_i
 
         # define parameters for vectorized points in the original data shape
         # and top-left seed
-        cdef SIZE_t vectorized_point
         cdef SIZE_t top_left_patch_seed
-        cdef SIZE_t vectorized_point_offset
 
         # size of the sampled patch, which is just the size of the n-dim patch
         # (\prod_i self.patch_dims_buff[i])
         cdef SIZE_t patch_size
-
-        # iterates over the size of the patch
-        cdef SIZE_t patch_idx
-
-        # stores how many patches we have iterated so far
-        cdef int vectorized_patch_offset
 
         for proj_i in range(0, max_features):
             # now get the top-left seed that is used to then determine the top-left
@@ -295,7 +316,7 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
         cdef SIZE_t vectorized_point
 
         cdef SIZE_t dim_idx
-    
+
         # weights are default to 1
         cdef DTYPE_t weight = 1.
 
@@ -361,6 +382,46 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
             proj_mat_indices[proj_i].push_back(vectorized_point)
             proj_mat_weights[proj_i].push_back(weight)
 
+    cdef void compute_features_over_samples(
+        self,
+        SIZE_t start,
+        SIZE_t end,
+        const SIZE_t[:] samples,
+        DTYPE_t[:] feature_values,
+        vector[DTYPE_t]* proj_vec_weights,  # weights of the vector (max_features,)
+        vector[SIZE_t]* proj_vec_indices    # indices of the features (max_features,)
+    ) noexcept nogil:
+        """Compute the feature values for the samples[start:end] range.
+
+        Returns -1 in case of failure to allocate memory (and raise MemoryError)
+        or 0 otherwise.
+        """
+        cdef SIZE_t idx, jdx
+
+        # initialize feature weight to normalize across patch
+        cdef DTYPE_t patch_weight
+
+        # Compute linear combination of features and then
+        # sort samples according to the feature values.
+        for idx in range(start, end):
+            patch_weight = 0.0
+
+            # initialize the feature value to 0
+            feature_values[idx] = 0
+            for jdx in range(0, proj_vec_indices.size()):
+                feature_values[idx] += self.X[
+                    samples[idx], deref(proj_vec_indices)[jdx]
+                ] * deref(proj_vec_weights)[jdx]
+
+                if self.feature_weight is not None:
+                    # gets the feature weight for this specific column from X
+                    # the default of feature_weights[i] is (1/n_features) for all i
+                    patch_weight += self.feature_weight[samples[idx], deref(proj_vec_indices)[jdx]]
+
+            if self.feature_weight is not None:
+                feature_values[idx] /= patch_weight
+
+
 cdef class BestPatchSplitterTester(BestPatchSplitter):
     """A class to expose a Python interface for testing."""
     cpdef sample_top_left_seed_cpdef(self):
@@ -368,12 +429,13 @@ cdef class BestPatchSplitterTester(BestPatchSplitter):
         patch_dims = np.array(self.patch_dims_buff, dtype=np.intp)
         return top_left_patch_seed, patch_size, patch_dims
 
-    cpdef sample_projection_vector(self,
+    cpdef sample_projection_vector(
+        self,
         SIZE_t proj_i,
         SIZE_t patch_size,
         SIZE_t top_left_patch_seed,
         SIZE_t[:] patch_dims,
-        ):
+    ):
         cdef vector[vector[DTYPE_t]] proj_mat_weights = vector[vector[DTYPE_t]](self.max_features)
         cdef vector[vector[SIZE_t]] proj_mat_indices = vector[vector[SIZE_t]](self.max_features)
         cdef SIZE_t i, j
@@ -424,7 +486,7 @@ cdef class BestPatchSplitterTester(BestPatchSplitter):
 
     cpdef init_test(self, X, y, sample_weight):
         """Initializes the state of the splitter.
-        
+
         Used for testing purposes.
 
         Parameters
