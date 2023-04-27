@@ -20,7 +20,7 @@ cdef void fisher_yates_shuffle(
     UINT32_t* random_state
 ) noexcept nogil:
     """Performs an in-place Fisher-Yates shuffle of the given index buffer.
-    
+
     XXX: Not used yet, because not sure if we should just use extern c++
 
     Parameters
@@ -33,7 +33,7 @@ cdef void fisher_yates_shuffle(
         The random state to be used for shuffling.
     """
     cdef int i, j
-    
+
     # fill with values 0, 1, ..., dimension - 1
     for i in range(0, size):
         index_buffer[i] = i
@@ -42,7 +42,6 @@ cdef void fisher_yates_shuffle(
         j = rand_int(0, size - i, random_state)
         index_buffer[i], index_buffer[j] = \
             index_buffer[j], index_buffer[i]
-
 
 
 cpdef unravel_index(
