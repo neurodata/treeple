@@ -1722,7 +1722,7 @@ class KernelDecisionTreeClassifier(PatchObliqueDecisionTreeClassifier):
 
         # compute user-defined Kernel library before
         kernel_library, kernel_dims, kernel_params = self._sample_kernel_library(X, y)
-        
+
         # Note: users cannot define a splitter themselves
         splitter = PATCH_SPLITTERS[self.splitter](
             criterion,

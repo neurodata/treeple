@@ -72,7 +72,7 @@ commands:
 
 jobs:
   # Build scikit-tree from source
-  build_scikit-tree:
+  build_scikit_tree:
     <<: *defaults
     steps:
       - checkout
@@ -193,10 +193,11 @@ jobs:
 workflows:
   default:
     jobs:
-      - build_scikit-tree
+      - build_scikit_tree:
+          name: build_scikit_tree
       - build_docs:
           requires:
-            - build_scikit-tree
+            - build_scikit_tree
       - docs-deploy:
           requires:
             - build_docs

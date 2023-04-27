@@ -383,7 +383,7 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
                     for idx in range(dim_idx + 1, self.ndim):
                         if not self.dim_contiguous[idx]:
                             row_index += ((self.unraveled_patch_point[idx] // other_dims_offset) %
-                                        self.patch_dims[idx]) * other_dims_offset
+                                        self.patch_dims_buff[idx]) * other_dims_offset
                             other_dims_offset //= self.data_dims[idx]
 
                     # assign random row index now

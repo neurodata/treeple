@@ -33,6 +33,11 @@ from .._oblique_splitter cimport BaseObliqueSplitter, ObliqueSplitRecord
 #         discrete_distribution(T first, T last) except +
 #         operator()(&G) except +
 
+# XXX: replace with from libcpp.algorithm cimport swap
+# when Cython 3.0 is released
+cdef extern from "<algorithm>" namespace "std" nogil:
+    void swap[T](T& a, T& b) except +  # array overload also works
+
 
 cdef class PatchSplitter(BaseObliqueSplitter):
     # The PatchSplitter creates candidate feature values by sampling 2D patches from
