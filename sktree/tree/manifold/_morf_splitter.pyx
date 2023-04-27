@@ -369,10 +369,22 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
                         continue
 
                     # determine the "row" we are currently on
+                    # other_dims_offset = 1
+                    # for idx in range(dim_idx + 1, self.ndim):
+                    #     other_dims_offset *= self.data_dims[idx]
+                    # row_index = self.unraveled_patch_point[dim_idx] % other_dims_offset
+                    # determine the "row" we are currently on
                     other_dims_offset = 1
                     for idx in range(dim_idx + 1, self.ndim):
-                        other_dims_offset *= self.data_dims[idx]
-                    row_index = self.unraveled_patch_point[dim_idx] % other_dims_offset
+                        if not self.dim_contiguous[idx]:
+                            other_dims_offset *= self.data_dims[idx]
+
+                    row_index = 0
+                    for idx in range(dim_idx + 1, self.ndim):
+                        if not self.dim_contiguous[idx]:
+                            row_index += ((self.unraveled_patch_point[idx] // other_dims_offset) %
+                                        self.patch_dims[idx]) * other_dims_offset
+                            other_dims_offset //= self.data_dims[idx]
 
                     # assign random row index now
                     self.unraveled_patch_point[dim_idx] = self._index_patch_buffer[row_index]

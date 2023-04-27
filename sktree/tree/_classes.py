@@ -1722,7 +1722,7 @@ class KernelDecisionTreeClassifier(PatchObliqueDecisionTreeClassifier):
 
         # compute user-defined Kernel library before
         kernel_library, kernel_dims, kernel_params = self._sample_kernel_library(X, y)
-
+        
         # Note: users cannot define a splitter themselves
         splitter = PATCH_SPLITTERS[self.splitter](
             criterion,
@@ -1767,6 +1767,8 @@ class KernelDecisionTreeClassifier(PatchObliqueDecisionTreeClassifier):
         # TODO: set some attributes based on what kernel indices were used in each tree
         # - construct a tree-nodes like array and set it as a Python attribute, so it is
         # - exposed to the Python interface
+        # - use the Cython tree.feature array to store the index of the dictionary library
+        # - that was used to split at each node
 
         if self.n_outputs_ == 1:
             self.n_classes_ = self.n_classes_[0]
