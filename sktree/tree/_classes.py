@@ -3,14 +3,14 @@ from numbers import Real
 
 import numpy as np
 from scipy.sparse import issparse
-from sklearn.base import ClusterMixin, TransformerMixin, is_classifier, is_regressor
-from sklearn.cluster import AgglomerativeClustering
-from sklearn.tree import BaseDecisionTree, DecisionTreeClassifier, DecisionTreeRegressor, _criterion
-from sklearn.tree import _tree as _sklearn_tree
-from sklearn.tree._criterion import BaseCriterion
-from sklearn.tree._tree import BestFirstTreeBuilder, DepthFirstTreeBuilder
-from sklearn.utils._param_validation import Interval
-from sklearn.utils.validation import check_is_fitted
+from sklearn_fork.base import ClusterMixin, TransformerMixin, is_classifier, is_regressor
+from sklearn_fork.cluster import AgglomerativeClustering
+from sklearn_fork.tree import BaseDecisionTree, DecisionTreeClassifier, DecisionTreeRegressor, _criterion
+from sklearn_fork.tree import _tree as _sklearn_tree
+from sklearn_fork.tree._criterion import BaseCriterion
+from sklearn_fork.tree._tree import BestFirstTreeBuilder, DepthFirstTreeBuilder
+from sklearn_fork.utils._param_validation import Interval
+from sklearn_fork.utils.validation import check_is_fitted
 
 from . import (  # type: ignore
     _morf_splitter,
@@ -22,11 +22,11 @@ from . import (  # type: ignore
 from ._morf_splitter import PatchSplitter
 from ._oblique_splitter import ObliqueSplitter
 from ._oblique_tree import ObliqueTree
-from .unsupervised._unsup_criterion import UnsupervisedCriterion
-from .unsupervised._unsup_oblique_splitter import UnsupervisedObliqueSplitter
-from .unsupervised._unsup_oblique_tree import UnsupervisedObliqueTree
-from .unsupervised._unsup_splitter import UnsupervisedSplitter
-from .unsupervised._unsup_tree import (  # type: ignore
+from ._unsup_criterion import UnsupervisedCriterion
+from ._unsup_oblique_splitter import UnsupervisedObliqueSplitter
+from ._unsup_oblique_tree import UnsupervisedObliqueTree
+from ._unsup_splitter import UnsupervisedSplitter
+from ._unsup_tree import (  # type: ignore
     UnsupervisedBestFirstTreeBuilder,
     UnsupervisedDepthFirstTreeBuilder,
     UnsupervisedTree,
@@ -874,7 +874,10 @@ class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         # Build tree
         criterion = self.criterion
         if not isinstance(criterion, BaseCriterion):
-            criterion = CRITERIA_CLF[self.criterion](self.n_outputs_, self.n_classes_)
+            if is_classifier(self):
+                criterion = CRITERIA_CLF[self.criterion](self.n_outputs_, self.n_classes_)
+            else:
+                criterion = CRITERIA_REG[self.criterion](self.n_outputs_, n_samples)
         else:
             # Make a deepcopy in case the criterion has mutable attributes that
             # might be shared and modified concurrently during parallel fitting
@@ -1230,7 +1233,6 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
             Controls the randomness of the estimator.
         """
         n_samples, n_features = X.shape
-
         if self.feature_combinations is None:
             self.feature_combinations_ = min(n_features, 1.5)
         elif self.feature_combinations > n_features:
@@ -1314,7 +1316,7 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         the structure in the data. For example, in an image, a patch would be contiguous
         along the rows and columns of the image. In a multivariate time-series, a patch
         would be contiguous over time, but possibly discontiguous over the sensors.
-
+    `
         Parameters
         ----------
         criterion : {"gini", "entropy"}, default="gini"
@@ -1522,13 +1524,13 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
         >>> from sklearn.datasets import load_diabetes
         >>> from sklearn.model_selection import cross_val_score
         >>> X, y = load_diabetes(return_X_y=True)
-        >>> from sktree.tree import PatchObliqueDecisionTreeClassifier
-        >>> regressor = PatchObliqueDecisionTreeClassifier(random_state=0)
+        >>> from sktree.tree import PatchObliqueDecisionTreeRegressor
+        >>> regressor = PatchObliqueDecisionTreeRegressor(random_state=0)
         >>> cross_val_score(regressor, X, y, cv=10)
         ...                     # doctest: +SKIP
         ...
         array([1.        , 0.93333333, 1.        , 0.93333333, 0.93333333,
-                0.86666667, 0.93333333, 1.        , 1.        , 0.93333333])
+               0.86666667, 0.93333333, 0.93333333, 1.        , 1.        ])
     """
 
     _parameter_constraints = {
@@ -1914,71 +1916,22 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         if ``sample_weight`` is passed.
 
 
-    min_patch_dims : array-like, optional
-        The minimum dimensions of a patch, by default 1 along all dimensions.
-
+    min_patch_height : int, optional
+        The minimum height of a patch, by default 1.
+    max_patch_height : int, optional
+        The maximum height of a patch, by default 1.
+    min_patch_width : int, optional
+        The minimum width of a patch, by default 1.
+    max_patch_width : int, optional
+        The maximum width of a patch, by default 1.
+    data_height : int, optional
+        The presumed height of the un-vectorized feature vector, by default 1.
+    data_width : int, optional
+        The presumed height of the un-vectorized feature vector, by default None.
+        If None, the data width will be presumed the number of columns in ``X``
+        passed to :meth:`fit`.
     max_patch_dims : array-like, optional
-        The maximum dimensions of a patch, by default 1 along all dimensions.
-
-    dim_contiguous : array-like of bool, optional
-        Whether or not each patch is sampled contiguously along this dimension.
-
-    data_dims : array-like, optional
-        The presumed dimensions of the un-vectorized feature vector, by default
-        will be a 1D vector with (1, n_features) shape.
-
-    Attributes
-    ----------
-    classes_ : ndarray of shape (n_classes,) or list of ndarray
-        The classes labels (single output problem),
-        or a list of arrays of class labels (multi-output problem).
-
-    feature_importances_ : ndarray of shape (n_features,)
-        The impurity-based feature importances.
-        The higher, the more important the feature.
-        The importance of a feature is computed as the (normalized)
-        total reduction of the criterion brought by that feature.  It is also
-        known as the Gini importance [4]_.
-
-        Warning: impurity-based feature importances can be misleading for
-        high cardinality features (many unique values). See
-        :func:`sklearn.inspection.permutation_importance` as an alternative.
-
-    max_features_ : int
-        The inferred value of max_features.
-
-    n_features_in_ : int
-        Number of features seen during :term:`fit`.
-
-    feature_names_in_ : ndarray of shape (`n_features_in_`,)
-        Names of features seen during :term:`fit`. Defined only when `X`
-        has feature names that are all strings.
-
-    n_outputs_ : int
-        The number of outputs when ``fit`` is performed.
-
-    tree_ : Tree instance
-        The underlying Tree object. Please refer to
-        ``help(sklearn.tree._tree.Tree)`` for
-        attributes of Tree object.
-
-    min_patch_dims_ : array-like
-        The minimum dimensions of a patch.
-
-    max_patch_dims_ : array-like
-        The maximum dimensions of a patch.
-
-    data_dims_ : array-like
-        The presumed dimensions of the un-vectorized feature vector.
-
-        Note that these weights will be multiplied with sample_weight (passed
-        through the fit method) if sample_weight is specified.
-
-    min_patch_dims : array-like, optional
-        The minimum dimensions of a patch, by default 1 along all dimensions.
-
-    max_patch_dims : array-like, optional
-        The maximum dimensions of a patch, by default 1 along all dimensions.
+            The maximum dimensions of a patch, by default 1 along all dimensions.
 
     dim_contiguous : array-like of bool, optional
         Whether or not each patch is sampled contiguously along this dimension.
@@ -1995,6 +1948,7 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         patches that are generated. The feature weights are used
         as follows: for every patch that is sampled, the feature weights over
         the entire patch is summed and normalizes the patch.
+
 
     Attributes
     ----------
@@ -2047,10 +2001,10 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
 
     Notes
     -----
-    Patches can be 2D masks that are applied onto the data matrix. Following sklearn
+    Patches are 2D masks that are applied onto the data matrix. Following sklearn
     API standards, ``X`` is always a ``(n_samples, n_features)`` array even if
     X is comprised of images, or multivariate-time series. The ``data_width`` and
-    ``data_height`` parameters are used to inform the ``PatchObliqueDecisionTreeClassifier``
+    ``data_height`` parameters are used to inform the ``PatchObliqueDecisionTreeRegressor``
     of the original structure of the data. It is required that
     ``data_width * data_height = n_features``.
 
@@ -2069,8 +2023,8 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
     >>> from sklearn.datasets import load_diabetes
     >>> from sklearn.model_selection import cross_val_score
     >>> X, y = load_diabetes(return_X_y=True)
-    >>> from sktree.tree import PatchObliqueDecisionTreeRegressor
-    >>> regressor = PatchObliqueDecisionTreeRegressor(random_state=0)
+    >>> from sktree.tree import PatchObliqueDecisionTreeRegressor as RGS
+    >>> regressor = RGS(random_state=0)
     >>> cross_val_score(regressor, X, y, cv=10)
     ...                    # doctest: +SKIP
     ...
@@ -2149,6 +2103,7 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         check_input : bool, optional
             Whether or not to check input, by default True.
         """
+
         if check_input:
             # Need to validate separately here.
             # We can't pass multi_output=True because that would allow y to be
@@ -2289,11 +2244,7 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         # Build tree
         criterion = self.criterion
         if not isinstance(criterion, BaseCriterion):
-            if is_classifier(self):
-                # TODO: is this needed?
-                criterion = CRITERIA_CLF[self.criterion](self.n_outputs_, self.n_classes_)
-            elif is_regressor(self):
-                criterion = CRITERIA_REG[self.criterion](self.n_outputs_, n_samples)
+            criterion = CRITERIA_REG[self.criterion](self.n_outputs_, n_samples)
         else:
             # Make a deepcopy in case the criterion has mutable attributes that
             # might be shared and modified concurrently during parallel fitting
@@ -2315,7 +2266,7 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
                 min_samples_leaf,
                 min_weight_leaf,
                 random_state,
-                self.min_patch_dims_,
+                 self.min_patch_dims_,
                 self.max_patch_dims_,
                 self.dim_contiguous_,
                 self.data_dims_,
