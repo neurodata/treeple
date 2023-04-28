@@ -7,21 +7,21 @@ from numpy.testing import (
     assert_array_almost_equal,
     assert_array_equal,
 )
-from sklearn import datasets
-from sklearn.base import is_classifier
-from sklearn.cluster import AgglomerativeClustering
-from sklearn.datasets import make_blobs
-from sklearn.metrics import (
+from sklearn_fork import datasets
+from sklearn_fork.base import is_classifier
+from sklearn_fork.cluster import AgglomerativeClustering
+from sklearn_fork.datasets import make_blobs
+from sklearn_fork.metrics import (
     accuracy_score,
     adjusted_rand_score,
     mean_poisson_deviance,
     mean_squared_error,
 )
-from sklearn.random_projection import _sparse_random_matrix
-from sklearn.utils._testing import skip_if_32bit
-from sklearn.utils.validation import check_random_state
-from sklearn_fork.tree import DecisionTreeClassifier
 from sklearn_fork.model_selection import cross_val_score
+from sklearn_fork.random_projection import _sparse_random_matrix
+from sklearn_fork.utils._testing import skip_if_32bit
+from sklearn_fork.utils.validation import check_random_state
+from sklearn_fork.tree import DecisionTreeClassifier
 from sklearn_fork.tree._tree import TREE_LEAF
 from sklearn_fork.utils.estimator_checks import parametrize_with_checks
 

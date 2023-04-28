@@ -2,19 +2,13 @@ from typing import Any, Dict
 
 import numpy as np
 import pytest
-<<<<<<< HEAD
-from sklearn.datasets import load_diabetes, make_classification, make_regression
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
-from sklearn.metrics import accuracy_score, mean_squared_error
-=======
-from sklearn.datasets import make_classification, make_regression
-from sklearn.datasets import load_diabetes, make_classification, make_regression
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
->>>>>>> d4fe5bc (add unit test for ObliqueRFRegressor, revert err, fix typos)
-from sklearn.model_selection import train_test_split
-from sklearn.utils._testing import assert_array_almost_equal
-from sklearn.utils.validation import check_random_state
+from sklearn_fork.datasets import load_diabetes, make_classification, make_regression
+from sklearn_fork.ensemble import RandomForestClassifier
+from sklearn_fork.metrics import accuracy_score
+from sklearn_fork.model_selection import train_test_split
+from sklearn_fork.utils._testing import assert_array_almost_equal
+from sklearn_fork.utils.estimator_checks import check_estimator
+from sklearn_fork.utils.validation import check_random_state
 
 from sktree import (
     ObliqueRandomForestClassifier,
@@ -200,31 +194,6 @@ def test_regression(forest, criterion, dtype):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=n_test, random_state=0)
     estimator.fit(X_train, y_train)
     assert estimator.score(X_test, y_test) > 0.88
-<<<<<<< HEAD
-
-
-# Unit test for PatchObliqueRandomForestRegressor
-@pytest.mark.parametrize("criterion", REG_CRITERIONS)
-@pytest.mark.parametrize("dtype", [np.float32, np.float64])
-def test_regression_patch(criterion, dtype):
-    estimator = PatchObliqueRandomForestRegressor(
-        n_estimators=10, criterion=criterion, random_state=0
-    )
-    n_test = 0.1
-    X_reg, y_reg = make_regression(
-        n_samples=500,
-        n_features=10,
-        n_informative=3,
-        shuffle=False,
-        random_state=0,
-    )
-    X = X_reg.astype(dtype, copy=False)
-    y = y_reg.astype(dtype, copy=False)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=n_test, random_state=0)
-    estimator.fit(X_train, y_train)
-    assert estimator.score(X_test, y_test) > 0.88
-=======
->>>>>>> d4fe5bc (add unit test for ObliqueRFRegressor, revert err, fix typos)
 
 
 # Unit test for PatchObliqueRandomForestRegressor
