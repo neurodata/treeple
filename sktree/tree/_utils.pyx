@@ -11,38 +11,6 @@ cimport numpy as cnp
 
 cnp.import_array()
 
-from sklearn.tree._utils cimport rand_int
-
-
-cdef void fisher_yates_shuffle(
-    int size,
-    SIZE_t[:] index_buffer,
-    UINT32_t* random_state
-) noexcept nogil:
-    """Performs an in-place Fisher-Yates shuffle of the given index buffer.
-
-    XXX: Not used yet, because not sure if we should just use extern c++
-
-    Parameters
-    ----------
-    size : int
-        The size of the index buffer.
-    index_buffer : numpy.ndarray[SIZE_t, ndim=1]
-        The index buffer to be shuffled that has been pre-allocated memory.
-    random_state : UINT32_t*
-        The random state to be used for shuffling.
-    """
-    cdef int i, j
-
-    # fill with values 0, 1, ..., dimension - 1
-    for i in range(0, size):
-        index_buffer[i] = i
-    # then shuffle indices using Fisher-Yates
-    for i in range(size):
-        j = rand_int(0, size - i, random_state)
-        index_buffer[i], index_buffer[j] = \
-            index_buffer[j], index_buffer[i]
-
 
 cpdef unravel_index(
     SIZE_t index,
