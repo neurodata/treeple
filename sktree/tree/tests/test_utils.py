@@ -3,7 +3,7 @@ from itertools import product
 
 import numpy as np
 from numpy.testing import assert_equal
-from sklearn_fork.tree._criterion import Gini
+from sktree._lib.sklearn.sklearn.tree._criterion import Gini
 
 from .._utils import ravel_multi_index, unravel_index
 from ..manifold._morf_splitter import BestPatchSplitterTester

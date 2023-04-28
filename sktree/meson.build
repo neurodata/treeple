@@ -77,6 +77,7 @@ c_undefined_ok = ['-Wno-maybe-uninitialized']
 # cython_c_args += ['-Wno-cpp']
 # cython_cpp_args = cython_c_args
 
-subdir('tree')
-subdir('ensemble')
-subdir('tests')
+subdir('_lib')
+# subdir('tree')
+# subdir('ensemble')
+# subdir('tests')
