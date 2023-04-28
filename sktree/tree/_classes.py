@@ -15,6 +15,7 @@ from sklearn_fork.utils.validation import check_is_fitted
 from . import _oblique_splitter
 from ._oblique_splitter import ObliqueSplitter
 from ._oblique_tree import ObliqueTree
+from .kernels import gaussian_kernel
 from .manifold import _morf_splitter
 from .manifold._morf_splitter import PatchSplitter
 from .unsupervised import _unsup_criterion, _unsup_oblique_splitter, _unsup_splitter
@@ -1595,6 +1596,23 @@ class KernelDecisionTreeClassifier(PatchObliqueDecisionTreeClassifier):
     data_dims_ : array-like
         The presumed dimensions of the un-vectorized feature vector.
 
+    kernel_arr_ : list of length (n_nodes,) of array-like of shape (patch_dims,)
+        The kernel array that is applied to the patches for this tree.
+        The order is in the same order in which the tree traverses the nodes.
+
+    kernel_params_ : list of length (n_nodes,)
+        The parameters of the kernel that is applied to the patches for this tree.
+        The order is in the same order in which the tree traverses the nodes.
+
+    kernel_library_ : array-like of shape (n_kernels,), optional
+        The library of kernels that was chosen from the patches for this tree.
+        Only stored if ``store_kernel_library`` is set to True.
+
+    kernel_library_params_ : list of length (n_nodes,), optional
+        The parameters of the kernels that was chosen from the patches for this tree.
+        The order is in the same order in which the tree traverses the nodes.
+        Only stored if ``store_kernel_library`` is set to True.
+
     References
     ----------
     .. footbibliography::
@@ -1610,6 +1628,7 @@ class KernelDecisionTreeClassifier(PatchObliqueDecisionTreeClassifier):
         "feature_weight": ["array-like", None],
         "kernel": ["str"],
         "n_kernels": [int, None],
+        "store_kernel_library": [bool],
     }
 
     def __init__(
@@ -1634,6 +1653,7 @@ class KernelDecisionTreeClassifier(PatchObliqueDecisionTreeClassifier):
         feature_weight=None,
         kernel="gaussian",
         n_kernels=None,
+        store_kernel_library=False,
     ):
         super().__init__(
             criterion=criterion,
@@ -1658,6 +1678,7 @@ class KernelDecisionTreeClassifier(PatchObliqueDecisionTreeClassifier):
 
         self.kernel = kernel
         self.n_kernel = n_kernels
+        self.store_kernel_library = store_kernel_library
 
     def _build_tree(
         self,
@@ -1764,11 +1785,21 @@ class KernelDecisionTreeClassifier(PatchObliqueDecisionTreeClassifier):
 
         builder.build(self.tree_, X, y, sample_weight)
 
-        # TODO: set some attributes based on what kernel indices were used in each tree
+        # Set some attributes based on what kernel indices were used in each tree
         # - construct a tree-nodes like array and set it as a Python attribute, so it is
-        # - exposed to the Python interface
+        #   exposed to the Python interface
         # - use the Cython tree.feature array to store the index of the dictionary library
-        # - that was used to split at each node
+        #   that was used to split at each node
+        kernel_idx_chosen = self.tree_.feature
+        kernel_lib_chosen = kernel_library[kernel_idx_chosen]
+        kernel_params_chosen = kernel_params[kernel_idx_chosen]
+        self.kernel_arr_ = kernel_lib_chosen
+        self.kernel_dims_ = kernel_dims[kernel_idx_chosen]
+        self.kernel_params_ = kernel_params_chosen
+
+        if self.store_kernel_library:
+            self.kernel_library_ = kernel_library
+            self.kernel_idx_chosen_ = kernel_idx_chosen
 
         if self.n_outputs_ == 1:
             self.n_classes_ = self.n_classes_[0]
@@ -1808,3 +1839,92 @@ class KernelDecisionTreeClassifier(PatchObliqueDecisionTreeClassifier):
             forest.
         """
         raise NotImplementedError("This method should be implemented in a child class.")
+
+
+class GaussianKernelDecisionTreeClassifier(KernelDecisionTreeClassifier):
+    _parameter_constraints = {
+        **KernelDecisionTreeClassifier._parameter_constraints,
+        "mu_bounds": [tuple],
+        "sigma_bounds": [tuple],
+    }
+
+    def __init__(
+        self,
+        *,
+        criterion="gini",
+        splitter="best",
+        max_depth=None,
+        min_samples_split=2,
+        min_samples_leaf=1,
+        min_weight_fraction_leaf=0,
+        max_features=None,
+        random_state=None,
+        max_leaf_nodes=None,
+        min_impurity_decrease=0,
+        class_weight=None,
+        min_patch_dims=None,
+        max_patch_dims=None,
+        dim_contiguous=None,
+        data_dims=None,
+        boundary=None,
+        feature_weight=None,
+        n_kernels=None,
+        store_kernel_library=False,
+        mu_bounds=(0, 1),
+        sigma_bounds=(0, 1),
+    ):
+        super().__init__(
+            criterion=criterion,
+            splitter=splitter,
+            max_depth=max_depth,
+            min_samples_split=min_samples_split,
+            min_samples_leaf=min_samples_leaf,
+            min_weight_fraction_leaf=min_weight_fraction_leaf,
+            max_features=max_features,
+            random_state=random_state,
+            max_leaf_nodes=max_leaf_nodes,
+            min_impurity_decrease=min_impurity_decrease,
+            class_weight=class_weight,
+            min_patch_dims=min_patch_dims,
+            max_patch_dims=max_patch_dims,
+            dim_contiguous=dim_contiguous,
+            data_dims=data_dims,
+            boundary=boundary,
+            feature_weight=feature_weight,
+            kernel="gaussian",
+            n_kernels=n_kernels,
+            store_kernel_library=store_kernel_library,
+        )
+        self.mu_bounds = mu_bounds
+        self.sigma_bounds = sigma_bounds
+
+    def _sample_kernel_library(self, X, y, sample_weight):
+        """Samples a gaussian kernel library."""
+        rng = np.random.default_rng(self.random_state)
+        kernel_library = []
+        kernel_params = []
+        kernel_dims = []
+
+        # Sample the kernel library
+        ndim = len(self.data_dims_)
+        for _ in range(self.n_kernels):
+            patch_shape = []
+            for idx in range(ndim):
+                # sample the possible patch shape given input parameters
+                if self.boundary == "wrap":
+                    pass
+                else:
+                    pass
+            patch_shape = np.array(patch_shape)
+
+            # sample the sigma and mu parameters
+            sigma = rng.uniform(low=self.mu_bounds[0], high=self.mu_bounds[1])
+            mu = rng.uniform(low=self.sigma_bounds[0], high=self.sigma_bounds[1])
+
+            kernel = gaussian_kernel(shape=patch_shape, sigma=sigma, mu=mu)
+
+            kernel_dims.append(kernel.shape)
+            kernel_library.append(kernel)
+            kernel_params.append({"shape": patch_shape, "sigma": sigma, "mu": mu})
+
+        return kernel_library, kernel_dims, kernel_params

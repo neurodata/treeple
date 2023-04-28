@@ -1,7 +1,8 @@
 import numpy as np
+from numpy.typing import ArrayLike
 
 
-def gaussian_kernel(shape, sigma=1.0, mu=0.0):
+def gaussian_kernel(shape, sigma: float = 1.0, mu: float = 0.0) -> ArrayLike:
     """N-dimensional gaussian kernel for the given shape.
 
     See: https://gist.github.com/liob/e784775e882b83749cb3bbcef480576e
