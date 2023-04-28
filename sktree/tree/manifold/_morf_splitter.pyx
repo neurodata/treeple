@@ -3,7 +3,7 @@
 # cython: language_level=3
 # cython: boundscheck=False
 # cython: wraparound=False
-# cython: profile=True
+# cython: initializedcheck=False
 
 import numpy as np
 
@@ -435,7 +435,6 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
             if self.feature_weight is not None:
                 feature_values[idx] /= patch_weight
 
-
 cdef class BestPatchSplitterTester(BestPatchSplitter):
     """A class to expose a Python interface for testing."""
     cpdef sample_top_left_seed_cpdef(self):
@@ -514,3 +513,40 @@ cdef class BestPatchSplitterTester(BestPatchSplitter):
             Sample weights.
         """
         self.init(X, y, sample_weight)
+
+cdef class UserKernelSplitter(PatchSplitter):
+    def __cinit__(
+        self,
+        criterion: Criterion,
+        max_features: SIZE_t,
+        min_samples_leaf: SIZE_t,
+        min_weight_leaf: double,
+        random_state: object,
+        min_patch_dims: SIZE_t,
+        max_patch_dims: SIZE_t,
+        dim_contiguous: cnp.uint8_t,
+        data_dims: SIZE_t,
+        boundary: str,
+        feature_weight: DTYPE_t,
+        kernel_dictionary: object,
+        kernel_dims: object,
+        *argv
+    ):
+        # initialize the kernel dictionary into a vector to allow Cython to see it
+        # see: https://stackoverflow.com/questions/46240207/passing-list-of-numpy-arrays-to-c-using-cython
+        cdef int n_arrays = len(kernel_dictionary)
+        self.kernel_dictionary = vector[DTYPE_t_ptr](n_arrays)  # A list of C-contiguous 2D kernels
+        self.kernel_dims = vector[SIZE_t_ptr](n_arrays)         # A list of arrays storing the dimensions of each kernel in `kernel_dictionary`
+
+        # buffers to point to each element in the list
+        cdef DTYPE_t[:] kernel
+        cdef SIZE_t[:] kernel_dim
+
+        cdef int i
+        for i in range(n_arrays):
+            kernel = kernel_dictionary[i]
+            kernel_dim = kernel_dims[i]
+
+            # store a pointer to the data
+            self.kernel_dictionary.push_back(&kernel[0])
+            self.kernel_dims.push_back(&kernel_dim[0])

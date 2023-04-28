@@ -1844,8 +1844,8 @@ class KernelDecisionTreeClassifier(PatchObliqueDecisionTreeClassifier):
 class GaussianKernelDecisionTreeClassifier(KernelDecisionTreeClassifier):
     _parameter_constraints = {
         **KernelDecisionTreeClassifier._parameter_constraints,
-        "mu_bounds": [tuple],
-        "sigma_bounds": [tuple],
+        # "mu_bounds": ['array-like'],
+        # "sigma_bounds": ['array-like'],
     }
 
     def __init__(
