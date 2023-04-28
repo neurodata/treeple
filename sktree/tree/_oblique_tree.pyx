@@ -1,6 +1,7 @@
 # cython: cdivision=True
 # cython: boundscheck=False
 # cython: wraparound=False
+# cython: initializedcheck=False
 
 # Authors: Adam Li <adam2392@gmail.com>
 #          Chester Huynh <chester.huynh924@gmail.com>
@@ -18,7 +19,7 @@ cimport numpy as cnp
 cnp.import_array()
 
 from cython.operator cimport dereference as deref
-from sktree._lib.sklearn.sklearn.tree._utils cimport safe_realloc, sizet_ptr_to_ndarray
+from .._lib.sklearn.sklearn.tree._utils cimport safe_realloc, sizet_ptr_to_ndarray
 
 
 # Gets Node dtype exposed inside oblique_tree.

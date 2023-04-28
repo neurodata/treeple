@@ -3,7 +3,7 @@
 # cython: language_level=3
 # cython: boundscheck=False
 # cython: wraparound=False
-# cython: profile=True
+# cython: initializedcheck=False
 
 import numpy as np
 
@@ -14,7 +14,7 @@ cnp.import_array()
 from cython.operator cimport dereference as deref
 from libcpp.vector cimport vector
 from sklearn.tree._utils cimport rand_int
-from sktree._lib.sklearn.sklearn.tree._criterion cimport Criterion
+from ..._lib.sklearn.sklearn.tree._criterion cimport Criterion
 
 from .._utils cimport ravel_multi_index_cython, unravel_index_cython
 

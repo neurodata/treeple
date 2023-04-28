@@ -9,13 +9,13 @@
 import numpy as np
 
 cimport numpy as cnp
-from sktree._lib.sklearn.sklearn.tree._splitter cimport SplitRecord
-from sktree._lib.sklearn.sklearn.tree._tree cimport DOUBLE_t  # Type of y, sample_weight
-from sktree._lib.sklearn.sklearn.tree._tree cimport DTYPE_t  # Type of X
-from sktree._lib.sklearn.sklearn.tree._tree cimport INT32_t  # Signed 32 bit integer
-from sktree._lib.sklearn.sklearn.tree._tree cimport SIZE_t  # Type for indices and counters
-from sktree._lib.sklearn.sklearn.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
-from sktree._lib.sklearn.sklearn.tree._tree cimport BaseTree, Node
+from ..._lib.sklearn.sklearn.tree._splitter cimport SplitRecord
+from ..._lib.sklearn.sklearn.tree._tree cimport DOUBLE_t  # Type of y, sample_weight
+from ..._lib.sklearn.sklearn.tree._tree cimport DTYPE_t  # Type of X
+from ..._lib.sklearn.sklearn.tree._tree cimport INT32_t  # Signed 32 bit integer
+from ..._lib.sklearn.sklearn.tree._tree cimport SIZE_t  # Type for indices and counters
+from ..._lib.sklearn.sklearn.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
+from ..._lib.sklearn.sklearn.tree._tree cimport BaseTree, Node
 
 from ._unsup_splitter cimport UnsupervisedSplitter
 

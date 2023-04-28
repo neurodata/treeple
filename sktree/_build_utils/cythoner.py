@@ -18,7 +18,8 @@ def main():
     print("inside cythoner: ")
     print("input file: ", in_fname)
     print("output file: ", out_fname)
-
+    print(os.getcwd())
+    
     sbp.run(
         [
             "cython",
