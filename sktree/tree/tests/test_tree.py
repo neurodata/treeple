@@ -1,29 +1,53 @@
 import joblib
 import numpy as np
 import pytest
-from numpy.testing import assert_almost_equal, assert_array_almost_equal, assert_array_equal
+from numpy.testing import (
+    assert_allclose,
+    assert_almost_equal,
+    assert_array_almost_equal,
+    assert_array_equal,
+)
 from sklearn import datasets
 from sklearn.base import is_classifier
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.datasets import make_blobs
-from sklearn.metrics import accuracy_score, adjusted_rand_score
-from sklearn.model_selection import cross_val_score
-from sklearn.tree._tree import TREE_LEAF
+from sklearn.metrics import (
+    accuracy_score,
+    adjusted_rand_score,
+    mean_poisson_deviance,
+    mean_squared_error,
+)
+from sklearn.random_projection import _sparse_random_matrix
+from sklearn.utils._testing import skip_if_32bit
+from sklearn.utils.validation import check_random_state
+from sklearn_fork.model_selection import cross_val_score
 from sklearn_fork.tree import DecisionTreeClassifier
+from sklearn_fork.tree._tree import TREE_LEAF
 from sklearn_fork.utils.estimator_checks import parametrize_with_checks
 
 from sktree.tree import (
     ObliqueDecisionTreeClassifier,
+    ObliqueDecisionTreeRegressor,
     PatchObliqueDecisionTreeClassifier,
+    PatchObliqueDecisionTreeRegressor,
     UnsupervisedDecisionTree,
     UnsupervisedObliqueDecisionTree,
 )
 
 CLUSTER_CRITERIONS = ("twomeans", "fastbic")
-
 TREE_CLUSTERS = {
     "UnsupervisedDecisionTree": UnsupervisedDecisionTree,
     "UnsupervisedObliqueDecisionTree": UnsupervisedObliqueDecisionTree,
+}
+
+REG_CRITERIONS = ("squared_error", "absolute_error", "friedman_mse", "poisson")
+REG_TREES = {
+    "ObliqueDecisionTreeRegressor": ObliqueDecisionTreeRegressor,
+    "PatchObliqueDecisionTreeRegressor": PatchObliqueDecisionTreeRegressor,
+}
+CLF_TREES = {
+    "ObliqueDecisionTreeClassifier": ObliqueDecisionTreeClassifier,
+    "PatchObliqueTreeClassifier": PatchObliqueDecisionTreeClassifier,
 }
 
 X_small = np.array(
@@ -81,6 +105,12 @@ y_small_reg = [
     0,
 ]
 
+# toy sample
+X = [[-2, -1], [-1, -1], [-1, -2], [1, 1], [1, 2], [2, 1]]
+y = [-1, -1, -1, 1, 1, 1]
+T = [[-1, -1], [2, 2], [3, 2]]
+true_result = [-1, 1, 1]
+
 # also load the iris dataset
 # and randomly permute it
 iris = datasets.load_iris()
@@ -89,11 +119,28 @@ perm = rng.permutation(iris.target.size)
 iris.data = iris.data[perm]
 iris.target = iris.target[perm]
 
+# also load the diabetes dataset
+# and randomly permute it
+diabetes = datasets.load_diabetes()
+perm = rng.permutation(diabetes.target.size)
+diabetes.data = diabetes.data[perm]
+diabetes.target = diabetes.target[perm]
+
 # load digits dataset and randomly permute it
 digits = datasets.load_digits()
 perm = rng.permutation(digits.target.size)
 digits.data = digits.data[perm]
 digits.target = digits.target[perm]
+
+random_state = check_random_state(0)
+X_multilabel, y_multilabel = datasets.make_multilabel_classification(
+    random_state=0, n_samples=30, n_features=10
+)
+# NB: despite their names X_sparse_* are numpy arrays (and not sparse matrices)
+X_sparse_pos = random_state.uniform(size=(20, 5))
+X_sparse_pos[X_sparse_pos <= 0.8] = 0.0
+y_random = random_state.randint(0, 4, size=(20,))
+X_sparse_mix = _sparse_random_matrix(20, 10, density=0.25, random_state=0).toarray()
 
 
 def assert_tree_equal(d, s, message):
@@ -129,6 +176,8 @@ def assert_tree_equal(d, s, message):
     [
         ObliqueDecisionTreeClassifier(random_state=12),
         PatchObliqueDecisionTreeClassifier(random_state=12),
+        ObliqueDecisionTreeRegressor(random_state=12),
+        PatchObliqueDecisionTreeRegressor(random_state=12),
     ]
 )
 def test_sklearn_compatible_estimator(estimator, check):
@@ -331,6 +380,7 @@ def test_patch_tree_errors():
     with pytest.raises(RuntimeError, match="Data dimensions"):
         clf = PatchObliqueDecisionTreeClassifier(
             data_dims=(8, 9),
+            data_dims=(8, 9),
         )
         clf.fit(X, y)
 
@@ -341,12 +391,17 @@ def test_patch_tree_errors():
             min_patch_dims=(2, 1),
             max_patch_dims=(1, 1),
             data_dims=(8, 8),
+            min_patch_dims=(2, 1),
+            max_patch_dims=(1, 1),
+            data_dims=(8, 8),
         )
         clf.fit(X, y)
 
     # the maximum patch height/width should not exceed the data height/width
     with pytest.raises(RuntimeError, match="The maximum patch width"):
         clf = PatchObliqueDecisionTreeClassifier(
+            max_patch_dims=(9, 1),
+            data_dims=(8, 8),
             max_patch_dims=(9, 1),
             data_dims=(8, 8),
         )
@@ -454,3 +509,98 @@ def test_patch_oblique_tree_feature_weights():
 def test_patch_tree_higher_dims():
     """Test patch oblique tree when patch and data dimensions are higher."""
     pass
+
+
+@pytest.mark.parametrize("Tree", REG_TREES.values())
+@pytest.mark.parametrize("criterion", REG_CRITERIONS)
+def test_regression_toy(Tree, criterion):
+    # Check regression on a toy dataset.
+    if criterion == "poisson":
+        # make target positive while not touching the original y and
+        # true_result
+        a = np.abs(np.min(y)) + 1
+        y_train = np.array(y) + a
+        y_test = np.array(true_result) + a
+    else:
+        y_train = y
+        y_test = true_result
+
+    regressor = Tree(criterion=criterion, random_state=1)
+    regressor.fit(X, y_train)
+    assert_allclose(regressor.predict(T), y_test)
+
+    regressor = Tree(criterion=criterion, max_features=1, random_state=1)
+    regressor.fit(X, y_train)
+    assert_allclose(regressor.predict(T), y_test)
+
+
+@pytest.mark.parametrize("name, Tree", REG_TREES.items())
+@pytest.mark.parametrize("criterion", REG_CRITERIONS)
+def test_diabetes_overfit(name, Tree, criterion):
+    # check consistency of overfitted trees on the diabetes dataset
+    # since the trees will overfit, we expect an MSE of 0
+    reg = Tree(criterion=criterion, random_state=0)
+    reg.fit(diabetes.data, diabetes.target)
+    score = mean_squared_error(diabetes.target, reg.predict(diabetes.data))
+    assert score == pytest.approx(
+        0
+    ), f"Failed with {name}, criterion = {criterion} and score = {score}"
+
+
+@skip_if_32bit
+@pytest.mark.parametrize("name, Tree", REG_TREES.items())
+@pytest.mark.parametrize(
+    "criterion, max_depth, metric, max_loss",
+    [
+        ("squared_error", 15, mean_squared_error, 60),
+        ("absolute_error", 20, mean_squared_error, 60),
+        ("friedman_mse", 15, mean_squared_error, 60),
+        ("poisson", 15, mean_poisson_deviance, 30),
+    ],
+)
+def test_diabetes_underfit(name, Tree, criterion, max_depth, metric, max_loss):
+    # check consistency of trees when the depth and the number of features are
+    # limited
+
+    reg = Tree(criterion=criterion, max_depth=max_depth, max_features=6, random_state=0)
+    reg.fit(diabetes.data, diabetes.target)
+    loss = metric(diabetes.target, reg.predict(diabetes.data))
+    assert 0 < loss < max_loss
+
+
+def test_numerical_stability():
+    # Check numerical stability.
+    X = np.array(
+        [
+            [152.08097839, 140.40744019, 129.75102234, 159.90493774],
+            [142.50700378, 135.81935120, 117.82884979, 162.75781250],
+            [127.28772736, 140.40744019, 129.75102234, 159.90493774],
+            [132.37025452, 143.71923828, 138.35694885, 157.84558105],
+            [103.10237122, 143.71928406, 138.35696411, 157.84559631],
+            [127.71276855, 143.71923828, 138.35694885, 157.84558105],
+            [120.91514587, 140.40744019, 129.75102234, 159.90493774],
+        ]
+    )
+
+    y = np.array([1.0, 0.70209277, 0.53896582, 0.0, 0.90914464, 0.48026916, 0.49622521])
+
+    with np.errstate(all="raise"):
+        for name, Tree in REG_TREES.items():
+            reg = Tree(random_state=0)
+            reg.fit(X, y)
+            reg.fit(X, -y)
+            reg.fit(-X, y)
+            reg.fit(-X, -y)
+
+
+@pytest.mark.parametrize("criterion", ["squared_error", "friedman_mse", "poisson"])
+@pytest.mark.parametrize("Tree", REG_TREES.values())
+def test_balance_property(criterion, Tree):
+    # Test that sum(y_pred)=sum(y_true) on training set.
+    # This works if the mean is predicted (should even be true for each leaf).
+    # MAE predicts the median and is therefore excluded from this test.
+    # Choose a training set with non-negative targets (for poisson)
+    X, y = diabetes.data, diabetes.target
+    reg = Tree(criterion=criterion)
+    reg.fit(X, y)
+    assert np.sum(reg.predict(X)) == pytest.approx(np.sum(y))

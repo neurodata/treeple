@@ -43,7 +43,9 @@ else:
         )
         from .ensemble._supervised_forest import (
             ObliqueRandomForestClassifier,
+            ObliqueRandomForestRegressor,
             PatchObliqueRandomForestClassifier,
+            PatchObliqueRandomForestRegressor,
         )
     except ImportError as e:
         msg = """Error importing scikit-tree: you cannot import scikit-tree while
@@ -55,7 +57,9 @@ else:
         "tree",
         "ensemble",
         "ObliqueRandomForestClassifier",
+        "ObliqueRandomForestRegressor",
         "PatchObliqueRandomForestClassifier",
+        "PatchObliqueRandonForestRegressor",
         "UnsupervisedRandomForest",
         "UnsupervisedObliqueRandomForest",
     ]
