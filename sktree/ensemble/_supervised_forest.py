@@ -1,5 +1,9 @@
 from sklearn.utils._param_validation import StrOptions
 from sklearn_fork.ensemble._forest import ForestClassifier, ForestRegressor
+<<<<<<< HEAD
+=======
+from sklearn_fork.utils._param_validation import StrOptions
+>>>>>>> 0ca2610 (rebase, import changes)
 
 from sktree.tree import (
     ObliqueDecisionTreeClassifier,
@@ -1233,6 +1237,8 @@ class PatchObliqueRandomForestRegressor(ForestRegressor):
         max_patch_dims=None,
         dim_contiguous=None,
         data_dims=None,
+        boundary=None,
+        feature_weight=None,
     ):
         super().__init__(
             estimator=PatchObliqueDecisionTreeRegressor(),
@@ -1251,6 +1257,8 @@ class PatchObliqueRandomForestRegressor(ForestRegressor):
                 "max_patch_dims",
                 "dim_contiguous",
                 "data_dims",
+                "boundary",
+                "feature_weight",
             ),
             bootstrap=bootstrap,
             oob_score=oob_score,
@@ -1277,6 +1285,7 @@ class PatchObliqueRandomForestRegressor(ForestRegressor):
         self.min_weight_fraction_leaf = min_weight_fraction_leaf
         self.max_leaf_nodes = max_leaf_nodes
         self.min_impurity_decrease = min_impurity_decrease
+<<<<<<< HEAD
 
 
 class PatchObliqueRandomForestRegressor(ForestRegressor):
@@ -1581,3 +1590,5 @@ class PatchObliqueRandomForestRegressor(ForestRegressor):
         self.min_weight_fraction_leaf = min_weight_fraction_leaf
         self.max_leaf_nodes = max_leaf_nodes
         self.min_impurity_decrease = min_impurity_decrease
+=======
+>>>>>>> 0ca2610 (rebase, import changes)

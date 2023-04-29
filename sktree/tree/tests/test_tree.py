@@ -19,11 +19,16 @@ from sklearn_fork.metrics import (
 )
 from sklearn_fork.model_selection import cross_val_score
 from sklearn_fork.random_projection import _sparse_random_matrix
+<<<<<<< HEAD
 from sklearn_fork.utils._testing import skip_if_32bit
 from sklearn_fork.utils.validation import check_random_state
+=======
+>>>>>>> 0ca2610 (rebase, import changes)
 from sklearn_fork.tree import DecisionTreeClassifier
 from sklearn_fork.tree._tree import TREE_LEAF
+from sklearn_fork.utils._testing import skip_if_32bit
 from sklearn_fork.utils.estimator_checks import parametrize_with_checks
+from sklearn_fork.utils.validation import check_random_state
 
 from sktree.tree import (
     ObliqueDecisionTreeClassifier,
