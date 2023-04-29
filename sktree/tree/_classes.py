@@ -1910,11 +1910,29 @@ class GaussianKernelDecisionTreeClassifier(KernelDecisionTreeClassifier):
         for _ in range(self.n_kernels):
             patch_shape = []
             for idx in range(ndim):
+                # Note: By constraining max patch height/width to be at least the min
+                # patch height/width this ensures that the minimum value of
+                # patch_height and patch_width is 1
+                patch_dim = rng.randint(self.min_patch_dims_[idx], self.max_patch_dims_[idx] + 1)
+
                 # sample the possible patch shape given input parameters
                 if self.boundary == "wrap":
-                    pass
-                else:
-                    pass
+                    # add circular boundary conditions
+                    delta_patch_dim = self.data_dims_[idx] + 2 * (patch_dim - 1)
+
+                    # sample the top left index for this dimension
+                    top_left_patch_seed = rng.randint(0, delta_patch_dim)
+
+                    # resample the patch dimension due to padding
+                    dim = top_left_patch_seed % delta_patch_dim
+
+                    # resample the patch dimension due to padding
+                    patch_dim = min(
+                        patch_dim, min(dim + 1, self.data_dims_[idx] + patch_dim - dim - 1)
+                    )
+
+                patch_shape.append(patch_dim)
+
             patch_shape = np.array(patch_shape)
 
             # sample the sigma and mu parameters

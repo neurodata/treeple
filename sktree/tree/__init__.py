@@ -1,4 +1,5 @@
 from ._classes import (
+    KernelDecisionTreeClassifier,
     ObliqueDecisionTreeClassifier,
     PatchObliqueDecisionTreeClassifier,
     UnsupervisedDecisionTree,
@@ -10,4 +11,5 @@ __all__ = [
     "UnsupervisedObliqueDecisionTree",
     "ObliqueDecisionTreeClassifier",
     "PatchObliqueDecisionTreeClassifier",
+    "KernelDecisionTreeClassifier",
 ]
