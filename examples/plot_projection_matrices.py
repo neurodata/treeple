@@ -31,7 +31,6 @@ We also allow each dimension to be arbitrarily discontiguous.
 """
 
 import matplotlib.pyplot as plt
-
 import numpy as np
 from sklearn_fork.tree._criterion import Gini
 

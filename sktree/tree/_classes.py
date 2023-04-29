@@ -3,10 +3,14 @@ from numbers import Real
 
 import numpy as np
 from scipy.sparse import issparse
-
 from sklearn.base import ClusterMixin, TransformerMixin, is_classifier, is_regressor
 from sklearn.cluster import AgglomerativeClustering
-from sklearn_fork.tree import BaseDecisionTree, DecisionTreeClassifier, DecisionTreeRegressor, _criterion
+from sklearn_fork.tree import (
+    BaseDecisionTree,
+    DecisionTreeClassifier,
+    DecisionTreeRegressor,
+    _criterion,
+)
 from sklearn_fork.tree import _tree as _sklearn_tree
 from sklearn_fork.tree._criterion import BaseCriterion
 from sklearn_fork.tree._tree import BestFirstTreeBuilder, DepthFirstTreeBuilder
@@ -1787,7 +1791,6 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
     the structure in the data. For example, in an image, a patch would be contiguous
     along the rows and columns of the image. In a multivariate time-series, a patch
     would be contiguous over time, but possibly discontiguous over the sensors.
-
     Parameters
     ----------
     criterion : {"squared_error", "friedman_mse", "absolute_error", \
@@ -2264,10 +2267,16 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         random_state : int, RandomState instance or None, default=None
             Controls the randomness of the estimator.
         """
+
+        n_samples = X.shape[0]
+
         # Build tree
         criterion = self.criterion
         if not isinstance(criterion, BaseCriterion):
-            criterion = CRITERIA_REG[self.criterion](self.n_outputs_, n_samples)
+            if is_classifier(self):
+                criterion = CRITERIA_CLF[self.criterion](self.n_outputs_, self.n_classes_)
+            else:
+                criterion = CRITERIA_REG[self.criterion](self.n_outputs_, n_samples)
         else:
             # Make a deepcopy in case the criterion has mutable attributes that
             # might be shared and modified concurrently during parallel fitting

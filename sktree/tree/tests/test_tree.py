@@ -19,9 +19,9 @@ from sklearn.metrics import (
 )
 from sklearn.model_selection import cross_val_score
 from sklearn.random_projection import _sparse_random_matrix
+from sklearn.tree._tree import TREE_LEAF
 from sklearn.utils._testing import skip_if_32bit
 from sklearn.utils.validation import check_random_state
-from sklearn.tree._tree import TREE_LEAF
 from sklearn_fork.tree import DecisionTreeClassifier
 from sklearn_fork.utils.estimator_checks import parametrize_with_checks
 
