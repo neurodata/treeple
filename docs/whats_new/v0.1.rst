@@ -32,7 +32,7 @@ Changelog
 - |Fix| Fix a bug in Patch oblique random forest that samples outside the data boundaries and adds a user guide, by `Adam Li`_ (:pr:`61`)
 - |Feature| MORF trees now can sample n-dimensional patches inside an n-dimensional structure sample and make any arbitrary axis discontinuous, by `Adam Li`_ (:pr:`63`)
 - |Feature| MORF trees now can normalize by feature weight per sample per feature column, by `Adam Li`_ (:pr:`67`)
-- |Feature| Implementation of ObliqueDecisionTreeRegressor, PatchObliqueDecisionTreeRegressor, ObliqueRandomForestRegressor, PatchObliqueRandomForestRegressor, by `SUKI-O`_ (:pr:`71`)
+- |Feature| Implementation of ObliqueDecisionTreeRegressor, PatchObliqueDecisionTreeRegressor, ObliqueRandomForestRegressor, PatchObliqueRandomForestRegressor, by `SUKI-O`_ (:pr:`72`)
 
 Code and Documentation Contributors
 -----------------------------------
