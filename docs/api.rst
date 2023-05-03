@@ -28,13 +28,17 @@ how scikit-learn builds trees.
    :toctree: generated/
 
    ObliqueRandomForestClassifier
+   ObliqueRandomForestRegressor
    PatchObliqueRandomForestClassifier
+   PatchObliqueRandomForestRegressor
 
 .. autosummary::
    :toctree: generated/
 
    tree.ObliqueDecisionTreeClassifier
+   tree.ObliqueDecisionTreeRegressor
    tree.PatchObliqueDecisionTreeClassifier
+   tree.PatchObliqueDecisionTreeRegressor
 
 Unsupervised
 ------------

@@ -932,8 +932,10 @@ class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
 
 class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
     """A decision tree Regressor.
+
     Read more in the :ref:`User Guide <sklearn:tree>`. The implementation follows
     that of :footcite:`breiman2001random` and :footcite:`TomitaSPORF2020`.
+    
     Parameters
     ----------
     criterion : {"squared_error", "friedman_mse", "absolute_error", \
@@ -1016,9 +1018,8 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         ``N``, ``N_t``, ``N_t_R`` and ``N_t_L`` all refer to the weighted sum,
         if ``sample_weight`` is passed.
     ccp_alpha : non-negative float, default=0.0
-        Complexity parameter used for Minimal Cost-Complexity Pruning. The
-        subtree with the largest cost complexity that is smaller than
-        ``ccp_alpha`` will be chosen. By default, no pruning is performed. See
+        Complexity parameter used for Minimal Cost-Complexity Pruning. Oblique trees
+        do not support cost complexity pruning yet. See
         :ref:`minimal_cost_complexity_pruning` for details.
     feature_combinations : float, default=None
         The number of features to combine on average at each split
@@ -1029,6 +1030,7 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         gives the number of expected non-zeros in the projection matrix of shape
         ``(max_features, n_features)``. Thus this value must always be less than
         ``n_features`` in order to be valid.
+
     Attributes
     ----------
     feature_importances_ : ndarray of shape (n_features,)
@@ -1055,9 +1057,11 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         attributes of Tree object.
     feature_combinations_ : float
         The number of feature combinations on average taken to fit the tree.
+
     See Also
     --------
     DecisionTreeClassifier : An axis-aligned decision tree classifier.
+
     Notes
     -----
     Compared to ``DecisionTreeClassifier``, oblique trees can sample
@@ -1076,6 +1080,7 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
     function on the outputs of :meth:`predict_proba`. This means that in
     case the highest predicted probabilities are tied, the classifier will
     predict the tied class with the lowest index in :term:`classes_`.
+
     References
     ----------
     .. [1] https://en.wikipedia.org/wiki/Decision_tree_learning
@@ -1152,6 +1157,7 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         random_state,
     ):
         """Build the actual tree.
+
         Parameters
         ----------
         X : {array-like, sparse matrix} of shape (n_samples, n_features)
@@ -1220,15 +1226,12 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
                 random_state,
                 self.feature_combinations_,
             )
-
-        if is_classifier(self):
-            raise ValueError("Please use the ObliqueDecisionTreeClassifier for classification")
-        elif is_regressor(self):
-            self.tree_ = ObliqueTree(
-                self.n_features_in_,
-                np.array([1] * self.n_outputs_, dtype=np.intp),
-                self.n_outputs_,
-            )
+            
+        self.tree_ = ObliqueTree(
+            self.n_features_in_,
+            np.array([1] * self.n_outputs_, dtype=np.intp),
+            self.n_outputs_,
+        )
 
         # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
         if max_leaf_nodes < 0:
@@ -1742,6 +1745,7 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
     the structure in the data. For example, in an image, a patch would be contiguous
     along the rows and columns of the image. In a multivariate time-series, a patch
     would be contiguous over time, but possibly discontiguous over the sensors.
+
     Parameters
     ----------
     criterion : {"squared_error", "friedman_mse", "absolute_error", \
@@ -1853,6 +1857,7 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         patches that are generated. The feature weights are used
         as follows: for every patch that is sampled, the feature weights over
         the entire patch is summed and normalizes the patch.
+
     Attributes
     ----------
     classes_ : ndarray of shape (n_classes,) or list of ndarray
@@ -1890,6 +1895,7 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         The maximum dimensions of a patch.
     data_dims_ : array-like
         The presumed dimensions of the un-vectorized feature vector.
+
     Notes
     -----
     Patches are 2D masks that are applied onto the data matrix. Following sklearn
@@ -1904,6 +1910,7 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
     decision tree, albeit with less efficiency optimizations. Therefore, it is always
     recommended to set the range of patch heights and widths based on the structure of your
     expected input data.
+
     References
     ----------
     .. footbibliography::
@@ -1971,6 +1978,7 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
 
     def fit(self, X, y, sample_weight=None, check_input=True):
         """Fit tree.
+
         Parameters
         ----------
         X : {array-like, sparse matrix} of shape (n_samples, n_features)
@@ -2093,6 +2101,7 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         random_state,
     ):
         """Build the actual tree.
+        
         Parameters
         ----------
         X : {array-like, sparse matrix} of shape (n_samples, n_features)

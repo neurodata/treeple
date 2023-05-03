@@ -343,6 +343,7 @@ class ObliqueRandomForestClassifier(ForestClassifier):
 class ObliqueRandomForestRegressor(ForestRegressor):
     """
     An oblique random forest regressor.
+
     A oblique random forest is a meta estimator similar to a random
     forest that fits a number of oblique decision tree regressor
     on various sub-samples of the dataset and uses averaging to
@@ -350,7 +351,9 @@ class ObliqueRandomForestRegressor(ForestRegressor):
     The sub-sample size is controlled with the `max_samples` parameter if
     `bootstrap=True` (default), otherwise the whole dataset is used to build
     each tree.
+
     Read more in the :ref:`User Guide <sklearn:forest>`.
+
     Parameters
     ----------
     n_estimators : int, default=100
@@ -459,6 +462,7 @@ class ObliqueRandomForestRegressor(ForestRegressor):
         gives the number of expected non-zeros in the projection matrix of shape
         ``(max_features, n_features)``. Thus this value must always be less than
         ``n_features`` in order to be valid.
+
     Attributes
     ----------
     base_estimator_ : ObliqueDecisionTreeRegressor
@@ -494,12 +498,14 @@ class ObliqueRandomForestRegressor(ForestRegressor):
         was never left out during the bootstrap. In this case,
         `oob_decision_function_` might contain NaN. This attribute exists
         only when ``oob_score`` is True.
+
     See Also
     --------
     sktree.tree.ObliqueDecisionTreeRegressor : An oblique decision
         tree regressor.
     sklearn.ensemble.RandomForestRegressor : An axis-aligned decision
         forest regressor.
+
     Notes
     -----
     The default values for the parameters controlling the size of the trees
@@ -513,9 +519,12 @@ class ObliqueRandomForestRegressor(ForestRegressor):
     of the criterion is identical for several splits enumerated during the
     search of the best split. To obtain a deterministic behaviour during
     fitting, ``random_state`` has to be fixed.
+
     References
     ----------
     .. [1] L. Breiman, "Random Forests", Machine Learning, 45(1), 5-32, 2001.
+    .. [2] T. Tomita, "Sparse Projection Oblique Randomer Forests", Journal of Machine Learning Research, 21(104), 1-39, 2020.
+
     Examples
     --------
     >>> from sktree.ensemble import ObliqueRandomForestRegressor
@@ -526,8 +535,7 @@ class ObliqueRandomForestRegressor(ForestRegressor):
     >>> regr.fit(X, y)
     ObliqueRandomForestRegressor(...)
     >>> print(regr.predict([[0, 0, 0, 0]]))
-    # TODO: Add example output
-    # [1]
+    [-5.86327109]
     """
 
     _parameter_constraints: dict = {

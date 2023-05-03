@@ -33,13 +33,12 @@ from sktree.tree import (
 )
 
 CLUSTER_CRITERIONS = ("twomeans", "fastbic")
+REG_CRITERIONS = ("squared_error", "absolute_error", "friedman_mse", "poisson")
 
 TREE_CLUSTERS = {
     "UnsupervisedDecisionTree": UnsupervisedDecisionTree,
     "UnsupervisedObliqueDecisionTree": UnsupervisedObliqueDecisionTree,
 }
-
-REG_CRITERIONS = ("squared_error", "absolute_error", "friedman_mse", "poisson")
 
 REG_TREES = {
     "ObliqueDecisionTreeRegressor": ObliqueDecisionTreeRegressor,
@@ -49,6 +48,11 @@ REG_TREES = {
 CLF_TREES = {
     "ObliqueDecisionTreeClassifier": ObliqueDecisionTreeClassifier,
     "PatchObliqueTreeClassifier": PatchObliqueDecisionTreeClassifier,
+}
+
+OBLIQUE_TREES = {
+    "ObliqueDecisionTreeClassifier": ObliqueDecisionTreeClassifier,
+    "ObliqueDecisionTreeRegressor": ObliqueDecisionTreeRegressor,
 }
 
 X_small = np.array(
@@ -327,9 +331,31 @@ def test_oblique_tree_sampling():
     assert rc_cv_scores.mean() > 0.91
 
 
-def test_oblique_tree_feature_combinations():
+@pytest.mark.parametrize("name,Tree", OBLIQUE_TREES.items())
+def test_oblique_trees_feature_combinations_less_than_n_features(name, Tree):
     """Test the hyperparameter ``feature_combinations`` behaves properly."""
-    X, y = iris.data, iris.target
+    if name == "ObliqueTreeClassifier":
+        X, y = iris.data, iris.target
+    else:
+        X, y = diabetes.data, diabetes.target
+    _, n_features = X.shape
+
+    X = X[:5, :]
+    y = y[:5, ...]
+
+    # asset that the feature combinations is less than the number of features
+    estimator = Tree(random_state=0, feature_combinations=3)
+    estimator.fit(X, y)
+    assert estimator.feature_combinations_ < n_features
+
+
+@pytest.mark.parametrize("name,Tree", OBLIQUE_TREES.items())
+def test_oblique_trees_feature_combinations(name, Tree):
+    """Test the hyperparameter ``feature_combinations`` behaves properly."""
+    if name == "ObliqueTreeClassifier":
+        X, y = iris.data, iris.target
+    else:
+        X, y = diabetes.data, diabetes.target
     _, n_features = X.shape
 
     X = X[:5, :]
@@ -338,24 +364,29 @@ def test_oblique_tree_feature_combinations():
     with pytest.raises(
         RuntimeError, match=f"Feature combinations {n_features + 1} should not be greater"
     ):
-        clf = ObliqueDecisionTreeClassifier(random_state=0, feature_combinations=n_features + 1)
-        clf.fit(X, y)
+        estimator = Tree(random_state=0, feature_combinations=n_features + 1)
+        estimator.fit(X, y)
+    
+    # asset that the feature combinations is less than the number of features
+    estimator = Tree(random_state=0, feature_combinations=3)
+    estimator.fit(X, y)
+    assert estimator.feature_combinations_ < n_features
 
     # default option should make it 1.5 if n_features > 1.5
-    clf = ObliqueDecisionTreeClassifier(random_state=0)
-    clf.fit(X, y)
-    assert clf.feature_combinations_ == 1.5
+    estimator = Tree(random_state=0)
+    estimator.fit(X, y)
+    assert estimator.feature_combinations_ == 1.5
 
     # setting the feature combinations explicitly is fine as long as it is < n_features
-    clf = ObliqueDecisionTreeClassifier(random_state=0, feature_combinations=3)
-    clf.fit(X, y)
-    assert clf.feature_combinations_ == 3
+    estimator = Tree(random_state=0, feature_combinations=3)
+    estimator.fit(X, y)
+    assert estimator.feature_combinations_ == 3
 
     # edge-case of only a single feature should set feature_combinations properly
     X = X[:, 0:1]
-    clf = ObliqueDecisionTreeClassifier(random_state=0)
-    clf.fit(X, y)
-    assert clf.feature_combinations_ == 1
+    estimator = Tree(random_state=0)
+    estimator.fit(X, y)
+    assert estimator.feature_combinations_ == 1
 
 
 def test_patch_tree_errors():
