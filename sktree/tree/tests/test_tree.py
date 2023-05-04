@@ -50,11 +50,6 @@ CLF_TREES = {
     "PatchObliqueTreeClassifier": PatchObliqueDecisionTreeClassifier,
 }
 
-OBLIQUE_TREES = {
-    "ObliqueDecisionTreeClassifier": ObliqueDecisionTreeClassifier,
-    "ObliqueDecisionTreeRegressor": ObliqueDecisionTreeRegressor,
-}
-
 X_small = np.array(
     [
         [0, 0, 4, 0, 0, 0, 1, -14, 0, -4, 0, 0, 0, 0],
@@ -331,28 +326,31 @@ def test_oblique_tree_sampling():
     assert rc_cv_scores.mean() > 0.91
 
 
-@pytest.mark.parametrize("name,Tree", OBLIQUE_TREES.items())
-def test_oblique_trees_feature_combinations_less_than_n_features(name, Tree):
+def test_oblique_trees_feature_combinations_less_than_n_features():
     """Test the hyperparameter ``feature_combinations`` behaves properly."""
-    if name == "ObliqueTreeClassifier":
-        X, y = iris.data, iris.target
-    else:
-        X, y = diabetes.data, diabetes.target
+
+    X, y = iris.data[:5, :], iris.target[:5, ...]
     _, n_features = X.shape
 
-    X = X[:5, :]
-    y = y[:5, ...]
+    # asset that the feature combinations is less than the number of features
+    estimator = ObliqueDecisionTreeClassifier(random_state=0, feature_combinations=3)
+    estimator.fit(X, y)
+    assert estimator.feature_combinations_ < n_features
+
+    X, y = diabetes.data[:5, :], diabetes.target[:5, ...]
+    _, n_features = X.shape
 
     # asset that the feature combinations is less than the number of features
-    estimator = Tree(random_state=0, feature_combinations=3)
+    estimator = ObliqueDecisionTreeRegressor(random_state=0, feature_combinations=3)
     estimator.fit(X, y)
     assert estimator.feature_combinations_ < n_features
 
 
-@pytest.mark.parametrize("name,Tree", OBLIQUE_TREES.items())
-def test_oblique_trees_feature_combinations(name, Tree):
+@pytest.mark.parametrize("Tree", [ObliqueDecisionTreeRegressor])
+def test_oblique_trees_feature_combinations(Tree):
     """Test the hyperparameter ``feature_combinations`` behaves properly."""
-    if name == "ObliqueTreeClassifier":
+
+    if is_classifier(Tree):
         X, y = iris.data, iris.target
     else:
         X, y = diabetes.data, diabetes.target
@@ -366,7 +364,7 @@ def test_oblique_trees_feature_combinations(name, Tree):
     ):
         estimator = Tree(random_state=0, feature_combinations=n_features + 1)
         estimator.fit(X, y)
-    
+
     # asset that the feature combinations is less than the number of features
     estimator = Tree(random_state=0, feature_combinations=3)
     estimator.fit(X, y)

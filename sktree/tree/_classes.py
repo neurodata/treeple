@@ -3,7 +3,7 @@ from numbers import Real
 
 import numpy as np
 from scipy.sparse import issparse
-from sklearn.base import ClusterMixin, TransformerMixin, is_classifier, is_regressor
+from sklearn.base import ClusterMixin, TransformerMixin
 from sklearn.cluster import AgglomerativeClustering
 from sklearn_fork.tree import (
     BaseDecisionTree,
@@ -935,7 +935,7 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
 
     Read more in the :ref:`User Guide <sklearn:tree>`. The implementation follows
     that of :footcite:`breiman2001random` and :footcite:`TomitaSPORF2020`.
-    
+
     Parameters
     ----------
     criterion : {"squared_error", "friedman_mse", "absolute_error", \
@@ -1226,7 +1226,7 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
                 random_state,
                 self.feature_combinations_,
             )
-            
+
         self.tree_ = ObliqueTree(
             self.n_features_in_,
             np.array([1] * self.n_outputs_, dtype=np.intp),
@@ -2101,7 +2101,7 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         random_state,
     ):
         """Build the actual tree.
-        
+
         Parameters
         ----------
         X : {array-like, sparse matrix} of shape (n_samples, n_features)

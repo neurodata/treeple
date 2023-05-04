@@ -523,7 +523,8 @@ class ObliqueRandomForestRegressor(ForestRegressor):
     References
     ----------
     .. [1] L. Breiman, "Random Forests", Machine Learning, 45(1), 5-32, 2001.
-    .. [2] T. Tomita, "Sparse Projection Oblique Randomer Forests", Journal of Machine Learning Research, 21(104), 1-39, 2020.
+    .. [2] T. Tomita, "Sparse Projection Oblique Randomer Forests", \
+        Journal of Machine Learning Research, 21(104), 1-39, 2020.
 
     Examples
     --------
