@@ -20,13 +20,11 @@ from libcpp.vector cimport vector
 import struct
 
 import numpy as np
+from scipy.sparse import issparse
 
 cimport numpy as cnp
 
 cnp.import_array()
-
-from scipy.sparse import csr_matrix, issparse
-
 
 cdef extern from "numpy/arrayobject.h":
     object PyArray_NewFromDescr(PyTypeObject* subtype, cnp.dtype descr,
@@ -70,7 +68,7 @@ cdef SIZE_t _TREE_UNDEFINED = TREE_UNDEFINED
 # This works by casting `dummy` to an array of Node of length 1, which numpy
 # can construct a `dtype`-object for. See https://stackoverflow.com/q/62448946
 # for a more detailed explanation.
-cdef Node dummy;  # no-cython-lint
+cdef Node dummy
 NODE_DTYPE = np.asarray(<Node[:1]>(&dummy)).dtype
 
 # =============================================================================
@@ -716,10 +714,10 @@ cdef class UnsupervisedTree(BaseTree):
         if self._resize_c(self.capacity) != 0:
             raise MemoryError("resizing tree to %d" % self.capacity)
 
-        nodes = memcpy(self.nodes, cnp.PyArray_DATA(node_ndarray),
-                       self.capacity * sizeof(Node))
-        value = memcpy(self.value, cnp.PyArray_DATA(value_ndarray),
-                       self.capacity * self.value_stride * sizeof(double))
+        memcpy(self.nodes, cnp.PyArray_DATA(node_ndarray),
+               self.capacity * sizeof(Node))
+        memcpy(self.value, cnp.PyArray_DATA(value_ndarray),
+               self.capacity * self.value_stride * sizeof(double))
 
     cdef int _set_split_node(
         self,

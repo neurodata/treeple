@@ -18,17 +18,16 @@ random forest on cnae-9 utilizing sparse random projection mechanism. All datase
 are subsampled due to computational constraints.
 """
 
-import pandas as pd
 from datetime import datetime
 
-import seaborn as sns
 import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+from sklearn.datasets import fetch_openml
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import RepeatedKFold, cross_validate
-from sklearn.datasets import fetch_openml
 
 from sktree import ObliqueRandomForestClassifier
-
 
 random_state = 123456
 t0 = datetime.now()

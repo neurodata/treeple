@@ -9,13 +9,13 @@
 import numpy as np
 
 cimport numpy as cnp
-from sklearn.tree._splitter cimport SplitRecord
-from sklearn.tree._tree cimport DOUBLE_t  # Type of y, sample_weight
-from sklearn.tree._tree cimport DTYPE_t  # Type of X
-from sklearn.tree._tree cimport INT32_t  # Signed 32 bit integer
-from sklearn.tree._tree cimport SIZE_t  # Type for indices and counters
-from sklearn.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
-from sklearn.tree._tree cimport BaseTree, Node
+from sklearn_fork.tree._splitter cimport SplitRecord
+from sklearn_fork.tree._tree cimport DOUBLE_t  # Type of y, sample_weight
+from sklearn_fork.tree._tree cimport DTYPE_t  # Type of X
+from sklearn_fork.tree._tree cimport INT32_t  # Signed 32 bit integer
+from sklearn_fork.tree._tree cimport SIZE_t  # Type for indices and counters
+from sklearn_fork.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
+from sklearn_fork.tree._tree cimport BaseTree, Node
 
 from ._unsup_splitter cimport UnsupervisedSplitter
 
@@ -37,7 +37,7 @@ cdef class UnsupervisedTree(BaseTree):
     # Methods
     cdef cnp.ndarray _get_value_ndarray(self)
     cdef cnp.ndarray _get_node_ndarray(self)
-    
+
     # Overridden Methods
     cdef int _set_split_node(
         self,
@@ -60,7 +60,7 @@ cdef class UnsupervisedTree(BaseTree):
         cnp.float64_t[:] importances,
         Node* node
     ) noexcept nogil
-    
+
 # =============================================================================
 # Tree builder
 # =============================================================================

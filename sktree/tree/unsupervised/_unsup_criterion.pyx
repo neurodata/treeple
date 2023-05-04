@@ -1,6 +1,6 @@
 # distutils: language = c++
-#cython: language_level=3
-#cython: boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
+# cython: language_level=3
+# cython: boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
 
 cimport numpy as cnp
 import numpy as np
@@ -300,7 +300,6 @@ cdef class TwoMeans(UnsupervisedCriterion):
         """
         cdef double mean
         cdef double impurity
-        cdef SIZE_t n_node_samples = self.n_node_samples
 
         # If calling without setting the
         if self.Xf is None:
@@ -319,7 +318,6 @@ cdef class TwoMeans(UnsupervisedCriterion):
             mean
         ) / self.weighted_n_node_samples
         return impurity
-
 
     cdef void children_impurity(
         self,
@@ -365,7 +363,6 @@ cdef class TwoMeans(UnsupervisedCriterion):
             mean_right
         ) / self.weighted_n_right
 
-
     cdef double sum_of_squares(
         self,
         SIZE_t start,
@@ -407,26 +404,26 @@ cdef class TwoMeans(UnsupervisedCriterion):
 
 cdef class FastBIC(TwoMeans):
     r"""Fast-BIC split criterion
-    
-    The Bayesian Information Criterion (BIC) is a popular model seleciton 
+
+    The Bayesian Information Criterion (BIC) is a popular model seleciton
     criteria that is based on the log likelihood of the model given data.
     MClust-BIC is a method in the R-package 'mclust' that uses BIC as a splitting
     criterion.
     See: https://stats.stackexchange.com/questions/237220/mclust-model-selection
 
-    Fast-BIC is a method that combines the speed of the two-means clustering 
-    method with the model flexibility of Mclust-BIC. It sorts data for each 
-    feature and tries all possible splits to assign data points to one of 
+    Fast-BIC is a method that combines the speed of the two-means clustering
+    method with the model flexibility of Mclust-BIC. It sorts data for each
+    feature and tries all possible splits to assign data points to one of
     two Gaussian distributions based on their position relative to the split.
-    The parameters for each cluster are estimated using maximum likelihood 
-    estimation (MLE). The method performs hard clustering rather than soft 
+    The parameters for each cluster are estimated using maximum likelihood
+    estimation (MLE). The method performs hard clustering rather than soft
     clustering like in GMM, resulting in a simpler calculation of the likelihood.
-    
+
     \hat{L} = \sum_{n=1}^s[\log\hat{\pi}_1+\log{\mathcal{N}(x_n;\hat{\mu}_1,\hat{\sigma}_1^2)}]
     + \sum_{n=s+1}^N[\log\hat{\pi}_2+\log{\mathcal{N}(x_n;\hat{\mu}_2,\hat{\sigma}_2^2)}]
-    
+
     where the prior, mean, and variance are defined as follows, respectively:
-    
+
     - \hat{\pi} = \frac{s}{N}
     - \hat{\mu} = \frac{1}{s}\sum_{n\le s}{x_n},
     - \hat{\sigma}^2 = \frac{1}{s}\sum_{n\le s}{||x_n-\hat{\mu_j}||^2}
@@ -439,7 +436,7 @@ cdef class FastBIC(TwoMeans):
     """
     cdef double bic_cluster(self, SIZE_t n_samples, double variance) noexcept nogil:
         """Help compute the BIC from assigning to a specific cluster.
-        
+
         Parameters
         ----------
         n_samples : SIZE_t
@@ -451,13 +448,13 @@ cdef class FastBIC(TwoMeans):
         -----
         Computes the following:
 
-        :math:`-2 * (n_i log(w_i) - n_i/2 log(2 \pi \sigma_i^2))
+        :math:`-2 * (n_i log(w_i) - n_i/2 log(2 \\pi \\sigma_i^2))
 
-        where ``n_i`` is the number of samples assigned to cluster i,
-        ``w_i`` is the probability of choosing cluster i at random (or also known
-        as the prior) and ``\sigma_i^2`` is the variance estimate for cluster i.
+        where :math:`n_i` is the number of samples assigned to cluster i,
+        :math:`w_i` is the probability of choosing cluster i at random (or also known
+        as the prior) and :math:`\\sigma_i^2` is the variance estimate for cluster i.
 
-        Note that ``\sigma_i^2`` in the Fast-BIC derivation may be the
+        Note that :math:`\\sigma_i^2` in the Fast-BIC derivation may be the
         variance of the cluster itself, or the estimated combined variance
         from both clusters.
         """
@@ -470,7 +467,6 @@ cdef class FastBIC(TwoMeans):
 
         # add to prevent taking log of 0 when there is a degenerate cluster (i.e. single sample, or no variance)
         return -2. * (n_samples * log(w_cluster) + 0.5 * n_samples * log(2. * PI * variance + 1.e-7))
-
 
     cdef double node_impurity(
         self
@@ -559,7 +555,7 @@ cdef class FastBIC(TwoMeans):
         )
         variance_left = ss_left / self.weighted_n_left
         variance_right = ss_right / self.weighted_n_right
-        
+
         # compute the estimated combined variance
         variance_comb = (ss_left + ss_right) / (self.weighted_n_left + self.weighted_n_right)
 
