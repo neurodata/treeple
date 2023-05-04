@@ -353,6 +353,7 @@ class ObliqueRandomForestClassifier(ForestClassifier, SimMatrixMixin):
             ignored while searching for a split in each node. In the case of
             classification, splits are also ignored if they would result in any
             single class carrying a negative weight in either child node.
+
         Returns
         -------
         self : object
