@@ -26,10 +26,10 @@ from sklearn_fork.tree._tree import DTYPE
 from sklearn_fork.utils.validation import _check_sample_weight, check_is_fitted, check_random_state
 
 from sktree.tree import UnsupervisedDecisionTree, UnsupervisedObliqueDecisionTree
-from sktree._neighbors import _sim_matrix
+from ._neighbors import SimMatrixMixin
 
 
-class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):
+class ForestCluster(TransformerMixin, ClusterMixin, BaseForest, SimMatrixMixin):
     """Unsupervised forest base class."""
 
     def __init__(
@@ -240,23 +240,8 @@ class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):
         X_leaves = self.apply(X)
 
         # now compute the affinity matrix and set it
-        affinity_matrix = self._compute_affinity_matrix(X_leaves)
+        affinity_matrix = self.compute_similarity_matrix_forest(X_leaves)
         return affinity_matrix
-
-    def _compute_affinity_matrix(self, X):
-        """Compute the proximity matrix of samples in X.
-
-        Parameters
-        ----------
-        X : ndarray of shape (n_samples, n_estimators)
-            For each datapoint x in X and for each tree in the forest,
-            is the index of the leaf x ends up in.
-
-        Returns
-        -------
-        prox_matrix : array-like of shape (n_samples, n_samples)
-        """
-        return _sim_matrix(X, self.n_estimators)
 
     def _assign_labels(self, affinity_matrix):
         """Assign cluster labels given X.
