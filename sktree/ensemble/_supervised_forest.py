@@ -335,6 +335,40 @@ class ObliqueRandomForestClassifier(ForestClassifier, SimMatrixMixin):
         self.max_leaf_nodes = max_leaf_nodes
         self.min_impurity_decrease = min_impurity_decrease
 
+    def fit(self, X, y, sample_weight=None):
+        """
+        Build a forest of trees from the training set (X, y).
+        Parameters
+        ----------
+        X : {array-like, sparse matrix} of shape (n_samples, n_features)
+            The training input samples. Internally, its dtype will be converted
+            to ``dtype=np.float32``. If a sparse matrix is provided, it will be
+            converted into a sparse ``csc_matrix``.
+        y : array-like of shape (n_samples,) or (n_samples, n_outputs)
+            The target values (class labels in classification, real numbers in
+            regression).
+        sample_weight : array-like of shape (n_samples,), default=None
+            Sample weights. If None, then samples are equally weighted. Splits
+            that would create child nodes with net zero or negative weight are
+            ignored while searching for a split in each node. In the case of
+            classification, splits are also ignored if they would result in any
+            single class carrying a negative weight in either child node.
+        Returns
+        -------
+        self : object
+            Fitted estimator.
+        """
+        super().fit(X, y, sample_weight)
+
+        # apply to the leaves
+        X_leaves = self.apply(X)
+
+        # now compute the similarity/dissimilarity matrix and set it
+        self.similarity_matrix_ = self.compute_similarity_matrix_forest(X_leaves)
+        self.dissimilarity_matrix_ = self.compute_dissimilarity_matrix_forest(X_leaves)
+
+        return self
+
 
 class PatchObliqueRandomForestClassifier(ForestClassifier, SimMatrixMixin):
     """A patch-oblique random forest classifier.
@@ -670,3 +704,37 @@ class PatchObliqueRandomForestClassifier(ForestClassifier, SimMatrixMixin):
         self.min_weight_fraction_leaf = min_weight_fraction_leaf
         self.max_leaf_nodes = max_leaf_nodes
         self.min_impurity_decrease = min_impurity_decrease
+
+    def fit(self, X, y, sample_weight=None):
+        """
+        Build a forest of trees from the training set (X, y).
+        Parameters
+        ----------
+        X : {array-like, sparse matrix} of shape (n_samples, n_features)
+            The training input samples. Internally, its dtype will be converted
+            to ``dtype=np.float32``. If a sparse matrix is provided, it will be
+            converted into a sparse ``csc_matrix``.
+        y : array-like of shape (n_samples,) or (n_samples, n_outputs)
+            The target values (class labels in classification, real numbers in
+            regression).
+        sample_weight : array-like of shape (n_samples,), default=None
+            Sample weights. If None, then samples are equally weighted. Splits
+            that would create child nodes with net zero or negative weight are
+            ignored while searching for a split in each node. In the case of
+            classification, splits are also ignored if they would result in any
+            single class carrying a negative weight in either child node.
+        Returns
+        -------
+        self : object
+            Fitted estimator.
+        """
+        super().fit(X, y, sample_weight)
+
+        # apply to the leaves
+        X_leaves = self.apply(X)
+
+        # now compute the similarity/dissimilarity matrix and set it
+        self.similarity_matrix_ = self.compute_similarity_matrix_forest(X_leaves)
+        self.dissimilarity_matrix_ = self.compute_dissimilarity_matrix_forest(X_leaves)
+
+        return self

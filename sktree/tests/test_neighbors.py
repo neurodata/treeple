@@ -28,8 +28,8 @@ def test_similarity_matrix(forest):
     )
 
     clf = forest(random_state=12345)
-    clf.fit(X)
-    sim_mat = clf.affinity_matrix_
+    clf.fit(X, y)
+    sim_mat = clf.similarity_matrix_
 
     assert np.allclose(sim_mat, sim_mat.T)
     assert np.all((sim_mat.diagonal() == 1))
@@ -46,8 +46,8 @@ def test_dissimilarity_matrix(forest):
     )
 
     clf = forest(random_state=12345)
-    clf.fit(X)
-    sim_mat = clf.affinity_matrix_
+    clf.fit(X, y)
+    dissim_mat = clf.dissimilarity_matrix_
 
-    assert np.allclose(sim_mat, sim_mat.T)
-    assert np.all((sim_mat.diagonal() == 0))
+    assert np.allclose(dissim_mat, dissim_mat.T)
+    assert np.all((dissim_mat.diagonal() == 0))
