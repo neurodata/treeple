@@ -12,7 +12,7 @@ def compute_forest_similarity_matrix(forest, X):
     ----------
     forest : sklearn.ensemble._forest.BaseForest
         The fitted forest.
-    X : array-like of shape (n_samples, n_features_in_)
+    X : array-like of shape (n_samples, n_features)
         The input data.
 
     Returns
@@ -42,7 +42,7 @@ class SimMatrixMixin:
 
         Parameters
         ----------
-        X : array-like of shape (n_samples, n_features_in_)
+        X : array-like of shape (n_samples, n_features)
             The input data.
 
         Returns
