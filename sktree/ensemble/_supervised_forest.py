@@ -2,6 +2,7 @@ from sklearn_fork.ensemble._forest import ForestClassifier
 from sklearn_fork.utils._param_validation import StrOptions
 
 from sktree.tree import ObliqueDecisionTreeClassifier, PatchObliqueDecisionTreeClassifier
+
 from ._neighbors import SimMatrixMixin
 
 
@@ -338,6 +339,7 @@ class ObliqueRandomForestClassifier(ForestClassifier, SimMatrixMixin):
     def fit(self, X, y, sample_weight=None):
         """
         Build a forest of trees from the training set (X, y).
+
         Parameters
         ----------
         X : {array-like, sparse matrix} of shape (n_samples, n_features)
@@ -361,12 +363,8 @@ class ObliqueRandomForestClassifier(ForestClassifier, SimMatrixMixin):
         """
         super().fit(X, y, sample_weight)
 
-        # apply to the leaves
-        X_leaves = self.apply(X)
-
         # now compute the similarity/dissimilarity matrix and set it
-        self.similarity_matrix_ = self.compute_similarity_matrix_forest(X_leaves)
-        self.dissimilarity_matrix_ = self.compute_dissimilarity_matrix_forest(X_leaves)
+        self.similarity_matrix_ = self.compute_similarity_matrix_forest(X)
 
         return self
 
@@ -709,6 +707,7 @@ class PatchObliqueRandomForestClassifier(ForestClassifier, SimMatrixMixin):
     def fit(self, X, y, sample_weight=None):
         """
         Build a forest of trees from the training set (X, y).
+
         Parameters
         ----------
         X : {array-like, sparse matrix} of shape (n_samples, n_features)
@@ -732,11 +731,7 @@ class PatchObliqueRandomForestClassifier(ForestClassifier, SimMatrixMixin):
         """
         super().fit(X, y, sample_weight)
 
-        # apply to the leaves
-        X_leaves = self.apply(X)
-
         # now compute the similarity/dissimilarity matrix and set it
-        self.similarity_matrix_ = self.compute_similarity_matrix_forest(X_leaves)
-        self.dissimilarity_matrix_ = self.compute_dissimilarity_matrix_forest(X_leaves)
+        self.similarity_matrix_ = self.compute_similarity_matrix_forest(X)
 
         return self

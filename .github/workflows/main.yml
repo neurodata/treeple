@@ -187,27 +187,20 @@ jobs:
           # wget https://github.com/scipy/scipy-ci-artifacts/raw/main/openblas_32_if.zip
           # unzip -d c:\ openblas_32_if.zip
           # echo "PKG_CONFIG_PATH=c:\opt\openblas\if_32\64\lib\pkgconfig;" >> $env:GITHUB_ENV
-      - name: meson-configure
+
+      - name: Build
         run: |
-          meson setup build --prefix=$PWD\build
-      - name: meson-build
-        run: |
-          ninja -j 2 -C build
-      - name: meson-install
-        run: |
-          cd build
-          meson install
-      - name: build-path
-        run: |
-          echo "installed_path=$PWD\build\Lib\site-packages" >> $env:GITHUB_ENV
-      - name: prep-test
-        run: |
-          echo "PYTHONPATH=${env:installed_path}" >> $env:GITHUB_ENV
+          echo "SCIPY_USE_PROPACK=1" >> $env:GITHUB_ENV
+          python spin build -j 2 --win-cp-openblas
+          # Necessary because GitHub Actions checks out the repo to D:\ while OpenBLAS
+          # got installed to C:\ higher up. The copying with `--win-cp-openblas` fails
+          # when things are split over drives.
+          cp C:\opt\64\bin\*.dll $pwd\build-install\Lib\site-packages\scikit-tree\.libs\
+          python tools\openblas_support.py --write-init $PWD\build-install\Lib\site-packages\scikit-tree\
+  
       - name: test
         run: |
-          mkdir tmp
-          cd tmp
-          python -c 'import sktree;'
+          python spin test -j2
 
   # release is ran when a release is made on Github
   release:

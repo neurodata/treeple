@@ -1,29 +1,40 @@
 import numpy as np
 
 
+def compute_forest_similarity_matrix(forest, X):
+    """Compute the similarity matrix of samples in X using a trained forest.
+
+    As an intermediate calculation, the forest applies the dataset and gets
+    the leaves for each sample. Then, the similarity matrix is computed by
+    counting the number of times each pair of samples ends up in the same leaf.
+
+    Parameters
+    ----------
+    forest : sklearn.ensemble._forest.BaseForest
+        The fitted forest.
+    X : array-like of shape (n_samples, n_features_in_)
+        The input data.
+
+    Returns
+    -------
+    aff_matrix : array-like of shape (n_samples, n_samples)
+        The estimated distance matrix.
+    """
+    # apply to the leaves
+    X_leaves = forest.apply(X)
+
+    aff_matrix = sum(
+        np.equal.outer(X_leaves[:, i], X_leaves[:, i]) for i in range(forest.n_estimators)
+    )
+
+    # normalize by the number of trees
+    aff_matrix = np.divide(aff_matrix, forest.n_estimators)
+    return aff_matrix
+
+
 # ported from https://github.com/neurodata/hyppo/blob/main/hyppo/independence/_utils.py
 class SimMatrixMixin:
     """Mixin class to calculate similarity and dissimilarity matrices."""
-
-    def _sim_matrix(self, X):
-        """
-        Compute the proximity matrix of samples in X.
-
-        Parameters
-        ----------
-        X : ndarray of shape (n_samples, n_estimators)
-            For each datapoint x in X and for each tree in the forest,
-            is the index of the leaf x ends up in.
-
-        Returns
-        -------
-        prox_matrix : array-like of shape (n_samples, n_samples)
-        """
-        aff_matrix = sum(np.equal.outer(X[:, i], X[:, i]) for i in range(self.n_estimators))
-
-        # normalize by the number of trees
-        aff_matrix = np.divide(aff_matrix, self.n_estimators)
-        return aff_matrix
 
     def compute_similarity_matrix_forest(self, X):
         """
@@ -31,28 +42,12 @@ class SimMatrixMixin:
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_estimators)
-            For each datapoint x in X and for each tree in the forest,
-            is the index of the leaf x ends up in.
+        X : array-like of shape (n_samples, n_features_in_)
+            The input data.
 
         Returns
         -------
-        prox_matrix : array-like of shape (n_samples, n_samples)
+        sim_matrix : array-like of shape (n_samples, n_samples)
+            The similarity matrix among the samples.
         """
-        return self._sim_matrix(X)
-
-    def compute_dissimilarity_matrix_forest(self, X):
-        """
-        Compute the dissimilarity matrix of samples in X.
-
-        Parameters
-        ----------
-        X : ndarray of shape (n_samples, n_estimators)
-            For each datapoint x in X and for each tree in the forest,
-            is the index of the leaf x ends up in.
-
-        Returns
-        -------
-        prox_matrix : array-like of shape (n_samples, n_samples)
-        """
-        return 1 - self._sim_matrix(X)
+        return compute_forest_similarity_matrix(self, X)
