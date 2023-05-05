@@ -10,8 +10,7 @@ from sktree.tree import (
 
 
 class ObliqueRandomForestClassifier(ForestClassifier):
-    """
-    An oblique random forest classifier.
+    """An oblique random forest classifier.
 
     A oblique random forest is a meta estimator similar to a random
     forest that fits a number of oblique decision tree classifiers
@@ -341,13 +340,13 @@ class ObliqueRandomForestClassifier(ForestClassifier):
 
 
 class ObliqueRandomForestRegressor(ForestRegressor):
-    """
-    An oblique random forest regressor.
+    """An oblique random forest regressor.
 
     A oblique random forest is a meta estimator similar to a random
     forest that fits a number of oblique decision tree regressor
     on various sub-samples of the dataset and uses averaging to
     improve the predictive accuracy and control over-fitting.
+
     The sub-sample size is controlled with the `max_samples` parameter if
     `bootstrap=True` (default), otherwise the whole dataset is used to build
     each tree.
@@ -358,8 +357,10 @@ class ObliqueRandomForestRegressor(ForestRegressor):
     ----------
     n_estimators : int, default=100
         The number of trees in the forest.
+
     criterion : {"squared_error", "absolute_error", "friedman_mse", "poisson"}, \
             default="squared_error"
+
         The function to measure the quality of a split. Supported criteria
         are "squared_error" for the mean squared error, which is equal to
         variance reduction as feature selection criterion and minimizes the L2
@@ -370,32 +371,40 @@ class ObliqueRandomForestRegressor(ForestRegressor):
         uses reduction in Poisson deviance to find splits.
         Training using "absolute_error" is significantly slower
         than when using "squared_error".
+
     max_depth : int, default=None
         The maximum depth of the tree. If None, then nodes are expanded until
         all leaves are pure or until all leaves contain less than
         min_samples_split samples.
+
     min_samples_split : int or float, default=2
         The minimum number of samples required to split an internal node:
+
         - If int, then consider `min_samples_split` as the minimum number.
         - If float, then `min_samples_split` is a fraction and
           `ceil(min_samples_split * n_samples)` are the minimum
           number of samples for each split.
+
     min_samples_leaf : int or float, default=1
         The minimum number of samples required to be at a leaf node.
         A split point at any depth will only be considered if it leaves at
         least ``min_samples_leaf`` training samples in each of the left and
         right branches.  This may have the effect of smoothing the model,
         especially in regression.
+
         - If int, then consider `min_samples_leaf` as the minimum number.
         - If float, then `min_samples_leaf` is a fraction and
           `ceil(min_samples_leaf * n_samples)` are the minimum
           number of samples for each node.
+
     min_weight_fraction_leaf : float, default=0.0
         The minimum weighted fraction of the sum total of weights (of all
         the input samples) required to be at a leaf node. Samples have
         equal weight when sample_weight is not provided.
+
     max_features : {"sqrt", "log2", None}, int or float, default="sqrt"
         The number of features to consider when looking for the best split:
+
         - If int, then consider `max_features` features at each split.
         - If float, then `max_features` is a fraction and
           `round(max_features * n_features)` features are considered at each
@@ -404,55 +413,71 @@ class ObliqueRandomForestRegressor(ForestRegressor):
         - If "sqrt", then `max_features=sqrt(n_features)`.
         - If "log2", then `max_features=log2(n_features)`.
         - If None, then `max_features=n_features`.
+
         Note: the search for a split does not stop until at least one
         valid partition of the node samples is found, even if it requires to
         effectively inspect more than ``max_features`` features.
+
     max_leaf_nodes : int, default=None
         Grow trees with ``max_leaf_nodes`` in best-first fashion.
         Best nodes are defined as relative reduction in impurity.
         If None then unlimited number of leaf nodes.
+
     min_impurity_decrease : float, default=0.0
         A node will be split if this split induces a decrease of the impurity
         greater than or equal to this value.
+
         The weighted impurity decrease equation is the following::
+
             N_t / N * (impurity - N_t_R / N_t * right_impurity
                                 - N_t_L / N_t * left_impurity)
+
         where ``N`` is the total number of samples, ``N_t`` is the number of
         samples at the current node, ``N_t_L`` is the number of samples in the
         left child, and ``N_t_R`` is the number of samples in the right child.
+
         ``N``, ``N_t``, ``N_t_R`` and ``N_t_L`` all refer to the weighted sum,
         if ``sample_weight`` is passed.
+
     bootstrap : bool, default=True
         Whether bootstrap samples are used when building trees. If False, the
         whole dataset is used to build each tree.
+
     oob_score : bool, default=False
         Whether to use out-of-bag samples to estimate the generalization score.
         Only available if bootstrap=True.
+
     n_jobs : int, default=None
         The number of jobs to run in parallel. :meth:`fit`, :meth:`predict`,
         :meth:`decision_path` and :meth:`apply` are all parallelized over the
         trees. ``None`` means 1 unless in a :obj:`joblib.parallel_backend`
         context. ``-1`` means using all processors. See :term:`Glossary
         <n_jobs>` for more details.
+
     random_state : int, RandomState instance or None, default=None
         Controls both the randomness of the bootstrapping of the samples used
         when building trees (if ``bootstrap=True``) and the sampling of the
         features to consider when looking for the best split at each node
         (if ``max_features < n_features``).
         See :term:`Glossary <random_state>` for details.
+
     verbose : int, default=0
         Controls the verbosity when fitting and predicting.
+
     warm_start : bool, default=False
         When set to ``True``, reuse the solution of the previous call to fit
         and add more estimators to the ensemble, otherwise, just fit a whole
         new forest. See :term:`the Glossary <warm_start>`.
+
     max_samples : int or float, default=None
         If bootstrap is True, the number of samples to draw from X
         to train each base estimator.
+
         - If None (default), then draw `X.shape[0]` samples.
         - If int, then draw `max_samples` samples.
         - If float, then draw `max_samples * X.shape[0]` samples. Thus,
           `max_samples` should be in the interval `(0.0, 1.0]`.
+
     feature_combinations : float, default=None
         The number of features to combine on average at each split
         of the decision trees. If ``None``, then will default to the minimum of
@@ -468,29 +493,38 @@ class ObliqueRandomForestRegressor(ForestRegressor):
     base_estimator_ : ObliqueDecisionTreeRegressor
         The child estimator template used to create the collection of fitted
         sub-estimators.
+
     estimators_ : list of ObliqueDecisionTreeRegressor
         The collection of fitted sub-estimators.
+
     n_features_ : int
         The number of features when ``fit`` is performed.
+
     n_features_in_ : int
         Number of features seen during :term:`fit`.
+
     feature_names_in_ : ndarray of shape (`n_features_in_`,)
         Names of features seen during :term:`fit`. Defined only when `X`
         has feature names that are all strings.
+
     n_outputs_ : int
         The number of outputs when ``fit`` is performed.
+
     feature_importances_ : ndarray of shape (n_features,)
         The impurity-based feature importances.
         The higher, the more important the feature.
         The importance of a feature is computed as the (normalized)
         total reduction of the criterion brought by that feature.  It is also
         known as the Gini importance.
+
         Warning: impurity-based feature importances can be misleading for
         high cardinality features (many unique values). See
         :func:`sklearn.inspection.permutation_importance` as an alternative.
+
     oob_score_ : float
         Score of the training dataset obtained using an out-of-bag estimate.
         This attribute exists only when ``oob_score`` is True.
+
     oob_decision_function_ : ndarray of shape (n_samples, n_classes) or \
             (n_samples, n_classes, n_outputs)
         Decision function computed with out-of-bag estimate on the training
@@ -513,6 +547,7 @@ class ObliqueRandomForestRegressor(ForestRegressor):
     unpruned trees which can potentially be very large on some data sets. To
     reduce memory consumption, the complexity and size of the trees should be
     controlled by setting those parameter values.
+
     The features are always randomly permuted at each split. Therefore,
     the best found split may vary, even with the same training data,
     ``max_features=n_features`` and ``bootstrap=False``, if the improvement
@@ -564,7 +599,6 @@ class ObliqueRandomForestRegressor(ForestRegressor):
         verbose=0,
         warm_start=False,
         max_samples=None,
-        max_bins=None,
         feature_combinations=None,
     ):
         super().__init__(
@@ -589,7 +623,6 @@ class ObliqueRandomForestRegressor(ForestRegressor):
             verbose=verbose,
             warm_start=warm_start,
             max_samples=max_samples,
-            max_bins=max_bins,
         )
         self.criterion = criterion
         self.max_depth = max_depth
@@ -757,18 +790,24 @@ class PatchObliqueRandomForestClassifier(ForestClassifier):
         - If int, then draw `max_samples` samples.
         - If float, then draw `max_samples * X.shape[0]` samples. Thus,
           `max_samples` should be in the interval `(0.0, 1.0]`.
+
     min_patch_dims : array-like, optional
         The minimum dimensions of a patch, by default 1 along all dimensions.
+
     max_patch_dims : array-like, optional
         The maximum dimensions of a patch, by default 1 along all dimensions.
+
     dim_contiguous : array-like of bool, optional
         Whether or not each patch is sampled contiguously along this dimension.
+
     data_dims : array-like, optional
         The presumed dimensions of the un-vectorized feature vector, by default
         will be a 1D vector with (1, n_features) shape.
+
     boundary : optional, str {'wrap'}
         The boundary condition to use when sampling patches, by default None.
         'wrap' corresponds to the boundary condition as is in numpy and scipy.
+
     feature_weight : array-like of shape (n_features,), default=None
         Feature weights. If None, then features are equally weighted as is.
         If provided, then the feature weights are used to weight the
@@ -945,17 +984,21 @@ class PatchObliqueRandomForestClassifier(ForestClassifier):
 
 class PatchObliqueRandomForestRegressor(ForestRegressor):
     """A patch-oblique random forest regressor.
+
     A patch-oblique random forest is a meta estimator similar to a random
     forest that fits a number of patch oblique decision tree regressors
     on various sub-samples of the dataset and uses averaging to
     improve the predictive accuracy and control over-fitting. For more
     details, see :footcite:`Li2019manifold`.
+
     Parameters
     ----------
     n_estimators : int, default=100
         The number of trees in the forest.
-    criterion : {"squared_error", "absolute_error", "friedman_mse", "poisson"}, \
+
+    criterion : {"squared_error", "absolute_error", "friedman_mse", "poisson"},\
             default="squared_error"
+
         The function to measure the quality of a split. Supported criteria
         are "squared_error" for the mean squared error, which is equal to
         variance reduction as feature selection criterion and minimizes the L2
@@ -966,32 +1009,40 @@ class PatchObliqueRandomForestRegressor(ForestRegressor):
         uses reduction in Poisson deviance to find splits.
         Training using "absolute_error" is significantly slower
         than when using "squared_error".
+
     max_depth : int, default=None
         The maximum depth of the tree. If None, then nodes are expanded until
         all leaves are pure or until all leaves contain less than
         min_samples_split samples.
+
     min_samples_split : int or float, default=2
         The minimum number of samples required to split an internal node:
+
         - If int, then consider `min_samples_split` as the minimum number.
         - If float, then `min_samples_split` is a fraction and
           `ceil(min_samples_split * n_samples)` are the minimum
           number of samples for each split.
+
     min_samples_leaf : int or float, default=1
         The minimum number of samples required to be at a leaf node.
         A split point at any depth will only be considered if it leaves at
         least ``min_samples_leaf`` training samples in each of the left and
         right branches.  This may have the effect of smoothing the model,
         especially in regression.
+
         - If int, then consider `min_samples_leaf` as the minimum number.
         - If float, then `min_samples_leaf` is a fraction and
           `ceil(min_samples_leaf * n_samples)` are the minimum
           number of samples for each node.
+
     min_weight_fraction_leaf : float, default=0.0
         The minimum weighted fraction of the sum total of weights (of all
         the input samples) required to be at a leaf node. Samples have
         equal weight when sample_weight is not provided.
+
     max_features : {"sqrt", "log2", None}, int or float, default="sqrt"
         The number of features to consider when looking for the best split:
+
         - If int, then consider `max_features` features at each split.
         - If float, then `max_features` is a fraction and
           `round(max_features * n_features)` features are considered at each
@@ -1000,101 +1051,143 @@ class PatchObliqueRandomForestRegressor(ForestRegressor):
         - If "sqrt", then `max_features=sqrt(n_features)`.
         - If "log2", then `max_features=log2(n_features)`.
         - If None, then `max_features=n_features`.
+
         Note: the search for a split does not stop until at least one
         valid partition of the node samples is found, even if it requires to
         effectively inspect more than ``max_features`` features.
+
     max_leaf_nodes : int, default=None
         Grow trees with ``max_leaf_nodes`` in best-first fashion.
         Best nodes are defined as relative reduction in impurity.
         If None then unlimited number of leaf nodes.
+
     min_impurity_decrease : float, default=0.0
         A node will be split if this split induces a decrease of the impurity
         greater than or equal to this value.
+
         The weighted impurity decrease equation is the following::
+
             N_t / N * (impurity - N_t_R / N_t * right_impurity
                                 - N_t_L / N_t * left_impurity)
+
         where ``N`` is the total number of samples, ``N_t`` is the number of
         samples at the current node, ``N_t_L`` is the number of samples in the
         left child, and ``N_t_R`` is the number of samples in the right child.
+
         ``N``, ``N_t``, ``N_t_R`` and ``N_t_L`` all refer to the weighted sum,
         if ``sample_weight`` is passed.
+
     bootstrap : bool, default=True
         Whether bootstrap samples are used when building trees. If False, the
         whole dataset is used to build each tree.
+
     oob_score : bool, default=False
         Whether to use out-of-bag samples to estimate the generalization score.
         Only available if bootstrap=True.
+
     n_jobs : int, default=None
         The number of jobs to run in parallel. :meth:`fit`, :meth:`predict`,
         :meth:`decision_path` and :meth:`apply` are all parallelized over the
         trees. ``None`` means 1 unless in a :obj:`joblib.parallel_backend`
         context. ``-1`` means using all processors. See :term:`Glossary
         <n_jobs>` for more details.
+
     random_state : int, RandomState instance or None, default=None
         Controls both the randomness of the bootstrapping of the samples used
         when building trees (if ``bootstrap=True``) and the sampling of the
         features to consider when looking for the best split at each node
         (if ``max_features < n_features``).
         See :term:`Glossary <random_state>` for details.
+
     verbose : int, default=0
         Controls the verbosity when fitting and predicting.
+
     warm_start : bool, default=False
         When set to ``True``, reuse the solution of the previous call to fit
         and add more estimators to the ensemble, otherwise, just fit a whole
         new forest. See :term:`the Glossary <warm_start>`.
+
     max_samples : int or float, default=None
         If bootstrap is True, the number of samples to draw from X
         to train each base estimator.
+
         - If None (default), then draw `X.shape[0]` samples.
         - If int, then draw `max_samples` samples.
         - If float, then draw `max_samples * X.shape[0]` samples. Thus,
           `max_samples` should be in the interval `(0.0, 1.0]`.
+
     min_patch_dims : array-like, optional
         The minimum dimensions of a patch, by default 1 along all dimensions.
+
     max_patch_dims : array-like, optional
         The maximum dimensions of a patch, by default 1 along all dimensions.
+
     dim_contiguous : array-like of bool, optional
         Whether or not each patch is sampled contiguously along this dimension.
+
     data_dims : array-like, optional
         The presumed dimensions of the un-vectorized feature vector, by default
         will be a 1D vector with (1, n_features) shape.
+
+    boundary : optional, str {'wrap'}
+        The boundary condition to use when sampling patches, by default None.
+        'wrap' corresponds to the boundary condition as is in numpy and scipy.
+
+    feature_weight : array-like of shape (n_features,), default=None
+        Feature weights. If None, then features are equally weighted as is.
+        If provided, then the feature weights are used to weight the
+        patches that are generated. The feature weights are used
+        as follows: for every patch that is sampled, the feature weights over
+        the entire patch is summed and normalizes the patch.
+
     Attributes
     ----------
     base_estimator_ : ObliqueDecisionTreeRegressor
         The child estimator template used to create the collection of fitted
         sub-estimators.
+
     estimators_ : list of ObliqueDecisionTreeRegressor
         The collection of fitted sub-estimators.
+
     n_features_ : int
         The number of features when ``fit`` is performed.
+
     n_features_in_ : int
         Number of features seen during :term:`fit`.
+
     feature_names_in_ : ndarray of shape (`n_features_in_`,)
         Names of features seen during :term:`fit`. Defined only when `X`
         has feature names that are all strings.
+
     n_outputs_ : int
         The number of outputs when ``fit`` is performed.
+
     feature_importances_ : ndarray of shape (n_features,)
         The impurity-based feature importances.
         The higher, the more important the feature.
         The importance of a feature is computed as the (normalized)
         total reduction of the criterion brought by that feature.  It is also
         known as the Gini importance.
+
         Warning: impurity-based feature importances can be misleading for
         high cardinality features (many unique values). See
         :func:`sklearn.inspection.permutation_importance` as an alternative.
+
     oob_score_ : float
         Score of the training dataset obtained using an out-of-bag estimate.
         This attribute exists only when ``oob_score`` is True.
+
     oob_prediction_ : ndarray of shape (n_samples,) or (n_samples, n_outputs)
         Prediction computed with out-of-bag estimate on the training set.
         This attribute exists only when ``oob_score`` is True.
+
     See Also
     --------
     sktree.tree.ObliqueDecisionTreeRegressor : An oblique decision
         tree regressor.
     sklearn.ensemble.RandomForestRegressor : An axis-aligned decision
         forest regressor.
+
     Notes
     -----
     The default values for the parameters controlling the size of the trees
@@ -1108,9 +1201,11 @@ class PatchObliqueRandomForestRegressor(ForestRegressor):
     of the criterion is identical for several splits enumerated during the
     search of the best split. To obtain a deterministic behaviour during
     fitting, ``random_state`` has to be fixed.
+
     References
     ----------
     .. footbibliography::
+
     Examples
     --------
     >>> from sktree.ensemble import PatchObliqueRandomForestRegressor

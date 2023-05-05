@@ -948,36 +948,45 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         splits, "absolute_error" for the mean absolute error, which minimizes
         the L1 loss using the median of each terminal node, and "poisson" which
         uses reduction in Poisson deviance to find splits.
+
     splitter : {"best", "random"}, default="best"
         The strategy used to choose the split at each node. Supported
         strategies are "best" to choose the best split and "random" to choose
         the best random split.
+
     max_depth : int, default=None
         The maximum depth of the tree. If None, then nodes are expanded until
         all leaves are pure or until all leaves contain less than
         min_samples_split samples.
+
     min_samples_split : int or float, default=2
-        The minimum number of samples required to split an internal node:
+        The minimum n`umber of samples required to split an internal node:
+
         - If int, then consider `min_samples_split` as the minimum number.
         - If float, then `min_samples_split` is a fraction and
           `ceil(min_samples_split * n_samples)` are the minimum
           number of samples for each split.
+
     min_samples_leaf : int or float, default=1
         The minimum number of samples required to be at a leaf node.
         A split point at any depth will only be considered if it leaves at
         least ``min_samples_leaf`` training samples in each of the left and
         right branches.  This may have the effect of smoothing the model,
         especially in regression.
+
         - If int, then consider `min_samples_leaf` as the minimum number.
         - If float, then `min_samples_leaf` is a fraction and
           `ceil(min_samples_leaf * n_samples)` are the minimum
           number of samples for each node.
+
     min_weight_fraction_leaf : float, default=0.0
         The minimum weighted fraction of the sum total of weights (of all
         the input samples) required to be at a leaf node. Samples have
         equal weight when sample_weight is not provided.
+
     max_features : int, float or {"auto", "sqrt", "log2"}, default=None
         The number of features to consider when looking for the best split:
+
             - If int, then consider `max_features` features at each split.
             - If float, then `max_features` is a fraction and
               `int(max_features * n_features)` features are considered at each
@@ -986,11 +995,13 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
             - If "sqrt", then `max_features=sqrt(n_features)`.
             - If "log2", then `max_features=log2(n_features)`.
             - If None, then `max_features=n_features`.
+
         Note: the search for a split does not stop until at least one
         valid partition of the node samples is found, even if it requires to
         effectively inspect more than ``max_features`` features.
         Note: Compared to axis-aligned Random Forests, one can set
         max_features to a number greater then ``n_features``.
+
     random_state : int, RandomState instance or None, default=None
         Controls the randomness of the estimator. The features are always
         randomly permuted at each split, even if ``splitter`` is set to
@@ -1002,25 +1013,27 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         split has to be selected at random. To obtain a deterministic behaviour
         during fitting, ``random_state`` has to be fixed to an integer.
         See :term:`Glossary <random_state>` for details.
+
     max_leaf_nodes : int, default=None
         Grow a tree with ``max_leaf_nodes`` in best-first fashion.
         Best nodes are defined as relative reduction in impurity.
         If None then unlimited number of leaf nodes.
+
     min_impurity_decrease : float, default=0.0
         A node will be split if this split induces a decrease of the impurity
         greater than or equal to this value.
         The weighted impurity decrease equation is the following::
+
             N_t / N * (impurity - N_t_R / N_t * right_impurity
                                 - N_t_L / N_t * left_impurity)
+
         where ``N`` is the total number of samples, ``N_t`` is the number of
         samples at the current node, ``N_t_L`` is the number of samples in the
         left child, and ``N_t_R`` is the number of samples in the right child.
+
         ``N``, ``N_t``, ``N_t_R`` and ``N_t_L`` all refer to the weighted sum,
         if ``sample_weight`` is passed.
-    ccp_alpha : non-negative float, default=0.0
-        Complexity parameter used for Minimal Cost-Complexity Pruning. Oblique trees
-        do not support cost complexity pruning yet. See
-        :ref:`minimal_cost_complexity_pruning` for details.
+
     feature_combinations : float, default=None
         The number of features to combine on average at each split
         of the decision trees. If ``None``, then will default to the minimum of
@@ -1039,22 +1052,29 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         The importance of a feature is computed as the (normalized)
         total reduction of the criterion brought by that feature.  It is also
         known as the Gini importance [4]_.
+
         Warning: impurity-based feature importances can be misleading for
         high cardinality features (many unique values). See
         :func:`sklearn.inspection.permutation_importance` as an alternative.
+
     max_features_ : int
         The inferred value of max_features.
+
     n_features_in_ : int
         Number of features seen during :term:`fit`.
+
     feature_names_in_ : ndarray of shape (`n_features_in_`,)
         Names of features seen during :term:`fit`. Defined only when `X`
         has feature names that are all strings.
+
     n_outputs_ : int
         The number of outputs when ``fit`` is performed.
+
     tree_ : Tree instance
         The underlying Tree object. Please refer to
         ``help(sklearn.tree._tree.Tree)`` for
         attributes of Tree object.
+
     feature_combinations_ : float
         The number of feature combinations on average taken to fit the tree.
 
@@ -1084,12 +1104,16 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
     References
     ----------
     .. [1] https://en.wikipedia.org/wiki/Decision_tree_learning
+
     .. [2] L. Breiman, J. Friedman, R. Olshen, and C. Stone, "Classification
         and Regression Trees", Wadsworth, Belmont, CA, 1984.
+
     .. [3] T. Hastie, R. Tibshirani and J. Friedman. "Elements of Statistical
         Learning", Springer, 2009.
+
     .. [4] L. Breiman, and A. Cutler, "Random Forests",
         https://www.stat.berkeley.edu/~breiman/RandomForests/cc_home.htm
+
     Examples
     --------
     >>> from sklearn.datasets import load_diabetes
@@ -1126,7 +1150,6 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         max_leaf_nodes=None,
         min_impurity_decrease=0.0,
         feature_combinations=None,
-        ccp_alpha=0.0,
     ):
         super().__init__(
             criterion=criterion,
@@ -1139,7 +1162,6 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
             max_leaf_nodes=max_leaf_nodes,
             random_state=random_state,
             min_impurity_decrease=min_impurity_decrease,
-            ccp_alpha=ccp_alpha,
         )
 
         self.feature_combinations = feature_combinations
@@ -1379,18 +1401,24 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
 
         Note that these weights will be multiplied with sample_weight (passed
         through the fit method) if sample_weight is specified.
+
     min_patch_dims : array-like, optional
         The minimum dimensions of a patch, by default 1 along all dimensions.
+
     max_patch_dims : array-like, optional
         The maximum dimensions of a patch, by default 1 along all dimensions.
+
     dim_contiguous : array-like of bool, optional
         Whether or not each patch is sampled contiguously along this dimension.
+
     data_dims : array-like, optional
         The presumed dimensions of the un-vectorized feature vector, by default
         will be a 1D vector with (1, n_features) shape.
+
     boundary : optional, str {'wrap'}
         The boundary condition to use when sampling patches, by default None.
         'wrap' corresponds to the boundary condition as is in numpy and scipy.
+
     feature_weight : array-like of shape (n_samples,n_features,), default=None
         Feature weights. If None, then features are equally weighted as is.
         If provided, then the feature weights are used to weight the
@@ -1740,6 +1768,7 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
 
 class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
     """A oblique decision tree regressor that operates over patches of data.
+
     A patch oblique decision tree is also known as a manifold oblique decision tree
     (called MORF in :footcite:`Li2019manifold`), where the splitter is aware of
     the structure in the data. For example, in an image, a patch would be contiguous
@@ -1758,36 +1787,45 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         splits, "absolute_error" for the mean absolute error, which minimizes
         the L1 loss using the median of each terminal node, and "poisson" which
         uses reduction in Poisson deviance to find splits.
+
     splitter : {"best", "random"}, default="best"
         The strategy used to choose the split at each node. Supported
         strategies are "best" to choose the best split and "random" to choose
         the best random split.
+
     max_depth : int, default=None
         The maximum depth of the tree. If None, then nodes are expanded until
         all leaves are pure or until all leaves contain less than
         min_samples_split samples.
+
     min_samples_split : int or float, default=2
         The minimum number of samples required to split an internal node:
+
         - If int, then consider `min_samples_split` as the minimum number.
         - If float, then `min_samples_split` is a fraction and
           `ceil(min_samples_split * n_samples)` are the minimum
           number of samples for each split.
+
     min_samples_leaf : int or float, default=1
         The minimum number of samples required to be at a leaf node.
         A split point at any depth will only be considered if it leaves at
         least ``min_samples_leaf`` training samples in each of the left and
         right branches.  This may have the effect of smoothing the model,
         especially in regression.
+
         - If int, then consider `min_samples_leaf` as the minimum number.
         - If float, then `min_samples_leaf` is a fraction and
           `ceil(min_samples_leaf * n_samples)` are the minimum
           number of samples for each node.
+
     min_weight_fraction_leaf : float, default=0.0
         The minimum weighted fraction of the sum total of weights (of all
         the input samples) required to be at a leaf node. Samples have
         equal weight when sample_weight is not provided.
+
     max_features : int, float or {"auto", "sqrt", "log2"}, default=None
         The number of features to consider when looking for the best split:
+
             - If int, then consider `max_features` features at each split.
             - If float, then `max_features` is a fraction and
               `int(max_features * n_features)` features are considered at each
@@ -1796,11 +1834,13 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
             - If "sqrt", then `max_features=sqrt(n_features)`.
             - If "log2", then `max_features=log2(n_features)`.
             - If None, then `max_features=n_features`.
+
         Note: the search for a split does not stop until at least one
         valid partition of the node samples is found, even if it requires to
         effectively inspect more than ``max_features`` features.
         Note: Compared to axis-aligned Random Forests, one can set
         max_features to a number greater then ``n_features``.
+
     random_state : int, RandomState instance or None, default=None
         Controls the randomness of the estimator. The features are always
         randomly permuted at each split, even if ``splitter`` is set to
@@ -1812,45 +1852,45 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         split has to be selected at random. To obtain a deterministic behaviour
         during fitting, ``random_state`` has to be fixed to an integer.
         See :term:`Glossary <random_state>` for details.
+
     max_leaf_nodes : int, default=None
         Grow a tree with ``max_leaf_nodes`` in best-first fashion.
         Best nodes are defined as relative reduction in impurity.
         If None then unlimited number of leaf nodes.
+
     min_impurity_decrease : float, default=0.0
         A node will be split if this split induces a decrease of the impurity
         greater than or equal to this value.
+
         The weighted impurity decrease equation is the following::
+
             N_t / N * (impurity - N_t_R / N_t * right_impurity
                                 - N_t_L / N_t * left_impurity)
+
         where ``N`` is the total number of samples, ``N_t`` is the number of
         samples at the current node, ``N_t_L`` is the number of samples in the
         left child, and ``N_t_R`` is the number of samples in the right child.
+
         ``N``, ``N_t``, ``N_t_R`` and ``N_t_L`` all refer to the weighted sum,
         if ``sample_weight`` is passed.
-    min_patch_height : int, optional
-        The minimum height of a patch, by default 1.
-    max_patch_height : int, optional
-        The maximum height of a patch, by default 1.
-    min_patch_width : int, optional
-        The minimum width of a patch, by default 1.
-    max_patch_width : int, optional
-        The maximum width of a patch, by default 1.
-    data_height : int, optional
-        The presumed height of the un-vectorized feature vector, by default 1.
-    data_width : int, optional
-        The presumed height of the un-vectorized feature vector, by default None.
-        If None, the data width will be presumed the number of columns in ``X``
-        passed to :meth:`fit`.
+
+    min_patch_dims : array-like, optional
+        The minimum dimensions of a patch, by default 1 along all dimensions.
+
     max_patch_dims : array-like, optional
-            The maximum dimensions of a patch, by default 1 along all dimensions.
+        The maximum dimensions of a patch, by default 1 along all dimensions.
+
     dim_contiguous : array-like of bool, optional
         Whether or not each patch is sampled contiguously along this dimension.
+
     data_dims : array-like, optional
         The presumed dimensions of the un-vectorized feature vector, by default
         will be a 1D vector with (1, n_features) shape.
+
     boundary : optional, str {'wrap'}
         The boundary condition to use when sampling patches, by default None.
         'wrap' corresponds to the boundary condition as is in numpy and scipy.
+
     feature_weight : array-like of shape (n_samples,n_features,), default=None
         Feature weights. If None, then features are equally weighted as is.
         If provided, then the feature weights are used to weight the
@@ -1860,39 +1900,41 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
 
     Attributes
     ----------
-    classes_ : ndarray of shape (n_classes,) or list of ndarray
-        The classes labels (single output problem),
-        or a list of arrays of class labels (multi-output problem).
     feature_importances_ : ndarray of shape (n_features,)
         The impurity-based feature importances.
         The higher, the more important the feature.
         The importance of a feature is computed as the (normalized)
         total reduction of the criterion brought by that feature.  It is also
         known as the Gini importance [4]_.
+
         Warning: impurity-based feature importances can be misleading for
         high cardinality features (many unique values). See
         :func:`sklearn.inspection.permutation_importance` as an alternative.
+
     max_features_ : int
         The inferred value of max_features.
-    n_classes_ : int or list of int
-        The number of classes (for single output problems),
-        or a list containing the number of classes for each
-        output (for multi-output problems).
+
     n_features_in_ : int
         Number of features seen during :term:`fit`.
+
     feature_names_in_ : ndarray of shape (`n_features_in_`,)
         Names of features seen during :term:`fit`. Defined only when `X`
         has feature names that are all strings.
+
     n_outputs_ : int
         The number of outputs when ``fit`` is performed.
+
     tree_ : Tree instance
         The underlying Tree object. Please refer to
         ``help(sklearn.tree._tree.Tree)`` for
         attributes of Tree object.
+
     min_patch_dims_ : array-like
         The minimum dimensions of a patch.
+
     max_patch_dims_ : array-like
         The maximum dimensions of a patch.
+
     data_dims_ : array-like
         The presumed dimensions of the un-vectorized feature vector.
 
@@ -1904,8 +1946,10 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
     ``data_height`` parameters are used to inform the ``PatchObliqueDecisionTreeRegressor``
     of the original structure of the data. It is required that
     ``data_width * data_height = n_features``.
+
     When users pass in ``X`` to :meth:`fit`, tt is presumed that all vectorization operations
     are done C-contiguously (i.e. the last axis is contiguous).
+
     Note that for a patch height and width of size 1, the tree is exactly the same as the
     decision tree, albeit with less efficiency optimizations. Therefore, it is always
     recommended to set the range of patch heights and widths based on the structure of your
