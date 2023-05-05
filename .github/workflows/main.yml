@@ -171,6 +171,7 @@ jobs:
           pip install spin
 
       - name: openblas-libs
+        shell: bash
         run: |
           # download openblas setup from scipy
           curl https://raw.githubusercontent.com/scipy/scipy/main/tools/cibw_before_build_win.sh -o cibw_before_build_win.sh
