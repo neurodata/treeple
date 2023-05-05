@@ -162,6 +162,9 @@ numpydoc_xref_aliases = {
     "Path": "pathlib.Path",
     "bool": ":class:`python:bool`",
     "~sklearn_fork": "~sklearn",
+    "ObliqueDecisionTreeRegressor": "sktree.tree.ObliqueDecisionTreeRegressor",
+    "DecisionTreeClassifier": "sklearn.tree.DecisionTreeClassifier",
+    "DecisionTreeRegressor": "sklearn.tree.DecisionTreeRegressor",
     # "sklearn_fork.pipeline.Pipeline": "sklearn.pipeline.Pipeline",
     # "sklearn_fork.inspection.permutation_importance": "sklearn.inspection.permutation_importance",
 }
@@ -193,7 +196,6 @@ numpydoc_xref_ignore = {
     "such",
     "arrays",
     "if",
-    "DecisionTreeClassifier",
     "dicts",
     "a",
     "Tree",
