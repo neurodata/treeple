@@ -3,7 +3,7 @@ from sklearn_fork.utils._param_validation import StrOptions
 
 from sktree.tree import ObliqueDecisionTreeClassifier, PatchObliqueDecisionTreeClassifier
 
-from ._neighbors import SimMatrixMixin
+from ..tree._neighbors import SimMatrixMixin
 
 
 class ObliqueRandomForestClassifier(ForestClassifier, SimMatrixMixin):
