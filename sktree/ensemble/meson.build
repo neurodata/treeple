@@ -2,7 +2,6 @@ python_sources = [
   '__init__.py',
   '_supervised_forest.py',
   '_unsupervised_forest.py',
-  '_neighbors.py',
 ]
 
 py3.install_sources(
