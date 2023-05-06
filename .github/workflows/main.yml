@@ -201,7 +201,7 @@ jobs:
   
       - name: test
         run: |
-          python spin test -j2
+          python spin test
 
   # release is ran when a release is made on Github
   release:
