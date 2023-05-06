@@ -27,10 +27,10 @@ from sklearn_fork.utils.validation import _check_sample_weight, check_is_fitted,
 
 from sktree.tree import UnsupervisedDecisionTree, UnsupervisedObliqueDecisionTree
 
-from ._neighbors import SimMatrixMixin
+from ..tree._neighbors import SimMatrixMixin
 
 
-class ForestCluster(TransformerMixin, ClusterMixin, BaseForest, SimMatrixMixin):
+class ForestCluster(SimMatrixMixin, TransformerMixin, ClusterMixin, BaseForest):
     """Unsupervised forest base class."""
 
     def __init__(
@@ -178,12 +178,8 @@ class ForestCluster(TransformerMixin, ClusterMixin, BaseForest, SimMatrixMixin):
             else:
                 self._set_oob_score_and_attributes(X)
 
-        # apply to the leaves
-        X_leaves = self.apply(X)
-
         # now compute the similarity/dissimilarity matrix and set it
-        self.similarity_matrix_ = self.compute_similarity_matrix_forest(X_leaves)
-        self.dissimilarity_matrix_ = self.compute_dissimilarity_matrix_forest(X_leaves)
+        self.similarity_matrix_ = self.compute_similarity_matrix_forest(X)
 
         # compute the labels and set it
         self.labels_ = self._assign_labels(self.similarity_matrix_)
@@ -234,11 +230,9 @@ class ForestCluster(TransformerMixin, ClusterMixin, BaseForest, SimMatrixMixin):
             X transformed in the new space.
         """
         check_is_fitted(self)
-        # apply to the leaves
-        X_leaves = self.apply(X)
 
         # now compute the affinity matrix and set it
-        similarity_matrix = self.compute_similarity_matrix_forest(X_leaves)
+        similarity_matrix = self.compute_similarity_matrix_forest(X)
         return similarity_matrix
 
     def _assign_labels(self, similarity_matrix):
