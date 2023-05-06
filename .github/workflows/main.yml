@@ -196,8 +196,8 @@ jobs:
           # Necessary because GitHub Actions checks out the repo to D:\ while OpenBLAS
           # got installed to C:\ higher up. The copying with `--win-cp-openblas` fails
           # when things are split over drives.
-          cp C:\opt\64\bin\*.dll $pwd\build-install\Lib\site-packages\scikit-tree\.libs\
-          python tools\openblas_support.py --write-init $PWD\build-install\Lib\site-packages\scikit-tree\
+          # cp C:\opt\64\bin\*.dll $pwd\build-install\Lib\site-packages\scikit-tree\.libs\
+          # python tools\openblas_support.py --write-init $PWD\build-install\Lib\site-packages\scikit-tree\
   
       - name: test
         run: |
