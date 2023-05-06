@@ -279,11 +279,9 @@ class ForestCluster(SimMatrixMixin, TransformerMixin, ClusterMixin, BaseForest):
             The OOB associated proximity matrix.
         """
         # transform X
-        # apply to the leaves
-        X_leaves = tree.apply(X)
 
         # now compute the affinity matrix and set it
-        tree_prox_matrix = tree._compute_affinity_matrix(X_leaves)
+        tree_prox_matrix = tree.compute_similarity_matrix_forest(X)
 
         return tree_prox_matrix
 
