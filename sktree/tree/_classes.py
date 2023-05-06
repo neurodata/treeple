@@ -48,7 +48,6 @@ CRITERIA_REG = {
     "poisson": _criterion.Poisson,
 }
 
-
 OBLIQUE_DENSE_SPLITTERS = {
     "best": _oblique_splitter.BestObliqueSplitter,
 }
@@ -75,15 +74,18 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
         "twomeans" for the variance impurity and "fastbic" for the
         BIC criterion. If ``UnsupervisedCriterion`` instance is passed in, then
         the user must abide by the Cython internal API. See source code.
+
     splitter : {"best", "random"}, default="best"
         The strategy used to choose the split at each node. Supported
         strategies are "best" to choose the best split and "random" to choose
         the best random split. If ``UnsupervisedSplitter`` instance is passed in, then
         the user must abide by the Cython internal API. See source code.
+
     max_depth : int, default=None
         The maximum depth of the tree. If None, then nodes are expanded until
         all leaves are pure or until all leaves contain less than
         min_samples_split samples.
+
     min_samples_split : int or float, default=2
         The minimum number of samples required to split an internal node:
 
@@ -91,6 +93,7 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
         - If float, then `min_samples_split` is a fraction and
           `ceil(min_samples_split * n_samples)` are the minimum
           number of samples for each split.
+
     min_samples_leaf : int or float, default=1
         The minimum number of samples required to be at a leaf node.
         A split point at any depth will only be considered if it leaves at
@@ -102,10 +105,12 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
         - If float, then `min_samples_leaf` is a fraction and
           `ceil(min_samples_leaf * n_samples)` are the minimum
           number of samples for each node.
+
     min_weight_fraction_leaf : float, default=0.0
         The minimum weighted fraction of the sum total of weights (of all
         the input samples) required to be at a leaf node. Samples have
         equal weight when sample_weight is not provided.
+
     max_features : int, float or {"auto", "sqrt", "log2"}, default=None
         The number of features to consider when looking for the best split:
 
@@ -117,10 +122,12 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
             - If "sqrt", then `max_features=sqrt(n_features)`.
             - If "log2", then `max_features=log2(n_features)`.
             - If None, then `max_features=n_features`.
+
     max_leaf_nodes : int, default=None
         Grow a tree with ``max_leaf_nodes`` in best-first fashion.
         Best nodes are defined as relative reduction in impurity.
         If None then unlimited number of leaf nodes.
+
     random_state : int, RandomState instance or None, default=None
         Controls the randomness of the estimator. The features are always
         randomly permuted at each split, even if ``splitter`` is set to
@@ -132,6 +139,7 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
         split has to be selected at random. To obtain a deterministic behaviour
         during fitting, ``random_state`` has to be fixed to an integer.
         See how scikit-learn defines ``random_state`` for details.
+
     min_impurity_decrease : float, default=0.0
         A node will be split if this split induces a decrease of the impurity
         greater than or equal to this value.
@@ -147,9 +155,11 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
 
         ``N``, ``N_t``, ``N_t_R`` and ``N_t_L`` all refer to the weighted sum,
         if ``sample_weight`` is passed.
+
     clustering_func : callable
         Scikit-learn compatible clustering function to take the affinity matrix
         and return cluster labels. By default, :class:`sklearn.cluster.AgglomerativeClustering`.
+
     clustering_func_args : dict
         Clustering function class keyword arguments. Passed to `clustering_func`.
     """
@@ -274,6 +284,7 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
         ----------
         X : array-like of shape (n_samples, n_features)
             Array to cluster.
+
         check_input : bool, optional
             Whether to validate input, by default True.
 
@@ -377,15 +388,18 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
         "twomeans" for the variance impurity and "fastbic" for the
         BIC criterion. If ``UnsupervisedCriterion`` instance is passed in, then
         the user must abide by the Cython internal API. See source code.
+
     splitter : {"best", "random"}, default="best"
         The strategy used to choose the split at each node. Supported
         strategies are "best" to choose the best split and "random" to choose
         the best random split. If ``UnsupervisedSplitter`` instance is passed in, then
         the user must abide by the Cython internal API. See source code.
+
     max_depth : int, default=None
         The maximum depth of the tree. If None, then nodes are expanded until
         all leaves are pure or until all leaves contain less than
         min_samples_split samples.
+
     min_samples_split : int or float, default=2
         The minimum number of samples required to split an internal node:
 
@@ -393,6 +407,7 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
         - If float, then `min_samples_split` is a fraction and
           `ceil(min_samples_split * n_samples)` are the minimum
           number of samples for each split.
+
     min_samples_leaf : int or float, default=1
         The minimum number of samples required to be at a leaf node.
         A split point at any depth will only be considered if it leaves at
@@ -404,10 +419,12 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
         - If float, then `min_samples_leaf` is a fraction and
           `ceil(min_samples_leaf * n_samples)` are the minimum
           number of samples for each node.
+
     min_weight_fraction_leaf : float, default=0.0
         The minimum weighted fraction of the sum total of weights (of all
         the input samples) required to be at a leaf node. Samples have
         equal weight when sample_weight is not provided.
+
     max_features : int, float or {"auto", "sqrt", "log2"}, default=None
         The number of features to consider when looking for the best split:
 
@@ -419,10 +436,12 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
             - If "sqrt", then `max_features=sqrt(n_features)`.
             - If "log2", then `max_features=log2(n_features)`.
             - If None, then `max_features=n_features`.
+
     max_leaf_nodes : int, default=None
         Grow a tree with ``max_leaf_nodes`` in best-first fashion.
         Best nodes are defined as relative reduction in impurity.
         If None then unlimited number of leaf nodes.
+
     random_state : int, RandomState instance or None, default=None
         Controls the randomness of the estimator. The features are always
         randomly permuted at each split, even if ``splitter`` is set to
@@ -434,6 +453,7 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
         split has to be selected at random. To obtain a deterministic behaviour
         during fitting, ``random_state`` has to be fixed to an integer.
         See how scikit-learn defines ``random_state`` for details.
+
     min_impurity_decrease : float, default=0.0
         A node will be split if this split induces a decrease of the impurity
         greater than or equal to this value.
@@ -449,12 +469,15 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
 
         ``N``, ``N_t``, ``N_t_R`` and ``N_t_L`` all refer to the weighted sum,
         if ``sample_weight`` is passed.
+
     feature_combinations : float, default=1.5
         The number of features to combine on average at each split
         of the decision trees.
+
     clustering_func : callable
         Scikit-learn compatible clustering function to take the affinity matrix
         and return cluster labels. By default, :class:`sklearn.cluster.AgglomerativeClustering`.
+
     clustering_func_args : dict
         Clustering function class keyword arguments. Passed to `clustering_func`.
     """
@@ -837,26 +860,34 @@ class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
             The training input samples. Internally, it will be converted to
             ``dtype=np.float32`` and if a sparse matrix is provided
             to a sparse ``csc_matrix``.
+
         y : array-like of shape (n_samples,) or (n_samples, n_outputs)
             The target values (class labels) as integers or strings.
+
         sample_weight : array-like of shape (n_samples,), default=None
             Sample weights. If None, then samples are equally weighted. Splits
             that would create child nodes with net zero or negative weight are
             ignored while searching for a split in each node. Splits are also
             ignored if they would result in any single class carrying a
             negative weight in either child node.
+
         min_samples_leaf : int or float
             The minimum number of samples required to be at a leaf node.
+
         min_weight_leaf : float, default=0.0
            The minimum weighted fraction of the sum total of weights.
+
         max_leaf_nodes : int, default=None
             Grow a tree with ``max_leaf_nodes`` in best-first fashion.
+
         min_samples_split : int or float, default=2
-            The minimum number of samples required to split an internal node:
+            The minimum number of samples required to split an internal node.
+
         max_depth : int, default=None
             The maximum depth of the tree. If None, then nodes are expanded until
             all leaves are pure or until all leaves contain less than
             min_samples_split samples.
+
         random_state : int, RandomState instance or None, default=None
             Controls the randomness of the estimator.
         """
@@ -960,7 +991,7 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
         min_samples_split samples.
 
     min_samples_split : int or float, default=2
-        The minimum n`umber of samples required to split an internal node:
+        The minimum number of samples required to split an internal node:
 
         - If int, then consider `min_samples_split` as the minimum number.
         - If float, then `min_samples_split` is a fraction and
@@ -1080,7 +1111,8 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
 
     See Also
     --------
-    DecisionTreeClassifier : An axis-aligned decision tree classifier.
+    DecisionTreeRegressor : An axis-aligned decision tree regressor.
+    ObliqueDecisionTreeClassifier : An oblique decision tree classifier.
 
     Notes
     -----
@@ -1091,15 +1123,12 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
     trees with the caveat that there is an increased computation. It is
     always recommended to sample more if one is willing to spend the
     computational resources.
+
     The default values for the parameters controlling the size of the trees
     (e.g. ``max_depth``, ``min_samples_leaf``, etc.) lead to fully grown and
     unpruned trees which can potentially be very large on some data sets. To
     reduce memory consumption, the complexity and size of the trees should be
     controlled by setting those parameter values.
-    The :meth:`predict` method operates using the :func:`numpy.argmax`
-    function on the outputs of :meth:`predict_proba`. This means that in
-    case the highest predicted probabilities are tied, the classifier will
-    predict the tied class with the lowest index in :term:`classes_`.
 
     References
     ----------
@@ -1186,26 +1215,33 @@ class ObliqueDecisionTreeRegressor(DecisionTreeRegressor):
             The training input samples. Internally, it will be converted to
             ``dtype=np.float32`` and if a sparse matrix is provided
             to a sparse ``csc_matrix``.
+
         y : array-like of shape (n_samples,) or (n_samples, n_outputs)
-            The target values (class labels) as integers or strings.
+            The target values (real numbers). Use ``dtype=np.float64`` and
+            ``order='C'`` for maximum efficiency.
+
         sample_weight : array-like of shape (n_samples,), default=None
             Sample weights. If None, then samples are equally weighted. Splits
             that would create child nodes with net zero or negative weight are
-            ignored while searching for a split in each node. Splits are also
-            ignored if they would result in any single class carrying a
-            negative weight in either child node.
+            ignored while searching for a split in each node.
+
         min_samples_leaf : int or float
             The minimum number of samples required to be at a leaf node.
+
         min_weight_leaf : float, default=0.0
            The minimum weighted fraction of the sum total of weights.
+
         max_leaf_nodes : int, default=None
             Grow a tree with ``max_leaf_nodes`` in best-first fashion.
+
         min_samples_split : int or float, default=2
-            The minimum number of samples required to split an internal node:
+            The minimum number of samples required to split an internal node.
+
         max_depth : int, default=None
             The maximum depth of the tree. If None, then nodes are expanded until
             all leaves are pure or until all leaves contain less than
             min_samples_split samples.
+
         random_state : int, RandomState instance or None, default=None
             Controls the randomness of the estimator.
         """
@@ -1488,7 +1524,7 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
     are done C-contiguously (i.e. the last axis is contiguous).
 
     Note that for a patch height and width of size 1, the tree is exactly the same as the
-    decision tree, albeit with less efficiency optimizations. Therefore, it is always
+    decision tree, albeit with less efficienc optimizations. Therefore, it is always
     recommended to set the range of patch heights and widths based on the structure of your
     expected input data.
 
@@ -1558,14 +1594,17 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
             The training input samples. Internally, it will be converted to
             ``dtype=np.float32`` and if a sparse matrix is provided
             to a sparse ``csc_matrix``.
+
         y : array-like of shape (n_samples,) or (n_samples, n_outputs)
             The target values (class labels) as integers or strings.
+
         sample_weight : array-like of shape (n_samples,), default=None
             Sample weights. If None, then samples are equally weighted. Splits
             that would create child nodes with net zero or negative weight are
             ignored while searching for a split in each node. Splits are also
             ignored if they would result in any single class carrying a
             negative weight in either child node.
+
         check_input : bool, optional
             Whether or not to check input, by default True.
         """
@@ -1680,26 +1719,34 @@ class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
             The training input samples. Internally, it will be converted to
             ``dtype=np.float32`` and if a sparse matrix is provided
             to a sparse ``csc_matrix``.
+
         y : array-like of shape (n_samples,) or (n_samples, n_outputs)
             The target values (class labels) as integers or strings.
+
         sample_weight : array-like of shape (n_samples,), default=None
             Sample weights. If None, then samples are equally weighted. Splits
             that would create child nodes with net zero or negative weight are
             ignored while searching for a split in each node. Splits are also
             ignored if they would result in any single class carrying a
             negative weight in either child node.
+
         min_samples_leaf : int or float
             The minimum number of samples required to be at a leaf node.
+
         min_weight_leaf : float, default=0.0
            The minimum weighted fraction of the sum total of weights.
+
         max_leaf_nodes : int, default=None
             Grow a tree with ``max_leaf_nodes`` in best-first fashion.
+
         min_samples_split : int or float, default=2
-            The minimum number of samples required to split an internal node:
+            The minimum number of samples required to split an internal node.
+
         max_depth : int, default=None
             The maximum depth of the tree. If None, then nodes are expanded until
             all leaves are pure or until all leaves contain less than
             min_samples_split samples.
+
         random_state : int, RandomState instance or None, default=None
             Controls the randomness of the estimator.
         """
@@ -1951,13 +1998,16 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
     are done C-contiguously (i.e. the last axis is contiguous).
 
     Note that for a patch height and width of size 1, the tree is exactly the same as the
-    decision tree, albeit with less efficiency optimizations. Therefore, it is always
+    decision tree, albeit with less efficienc optimizations. Therefore, it is always
     recommended to set the range of patch heights and widths based on the structure of your
     expected input data.
 
     References
     ----------
     .. footbibliography::
+
+    Examples
+    --------
     >>> from sklearn.datasets import load_diabetes
     >>> from sklearn.model_selection import cross_val_score
     >>> X, y = load_diabetes(return_X_y=True)
@@ -2029,14 +2079,16 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
             The training input samples. Internally, it will be converted to
             ``dtype=np.float32`` and if a sparse matrix is provided
             to a sparse ``csc_matrix``.
+
         y : array-like of shape (n_samples,) or (n_samples, n_outputs)
-            The target values (class labels) as integers or strings.
+            The target values (real numbers). Use ``dtype=np.float64`` and
+            ``order='C'`` for maximum efficiency.
+
         sample_weight : array-like of shape (n_samples,), default=None
             Sample weights. If None, then samples are equally weighted. Splits
             that would create child nodes with net zero or negative weight are
-            ignored while searching for a split in each node. Splits are also
-            ignored if they would result in any single class carrying a
-            negative weight in either child node.
+            ignored while searching for a split in each node.
+
         check_input : bool, optional
             Whether or not to check input, by default True.
         """
@@ -2152,26 +2204,33 @@ class PatchObliqueDecisionTreeRegressor(DecisionTreeRegressor):
             The training input samples. Internally, it will be converted to
             ``dtype=np.float32`` and if a sparse matrix is provided
             to a sparse ``csc_matrix``.
+
         y : array-like of shape (n_samples,) or (n_samples, n_outputs)
-            The target values (class labels) as integers or strings.
+            The target values (real numbers). Use ``dtype=np.float64`` and
+            ``order='C'`` for maximum efficiency.
+
         sample_weight : array-like of shape (n_samples,), default=None
             Sample weights. If None, then samples are equally weighted. Splits
             that would create child nodes with net zero or negative weight are
-            ignored while searching for a split in each node. Splits are also
-            ignored if they would result in any single class carrying a
-            negative weight in either child node.
+            ignored while searching for a split in each node.
+
         min_samples_leaf : int or float
             The minimum number of samples required to be at a leaf node.
+
         min_weight_leaf : float, default=0.0
            The minimum weighted fraction of the sum total of weights.
+
         max_leaf_nodes : int, default=None
             Grow a tree with ``max_leaf_nodes`` in best-first fashion.
+
         min_samples_split : int or float, default=2
-            The minimum number of samples required to split an internal node:
+            The minimum number of samples required to split an internal node.
+
         max_depth : int, default=None
             The maximum depth of the tree. If None, then nodes are expanded until
             all leaves are pure or until all leaves contain less than
             min_samples_split samples.
+
         random_state : int, RandomState instance or None, default=None
             Controls the randomness of the estimator.
         """
