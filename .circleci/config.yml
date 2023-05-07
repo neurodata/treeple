@@ -91,8 +91,6 @@ jobs:
             pip install -r build_requirements.txt
             pip install spin
             pip install -r doc_requirements.txt
-            # extra benchmark deps
-            pip install pytest
       - run:
           name: build scikit-tree
           command: |
@@ -133,7 +131,7 @@ jobs:
             echo "After..."
             ls build-install/**
             export PYTHONPATH=$PWD/build-install/usr/lib/python3.8/site-packages
-            make -C docs html
+            ./spin docs
 
       - store_artifacts:
           path: docs/_build/html
