@@ -30,7 +30,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.datasets import load_iris
 from sklearn.inspection import DecisionBoundaryDisplay
-from sklearn.tree import DecisionTreeClassifier
+from sklearn_fork.tree import DecisionTreeClassifier
 
 from sktree.tree import ObliqueDecisionTreeClassifier
 
@@ -93,7 +93,7 @@ for clf, clf_label in zip(clfs, clf_labels):
 # %%
 # Display the structure of a single decision tree trained on all the features
 # together.
-from sklearn.tree import plot_tree
+from sklearn_fork.tree import plot_tree
 
 for clf, clf_label in zip(clfs, clf_labels):
     plt.figure()
