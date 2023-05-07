@@ -131,7 +131,7 @@ jobs:
             echo "After..."
             ls build-install/**
             export PYTHONPATH=$PWD/build-install/usr/lib/python3.8/site-packages
-            ./spin docs
+            make -C docs html
 
       - store_artifacts:
           path: docs/_build/html
