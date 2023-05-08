@@ -9,4 +9,3 @@ click
 rich-click
 doit
 pydevtool
-spin
