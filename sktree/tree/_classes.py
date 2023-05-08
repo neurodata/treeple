@@ -1586,12 +1586,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
             # csr.
             check_X_params = dict(dtype=DTYPE, accept_sparse="csc")
             check_y_params = dict(ensure_2d=False, dtype=None)
-            if y is not None:
-                X, y = self._validate_data(
-                    X, y, validate_separately=(check_X_params, check_y_params)
-                )
-            else:
-                X = self._validate_data(X, **check_X_params)
+            X, y = self._validate_data(X, y, validate_separately=(check_X_params, check_y_params))
             if self.feature_weight is not None:
                 self.feature_weight = self._validate_data(
                     self.feature_weight, ensure_2d=True, dtype=DTYPE
@@ -1606,17 +1601,6 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
 
                 if X.indices.dtype != np.intc or X.indptr.dtype != np.intc:
                     raise ValueError("No support for np.int64 index based sparse matrices")
-
-            if y is not None and self.criterion == "poisson":
-                if np.any(y < 0):
-                    raise ValueError(
-                        "Some value(s) of y are negative which is"
-                        " not allowed for Poisson regression."
-                    )
-                if np.sum(y) <= 0:
-                    raise ValueError(
-                        "Sum of y is not positive which is " "necessary for Poisson regression."
-                    )
 
         if self.data_dims is None:
             self.data_dims_ = np.array((1, X.shape[1]))
@@ -2064,19 +2048,13 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         check_input : bool, optional
             Whether or not to check input, by default True.
         """
-
         if check_input:
             # Need to validate separately here.
             # We can't pass multi_output=True because that would allow y to be
             # csr.
             check_X_params = dict(dtype=DTYPE, accept_sparse="csc")
             check_y_params = dict(ensure_2d=False, dtype=None)
-            if y is not None:
-                X, y = self._validate_data(
-                    X, y, validate_separately=(check_X_params, check_y_params)
-                )
-            else:
-                X = self._validate_data(X, **check_X_params)
+            X, y = self._validate_data(X, y, validate_separately=(check_X_params, check_y_params))
             if self.feature_weight is not None:
                 self.feature_weight = self._validate_data(
                     self.feature_weight, ensure_2d=True, dtype=DTYPE
@@ -2091,17 +2069,6 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
 
                 if X.indices.dtype != np.intc or X.indptr.dtype != np.intc:
                     raise ValueError("No support for np.int64 index based sparse matrices")
-
-            if y is not None and self.criterion == "poisson":
-                if np.any(y < 0):
-                    raise ValueError(
-                        "Some value(s) of y are negative which is"
-                        " not allowed for Poisson regression."
-                    )
-                if np.sum(y) <= 0:
-                    raise ValueError(
-                        "Sum of y is not positive which is " "necessary for Poisson regression."
-                    )
 
         if self.data_dims is None:
             self.data_dims_ = np.array((1, X.shape[1]))
