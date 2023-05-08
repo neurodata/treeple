@@ -1,15 +1,12 @@
 # See: https://circleci.com/blog/deploying-documentation-to-github-pages-with-continuous-integration/
 version: 2.1
 
-# orbs:
-#   python: circleci/python@2.0.3
-
 # Aliases to reuse
 _defaults: &defaults
   docker:
     # CircleCI maintains a library of pre-built images
     # documented at https://circleci.com/docs/2.0/circleci-images/
-    - image: cimg/python:3.8
+    - image: cimg/python:3.9
 
 # document commands used by downstream jobs
 commands:
@@ -89,14 +86,12 @@ jobs:
           name: setup Python venv
           command: |
             pip install -r build_requirements.txt
-            pip install spin
             pip install -r doc_requirements.txt
-            # extra benchmark deps
-            pip install pytest
       - run:
           name: build scikit-tree
           command: |
             python spin build -j2
+
       - save_cache:
           key: deps_ccache-{{ .Branch }}
           paths:
@@ -133,7 +128,7 @@ jobs:
             echo "After..."
             ls build-install/**
             export PYTHONPATH=$PWD/build-install/usr/lib/python3.8/site-packages
-            make -C docs html
+            python ./spin docs
 
       - store_artifacts:
           path: docs/_build/html

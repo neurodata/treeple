@@ -13,6 +13,7 @@ from sklearn_fork.utils._param_validation import Interval
 from sklearn_fork.utils.validation import check_is_fitted
 
 from . import _oblique_splitter
+from ._neighbors import SimMatrixMixin
 from ._oblique_splitter import ObliqueSplitter
 from ._oblique_tree import ObliqueTree
 from .manifold import _morf_splitter
@@ -60,7 +61,7 @@ UNSUPERVISED_SPLITTERS = {
 UNSUPERVISED_OBLIQUE_SPLITTERS = {"best": _unsup_oblique_splitter.BestObliqueUnsupervisedSplitter}
 
 
-class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree):
+class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, BaseDecisionTree):
     """Unsupervised decision tree.
 
     Parameters
@@ -196,14 +197,12 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
 
         # apply to the leaves
         n_samples = X.shape[0]
-        X_leaves = self.apply(X)
 
-        # now compute the affinity matrix and set it
-        self.affinity_matrix_ = self._compute_affinity_matrix(X_leaves)
+        sim_mat = self.compute_similarity_matrix(X)
 
         # compute the labels and set it
         if n_samples >= 2:
-            self.labels_ = self._assign_labels(self.affinity_matrix_)
+            self.labels_ = self._assign_labels(sim_mat)
 
         return self
 
@@ -302,37 +301,10 @@ class UnsupervisedDecisionTree(TransformerMixin, ClusterMixin, BaseDecisionTree)
             X transformed in the new space.
         """
         check_is_fitted(self)
-        # apply to the leaves
-        X_leaves = self.apply(X)
 
         # now compute the affinity matrix and set it
-        affinity_matrix = self._compute_affinity_matrix(X_leaves)
+        affinity_matrix = self.compute_similarity_matrix(X)
         return affinity_matrix
-
-    def _compute_affinity_matrix(self, X_leaves):
-        """Compute the proximity matrix of samples in X.
-
-        Parameters
-        ----------
-        X_leaves : ndarray of shape (n_samples,)
-            For each datapoint x in X and for each tree in the forest,
-            is the index of the leaf x ends up in.
-
-        Returns
-        -------
-        prox_matrix : array-like of shape (n_samples, n_samples)
-        """
-        n_samples = X_leaves.shape[0]
-        aff_matrix = np.zeros((n_samples, n_samples), dtype=np.int32)
-
-        # for every unique leaf in this dataset, count all co-occurrences of samples
-        # in the same leaf
-        for leaf in np.unique(X_leaves):
-            # find out which samples occur with this leaf
-            samples_in_leaf = np.atleast_1d(np.argwhere(X_leaves == leaf).squeeze())
-            aff_matrix[np.ix_(samples_in_leaf, samples_in_leaf)] += 1
-
-        return aff_matrix
 
     def _assign_labels(self, affinity_matrix):
         """Assign cluster labels given X.
@@ -546,7 +518,7 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
         builder.build(self.tree_, X, sample_weight)
 
 
-class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
+class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
     """A decision tree classifier.
 
     Read more in the :ref:`User Guide <sklearn:tree>`. The implementation follows
@@ -925,7 +897,7 @@ class ObliqueDecisionTreeClassifier(DecisionTreeClassifier):
             self.classes_ = self.classes_[0]
 
 
-class PatchObliqueDecisionTreeClassifier(DecisionTreeClassifier):
+class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
     """A oblique decision tree classifier that operates over patches of data.
 
     A patch oblique decision tree is also known as a manifold oblique decision tree
