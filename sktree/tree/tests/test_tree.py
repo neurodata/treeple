@@ -96,6 +96,14 @@ digits.data = digits.data[perm]
 digits.target = digits.target[perm]
 
 
+ALL_TREES = [
+    ObliqueDecisionTreeClassifier,
+    PatchObliqueDecisionTreeClassifier,
+    UnsupervisedDecisionTree,
+    UnsupervisedObliqueDecisionTree,
+]
+
+
 def assert_tree_equal(d, s, message):
     assert s.node_count == d.node_count, "{0}: inequal number of node ({1} != {2})".format(
         message, s.node_count, d.node_count
@@ -169,7 +177,7 @@ def test_check_simulation(name, Tree, criterion):
 
     est = Tree(criterion=criterion, random_state=1234)
     est.fit(X)
-    sim_mat = est.affinity_matrix_
+    sim_mat = est.compute_similarity_matrix(X)
 
     # there is quite a bit of variance in the performance at the tree level
     if criterion == "twomeans":
@@ -208,7 +216,7 @@ def test_check_rotated_blobs(name, Tree, criterion):
 
     est = Tree(criterion=criterion, random_state=1234)
     est.fit(X)
-    sim_mat = est.affinity_matrix_
+    sim_mat = est.compute_similarity_matrix(X)
 
     # there is quite a bit of variance in the performance at the tree level
     if criterion == "twomeans":
@@ -242,7 +250,7 @@ def test_check_iris(name, Tree, criterion):
     n_classes = len(np.unique(iris.target))
     est = Tree(criterion=criterion, random_state=12345)
     est.fit(iris.data, iris.target)
-    sim_mat = est.affinity_matrix_
+    sim_mat = est.compute_similarity_matrix(iris.data)
 
     # there is quite a bit of variance in the performance at the tree level
     if criterion == "twomeans":
@@ -451,6 +459,19 @@ def test_patch_oblique_tree_feature_weights():
         clf.fit(X, y)
 
 
-def test_patch_tree_higher_dims():
-    """Test patch oblique tree when patch and data dimensions are higher."""
-    pass
+@pytest.mark.parametrize("tree", ALL_TREES)
+def test_similarity_matrix(tree):
+    n_samples = 200
+    n_classes = 2
+    n_features = 5
+
+    X, y = make_blobs(
+        n_samples=n_samples, centers=n_classes, n_features=n_features, random_state=12345
+    )
+
+    clf = tree(random_state=12345)
+    clf.fit(X, y)
+    sim_mat = clf.compute_similarity_matrix(X)
+
+    assert np.allclose(sim_mat, sim_mat.T)
+    assert np.all((sim_mat.diagonal() == 1))

@@ -11,7 +11,6 @@ from rerf.rerfClassifier import rerfClassifier as rfc
 
 
 def load_data(n):
-
     ftrain = "data/orthant_train_" + str(n) + ".npy"
     ftest = "data/orthant_test.npy"
 
@@ -33,7 +32,6 @@ def test_rf(n, reps, n_estimators, max_features):
     preds = np.zeros((reps, 10000))
     acc = np.zeros(reps)
     for i in range(reps):
-
         X_train, y_train, X_test, y_test = load_data(n)
 
         # clf = rfc(n_estimators=n_estimators,
@@ -56,11 +54,9 @@ def test_rf(n, reps, n_estimators, max_features):
 
 
 def test_rerf(n, reps, n_estimators, feature_combinations, max_features):
-
     preds = np.zeros((reps, 10000))
     acc = np.zeros(reps)
     for i in range(reps):
-
         X_train, y_train, X_test, y_test = load_data(n)
 
         clf = rfc(
@@ -85,11 +81,9 @@ def test_rerf(n, reps, n_estimators, feature_combinations, max_features):
 
 
 def test_of(n, reps, n_estimators, feature_combinations, max_features):
-
     preds = np.zeros((reps, 10000))
     acc = np.zeros(reps)
     for i in range(reps):
-
         X_train, y_train, X_test, y_test = load_data(n)
 
         clf = ofc(
@@ -115,7 +109,6 @@ def test_of(n, reps, n_estimators, feature_combinations, max_features):
 
 
 def main():
-
     n = 4000
     reps = 3
     n_estimators = 100
