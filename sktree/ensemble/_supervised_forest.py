@@ -180,11 +180,11 @@ class ObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
 
     Attributes
     ----------
-    base_estimator_ : ObliqueDecisionTreeClassifier
+    base_estimator_ : sktree.tree.ObliqueDecisionTreeClassifier
         The child estimator template used to create the collection of fitted
         sub-estimators.
 
-    estimators_ : list of ObliqueDecisionTreeClassifier
+    estimators_ : list of sktree.tree.ObliqueDecisionTreeClassifier
         The collection of fitted sub-estimators.
 
     classes_ : ndarray of shape (n_classes,) or a list of such arrays
@@ -821,11 +821,11 @@ class PatchObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
 
     Attributes
     ----------
-    base_estimator_ : ObliqueDecisionTreeClassifier
+    base_estimator_ : PatchObliqueDecisionTreeClassifier
         The child estimator template used to create the collection of fitted
         sub-estimators.
 
-    estimators_ : list of ObliqueDecisionTreeClassifier
+    estimators_ : list of PatchObliqueDecisionTreeClassifier
         The collection of fitted sub-estimators.
 
     classes_ : ndarray of shape (n_classes,) or a list of such arrays
@@ -1146,11 +1146,11 @@ class PatchObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
 
     Attributes
     ----------
-    base_estimator_ : ObliqueDecisionTreeRegressor
+    base_estimator_ : PatchObliqueDecisionTreeRegressor
         The child estimator template used to create the collection of fitted
         sub-estimators.
 
-    estimators_ : list of ObliqueDecisionTreeRegressor
+    estimators_ : list of PatchObliqueDecisionTreeRegressor
         The collection of fitted sub-estimators.
 
     n_features_ : int

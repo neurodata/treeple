@@ -81,10 +81,6 @@ nitpicky = False
 
 # TODO: figure out why these are raising an error?
 nitpick_ignore = [
-    ("py:obj", "UnsupervisedDecisionTree"),
-    ("py:obj", "ObliqueDecisionTreeClassifier"),
-    ("py:obj", "PatchObliqueDecisionTreeClassifier"),
-    ("py:obj", "DecisionTreeClassifier"),
     ("py:mod", "sktree.tree"),
 ]
 
@@ -162,7 +158,11 @@ numpydoc_xref_aliases = {
     "Path": "pathlib.Path",
     "bool": ":class:`python:bool`",
     "~sklearn_fork": "~sklearn",
+    "UnsupervisedDecisionTree": "sktree.tree.UnsupervisedDecisionTree",
+    "ObliqueDecisionTreeClassifier": "sktree.tree.ObliqueDecisionTreeClassifier",
+    "PatchObliqueDecisionTreeClassifier": "sktree.tree.PatchObliqueDecisionTreeClassifier",
     "ObliqueDecisionTreeRegressor": "sktree.tree.ObliqueDecisionTreeRegressor",
+    "PatchObliqueDecisionTreeRegressor": "sktree.tree.PatchObliqueDecisionTreeRegressor",
     "DecisionTreeClassifier": "sklearn.tree.DecisionTreeClassifier",
     "DecisionTreeRegressor": "sklearn.tree.DecisionTreeRegressor",
     # "sklearn_fork.pipeline.Pipeline": "sklearn.pipeline.Pipeline",

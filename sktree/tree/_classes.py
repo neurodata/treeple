@@ -721,7 +721,7 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
 
     See Also
     --------
-    DecisionTreeClassifier : An axis-aligned decision tree classifier.
+    sklearn.tree.DecisionTreeClassifier : An axis-aligned decision tree classifier.
 
     Notes
     -----
@@ -1083,7 +1083,7 @@ class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
 
     See Also
     --------
-    DecisionTreeRegressor : An axis-aligned decision tree regressor.
+    sklearn.tree.DecisionTreeRegressor : An axis-aligned decision tree regressor.
     ObliqueDecisionTreeClassifier : An oblique decision tree classifier.
 
     Notes
@@ -1121,7 +1121,7 @@ class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
     >>> from sklearn.model_selection import cross_val_score
     >>> from sklearn.tree import ObliqueDecisionTreeRegressor
     >>> X, y = load_diabetes(return_X_y=True)
-    >>> regressor = DecisionTreeRegressor(random_state=0)
+    >>> regressor = ObliqueDecisionTreeRegressor(random_state=0)
     >>> cross_val_score(regressor, X, y, cv=10)
     ...                    # doctest: +SKIP
     ...
