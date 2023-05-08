@@ -66,7 +66,7 @@ def test_check_simulation(name, forest, criterion):
 
     clf = forest(criterion=criterion, random_state=12345)
     clf.fit(X)
-    sim_mat = clf.affinity_matrix_
+    sim_mat = clf.compute_similarity_matrix(X)
 
     # all ones along the diagonal
     assert np.array_equal(sim_mat.diagonal(), np.ones(n_samples))
@@ -89,7 +89,7 @@ def test_check_iris(name, forest, criterion):
     n_classes = 3
     est = forest(criterion=criterion, random_state=12345)
     est.fit(iris.data, iris.target)
-    sim_mat = est.affinity_matrix_
+    sim_mat = est.compute_similarity_matrix(iris.data)
 
     if criterion == "twomeans":
         if "oblique" in name.lower():

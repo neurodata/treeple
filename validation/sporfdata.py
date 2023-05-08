@@ -2,7 +2,6 @@ import numpy as np
 
 
 def find_label(x):
-
     base = 0.0
     add = 0.5
     top = base + add
@@ -21,7 +20,6 @@ def find_label(x):
 
 
 def consistency(n):
-
     # np.random.seed(1231761)
 
     X = np.zeros((n, 2))
@@ -29,19 +27,16 @@ def consistency(n):
 
     box = 0
     for i in range(0, n):
-
         # box = np.random.randint(3)
         box = (box + 1) % 3
 
         if box == 0:
-
             X[i, 0] = np.random.uniform(0, 1)
             X[i, 1] = np.random.uniform(0, 1)
 
             y[i] = find_label(X[i, 0])
 
         elif box == 1:
-
             X[i, 0] = np.random.uniform(1, 2)
             X[i, 1] = np.random.uniform(1, 2)
 
@@ -51,7 +46,6 @@ def consistency(n):
                 y[i] = 0
 
         else:
-
             X[i, 0] = np.random.uniform(0, 1)
             X[i, 1] = np.random.uniform(0, 1)
 
@@ -64,7 +58,6 @@ def consistency(n):
 
 
 def sparse_parity(n, p=20, p_star=3):
-
     # np.random.seed(12763123)
 
     X = np.random.uniform(-1, 1, (n, p))
@@ -78,7 +71,6 @@ def sparse_parity(n, p=20, p_star=3):
 
 
 def orthant(n, p=6, rec=1):
-
     if rec == 10:
         print("sample size too small")
         sys.exit(0)
@@ -100,7 +92,6 @@ def orthant(n, p=6, rec=1):
 
 
 def trunk(n, p=10):
-
     mu_1 = np.array([1 / i for i in range(1, p + 1)])
     mu_0 = -1 * mu_1
 

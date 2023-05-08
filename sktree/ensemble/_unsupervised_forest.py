@@ -27,108 +27,10 @@ from sklearn_fork.utils.validation import _check_sample_weight, check_is_fitted,
 
 from sktree.tree import UnsupervisedDecisionTree, UnsupervisedObliqueDecisionTree
 
-
-def pairwise_forest_distance(est, X, epsilon=1e-6, n_jobs=None):
-    """Compute pairwise distance matrix using a forest.
-
-    The distances/dissimilarities computed using a forest are not necessarily
-    a proper distance metric due to the violation of the definiteness property
-    and the triangle inequality property. In order to overcome that, we utilize
-    the adjustment proposed in :footcite:`marx2021estimating`, where the distance
-    between samples :math:`x_i` and :math:`x_j` is defined as:
-
-    - :math:`d_F(x_i, x_j)` if :math:`d_F(x_i, x_j) > 0`
-    - :math:`\\frac{d_2(x_i, x_j)}{c(T + \\epsilon)}` otherwise
-
-    where :math:`d_F(x_i, x_j)` is the dissimilarity matrix computed using the forest,
-    :math:`d_2(x_i, x_j)` is the Euclidean distance metric, ``c`` is the maximum L2-norm
-    between any two pairs i, j, ``T`` is the number of trees and a small constant
-    :math:`\\epsilon > 0`.
-
-    Parameters
-    ----------
-    est : BaseForest
-        An instance of an unsupervised forest. If not fitted already, then
-        will fit on ``X``.
-    X : ndarray of shape (n_samples_X, n_features)
-        Array of pairwise distances between samples.
-    epsilon : float, optional
-        The epsilon value to add, by default 1e-6.
-    n_jobs : int, default=None
-        The number of jobs to use for the computation. This works by breaking
-        down the pairwise matrix into n_jobs even slices and computing them in
-        parallel.
-
-        ``None`` means 1 unless in a :obj:`joblib.parallel_backend` context.
-        ``-1`` means using all processors. See :term:`Glossary <n_jobs>`
-        for more details.
-
-    Returns
-    -------
-    D : ndarray of shape (n_samples_X, n_samples_X)
-        A distance matrix D such that D_{i, j} is the distance between the
-        ith and jth vectors of the given matrix X.
-    """
-    if not isinstance(est, BaseForest):
-        raise RuntimeError(f"Must use a forest, not {est}.")
-
-    if not check_is_fitted(est):
-        # fit the forest
-        est.fit(X)
-
-    # compute pairwise affinity array
-    aff_arr = _compute_affinity_matrix(est, X)
-
-    # convert to a dissimilarity array
-    D = 1.0 - aff_arr
-
-    # compute pairwise Euclidean distance matrix
-    l2_matrix = pairwise_distances(X, metric="l2", n_jobs=n_jobs)
-    c_constant = max(l2_matrix)
-
-    # apply conversion to turn dissimilarity array into a proper distance matrix
-    z_indices = np.argwhere(np.triu(D, -1) == 0)
-    D[z_indices] = l2_matrix[z_indices] / (c_constant * (est.n_estimators + epsilon))
-    return D
+from ..tree._neighbors import SimMatrixMixin
 
 
-def _compute_affinity_matrix(est: BaseForest, X):
-    """Compute the proximity matrix of samples in X.
-
-    Parameters
-    ----------
-    X : ndarray of shape (n_samples, n_features)
-        Data array that we want to compute pairwise affinity matrix of.
-
-    Returns
-    -------
-    prox_matrix : array-like of shape (n_samples, n_samples)
-        This is the proximity matrix, or counts the number of times other samples
-        fall in the same leaf over the entire forest. This is normalized by the
-        total number of trees in the entire forest.
-    """
-    # apply to the leaves
-    # For each datapoint x in X and for each tree in the forest,
-    # the index of the leaf x ends up in.
-    X_leaves = est.apply(X)
-
-    n_samples = X_leaves.shape[0]
-    aff_matrix = np.zeros((n_samples, n_samples), dtype=np.float32)
-
-    # fill the main diagonal with 1's
-    # np.fill_diagonal(aff_matrix, 1.0)
-    for idx in range(est.n_estimators):
-        for unique_leaf in np.unique(X_leaves[:, idx]):
-            # find all samples
-            samples_in_leaf = np.atleast_1d(np.argwhere(X_leaves[:, idx] == unique_leaf).squeeze())
-            aff_matrix[np.ix_(samples_in_leaf, samples_in_leaf)] += 1
-
-    # normalize by the number of trees
-    aff_matrix = np.divide(aff_matrix, est.n_estimators)
-    return aff_matrix
-
-
-class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):
+class ForestCluster(SimMatrixMixin, TransformerMixin, ClusterMixin, BaseForest):
     """Unsupervised forest base class."""
 
     def __init__(
@@ -275,11 +177,11 @@ class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):
             else:
                 self._set_oob_score_and_attributes(X)
 
-        # now compute the affinity matrix and set it
-        self.affinity_matrix_ = _compute_affinity_matrix(self, X)
+        # now compute the similarity/dissimilarity matrix and set it
+        sim_mat = self.compute_similarity_matrix(X)
 
         # compute the labels and set it
-        self.labels_ = self._assign_labels(self.affinity_matrix_)
+        self.labels_ = self._assign_labels(sim_mat)
 
         return self
 
@@ -304,10 +206,10 @@ class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):
             The predicted classes.
         """
         X = self._validate_X_predict(X)
-        affinity_matrix = self.transform(X)
+        similarity_matrix = self.transform(X)
 
         # compute the labels and set it
-        return self._assign_labels(affinity_matrix)
+        return self._assign_labels(similarity_matrix)
 
     def transform(self, X):
         """Transform X to a cluster-distance space.
@@ -329,15 +231,15 @@ class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):
         check_is_fitted(self)
 
         # now compute the affinity matrix and set it
-        affinity_matrix = _compute_affinity_matrix(self, X)
-        return affinity_matrix
+        similarity_matrix = self.compute_similarity_matrix(X)
+        return similarity_matrix
 
-    def _assign_labels(self, affinity_matrix):
+    def _assign_labels(self, similarity_matrix):
         """Assign cluster labels given X.
 
         Parameters
         ----------
-        affinity_matrix : ndarray of shape (n_samples, n_samples)
+        similarity_matrix : ndarray of shape (n_samples, n_samples)
             The affinity matrix.
 
         Returns
@@ -356,7 +258,7 @@ class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):
         cluster = self.clustering_func_(**self.clustering_func_args_)
 
         # apply agglomerative clustering to obtain cluster labels
-        predict_labels = cluster.fit_predict(affinity_matrix)
+        predict_labels = cluster.fit_predict(similarity_matrix)
         return predict_labels
 
     @staticmethod
@@ -376,11 +278,9 @@ class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):
             The OOB associated proximity matrix.
         """
         # transform X
-        # apply to the leaves
-        X_leaves = tree.apply(X)
 
         # now compute the affinity matrix and set it
-        tree_prox_matrix = tree._compute_affinity_matrix(X_leaves)
+        tree_prox_matrix = tree.compute_similarity_matrix_forest(X)
 
         return tree_prox_matrix
 
@@ -625,8 +525,12 @@ class UnsupervisedRandomForest(ForestCluster):
     labels_ : ndarray of shape (n_samples,)
         Labels of each point.
 
-    affinity_matrix_ : ndarray of shape (n_samples, n_samples)
-        Stores the affinity/proximity matrix used in fit. Note this matrix
+    similarity_matrix_ : ndarray of shape (n_samples, n_samples)
+        Stores the affinity/similarity matrix used in fit. Note this matrix
+        is computed from within-bag and OOB samples.
+
+    dissimilarity_matrix_ : ndarray of shape (n_samples, n_samples)
+        Stores the dissimilarity matrix used in fit. Note this matrix
         is computed from within-bag and OOB samples.
 
     oob_score_ : float
@@ -859,8 +763,12 @@ class UnsupervisedObliqueRandomForest(ForestCluster):
     labels_ : ndarray of shape (n_samples,)
         Labels of each point.
 
-    affinity_matrix_ : ndarray of shape (n_samples, n_samples)
-        Stores the affinity/proximity matrix used in fit. Note this matrix
+    similarity_matrix_ : ndarray of shape (n_samples, n_samples)
+        Stores the affinity/similarity matrix used in fit. Note this matrix
+        is computed from within-bag and OOB samples.
+
+    dissimilarity_matrix_ : ndarray of shape (n_samples, n_samples)
+        Stores the dissimilarity matrix used in fit. Note this matrix
         is computed from within-bag and OOB samples.
 
     oob_score_ : float
