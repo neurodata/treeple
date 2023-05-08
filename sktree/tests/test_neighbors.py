@@ -29,7 +29,7 @@ def test_similarity_matrix(forest):
 
     clf = forest(random_state=12345)
     clf.fit(X, y)
-    sim_mat = clf.similarity_matrix_
+    sim_mat = clf.compute_similarity_matrix(X)
 
     assert np.allclose(sim_mat, sim_mat.T)
     assert np.all((sim_mat.diagonal() == 1))

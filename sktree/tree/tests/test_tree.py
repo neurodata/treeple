@@ -177,7 +177,7 @@ def test_check_simulation(name, Tree, criterion):
 
     est = Tree(criterion=criterion, random_state=1234)
     est.fit(X)
-    sim_mat = est.similarity_matrix_
+    sim_mat = est.compute_similarity_matrix(X)
 
     # there is quite a bit of variance in the performance at the tree level
     if criterion == "twomeans":
@@ -216,7 +216,7 @@ def test_check_rotated_blobs(name, Tree, criterion):
 
     est = Tree(criterion=criterion, random_state=1234)
     est.fit(X)
-    sim_mat = est.similarity_matrix_
+    sim_mat = est.compute_similarity_matrix(X)
 
     # there is quite a bit of variance in the performance at the tree level
     if criterion == "twomeans":
@@ -250,7 +250,7 @@ def test_check_iris(name, Tree, criterion):
     n_classes = len(np.unique(iris.target))
     est = Tree(criterion=criterion, random_state=12345)
     est.fit(iris.data, iris.target)
-    sim_mat = est.similarity_matrix_
+    sim_mat = est.compute_similarity_matrix(iris.data)
 
     # there is quite a bit of variance in the performance at the tree level
     if criterion == "twomeans":
@@ -471,7 +471,7 @@ def test_similarity_matrix(tree):
 
     clf = tree(random_state=12345)
     clf.fit(X, y)
-    sim_mat = clf.similarity_matrix_
+    sim_mat = clf.compute_similarity_matrix(X)
 
     assert np.allclose(sim_mat, sim_mat.T)
     assert np.all((sim_mat.diagonal() == 1))

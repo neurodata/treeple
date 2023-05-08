@@ -198,12 +198,11 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
         # apply to the leaves
         n_samples = X.shape[0]
 
-        # now compute the affinity matrix and set it
-        self.similarity_matrix_ = self.compute_similarity_matrix_forest(X)
+        sim_mat = self.compute_similarity_matrix(X)
 
         # compute the labels and set it
         if n_samples >= 2:
-            self.labels_ = self._assign_labels(self.similarity_matrix_)
+            self.labels_ = self._assign_labels(sim_mat)
 
         return self
 
@@ -304,7 +303,7 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
         check_is_fitted(self)
 
         # now compute the affinity matrix and set it
-        affinity_matrix = self.compute_similarity_matrix_forest(X)
+        affinity_matrix = self.compute_similarity_matrix(X)
         return affinity_matrix
 
     def _assign_labels(self, affinity_matrix):
@@ -893,9 +892,6 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
 
         builder.build(self.tree_, X, y, sample_weight)
 
-        # now compute the affinity matrix and set it
-        self.similarity_matrix_ = self.compute_similarity_matrix_forest(X)
-
         if self.n_outputs_ == 1:
             self.n_classes_ = self.n_classes_[0]
             self.classes_ = self.classes_[0]
@@ -1376,9 +1372,6 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
             )
 
         builder.build(self.tree_, X, y, sample_weight)
-
-        # now compute the affinity matrix and set it
-        self.similarity_matrix_ = self.compute_similarity_matrix_forest(X)
 
         if self.n_outputs_ == 1:
             self.n_classes_ = self.n_classes_[0]

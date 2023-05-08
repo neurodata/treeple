@@ -179,10 +179,10 @@ class ForestCluster(SimMatrixMixin, TransformerMixin, ClusterMixin, BaseForest):
                 self._set_oob_score_and_attributes(X)
 
         # now compute the similarity/dissimilarity matrix and set it
-        self.similarity_matrix_ = self.compute_similarity_matrix_forest(X)
+        sim_mat = self.compute_similarity_matrix(X)
 
         # compute the labels and set it
-        self.labels_ = self._assign_labels(self.similarity_matrix_)
+        self.labels_ = self._assign_labels(sim_mat)
 
         return self
 
@@ -232,7 +232,7 @@ class ForestCluster(SimMatrixMixin, TransformerMixin, ClusterMixin, BaseForest):
         check_is_fitted(self)
 
         # now compute the affinity matrix and set it
-        similarity_matrix = self.compute_similarity_matrix_forest(X)
+        similarity_matrix = self.compute_similarity_matrix(X)
         return similarity_matrix
 
     def _assign_labels(self, similarity_matrix):

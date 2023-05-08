@@ -42,7 +42,7 @@ def compute_forest_similarity_matrix(forest, X):
 class SimMatrixMixin:
     """Mixin class to calculate similarity and dissimilarity matrices."""
 
-    def compute_similarity_matrix_forest(self, X):
+    def compute_similarity_matrix(self, X):
         """
         Compute the similarity matrix of samples in X.
 
