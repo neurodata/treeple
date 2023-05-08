@@ -391,8 +391,10 @@ document.write(`
 
 <span class="kn">from</span> <span class="nn">sktree.tree</span> <span class="kn">import</span> <span class="n">ObliqueDecisionTreeClassifier</span><span class="p">,</span> <span class="n">PatchObliqueDecisionTreeClassifier</span>
 
+<span class="kn">from</span> <span class="nn">..tree._neighbors</span> <span class="kn">import</span> <span class="n">SimMatrixMixin</span>
 
-<div class="viewcode-block" id="ObliqueRandomForestClassifier"><a class="viewcode-back" href="../../../generated/sktree.ObliqueRandomForestClassifier.html#sktree.ObliqueRandomForestClassifier">[docs]</a><span class="k">class</span> <span class="nc">ObliqueRandomForestClassifier</span><span class="p">(</span><span class="n">ForestClassifier</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ObliqueRandomForestClassifier"><a class="viewcode-back" href="../../../generated/sktree.ObliqueRandomForestClassifier.html#sktree.ObliqueRandomForestClassifier">[docs]</a><span class="k">class</span> <span class="nc">ObliqueRandomForestClassifier</span><span class="p">(</span><span class="n">ForestClassifier</span><span class="p">,</span> <span class="n">SimMatrixMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An oblique random forest classifier.</span>
 
@@ -723,7 +725,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span> <span class="o">=</span> <span class="n">min_impurity_decrease</span></div>
 
 
-<div class="viewcode-block" id="PatchObliqueRandomForestClassifier"><a class="viewcode-back" href="../../../generated/sktree.PatchObliqueRandomForestClassifier.html#sktree.PatchObliqueRandomForestClassifier">[docs]</a><span class="k">class</span> <span class="nc">PatchObliqueRandomForestClassifier</span><span class="p">(</span><span class="n">ForestClassifier</span><span class="p">):</span>
+<div class="viewcode-block" id="PatchObliqueRandomForestClassifier"><a class="viewcode-back" href="../../../generated/sktree.PatchObliqueRandomForestClassifier.html#sktree.PatchObliqueRandomForestClassifier">[docs]</a><span class="k">class</span> <span class="nc">PatchObliqueRandomForestClassifier</span><span class="p">(</span><span class="n">ForestClassifier</span><span class="p">,</span> <span class="n">SimMatrixMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A patch-oblique random forest classifier.</span>
 
 <span class="sd">    A patch-oblique random forest is a meta estimator similar to a random</span>
@@ -1101,7 +1103,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-04-26.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-05-08.
       <br/>
     
   </p>

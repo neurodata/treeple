@@ -401,6 +401,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">sklearn_fork.utils.validation</span> <span class="kn">import</span> <span class="n">check_is_fitted</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_oblique_splitter</span>
+<span class="kn">from</span> <span class="nn">._neighbors</span> <span class="kn">import</span> <span class="n">SimMatrixMixin</span>
 <span class="kn">from</span> <span class="nn">._oblique_splitter</span> <span class="kn">import</span> <span class="n">ObliqueSplitter</span>
 <span class="kn">from</span> <span class="nn">._oblique_tree</span> <span class="kn">import</span> <span class="n">ObliqueTree</span>
 <span class="kn">from</span> <span class="nn">.manifold</span> <span class="kn">import</span> <span class="n">_morf_splitter</span>
@@ -448,7 +449,7 @@ document.write(`
 <span class="n">UNSUPERVISED_OBLIQUE_SPLITTERS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;best&quot;</span><span class="p">:</span> <span class="n">_unsup_oblique_splitter</span><span class="o">.</span><span class="n">BestObliqueUnsupervisedSplitter</span><span class="p">}</span>
 
 
-<div class="viewcode-block" id="UnsupervisedDecisionTree"><a class="viewcode-back" href="../../../generated/sktree.tree.UnsupervisedDecisionTree.html#sktree.tree.UnsupervisedDecisionTree">[docs]</a><span class="k">class</span> <span class="nc">UnsupervisedDecisionTree</span><span class="p">(</span><span class="n">TransformerMixin</span><span class="p">,</span> <span class="n">ClusterMixin</span><span class="p">,</span> <span class="n">BaseDecisionTree</span><span class="p">):</span>
+<div class="viewcode-block" id="UnsupervisedDecisionTree"><a class="viewcode-back" href="../../../generated/sktree.tree.UnsupervisedDecisionTree.html#sktree.tree.UnsupervisedDecisionTree">[docs]</a><span class="k">class</span> <span class="nc">UnsupervisedDecisionTree</span><span class="p">(</span><span class="n">SimMatrixMixin</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">,</span> <span class="n">ClusterMixin</span><span class="p">,</span> <span class="n">BaseDecisionTree</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Unsupervised decision tree.</span>
 
 <span class="sd">    Parameters</span>
@@ -584,14 +585,12 @@ document.write(`
 
         <span class="c1"># apply to the leaves</span>
         <span class="n">n_samples</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">X_leaves</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 
-        <span class="c1"># now compute the affinity matrix and set it</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">affinity_matrix_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_affinity_matrix</span><span class="p">(</span><span class="n">X_leaves</span><span class="p">)</span>
+        <span class="n">sim_mat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_similarity_matrix</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 
         <span class="c1"># compute the labels and set it</span>
         <span class="k">if</span> <span class="n">n_samples</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">labels_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_assign_labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">affinity_matrix_</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">labels_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_assign_labels</span><span class="p">(</span><span class="n">sim_mat</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span>
 
@@ -690,37 +689,10 @@ document.write(`
 <span class="sd">            X transformed in the new space.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="c1"># apply to the leaves</span>
-        <span class="n">X_leaves</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 
         <span class="c1"># now compute the affinity matrix and set it</span>
-        <span class="n">affinity_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_affinity_matrix</span><span class="p">(</span><span class="n">X_leaves</span><span class="p">)</span>
+        <span class="n">affinity_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_similarity_matrix</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">affinity_matrix</span></div>
-
-    <span class="k">def</span> <span class="nf">_compute_affinity_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_leaves</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the proximity matrix of samples in X.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        X_leaves : ndarray of shape (n_samples,)</span>
-<span class="sd">            For each datapoint x in X and for each tree in the forest,</span>
-<span class="sd">            is the index of the leaf x ends up in.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        prox_matrix : array-like of shape (n_samples, n_samples)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">n_samples</span> <span class="o">=</span> <span class="n">X_leaves</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">aff_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
-
-        <span class="c1"># for every unique leaf in this dataset, count all co-occurrences of samples</span>
-        <span class="c1"># in the same leaf</span>
-        <span class="k">for</span> <span class="n">leaf</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">X_leaves</span><span class="p">):</span>
-            <span class="c1"># find out which samples occur with this leaf</span>
-            <span class="n">samples_in_leaf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">X_leaves</span> <span class="o">==</span> <span class="n">leaf</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">())</span>
-            <span class="n">aff_matrix</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">samples_in_leaf</span><span class="p">,</span> <span class="n">samples_in_leaf</span><span class="p">)]</span> <span class="o">+=</span> <span class="mi">1</span>
-
-        <span class="k">return</span> <span class="n">aff_matrix</span>
 
     <span class="k">def</span> <span class="nf">_assign_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">affinity_matrix</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Assign cluster labels given X.</span>
@@ -934,7 +906,7 @@ document.write(`
         <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="ObliqueDecisionTreeClassifier"><a class="viewcode-back" href="../../../generated/sktree.tree.ObliqueDecisionTreeClassifier.html#sktree.tree.ObliqueDecisionTreeClassifier">[docs]</a><span class="k">class</span> <span class="nc">ObliqueDecisionTreeClassifier</span><span class="p">(</span><span class="n">DecisionTreeClassifier</span><span class="p">):</span>
+<div class="viewcode-block" id="ObliqueDecisionTreeClassifier"><a class="viewcode-back" href="../../../generated/sktree.tree.ObliqueDecisionTreeClassifier.html#sktree.tree.ObliqueDecisionTreeClassifier">[docs]</a><span class="k">class</span> <span class="nc">ObliqueDecisionTreeClassifier</span><span class="p">(</span><span class="n">SimMatrixMixin</span><span class="p">,</span> <span class="n">DecisionTreeClassifier</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A decision tree classifier.</span>
 
 <span class="sd">    Read more in the :ref:`User Guide &lt;sklearn:tree&gt;`. The implementation follows</span>
@@ -1313,7 +1285,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="PatchObliqueDecisionTreeClassifier"><a class="viewcode-back" href="../../../generated/sktree.tree.PatchObliqueDecisionTreeClassifier.html#sktree.tree.PatchObliqueDecisionTreeClassifier">[docs]</a><span class="k">class</span> <span class="nc">PatchObliqueDecisionTreeClassifier</span><span class="p">(</span><span class="n">DecisionTreeClassifier</span><span class="p">):</span>
+<div class="viewcode-block" id="PatchObliqueDecisionTreeClassifier"><a class="viewcode-back" href="../../../generated/sktree.tree.PatchObliqueDecisionTreeClassifier.html#sktree.tree.PatchObliqueDecisionTreeClassifier">[docs]</a><span class="k">class</span> <span class="nc">PatchObliqueDecisionTreeClassifier</span><span class="p">(</span><span class="n">SimMatrixMixin</span><span class="p">,</span> <span class="n">DecisionTreeClassifier</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A oblique decision tree classifier that operates over patches of data.</span>
 
 <span class="sd">    A patch oblique decision tree is also known as a manifold oblique decision tree</span>
@@ -1836,7 +1808,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-04-26.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-05-08.
       <br/>
     
   </p>

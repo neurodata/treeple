@@ -551,7 +551,10 @@ has feature names that are all strings.</p>
 </dd>
 <dt><strong>labels_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_samples,)</span></dt><dd><p>Labels of each point.</p>
 </dd>
-<dt><strong>affinity_matrix_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_samples, n_samples)</span></dt><dd><p>Stores the affinity/proximity matrix used in fit. Note this matrix
+<dt><strong>similarity_matrix_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_samples, n_samples)</span></dt><dd><p>Stores the affinity/similarity matrix used in fit. Note this matrix
+is computed from within-bag and OOB samples.</p>
+</dd>
+<dt><strong>dissimilarity_matrix_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_samples, n_samples)</span></dt><dd><p>Stores the dissimilarity matrix used in fit. Note this matrix
 is computed from within-bag and OOB samples.</p>
 </dd>
 <dt><strong>oob_score_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>Score of the training dataset obtained using an out-of-bag estimate.
@@ -572,31 +575,34 @@ only when <code class="docutils literal notranslate"><span class="pre">oob_score
 <tr class="row-odd"><td><p><a class="reference internal" href="#sktree.UnsupervisedObliqueRandomForest.apply" title="sktree.UnsupervisedObliqueRandomForest.apply"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply</span></code></a>(X)</p></td>
 <td><p>Apply trees in the forest to X, return leaf indices.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sktree.UnsupervisedObliqueRandomForest.decision_path" title="sktree.UnsupervisedObliqueRandomForest.decision_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decision_path</span></code></a>(X)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#sktree.UnsupervisedObliqueRandomForest.compute_similarity_matrix" title="sktree.UnsupervisedObliqueRandomForest.compute_similarity_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_similarity_matrix</span></code></a>(X)</p></td>
+<td><p>Compute the similarity matrix of samples in X.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sktree.UnsupervisedObliqueRandomForest.decision_path" title="sktree.UnsupervisedObliqueRandomForest.decision_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decision_path</span></code></a>(X)</p></td>
 <td><p>Return the decision path in the forest.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sktree.UnsupervisedObliqueRandomForest.fit" title="sktree.UnsupervisedObliqueRandomForest.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(X[, y, sample_weight])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#sktree.UnsupervisedObliqueRandomForest.fit" title="sktree.UnsupervisedObliqueRandomForest.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(X[, y, sample_weight])</p></td>
 <td><p>Fit estimator.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sktree.UnsupervisedObliqueRandomForest.fit_predict" title="sktree.UnsupervisedObliqueRandomForest.fit_predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_predict</span></code></a>(X[, y])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sktree.UnsupervisedObliqueRandomForest.fit_predict" title="sktree.UnsupervisedObliqueRandomForest.fit_predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_predict</span></code></a>(X[, y])</p></td>
 <td><p>Perform clustering on <code class="docutils literal notranslate"><span class="pre">X</span></code> and returns cluster labels.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sktree.UnsupervisedObliqueRandomForest.fit_transform" title="sktree.UnsupervisedObliqueRandomForest.fit_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_transform</span></code></a>(X[, y])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#sktree.UnsupervisedObliqueRandomForest.fit_transform" title="sktree.UnsupervisedObliqueRandomForest.fit_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_transform</span></code></a>(X[, y])</p></td>
 <td><p>Fit to data, then transform it.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sktree.UnsupervisedObliqueRandomForest.get_params" title="sktree.UnsupervisedObliqueRandomForest.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([deep])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sktree.UnsupervisedObliqueRandomForest.get_params" title="sktree.UnsupervisedObliqueRandomForest.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([deep])</p></td>
 <td><p>Get parameters for this estimator.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sktree.UnsupervisedObliqueRandomForest.predict" title="sktree.UnsupervisedObliqueRandomForest.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(X)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#sktree.UnsupervisedObliqueRandomForest.predict" title="sktree.UnsupervisedObliqueRandomForest.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(X)</p></td>
 <td><p>Predict clusters for X.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sktree.UnsupervisedObliqueRandomForest.set_output" title="sktree.UnsupervisedObliqueRandomForest.set_output"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_output</span></code></a>(*[, transform])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sktree.UnsupervisedObliqueRandomForest.set_output" title="sktree.UnsupervisedObliqueRandomForest.set_output"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_output</span></code></a>(*[, transform])</p></td>
 <td><p>Set output container.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sktree.UnsupervisedObliqueRandomForest.set_params" title="sktree.UnsupervisedObliqueRandomForest.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#sktree.UnsupervisedObliqueRandomForest.set_params" title="sktree.UnsupervisedObliqueRandomForest.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</p></td>
 <td><p>Set the parameters of this estimator.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sktree.UnsupervisedObliqueRandomForest.transform" title="sktree.UnsupervisedObliqueRandomForest.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(X)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sktree.UnsupervisedObliqueRandomForest.transform" title="sktree.UnsupervisedObliqueRandomForest.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(X)</p></td>
 <td><p>Transform X to a cluster-distance space.</p></td>
 </tr>
 </tbody>
@@ -618,6 +624,26 @@ converted into a sparse <code class="docutils literal notranslate"><span class="
 <dd class="field-even"><dl>
 <dt><strong>X_leaves</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_samples, n_estimators)</span></dt><dd><p>For each datapoint x in X and for each tree in the forest,
 return the index of the leaf x ends up in.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sktree.UnsupervisedObliqueRandomForest.compute_similarity_matrix">
+<span class="sig-name descname"><span class="pre">compute_similarity_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sktree.UnsupervisedObliqueRandomForest.compute_similarity_matrix" title="Permalink to this definition">#</a></dt>
+<dd><p>Compute the similarity matrix of samples in X.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>X</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v1.25.dev0)"><span>array_like</span></a> of shape (n_samples, n_features)</span></dt><dd><p>The input data.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>sim_matrix</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v1.25.dev0)"><span>array_like</span></a> of shape (n_samples, n_samples)</span></dt><dd><p>The similarity matrix among the samples.</p>
 </dd>
 </dl>
 </dd>
@@ -935,6 +961,7 @@ array of zeros.</p>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.UnsupervisedObliqueRandomForest"><code class="docutils literal notranslate"><span class="pre">UnsupervisedObliqueRandomForest</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.UnsupervisedObliqueRandomForest.apply"><code class="docutils literal notranslate"><span class="pre">UnsupervisedObliqueRandomForest.apply()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.UnsupervisedObliqueRandomForest.compute_similarity_matrix"><code class="docutils literal notranslate"><span class="pre">UnsupervisedObliqueRandomForest.compute_similarity_matrix()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.UnsupervisedObliqueRandomForest.decision_path"><code class="docutils literal notranslate"><span class="pre">UnsupervisedObliqueRandomForest.decision_path()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.UnsupervisedObliqueRandomForest.fit"><code class="docutils literal notranslate"><span class="pre">UnsupervisedObliqueRandomForest.fit()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.UnsupervisedObliqueRandomForest.fit_predict"><code class="docutils literal notranslate"><span class="pre">UnsupervisedObliqueRandomForest.fit_predict()</span></code></a></li>
@@ -975,7 +1002,7 @@ array of zeros.</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-04-26.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-05-08.
       <br/>
     
   </p>

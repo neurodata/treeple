@@ -525,37 +525,40 @@ and return cluster labels. By default, <a class="reference external" href="https
 <tr class="row-odd"><td><p><a class="reference internal" href="#sktree.tree.UnsupervisedDecisionTree.apply" title="sktree.tree.UnsupervisedDecisionTree.apply"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply</span></code></a>(X[, check_input])</p></td>
 <td><p>Return the index of the leaf that each sample is predicted as.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sktree.tree.UnsupervisedDecisionTree.cost_complexity_pruning_path" title="sktree.tree.UnsupervisedDecisionTree.cost_complexity_pruning_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cost_complexity_pruning_path</span></code></a>(X, y[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#sktree.tree.UnsupervisedDecisionTree.compute_similarity_matrix" title="sktree.tree.UnsupervisedDecisionTree.compute_similarity_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_similarity_matrix</span></code></a>(X)</p></td>
+<td><p>Compute the similarity matrix of samples in X.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sktree.tree.UnsupervisedDecisionTree.cost_complexity_pruning_path" title="sktree.tree.UnsupervisedDecisionTree.cost_complexity_pruning_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cost_complexity_pruning_path</span></code></a>(X, y[, ...])</p></td>
 <td><p>Compute the pruning path during Minimal Cost-Complexity Pruning.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sktree.tree.UnsupervisedDecisionTree.decision_path" title="sktree.tree.UnsupervisedDecisionTree.decision_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decision_path</span></code></a>(X[, check_input])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#sktree.tree.UnsupervisedDecisionTree.decision_path" title="sktree.tree.UnsupervisedDecisionTree.decision_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decision_path</span></code></a>(X[, check_input])</p></td>
 <td><p>Return the decision path in the tree.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sktree.tree.UnsupervisedDecisionTree.fit_predict" title="sktree.tree.UnsupervisedDecisionTree.fit_predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_predict</span></code></a>(X[, y])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sktree.tree.UnsupervisedDecisionTree.fit_predict" title="sktree.tree.UnsupervisedDecisionTree.fit_predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_predict</span></code></a>(X[, y])</p></td>
 <td><p>Perform clustering on <code class="docutils literal notranslate"><span class="pre">X</span></code> and returns cluster labels.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sktree.tree.UnsupervisedDecisionTree.fit_transform" title="sktree.tree.UnsupervisedDecisionTree.fit_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_transform</span></code></a>(X[, y])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#sktree.tree.UnsupervisedDecisionTree.fit_transform" title="sktree.tree.UnsupervisedDecisionTree.fit_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_transform</span></code></a>(X[, y])</p></td>
 <td><p>Fit to data, then transform it.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sktree.tree.UnsupervisedDecisionTree.get_depth" title="sktree.tree.UnsupervisedDecisionTree.get_depth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_depth</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sktree.tree.UnsupervisedDecisionTree.get_depth" title="sktree.tree.UnsupervisedDecisionTree.get_depth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_depth</span></code></a>()</p></td>
 <td><p>Return the depth of the decision tree.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sktree.tree.UnsupervisedDecisionTree.get_n_leaves" title="sktree.tree.UnsupervisedDecisionTree.get_n_leaves"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_n_leaves</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#sktree.tree.UnsupervisedDecisionTree.get_n_leaves" title="sktree.tree.UnsupervisedDecisionTree.get_n_leaves"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_n_leaves</span></code></a>()</p></td>
 <td><p>Return the number of leaves of the decision tree.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sktree.tree.UnsupervisedDecisionTree.get_params" title="sktree.tree.UnsupervisedDecisionTree.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([deep])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sktree.tree.UnsupervisedDecisionTree.get_params" title="sktree.tree.UnsupervisedDecisionTree.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([deep])</p></td>
 <td><p>Get parameters for this estimator.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sktree.tree.UnsupervisedDecisionTree.predict" title="sktree.tree.UnsupervisedDecisionTree.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(X[, check_input])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#sktree.tree.UnsupervisedDecisionTree.predict" title="sktree.tree.UnsupervisedDecisionTree.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(X[, check_input])</p></td>
 <td><p>Assign labels based on clustering the affinity matrix.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sktree.tree.UnsupervisedDecisionTree.set_output" title="sktree.tree.UnsupervisedDecisionTree.set_output"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_output</span></code></a>(*[, transform])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sktree.tree.UnsupervisedDecisionTree.set_output" title="sktree.tree.UnsupervisedDecisionTree.set_output"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_output</span></code></a>(*[, transform])</p></td>
 <td><p>Set output container.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sktree.tree.UnsupervisedDecisionTree.set_params" title="sktree.tree.UnsupervisedDecisionTree.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#sktree.tree.UnsupervisedDecisionTree.set_params" title="sktree.tree.UnsupervisedDecisionTree.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</p></td>
 <td><p>Set the parameters of this estimator.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sktree.tree.UnsupervisedDecisionTree.transform" title="sktree.tree.UnsupervisedDecisionTree.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(X)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sktree.tree.UnsupervisedDecisionTree.transform" title="sktree.tree.UnsupervisedDecisionTree.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(X)</p></td>
 <td><p>Transform X to a cluster-distance space.</p></td>
 </tr>
 </tbody>
@@ -592,6 +595,26 @@ Don’t use this parameter unless you know what you’re doing.</p>
 ends up in. Leaves are numbered within
 <code class="docutils literal notranslate"><span class="pre">[0;</span> <span class="pre">self.tree_.node_count)</span></code>, possibly with gaps in the
 numbering.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sktree.tree.UnsupervisedDecisionTree.compute_similarity_matrix">
+<span class="sig-name descname"><span class="pre">compute_similarity_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sktree.tree.UnsupervisedDecisionTree.compute_similarity_matrix" title="Permalink to this definition">#</a></dt>
+<dd><p>Compute the similarity matrix of samples in X.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>X</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v1.25.dev0)"><span>array_like</span></a> of shape (n_samples, n_features)</span></dt><dd><p>The input data.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>sim_matrix</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v1.25.dev0)"><span>array_like</span></a> of shape (n_samples, n_samples)</span></dt><dd><p>The similarity matrix among the samples.</p>
 </dd>
 </dl>
 </dd>
@@ -935,6 +958,7 @@ high cardinality features (many unique values). See
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.tree.UnsupervisedDecisionTree"><code class="docutils literal notranslate"><span class="pre">UnsupervisedDecisionTree</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.tree.UnsupervisedDecisionTree.apply"><code class="docutils literal notranslate"><span class="pre">UnsupervisedDecisionTree.apply()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.tree.UnsupervisedDecisionTree.compute_similarity_matrix"><code class="docutils literal notranslate"><span class="pre">UnsupervisedDecisionTree.compute_similarity_matrix()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.tree.UnsupervisedDecisionTree.cost_complexity_pruning_path"><code class="docutils literal notranslate"><span class="pre">UnsupervisedDecisionTree.cost_complexity_pruning_path()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.tree.UnsupervisedDecisionTree.decision_path"><code class="docutils literal notranslate"><span class="pre">UnsupervisedDecisionTree.decision_path()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.tree.UnsupervisedDecisionTree.fit_predict"><code class="docutils literal notranslate"><span class="pre">UnsupervisedDecisionTree.fit_predict()</span></code></a></li>
@@ -976,7 +1000,7 @@ high cardinality features (many unique values). See
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-04-26.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-05-08.
       <br/>
     
   </p>
