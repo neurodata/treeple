@@ -27,8 +27,10 @@ from sklearn_fork.utils.validation import _check_sample_weight, check_is_fitted,
 
 from sktree.tree import UnsupervisedDecisionTree, UnsupervisedObliqueDecisionTree
 
+from ..tree._neighbors import SimMatrixMixin
 
-class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):
+
+class ForestCluster(SimMatrixMixin, TransformerMixin, ClusterMixin, BaseForest):
     """Unsupervised forest base class."""
 
     def __init__(
@@ -176,14 +178,11 @@ class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):
             else:
                 self._set_oob_score_and_attributes(X)
 
-        # apply to the leaves
-        X_leaves = self.apply(X)
-
-        # now compute the affinity matrix and set it
-        self.affinity_matrix_ = self._compute_affinity_matrix(X_leaves)
+        # now compute the similarity/dissimilarity matrix and set it
+        sim_mat = self.compute_similarity_matrix(X)
 
         # compute the labels and set it
-        self.labels_ = self._assign_labels(self.affinity_matrix_)
+        self.labels_ = self._assign_labels(sim_mat)
 
         return self
 
@@ -208,10 +207,10 @@ class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):
             The predicted classes.
         """
         X = self._validate_X_predict(X)
-        affinity_matrix = self.transform(X)
+        similarity_matrix = self.transform(X)
 
         # compute the labels and set it
-        return self._assign_labels(affinity_matrix)
+        return self._assign_labels(similarity_matrix)
 
     def transform(self, X):
         """Transform X to a cluster-distance space.
@@ -231,47 +230,17 @@ class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):
             X transformed in the new space.
         """
         check_is_fitted(self)
-        # apply to the leaves
-        X_leaves = self.apply(X)
 
         # now compute the affinity matrix and set it
-        affinity_matrix = self._compute_affinity_matrix(X_leaves)
-        return affinity_matrix
+        similarity_matrix = self.compute_similarity_matrix(X)
+        return similarity_matrix
 
-    def _compute_affinity_matrix(self, X):
-        """Compute the proximity matrix of samples in X.
-
-        Parameters
-        ----------
-        X : ndarray of shape (n_samples, n_estimators)
-            For each datapoint x in X and for each tree in the forest,
-            is the index of the leaf x ends up in.
-
-        Returns
-        -------
-        prox_matrix : array-like of shape (n_samples, n_samples)
-        """
-        n_samples = X.shape[0]
-        aff_matrix = np.zeros((n_samples, n_samples), dtype=np.float32)
-
-        # fill the main diagonal with 1's
-        # np.fill_diagonal(aff_matrix, 1.0)
-        for idx in range(self.n_estimators):
-            for unique_leaf in np.unique(X[:, idx]):
-                # find all samples
-                samples_in_leaf = np.atleast_1d(np.argwhere(X[:, idx] == unique_leaf).squeeze())
-                aff_matrix[np.ix_(samples_in_leaf, samples_in_leaf)] += 1
-
-        # normalize by the number of trees
-        aff_matrix = np.divide(aff_matrix, self.n_estimators)
-        return aff_matrix
-
-    def _assign_labels(self, affinity_matrix):
+    def _assign_labels(self, similarity_matrix):
         """Assign cluster labels given X.
 
         Parameters
         ----------
-        affinity_matrix : ndarray of shape (n_samples, n_samples)
+        similarity_matrix : ndarray of shape (n_samples, n_samples)
             The affinity matrix.
 
         Returns
@@ -290,7 +259,7 @@ class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):
         cluster = self.clustering_func_(**self.clustering_func_args_)
 
         # apply agglomerative clustering to obtain cluster labels
-        predict_labels = cluster.fit_predict(affinity_matrix)
+        predict_labels = cluster.fit_predict(similarity_matrix)
         return predict_labels
 
     @staticmethod
@@ -310,11 +279,9 @@ class ForestCluster(TransformerMixin, ClusterMixin, BaseForest):
             The OOB associated proximity matrix.
         """
         # transform X
-        # apply to the leaves
-        X_leaves = tree.apply(X)
 
         # now compute the affinity matrix and set it
-        tree_prox_matrix = tree._compute_affinity_matrix(X_leaves)
+        tree_prox_matrix = tree.compute_similarity_matrix_forest(X)
 
         return tree_prox_matrix
 
@@ -557,8 +524,12 @@ class UnsupervisedRandomForest(ForestCluster):
     labels_ : ndarray of shape (n_samples,)
         Labels of each point.
 
-    affinity_matrix_ : ndarray of shape (n_samples, n_samples)
-        Stores the affinity/proximity matrix used in fit. Note this matrix
+    similarity_matrix_ : ndarray of shape (n_samples, n_samples)
+        Stores the affinity/similarity matrix used in fit. Note this matrix
+        is computed from within-bag and OOB samples.
+
+    dissimilarity_matrix_ : ndarray of shape (n_samples, n_samples)
+        Stores the dissimilarity matrix used in fit. Note this matrix
         is computed from within-bag and OOB samples.
 
     oob_score_ : float
@@ -787,8 +758,12 @@ class UnsupervisedObliqueRandomForest(ForestCluster):
     labels_ : ndarray of shape (n_samples,)
         Labels of each point.
 
-    affinity_matrix_ : ndarray of shape (n_samples, n_samples)
-        Stores the affinity/proximity matrix used in fit. Note this matrix
+    similarity_matrix_ : ndarray of shape (n_samples, n_samples)
+        Stores the affinity/similarity matrix used in fit. Note this matrix
+        is computed from within-bag and OOB samples.
+
+    dissimilarity_matrix_ : ndarray of shape (n_samples, n_samples)
+        Stores the dissimilarity matrix used in fit. Note this matrix
         is computed from within-bag and OOB samples.
 
     oob_score_ : float

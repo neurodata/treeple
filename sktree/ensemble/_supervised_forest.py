@@ -3,8 +3,10 @@ from sklearn_fork.utils._param_validation import StrOptions
 
 from sktree.tree import ObliqueDecisionTreeClassifier, PatchObliqueDecisionTreeClassifier
 
+from ..tree._neighbors import SimMatrixMixin
 
-class ObliqueRandomForestClassifier(ForestClassifier):
+
+class ObliqueRandomForestClassifier(ForestClassifier, SimMatrixMixin):
     """
     An oblique random forest classifier.
 
@@ -335,7 +337,7 @@ class ObliqueRandomForestClassifier(ForestClassifier):
         self.min_impurity_decrease = min_impurity_decrease
 
 
-class PatchObliqueRandomForestClassifier(ForestClassifier):
+class PatchObliqueRandomForestClassifier(ForestClassifier, SimMatrixMixin):
     """A patch-oblique random forest classifier.
 
     A patch-oblique random forest is a meta estimator similar to a random

@@ -14,7 +14,6 @@ from rerf.rerfClassifier import rerfClassifier as RERF
 
 
 def load_data(n):
-
     ftrain = "data/sparse_parity_train_" + str(n) + ".npy"
     ftest = "data/sparse_parity_test.npy"
 
@@ -31,11 +30,9 @@ def load_data(n):
 
 
 def test_rf(n, reps, n_estimators, max_features):
-
     preds = np.zeros((reps, 10000))
     acc = np.zeros(reps)
     for i in range(reps):
-
         X_train, y_train, X_test, y_test = load_data(n)
 
         clf = RF(n_estimators=n_estimators, max_features=max_features)
@@ -54,11 +51,9 @@ def test_rf(n, reps, n_estimators, max_features):
 
 
 def test_rerf(n, reps, n_estimators, feature_combinations, max_features):
-
     preds = np.zeros((reps, 10000))
     acc = np.zeros(reps)
     for i in range(reps):
-
         X_train, y_train, X_test, y_test = load_data(n)
 
         clf = RERF(
@@ -81,11 +76,9 @@ def test_rerf(n, reps, n_estimators, feature_combinations, max_features):
 
 
 def test_pysporf(n, reps, n_estimators, feature_combinations, max_features):
-
     preds = np.zeros((reps, 10000))
     acc = np.zeros(reps)
     for i in range(reps):
-
         X_train, y_train, X_test, y_test = load_data(n)
 
         clf = PySPORF(
@@ -104,11 +97,9 @@ def test_pysporf(n, reps, n_estimators, feature_combinations, max_features):
 
 
 def test_sporf(n, reps, n_estimators, feature_combinations, max_features):
-
     preds = np.zeros((reps, 10000))
     acc = np.zeros(reps)
     for i in range(reps):
-
         X_train, y_train, X_test, y_test = load_data(n)
 
         clf = SPORF(
@@ -131,7 +122,6 @@ def test_sporf(n, reps, n_estimators, feature_combinations, max_features):
 
 
 def main():
-
     # How many samples to train on
     ns = [1000, 5000, 10000]
 
