@@ -53,7 +53,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'generated/sktree.ObliqueRandomForestClassifier';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sktree.PatchObliqueRandomForestClassifier" href="sktree.PatchObliqueRandomForestClassifier.html" />
+    <link rel="next" title="sktree.ObliqueRandomForestRegressor" href="sktree.ObliqueRandomForestRegressor.html" />
     <link rel="prev" title="API Documentation" href="../api.html" />
     <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
     <script type="text/javascript" src="../_static/copybutton.js"></script>
@@ -346,11 +346,15 @@ document.write(`
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ObliqueRandomForestClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.ObliqueRandomForestRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ObliqueRandomForestRegressor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sktree.PatchObliqueRandomForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.PatchObliqueRandomForestClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.PatchObliqueRandomForestRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.PatchObliqueRandomForestRegressor</a></li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="sktree.tree.ObliqueDecisionTreeClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.ObliqueDecisionTreeClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.tree.ObliqueDecisionTreeRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.ObliqueDecisionTreeRegressor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sktree.tree.PatchObliqueDecisionTreeClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.PatchObliqueDecisionTreeClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.tree.PatchObliqueDecisionTreeRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.PatchObliqueDecisionTreeRegressor</a></li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="sktree.UnsupervisedRandomForest.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.UnsupervisedRandomForest</a></li>
@@ -608,9 +612,9 @@ fitting, <code class="docutils literal notranslate"><span class="pre">random_sta
 <dl class="field-list">
 <dt class="field-odd">Attributes<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><a class="reference internal" href="#sktree.ObliqueRandomForestClassifier.base_estimator_" title="sktree.ObliqueRandomForestClassifier.base_estimator_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">base_estimator_</span></code></a><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ObliqueDecisionTreeClassifier</span></code></span></dt><dd><p>Estimator used to grow the ensemble.</p>
+<dt><a class="reference internal" href="#sktree.ObliqueRandomForestClassifier.base_estimator_" title="sktree.ObliqueRandomForestClassifier.base_estimator_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">base_estimator_</span></code></a><span class="classifier"><a class="reference internal" href="sktree.tree.ObliqueDecisionTreeClassifier.html#sktree.tree.ObliqueDecisionTreeClassifier" title="sktree.tree.ObliqueDecisionTreeClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sktree.tree.ObliqueDecisionTreeClassifier</span></code></a></span></dt><dd><p>Estimator used to grow the ensemble.</p>
 </dd>
-<dt><strong>estimators_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">ObliqueDecisionTreeClassifier</span></code></span></dt><dd><p>The collection of fitted sub-estimators.</p>
+<dt><strong>estimators_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference internal" href="sktree.tree.ObliqueDecisionTreeClassifier.html#sktree.tree.ObliqueDecisionTreeClassifier" title="sktree.tree.ObliqueDecisionTreeClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sktree.tree.ObliqueDecisionTreeClassifier</span></code></a></span></dt><dd><p>The collection of fitted sub-estimators.</p>
 </dd>
 <dt><strong>classes_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_classes,) or a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of such arrays</span></dt><dd><p>The classes labels (single output problem), or a list of arrays of
 class labels (multi-output problem).</p>
@@ -994,11 +998,11 @@ array of zeros.</p>
       </div>
     </a>
     <a class="right-next"
-       href="sktree.PatchObliqueRandomForestClassifier.html"
+       href="sktree.ObliqueRandomForestRegressor.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.PatchObliqueRandomForestClassifier</p>
+        <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ObliqueRandomForestRegressor</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -1063,7 +1067,7 @@ array of zeros.</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-05-08.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-05-09.
       <br/>
     
   </p>

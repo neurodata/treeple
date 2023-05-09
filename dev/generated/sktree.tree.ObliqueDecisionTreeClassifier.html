@@ -53,8 +53,8 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'generated/sktree.tree.ObliqueDecisionTreeClassifier';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sktree.tree.PatchObliqueDecisionTreeClassifier" href="sktree.tree.PatchObliqueDecisionTreeClassifier.html" />
-    <link rel="prev" title="sktree.PatchObliqueRandomForestClassifier" href="sktree.PatchObliqueRandomForestClassifier.html" />
+    <link rel="next" title="sktree.tree.ObliqueDecisionTreeRegressor" href="sktree.tree.ObliqueDecisionTreeRegressor.html" />
+    <link rel="prev" title="sktree.PatchObliqueRandomForestRegressor" href="sktree.PatchObliqueRandomForestRegressor.html" />
     <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
     <script type="text/javascript" src="../_static/copybutton.js"></script>
     <script type="text/javascript" src="../_static/scrollfix.js"></script>
@@ -346,11 +346,15 @@ document.write(`
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="sktree.ObliqueRandomForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ObliqueRandomForestClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.ObliqueRandomForestRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ObliqueRandomForestRegressor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sktree.PatchObliqueRandomForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.PatchObliqueRandomForestClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.PatchObliqueRandomForestRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.PatchObliqueRandomForestRegressor</a></li>
 </ul>
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.ObliqueDecisionTreeClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.tree.ObliqueDecisionTreeRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.ObliqueDecisionTreeRegressor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sktree.tree.PatchObliqueDecisionTreeClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.PatchObliqueDecisionTreeClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.tree.PatchObliqueDecisionTreeRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.PatchObliqueDecisionTreeRegressor</a></li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="sktree.UnsupervisedRandomForest.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.UnsupervisedRandomForest</a></li>
@@ -540,7 +544,7 @@ gives the number of expected non-zeros in the projection matrix of shape
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
-<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">DecisionTreeClassifier</span></code></dt><dd><p>An axis-aligned decision tree classifier.</p>
+<dt><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html#sklearn.tree.DecisionTreeClassifier" title="(in scikit-learn v1.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.tree.DecisionTreeClassifier</span></code></a></dt><dd><p>An axis-aligned decision tree classifier.</p>
 </dd>
 </dl>
 </div>
@@ -814,8 +818,8 @@ Don’t use this parameter unless you know what you’re doing.</p>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>self</strong><span class="classifier">DecisionTreeClassifier</span></dt><dd><p>Fitted estimator.</p>
+<dd class="field-even"><dl>
+<dt><strong>self</strong><span class="classifier"><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html#sklearn.tree.DecisionTreeClassifier" title="(in scikit-learn v1.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DecisionTreeClassifier</span></code></a></span></dt><dd><p>Fitted estimator.</p>
 </dd>
 </dl>
 </dd>
@@ -1046,20 +1050,20 @@ high cardinality features (many unique values). See
     <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="sktree.PatchObliqueRandomForestClassifier.html"
+       href="sktree.PatchObliqueRandomForestRegressor.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.PatchObliqueRandomForestClassifier</p>
+        <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.PatchObliqueRandomForestRegressor</p>
       </div>
     </a>
     <a class="right-next"
-       href="sktree.tree.PatchObliqueDecisionTreeClassifier.html"
+       href="sktree.tree.ObliqueDecisionTreeRegressor.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.PatchObliqueDecisionTreeClassifier</p>
+        <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.ObliqueDecisionTreeRegressor</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -1126,7 +1130,7 @@ high cardinality features (many unique values). See
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-05-08.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-05-09.
       <br/>
     
   </p>
