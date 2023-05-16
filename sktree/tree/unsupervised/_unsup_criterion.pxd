@@ -1,7 +1,6 @@
 # cython: boundscheck=False
 # cython: wraparound=False
 # cython: language_level=3
-# cython: linetrace=True
 
 from sklearn_fork.tree._criterion cimport BaseCriterion
 from sklearn_fork.tree._tree cimport DOUBLE_t  # Type of y, sample_weight
