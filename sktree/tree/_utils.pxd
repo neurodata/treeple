@@ -21,3 +21,5 @@ cpdef ravel_multi_index(SIZE_t[:] coords, SIZE_t[:] shape)
 cdef void unravel_index_cython(SIZE_t index, const SIZE_t[:] shape, SIZE_t[:] coords) noexcept nogil
 
 cdef SIZE_t ravel_multi_index_cython(SIZE_t[:] coords, SIZE_t[:] shape) nogil
+
+cdef INT32_t find_index(DTYPE_t[:] feature_values, DOUBLE_t threshold) noexcept nogil

@@ -26,6 +26,7 @@ from sklearn_fork.utils.estimator_checks import parametrize_with_checks
 from sktree.tree import (
     ObliqueDecisionTreeClassifier,
     ObliqueDecisionTreeRegressor,
+    ExtraObliqueDecisionTreeClassifier,
     PatchObliqueDecisionTreeClassifier,
     PatchObliqueDecisionTreeRegressor,
     UnsupervisedDecisionTree,
@@ -34,6 +35,7 @@ from sktree.tree import (
 
 CLUSTER_CRITERIONS = ("twomeans", "fastbic")
 REG_CRITERIONS = ("squared_error", "absolute_error", "friedman_mse", "poisson")
+CLF_CRITERIONS = ("gini", "entropy")
 
 TREE_CLUSTERS = {
     "UnsupervisedDecisionTree": UnsupervisedDecisionTree,
@@ -48,6 +50,7 @@ REG_TREES = {
 CLF_TREES = {
     "ObliqueDecisionTreeClassifier": ObliqueDecisionTreeClassifier,
     "PatchObliqueTreeClassifier": PatchObliqueDecisionTreeClassifier,
+    "ExtraObliqueDecisionTreeClassifier": ExtraObliqueDecisionTreeClassifier,
 }
 
 X_small = np.array(
@@ -131,6 +134,7 @@ digits.target = digits.target[perm]
 ALL_TREES = [
     ObliqueDecisionTreeClassifier,
     PatchObliqueDecisionTreeClassifier,
+    ExtraObliqueDecisionTreeClassifier,
     UnsupervisedDecisionTree,
     UnsupervisedObliqueDecisionTree,
 ]
@@ -169,6 +173,7 @@ def assert_tree_equal(d, s, message):
     [
         ObliqueDecisionTreeClassifier(random_state=12),
         ObliqueDecisionTreeRegressor(random_state=12),
+        ExtraObliqueDecisionTreeClassifier(random_state=12),
         PatchObliqueDecisionTreeClassifier(random_state=12),
         PatchObliqueDecisionTreeRegressor(random_state=12),
     ]
@@ -178,7 +183,7 @@ def test_sklearn_compatible_estimator(estimator, check):
     if check.func.__name__ in ["check_requires_y_none"]:
         pytest.skip()
     check(estimator)
-
+    
 
 @parametrize_with_checks(
     [
@@ -307,7 +312,7 @@ def test_check_iris(name, Tree, criterion):
         name, criterion, score
     )
 
-
+#@pytest.mark.parametrize("name,Tree", TREE_CLUSTERS.items())
 def test_oblique_tree_sampling():
     """Test Oblique Decision Trees.
 
