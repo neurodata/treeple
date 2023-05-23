@@ -3,8 +3,8 @@ from numbers import Real
 
 import numpy as np
 from scipy.sparse import issparse
-from sklearn.base import ClusterMixin, TransformerMixin
-from sklearn.cluster import AgglomerativeClustering
+from sklearn_fork.base import ClusterMixin, TransformerMixin
+from sklearn_fork.cluster import AgglomerativeClustering
 from sklearn_fork.tree import (
     BaseDecisionTree,
     DecisionTreeClassifier,
