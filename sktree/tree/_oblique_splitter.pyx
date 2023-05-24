@@ -11,7 +11,7 @@ cnp.import_array()
 
 from cython.operator cimport dereference as deref
 from libcpp.vector cimport vector
-from sklearn.tree._utils cimport rand_int
+from sklearn_fork.tree._utils cimport rand_int
 from sklearn_fork.tree._criterion cimport Criterion
 
 

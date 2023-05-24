@@ -8,7 +8,7 @@ cimport numpy as cnp
 cnp.import_array()
 
 from libc.string cimport memcpy
-from sklearn.tree._utils cimport RAND_R_MAX, rand_int
+from sklearn_fork.tree._utils cimport RAND_R_MAX, rand_int
 
 from .._sklearn_splitter cimport sort
 

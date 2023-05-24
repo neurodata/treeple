@@ -11,16 +11,16 @@ from warnings import warn
 
 import numpy as np
 from scipy.sparse import issparse
-from sklearn.base import ClusterMixin, TransformerMixin
-from sklearn.cluster import AgglomerativeClustering
-from sklearn.ensemble._forest import (
+from sklearn_fork.base import ClusterMixin, TransformerMixin
+from sklearn_fork.cluster import AgglomerativeClustering
+from sklearn_fork.ensemble._forest import (
     MAX_INT,
     _generate_unsampled_indices,
     _get_n_samples_bootstrap,
     _parallel_build_trees,
 )
-from sklearn.metrics import calinski_harabasz_score
-from sklearn.utils.parallel import Parallel, delayed
+from sklearn_fork.metrics import calinski_harabasz_score
+from sklearn_fork.utils.parallel import Parallel, delayed
 from sklearn_fork.ensemble._forest import BaseForest
 from sklearn_fork.tree._tree import DTYPE
 from sklearn_fork.utils.validation import _check_sample_weight, check_is_fitted, check_random_state
