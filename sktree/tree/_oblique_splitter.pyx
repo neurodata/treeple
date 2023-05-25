@@ -11,6 +11,7 @@ cnp.import_array()
 
 from cython.operator cimport dereference as deref
 from libcpp.vector cimport vector
+from libc.stdio cimport printf
 from sklearn.tree._utils cimport rand_int, rand_uniform
 from sklearn_fork.tree._criterion cimport Criterion
 
@@ -509,13 +510,18 @@ cdef class RandomObliqueSplitter(BestObliqueSplitter):
             The minimal weight each leaf can have, where the weight is the sum
             of the weights of each sample in it.
 
+        random_state : object
+            The user inputted random state to be used for pseudo-randomness
+
         feature_combinations : double
             The average number of features to combine in an oblique split.
             Each feature is independently included with probability
             ``feature_combination`` / ``n_features``.
 
-        random_state : object
-            The user inputted random state to be used for pseudo-randomness
+        random_over_feature_value_range : bint
+            Whether to sample the threshold for each feature uniformly over 
+            the range of minumun and maximum of feature values or to randomly
+            select a sample at the node.
         """
         # Oblique tree parameters
         self.feature_combinations = feature_combinations
@@ -547,11 +553,12 @@ cdef class RandomObliqueSplitter(BestObliqueSplitter):
         # self.feature_weights = np.ones((self.n_features,), dtype=DTYPE_t) / self.n_features
         return 0
 
-    cdef int node_split_random(
+    # overwrite the node_soplit method with random threshold selection
+    cdef int node_split(
         self,
         double impurity,
         SplitRecord* split,
-        SIZE_t* n_constant_features
+        SIZE_t* n_constant_features,
     ) except -1 nogil:
         """Find the best random split on node samples[start:end]
 
@@ -578,7 +585,7 @@ cdef class RandomObliqueSplitter(BestObliqueSplitter):
         cdef double current_proxy_improvement = -INFINITY
         cdef double best_proxy_improvement = -INFINITY
 
-        cdef SIZE_t feat_i, p       # index over computed features and start/end
+        cdef SIZE_t feat_i, p, counter       # index over computed features and start/end
         cdef SIZE_t partition_end
         cdef DTYPE_t temp_d         # to compute a projection feature value
 
@@ -612,47 +619,24 @@ cdef class RandomObliqueSplitter(BestObliqueSplitter):
             )
 
             # Sort the samples
-            sort(&feature_values[start], &samples[start], end - start)
+            # sort(&feature_values[start], &samples[start], end - start)
 
-            # Evaluate all splits
-            self.criterion.reset()
-
-            while True:
-                # Choose random
-                random_threshold = rand_uniform(feature_values[start], feature_values[end], &self.rand_r_state)
-                # Find the 'p/pos' that is closest to the threshold
-                p = find_index(feature_values, random_threshold)
+            # indicates if the criteria is not met
+            flag = True
+            while flag:
+                # randomly select a split point between start+min_samples_leaf and end
+                p = rand_int(start+min_samples_leaf, end, &self.rand_r_state)
 
                 current_split.pos = p
 
-                # Reject if min_samples_leaf is not guaranteed
-                if (((current_split.pos - start) < min_samples_leaf) or
-                        ((end - current_split.pos) < min_samples_leaf)):
-                    continue
-
+                self.criterion.reset()
                 self.criterion.update(current_split.pos)
                 # Reject if min_weight_leaf is not satisfied
                 if ((self.criterion.weighted_n_left < min_weight_leaf) or
                         (self.criterion.weighted_n_right < min_weight_leaf)):
                     continue
-
-                current_proxy_improvement = \
-                    self.criterion.proxy_impurity_improvement()
-
-                if current_proxy_improvement > best_proxy_improvement:
-                    best_proxy_improvement = current_proxy_improvement
-                    # sum of halves is used to avoid infinite value
-                    current_split.threshold = feature_values[p - 1] / 2.0 + feature_values[p] / 2.0
-
-                    if (
-                        (current_split.threshold == feature_values[p]) or
-                        (current_split.threshold == INFINITY) or
-                        (current_split.threshold == -INFINITY)
-                    ):
-                        current_split.threshold = feature_values[p - 1]
-
-                    best_split = current_split  # copy
-                    break
+                best_split = current_split  # copy
+                flag = False
 
         # Reorganize into samples[start:best_split.pos] + samples[best_split.pos:end]
         if best_split.pos < end:

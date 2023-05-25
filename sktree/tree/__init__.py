@@ -1,7 +1,8 @@
 from ._classes import (
+    ExtraObliqueDecisionTreeClassifier,
+    ExtraObliqueDecisionTreeRegressor,
     ObliqueDecisionTreeClassifier,
     ObliqueDecisionTreeRegressor,
-    ExtraObliqueDecisionTreeClassifier,
     PatchObliqueDecisionTreeClassifier,
     PatchObliqueDecisionTreeRegressor,
     UnsupervisedDecisionTree,
@@ -9,11 +10,12 @@ from ._classes import (
 )
 
 __all__ = [
-    "UnsupervisedDecisionTree",
-    "UnsupervisedObliqueDecisionTree",
+    "ExtraObliqueDecisionTreeClassifier",
+    "ExtraObliqueDecisionTreeRegressor",
     "ObliqueDecisionTreeClassifier",
     "ObliqueDecisionTreeRegressor",
-    "ExtraObliqueDecisionTreeClassifier",
     "PatchObliqueDecisionTreeClassifier",
     "PatchObliqueDecisionTreeRegressor",
+    "UnsupervisedDecisionTree",
+    "UnsupervisedObliqueDecisionTree",
 ]
