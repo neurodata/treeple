@@ -11,8 +11,7 @@ cnp.import_array()
 
 from cython.operator cimport dereference as deref
 from libcpp.vector cimport vector
-from libc.stdio cimport printf
-from sklearn.tree._utils cimport rand_int, rand_uniform
+from sklearn.tree._utils cimport rand_int
 from sklearn_fork.tree._criterion cimport Criterion
 
 # from .._utils cimport find_index_cython
@@ -517,11 +516,6 @@ cdef class RandomObliqueSplitter(BestObliqueSplitter):
             The average number of features to combine in an oblique split.
             Each feature is independently included with probability
             ``feature_combination`` / ``n_features``.
-
-        random_over_feature_value_range : bint
-            Whether to sample the threshold for each feature uniformly over 
-            the range of minumun and maximum of feature values or to randomly
-            select a sample at the node.
         """
         # Oblique tree parameters
         self.feature_combinations = feature_combinations
@@ -582,12 +576,12 @@ cdef class RandomObliqueSplitter(BestObliqueSplitter):
         # keep track of split record for current_split node and the best_split split
         # found among the sampled projection vectors
         cdef ObliqueSplitRecord best_split, current_split
-        cdef double current_proxy_improvement = -INFINITY
-        cdef double best_proxy_improvement = -INFINITY
+        # cdef double current_proxy_improvement = -INFINITY
+        # cdef double best_proxy_improvement = -INFINITY
 
-        cdef SIZE_t feat_i, p, counter       # index over computed features and start/end
+        cdef SIZE_t feat_i, p      # index over computed features and start/end
         cdef SIZE_t partition_end
-        cdef DTYPE_t temp_d         # to compute a projection feature value
+        cdef DTYPE_t temp_d, threshold         # to compute a projection feature value
 
         # instantiate the split records
         _init_split(&best_split, end)
@@ -619,15 +613,18 @@ cdef class RandomObliqueSplitter(BestObliqueSplitter):
             )
 
             # Sort the samples
-            # sort(&feature_values[start], &samples[start], end - start)
+            sort(&feature_values[start], &samples[start], end - start)
 
-            # indicates if the criteria is not met
+            # indicates if the criteria is not yet met
             flag = True
             while flag:
                 # randomly select a split point between start+min_samples_leaf and end
                 p = rand_int(start+min_samples_leaf, end, &self.rand_r_state)
+                # threshold is the feature value at p
+                threshold = feature_values[p]
 
                 current_split.pos = p
+                current_split.threshold = threshold
 
                 self.criterion.reset()
                 self.criterion.update(current_split.pos)

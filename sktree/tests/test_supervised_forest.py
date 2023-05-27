@@ -11,6 +11,8 @@ from sklearn_fork.ensemble import RandomForestClassifier
 from sklearn_fork.utils.estimator_checks import check_estimator
 
 from sktree import (
+    # ExtraObliqueRandomForestClassifier,
+    # ExtraObliqueRandomForestRegressor,
     ObliqueRandomForestClassifier,
     ObliqueRandomForestRegressor,
     PatchObliqueRandomForestClassifier,
@@ -47,11 +49,13 @@ diabetes.target = diabetes.target[perm]
 
 
 FOREST_CLASSIFIERS = {
+    # "ExtraObliqueRandomForestClassifier": ExtraObliqueRandomForestClassifier,
     "ObliqueRandomForestClassifier": ObliqueRandomForestClassifier,
     "PatchObliqueRandomForestClassifier": PatchObliqueRandomForestClassifier,
 }
 
 FOREST_REGRESSORS = {
+    # "ExtraObliqueDecisionTreeRegressor": ExtraObliqueDecisionTreeRegressor,
     "ObliqueRandomForestRegressor": ObliqueRandomForestRegressor,
     "PatchObliqueRandomForestRegressor": PatchObliqueRandomForestRegressor,
 }

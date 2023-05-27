@@ -23,9 +23,8 @@ from sklearn_fork.tree import DecisionTreeClassifier
 from sklearn_fork.utils._testing import skip_if_32bit
 from sklearn_fork.utils.estimator_checks import parametrize_with_checks
 
-from sktree.tree import (
+from sktree.tree import (  # ExtraObliqueDecisionTreeRegressor,
     ExtraObliqueDecisionTreeClassifier,
-    ExtraObliqueDecisionTreeRegressor,
     ObliqueDecisionTreeClassifier,
     ObliqueDecisionTreeRegressor,
     PatchObliqueDecisionTreeClassifier,
@@ -56,10 +55,10 @@ CLF_TREES = {
 }
 
 OBLIQUE_TREES = {
-    "ObliqueDecisionTreeClassifier": ObliqueDecisionTreeClassifier,
-    "ObliqueDecisionTreeRegressor": ObliqueDecisionTreeRegressor,
     "ExtraObliqueDecisionTreeClassifier": ExtraObliqueDecisionTreeClassifier,
     # "ExtraObliqueDecisionTreeRegressor": ExtraObliqueDecisionTreeRegressor,
+    "ObliqueDecisionTreeClassifier": ObliqueDecisionTreeClassifier,
+    "ObliqueDecisionTreeRegressor": ObliqueDecisionTreeRegressor,
 }
 
 PATCH_OBLIQUE_TREES = {
@@ -331,8 +330,15 @@ def test_check_iris(name, Tree, criterion):
     )
 
 
-@pytest.mark.parametrize("Tree", CLF_TREES.values())
-def test_oblique_tree_sampling(Tree):
+@pytest.mark.parametrize(
+    "Tree",
+    [
+        ExtraObliqueDecisionTreeClassifier,
+        ObliqueDecisionTreeClassifier,
+        PatchObliqueDecisionTreeClassifier,
+    ],
+)
+def test_oblique_tree_sampling(Tree, random_state=0):
     """Test Oblique Decision Trees.
 
     Oblique trees can sample more candidate splits than
@@ -342,15 +348,15 @@ def test_oblique_tree_sampling(Tree):
     n_samples, n_features = X.shape
 
     # add additional noise dimensions
-    rng = np.random.RandomState(2)
+    rng = np.random.RandomState(random_state)
     X_noise = rng.random((n_samples, n_features))
     X = np.concatenate((X, X_noise), axis=1)
 
     # oblique decision trees can sample significantly more
     # diverse sets of splits and will do better if allowed
     # to sample more
-    tree_ri = DecisionTreeClassifier(random_state=0, max_features=n_features)
-    tree_rc = Tree(random_state=0, max_features=n_features * 2)
+    tree_ri = DecisionTreeClassifier(random_state=random_state, max_features=n_features)
+    tree_rc = Tree(random_state=random_state, max_features=n_features * 2)
     ri_cv_scores = cross_val_score(tree_ri, X, y, scoring="accuracy", cv=10, error_score="raise")
     rc_cv_scores = cross_val_score(tree_rc, X, y, scoring="accuracy", cv=10, error_score="raise")
     assert rc_cv_scores.mean() > ri_cv_scores.mean()

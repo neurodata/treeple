@@ -1,4 +1,5 @@
-from ._supervised_forest import (
+from ._supervised_forest import (  # ExtraObliqueRandomForestRegressor,
+    ExtraObliqueRandomForestClassifier,
     ObliqueRandomForestClassifier,
     ObliqueRandomForestRegressor,
     PatchObliqueRandomForestClassifier,
