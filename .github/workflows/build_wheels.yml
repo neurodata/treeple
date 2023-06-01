@@ -42,7 +42,7 @@ jobs:
       - name: Checkout scikit-tree
         uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v4.6.0
+      - uses: actions/setup-python@v4.6.1
         with:
           python-version: 3.9
       
@@ -53,7 +53,7 @@ jobs:
         if: ${{ runner.os == 'Windows' && env.IS_32_BIT == 'false' }}
         
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.12.3
+        uses: pypa/cibuildwheel@v2.13.0
         # Build all wheels here, apart from macosx_arm64, linux_aarch64
         # cibuildwheel is currently unable to pass configuration flags to
         # CIBW_BUILD_FRONTEND https://github.com/pypa/cibuildwheel/issues/1227
@@ -81,7 +81,7 @@ jobs:
   #   steps:
   #     - uses: actions/checkout@v3
 
-  #     - uses: actions/setup-python@v4.6.0
+  #     - uses: actions/setup-python@v4.6.1
   #       with:
   #         python-version: 3.9
 
@@ -90,7 +90,7 @@ jobs:
   #         python -m pip wheel --config-settings builddir=build .
 
   #     - name: Build wheels
-  #       uses: pypa/cibuildwheel@v2.12.3
+  #       uses: pypa/cibuildwheel@v2.13.0
   #       env:
   #         CIBW_ARCHS_MACOS: arm64
 
