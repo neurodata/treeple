@@ -6,7 +6,6 @@ from ._classes import (
     UnsupervisedDecisionTree,
     UnsupervisedObliqueDecisionTree,
 )
-
 from ._honest_tree import HonestTreeClassifier
 
 __all__ = [

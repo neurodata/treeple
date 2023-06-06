@@ -1,15 +1,14 @@
-"""Module for honest forest estimators"""
 # Authors: Ronan Perry
 # Adopted from: https://github.com/neurodata/honest-forests
 
+import threading
+
 import numpy as np
-from sklearn_fork.utils.validation import check_X_y
+from joblib import Parallel, delayed
+from sklearn_fork.ensemble._base import _partition_estimators
 from sklearn_fork.ensemble._forest import ForestClassifier
 from sklearn_fork.tree import DecisionTreeClassifier
 from sklearn_fork.utils.validation import check_is_fitted
-from sklearn_fork.ensemble._base import _partition_estimators
-from joblib import Parallel, delayed
-import threading
 
 from ..tree import HonestTreeClassifier
 

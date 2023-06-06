@@ -1,4 +1,3 @@
-"""Module for tree-based estimators"""
 # Authors: Ronan Perry, Sambit Panda
 # Adopted from: https://github.com/neurodata/honest-forests
 
@@ -6,8 +5,8 @@ import numpy as np
 from sklearn_fork.base import MetaEstimatorMixin
 from sklearn_fork.tree import DecisionTreeClassifier
 from sklearn_fork.tree._classes import BaseDecisionTree
-from sklearn_fork.utils.validation import check_is_fitted
 from sklearn_fork.utils.multiclass import check_classification_targets
+from sklearn_fork.utils.validation import check_is_fitted
 
 
 class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
