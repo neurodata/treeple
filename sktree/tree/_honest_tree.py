@@ -212,9 +212,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
         # Fit leaves using other subsample
         honest_leaves = self.tree_.apply(X[self.honest_indices_])
 
-        self.tree_.value[:, :, :] = 0
-        for leaf_id, yval in zip(honest_leaves, y[self.honest_indices_, 0]):
-            self.tree_.value[leaf_id][0, yval] += 1
+        self._set_leaf_nodes(honest_leaves, y)
 
         # preserve from underlying tree
         # https://github.com/scikit-learn/scikit-learn/blob/1.0.X/sklearn/tree/_classes.py#L202
@@ -243,6 +241,12 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
             y = y[:, 0]
 
         return self
+
+    def _set_leaf_nodes(self, X, y):
+        "Traverse the already built tree with X and set leaf nodes with y"
+        self.tree_.value[:, :, :] = 0
+        for leaf_id, yval in zip(X, y[self.honest_indices_, 0]):
+            self.tree_.value[leaf_id][0, yval] += 1
 
     def _inherit_estimator_attributes(self):
         """Initialize necessary attributes from the provided estimator"""
