@@ -8,7 +8,7 @@ from joblib import Parallel, delayed
 from sklearn_fork.ensemble._base import _partition_estimators
 from sklearn_fork.ensemble._forest import ForestClassifier
 from sklearn_fork.tree import DecisionTreeClassifier
-from sklearn_fork.utils.validation import check_is_fitted
+from sklearn_fork.utils.validation import check_is_fitted, check_X_y
 from sklearn_fork.utils.multiclass import check_classification_targets
 
 from ..tree import HonestTreeClassifier
@@ -394,6 +394,11 @@ class HonestForestClassifier(ForestClassifier):
         self : object
             Fitted estimator.
         """
+        X, y = check_X_y(X, y)
+
+        # Account for bootstrapping too
+        if sample_weight is None:
+            sample_weight = np.ones((X.shape[0],), dtype=np.float64)
         super().fit(X, y, sample_weight)
         classes_k, y_encoded = np.unique(y, return_inverse=True)
         self.empirical_prior_ = np.bincount(y_encoded, minlength=classes_k.shape[0]) / len(y)

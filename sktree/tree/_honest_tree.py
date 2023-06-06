@@ -6,7 +6,7 @@ from sklearn_fork.base import MetaEstimatorMixin
 from sklearn_fork.tree import DecisionTreeClassifier
 from sklearn_fork.tree._classes import BaseDecisionTree
 from sklearn_fork.utils.multiclass import check_classification_targets
-from sklearn_fork.utils.validation import check_is_fitted
+from sklearn_fork.utils.validation import check_is_fitted, check_X_y
 
 
 class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
@@ -308,6 +308,9 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
         self : HonestTreeClassifier
             Fitted estimator.
         """
+        if check_input:
+            X, y = check_X_y(X, y)
+
         # Account for bootstrapping too
         if sample_weight is None:
             sample_weight = np.ones((X.shape[0],), dtype=np.float64)
