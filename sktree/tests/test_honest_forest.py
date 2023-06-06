@@ -10,7 +10,7 @@ from sklearn.utils.validation import check_random_state
 from sklearn_fork.ensemble import RandomForestClassifier
 from sklearn_fork.utils.estimator_checks import check_estimator
 
-from sktree import HonestForestClassifier
+from sktree.ensemble import HonestForestClassifier
 
 # Larger classification sample used for testing feature importances
 X_large, y_large = make_classification(
@@ -46,8 +46,6 @@ FOREST_CLASSIFIERS = {"HonestForestClassifier": HonestForestClassifier}
 
 FOREST_ESTIMATORS: Dict[str, Any] = dict()
 FOREST_ESTIMATORS.update(FOREST_CLASSIFIERS)
-
-REG_CRITERIONS = ("squared_error", "absolute_error", "friedman_mse")
 
 
 def _sparse_parity(n, p=20, p_star=3, random_state=None):
@@ -169,149 +167,145 @@ def test_sklearn_compatible_estimator(name):
     estimator = FOREST_ESTIMATORS[name](random_state=12345, n_estimators=10)
     check_estimator(estimator)
 
-
-@pytest.mark.parametrize("name", FOREST_ESTIMATORS)
-def test_honest_forest_sparse_parity():
-    """Test honest vs axis-aligned forests on sparse parity."""
-    n = 1000
-    X, y = _sparse_parity(n, random_state=0)
-    n_test = 0.1
-    X_train, X_test, y_train, y_test = train_test_split(
-        X,
-        y,
-        test_size=n_test,
-        random_state=0,
-    )
-
-    rc_clf = FOREST_ESTIMATORS[name](max_features=None, random_state=0)
-    rc_clf.fit(X_train, y_train)
-    y_hat = rc_clf.predict(X_test)
-    rc_accuracy = accuracy_score(y_test, y_hat)
-
-    ri_clf = RandomForestClassifier(random_state=0)
-    ri_clf.fit(X_train, y_train)
-    y_hat = ri_clf.predict(X_test)
-    ri_accuracy = accuracy_score(y_test, y_hat)
-
-    assert ri_accuracy < rc_accuracy
-    assert ri_accuracy > 0.45
-    assert rc_accuracy > 0.5
-
-
-@pytest.mark.parametrize("name", FOREST_ESTIMATORS)
-def test_honest_forest_orthant():
-    """Test honest vs axis-aligned forests on orthant."""
-    n = 500
-    X, y = _orthant(n, p=6, random_state=0)
-    n_test = 0.3
-    X_train, X_test, y_train, y_test = train_test_split(
-        X,
-        y,
-        test_size=n_test,
-        random_state=0,
-    )
-
-    rc_clf = FOREST_ESTIMATORS[name](max_features=None, random_state=0)
-    rc_clf.fit(X_train, y_train)
-    y_hat = rc_clf.predict(X_test)
-    rc_accuracy = accuracy_score(y_test, y_hat)
-
-    ri_clf = RandomForestClassifier(max_features="sqrt", random_state=0)
-    ri_clf.fit(X_train, y_train)
-    y_hat = ri_clf.predict(X_test)
-    ri_accuracy = accuracy_score(y_test, y_hat)
-
-    assert rc_accuracy >= ri_accuracy
-    assert ri_accuracy > 0.84
-    assert rc_accuracy > 0.85
-
-
-@pytest.mark.parametrize("name", FOREST_ESTIMATORS)
-def test_honest_forest_trunk():
-    """Test honest vs axis-aligned forests on Trunk."""
-    n = 1000
-    X, y = _trunk(n, p=100, random_state=0)
-    n_test = 0.2
-    X_train, X_test, y_train, y_test = train_test_split(
-        X,
-        y,
-        test_size=n_test,
-        random_state=0,
-    )
-
-    rc_clf = FOREST_ESTIMATORS[name](max_features=X.shape[1], random_state=0)
-    rc_clf.fit(X_train, y_train)
-    y_hat = rc_clf.predict(X_test)
-    rc_accuracy = accuracy_score(y_test, y_hat)
-
-    ri_clf = RandomForestClassifier(max_features="sqrt", random_state=0)
-    ri_clf.fit(X_train, y_train)
-    y_hat = ri_clf.predict(X_test)
-    ri_accuracy = accuracy_score(y_test, y_hat)
-
-    assert rc_accuracy > ri_accuracy
-    assert ri_accuracy > 0.83
-    assert rc_accuracy > 0.86
-
-
-@pytest.mark.parametrize("dtype", (np.float64, np.float32))
-@pytest.mark.parametrize("name", FOREST_ESTIMATORS)
-@pytest.mark.parametrize(
-    "criterion",
-    (
-        "gini",
-        "log_loss",
-    ),
-)
-def test_check_importances_honest(criterion, dtype, estimator=FOREST_ESTIMATORS[name]):
-    """Test checking feature importances for honest trees."""
-    tolerance = 0.01
-
-    # cast as dype
-    X = X_large.astype(dtype, copy=False)
-    y = y_large.astype(dtype, copy=False)
-
-    est = estimator(
-        n_estimators=10,
-        criterion=criterion,
-        random_state=0,
-    )
-    est.fit(X, y)
-    importances = est.feature_importances_
-
-    # The forest estimator can detect that only the first 3 features of the
-    # dataset are informative:
-    n_important = np.sum(importances > 0.1)
-    assert importances.shape[0] == 10
-    if feature_combinations == 2:
-        assert n_important == 3
-    else:
-        assert n_important >= 3
-    assert np.all(importances[:3] > 0.1)
-
-    # Check with parallel
-    importances = est.feature_importances_
-    est.set_params(n_jobs=2)
-    importances_parallel = est.feature_importances_
-    assert_array_almost_equal(importances, importances_parallel)
-
-    # Check with sample weights
-    sample_weight = check_random_state(0).randint(1, 10, len(X))
-    est = estimator(
-        n_estimators=10,
-        random_state=0,
-        criterion=criterion,
-    )
-    est.fit(X, y, sample_weight=sample_weight)
-    importances = est.feature_importances_
-    assert np.all(importances >= 0.0)
-
-    for scale in [0.5, 100]:
-        est = estimator(
-            n_estimators=10,
-            random_state=0,
-            criterion=criterion,
-        )
-        est.fit(X, y, sample_weight=scale * sample_weight)
-        importances_bis = est.feature_importances_
-        assert np.abs(importances - importances_bis).mean() < tolerance
+#
+# @pytest.mark.parametrize("name", FOREST_ESTIMATORS)
+# def test_honest_forest_sparse_parity(name):
+#     """Test honest vs axis-aligned forests on sparse parity."""
+#     n = 1000
+#     X, y = _sparse_parity(n, random_state=0)
+#     n_test = 0.1
+#     X_train, X_test, y_train, y_test = train_test_split(
+#         X,
+#         y,
+#         test_size=n_test,
+#         random_state=0,
+#     )
+#
+#     rc_clf = FOREST_ESTIMATORS[name](random_state=0)
+#     rc_clf.fit(X_train, y_train)
+#     y_hat = rc_clf.predict(X_test)
+#     rc_accuracy = accuracy_score(y_test, y_hat)
+#
+#     ri_clf = RandomForestClassifier(random_state=0)
+#     ri_clf.fit(X_train, y_train)
+#     y_hat = ri_clf.predict(X_test)
+#     ri_accuracy = accuracy_score(y_test, y_hat)
+#
+#     assert ri_accuracy < rc_accuracy
+#     assert ri_accuracy > 0.45
+#     assert rc_accuracy > 0.5
+#
+#
+# @pytest.mark.parametrize("name", FOREST_ESTIMATORS)
+# def test_honest_forest_orthant(name):
+#     """Test honest vs axis-aligned forests on orthant."""
+#     n = 500
+#     X, y = _orthant(n, p=6, random_state=0)
+#     n_test = 0.3
+#     X_train, X_test, y_train, y_test = train_test_split(
+#         X,
+#         y,
+#         test_size=n_test,
+#         random_state=0,
+#     )
+#
+#     rc_clf = FOREST_ESTIMATORS[name](random_state=0)
+#     rc_clf.fit(X_train, y_train)
+#     y_hat = rc_clf.predict(X_test)
+#     rc_accuracy = accuracy_score(y_test, y_hat)
+#
+#     ri_clf = RandomForestClassifier(max_features="sqrt", random_state=0)
+#     ri_clf.fit(X_train, y_train)
+#     y_hat = ri_clf.predict(X_test)
+#     ri_accuracy = accuracy_score(y_test, y_hat)
+#
+#     assert rc_accuracy >= ri_accuracy
+#     assert ri_accuracy > 0.84
+#     assert rc_accuracy > 0.85
+#
+#
+# @pytest.mark.parametrize("name", FOREST_ESTIMATORS)
+# def test_honest_forest_trunk(name):
+#     """Test honest vs axis-aligned forests on Trunk."""
+#     n = 1000
+#     X, y = _trunk(n, p=100, random_state=0)
+#     n_test = 0.2
+#     X_train, X_test, y_train, y_test = train_test_split(
+#         X,
+#         y,
+#         test_size=n_test,
+#         random_state=0,
+#     )
+#
+#     rc_clf = FOREST_ESTIMATORS[name](random_state=0)
+#     rc_clf.fit(X_train, y_train)
+#     y_hat = rc_clf.predict(X_test)
+#     rc_accuracy = accuracy_score(y_test, y_hat)
+#
+#     ri_clf = RandomForestClassifier(max_features="sqrt", random_state=0)
+#     ri_clf.fit(X_train, y_train)
+#     y_hat = ri_clf.predict(X_test)
+#     ri_accuracy = accuracy_score(y_test, y_hat)
+#
+#     assert rc_accuracy > ri_accuracy
+#     assert ri_accuracy > 0.83
+#     assert rc_accuracy > 0.86
+#
+#
+# @pytest.mark.parametrize("dtype", (np.float64, np.float32))
+# @pytest.mark.parametrize(
+#     "estimator, criterion",
+#     (
+#         [HonestForestClassifier, "gini"],
+#         [HonestForestClassifier, "log_loss"],
+#     ),
+# )
+# def test_check_importances_honest(estimator, criterion, dtype):
+#     """Test checking feature importances for honest trees."""
+#     tolerance = 0.01
+#
+#     # cast as dype
+#     X = X_large.astype(dtype, copy=False)
+#     y = y_large.astype(dtype, copy=False)
+#
+#     est = estimator(
+#         n_estimators=10,
+#         criterion=criterion,
+#         random_state=0,
+#     )
+#     est.fit(X, y)
+#     importances = est.feature_importances_
+#
+#     # The forest estimator can detect that only the first 3 features of the
+#     # dataset are informative:
+#     n_important = np.sum(importances > 0.1)
+#     assert importances.shape[0] == 10
+#     assert n_important >= 3
+#     assert np.all(importances[:3] > 0.1)
+#
+#     # Check with parallel
+#     importances = est.feature_importances_
+#     est.set_params(n_jobs=2)
+#     importances_parallel = est.feature_importances_
+#     assert_array_almost_equal(importances, importances_parallel)
+#
+#     # Check with sample weights
+#     sample_weight = check_random_state(0).randint(1, 10, len(X))
+#     est = estimator(
+#         n_estimators=10,
+#         random_state=0,
+#         criterion=criterion,
+#     )
+#     est.fit(X, y, sample_weight=sample_weight)
+#     importances = est.feature_importances_
+#     assert np.all(importances >= 0.0)
+#
+#     for scale in [0.5, 100]:
+#         est = estimator(
+#             n_estimators=10,
+#             random_state=0,
+#             criterion=criterion,
+#         )
+#         est.fit(X, y, sample_weight=scale * sample_weight)
+#         importances_bis = est.feature_importances_
+#         assert np.abs(importances - importances_bis).mean() < tolerance

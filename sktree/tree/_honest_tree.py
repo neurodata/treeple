@@ -1,4 +1,4 @@
-# Authors: Ronan Perry, Sambit Panda
+# Authors: Ronan Perry, Sambit Panda, Haoyin Xu
 # Adopted from: https://github.com/neurodata/honest-forests
 
 import numpy as np
@@ -11,14 +11,124 @@ from sklearn_fork.utils.validation import check_is_fitted
 
 class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
     """
-    A deecision tree classifier with honest predictions.
+    A decision tree classifier with honest predictions.
 
     Parameters
     ----------
-    estimator : object, default=None
-        Instatiated tree of type BaseDecisionTree.
-        If None, then DecisionTreeClassifier with default parameters will
-        be used.
+    criterion : {"gini", "entropy"}, default="gini"
+        The function to measure the quality of a split. Supported criteria are
+        "gini" for the Gini impurity and "entropy" for the information gain.
+
+    splitter : {"best", "random"}, default="best"
+        The strategy used to choose the split at each node. Supported
+        strategies are "best" to choose the best split and "random" to choose
+        the best random split.
+
+    max_depth : int, default=None
+        The maximum depth of the tree. If None, then nodes are expanded until
+        all leaves are pure or until all leaves contain less than
+        min_samples_split samples.
+
+    min_samples_split : int or float, default=2
+        The minimum number of samples required to split an internal node:
+
+        - If int, then consider `min_samples_split` as the minimum number.
+        - If float, then `min_samples_split` is a fraction and
+          `ceil(min_samples_split * n_samples)` are the minimum
+          number of samples for each split.
+
+    min_samples_leaf : int or float, default=1
+        The minimum number of samples required to be at a leaf node.
+        A split point at any depth will only be considered if it leaves at
+        least ``min_samples_leaf`` training samples in each of the left and
+        right branches.  This may have the effect of smoothing the model,
+        especially in regression.
+
+        - If int, then consider `min_samples_leaf` as the minimum number.
+        - If float, then `min_samples_leaf` is a fraction and
+          `ceil(min_samples_leaf * n_samples)` are the minimum
+          number of samples for each node.
+
+    min_weight_fraction_leaf : float, default=0.0
+        The minimum weighted fraction of the sum total of weights (of all
+        the input samples) required to be at a leaf node. Samples have
+        equal weight when sample_weight is not provided.
+
+    max_features : int, float or {"auto", "sqrt", "log2"}, default=None
+        The number of features to consider when looking for the best split:
+
+            - If int, then consider `max_features` features at each split.
+            - If float, then `max_features` is a fraction and
+              `int(max_features * n_features)` features are considered at each
+              split.
+            - If "auto", then `max_features=sqrt(n_features)`.
+            - If "sqrt", then `max_features=sqrt(n_features)`.
+            - If "log2", then `max_features=log2(n_features)`.
+            - If None, then `max_features=n_features`.
+
+        Note: the search for a split does not stop until at least one
+        valid partition of the node samples is found, even if it requires to
+        effectively inspect more than ``max_features`` features.
+
+    random_state : int, RandomState instance or None, default=None
+        Controls the randomness of the estimator. The features are always
+        randomly permuted at each split, even if ``splitter`` is set to
+        ``"best"``. When ``max_features < n_features``, the algorithm will
+        select ``max_features`` at random at each split before finding the best
+        split among them. But the best found split may vary across different
+        runs, even if ``max_features=n_features``. That is the case, if the
+        improvement of the criterion is identical for several splits and one
+        split has to be selected at random. To obtain a deterministic behaviour
+        during fitting, ``random_state`` has to be fixed to an integer.
+        See :term:`Glossary <random_state>` for details.
+
+    max_leaf_nodes : int, default=None
+        Grow a tree with ``max_leaf_nodes`` in best-first fashion.
+        Best nodes are defined as relative reduction in impurity.
+        If None then unlimited number of leaf nodes.
+
+    min_impurity_decrease : float, default=0.0
+        A node will be split if this split induces a decrease of the impurity
+        greater than or equal to this value.
+
+        The weighted impurity decrease equation is the following::
+
+            N_t / N * (impurity - N_t_R / N_t * right_impurity
+                                - N_t_L / N_t * left_impurity)
+
+        where ``N`` is the total number of samples, ``N_t`` is the number of
+        samples at the current node, ``N_t_L`` is the number of samples in the
+        left child, and ``N_t_R`` is the number of samples in the right child.
+
+        ``N``, ``N_t``, ``N_t_R`` and ``N_t_L`` all refer to the weighted sum,
+        if ``sample_weight`` is passed.
+
+    class_weight : dict, list of dict or "balanced", default=None
+        Weights associated with classes in the form ``{class_label: weight}``.
+        If None, all classes are supposed to have weight one. For
+        multi-output problems, a list of dicts can be provided in the same
+        order as the columns of y.
+
+        Note that for multioutput (including multilabel) weights should be
+        defined for each class of every column in its own dict. For example,
+        for four-class multilabel classification weights should be
+        [{0: 1, 1: 1}, {0: 1, 1: 5}, {0: 1, 1: 1}, {0: 1, 1: 1}] instead of
+        [{1:1}, {2:5}, {3:1}, {4:1}].
+
+        The "balanced" mode uses the values of y to automatically adjust
+        weights inversely proportional to class frequencies in the input data
+        as ``n_samples / (n_classes * np.bincount(y))``
+
+        For multi-output, the weights of each column of y will be multiplied.
+
+        Note that these weights will be multiplied with sample_weight (passed
+        through the fit method) if sample_weight is specified.
+
+    ccp_alpha : non-negative float, default=0.0
+        Complexity parameter used for Minimal Cost-Complexity Pruning. The
+        subtree with the largest cost complexity that is smaller than
+        ``ccp_alpha`` will be chosen. By default, no pruning is performed. See
+        :ref:`minimal_cost_complexity_pruning` for details.
 
     honest_fraction : float, default=0.5
         Fraction of training samples used for estimates in the leaves. The
@@ -31,6 +141,11 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
         If "uniform", the prior tree posterior is 1/(number of
         classes). If "empirical", the prior tree posterior is the relative
         class frequency in the voting subsample.
+
+    estimator : object, default=None
+        Instatiated tree of type BaseDecisionTree.
+        If None, then DecisionTreeClassifier with default parameters will
+        be used.
 
     Attributes
     ----------
@@ -132,13 +247,35 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
 
     def __init__(
         self,
+        criterion="gini",
+        splitter="best",
+        max_depth=None,
+        min_samples_split=2,
+        min_samples_leaf=1,
+        min_weight_fraction_leaf=0.0,
+        max_features=None,
+        random_state=None,
+        max_leaf_nodes=None,
+        min_impurity_decrease=0.0,
+        class_weight=None,
+        ccp_alpha=0.0,
         estimator=None,
         honest_fraction=0.5,
         honest_prior="empirical",
     ):
-        if not estimator:
-            self.estimator_ = DecisionTreeClassifier()
-        self.estimator_ = estimator
+        self.estimator = estimator
+        self.criterion = criterion
+        self.splitter = splitter
+        self.max_depth = max_depth
+        self.min_samples_split = min_samples_split
+        self.min_samples_leaf = min_samples_leaf
+        self.min_weight_fraction_leaf = min_weight_fraction_leaf
+        self.max_features = max_features
+        self.max_leaf_nodes = max_leaf_nodes
+        self.class_weight = class_weight
+        self.random_state = random_state
+        self.min_impurity_decrease = min_impurity_decrease
+        self.ccp_alpha = ccp_alpha
         self.honest_fraction = honest_fraction
         self.honest_prior = honest_prior
 
@@ -186,13 +323,29 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
 
         sample_weight[self.honest_indices_] = 0
 
+        if not self.estimator:
+            self.estimator = DecisionTreeClassifier(
+                criterion=self.criterion,
+                splitter=self.splitter,
+                max_depth=self.max_depth,
+                min_samples_split=self.min_samples_split,
+                min_samples_leaf=self.min_samples_leaf,
+                min_weight_fraction_leaf=self.min_weight_fraction_leaf,
+                max_features=self.max_features,
+                max_leaf_nodes=self.max_leaf_nodes,
+                class_weight=self.class_weight,
+                random_state=self.random_state,
+                min_impurity_decrease=self.min_impurity_decrease,
+                ccp_alpha=self.ccp_alpha,
+            )
         # Learn structure on subsample
-        self.estimator_.fit(
+        self.estimator.fit(
             X,
             y,
             sample_weight=sample_weight,
             check_input=check_input,
         )
+        self._inherit_estimator_attributes()
 
         if self.n_outputs_ > 1:
             raise NotImplementedError(
@@ -208,7 +361,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
         check_classification_targets(y)
         y = np.copy(y).astype(int)
         # Normally called by super
-        X = self.estimator_._validate_X_predict(X, True)
+        X = self.estimator._validate_X_predict(X, True)
         # Fit leaves using other subsample
         honest_leaves = self.tree_.apply(X[self.honest_indices_])
 
@@ -250,14 +403,12 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
 
     def _inherit_estimator_attributes(self):
         """Initialize necessary attributes from the provided estimator"""
-        self.classes_ = self.estimator_.classes_
-        self.feature_importances_ = self.estimator_.feature_importances_
-        self.max_features_ = self.estimator_.max_features_
-        self.n_classes_ = self.estimator_.n_classes_
-        self.n_features_in_ = self.estimator_.n_features_in_
-        self.feature_names_in_ = self.estimator_.feature_names_in_
-        self.n_outputs_ = self.estimator_.n_outputs_
-        self.tree_ = self.estimator_.tree_
+        self.classes_ = self.estimator.classes_
+        self.max_features_ = self.estimator.max_features_
+        self.n_classes_ = self.estimator.n_classes_
+        self.n_features_in_ = self.estimator.n_features_in_
+        self.n_outputs_ = self.estimator.n_outputs_
+        self.tree_ = self.estimator.tree_
 
     def _empty_leaf_correction(self, proba, normalizer):
         """Leaves with empty posteriors are assigned values"""
@@ -307,7 +458,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
             classes corresponds to that in the attribute :term:`classes_`.
         """
         check_is_fitted(self)
-        X = self.estimator_._validate_X_predict(X, check_input)
+        X = self.estimator._validate_X_predict(X, check_input)
         proba = self.tree_.predict(X)
 
         if self.n_outputs_ == 1:

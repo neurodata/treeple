@@ -10,7 +10,7 @@ from sklearn.utils.validation import check_random_state
 from sklearn_fork.ensemble import RandomForestClassifier
 from sklearn_fork.utils.estimator_checks import check_estimator
 
-from sktree import (
+from sktree.ensemble import (
     ObliqueRandomForestClassifier,
     ObliqueRandomForestRegressor,
     PatchObliqueRandomForestClassifier,
