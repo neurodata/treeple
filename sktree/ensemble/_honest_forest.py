@@ -1,31 +1,22 @@
-"""Module for forest-based estimators"""
+"""Module for honest forest estimators"""
 # Authors: Ronan Perry
-# Adopted from: https://github.com/rflperry/ProgLearn/blob/UF/
-# License: MIT
-# and https://github.com/scikit-learn/scikit-learn/
-# License: BSD 3 clause
+# Adopted from: https://github.com/neurodata/honest-forests
 
 import numpy as np
-from sklearn.utils.validation import check_X_y
-from sklearn.ensemble._forest import ForestClassifier
-from sklearn.ensemble import DecisionTreeClassifier
-from sktree.tree import HonestTreeClassifier
-from sklearn.utils.validation import check_is_fitted
+from sklearn_fork.utils.validation import check_X_y
+from sklearn_fork.ensemble._forest import ForestClassifier
+from sklearn_fork.tree import DecisionTreeClassifier
+from sklearn_fork.utils.validation import check_is_fitted
+from sklearn_fork.ensemble._base import _partition_estimators
 from joblib import Parallel, delayed
-from sklearn.ensemble._base import _partition_estimators
 import threading
+
+from ..tree import HonestTreeClassifier
 
 
 class HonestForestClassifier(ForestClassifier):
     """
-    A random forest classifier with honest leaf estimates.
-
-    A random forest is a meta estimator that fits a number of decision tree
-    classifiers on various sub-samples of the dataset and uses averaging to
-    improve the predictive accuracy and control over-fitting.
-    The sub-sample size is controlled with the `max_samples` parameter if
-    `bootstrap=True` (default), otherwise the whole dataset is used to build
-    each tree.
+    A forest classifier with honest leaf estimates.
 
     Parameters
     ----------
@@ -66,18 +57,12 @@ class HonestForestClassifier(ForestClassifier):
     n_features_ : int
         The number of features when ``fit`` is performed.
 
-        .. deprecated:: 1.0
-            Attribute `n_features_` was deprecated in version 1.0 and will be
-            removed in 1.2. Use `n_features_in_` instead.
-
     n_features_in_ : int
         Number of features seen during :term:`fit`.
 
     feature_names_in_ : ndarray of shape (`n_features_in_`,)
         Names of features seen during :term:`fit`. Defined only when `X`
         has feature names that are all strings.
-
-        .. versionadded:: 1.0
 
     n_outputs_ : int
         The number of outputs when ``fit`` is performed.
@@ -132,6 +117,14 @@ class HonestForestClassifier(ForestClassifier):
     of the criterion is identical for several splits enumerated during the
     search of the best split. To obtain a deterministic behaviour during
     fitting, ``random_state`` has to be fixed.
+
+    Honesty is a feature of trees that enables unbiased estimates of confidence
+    intervals. The default implementation here is using double sampling to
+    implement honesty. The amount of samples used for learning split nodes vs
+    leaf nodes is controlled by the ``honest_fraction`` parameter. This forest
+    classifier is a "meta-estimator" because any tree model can be used in the
+    classification process, while enabling honesty separates the data used for
+    split and leaf nodes.
 
     References
     ----------
@@ -195,9 +188,7 @@ class HonestForestClassifier(ForestClassifier):
         """
         super().fit(X, y, sample_weight)
         classes_k, y_encoded = np.unique(y, return_inverse=True)
-        self.empirical_prior_ = np.bincount(
-            y_encoded, minlength=classes_k.shape[0]
-        ) / len(y)
+        self.empirical_prior_ = np.bincount(y_encoded, minlength=classes_k.shape[0]) / len(y)
 
         # Compute honest decision function
         self.honest_decision_function_ = self._predict_proba(
@@ -240,11 +231,7 @@ class HonestForestClassifier(ForestClassifier):
 
         if indices is None:
             indices = [None] * self.n_estimators
-        Parallel(
-            n_jobs=n_jobs,
-            verbose=self.verbose,
-            require="sharedmem"
-        )(
+        Parallel(n_jobs=n_jobs, verbose=self.verbose, require="sharedmem")(
             delayed(_accumulate_prediction)(tree, X, posteriors, lock, idx)
             for tree, idx in zip(self.estimators_, indices)
         )
@@ -272,15 +259,15 @@ class HonestForestClassifier(ForestClassifier):
 
 def _accumulate_prediction(tree, X, out, lock, indices=None):
     """
-    See https://github.com/scikit-learn/scikit-learn/blob/95119c13af77c76e150b753485c662b7c52a41a2/sklearn/ensemble/_forest.py#L460
+    See https://github.com/scikit-learn/scikit-learn/blob/
+    95119c13af77c76e150b753485c662b7c52a41a2/sklearn/ensemble/_forest.py#L460
     This is a utility function for joblib's Parallel.
-    It can't go locally in ForestClassifier or ForestRegressor, because joblib
-    complains that it cannot pickle it when placed there.
+    It cannot be placed in ForestClassifier or ForestRegressor due to joblib's
+    compatibility issue with pickle.
     """
 
     if indices is None:
         indices = np.arange(X.shape[0])
-    # predict = DecisionTreeClassifier.tree_.predict
     proba = tree.tree_.predict(X[indices])
     proba = proba[:, : tree._tree_n_classes_]
     normalizer = proba.sum(axis=1)[:, np.newaxis]

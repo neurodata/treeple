@@ -1,17 +1,13 @@
 """Module for tree-based estimators"""
 # Authors: Ronan Perry, Sambit Panda
-# Adopted from: https://github.com/rflperry/ProgLearn/blob/UF/
-# License: MIT
-# and https://github.com/scikit-learn/scikit-learn/
-# License: BSD 3 clause
+# Adopted from: https://github.com/neurodata/honest-forests
 
 import numpy as np
-from sklearn.base import MetaEstimatorMixin
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.tree._classes import BaseDecisionTree
-from sklearn.utils.validation import check_is_fitted
-from sklearn.utils.validation import check_X_y
-from sklearn.utils.multiclass import check_classification_targets
+from sklearn_fork.base import MetaEstimatorMixin
+from sklearn_fork.tree import DecisionTreeClassifier
+from sklearn_fork.tree._classes import BaseDecisionTree
+from sklearn_fork.utils.validation import check_is_fitted
+from sklearn_fork.utils.multiclass import check_classification_targets
 
 
 class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
@@ -69,13 +65,9 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
     n_features_in_ : int
         Number of features seen during :term:`fit`.
 
-        .. versionadded:: 0.24
-
     feature_names_in_ : ndarray of shape (`n_features_in_`,)
         Names of features seen during :term:`fit`. Defined only when `X`
         has feature names that are all strings.
-
-        .. versionadded:: 1.0
 
     n_outputs_ : int
         The number of outputs when ``fit`` is performed.
@@ -180,10 +172,6 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
         self : HonestTreeClassifier
             Fitted estimator.
         """
-        if check_input:
-            X, y = check_X_y(X, y)
-        self._inherit_estimator_attributes()
-
         # Account for bootstrapping too
         if sample_weight is None:
             sample_weight = np.ones((X.shape[0],), dtype=np.float64)
@@ -214,7 +202,6 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
             )
 
         # update the number of classes, unsplit
-        # self.n_samples_, self.n_features_in_ = X.shape
         if y.ndim == 1:
             # reshape is necessary to preserve the data contiguity against vs
             # [:, np.newaxis] that does not.
@@ -263,9 +250,9 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
         self.classes_ = self.estimator_.classes_
         self.feature_importances_ = self.estimator_.feature_importances_
         self.max_features_ = self.estimator_.max_features_
-        self.n_classes_ =self.estimator_.n_classes_
-        self.n_features_in_ =self.estimator_.n_features_in_
-        self.feature_names_in_ =self.estimator_.feature_names_in_
+        self.n_classes_ = self.estimator_.n_classes_
+        self.n_features_in_ = self.estimator_.n_features_in_
+        self.feature_names_in_ = self.estimator_.feature_names_in_
         self.n_outputs_ = self.estimator_.n_outputs_
         self.tree_ = self.estimator_.tree_
 
