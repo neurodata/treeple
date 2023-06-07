@@ -8,8 +8,8 @@ from joblib import Parallel, delayed
 from sklearn_fork.ensemble._base import _partition_estimators
 from sklearn_fork.ensemble._forest import ForestClassifier
 from sklearn_fork.tree import DecisionTreeClassifier
-from sklearn_fork.utils.validation import check_is_fitted, check_X_y
 from sklearn_fork.utils.multiclass import check_classification_targets
+from sklearn_fork.utils.validation import check_is_fitted, check_X_y
 
 from ..tree import HonestTreeClassifier
 
@@ -367,7 +367,7 @@ class HonestForestClassifier(ForestClassifier):
         self.honest_fraction = honest_fraction
         self.honest_prior = honest_prior
 
-    def fit(self, X, y, sample_weight=None):
+    def fit(self, X, y, sample_weight=None, check_input=True):
         """
         Build a forest of trees from the training set (X, y).
 
@@ -389,17 +389,22 @@ class HonestForestClassifier(ForestClassifier):
             classification, splits are also ignored if they would result in any
             single class carrying a negative weight in either child node.
 
+        check_input : bool, default=True
+            Allow to bypass several input checking.
+            Don't use this parameter unless you know what you do.
+
         Returns
         -------
-        self : object
+        self : HonestForestClassifier
             Fitted estimator.
         """
-        X, y = check_X_y(X, y)
+        if check_input:
+            X, y = check_X_y(X, y)
 
         # Account for bootstrapping too
         if sample_weight is None:
             sample_weight = np.ones((X.shape[0],), dtype=np.float64)
-        super().fit(X, y, sample_weight)
+        super().fit(X, y, sample_weight, check_input)
         classes_k, y_encoded = np.unique(y, return_inverse=True)
         self.empirical_prior_ = np.bincount(y_encoded, minlength=classes_k.shape[0]) / len(y)
 
