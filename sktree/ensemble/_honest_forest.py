@@ -7,8 +7,6 @@ import numpy as np
 from joblib import Parallel, delayed
 from sklearn_fork.ensemble._base import _partition_estimators
 from sklearn_fork.ensemble._forest import ForestClassifier
-from sklearn_fork.tree import DecisionTreeClassifier
-from sklearn_fork.utils.multiclass import check_classification_targets
 from sklearn_fork.utils.validation import check_is_fitted, check_X_y
 
 from ..tree import HonestTreeClassifier
@@ -187,10 +185,8 @@ class HonestForestClassifier(ForestClassifier):
         Whether to use the honest samples to make estimate on the training
         data.
 
-    estimator : object, default=None
+    estimator : object, default=HonestTreeClassifier
         Instatiated tree of type BaseDecisionTree.
-        If None, then DecisionTreeClassifier with default parameters will
-        be used.
 
     Attributes
     ----------
@@ -324,7 +320,7 @@ class HonestForestClassifier(ForestClassifier):
         ccp_alpha=0.0,
         max_samples=None,
         honest_prior="empirical",
-        honest_fraction=0.5,
+        honest_fraction=0,
         estimator=HonestTreeClassifier(),
     ):
         super().__init__(
@@ -367,7 +363,7 @@ class HonestForestClassifier(ForestClassifier):
         self.honest_fraction = honest_fraction
         self.honest_prior = honest_prior
 
-    def fit(self, X, y, sample_weight=None, check_input=True):
+    def fit(self, X, y, sample_weight=None):
         """
         Build a forest of trees from the training set (X, y).
 
@@ -398,13 +394,12 @@ class HonestForestClassifier(ForestClassifier):
         self : HonestForestClassifier
             Fitted estimator.
         """
-        if check_input:
-            X, y = check_X_y(X, y)
+        X, y = check_X_y(X, y)
 
         # Account for bootstrapping too
         if sample_weight is None:
             sample_weight = np.ones((X.shape[0],), dtype=np.float64)
-        super().fit(X, y, sample_weight, check_input)
+        super().fit(X, y, sample_weight)
         classes_k, y_encoded = np.unique(y, return_inverse=True)
         self.empirical_prior_ = np.bincount(y_encoded, minlength=classes_k.shape[0]) / len(y)
 
