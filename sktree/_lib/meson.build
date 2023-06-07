@@ -15,19 +15,19 @@ py3.install_sources(
 
 # install tree/ submodule
 extensions = [
+  '_utils',
   '_splitter',
   '_tree',
   '_criterion',
-  '_utils',
 ]
 
 foreach ext: extensions
   py3.extension_module(ext,
     cython_gen_cpp.process('./sklearn/sklearn/tree/' + ext + '.pyx'),
     c_args: cython_c_args,
-    include_directories: [incdir_numpy, ],
+    include_directories: [incdir_numpy,],
     install: true,
-    subdir: './sklearn/sklearn/tree',
+    subdir: 'sktree/_lib/sklearn/tree/',
   )
 endforeach
 
@@ -37,7 +37,7 @@ python_sources = [
 foreach py_source: python_sources
   py3.install_sources(
     './sklearn/sklearn/tree/' + py_source,
-    subdir: './sklearn/sklearn/tree'
+    subdir: 'sktree/_lib/sklearn/tree/'
   )
 endforeach
 
@@ -48,9 +48,6 @@ python_sources = [
 foreach py_source: python_sources
   py3.install_sources(
     './sklearn/sklearn/ensemble/' + py_source,
-    subdir: './sklearn/sklearn/ensemble'
+    subdir: 'sktree/_lib/sklearn/ensemble'
   )
 endforeach
-
-# subdir('sklearn/sklearn/tree/')
-# subdir('sklearn/sklearn/ensemble/')

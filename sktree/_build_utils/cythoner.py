@@ -28,7 +28,7 @@ def main():
             "--output-file",
             out_fname,
             "--include-dir",
-            os.getcwd(),
+            os.getcwd()
         ]
         + sys.argv[3:]
         + [in_fname],
