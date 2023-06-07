@@ -51,3 +51,18 @@ foreach py_source: python_sources
     subdir: 'sktree/_lib/sklearn/ensemble'
   )
 endforeach
+
+# install tree/ submodule
+extensions = [
+  'stuff',
+]
+
+foreach ext: extensions
+  py3.extension_module(ext,
+    cython_gen_cpp.process('./' + ext + '.pyx'),
+    c_args: cython_c_args,
+    include_directories: [incdir_numpy,],
+    install: true,
+    subdir: 'sktree/_lib/',
+  )
+endforeach
