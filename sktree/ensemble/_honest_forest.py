@@ -1,4 +1,4 @@
-# Authors: Ronan Perry, Haoyin Xu
+# Authors: Ronan Perry, Sambit Panda, Haoyin Xu
 # Adopted from: https://github.com/neurodata/honest-forests
 
 import threading

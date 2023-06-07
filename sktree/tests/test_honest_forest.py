@@ -160,6 +160,8 @@ def _trunk(n, p=10, random_state=None):
     )
     y = np.concatenate((np.zeros(int(n / 2)), np.ones(int(n / 2))))
     return X, y
+
+
 #
 #
 # @pytest.mark.parametrize("name", FOREST_ESTIMATORS)

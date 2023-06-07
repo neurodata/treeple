@@ -24,3 +24,5 @@
 .. _Jong Shin: https://github.com/jshinm
 .. _Sambit Panda: https://sampan.me
 .. _SUKI-O : https://github.com/SUKI-O
+.. _Ronan Perry : https://rflperry.github.io/
+.. _Haoyin Xu : https://github.com/PSSF23
