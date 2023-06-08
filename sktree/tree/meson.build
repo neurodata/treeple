@@ -1,8 +1,8 @@
 extensions = [
   '_sklearn_splitter',
-  # '_oblique_splitter',
-  # '_oblique_tree',
-  # '_utils',
+  '_oblique_splitter',
+  '_oblique_tree',
+  '_utils',
 ]
 
 foreach ext: extensions
@@ -29,5 +29,5 @@ py3.install_sources(
 
 # TODO: comment in if we include tests
 subdir('tests')
-# subdir('unsupervised')
-# subdir('manifold')
+subdir('unsupervised')
+subdir('manifold')

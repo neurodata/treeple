@@ -92,6 +92,7 @@ def build(ctx, meson_args, jobs=None, clean=False, verbose=False):
             "submodule",
             "update",
             "--init",
+            "--force"
         ]
     )
 
@@ -109,6 +110,13 @@ def build(ctx, meson_args, jobs=None, clean=False, verbose=False):
     # if the commit file doesn't exist or the commit hash is different, we need
     # to update our sklearn repository
     if current_hash == "" or current_hash != commit:
+        util.run(
+            [
+                "mkdir",
+                "-p",
+                './sktree/_lib/sklearn/',
+            ],
+        )
         util.run(
             [
                 "touch",

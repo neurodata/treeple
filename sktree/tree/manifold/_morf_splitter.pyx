@@ -90,9 +90,10 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         self,
         object X,
         const DOUBLE_t[:, ::1] y,
-        const DOUBLE_t[:] sample_weight
+        const DOUBLE_t[:] sample_weight,
+        const unsigned char[::1] feature_has_missing,
     ) except -1:
-        BaseObliqueSplitter.init(self, X, y, sample_weight)
+        BaseObliqueSplitter.init(self, X, y, sample_weight, feature_has_missing)
 
         return 0
 
@@ -151,17 +152,20 @@ cdef class PatchSplitter(BaseObliqueSplitter):
 
 
 cdef class BaseDensePatchSplitter(PatchSplitter):
-    cdef int init(self,
-                  object X,
-                  const DOUBLE_t[:, ::1] y,
-                  const DOUBLE_t[:] sample_weight) except -1:
+    cdef int init(
+        self,
+        object X,
+        const DOUBLE_t[:, ::1] y,
+        const DOUBLE_t[:] sample_weight,
+        const unsigned char[::1] feature_has_missing
+    ) except -1:
         """Initialize the splitter
 
         Returns -1 in case of failure to allocate memory (and raise MemoryError)
         or 0 otherwise.
         """
         # Call parent init
-        PatchSplitter.init(self, X, y, sample_weight)
+        PatchSplitter.init(self, X, y, sample_weight, feature_has_missing)
 
         self.X = X
         return 0
@@ -494,7 +498,7 @@ cdef class BestPatchSplitterTester(BestPatchSplitter):
 
         return proj_vecs
 
-    cpdef init_test(self, X, y, sample_weight):
+    cpdef init_test(self, X, y, sample_weight, feature_has_missing):
         """Initializes the state of the splitter.
 
         Used for testing purposes.
@@ -509,4 +513,4 @@ cdef class BestPatchSplitterTester(BestPatchSplitter):
         sample_weight : array-like, shape (n_samples,)
             Sample weights.
         """
-        self.init(X, y, sample_weight)
+        self.init(X, y, sample_weight, feature_has_missing)

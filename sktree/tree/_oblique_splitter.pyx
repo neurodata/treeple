@@ -368,9 +368,10 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         self,
         object X,
         const DOUBLE_t[:, ::1] y,
-        const DOUBLE_t[:] sample_weight
+        const DOUBLE_t[:] sample_weight,
+        const unsigned char[::1] feature_has_missing,
     ) except -1:
-        Splitter.init(self, X, y, sample_weight)
+        Splitter.init(self, X, y, sample_weight, feature_has_missing)
 
         self.X = X
 
