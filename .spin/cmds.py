@@ -85,16 +85,20 @@ def build(ctx, meson_args, jobs=None, clean=False, verbose=False):
     commit = ""
     current_hash = ""
 
-    # update git submodule
-    util.run(
-        [
-            "git",
-            "submodule",
-            "update",
-            "--init",
-            "--force"
-        ]
-    )
+    # if the forked folder does not exist, we will need to force update the submodule
+    if not os.path.exists("./sktree/_lib/sklearn/"):
+        # update git submodule
+        util.run(["git", "submodule", "update", "--init", "--force"])
+    else:
+        # update git submodule
+        util.run(
+            [
+                "git",
+                "submodule",
+                "update",
+                "--init",
+            ]
+        )
 
     # get the commit hash if the commmit file exists
     if os.path.exists(commit_fpath):
@@ -114,7 +118,7 @@ def build(ctx, meson_args, jobs=None, clean=False, verbose=False):
             [
                 "mkdir",
                 "-p",
-                './sktree/_lib/sklearn/',
+                "./sktree/_lib/sklearn/",
             ],
         )
         util.run(

@@ -120,11 +120,11 @@ _flake8 = 'flake8'
 _bandit = 'bandit -r sktree -c pyproject.toml'
 _black = 'black .'
 _isort = 'isort .'
-_cythonlint = 'cython-lint sktree/'
+_cythonlint = 'cython-lint sktree/ --exclude "sktree/_lib/*"'
 _black_check = 'black --check sktree examples'
 _isort_check = 'isort --check .'
 _pydocstyle = 'pydocstyle ./sktree'
-_codespell = 'codespell sktree/ doc/ examples/ --ignore-words=.codespellignore --skip "**/_build/*"'
+_codespell = 'codespell sktree/ doc/ examples/ --ignore-words=.codespellignore --skip "**/_build/*,**/_lib/*"'
 _changelog = 'semversioner changelog > CHANGELOG.md'
 _apply_version = 'semversioner release'
 
@@ -185,6 +185,9 @@ add_ignore = 'D100,D104,D105,D107'
 [tool.mypy]
 ignore_missing_imports = true
 no_site_packages = true
+exclude = [
+    'sktree/_lib/',
+]
 
 [tool.pytest.ini_options]
 minversion = '6.0'

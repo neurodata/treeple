@@ -5,13 +5,18 @@ import numpy as np
 from scipy.sparse import issparse
 from sklearn.base import ClusterMixin, TransformerMixin
 from sklearn.cluster import AgglomerativeClustering
+from sklearn.utils._param_validation import Interval
+from sklearn.utils.validation import check_is_fitted
 
-from .._lib.sklearn.tree import BaseDecisionTree, DecisionTreeClassifier#, _criterion
+from .._lib.sklearn.tree import (
+    BaseDecisionTree,
+    DecisionTreeClassifier,
+    DecisionTreeRegressor,
+    _criterion,
+)
 from .._lib.sklearn.tree import _tree as _sklearn_tree
 from .._lib.sklearn.tree._criterion import BaseCriterion
 from .._lib.sklearn.tree._tree import BestFirstTreeBuilder, DepthFirstTreeBuilder
-from sklearn.utils._param_validation import Interval
-from sklearn.utils.validation import check_is_fitted
 from . import _oblique_splitter
 from ._neighbors import SimMatrixMixin
 from ._oblique_splitter import ObliqueSplitter
@@ -203,7 +208,7 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
                 if X.indices.dtype != np.intc or X.indptr.dtype != np.intc:
                     raise ValueError("No support for np.int64 index based sparse matrices")
 
-        super().fit(X, None, sample_weight, check_input)
+        super()._fit(X=X, y=None, sample_weight=sample_weight, check_input=check_input)
 
         # apply to the leaves
         n_samples = X.shape[0]
@@ -221,6 +226,7 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
         X,
         y,
         sample_weight,
+        feature_has_missing,
         min_samples_leaf,
         min_weight_leaf,
         max_leaf_nodes,
@@ -487,6 +493,7 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
         X,
         y,
         sample_weight,
+        feature_has_missing,
         min_samples_leaf,
         min_weight_leaf,
         max_leaf_nodes,
@@ -812,6 +819,7 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         X,
         y,
         sample_weight,
+        feature_has_missing,
         min_samples_leaf,
         min_weight_leaf,
         max_leaf_nodes,
@@ -1167,6 +1175,7 @@ class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         X,
         y,
         sample_weight,
+        feature_has_missing,
         min_samples_leaf,
         min_weight_leaf,
         max_leaf_nodes,
@@ -1655,6 +1664,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
         X,
         y,
         sample_weight,
+        feature_has_missing,
         min_samples_leaf,
         min_weight_leaf,
         max_leaf_nodes,
@@ -1762,6 +1772,12 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
         if self.n_outputs_ == 1:
             self.n_classes_ = self.n_classes_[0]
             self.classes_ = self.classes_[0]
+
+    def _more_tags(self):
+        # XXX: nans should be supportable in SPORF by just using RF-like splits on missing values
+        # However, for MORF it is not supported
+        allow_nan = False
+        return {"multilabel": True, "allow_nan": allow_nan}
 
 
 class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
@@ -2123,6 +2139,7 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         X,
         y,
         sample_weight,
+        feature_has_missing,
         min_samples_leaf,
         min_weight_leaf,
         max_leaf_nodes,
@@ -2232,3 +2249,9 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
             )
 
         builder.build(self.tree_, X, y, sample_weight)
+
+    def _more_tags(self):
+        # XXX: nans should be supportable in SPORF by just using RF-like splits on missing values
+        # However, for MORF it is not supported
+        allow_nan = False
+        return {"multilabel": True, "allow_nan": allow_nan}
