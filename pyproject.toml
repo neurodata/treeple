@@ -36,7 +36,6 @@ requires = [
     "packaging",
     "Cython>=0.29.24",
     "scikit-learn",
-    "scikit-learn-tree>=1.2.3",
     "lazy_loader>=0.1",
 
     # We follow scipy for much of these pinnings
@@ -72,7 +71,7 @@ files = ["sktree/__init__.py"]
 python = ">=3.8,<3.11"
 numpy = "^1.23.0"
 scipy = "^1.9.0"
-scikit-learn-tree = "^1.2.2"
+scikit-learn = "^1.2.2"
 importlib-resources = { version = "*", python = "<3.9" }
 
 [tool.poetry.group.test]
@@ -214,7 +213,10 @@ package = 'sktree'
 [tool.spin.commands]
 Build = [
     # "spin.cmds.meson.build", 
-    "spin.cmds.meson.test"]
+    ".spin/cmds.py:build",
+    ".spin/cmds.py:setup_submodule",
+    "spin.cmds.meson.test",
+]
 Environments = [
     'spin.cmds.meson.shell',
     'spin.cmds.meson.ipython',
@@ -223,7 +225,6 @@ Environments = [
 Documentation = ['.spin/cmds.py:docs']
 Metrics = [
     '.spin/cmds.py:coverage',
-    '.spin/cmds.py:build',
 ]
 
 [tool.cython-lint]

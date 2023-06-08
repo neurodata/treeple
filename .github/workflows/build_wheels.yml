@@ -45,6 +45,12 @@ jobs:
       - uses: actions/setup-python@v4.6.1
         with:
           python-version: 3.9
+
+      - name: Setup submodule
+        run: |
+          python -m pip install -r build_requirements.txt
+          python -m pip install spin
+          ./spin setup-submodule
       
       - name: win_amd64 - install rtools
         run: |

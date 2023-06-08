@@ -58,6 +58,87 @@ def coverage():
         replace=True,
     )
 
+@click.command()
+def setup_submodule():
+    """Build scikit-tree using submodules.
+
+    git submodule update --recursive --remote
+
+    To update submodule wrt latest commits:
+
+        git submodule update --init --recursive --remote
+        git add -A
+        git commit
+
+    This will update the submodule, which then must be commited so that
+    git knows the submodule needs to be at a certain commit hash.
+    """
+    commit_fpath = "./sktree/_lib/sklearn/commit.txt"
+    submodule = "./sktree/_lib/sklearn_fork"
+    commit = ""
+    current_hash = ""
+
+    # if the forked folder does not exist, we will need to force update the submodule
+    if not os.path.exists("./sktree/_lib/sklearn/"):
+        # update git submodule
+        util.run(["git", "submodule", "update", "--init", "--force"])
+    else:
+        # update git submodule
+        util.run(
+            [
+                "git",
+                "submodule",
+                "update",
+                "--init",
+            ]
+        )
+
+    # get the commit hash if the commmit file exists
+    if os.path.exists(commit_fpath):
+        with open(commit_fpath, "r") as f:
+            commit = f.read().strip()
+
+    # get revision hash
+    current_hash = get_git_revision_hash(submodule)
+
+    print(current_hash)
+    print(commit)
+
+    # if the commit file doesn't exist or the commit hash is different, we need
+    # to update our sklearn repository
+    if current_hash == "" or current_hash != commit:
+        util.run(
+            [
+                "mkdir",
+                "-p",
+                "./sktree/_lib/sklearn/",
+            ],
+        )
+        util.run(
+            [
+                "touch",
+                commit_fpath,
+            ],
+        )
+        with open(commit_fpath, "w") as f:
+            f.write(current_hash)
+
+        util.run(
+            [
+                "rm",
+                "-rf",
+                "sktree/_lib/sklearn",
+            ]
+        )
+
+        util.run(
+            [
+                "mv",
+                "sktree/_lib/sklearn_fork/sklearn",
+                "sktree/_lib/sklearn",
+            ]
+        )
+
 
 @click.command()
 @click.option("-j", "--jobs", help="Number of parallel tasks to launch", type=int)
