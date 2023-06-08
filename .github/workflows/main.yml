@@ -98,7 +98,7 @@ jobs:
 
       - name: Setup build and install scikit-tree
         run: |
-          python spin build -j 2
+          python spin build -j 2 --forcesubmodule
 
       - name: Ccache performance
         shell: bash -l {0}
