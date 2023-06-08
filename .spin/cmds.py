@@ -133,13 +133,14 @@ def setup_submodule(forcesubmodule=False):
             ]
         )
 
-        util.run(
-            [
-                "mv",
-                "sktree/_lib/sklearn_fork/sklearn",
-                "sktree/_lib/sklearn",
-            ]
-        )
+        if os.path.exists('sktree/_lib/sklearn_fork/sklearn'):
+            util.run(
+                [
+                    "mv",
+                    "sktree/_lib/sklearn_fork/sklearn",
+                    "sktree/_lib/sklearn",
+                ]
+            )
 
 
 @click.command()

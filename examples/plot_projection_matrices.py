@@ -42,8 +42,8 @@ import matplotlib.pyplot as plt
 #           To use the actual splitter, one should use the public API for the
 #           relevant tree/forests class.
 import numpy as np
-from sklearn_fork.tree._criterion import Gini
 
+from sktree._lib.sklearn.tree._criterion import Gini
 from sktree.tree.manifold._morf_splitter import BestPatchSplitterTester
 
 # %%
