@@ -480,3 +480,28 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
                 "Multi-target honest trees not yet \
                 implemented"
             )
+
+    def predict(self, X, check_input=True):
+        """Predict class for X.
+
+        For a classification model, the predicted class for each sample in X is
+        returned.
+
+        Parameters
+        ----------
+        X : {array-like, sparse matrix} of shape (n_samples, n_features)
+            The input samples. Internally, it will be converted to
+            ``dtype=np.float32`` and if a sparse matrix is provided
+            to a sparse ``csr_matrix``.
+
+        check_input : bool, default=True
+            Allow to bypass several input checking.
+            Don't use this parameter unless you know what you're doing.
+
+        Returns
+        -------
+        y : array-like of shape (n_samples,) or (n_samples, n_outputs)
+            The predicted classes, or the predict values.
+        """
+
+        return self.estimator.predict(X, check_input)

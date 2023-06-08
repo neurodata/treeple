@@ -1,314 +1,140 @@
-# from typing import Any, Dict
-#
-# import numpy as np
-# import pytest
-# from sklearn.datasets import load_diabetes, make_classification, make_regression
-# from sklearn.metrics import accuracy_score
-# from sklearn.model_selection import train_test_split
-# from sklearn.utils._testing import assert_array_almost_equal
-# from sklearn.utils.validation import check_random_state
-# from sklearn_fork.ensemble import RandomForestClassifier
-# from sklearn_fork.utils.estimator_checks import check_estimator
-#
-# from sktree.ensemble import HonestForestClassifier
-#
-# # Larger classification sample used for testing feature importances
-# X_large, y_large = make_classification(
-#     n_samples=500,
-#     n_features=10,
-#     n_informative=3,
-#     n_redundant=0,
-#     n_repeated=0,
-#     shuffle=False,
-#     random_state=0,
-# )
-#
-# # Larger regression sample used for testing feature importances
-# X_large_reg, y_large_reg = make_regression(
-#     n_samples=500,
-#     n_features=10,
-#     n_informative=3,
-#     shuffle=False,
-#     random_state=0,
-# )
-#
-#
-# # load the diabetes dataset
-# # and randomly permute it
-# rng = np.random.RandomState(1)
-# diabetes = load_diabetes()
-# perm = rng.permutation(diabetes.target.size)
-# diabetes.data = diabetes.data[perm]
-# diabetes.target = diabetes.target[perm]
-#
-#
-# FOREST_CLASSIFIERS = {"HonestForestClassifier": HonestForestClassifier}
-#
-# FOREST_ESTIMATORS: Dict[str, Any] = dict()
-# FOREST_ESTIMATORS.update(FOREST_CLASSIFIERS)
-#
-#
-# def _sparse_parity(n, p=20, p_star=3, random_state=None):
-#     """Generate sparse parity dataset.
-#
-#     Sparse parity is a multivariate generalization of the
-#     XOR problem.
-#
-#     Parameters
-#     ----------
-#     n : int
-#         Number of sample to generate.
-#     p : int, optional
-#         The dimensionality of the dataset, by default 20
-#     p_star : int, optional
-#         The number of informative dimensions, by default 3.
-#     random_state : Random State, optional
-#         Random state, by default None.
-#
-#     Returns
-#     -------
-#     X : np.ndarray of shape (n, p)
-#         Sparse parity dataset as a dense array.
-#     y : np.ndarray of shape (n,)
-#         Labels of the dataset
-#     """
-#     rng = np.random.RandomState(seed=random_state)
-#     X = rng.uniform(-1, 1, (n, p))
-#     y = np.zeros(n)
-#
-#     for i in range(0, n):
-#         y[i] = sum(X[i, :p_star] > 0) % 2
-#
-#     return X, y
-#
-#
-# def _orthant(n, p=6, random_state=None):
-#     """Generate orthant dataset.
-#
-#     Parameters
-#     ----------
-#     n : int
-#         Number of sample to generate.
-#     p : int, optional
-#         The dimensionality of the dataset and the number of
-#         unique labels, by default 6.
-#     rec : int, optional
-#         _description_, by default 1
-#     random_state : Random State, optional
-#         Random state, by default None.
-#
-#     Returns
-#     -------
-#     X : np.ndarray of shape (n, p)
-#         Orthant dataset as a dense array.
-#     y : np.ndarray of shape (n,)
-#         Labels of the dataset
-#     """
-#     rng = np.random.RandomState(seed=random_state)
-#     orth_labels = np.asarray([2**i for i in range(0, p)][::-1])
-#
-#     X = rng.uniform(-1, 1, (n, p))
-#     y = np.zeros(n)
-#
-#     for i in range(0, n):
-#         idx = np.where(X[i, :] > 0)[0]
-#         y[i] = sum(orth_labels[idx])
-#
-#     if len(np.unique(y)) < 2**p:
-#         raise RuntimeError("Increase sample size to get a label in each orthant.")
-#
-#     return X, y
-#
-#
-# def _trunk(n, p=10, random_state=None):
-#     """Generate trunk dataset.
-#
-#     Parameters
-#     ----------
-#     n : int
-#         Number of sample to generate.
-#     p : int, optional
-#         The dimensionality of the dataset and the number of
-#         unique labels, by default 10.
-#     random_state : Random State, optional
-#         Random state, by default None.
-#
-#     Returns
-#     -------
-#     X : np.ndarray of shape (n, p)
-#         Trunk dataset as a dense array.
-#     y : np.ndarray of shape (n,)
-#         Labels of the dataset
-#
-#     References
-#     ----------
-#     [1] Gerard V. Trunk. A problem of dimensionality: A
-#     simple example. IEEE Transactions on Pattern Analysis
-#     and Machine Intelligence, 1(3):306–307, 1979.
-#     """
-#     rng = np.random.RandomState(seed=random_state)
-#
-#     mu_1 = np.array([1 / i for i in range(1, p + 1)])
-#     mu_0 = -1 * mu_1
-#     cov = np.identity(p)
-#
-#     X = np.vstack(
-#         (
-#             rng.multivariate_normal(mu_0, cov, int(n / 2)),
-#             rng.multivariate_normal(mu_1, cov, int(n / 2)),
-#         )
-#     )
-#     y = np.concatenate((np.zeros(int(n / 2)), np.ones(int(n / 2))))
-#     return X, y
-#
-#
-#
-#
-# @pytest.mark.parametrize("name", FOREST_ESTIMATORS)
-# def test_sklearn_compatible_estimator(name):
-#     estimator = FOREST_ESTIMATORS[name](random_state=12345, n_estimators=10)
-#     check_estimator(estimator)
-#
-#
-#
-# @pytest.mark.parametrize("name", FOREST_ESTIMATORS)
-# def test_honest_forest_sparse_parity(name):
-#     """Test honest vs axis-aligned forests on sparse parity."""
-#     n = 1000
-#     X, y = _sparse_parity(n, random_state=0)
-#     n_test = 0.1
-#     X_train, X_test, y_train, y_test = train_test_split(
-#         X,
-#         y,
-#         test_size=n_test,
-#         random_state=0,
-#     )
-#
-#     rc_clf = FOREST_ESTIMATORS[name](random_state=0)
-#     rc_clf.fit(X_train, y_train)
-#     y_hat = rc_clf.predict(X_test)
-#     rc_accuracy = accuracy_score(y_test, y_hat)
-#
-#     ri_clf = RandomForestClassifier(random_state=0)
-#     ri_clf.fit(X_train, y_train)
-#     y_hat = ri_clf.predict(X_test)
-#     ri_accuracy = accuracy_score(y_test, y_hat)
-#
-#     assert ri_accuracy < rc_accuracy
-#     assert ri_accuracy > 0.45
-#     assert rc_accuracy > 0.5
-#
-#
-# @pytest.mark.parametrize("name", FOREST_ESTIMATORS)
-# def test_honest_forest_orthant(name):
-#     """Test honest vs axis-aligned forests on orthant."""
-#     n = 500
-#     X, y = _orthant(n, p=6, random_state=0)
-#     n_test = 0.3
-#     X_train, X_test, y_train, y_test = train_test_split(
-#         X,
-#         y,
-#         test_size=n_test,
-#         random_state=0,
-#     )
-#
-#     rc_clf = FOREST_ESTIMATORS[name](random_state=0)
-#     rc_clf.fit(X_train, y_train)
-#     y_hat = rc_clf.predict(X_test)
-#     rc_accuracy = accuracy_score(y_test, y_hat)
-#
-#     ri_clf = RandomForestClassifier(max_features="sqrt", random_state=0)
-#     ri_clf.fit(X_train, y_train)
-#     y_hat = ri_clf.predict(X_test)
-#     ri_accuracy = accuracy_score(y_test, y_hat)
-#
-#     assert rc_accuracy >= ri_accuracy
-#     assert ri_accuracy > 0.84
-#     assert rc_accuracy > 0.85
-#
-#
-# @pytest.mark.parametrize("name", FOREST_ESTIMATORS)
-# def test_honest_forest_trunk(name):
-#     """Test honest vs axis-aligned forests on Trunk."""
-#     n = 1000
-#     X, y = _trunk(n, p=100, random_state=0)
-#     n_test = 0.2
-#     X_train, X_test, y_train, y_test = train_test_split(
-#         X,
-#         y,
-#         test_size=n_test,
-#         random_state=0,
-#     )
-#
-#     rc_clf = FOREST_ESTIMATORS[name](random_state=0)
-#     rc_clf.fit(X_train, y_train)
-#     y_hat = rc_clf.predict(X_test)
-#     rc_accuracy = accuracy_score(y_test, y_hat)
-#
-#     ri_clf = RandomForestClassifier(max_features="sqrt", random_state=0)
-#     ri_clf.fit(X_train, y_train)
-#     y_hat = ri_clf.predict(X_test)
-#     ri_accuracy = accuracy_score(y_test, y_hat)
-#
-#     assert rc_accuracy > ri_accuracy
-#     assert ri_accuracy > 0.83
-#     assert rc_accuracy > 0.86
-#
-#
-# @pytest.mark.parametrize("dtype", (np.float64, np.float32))
-# @pytest.mark.parametrize(
-#     "estimator, criterion",
-#     (
-#         [HonestForestClassifier, "gini"],
-#         [HonestForestClassifier, "log_loss"],
-#     ),
-# )
-# def test_check_importances_honest(estimator, criterion, dtype):
-#     """Test checking feature importances for honest trees."""
-#     tolerance = 0.01
-#
-#     # cast as dype
-#     X = X_large.astype(dtype, copy=False)
-#     y = y_large.astype(dtype, copy=False)
-#
-#     est = estimator(
-#         n_estimators=10,
-#         criterion=criterion,
-#         random_state=0,
-#     )
-#     est.fit(X, y)
-#     importances = est.feature_importances_
-#
-#     # The forest estimator can detect that only the first 3 features of the
-#     # dataset are informative:
-#     n_important = np.sum(importances > 0.1)
-#     assert importances.shape[0] == 10
-#     assert n_important >= 3
-#     assert np.all(importances[:3] > 0.1)
-#
-#     # Check with parallel
-#     importances = est.feature_importances_
-#     est.set_params(n_jobs=2)
-#     importances_parallel = est.feature_importances_
-#     assert_array_almost_equal(importances, importances_parallel)
-#
-#     # Check with sample weights
-#     sample_weight = check_random_state(0).randint(1, 10, len(X))
-#     est = estimator(
-#         n_estimators=10,
-#         random_state=0,
-#         criterion=criterion,
-#     )
-#     est.fit(X, y, sample_weight=sample_weight)
-#     importances = est.feature_importances_
-#     assert np.all(importances >= 0.0)
-#
-#     for scale in [0.5, 100]:
-#         est = estimator(
-#             n_estimators=10,
-#             random_state=0,
-#             criterion=criterion,
-#         )
-#         est.fit(X, y, sample_weight=scale * sample_weight)
-#         importances_bis = est.feature_importances_
-#         assert np.abs(importances - importances_bis).mean() < tolerance
+import time
+from itertools import product
+
+import numpy as np
+import pytest
+from sklearn_fork import datasets
+from sklearn_fork.metrics import accuracy_score
+
+from sktree.ensemble import HonestForestClassifier
+
+CLF_CRITERIONS = ("gini", "entropy")
+
+# also load the iris dataset
+# and randomly permute it
+iris = datasets.load_iris()
+rng = np.random.RandomState(1)
+perm = rng.permutation(iris.target.size)
+iris.data = iris.data[perm]
+iris.target = iris.target[perm]
+
+
+def test_toy_accuracy():
+    clf = HonestForestClassifier(n_estimators=10)
+    X = np.ones((20, 4))
+    X[10:] *= -1
+    y = [0] * 10 + [1] * 10
+    clf = clf.fit(X, y)
+    np.testing.assert_array_equal(clf.predict(X), y)
+
+
+@pytest.mark.parametrize("criterion", ["gini", "entropy"])
+@pytest.mark.parametrize("max_features", [None, 2])
+def test_iris(criterion, max_features):
+    # Check consistency on dataset iris.
+    clf = HonestForestClassifier(
+        criterion=criterion, random_state=0, max_features=max_features, n_estimators=10
+    )
+    clf.fit(iris.data, iris.target)
+    score = accuracy_score(clf.predict(iris.data), iris.target)
+    assert score > 0.5 and score < 1.0, "Failed with {0}, criterion = {1} and score = {2}".format(
+        "HForest", criterion, score
+    )
+
+    score = accuracy_score(clf.predict(iris.data), clf.predict_proba(iris.data).argmax(1))
+    assert score == 1.0, "Failed with {0}, criterion = {1} and score = {2}".format(
+        "HForest", criterion, score
+    )
+
+
+def test_impute_classes():
+    np.random.seed(0)
+    X = np.random.normal(0, 1, (101, 2))
+    y = [0] * 50 + [1] * 50 + [2]
+    clf = HonestForestClassifier(honest_fraction=0.02, random_state=0)
+    clf = clf.fit(X, y)
+
+    y_proba = clf.predict_proba(X)
+
+    assert y_proba.shape[1] == 3
+
+
+def test_parallel_trees():
+    uf = HonestForestClassifier(n_estimators=100, n_jobs=1, max_features=1.0, honest_fraction=0.5)
+    uf_parallel = HonestForestClassifier(
+        n_estimators=100, n_jobs=10, max_features=1.0, honest_fraction=0.5
+    )
+    X = np.random.normal(0, 1, (1000, 100))
+    y = [0, 1] * (len(X) // 2)
+
+    time_start = time.time()
+    uf.fit(X, y)
+    time_diff = time.time() - time_start
+
+    time_start = time.time()
+    uf_parallel.fit(X, y)
+    time_parallel_diff = time.time() - time_start
+    assert time_parallel_diff / time_diff < 0.9
+
+
+def test_max_samples():
+    max_samples_list = [8, 0.5, None]
+    depths = []
+    X = np.random.normal(0, 1, (100, 2))
+    X[:50] *= -1
+    y = [0, 1] * 50
+    for ms in max_samples_list:
+        uf = HonestForestClassifier(n_estimators=2, max_samples=ms, bootstrap=True)
+        uf = uf.fit(X, y)
+        depths.append(uf.estimators_[0].get_depth())
+
+    assert all(np.diff(depths) > 0)
+
+
+@pytest.mark.parametrize(
+    "honest_prior, val",
+    [
+        ("uniform", 0.5),
+        ("empirical", 0.75),
+        ("ignore", np.nan),
+    ],
+)
+def test_impute_posteriors(honest_prior, val):
+    np.random.seed(0)
+    X = np.random.normal(0, 1, (100, 2))
+    y = [0] * 75 + [1] * 25
+    clf = HonestForestClassifier(
+        honest_fraction=0.02, random_state=0, honest_prior=honest_prior, n_estimators=2
+    )
+    clf = clf.fit(X, y)
+
+    y_proba = clf.predict_proba(X)
+    if np.isnan(val):
+        assert (
+            len(np.where(np.isnan(y_proba[:, 0]))[0]) > 50
+        ), f"Failed with {honest_prior}, prior {clf.estimators_[0].empirical_prior_}"
+    else:
+        assert (
+            len(np.where(y_proba[:, 0] == val)[0]) > 50
+        ), f"Failed with {honest_prior}, prior {clf.estimators_[0].empirical_prior_}"
+
+
+@pytest.mark.parametrize(
+    "honest_fraction, val",
+    [
+        (0.8, 0.5),
+        (0.02, np.nan),
+    ],
+)
+def test_honest_decision_function(honest_fraction, val):
+    np.random.seed(0)
+    X = np.random.normal(0, 1, (100, 2))
+    y = [0] * 75 + [1] * 25
+    clf = HonestForestClassifier(honest_fraction=honest_fraction, random_state=0, n_estimators=2)
+    clf = clf.fit(X, y)
+
+    y_proba = clf.honest_decision_function_
+    if np.isnan(val):
+        assert len(np.where(np.isnan(y_proba[:, 0]))[0]) > 50, f"Failed with {honest_fraction}"
+    else:
+        assert len(np.where(y_proba[:, 1] < val)[0]) > 50, f"Failed with {honest_fraction}"
