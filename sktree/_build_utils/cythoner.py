@@ -15,10 +15,10 @@ import sys
 def main():
     in_fname, out_fname = (op.abspath(p) for p in sys.argv[1:3])
 
-    print("inside cythoner: ")
+    print("\n\ninside cythoner: ")
     print("input file: ", in_fname)
     print("output file: ", out_fname)
-    print(os.getcwd())
+    print(os.getcwd(), '\n\n')
     
     sbp.run(
         [
@@ -28,7 +28,7 @@ def main():
             "--output-file",
             out_fname,
             "--include-dir",
-            os.getcwd()
+            f'{os.getcwd()}'
         ]
         + sys.argv[3:]
         + [in_fname],

@@ -8,6 +8,8 @@ coverage
 *.xml
 .venv
 
+commit.txt
+
 # Sphinx documentation
 docs/_build/
 docs/generated/

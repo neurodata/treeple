@@ -208,7 +208,9 @@ skips = ['B404', 'B603']
 package = 'sktree'
 
 [tool.spin.commands]
-Build = ["spin.cmds.meson.build", "spin.cmds.meson.test"]
+Build = [
+    # "spin.cmds.meson.build", 
+    "spin.cmds.meson.test"]
 Environments = [
     'spin.cmds.meson.shell',
     'spin.cmds.meson.ipython',
@@ -217,6 +219,7 @@ Environments = [
 Documentation = ['.spin/cmds.py:docs']
 Metrics = [
     '.spin/cmds.py:coverage',
+    '.spin/cmds.py:build',
 ]
 
 [tool.cython-lint]

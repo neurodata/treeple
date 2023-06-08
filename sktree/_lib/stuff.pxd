@@ -1,4 +1,4 @@
-from sktree._lib._tree cimport DOUBLE_t  # Type of y, sample_weight
+from sktree._lib.sklearn.tree._tree cimport DOUBLE_t
 # from .._lib.sklearn.sklearn.tree._tree cimport DOUBLE_t  # Type of y, sample_weight
 # from .._lib.sklearn.sklearn.tree._tree cimport DTYPE_t  # Type of X
 # from .._lib.sklearn.sklearn.tree._tree cimport INT32_t  # Signed 32 bit integer
