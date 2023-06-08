@@ -385,10 +385,6 @@ class HonestForestClassifier(ForestClassifier):
             classification, splits are also ignored if they would result in any
             single class carrying a negative weight in either child node.
 
-        check_input : bool, default=True
-            Allow to bypass several input checking.
-            Don't use this parameter unless you know what you do.
-
         Returns
         -------
         self : HonestForestClassifier
