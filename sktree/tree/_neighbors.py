@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn_fork.ensemble._forest import BaseForest
+from sktree._lib.ensemble._forest import BaseForest
 
 
 def compute_forest_similarity_matrix(forest, X):

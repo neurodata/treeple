@@ -6,12 +6,12 @@ from scipy.sparse import issparse
 from sklearn.base import ClusterMixin, TransformerMixin
 from sklearn.cluster import AgglomerativeClustering
 
-from .._lib.sklearn.sklearn.tree import BaseDecisionTree, DecisionTreeClassifier, _criterion
-from .._lib.sklearn.sklearn.tree import _tree as _sklearn_tree
-from .._lib.sklearn.sklearn.tree._criterion import BaseCriterion
-from .._lib.sklearn.sklearn.tree._tree import BestFirstTreeBuilder, DepthFirstTreeBuilder
-from .._lib.sklearn.sklearn.utils._param_validation import Interval
-from .._lib.sklearn.sklearn.utils.validation import check_is_fitted
+from .._lib.sklearn.tree import BaseDecisionTree, DecisionTreeClassifier#, _criterion
+from .._lib.sklearn.tree import _tree as _sklearn_tree
+from .._lib.sklearn.tree._criterion import BaseCriterion
+from .._lib.sklearn.tree._tree import BestFirstTreeBuilder, DepthFirstTreeBuilder
+from sklearn.utils._param_validation import Interval
+from sklearn.utils.validation import check_is_fitted
 from . import _oblique_splitter
 from ._neighbors import SimMatrixMixin
 from ._oblique_splitter import ObliqueSplitter
@@ -1764,16 +1764,6 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
             self.classes_ = self.classes_[0]
 
 
-<<<<<<< HEAD
-class KernelDecisionTreeClassifier(PatchObliqueDecisionTreeClassifier):
-    """Oblique decision tree classifier over data patches combined with Gaussian kernels.
-
-    Parameters
-    ----------
-    criterion : {"gini", "entropy"}, default="gini"
-        The function to measure the quality of a split. Supported criteria are
-        "gini" for the Gini impurity and "entropy" for the information gain.
-=======
 class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
     """A oblique decision tree regressor that operates over patches of data.
 
@@ -1795,7 +1785,6 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         splits, "absolute_error" for the mean absolute error, which minimizes
         the L1 loss using the median of each terminal node, and "poisson" which
         uses reduction in Poisson deviance to find splits.
->>>>>>> main
 
     splitter : {"best", "random"}, default="best"
         The strategy used to choose the split at each node. Supported
@@ -1847,10 +1836,6 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         Note: the search for a split does not stop until at least one
         valid partition of the node samples is found, even if it requires to
         effectively inspect more than ``max_features`` features.
-<<<<<<< HEAD
-
-=======
->>>>>>> main
         Note: Compared to axis-aligned Random Forests, one can set
         max_features to a number greater then ``n_features``.
 
@@ -1887,40 +1872,6 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         ``N``, ``N_t``, ``N_t_R`` and ``N_t_L`` all refer to the weighted sum,
         if ``sample_weight`` is passed.
 
-<<<<<<< HEAD
-    class_weight : dict, list of dict or "balanced", default=None
-        Weights associated with classes in the form ``{class_label: weight}``.
-        If None, all classes are supposed to have weight one. For
-        multi-output problems, a list of dicts can be provided in the same
-        order as the columns of y.
-
-        Note that for multioutput (including multilabel) weights should be
-        defined for each class of every column in its own dict. For example,
-        for four-class multilabel classification weights should be
-        [{0: 1, 1: 1}, {0: 1, 1: 5}, {0: 1, 1: 1}, {0: 1, 1: 1}] instead of
-        [{1:1}, {2:5}, {3:1}, {4:1}].
-
-        The "balanced" mode uses the values of y to automatically adjust
-        weights inversely proportional to class frequencies in the input data
-        as ``n_samples / (n_classes * np.bincount(y))``
-
-        For multi-output, the weights of each column of y will be multiplied.
-
-        Note that these weights will be multiplied with sample_weight (passed
-        through the fit method) if sample_weight is specified.
-    min_patch_dim : array-like, optional
-        The minimum dimensions of a patch, by default 1 along all dimensions.
-    max_patch_dim : array-like, optional
-        The maximum dimensions of a patch, by default 1 along all dimensions.
-    dim_contiguous : array-like of bool, optional
-        Whether or not each patch is sampled contiguously along this dimension.
-    data_dims : array-like, optional
-        The presumed dimensions of the un-vectorized feature vector, by default
-        will be a 1D vector with (1, n_features) shape.
-    boundary : optional, str {'wrap'}
-        The boundary condition to use when sampling patches, by default None.
-        'wrap' corresponds to the boundary condition as is in numpy and scipy.
-=======
     min_patch_dims : array-like, optional
         The minimum dimensions of a patch, by default 1 along all dimensions.
 
@@ -1938,31 +1889,15 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         The boundary condition to use when sampling patches, by default None.
         'wrap' corresponds to the boundary condition as is in numpy and scipy.
 
->>>>>>> main
     feature_weight : array-like of shape (n_samples,n_features,), default=None
         Feature weights. If None, then features are equally weighted as is.
         If provided, then the feature weights are used to weight the
         patches that are generated. The feature weights are used
         as follows: for every patch that is sampled, the feature weights over
         the entire patch is summed and normalizes the patch.
-<<<<<<< HEAD
-    kernel : str {'gaussian', 'uniform'}, default='gaussian'
-        The kernel to use.
-    n_kernels : int, optional
-        The number of different kernels to generate. This number should be very high
-        as this generates kernels
 
     Attributes
     ----------
-    classes_ : ndarray of shape (n_classes,) or list of ndarray
-        The classes labels (single output problem),
-        or a list of arrays of class labels (multi-output problem).
-
-=======
-
-    Attributes
-    ----------
->>>>>>> main
     feature_importances_ : ndarray of shape (n_features,)
         The impurity-based feature importances.
         The higher, the more important the feature.
@@ -1977,14 +1912,6 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
     max_features_ : int
         The inferred value of max_features.
 
-<<<<<<< HEAD
-    n_classes_ : int or list of int
-        The number of classes (for single output problems),
-        or a list containing the number of classes for each
-        output (for multi-output problems).
-
-=======
->>>>>>> main
     n_features_in_ : int
         Number of features seen during :term:`fit`.
 
@@ -2009,15 +1936,6 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
     data_dims_ : array-like
         The presumed dimensions of the un-vectorized feature vector.
 
-<<<<<<< HEAD
-    References
-    ----------
-    .. footbibliography::
-    """
-
-    _parameter_constraints = {
-        **DecisionTreeClassifier._parameter_constraints,
-=======
     Notes
     -----
     Patches are 2D masks that are applied onto the data matrix. Following sklearn
@@ -2055,28 +1973,18 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
 
     _parameter_constraints = {
         **DecisionTreeRegressor._parameter_constraints,
->>>>>>> main
         "min_patch_dims": ["array-like", None],
         "max_patch_dims": ["array-like", None],
         "data_dims": ["array-like", None],
         "dim_contiguous": ["array-like", None],
         "boundary": [str, None],
         "feature_weight": ["array-like", None],
-<<<<<<< HEAD
-        "kernel": ["str"],
-        "n_kernels": [int, None],
-=======
->>>>>>> main
     }
 
     def __init__(
         self,
         *,
-<<<<<<< HEAD
-        criterion="gini",
-=======
         criterion="squared_error",
->>>>>>> main
         splitter="best",
         max_depth=None,
         min_samples_split=2,
@@ -2086,21 +1994,12 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         random_state=None,
         max_leaf_nodes=None,
         min_impurity_decrease=0.0,
-<<<<<<< HEAD
-        class_weight=None,
-=======
->>>>>>> main
         min_patch_dims=None,
         max_patch_dims=None,
         dim_contiguous=None,
         data_dims=None,
         boundary=None,
         feature_weight=None,
-<<<<<<< HEAD
-        kernel="gaussian",
-        n_kernels=None,
-=======
->>>>>>> main
     ):
         super().__init__(
             criterion=criterion,
@@ -2111,10 +2010,6 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
             min_weight_fraction_leaf=min_weight_fraction_leaf,
             max_features=max_features,
             max_leaf_nodes=max_leaf_nodes,
-<<<<<<< HEAD
-            class_weight=class_weight,
-=======
->>>>>>> main
             random_state=random_state,
             min_impurity_decrease=min_impurity_decrease,
         )
@@ -2126,10 +2021,6 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         self.boundary = boundary
         self.feature_weight = feature_weight
 
-<<<<<<< HEAD
-        self.kernel = kernel
-        self.n_kernel = n_kernels
-=======
     def fit(self, X, y, sample_weight=None, check_input=True):
         """Fit tree.
 
@@ -2226,7 +2117,6 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
                 )
 
         return super().fit(X, y, sample_weight, check_input=False)
->>>>>>> main
 
     def _build_tree(
         self,
@@ -2248,24 +2138,6 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
             The training input samples. Internally, it will be converted to
             ``dtype=np.float32`` and if a sparse matrix is provided
             to a sparse ``csc_matrix``.
-<<<<<<< HEAD
-        y : array-like of shape (n_samples,) or (n_samples, n_outputs)
-            The target values (class labels) as integers or strings.
-        sample_weight : array-like of shape (n_samples,), default=None
-            Sample weights. If None, then samples are equally weighted. Splits
-            that would create child nodes with net zero or negative weight are
-            ignored while searching for a split in each node. Splits are also
-            ignored if they would result in any single class carrying a
-            negative weight in either child node.
-        min_samples_leaf : int or float
-            The minimum number of samples required to be at a leaf node.
-        min_weight_leaf : float, default=0.0
-           The minimum weighted fraction of the sum total of weights.
-        max_leaf_nodes : int, default=None
-            Grow a tree with ``max_leaf_nodes`` in best-first fashion.
-        min_samples_split : int or float, default=2
-            The minimum number of samples required to split an internal node:
-=======
 
         y : array-like of shape (n_samples,) or (n_samples, n_outputs)
             The target values (real numbers). Use ``dtype=np.float64`` and
@@ -2288,20 +2160,10 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         min_samples_split : int or float, default=2
             The minimum number of samples required to split an internal node.
 
->>>>>>> main
         max_depth : int, default=None
             The maximum depth of the tree. If None, then nodes are expanded until
             all leaves are pure or until all leaves contain less than
             min_samples_split samples.
-<<<<<<< HEAD
-        random_state : int, RandomState instance or None, default=None
-            Controls the randomness of the estimator.
-        """
-        # Build tree
-        criterion = self.criterion
-        if not isinstance(criterion, BaseCriterion):
-            criterion = CRITERIA_CLF[self.criterion](self.n_outputs_, self.n_classes_)
-=======
 
         random_state : int, RandomState instance or None, default=None
             Controls the randomness of the estimator.
@@ -2313,7 +2175,6 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         criterion = self.criterion
         if not isinstance(criterion, BaseCriterion):
             criterion = CRITERIA_REG[self.criterion](self.n_outputs_, n_samples)
->>>>>>> main
         else:
             # Make a deepcopy in case the criterion has mutable attributes that
             # might be shared and modified concurrently during parallel fitting
@@ -2328,29 +2189,6 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         else:
             PATCH_SPLITTERS = PATCH_DENSE_SPLITTERS
 
-<<<<<<< HEAD
-        # compute user-defined Kernel library before
-        kernel_library, kernel_dims, kernel_params = self._sample_kernel_library(X, y)
-
-        # Note: users cannot define a splitter themselves
-        splitter = PATCH_SPLITTERS[self.splitter](
-            criterion,
-            self.max_features_,
-            min_samples_leaf,
-            min_weight_leaf,
-            random_state,
-            self.min_patch_dims_,
-            self.max_patch_dims_,
-            self.dim_contiguous_,
-            self.data_dims_,
-            self.boundary,
-            self.feature_weight,
-            kernel_library,
-        )
-
-        self.tree_ = ObliqueTree(self.n_features_in_, self.n_classes_, self.n_outputs_)
-
-=======
         if not isinstance(self.splitter, PatchSplitter):
             splitter = PATCH_SPLITTERS[self.splitter](
                 criterion,
@@ -2372,7 +2210,6 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
             self.n_outputs_,
         )
 
->>>>>>> main
         # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
         if max_leaf_nodes < 0:
             builder = DepthFirstTreeBuilder(
@@ -2395,51 +2232,3 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
             )
 
         builder.build(self.tree_, X, y, sample_weight)
-<<<<<<< HEAD
-
-        # TODO: set some attributes based on what kernel indices were used in each tree
-        # - construct a tree-nodes like array and set it as a Python attribute, so it is
-        # - exposed to the Python interface
-        # - use the Cython tree.feature array to store the index of the dictionary library
-        # - that was used to split at each node
-
-        if self.n_outputs_ == 1:
-            self.n_classes_ = self.n_classes_[0]
-            self.classes_ = self.classes_[0]
-
-    def _sample_kernel_library(self, X, y, sample_weight):
-        """Samples the dictionary library that is sampled from in the random forest.
-
-        A kernel can either be applied with the boundaries of the image in mind, such that
-        the patch can be uniformly applied across all indices of rows of ``X_structured``. This
-        is equivalent to passing in ``boundary = 'wrap'``. Alternatively, a kernel can be sampled,
-        such that the patch is always contained within the boundary of the image. This is equivalent
-        to passing in ``boundary = None``.
-
-        Parameters
-        ----------
-        X : _type_
-            _description_
-        y : _type_
-            _description_
-        sample_weight : _type_
-            _description_
-
-        Returns
-        -------
-        kernel_library : array-like of shape (n_kernels, n_features)
-            The dictionary that will be sampled from the random forest. Non-zero entries indicate
-            where the kernel is applied. This is a n-dimensional kernel matrix that is vectorized
-            and placed into the original ``X`` data dimensions of (n_dims,).
-        kernel_dims : list of (n_kernels,) length
-            The dimensions of each kernel that is sampled. For example, (n_dims_x, n_dims_y) in
-            the first element indicates that the first kernel has a shape of (n_dims_x, n_dims_y).
-            This can be used to then place where the top-left seed of each kernel is applied.
-        kernel_params : list of (n_kernels,) length
-            A list of dictionaries representing the parameters of each kernel. This is used to
-            keep track of what kernels and parameterizations were valuable when used in the random
-            forest.
-        """
-        raise NotImplementedError("This method should be implemented in a child class.")
-=======
->>>>>>> main

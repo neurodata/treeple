@@ -135,4 +135,4 @@ def build(ctx, meson_args, jobs=None, clean=False, verbose=False):
         )
 
     # run build as normal
-    ctx.invoke(meson.build)
+    ctx.invoke(meson.build, meson_args=meson_args, jobs=jobs, clean=clean, verbose=verbose)

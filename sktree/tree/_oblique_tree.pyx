@@ -20,7 +20,7 @@ cnp.import_array()
 
 from cython.operator cimport dereference as deref
 
-from .._lib.sklearn.sklearn.tree._utils cimport safe_realloc, sizet_ptr_to_ndarray
+from .._lib.sklearn.tree._utils cimport safe_realloc, sizet_ptr_to_ndarray
 
 
 # Gets Node dtype exposed inside oblique_tree.
