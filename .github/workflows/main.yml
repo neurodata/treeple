@@ -42,7 +42,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4.6.0
+        uses: actions/setup-python@v4.6.1
         with:
           python-version: ${{ matrix.python-version }}
           architecture: "x64"
@@ -149,22 +149,37 @@ jobs:
           submodules: recursive
 
       - name: Setup Python
-        uses: actions/setup-python@v4.6.0
+        uses: actions/setup-python@v4.6.1
         with:
           python-version: "3.9"
           architecture: "x64"
           cache: "pip"
           cache-dependency-path: "requirements.txt"
+
       - name: install-rtools
         run: |
-          choco install rtools --no-progress
+          choco install rtools -y --no-progress --force --version=4.0.0.20220206
           echo "c:\rtools40\ucrt64\bin;" >> $env:GITHUB_PATH
+
+      - name: show-gcc
+        run: |
+          gcc --version
+
       - name: pip-packages
         run: |
           pip install -r build_requirements.txt
           pip install spin
+
       - name: openblas-libs
+        # shell: bash
         run: |
+          # download openblas setup from scipy
+          # curl https://raw.githubusercontent.com/scipy/scipy/main/tools/cibw_before_build_win.sh -o cibw_before_build_win.sh
+          # chmod +x cibw_before_build_win.sh
+          # set -xe
+          # bash cibw_before_build_win.sh .
+          # echo "PKG_CONFIG_PATH=c:\opt\64\lib\pkgconfig;" >> $GITHUB_ENV
+
           # Download and install pre-built OpenBLAS library
           # Built with mingw-w64, -ucrt -static.
           # https://github.com/matthew-brett/openblas-libs/blob/ucrt-build/build_openblas.ps1
@@ -173,36 +188,20 @@ jobs:
           wget https://github.com/scipy/scipy-ci-artifacts/raw/main/openblas_32_if.zip
           unzip -d c:\ openblas_32_if.zip
           echo "PKG_CONFIG_PATH=c:\opt\openblas\if_32\64\lib\pkgconfig;" >> $env:GITHUB_ENV
-      - name: meson-configure
+
+      - name: Build
         run: |
-          meson setup build --prefix=$PWD\build
-      - name: meson-build
-        run: |
-          ninja -j 2 -C build
-      - name: meson-install
-        run: |
-          cd build
-          meson install
-      # - name: build
-      #   run: |
-      #     python spin build -j 2
-      #     # following steps are required because the build step does not put
-      #     # the *.pyd files in build-install! Furthermore the --win-cp-openblas
-      #     # option does not seem to copy libopenblas*.dll, so manually copy it.
-      #     cd build
-      #     meson install
-      #     cd ..
-      - name: build-path
-        run: |
-          echo "installed_path=$PWD\build\Lib\site-packages" >> $env:GITHUB_ENV
-      - name: prep-test
-        run: |
-          echo "PYTHONPATH=${env:installed_path}" >> $env:GITHUB_ENV
+          echo "SCIPY_USE_PROPACK=1" >> $env:GITHUB_ENV
+          python spin build -j 2
+          # Necessary because GitHub Actions checks out the repo to D:\ while OpenBLAS
+          # got installed to C:\ higher up. The copying with `--win-cp-openblas` fails
+          # when things are split over drives.
+          # cp C:\opt\64\bin\*.dll $pwd\build-install\Lib\site-packages\scikit-tree\.libs\
+          # python tools\openblas_support.py --write-init $PWD\build-install\Lib\site-packages\scikit-tree\
+  
       - name: test
         run: |
-          mkdir tmp
-          cd tmp
-          python -c 'import sktree;'
+          python spin test
 
   # release is ran when a release is made on Github
   release:
@@ -214,7 +213,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Setup Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4.6.0
+        uses: actions/setup-python@v4.6.1
         with:
           python-version: 3.9
           architecture: "x64"

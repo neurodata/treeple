@@ -36,16 +36,17 @@ if __sktree_SETUP__:
     # process, as it may not be compiled yet
 else:
     try:
-        from . import _lib  # , tree, ensemble
-
-        # from .ensemble._unsupervised_forest import (
-        #     UnsupervisedRandomForest,
-        #     UnsupervisedObliqueRandomForest,
-        # )
-        # from .ensemble._supervised_forest import (
-        #     ObliqueRandomForestClassifier,
-        #     PatchObliqueRandomForestClassifier,
-        # )
+        from . import _lib, tree, ensemble
+        from .ensemble._unsupervised_forest import (
+            UnsupervisedRandomForest,
+            UnsupervisedObliqueRandomForest,
+        )
+        from .ensemble._supervised_forest import (
+            ObliqueRandomForestClassifier,
+            ObliqueRandomForestRegressor,
+            PatchObliqueRandomForestClassifier,
+            PatchObliqueRandomForestRegressor,
+        )
     except ImportError as e:
         msg = """Error importing scikit-tree: you cannot import scikit-tree while
         being in scikit-tree source directory; please exit the scikit-tree source
@@ -57,7 +58,9 @@ else:
         "tree",
         "ensemble",
         "ObliqueRandomForestClassifier",
+        "ObliqueRandomForestRegressor",
         "PatchObliqueRandomForestClassifier",
+        "PatchObliqueRandomForestRegressor",
         "UnsupervisedRandomForest",
         "UnsupervisedObliqueRandomForest",
     ]

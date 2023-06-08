@@ -49,6 +49,7 @@ cc = meson.get_compiler('c')
 #   'source_fname',
 #   numpy_nodepr_api)
 numpy_nodepr_api = '-DNPY_NO_DEPRECATED_API=NPY_1_9_API_VERSION'
+cython_c_args += numpy_nodepr_api
 
 python_sources = [
   '__init__.py',

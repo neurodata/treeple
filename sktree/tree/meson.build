@@ -19,6 +19,7 @@ endforeach
 python_sources = [
   '__init__.py',
   '_classes.py',
+  '_neighbors.py',
 ]
 
 py3.install_sources(

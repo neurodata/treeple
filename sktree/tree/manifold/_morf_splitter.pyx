@@ -149,10 +149,6 @@ cdef class PatchSplitter(BaseObliqueSplitter):
     cdef (SIZE_t, SIZE_t) sample_top_left_seed(self) noexcept nogil:
         pass
 
-    cdef int pointer_size(self) noexcept nogil:
-        """Get size of a pointer to record for ObliqueSplitter."""
-
-        return sizeof(ObliqueSplitRecord)
 
 cdef class BaseDensePatchSplitter(PatchSplitter):
     cdef int init(self,

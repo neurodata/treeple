@@ -15,7 +15,8 @@ def get_git_revision_hash(submodule) -> str:
 @click.command()
 @click.option("--build-dir", default="build", help="Build directory; default is `$PWD/build`")
 @click.option("--clean", is_flag=True, help="Clean previously built docs before building")
-def docs(build_dir, clean=False):
+@click.option("--noplot", is_flag=True, help="Build docs without plots")
+def docs(build_dir, clean=False, noplot=False):
     """📖 Build documentation"""
     if clean:
         doc_dir = "./docs/_build"
@@ -32,7 +33,10 @@ def docs(build_dir, clean=False):
 
     os.environ["SPHINXOPTS"] = "-W"
     os.environ["PYTHONPATH"] = f'{site_path}{os.sep}:{os.environ.get("PYTHONPATH", "")}'
-    util.run(["make", "-C", "docs", "clean", "html-noplot"], replace=True)
+    if noplot:
+        util.run(["make", "-C", "docs", "clean", "html-noplot"], replace=True)
+    else:
+        util.run(["make", "-C", "docs", "clean", "html"], replace=True)
 
 
 @click.command()

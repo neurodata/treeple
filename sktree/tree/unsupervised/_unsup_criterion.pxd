@@ -1,7 +1,6 @@
 # cython: boundscheck=False
 # cython: wraparound=False
 # cython: language_level=3
-# cython: linetrace=True
 
 from ..._lib.sklearn.sklearn.tree._criterion cimport BaseCriterion
 from ..._lib.sklearn.sklearn.tree._tree cimport DOUBLE_t  # Type of y, sample_weight
