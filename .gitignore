@@ -9,6 +9,7 @@ coverage
 .venv
 
 commit.txt
+sktree/_lib/sklearn/
 
 # Sphinx documentation
 docs/_build/
