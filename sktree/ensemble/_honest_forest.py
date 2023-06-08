@@ -396,9 +396,6 @@ class HonestForestClassifier(ForestClassifier):
         """
         X, y = check_X_y(X, y)
 
-        # Account for bootstrapping too
-        if sample_weight is None:
-            sample_weight = np.ones((X.shape[0],), dtype=np.float64)
         super().fit(X, y, sample_weight)
         classes_k, y_encoded = np.unique(y, return_inverse=True)
         self.empirical_prior_ = np.bincount(y_encoded, minlength=classes_k.shape[0]) / len(y)
