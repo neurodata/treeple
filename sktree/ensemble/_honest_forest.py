@@ -320,7 +320,7 @@ class HonestForestClassifier(ForestClassifier):
         ccp_alpha=0.0,
         max_samples=None,
         honest_prior="empirical",
-        honest_fraction=0,
+        honest_fraction=0.5,
         estimator=HonestTreeClassifier(),
     ):
         super().__init__(
