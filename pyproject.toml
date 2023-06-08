@@ -164,6 +164,7 @@ extend-exclude = '''
 (
       __pycache__
     | \.github
+    | sktree/_lib
 )
 '''
 
@@ -172,12 +173,12 @@ profile = 'black'
 multi_line_output = 3
 line_length = 100
 py_version = 38
-extend_skip_glob = ['sktree/__init__.py']
+extend_skip_glob = ['sktree/__init__.py', 'sktree/_lib/*']
 
 [tool.pydocstyle]
 convention = 'numpy'
 ignore-decorators = '(copy_doc|property|.*setter|.*getter)'
-match = '^(?!setup|__init__|test_).*\.py'
+match = '^(?!setup|__init__|test_|_lib).*\.py'
 match-dir = '^sktree*'
 add_ignore = 'D100,D104,D105,D107'
 
@@ -194,14 +195,14 @@ filterwarnings = []
 branch = true
 cover_pylib = false
 source = ['sktree']
-omit = ['**/__init__.py', '**/tests/**', 'sktree/_build_utils/*']
+omit = ['**/__init__.py', '**/tests/**', 'sktree/_build_utils/*', 'sktree/_lib/*']
 
 [tool.coverage.report]
 exclude_lines = ['pragma: no cover', 'if __name__ == .__main__.:']
 precision = 2
 
 [tool.bandit]
-exclude_dirs = ["sktree/tests", "sktree/tree/tests", 'sktree/_build_utils/*']
+exclude_dirs = ["sktree/tests", "sktree/tree/tests", 'sktree/_build_utils/*', 'sktree/_lib/*']
 skips = ['B404', 'B603']
 
 [tool.spin]

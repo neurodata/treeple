@@ -9,9 +9,9 @@ from sklearn.datasets import make_blobs
 from sklearn.metrics import accuracy_score, adjusted_rand_score
 from sklearn.model_selection import cross_val_score
 from sklearn.tree._tree import TREE_LEAF
+
 from sktree._lib.sklearn.sklearn.tree import DecisionTreeClassifier
 from sktree._lib.sklearn.sklearn.utils.estimator_checks import parametrize_with_checks
-
 from sktree.tree import (
     ObliqueDecisionTreeClassifier,
     PatchObliqueDecisionTreeClassifier,

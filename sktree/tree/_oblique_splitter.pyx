@@ -13,6 +13,7 @@ cnp.import_array()
 from cython.operator cimport dereference as deref
 from libcpp.vector cimport vector
 from sklearn.tree._utils cimport rand_int
+
 from .._lib.sklearn.sklearn.tree._criterion cimport Criterion
 
 

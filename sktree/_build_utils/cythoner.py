@@ -18,8 +18,8 @@ def main():
     print("\n\ninside cythoner: ")
     print("input file: ", in_fname)
     print("output file: ", out_fname)
-    print(os.getcwd(), '\n\n')
-    
+    print(os.getcwd(), "\n\n")
+
     sbp.run(
         [
             "cython",
@@ -28,7 +28,7 @@ def main():
             "--output-file",
             out_fname,
             "--include-dir",
-            f'{os.getcwd()}'
+            f"{os.getcwd()}",
         ]
         + sys.argv[3:]
         + [in_fname],

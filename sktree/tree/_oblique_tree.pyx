@@ -19,6 +19,7 @@ cimport numpy as cnp
 cnp.import_array()
 
 from cython.operator cimport dereference as deref
+
 from .._lib.sklearn.sklearn.tree._utils cimport safe_realloc, sizet_ptr_to_ndarray
 
 
