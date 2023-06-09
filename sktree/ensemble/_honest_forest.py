@@ -402,7 +402,9 @@ class HonestForestClassifier(ForestClassifier):
         self.empirical_prior_ = np.bincount(y_encoded, minlength=classes_k.shape[0]) / len(y)
 
         # Compute honest decision function
-        self.honest_decision_function_ = self._predict_proba(X, indices=self.honest_indices_)
+        self.honest_decision_function_ = self._predict_proba(
+            X, indices=self.honest_indices_, impute_missing=np.nan
+        )
         return self
 
     def predict_proba(self, X):
@@ -429,7 +431,7 @@ class HonestForestClassifier(ForestClassifier):
         """
         return self._predict_proba(X)
 
-    def _predict_proba(self, X, indices=None):
+    def _predict_proba(self, X, indices=None, impute_missing=None):
         """predict_proba helper class"""
         X = self._validate_X_predict(X)
         n_jobs, _, _ = _partition_estimators(self.n_estimators, self.n_jobs)
@@ -448,7 +450,10 @@ class HonestForestClassifier(ForestClassifier):
         # Normalize to unit length, due to prior weighting
         zero_mask = posteriors.sum(1) == 0
         posteriors[~zero_mask] /= posteriors[~zero_mask].sum(1, keepdims=True)
-        posteriors[zero_mask] = self.empirical_prior_
+        if impute_missing is None:
+            posteriors[zero_mask] = self.empirical_prior_
+        else:
+            posteriors[zero_mask] = impute_missing
 
         return posteriors
 
@@ -480,6 +485,8 @@ def _accumulate_prediction(tree, X, out, lock, indices=None):
     normalizer[normalizer == 0.0] = 1.0
     proba /= normalizer
 
+    if tree._tree_n_classes_ != tree.n_classes_:
+        proba = tree._impute_missing_classes(proba)
     proba = tree._empty_leaf_correction(proba, normalizer)
 
     with lock:
