@@ -51,7 +51,7 @@ def test_iris(criterion, max_features, estimator):
         random_state=0,
         max_features=max_features,
         n_estimators=10,
-        estimator=HonestTreeClassifier(estimator),
+        tree_estimator=None,
     )
     clf.fit(iris.data, iris.target)
     score = accuracy_score(clf.predict(iris.data), iris.target)
@@ -158,9 +158,16 @@ def test_honest_decision_function(honest_fraction, val):
         assert len(np.where(y_proba[:, 1] < val)[0]) > 50, f"Failed with {honest_fraction}"
 
 
-@parametrize_with_checks([HonestForestClassifier(n_estimators=10, random_state=0)])
+@parametrize_with_checks(
+    [HonestForestClassifier(n_estimators=10, honest_fraction=0.5, random_state=0)]
+)
 def test_sklearn_compatible_estimator(estimator, check):
-    # TODO: remove when we implement Regressor classes
+    # TODO: ignore all multi-target output forest tests
+    # TODO: possibly ignoring the zero sample_weight and document it in the class because
+    # TODO: IGNORE -check_class_weight_classifiers since this is also related to sample_weight
+    # XXX: can include this "generalization" in the future if it's useful
+    #  zero sample weight is not "really supported" in honest subsample trees since sample weight
+    #  for fitting the tree's splits
     # if TREE_ESTIMATORS[estimator].__name__ in TREE_CLASSIFIERS:
     #     pytest.skip()
     check(estimator)

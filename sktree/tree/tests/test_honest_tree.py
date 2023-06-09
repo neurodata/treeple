@@ -33,7 +33,7 @@ iris.target = iris.target[perm]
 def test_iris(criterion, max_features, estimator):
     # Check consistency on dataset iris.
     clf = HonestTreeClassifier(
-        criterion=criterion, random_state=0, max_features=max_features, estimator=estimator
+        criterion=criterion, random_state=0, max_features=max_features, tree_estimator=estimator
     )
     clf.fit(iris.data, iris.target)
     score = accuracy_score(clf.predict(iris.data), iris.target)

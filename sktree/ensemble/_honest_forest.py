@@ -400,9 +400,8 @@ class HonestForestClassifier(ForestClassifier):
         self : HonestForestClassifier
             Fitted tree estimator.
         """
-        X, y = check_X_y(X, y)
-
         super().fit(X, y, sample_weight)
+        X, y = check_X_y(X, y)
         classes_k, y_encoded = np.unique(y, return_inverse=True)
         self.empirical_prior_ = np.bincount(y_encoded, minlength=classes_k.shape[0]) / len(y)
 

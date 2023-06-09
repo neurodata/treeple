@@ -145,7 +145,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
         classes). If "empirical", the prior tree posterior is the relative
         class frequency in the voting subsample.
 
-    tree estimator : object, default=None
+    tree_estimator : object, default=None
         Instatiated tree of type BaseDecisionTree.
         If None, then DecisionTreeClassifier with default parameters will
         be used.
@@ -348,6 +348,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
                 ccp_alpha=self.ccp_alpha,
             )
         else:
+            # XXX: maybe error out if the tree_estimator is already fitted
             self.estimator_ = deepcopy(self.tree_estimator)
 
         # Learn structure on subsample
@@ -377,8 +378,6 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
         # Fit leaves using other subsample
         honest_leaves = self.tree_.apply(X[self.honest_indices_])
 
-        self._set_leaf_nodes(honest_leaves, y)
-
         # preserve from underlying tree
         # https://github.com/scikit-learn/scikit-learn/blob/1.0.X/sklearn/tree/_classes.py#L202
         self._tree_classes_ = self.classes_
@@ -397,8 +396,10 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
             )
         y = y_encoded
 
-        self.n_classes_ = np.array(self.n_classes_, dtype=np.intp)
+        # y-encoded ensures that y values match the indices of the classes
+        self._set_leaf_nodes(honest_leaves, y)
 
+        self.n_classes_ = np.array(self.n_classes_, dtype=np.intp)
         if self.n_outputs_ == 1:
             self.n_classes_ = self.n_classes_[0]
             self.classes_ = self.classes_[0]
