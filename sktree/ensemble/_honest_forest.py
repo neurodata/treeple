@@ -275,10 +275,11 @@ class HonestForestClassifier(ForestClassifier):
     intervals. The default implementation here is using double sampling to
     implement honesty. The amount of samples used for learning split nodes vs
     leaf nodes is controlled by the ``honest_fraction`` parameter. In order to
-    enforce honesty but also enable the tree to have access to all y labels,
+    enforce honesty, but also enable the tree to have access to all y labels,
     we set sample_weight to 0 for a random subset of samples. This results in
     inefficiency when building trees using a greedy splitter as we still sort
-    over all values of X.
+    over all values of X. We recommend using propensity trees if you are
+    computing causal effects.
 
     This forest classifier is a "meta-estimator" because any tree model can
     be used in the classification process, while enabling honesty separates
