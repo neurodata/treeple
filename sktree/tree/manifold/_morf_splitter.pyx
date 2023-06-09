@@ -3,6 +3,7 @@
 # cython: language_level=3
 # cython: boundscheck=False
 # cython: wraparound=False
+# cython: initializedcheck=False
 
 import numpy as np
 
@@ -13,8 +14,8 @@ cnp.import_array()
 from cython.operator cimport dereference as deref
 from libcpp.vector cimport vector
 from sklearn.tree._utils cimport rand_int
-from sklearn_fork.tree._criterion cimport Criterion
 
+from ..._lib.sklearn.tree._criterion cimport Criterion
 from .._utils cimport ravel_multi_index_cython, unravel_index_cython
 
 
@@ -89,9 +90,10 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         self,
         object X,
         const DOUBLE_t[:, ::1] y,
-        const DOUBLE_t[:] sample_weight
+        const DOUBLE_t[:] sample_weight,
+        const unsigned char[::1] feature_has_missing,
     ) except -1:
-        BaseObliqueSplitter.init(self, X, y, sample_weight)
+        BaseObliqueSplitter.init(self, X, y, sample_weight, feature_has_missing)
 
         return 0
 
@@ -150,17 +152,20 @@ cdef class PatchSplitter(BaseObliqueSplitter):
 
 
 cdef class BaseDensePatchSplitter(PatchSplitter):
-    cdef int init(self,
-                  object X,
-                  const DOUBLE_t[:, ::1] y,
-                  const DOUBLE_t[:] sample_weight) except -1:
+    cdef int init(
+        self,
+        object X,
+        const DOUBLE_t[:, ::1] y,
+        const DOUBLE_t[:] sample_weight,
+        const unsigned char[::1] feature_has_missing
+    ) except -1:
         """Initialize the splitter
 
         Returns -1 in case of failure to allocate memory (and raise MemoryError)
         or 0 otherwise.
         """
         # Call parent init
-        PatchSplitter.init(self, X, y, sample_weight)
+        PatchSplitter.init(self, X, y, sample_weight, feature_has_missing)
 
         self.X = X
         return 0
@@ -364,10 +369,24 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
                         continue
 
                     # determine the "row" we are currently on
+                    # other_dims_offset = 1
+                    # for idx in range(dim_idx + 1, self.ndim):
+                    #     other_dims_offset *= self.data_dims[idx]
+                    # row_index = self.unraveled_patch_point[dim_idx] % other_dims_offset
+                    # determine the "row" we are currently on
                     other_dims_offset = 1
                     for idx in range(dim_idx + 1, self.ndim):
-                        other_dims_offset *= self.data_dims[idx]
-                    row_index = self.unraveled_patch_point[dim_idx] % other_dims_offset
+                        if not self.dim_contiguous[idx]:
+                            other_dims_offset *= self.data_dims[idx]
+
+                    row_index = 0
+                    for idx in range(dim_idx + 1, self.ndim):
+                        if not self.dim_contiguous[idx]:
+                            row_index += (
+                                (self.unraveled_patch_point[idx] // other_dims_offset) %
+                                self.patch_dims_buff[idx]
+                            ) * other_dims_offset
+                            other_dims_offset //= self.data_dims[idx]
 
                     # assign random row index now
                     self.unraveled_patch_point[dim_idx] = self._index_patch_buffer[row_index]
@@ -479,7 +498,7 @@ cdef class BestPatchSplitterTester(BestPatchSplitter):
 
         return proj_vecs
 
-    cpdef init_test(self, X, y, sample_weight):
+    cpdef init_test(self, X, y, sample_weight, feature_has_missing=None):
         """Initializes the state of the splitter.
 
         Used for testing purposes.
@@ -493,5 +512,7 @@ cdef class BestPatchSplitterTester(BestPatchSplitter):
             regression).
         sample_weight : array-like, shape (n_samples,)
             Sample weights.
+        feature_has_missing : array-like, shape (n_features,)
+            Whether or not a feature has missing values.
         """
-        self.init(X, y, sample_weight)
+        self.init(X, y, sample_weight, feature_has_missing)

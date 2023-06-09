@@ -13,13 +13,13 @@ import numpy as np
 cimport numpy as cnp
 from libcpp.vector cimport vector
 from sklearn.utils._sorting cimport simultaneous_sort
-from sklearn_fork.tree._splitter cimport SplitRecord
-from sklearn_fork.tree._tree cimport DOUBLE_t  # Type of y, sample_weight
-from sklearn_fork.tree._tree cimport DTYPE_t  # Type of X
-from sklearn_fork.tree._tree cimport INT32_t  # Signed 32 bit integer
-from sklearn_fork.tree._tree cimport SIZE_t  # Type for indices and counters
-from sklearn_fork.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
 
+from ..._lib.sklearn.tree._splitter cimport SplitRecord
+from ..._lib.sklearn.tree._tree cimport DOUBLE_t  # Type of y, sample_weight
+from ..._lib.sklearn.tree._tree cimport DTYPE_t  # Type of X
+from ..._lib.sklearn.tree._tree cimport INT32_t  # Signed 32 bit integer
+from ..._lib.sklearn.tree._tree cimport SIZE_t  # Type for indices and counters
+from ..._lib.sklearn.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
 from .._oblique_splitter cimport BaseObliqueSplitter, ObliqueSplitRecord
 
 # https://github.com/cython/cython/blob/master/Cython/Includes/libcpp/algorithm.pxd
@@ -32,6 +32,11 @@ from .._oblique_splitter cimport BaseObliqueSplitter, ObliqueSplitRecord
 #         ctypedef G generator_type
 #         discrete_distribution(T first, T last) except +
 #         operator()(&G) except +
+
+# XXX: replace with from libcpp.algorithm cimport swap
+# when Cython 3.0 is released
+cdef extern from "<algorithm>" namespace "std" nogil:
+    void swap[T](T& a, T& b) except +  # array overload also works
 
 
 cdef class PatchSplitter(BaseObliqueSplitter):

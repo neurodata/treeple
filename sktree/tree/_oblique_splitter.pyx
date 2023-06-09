@@ -2,6 +2,7 @@
 # cython: language_level=3
 # cython: boundscheck=False
 # cython: wraparound=False
+# cython: initializedcheck=False
 
 import numpy as np
 
@@ -12,7 +13,8 @@ cnp.import_array()
 from cython.operator cimport dereference as deref
 from libcpp.vector cimport vector
 from sklearn.tree._utils cimport rand_int
-from sklearn_fork.tree._criterion cimport Criterion
+
+from .._lib.sklearn.tree._criterion cimport Criterion
 
 
 cdef double INFINITY = np.inf
@@ -161,7 +163,7 @@ cdef class BaseObliqueSplitter(Splitter):
         # sort samples according to the feature values.
         for idx in range(start, end):
             # initialize the feature value to 0
-            feature_values[idx] = 0
+            feature_values[idx] = 0.0
             for jdx in range(0, proj_vec_indices.size()):
                 feature_values[idx] += self.X[
                     samples[idx], deref(proj_vec_indices)[jdx]
@@ -366,9 +368,10 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         self,
         object X,
         const DOUBLE_t[:, ::1] y,
-        const DOUBLE_t[:] sample_weight
+        const DOUBLE_t[:] sample_weight,
+        const unsigned char[::1] feature_has_missing,
     ) except -1:
-        Splitter.init(self, X, y, sample_weight)
+        Splitter.init(self, X, y, sample_weight, feature_has_missing)
 
         self.X = X
 

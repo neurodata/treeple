@@ -1,6 +1,6 @@
-from sklearn_fork.ensemble._forest import ForestClassifier, ForestRegressor
-from sklearn_fork.utils._param_validation import StrOptions
+from sklearn.utils._param_validation import StrOptions
 
+from .._lib.sklearn.ensemble._forest import ForestClassifier, ForestRegressor
 from ..tree import (
     ObliqueDecisionTreeClassifier,
     ObliqueDecisionTreeRegressor,

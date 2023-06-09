@@ -342,7 +342,7 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
                                  is_left, is_leaf,
                                  split_ptr,
                                  impurity, n_node_samples,
-                                 weighted_n_node_samples)
+                                 weighted_n_node_samples, 0)
         if node_id == INTPTR_MAX:
             return -1
 
@@ -506,7 +506,7 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
 
                 node_id = tree._add_node(parent, is_left, is_leaf, split_ptr,
                                          impurity, n_node_samples,
-                                         weighted_n_node_samples)
+                                         weighted_n_node_samples, 0)
                 if node_id == INTPTR_MAX:
                     rc = -1
                     break
