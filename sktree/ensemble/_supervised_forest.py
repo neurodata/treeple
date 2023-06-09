@@ -1,12 +1,13 @@
-from sklearn_fork.ensemble._forest import ForestClassifier, ForestRegressor
-from sklearn_fork.utils._param_validation import StrOptions
+from sklearn.utils._param_validation import StrOptions
 
-from ..tree import (
+from sktree._lib.sklearn.ensemble._forest import ForestClassifier, ForestRegressor
+from sktree.tree import (
     ObliqueDecisionTreeClassifier,
     ObliqueDecisionTreeRegressor,
     PatchObliqueDecisionTreeClassifier,
     PatchObliqueDecisionTreeRegressor,
 )
+
 from ..tree._neighbors import SimMatrixMixin
 
 

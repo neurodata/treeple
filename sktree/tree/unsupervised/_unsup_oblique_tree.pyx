@@ -1,6 +1,7 @@
 # cython: cdivision=True
 # cython: boundscheck=False
 # cython: wraparound=False
+# cython: initializedcheck=False
 
 # Authors: Adam Li <adam2392@gmail.com>
 #
@@ -16,7 +17,8 @@ cimport numpy as cnp
 cnp.import_array()
 
 from cython.operator cimport dereference as deref
-from sklearn_fork.tree._utils cimport safe_realloc
+
+from ..._lib.sklearn.tree._utils cimport safe_realloc
 
 
 # Gets Node dtype exposed inside oblique_tree.

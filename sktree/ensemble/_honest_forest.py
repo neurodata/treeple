@@ -5,9 +5,10 @@ import threading
 
 import numpy as np
 from joblib import Parallel, delayed
-from sklearn_fork.ensemble._base import _partition_estimators
-from sklearn_fork.ensemble._forest import ForestClassifier
-from sklearn_fork.utils.validation import check_is_fitted, check_X_y
+from sklearn.ensemble._base import _partition_estimators
+from sklearn.utils.validation import check_is_fitted, check_X_y
+
+from sktree._lib.sklearn.ensemble._forest import ForestClassifier
 
 from ..tree import HonestTreeClassifier
 

@@ -2,11 +2,12 @@
 # Adopted from: https://github.com/neurodata/honest-forests
 
 import numpy as np
-from sklearn_fork.base import MetaEstimatorMixin
-from sklearn_fork.tree import DecisionTreeClassifier
-from sklearn_fork.tree._classes import BaseDecisionTree
-from sklearn_fork.utils.multiclass import check_classification_targets
-from sklearn_fork.utils.validation import check_is_fitted, check_X_y
+from sklearn.base import MetaEstimatorMixin
+from sklearn.utils.multiclass import check_classification_targets
+from sklearn.utils.validation import check_is_fitted, check_X_y
+
+from sktree._lib.sklearn.tree import DecisionTreeClassifier
+from sktree._lib.sklearn.tree._classes import BaseDecisionTree
 
 
 class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
