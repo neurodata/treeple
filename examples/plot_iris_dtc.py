@@ -30,9 +30,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.datasets import load_iris
 from sklearn.inspection import DecisionBoundaryDisplay
-from sklearn.tree import DecisionTreeClassifier
 
-from sktree._lib.sklearn.tree import plot_tree
+from sktree._lib.sklearn.tree import DecisionTreeClassifier, plot_tree
 from sktree.tree import ObliqueDecisionTreeClassifier
 
 # Parameters
