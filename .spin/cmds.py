@@ -40,23 +40,11 @@ def docs(build_dir, clean=False, noplot=False):
 
 
 @click.command()
-def coverage():
+@click.pass_context
+def coverage(ctx):
     """📊 Generate coverage report"""
-    util.run(
-        [
-            "python",
-            "-m",
-            "spin",
-            "test",
-            "--",
-            "-o",
-            "python_functions=test_*",
-            "sktree",
-            "--cov=sktree",
-            "--cov-report=xml",
-        ],
-        # replace=True,
-    )
+    pytest_args = ("-o", "python_functions=test_*", "sktree", "--cov=sktree", "--cov-report=xml")
+    ctx.invoke(meson.test, pytest_args=pytest_args)
 
 
 @click.command()

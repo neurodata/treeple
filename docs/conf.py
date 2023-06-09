@@ -1,7 +1,6 @@
 """Configure details for documentation with sphinx."""
 
 import os
-import re
 import subprocess
 import sys
 from datetime import date

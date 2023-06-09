@@ -498,7 +498,7 @@ cdef class BestPatchSplitterTester(BestPatchSplitter):
 
         return proj_vecs
 
-    cpdef init_test(self, X, y, sample_weight, feature_has_missing):
+    cpdef init_test(self, X, y, sample_weight, feature_has_missing=None):
         """Initializes the state of the splitter.
 
         Used for testing purposes.
@@ -512,5 +512,7 @@ cdef class BestPatchSplitterTester(BestPatchSplitter):
             regression).
         sample_weight : array-like, shape (n_samples,)
             Sample weights.
+        feature_has_missing : array-like, shape (n_features,)
+            Whether or not a feature has missing values.
         """
         self.init(X, y, sample_weight, feature_has_missing)
