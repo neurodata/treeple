@@ -1,4 +1,5 @@
 import time
+from typing import Any, Dict
 
 import numpy as np
 import pytest
@@ -12,6 +13,13 @@ from sktree.tree import (
     ObliqueDecisionTreeClassifier,
     PatchObliqueDecisionTreeClassifier,
 )
+
+FOREST_CLASSIFIERS = {
+    "HonestForestClassifier": HonestForestClassifier,
+}
+
+FOREST_ESTIMATORS: Dict[str, Any] = dict()
+FOREST_ESTIMATORS.update(FOREST_CLASSIFIERS)
 
 CLF_CRITERIONS = ("gini", "entropy")
 
@@ -155,3 +163,11 @@ def test_honest_decision_function(honest_fraction, val):
         assert len(np.where(np.isnan(y_proba[:, 0]))[0]) > 50, f"Failed with {honest_fraction}"
     else:
         assert len(np.where(y_proba[:, 1] < val)[0]) > 50, f"Failed with {honest_fraction}"
+
+
+@pytest.mark.parametrize("estimator", FOREST_ESTIMATORS)
+def test_sklearn_compatible_estimator(estimator):
+    # TODO: remove when we implement Regressor classes
+    if FOREST_ESTIMATORS[estimator].__name__ in FOREST_CLASSIFIERS:
+        pytest.skip()
+    check(estimator)

@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 import numpy as np
 import pytest
 from sklearn import datasets
@@ -9,6 +11,13 @@ from sktree.tree import (
     ObliqueDecisionTreeClassifier,
     PatchObliqueDecisionTreeClassifier,
 )
+
+TREE_CLASSIFIERS = {
+    "HonestTreeClassifier": HonestTreeClassifier,
+}
+
+TREE_ESTIMATORS: Dict[str, Any] = dict()
+TREE_ESTIMATORS.update(TREE_CLASSIFIERS)
 
 # also load the iris dataset
 # and randomly permute it
@@ -101,3 +110,11 @@ def test_impute_classes():
     y_proba = clf.predict_proba(X)
 
     assert y_proba.shape[1] == 3
+
+
+@pytest.mark.parametrize("estimator", TREE_ESTIMATORS)
+def test_sklearn_compatible_estimator(estimator):
+    # TODO: remove when we implement Regressor classes
+    if TREE_ESTIMATORS[estimator].__name__ in TREE_CLASSIFIERS:
+        pytest.skip()
+    check(estimator)
