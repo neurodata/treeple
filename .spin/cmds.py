@@ -55,7 +55,7 @@ def coverage():
             "--cov=sktree",
             "--cov-report=xml",
         ],
-        replace=True,
+        # replace=True,
     )
 
 

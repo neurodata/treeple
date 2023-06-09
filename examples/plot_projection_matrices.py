@@ -93,7 +93,7 @@ splitter = BestPatchSplitterTester(
     boundary,
     feature_weight,
 )
-splitter.init_test(X, y, sample_weight)
+splitter.init_test(X, y, sample_weight, None)
 
 # sample the projection matrix that consists of 1D patches
 proj_mat = splitter.sample_projection_matrix()
