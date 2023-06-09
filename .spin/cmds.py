@@ -80,6 +80,7 @@ def setup_submodule(forcesubmodule=False):
                 "submodule",
                 "update",
                 "--init",
+                "--force",
             ]
         )
 

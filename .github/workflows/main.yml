@@ -37,6 +37,9 @@ jobs:
     defaults:
       run:
         shell: bash
+    env:
+      # to make sure coverage/test command builds cleanly
+      FORCE_SUBMODULE: True
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -48,7 +51,6 @@ jobs:
           architecture: "x64"
           cache: "pip"
           cache-dependency-path: "requirements.txt"
-
 
       - name: show-gcc
         run: |
@@ -98,7 +100,7 @@ jobs:
 
       - name: Setup build and install scikit-tree
         run: |
-          python spin build -j 2 --forcesubmodule
+          ./spin build -j 2 --forcesubmodule
 
       - name: Ccache performance
         shell: bash -l {0}
@@ -108,9 +110,6 @@ jobs:
         run: |
           echo "$PWD/build-install/"
           export INSTALLED_PATH=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages
-          
-          # to make sure coverage/test command builds cleanly
-          echo "FORCE_SUBMODULE=True" >> $GITHUB_ENV
 
       - name: Run unit tests and coverage
         run: |
@@ -205,7 +204,7 @@ jobs:
   
       - name: test
         run: |
-          ./spin test
+          python spin test
 
   # release is ran when a release is made on Github
   release:
