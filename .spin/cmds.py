@@ -133,7 +133,7 @@ def setup_submodule(forcesubmodule=False):
             ]
         )
 
-        if os.path.exists('sktree/_lib/sklearn_fork/sklearn'):
+        if os.path.exists("sktree/_lib/sklearn_fork/sklearn"):
             util.run(
                 [
                     "mv",
