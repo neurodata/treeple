@@ -6,7 +6,7 @@ import pytest
 from sklearn import datasets
 from sklearn.metrics import accuracy_score
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.utils.estimator_checks import check_estimator
+from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from sktree.ensemble import HonestForestClassifier
 from sktree.tree import (
@@ -14,13 +14,6 @@ from sktree.tree import (
     ObliqueDecisionTreeClassifier,
     PatchObliqueDecisionTreeClassifier,
 )
-
-FOREST_CLASSIFIERS = {
-    "HonestForestClassifier": HonestForestClassifier,
-}
-
-FOREST_ESTIMATORS: Dict[str, Any] = dict()
-FOREST_ESTIMATORS.update(FOREST_CLASSIFIERS)
 
 CLF_CRITERIONS = ("gini", "entropy")
 
@@ -166,9 +159,9 @@ def test_honest_decision_function(honest_fraction, val):
         assert len(np.where(y_proba[:, 1] < val)[0]) > 50, f"Failed with {honest_fraction}"
 
 
-@pytest.mark.parametrize("estimator", FOREST_ESTIMATORS)
-def test_sklearn_compatible_estimator(estimator):
+@parametrize_with_checks([HonestForestClassifier(n_estimators=10, random_state=0)])
+def test_sklearn_compatible_estimator(estimator, check):
     # TODO: remove when we implement Regressor classes
-    if FOREST_ESTIMATORS[estimator].__name__ in FOREST_CLASSIFIERS:
-        pytest.skip()
-    check_estimator(estimator)
+    # if TREE_ESTIMATORS[estimator].__name__ in TREE_CLASSIFIERS:
+    #     pytest.skip()
+    check(estimator)

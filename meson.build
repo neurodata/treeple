@@ -45,7 +45,7 @@ if not cython.found()
   error('MESON_BUILD_FAILED: Cython3 not found. Please install it.')
 endif
 
-run_command('git', 'submodule', 'update', '--init')
+run_command('git', 'submodule', 'update', '--init', check: true)
 
 # Setup Python:
 # https://mesonbuild.com/Python-module.html

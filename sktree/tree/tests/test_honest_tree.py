@@ -5,20 +5,13 @@ import pytest
 from sklearn import datasets
 from sklearn.metrics import accuracy_score
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.utils.estimator_checks import check_estimator
+from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from sktree.tree import (
     HonestTreeClassifier,
     ObliqueDecisionTreeClassifier,
     PatchObliqueDecisionTreeClassifier,
 )
-
-TREE_CLASSIFIERS = {
-    "HonestTreeClassifier": HonestTreeClassifier,
-}
-
-TREE_ESTIMATORS: Dict[str, Any] = dict()
-TREE_ESTIMATORS.update(TREE_CLASSIFIERS)
 
 # also load the iris dataset
 # and randomly permute it
@@ -113,9 +106,9 @@ def test_impute_classes():
     assert y_proba.shape[1] == 3
 
 
-@pytest.mark.parametrize("estimator", TREE_ESTIMATORS)
-def test_sklearn_compatible_estimator(estimator):
+@parametrize_with_checks([HonestTreeClassifier(random_state=0)])
+def test_sklearn_compatible_estimator(estimator, check):
     # TODO: remove when we implement Regressor classes
-    if TREE_ESTIMATORS[estimator].__name__ in TREE_CLASSIFIERS:
-        pytest.skip()
-    check_estimator(estimator)
+    # if TREE_ESTIMATORS[estimator].__name__ in TREE_CLASSIFIERS:
+    #     pytest.skip()
+    check(estimator)

@@ -163,7 +163,7 @@ class HonestForestClassifier(ForestClassifier):
 
     max_samples : int or float, default=None
         If bootstrap is True, the number of samples to draw from X
-        to train each base estimator.
+        to train each base tree estimator.
 
         - If None (default), then draw `X.shape[0]` samples.
         - If int, then draw `max_samples` samples.
@@ -186,8 +186,9 @@ class HonestForestClassifier(ForestClassifier):
         Whether to use the honest samples to make estimate on the training
         data.
 
-    estimator : object, default=HonestTreeClassifier
-        Instatiated tree of type BaseDecisionTree.
+    tree_estimator : object, default=None
+        Type of decision tree classifier to use. By default `None`, which
+        defaults to :class:`sklearn.tree.DecisionTreeClassifier`.
 
     Attributes
     ----------
@@ -327,10 +328,10 @@ class HonestForestClassifier(ForestClassifier):
         max_samples=None,
         honest_prior="empirical",
         honest_fraction=0.5,
-        estimator=HonestTreeClassifier(),
+        tree_estimator=None,
     ):
         super().__init__(
-            estimator=estimator,
+            estimator=HonestTreeClassifier(),
             n_estimators=n_estimators,
             estimator_params=(
                 "criterion",
@@ -344,6 +345,7 @@ class HonestForestClassifier(ForestClassifier):
                 "min_impurity_decrease",
                 "random_state",
                 "ccp_alpha",
+                "tree_estimator",
                 "honest_fraction",
                 "honest_prior",
             ),
@@ -368,6 +370,7 @@ class HonestForestClassifier(ForestClassifier):
         self.ccp_alpha = ccp_alpha
         self.honest_fraction = honest_fraction
         self.honest_prior = honest_prior
+        self.tree_estimator = tree_estimator
 
     def fit(self, X, y, sample_weight=None):
         """
@@ -394,7 +397,7 @@ class HonestForestClassifier(ForestClassifier):
         Returns
         -------
         self : HonestForestClassifier
-            Fitted estimator.
+            Fitted tree estimator.
         """
         X, y = check_X_y(X, y)
 
@@ -437,7 +440,7 @@ class HonestForestClassifier(ForestClassifier):
         X = self._validate_X_predict(X)
         n_jobs, _, _ = _partition_estimators(self.n_estimators, self.n_jobs)
 
-        # avoid storing the output of every estimator by summing them here
+        # avoid storing the output of every tree estimator by summing them here
         posteriors = np.zeros((X.shape[0], self.n_classes_), dtype=np.float64)
         lock = threading.Lock()
 

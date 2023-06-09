@@ -1,6 +1,8 @@
 # Authors: Ronan Perry, Sambit Panda, Haoyin Xu
 # Adopted from: https://github.com/neurodata/honest-forests
 
+from copy import deepcopy
+
 import numpy as np
 from sklearn.base import MetaEstimatorMixin
 from sklearn.utils.multiclass import check_classification_targets
@@ -72,7 +74,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
         effectively inspect more than ``max_features`` features.
 
     random_state : int, RandomState instance or None, default=None
-        Controls the randomness of the estimator. The features are always
+        Controls the randomness of the tree estimator. The features are always
         randomly permuted at each split, even if ``splitter`` is set to
         ``"best"``. When ``max_features < n_features``, the algorithm will
         select ``max_features`` at random at each split before finding the best
@@ -143,7 +145,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
         classes). If "empirical", the prior tree posterior is the relative
         class frequency in the voting subsample.
 
-    estimator : object, default=None
+    tree estimator : object, default=None
         Instatiated tree of type BaseDecisionTree.
         If None, then DecisionTreeClassifier with default parameters will
         be used.
@@ -151,7 +153,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
     Attributes
     ----------
     estimator_ : object
-        The child estimator template used to create the collection
+        The child tree estimator template used to create the collection
         of fitted sub-estimators.
 
     classes_ : ndarray of shape (n_classes,) or list of ndarray
@@ -260,11 +262,11 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
         min_impurity_decrease=0.0,
         class_weight=None,
         ccp_alpha=0.0,
-        estimator=None,
+        tree_estimator=None,
         honest_fraction=0.5,
         honest_prior="empirical",
     ):
-        self.estimator = estimator
+        self.tree_estimator = tree_estimator
         self.criterion = criterion
         self.splitter = splitter
         self.max_depth = max_depth
@@ -307,28 +309,31 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
         Returns
         -------
         self : HonestTreeClassifier
-            Fitted estimator.
+            Fitted tree estimator.
         """
+        rng = np.random.default_rng(self.random_state)
         if check_input:
             X, y = check_X_y(X, y)
 
         # Account for bootstrapping too
         if sample_weight is None:
-            sample_weight = np.ones((X.shape[0],), dtype=np.float64)
+            _sample_weight = np.ones((X.shape[0],), dtype=np.float64)
+        else:
+            _sample_weight = np.array(sample_weight)
 
-        nonzero_indices = np.where(sample_weight > 0)[0]
+        nonzero_indices = np.where(_sample_weight > 0)[0]
 
-        self.structure_indices_ = np.random.choice(
+        self.structure_indices_ = rng.choice(
             nonzero_indices,
             int((1 - self.honest_fraction) * len(nonzero_indices)),
             replace=False,
         )
         self.honest_indices_ = np.setdiff1d(nonzero_indices, self.structure_indices_)
 
-        sample_weight[self.honest_indices_] = 0
+        _sample_weight[self.honest_indices_] = 0
 
-        if not self.estimator:
-            self.estimator = DecisionTreeClassifier(
+        if not self.tree_estimator:
+            self.estimator_ = DecisionTreeClassifier(
                 criterion=self.criterion,
                 splitter=self.splitter,
                 max_depth=self.max_depth,
@@ -342,11 +347,14 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
                 min_impurity_decrease=self.min_impurity_decrease,
                 ccp_alpha=self.ccp_alpha,
             )
+        else:
+            self.estimator_ = deepcopy(self.tree_estimator)
+
         # Learn structure on subsample
-        self.estimator.fit(
+        self.estimator_.fit(
             X,
             y,
-            sample_weight=sample_weight,
+            sample_weight=_sample_weight,
             check_input=check_input,
         )
         self._inherit_estimator_attributes()
@@ -365,7 +373,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
         check_classification_targets(y)
         y = np.copy(y).astype(int)
         # Normally called by super
-        X = self.estimator._validate_X_predict(X, True)
+        X = self.estimator_._validate_X_predict(X, True)
         # Fit leaves using other subsample
         honest_leaves = self.tree_.apply(X[self.honest_indices_])
 
@@ -406,13 +414,13 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
             self.tree_.value[leaf_id][0, yval] += 1
 
     def _inherit_estimator_attributes(self):
-        """Initialize necessary attributes from the provided estimator"""
-        self.classes_ = self.estimator.classes_
-        self.max_features_ = self.estimator.max_features_
-        self.n_classes_ = self.estimator.n_classes_
-        self.n_features_in_ = self.estimator.n_features_in_
-        self.n_outputs_ = self.estimator.n_outputs_
-        self.tree_ = self.estimator.tree_
+        """Initialize necessary attributes from the provided tree estimator"""
+        self.classes_ = self.estimator_.classes_
+        self.max_features_ = self.estimator_.max_features_
+        self.n_classes_ = self.estimator_.n_classes_
+        self.n_features_in_ = self.estimator_.n_features_in_
+        self.n_outputs_ = self.estimator_.n_outputs_
+        self.tree_ = self.estimator_.tree_
 
     def _empty_leaf_correction(self, proba, normalizer):
         """Leaves with empty posteriors are assigned values"""
@@ -462,7 +470,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
             classes corresponds to that in the attribute :term:`classes_`.
         """
         check_is_fitted(self)
-        X = self.estimator._validate_X_predict(X, check_input)
+        X = self.estimator_._validate_X_predict(X, check_input)
         proba = self.tree_.predict(X)
 
         if self.n_outputs_ == 1:
@@ -504,5 +512,5 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
         y : array-like of shape (n_samples,) or (n_samples, n_outputs)
             The predicted classes, or the predict values.
         """
-
-        return self.estimator.predict(X, check_input)
+        X = self._validate_X_predict(X, check_input)
+        return self.estimator_.predict(X, False)
