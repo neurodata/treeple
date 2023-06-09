@@ -10,9 +10,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import cm
 from sklearn import datasets
-from sklearn.calibration import CalibratedClassifierCV, calibration_curve
+from sklearn.calibration import CalibratedClassifierCV
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import brier_score_loss, f1_score, precision_score, recall_score
 from sklearn.model_selection import train_test_split
 
 from sktree.ensemble import HonestForestClassifier
