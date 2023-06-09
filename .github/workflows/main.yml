@@ -108,13 +108,15 @@ jobs:
         run: |
           echo "$PWD/build-install/"
           export INSTALLED_PATH=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages
+          
+          # to make sure coverage/test command builds cleanly
+          echo "FORCE_SUBMODULE=True" >> $GITHUB_ENV
 
       - name: Run unit tests and coverage
         run: |
           ./spin --help
           ./spin coverage --help
           ./spin test --help
-          export FORCE_SUBMODULE=True
           python spin coverage
           cp $PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages/coverage.xml ./coverage.xml
 
@@ -193,6 +195,7 @@ jobs:
       - name: Build
         run: |
           echo "SCIPY_USE_PROPACK=1" >> $env:GITHUB_ENV
+          echo "FORCE_SUBMODULE=True" >> $env:GITHUB_ENV
           python spin build -j 2
           # Necessary because GitHub Actions checks out the repo to D:\ while OpenBLAS
           # got installed to C:\ higher up. The copying with `--win-cp-openblas` fails
@@ -202,7 +205,6 @@ jobs:
   
       - name: test
         run: |
-          echo "FORCE_SUBMODULE=True" >> $env:GITHUB_ENV
           python spin test
 
   # release is ran when a release is made on Github
