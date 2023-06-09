@@ -73,7 +73,7 @@ def test_toy_accuracy():
         ("ignore", np.nan),
     ],
 )
-def test_impute_posteriors(honest_prior, val):
+def test_low_fraction_posteriors(honest_prior, val):
     np.random.seed(0)
     X = np.random.normal(0, 1, (100, 2))
     y = [0] * 75 + [1] * 25
@@ -101,7 +101,7 @@ def test_increasing_leaves():
     assert np.all(np.diff(n_leaves) > 0)
 
 
-def test_impute_classes():
+def test_low_fraction_classes():
     np.random.seed(0)
     X = np.random.normal(0, 1, (101, 2))
     y = [2] * 50 + [1] * 50 + [0]

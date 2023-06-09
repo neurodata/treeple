@@ -427,15 +427,6 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
 
         return proba
 
-    def _impute_missing_classes(self, proba):
-        """Due to splitting, provide proba outputs for some classes"""
-        new_proba = np.zeros((proba.shape[0], self.n_classes_))
-        for i, old_class in enumerate(self._tree_classes_):
-            j = np.where(self.classes_ == old_class)[0][0]
-            new_proba[:, j] = proba[:, i]
-
-        return new_proba
-
     def predict_proba(self, X, check_input=True):
         """Predict class probabilities of the input samples X.
 
@@ -469,8 +460,6 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
             normalizer = proba.sum(axis=1)[:, np.newaxis]
             normalizer[normalizer == 0.0] = 1.0
             proba /= normalizer
-            if self._tree_n_classes_ != self.n_classes_:
-                proba = self._impute_missing_classes(proba)
             proba = self._empty_leaf_correction(proba, normalizer)
 
             return proba

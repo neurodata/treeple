@@ -73,7 +73,7 @@ def test_iris(criterion, max_features, estimator):
     )
 
 
-def test_impute_classes():
+def test_low_fraction_classes():
     np.random.seed(0)
     X = np.random.normal(0, 1, (101, 2))
     y = [0] * 50 + [1] * 50 + [2]
@@ -125,7 +125,7 @@ def test_max_samples():
         ("ignore", np.nan),
     ],
 )
-def test_impute_posteriors(honest_prior, val):
+def test_low_fraction_posteriors(honest_prior, val):
     np.random.seed(0)
     X = np.random.normal(0, 1, (100, 2))
     y = [0] * 75 + [1] * 25
