@@ -393,18 +393,18 @@ document.write(`
 <span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">issparse</span>
 <span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">ClusterMixin</span><span class="p">,</span> <span class="n">TransformerMixin</span>
 <span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">AgglomerativeClustering</span>
-<span class="kn">from</span> <span class="nn">sklearn_fork.tree</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils._param_validation</span> <span class="kn">import</span> <span class="n">Interval</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">check_is_fitted</span>
+
+<span class="kn">from</span> <span class="nn">.._lib.sklearn.tree</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">BaseDecisionTree</span><span class="p">,</span>
     <span class="n">DecisionTreeClassifier</span><span class="p">,</span>
     <span class="n">DecisionTreeRegressor</span><span class="p">,</span>
     <span class="n">_criterion</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">sklearn_fork.tree</span> <span class="kn">import</span> <span class="n">_tree</span> <span class="k">as</span> <span class="n">_sklearn_tree</span>
-<span class="kn">from</span> <span class="nn">sklearn_fork.tree._criterion</span> <span class="kn">import</span> <span class="n">BaseCriterion</span>
-<span class="kn">from</span> <span class="nn">sklearn_fork.tree._tree</span> <span class="kn">import</span> <span class="n">BestFirstTreeBuilder</span><span class="p">,</span> <span class="n">DepthFirstTreeBuilder</span>
-<span class="kn">from</span> <span class="nn">sklearn_fork.utils._param_validation</span> <span class="kn">import</span> <span class="n">Interval</span>
-<span class="kn">from</span> <span class="nn">sklearn_fork.utils.validation</span> <span class="kn">import</span> <span class="n">check_is_fitted</span>
-
+<span class="kn">from</span> <span class="nn">.._lib.sklearn.tree</span> <span class="kn">import</span> <span class="n">_tree</span> <span class="k">as</span> <span class="n">_sklearn_tree</span>
+<span class="kn">from</span> <span class="nn">.._lib.sklearn.tree._criterion</span> <span class="kn">import</span> <span class="n">BaseCriterion</span>
+<span class="kn">from</span> <span class="nn">.._lib.sklearn.tree._tree</span> <span class="kn">import</span> <span class="n">BestFirstTreeBuilder</span><span class="p">,</span> <span class="n">DepthFirstTreeBuilder</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_oblique_splitter</span>
 <span class="kn">from</span> <span class="nn">._neighbors</span> <span class="kn">import</span> <span class="n">SimMatrixMixin</span>
 <span class="kn">from</span> <span class="nn">._oblique_splitter</span> <span class="kn">import</span> <span class="n">ObliqueSplitter</span>
@@ -416,7 +416,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">.unsupervised._unsup_oblique_splitter</span> <span class="kn">import</span> <span class="n">UnsupervisedObliqueSplitter</span>
 <span class="kn">from</span> <span class="nn">.unsupervised._unsup_oblique_tree</span> <span class="kn">import</span> <span class="n">UnsupervisedObliqueTree</span>
 <span class="kn">from</span> <span class="nn">.unsupervised._unsup_splitter</span> <span class="kn">import</span> <span class="n">UnsupervisedSplitter</span>
-<span class="kn">from</span> <span class="nn">.unsupervised._unsup_tree</span> <span class="kn">import</span> <span class="p">(</span>  <span class="c1"># type: ignore</span>
+<span class="kn">from</span> <span class="nn">.unsupervised._unsup_tree</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">UnsupervisedBestFirstTreeBuilder</span><span class="p">,</span>
     <span class="n">UnsupervisedDepthFirstTreeBuilder</span><span class="p">,</span>
     <span class="n">UnsupervisedTree</span><span class="p">,</span>
@@ -596,7 +596,7 @@ document.write(`
                 <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">intc</span> <span class="ow">or</span> <span class="n">X</span><span class="o">.</span><span class="n">indptr</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">intc</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No support for np.int64 index based sparse matrices&quot;</span><span class="p">)</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">,</span> <span class="n">check_input</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">,</span> <span class="n">check_input</span><span class="o">=</span><span class="n">check_input</span><span class="p">)</span>
 
         <span class="c1"># apply to the leaves</span>
         <span class="n">n_samples</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -614,6 +614,7 @@ document.write(`
         <span class="n">X</span><span class="p">,</span>
         <span class="n">y</span><span class="p">,</span>
         <span class="n">sample_weight</span><span class="p">,</span>
+        <span class="n">feature_has_missing</span><span class="p">,</span>
         <span class="n">min_samples_leaf</span><span class="p">,</span>
         <span class="n">min_weight_leaf</span><span class="p">,</span>
         <span class="n">max_leaf_nodes</span><span class="p">,</span>
@@ -880,6 +881,7 @@ document.write(`
         <span class="n">X</span><span class="p">,</span>
         <span class="n">y</span><span class="p">,</span>
         <span class="n">sample_weight</span><span class="p">,</span>
+        <span class="n">feature_has_missing</span><span class="p">,</span>
         <span class="n">min_samples_leaf</span><span class="p">,</span>
         <span class="n">min_weight_leaf</span><span class="p">,</span>
         <span class="n">max_leaf_nodes</span><span class="p">,</span>
@@ -1205,6 +1207,7 @@ document.write(`
         <span class="n">X</span><span class="p">,</span>
         <span class="n">y</span><span class="p">,</span>
         <span class="n">sample_weight</span><span class="p">,</span>
+        <span class="n">feature_has_missing</span><span class="p">,</span>
         <span class="n">min_samples_leaf</span><span class="p">,</span>
         <span class="n">min_weight_leaf</span><span class="p">,</span>
         <span class="n">max_leaf_nodes</span><span class="p">,</span>
@@ -1560,6 +1563,7 @@ document.write(`
         <span class="n">X</span><span class="p">,</span>
         <span class="n">y</span><span class="p">,</span>
         <span class="n">sample_weight</span><span class="p">,</span>
+        <span class="n">feature_has_missing</span><span class="p">,</span>
         <span class="n">min_samples_leaf</span><span class="p">,</span>
         <span class="n">min_weight_leaf</span><span class="p">,</span>
         <span class="n">max_leaf_nodes</span><span class="p">,</span>
@@ -2048,6 +2052,7 @@ document.write(`
         <span class="n">X</span><span class="p">,</span>
         <span class="n">y</span><span class="p">,</span>
         <span class="n">sample_weight</span><span class="p">,</span>
+        <span class="n">feature_has_missing</span><span class="p">,</span>
         <span class="n">min_samples_leaf</span><span class="p">,</span>
         <span class="n">min_weight_leaf</span><span class="p">,</span>
         <span class="n">max_leaf_nodes</span><span class="p">,</span>
@@ -2154,7 +2159,13 @@ document.write(`
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_more_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># XXX: nans should be supportable in SPORF by just using RF-like splits on missing values</span>
+        <span class="c1"># However, for MORF it is not supported</span>
+        <span class="n">allow_nan</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;multilabel&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;allow_nan&quot;</span><span class="p">:</span> <span class="n">allow_nan</span><span class="p">}</span></div>
 
 
 <div class="viewcode-block" id="PatchObliqueDecisionTreeRegressor"><a class="viewcode-back" href="../../../generated/sktree.tree.PatchObliqueDecisionTreeRegressor.html#sktree.tree.PatchObliqueDecisionTreeRegressor">[docs]</a><span class="k">class</span> <span class="nc">PatchObliqueDecisionTreeRegressor</span><span class="p">(</span><span class="n">SimMatrixMixin</span><span class="p">,</span> <span class="n">DecisionTreeRegressor</span><span class="p">):</span>
@@ -2516,6 +2527,7 @@ document.write(`
         <span class="n">X</span><span class="p">,</span>
         <span class="n">y</span><span class="p">,</span>
         <span class="n">sample_weight</span><span class="p">,</span>
+        <span class="n">feature_has_missing</span><span class="p">,</span>
         <span class="n">min_samples_leaf</span><span class="p">,</span>
         <span class="n">min_weight_leaf</span><span class="p">,</span>
         <span class="n">max_leaf_nodes</span><span class="p">,</span>
@@ -2624,7 +2636,13 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">)</span></div>
+        <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_more_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># XXX: nans should be supportable in SPORF by just using RF-like splits on missing values</span>
+        <span class="c1"># However, for MORF it is not supported</span>
+        <span class="n">allow_nan</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;multilabel&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;allow_nan&quot;</span><span class="p">:</span> <span class="n">allow_nan</span><span class="p">}</span></div>
 </pre></div>
 
                 </article>
@@ -2669,7 +2687,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-06-06.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-06-09.
       <br/>
     
   </p>
