@@ -37,6 +37,9 @@ jobs:
     defaults:
       run:
         shell: bash
+    env:
+      # to make sure coverage/test command builds cleanly
+      FORCE_SUBMODULE: True
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -48,7 +51,6 @@ jobs:
           architecture: "x64"
           cache: "pip"
           cache-dependency-path: "requirements.txt"
-
 
       - name: show-gcc
         run: |
@@ -98,7 +100,7 @@ jobs:
 
       - name: Setup build and install scikit-tree
         run: |
-          python spin build -j 2
+          ./spin build -j 2 --forcesubmodule
 
       - name: Ccache performance
         shell: bash -l {0}
@@ -114,7 +116,7 @@ jobs:
           ./spin --help
           ./spin coverage --help
           ./spin test --help
-          python spin coverage
+          ./spin coverage
           cp $PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages/coverage.xml ./coverage.xml
 
       - name: debug
@@ -192,6 +194,7 @@ jobs:
       - name: Build
         run: |
           echo "SCIPY_USE_PROPACK=1" >> $env:GITHUB_ENV
+          echo "FORCE_SUBMODULE=True" >> $env:GITHUB_ENV
           python spin build -j 2
           # Necessary because GitHub Actions checks out the repo to D:\ while OpenBLAS
           # got installed to C:\ higher up. The copying with `--win-cp-openblas` fails
