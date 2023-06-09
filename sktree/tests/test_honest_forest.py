@@ -2,10 +2,16 @@ import time
 
 import numpy as np
 import pytest
-from sklearn_fork import datasets
-from sklearn_fork.metrics import accuracy_score
+from sklearn import datasets
+from sklearn.metrics import accuracy_score
+from sklearn.tree import DecisionTreeClassifier
 
 from sktree.ensemble import HonestForestClassifier
+from sktree.tree import (
+    HonestTreeClassifier,
+    ObliqueDecisionTreeClassifier,
+    PatchObliqueDecisionTreeClassifier,
+)
 
 CLF_CRITERIONS = ("gini", "entropy")
 
@@ -29,10 +35,22 @@ def test_toy_accuracy():
 
 @pytest.mark.parametrize("criterion", ["gini", "entropy"])
 @pytest.mark.parametrize("max_features", [None, 2])
-def test_iris(criterion, max_features):
+@pytest.mark.parametrize(
+    "estimator",
+    [
+        DecisionTreeClassifier(),
+        ObliqueDecisionTreeClassifier(),
+        PatchObliqueDecisionTreeClassifier(),
+    ],
+)
+def test_iris(criterion, max_features, estimator):
     # Check consistency on dataset iris.
     clf = HonestForestClassifier(
-        criterion=criterion, random_state=0, max_features=max_features, n_estimators=10
+        criterion=criterion,
+        random_state=0,
+        max_features=max_features,
+        n_estimators=10,
+        estimator=HonestTreeClassifier(estimator),
     )
     clf.fit(iris.data, iris.target)
     score = accuracy_score(clf.predict(iris.data), iris.target)

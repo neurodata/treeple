@@ -1,9 +1,14 @@
 import numpy as np
 import pytest
-from sklearn_fork import datasets
-from sklearn_fork.metrics import accuracy_score
+from sklearn import datasets
+from sklearn.metrics import accuracy_score
+from sklearn.tree import DecisionTreeClassifier
 
-from sktree.tree import HonestTreeClassifier
+from sktree.tree import (
+    HonestTreeClassifier,
+    ObliqueDecisionTreeClassifier,
+    PatchObliqueDecisionTreeClassifier,
+)
 
 # also load the iris dataset
 # and randomly permute it
@@ -16,9 +21,19 @@ iris.target = iris.target[perm]
 
 @pytest.mark.parametrize("criterion", ["gini", "entropy"])
 @pytest.mark.parametrize("max_features", [None, 2])
-def test_iris(criterion, max_features):
+@pytest.mark.parametrize(
+    "estimator",
+    [
+        DecisionTreeClassifier(),
+        ObliqueDecisionTreeClassifier(),
+        PatchObliqueDecisionTreeClassifier(),
+    ],
+)
+def test_iris(criterion, max_features, estimator):
     # Check consistency on dataset iris.
-    clf = HonestTreeClassifier(criterion=criterion, random_state=0, max_features=max_features)
+    clf = HonestTreeClassifier(
+        criterion=criterion, random_state=0, max_features=max_features, estimator=estimator
+    )
     clf.fit(iris.data, iris.target)
     score = accuracy_score(clf.predict(iris.data), iris.target)
     assert score > 0.5 and score < 1.0, "Failed with {0}, criterion = {1} and score = {2}".format(
