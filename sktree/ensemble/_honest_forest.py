@@ -272,10 +272,15 @@ class HonestForestClassifier(ForestClassifier):
     Honesty is a feature of trees that enables unbiased estimates of confidence
     intervals. The default implementation here is using double sampling to
     implement honesty. The amount of samples used for learning split nodes vs
-    leaf nodes is controlled by the ``honest_fraction`` parameter. This forest
-    classifier is a "meta-estimator" because any tree model can be used in the
-    classification process, while enabling honesty separates the data used for
-    split and leaf nodes.
+    leaf nodes is controlled by the ``honest_fraction`` parameter. In order to
+    enforce honesty but also enable the tree to have access to all y labels,
+    we set sample_weight to 0 for a random subset of samples. This results in
+    inefficiency when building trees using a greedy splitter as we still sort
+    over all values of X.
+
+    This forest classifier is a "meta-estimator" because any tree model can
+    be used in the classification process, while enabling honesty separates
+    the data used for split and leaf nodes.
 
     References
     ----------

@@ -5,6 +5,7 @@ import pytest
 from sklearn import datasets
 from sklearn.metrics import accuracy_score
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.utils.estimator_checks import check_estimator
 
 from sktree.tree import (
     HonestTreeClassifier,
@@ -117,4 +118,4 @@ def test_sklearn_compatible_estimator(estimator):
     # TODO: remove when we implement Regressor classes
     if TREE_ESTIMATORS[estimator].__name__ in TREE_CLASSIFIERS:
         pytest.skip()
-    check(estimator)
+    check_estimator(estimator)
