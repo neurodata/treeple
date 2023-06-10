@@ -173,11 +173,6 @@ class HonestForestClassifier(ForestClassifier):
         - If float, then draw `max_samples * X.shape[0]` samples. Thus,
           `max_samples` should be in the interval `(0.0, 1.0]`.
 
-    honest_fraction : float, default=0.5
-        Fraction of training samples used for estimates in the trees. The
-        remaining samples will be used to learn the tree structure. A larger
-        fraction creates shallower trees with lower variance estimates.
-
     honest_prior : {"ignore", "uniform", "empirical"}, default="empirical"
         Method for dealing with empty leaves during evaluation of a test
         sample. If "ignore", the tree is ignored. If "uniform", the prior tree
@@ -185,9 +180,10 @@ class HonestForestClassifier(ForestClassifier):
         posterior is the relative class frequency in the voting subsample.
         If all trees are ignored, the empirical estimate is returned.
 
-    honest_score : bool, default=False
-        Whether to use the honest samples to make estimate on the training
-        data.
+    honest_fraction : float, default=0.5
+        Fraction of training samples used for estimates in the trees. The
+        remaining samples will be used to learn the tree structure. A larger
+        fraction creates shallower trees with lower variance estimates.
 
     tree_estimator : object, default=None
         Type of decision tree classifier to use. By default `None`, which
@@ -195,11 +191,11 @@ class HonestForestClassifier(ForestClassifier):
 
     Attributes
     ----------
-    estimator : HonestTreeClassifier
+    estimator : sktree.tree.HonestTreeClassifier
         The child estimator template used to create the collection of fitted
         sub-estimators.
 
-    estimators_ : list of HonestTreeClassifier
+    estimators_ : list of sktree.tree.HonestTreeClassifier
         The collection of fitted sub-estimators.
 
     classes_ : ndarray of shape (n_classes,) or a list of such arrays
@@ -251,13 +247,13 @@ class HonestForestClassifier(ForestClassifier):
         Decision function computed on each sample, including only the trees
         for which it was in the honest subsample. It is possible that a sample
         is never in the honest subset in which case `honest_decision_function_`
-        might contain NaN. This attribute exists when `honest_score_` is True.
+        might contain NaN.
 
     structure_indices_ : list of lists, shape=(n_estimators, n_structure)
-        Indices of training samples used to learn the structure
+        Indices of training samples used to learn the structure.
 
     honest_indices_ : list of lists, shape=(n_estimators, n_honest)
-        Indices of training samples used to learn leaf estimates
+        Indices of training samples used to learn leaf estimates.
 
     Notes
     -----
