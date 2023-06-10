@@ -133,6 +133,11 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
         ``ccp_alpha`` will be chosen. By default, no pruning is performed. See
         :ref:`minimal_cost_complexity_pruning` for details.
 
+    tree_estimator : object, default=None
+        Instatiated tree of type BaseDecisionTree.
+        If None, then DecisionTreeClassifier with default parameters will
+        be used.
+
     honest_fraction : float, default=0.5
         Fraction of training samples used for estimates in the leaves. The
         remaining samples will be used to learn the tree structure. A larger
@@ -144,11 +149,6 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
         If "uniform", the prior tree posterior is 1/(number of
         classes). If "empirical", the prior tree posterior is the relative
         class frequency in the voting subsample.
-
-    tree_estimator : object, default=None
-        Instatiated tree of type BaseDecisionTree.
-        If None, then DecisionTreeClassifier with default parameters will
-        be used.
 
     Attributes
     ----------
