@@ -162,12 +162,17 @@ def test_honest_decision_function(honest_fraction, val):
     [HonestForestClassifier(n_estimators=10, honest_fraction=0.5, random_state=0)]
 )
 def test_sklearn_compatible_estimator(estimator, check):
-    # TODO: ignore all multi-target output forest tests
-    # TODO: possibly ignoring the zero sample_weight and document it in the class because
-    # TODO: IGNORE -check_class_weight_classifiers since this is also related to sample_weight
+    # 1. multi-output is not supported
+    # 2. check_class_weight_classifiers is not supported since it requires sample weight
     # XXX: can include this "generalization" in the future if it's useful
     #  zero sample weight is not "really supported" in honest subsample trees since sample weight
     #  for fitting the tree's splits
-    # if TREE_ESTIMATORS[estimator].__name__ in TREE_CLASSIFIERS:
-    #     pytest.skip()
+    if check.func.__name__ in [
+        "check_class_weight_classifiers",
+        "check_classifiers_multilabel_output_format_decision_function",
+        "check_classifiers_multilabel_output_format_predict_proba",
+        "check_classifiers_multilabel_output_format_predict",
+        "check_classifiers_multilabel_representation_invariance",
+    ]:
+        pytest.skip()
     check(estimator)

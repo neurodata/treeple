@@ -10,7 +10,10 @@ from sklearn.utils.validation import check_is_fitted, check_X_y
 
 from sktree._lib.sklearn.ensemble._forest import ForestClassifier
 
+from .._lib.sklearn.tree import _tree as _sklearn_tree
 from ..tree import HonestTreeClassifier
+
+DTYPE = _sklearn_tree.DTYPE
 
 
 class HonestForestClassifier(ForestClassifier):
@@ -401,7 +404,7 @@ class HonestForestClassifier(ForestClassifier):
             Fitted tree estimator.
         """
         super().fit(X, y, sample_weight)
-        X, y = check_X_y(X, y)
+        X, y = check_X_y(X, y, multi_output=False)
         classes_k, y_encoded = np.unique(y, return_inverse=True)
         self.empirical_prior_ = np.bincount(y_encoded, minlength=classes_k.shape[0]) / len(y)
 
@@ -470,6 +473,9 @@ class HonestForestClassifier(ForestClassifier):
     def honest_indices_(self):
         check_is_fitted(self)
         return [tree.honest_indices_ for tree in self.estimators_]
+
+    def _more_tags(self):
+        return {"multioutput": False}
 
 
 def _accumulate_prediction(tree, X, out, lock, indices=None):
