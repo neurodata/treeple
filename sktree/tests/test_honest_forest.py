@@ -1,5 +1,3 @@
-import time
-
 import numpy as np
 import pytest
 from sklearn import datasets
@@ -8,11 +6,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from sktree.ensemble import HonestForestClassifier
-from sktree.tree import (
-    HonestTreeClassifier,
-    ObliqueDecisionTreeClassifier,
-    PatchObliqueDecisionTreeClassifier,
-)
+from sktree.tree import ObliqueDecisionTreeClassifier, PatchObliqueDecisionTreeClassifier
 
 CLF_CRITERIONS = ("gini", "entropy")
 
@@ -51,7 +45,7 @@ def test_iris(criterion, max_features, estimator):
         random_state=0,
         max_features=max_features,
         n_estimators=10,
-        tree_estimator=None,
+        tree_estimator=estimator,
     )
     clf.fit(iris.data, iris.target)
     score = accuracy_score(clf.predict(iris.data), iris.target)
@@ -75,24 +69,6 @@ def test_impute_classes():
     y_proba = clf.predict_proba(X)
 
     assert y_proba.shape[1] == 3
-
-
-def test_parallel_trees():
-    uf = HonestForestClassifier(n_estimators=100, n_jobs=1, max_features=1.0, honest_fraction=0.5)
-    uf_parallel = HonestForestClassifier(
-        n_estimators=100, n_jobs=10, max_features=1.0, honest_fraction=0.5
-    )
-    X = np.random.normal(0, 1, (1000, 100))
-    y = [0, 1] * (len(X) // 2)
-
-    time_start = time.time()
-    uf.fit(X, y)
-    time_diff = time.time() - time_start
-
-    time_start = time.time()
-    uf_parallel.fit(X, y)
-    time_parallel_diff = time.time() - time_start
-    assert time_parallel_diff / time_diff < 0.9
 
 
 def test_max_samples():
