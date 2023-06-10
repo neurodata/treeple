@@ -10,7 +10,7 @@ jobs:
   label_pull_request:
     runs-on: ubuntu-latest
     steps:
-      - uses: thomasjpfan/labeler@v2.5.0
+      - uses: thomasjpfan/labeler@v2.5.1
         continue-on-error: true
         if: github.repository == 'neurodata/scikit-tree'
         with:
