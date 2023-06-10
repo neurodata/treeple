@@ -6,6 +6,7 @@ from ._classes import (
     UnsupervisedDecisionTree,
     UnsupervisedObliqueDecisionTree,
 )
+from ._honest_tree import HonestTreeClassifier
 
 __all__ = [
     "UnsupervisedDecisionTree",
@@ -14,4 +15,5 @@ __all__ = [
     "ObliqueDecisionTreeRegressor",
     "PatchObliqueDecisionTreeClassifier",
     "PatchObliqueDecisionTreeRegressor",
+    "HonestTreeClassifier",
 ]

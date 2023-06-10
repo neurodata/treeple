@@ -157,7 +157,6 @@ numpydoc_xref_aliases = {
     # Python
     "Path": "pathlib.Path",
     "bool": ":class:`python:bool`",
-    "~sklearn_fork": "~sklearn",
     "UnsupervisedDecisionTree": "sktree.tree.UnsupervisedDecisionTree",
     "ObliqueDecisionTreeClassifier": "sktree.tree.ObliqueDecisionTreeClassifier",
     "PatchObliqueDecisionTreeClassifier": "sktree.tree.PatchObliqueDecisionTreeClassifier",
@@ -165,7 +164,7 @@ numpydoc_xref_aliases = {
     "PatchObliqueDecisionTreeRegressor": "sktree.tree.PatchObliqueDecisionTreeRegressor",
     "DecisionTreeClassifier": "sklearn.tree.DecisionTreeClassifier",
     "DecisionTreeRegressor": "sklearn.tree.DecisionTreeRegressor",
-    # "sklearn_fork.pipeline.Pipeline": "sklearn.pipeline.Pipeline",
+    "pipeline.Pipeline": "sklearn.pipeline.Pipeline",
     # "sklearn_fork.inspection.permutation_importance": "sklearn.inspection.permutation_importance",
 }
 numpydoc_xref_ignore = {
@@ -185,6 +184,9 @@ numpydoc_xref_ignore = {
     "n_features_new",
     "n_estimators",
     "n_outputs",
+    "n_honest",
+    "n_structure",
+    "lists",
     "n_nodes",
     "X",
     "default",
@@ -200,6 +202,8 @@ numpydoc_xref_ignore = {
     "a",
     "Tree",
     "_type_",
+    "MetadataRequest",
+    "~utils.metadata_routing.MetadataRequest",
 }
 
 # validation
@@ -239,7 +243,7 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "numpy": ("https://numpy.org/devdocs", None),
     "scipy": ("https://scipy.github.io/devdocs", None),
-    "sklearn": ("https://scikit-learn.org/stable", None),
+    "sklearn": ("https://scikit-learn.org/dev", None),
     "pandas": ("https://pandas.pydata.org/pandas-docs/dev", None),
     "joblib": ("https://joblib.readthedocs.io/en/latest", None),
     "matplotlib": ("https://matplotlib.org/stable", None),
@@ -341,15 +345,15 @@ issues_github_path = "neurodata/scikit-tree"
 
 def replace_sklearn_fork_with_sklearn(app, what, name, obj, options, lines):
     """
-    This function replaces all instances of 'sklearn_fork' with 'sklearn'
+    This function replaces all instances of 'sklearn' with 'sklearn'
     in the docstring content.
     """
     # Convert the list of lines to a string
     content = "\n".join(lines)
 
     # Use regular expressions to replace 'sklearn_fork' with 'sklearn'
-    content = re.sub(r"`~sklearn_fork\.", r"`~sklearn.", content)
-    content = re.sub(r"`sklearn_fork\.", r"`sklearn.", content)
+    content = re.sub(r"`pipeline.Pipeline", r"`~sklearn.pipeline.Pipeline", content)
+    content = re.sub(r"`~utils.metadata_routing.MetadataRequest", r"``MetadataRequest``", content)
 
     # Convert the modified string back to a list of lines
     lines[:] = content.split("\n")

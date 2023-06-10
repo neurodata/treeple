@@ -162,3 +162,26 @@ Limitations compared to decision trees
 
   * T. Hastie, R. Tibshirani and J. Friedman. Elements of Statistical
     Learning, Springer, 2009.
+
+
+.. _honest_trees:
+
+Honest Trees
+============
+
+Honesty is a property of decision trees where the data used to determine splitting is independent
+of the data used to estimate the prediction at each leaf. This is in contrast to standard decision
+where the data used to determine splitting is also used to estimate the prediction at each leaf.
+
+Honesty is a desirable property because it prevents overfitting. In particular, it prevents
+the tree from overfitting to the training data. This is because the data used to determine
+splitting is independent of the data used to estimate the prediction at each leaf. 
+
+There are two methods for constructing an honest tree: 1. subsampling and 2. propensity trees.
+The first method, subsampling, is the most common method for constructing honest trees and only
+requires (X, y) pairs of data. The second method, propensity trees, requires (X, y, T) triplets
+where the tree is split first using (X, T), where T is the treatment variable, and then the
+prediction at each leaf is estimated using (X, y).
+
+Honesty results in calibrated confidence intervals, but sacrifices sample size to do so. Thus
+subsampled honest trees have higher MSE, but are better calibrated. See :

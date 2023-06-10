@@ -25,6 +25,7 @@ exclude =
     build
     build-install 
     dist
+    sktree/_lib/
 
 per-file-ignores =
     # __init__.py files are allowed to have unused imports

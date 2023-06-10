@@ -19,10 +19,10 @@ from sklearn.metrics import (
 )
 from sklearn.model_selection import cross_val_score
 from sklearn.tree._tree import TREE_LEAF
-from sklearn_fork.tree import DecisionTreeClassifier
-from sklearn_fork.utils._testing import skip_if_32bit
-from sklearn_fork.utils.estimator_checks import parametrize_with_checks
+from sklearn.utils._testing import skip_if_32bit
+from sklearn.utils.estimator_checks import parametrize_with_checks
 
+from sktree._lib.sklearn.tree import DecisionTreeClassifier
 from sktree.tree import (
     ObliqueDecisionTreeClassifier,
     ObliqueDecisionTreeRegressor,
