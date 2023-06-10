@@ -35,6 +35,7 @@ Changelog
 - |Feature| MORF trees now can normalize by feature weight per sample per feature column, by `Adam Li`_ (:pr:`67`)
 - |Feature| A general-kernel MORF is now implemented where users can pass in a kernel library, by `Adam Li`_ (:pr:`70`)
 - |Feature| Implementation of ObliqueDecisionTreeRegressor, PatchObliqueDecisionTreeRegressor, ObliqueRandomForestRegressor, PatchObliqueRandomForestRegressor, by `SUKI-O`_ (:pr:`72`)
+- |Feature| Implementation of HonestTreeClassifier, HonestForestClassifier, by `Sambit Panda`_, `Adam Li`_, `Ronan Perry`_ and `Haoyin Xu`_ (:pr:`57`)
 
 Code and Documentation Contributors
 -----------------------------------
@@ -44,3 +45,5 @@ the project since version inception, including:
 
 * `Adam Li`_
 * `Sambit Panda`_
+* `Ronan Perry`_
+* `Haoyin Xu`_

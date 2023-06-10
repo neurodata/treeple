@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from sklearn.datasets import make_blobs
 
-from sktree import (
+from sktree.ensemble import (
     ObliqueRandomForestClassifier,
     PatchObliqueRandomForestClassifier,
     UnsupervisedObliqueRandomForest,

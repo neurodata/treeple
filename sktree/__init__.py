@@ -63,4 +63,5 @@ else:
         "PatchObliqueRandomForestRegressor",
         "UnsupervisedRandomForest",
         "UnsupervisedObliqueRandomForest",
+        "HonestForestClassifier",
     ]

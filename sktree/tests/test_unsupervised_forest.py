@@ -6,7 +6,7 @@ from sklearn.datasets import make_blobs
 from sklearn.metrics import adjusted_rand_score
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
-from sktree import UnsupervisedObliqueRandomForest, UnsupervisedRandomForest
+from sktree.ensemble import UnsupervisedObliqueRandomForest, UnsupervisedRandomForest
 
 CLUSTER_CRITERIONS = ("twomeans", "fastbic")
 

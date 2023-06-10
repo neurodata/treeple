@@ -10,7 +10,7 @@ from sklearn.utils._testing import assert_array_almost_equal
 from sklearn.utils.estimator_checks import check_estimator
 from sklearn.utils.validation import check_random_state
 
-from sktree import (
+from sktree.ensemble import (
     ObliqueRandomForestClassifier,
     ObliqueRandomForestRegressor,
     PatchObliqueRandomForestClassifier,

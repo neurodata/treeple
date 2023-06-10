@@ -1,5 +1,5 @@
 meson
-meson-python@git+https://github.com/mesonbuild/meson-python
+meson-python
 cython
 ninja
 numpy

@@ -190,7 +190,7 @@ exclude = [
 
 [tool.pytest.ini_options]
 minversion = '6.0'
-addopts = '--durations 20 --junit-xml=junit-results.xml --verbose'
+addopts = '--durations 20 --junit-xml=junit-results.xml --verbose --ignore=sktree/_lib/'
 filterwarnings = []
 
 [tool.coverage.run]
