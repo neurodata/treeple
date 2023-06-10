@@ -4,8 +4,28 @@ Plot honest forest calibrations on overlapping gaussian simulations
 ===================================================================
 
 Compare the prediction results of honest forests and random forests with
-various methods of calibrations.
+various methods of calibrations. Honest trees are a method for achieving
+improved calibration in random forests. See :ref:`User Guide <honest_trees>`
+for more information.
+
+Other methods for achieving calibrated random forests are also included:
+
+- Isotonic regression (``IRF``)
+- Sigmoid calibration (``SigRF``)
+- regular Random Forests without calibration (``RF``)
+
+The plot shows the calibration curves of the different methods on a simulated
+dataset with two overlapping gaussian clusters. The red line shows the
+calibration curve of the honest forest, which is closest to the ideal. The figure
+is reproduced from :footcite:`perry2021random`.
+
+References
+----------
+.. footbibliography::
 """
+
+# %%
+# Import the necessary modules and libraries
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import cm
@@ -15,6 +35,9 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 
 from sktree.ensemble import HonestForestClassifier
+
+# %%
+# Define the classifiers and generate the data
 
 color_dict = {
     "HonestRF": "#F41711",
@@ -104,7 +127,7 @@ for name, clf in clfs:
     class_one_probs[name] = clf.predict_proba(X_test)[:, 1]
 
 
-# #############################################################################
+# %%
 # Plot the data and the predicted probabilities
 fig, axes = plt.subplots(1, 2, figsize=(10, 3))
 y_unique = np.unique(y)
@@ -153,3 +176,9 @@ ax.set_ylabel("P(y=1|x)")
 ax.legend(loc="upper left")
 plt.tight_layout()
 plt.savefig("./overlapping_gaussians.png")
+
+# Discussion
+# ----------
+# The honest forest and IRF are closest to the truth, while the other methods are
+# not as well calibrated. The honest forest is also closer to the ideal calibration
+# curve, compared to RF which is shown below.

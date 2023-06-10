@@ -552,6 +552,22 @@ Learning, Springer, 2009.</p></li>
 </aside>
 </section>
 </section>
+<section id="honest-trees">
+<span id="id3"></span><h2><span class="section-number">1.2. </span>Honest Trees<a class="headerlink" href="#honest-trees" title="Permalink to this heading">#</a></h2>
+<p>Honesty is a property of decision trees where the data used to determine splitting is independent
+of the data used to estimate the prediction at each leaf. This is in contrast to standard decision
+where the data used to determine splitting is also used to estimate the prediction at each leaf.</p>
+<p>Honesty is a desirable property because it prevents overfitting. In particular, it prevents
+the tree from overfitting to the training data. This is because the data used to determine
+splitting is independent of the data used to estimate the prediction at each leaf.</p>
+<p>There are two methods for constructing an honest tree: 1. subsampling and 2. propensity trees.
+The first method, subsampling, is the most common method for constructing honest trees and only
+requires (X, y) pairs of data. The second method, propensity trees, requires (X, y, T) triplets
+where the tree is split first using (X, T), where T is the treatment variable, and then the
+prediction at each leaf is estimated using (X, y).</p>
+<p>Honesty results in calibrated confidence intervals, but sacrifices sample size to do so. Thus
+subsampled honest trees have higher MSE, but are better calibrated. See :</p>
+</section>
 </section>
 
 
@@ -610,6 +626,7 @@ Learning, Springer, 2009.</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#limitations-compared-to-decision-trees">1.1.6. Limitations compared to decision trees</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#honest-trees">1.2. Honest Trees</a></li>
 </ul>
   </nav></div>
 
