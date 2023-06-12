@@ -144,6 +144,32 @@ jobs:
             - html
             - html_stable
 
+  run_benchmarks:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/
+
+      - check-skip
+      - apt-install
+
+      - run:
+          name: run asv
+          no_output_timeout: 30m
+          command: |
+            export PYTHONPATH=$PWD/build-install/lib/python3.9/site-packages
+            cd benchmarks
+            asv machine --machine CircleCI
+            export SCIPY_GLOBAL_BENCH_NUMTRIALS=1
+            export SCIPY_ALLOW_BENCH_IMPORT_ERRORS=0
+            export OPENBLAS_NUM_THREADS=1
+            time asv --config asv.conf.json dev -m CircleCI --python=same --bench '^((?!BenchGlobal|QuadraticAssignment).)*$'
+            asv --config asv.conf.json publish
+
+      - store_artifacts:
+          path: benchmarks/html
+          destination: html-benchmarks
+
   docs-deploy:
     docker:
       - image: node:8
@@ -193,7 +219,10 @@ workflows:
       - build_docs:
           name: build_docs
           requires:
-            - build_scikit_tree
+            - build_scikit-tree
+      - run_benchmarks:
+          requires:
+            - build_scikit-tree
       - docs-deploy:
           name: docs-deploy
           requires:
