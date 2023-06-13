@@ -404,10 +404,11 @@ class HonestForestClassifier(ForestClassifier):
         classes_k, y_encoded = np.unique(y, return_inverse=True)
         self.empirical_prior_ = np.bincount(y_encoded, minlength=classes_k.shape[0]) / len(y)
 
-        # Compute honest decision function
-        self.honest_decision_function_ = self._predict_proba(
-            X, indices=self.honest_indices_, impute_missing=np.nan
-        )
+        # when honest fraction is not zero, compute honest decision function
+        if not self.honest_fraction:
+            self.honest_decision_function_ = self._predict_proba(
+                X, indices=self.honest_indices_, impute_missing=np.nan
+            )
         return self
 
     def predict_proba(self, X):

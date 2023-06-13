@@ -323,14 +323,16 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
 
         nonzero_indices = np.where(_sample_weight > 0)[0]
 
-        self.structure_indices_ = rng.choice(
-            nonzero_indices,
-            int((1 - self.honest_fraction) * len(nonzero_indices)),
-            replace=False,
-        )
-        self.honest_indices_ = np.setdiff1d(nonzero_indices, self.structure_indices_)
+        # when honest fraction is not zero
+        if not self.honest_fraction:
+            self.structure_indices_ = rng.choice(
+                nonzero_indices,
+                int((1 - self.honest_fraction) * len(nonzero_indices)),
+                replace=False,
+            )
+            self.honest_indices_ = np.setdiff1d(nonzero_indices, self.structure_indices_)
 
-        _sample_weight[self.honest_indices_] = 0
+            _sample_weight[self.honest_indices_] = 0
 
         if not self.tree_estimator:
             self.estimator_ = DecisionTreeClassifier(
@@ -373,10 +375,13 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
             y = np.reshape(y, (-1, 1))
         check_classification_targets(y)
         y = np.copy(y).astype(int)
-        # Normally called by super
-        X = self.estimator_._validate_X_predict(X, True)
-        # Fit leaves using other subsample
-        honest_leaves = self.tree_.apply(X[self.honest_indices_])
+
+        # when honest fraction is not zero
+        if not self.honest_fraction:
+            # Normally called by super
+            X = self.estimator_._validate_X_predict(X, True)
+            # Fit leaves using other subsample
+            honest_leaves = self.tree_.apply(X[self.honest_indices_])
 
         # preserve from underlying tree
         # https://github.com/scikit-learn/scikit-learn/blob/1.0.X/sklearn/tree/_classes.py#L202
@@ -396,8 +401,13 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
             )
         y = y_encoded
 
-        # y-encoded ensures that y values match the indices of the classes
-        self._set_leaf_nodes(honest_leaves, y)
+        # when honest fraction is not zero
+        if not self.honest_fraction:
+            # y-encoded ensures that y values match the indices of the classes
+            self._set_leaf_nodes(honest_leaves, y)
+        else:
+            # TODO: add samples for leaf labels
+            pass
 
         self.n_classes_ = np.array(self.n_classes_, dtype=np.intp)
         if self.n_outputs_ == 1:
