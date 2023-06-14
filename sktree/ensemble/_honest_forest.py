@@ -440,11 +440,9 @@ class HonestForestClassifier(ForestClassifier):
         n_jobs, _, _ = _partition_estimators(self.n_estimators, self.n_jobs)
 
         # avoid storing the output of every tree estimator by summing them here
-        if self.n_outputs_ > 1:
-            posteriors = np.zeros((X.shape[0], self.n_classes_[0]), dtype=np.float64)
-            posteriors = np.array([posteriors for _ in range(len(self.n_classes_))])
-        else:
-            posteriors = np.zeros((X.shape[0], self.n_classes_), dtype=np.float64)
+        posteriors = [
+            np.zeros((X.shape[0], j), dtype=np.float64) for j in np.atleast_1d(self.n_classes_)
+        ]
         lock = threading.Lock()
 
         if indices is None:
@@ -454,19 +452,19 @@ class HonestForestClassifier(ForestClassifier):
             for tree, idx in zip(self.estimators_, indices)
         )
         # Normalize to unit length, due to prior weighting
-        if self.n_outputs_ > 1:
-            zero_mask = posteriors.sum(2) == 0
-            posteriors[~zero_mask] /= posteriors[~zero_mask].sum(1, keepdims=True)
-        else:
-            zero_mask = posteriors.sum(1) == 0
-            posteriors[~zero_mask] /= posteriors[~zero_mask].sum(1, keepdims=True)
+        posteriors = np.array(posteriors)
+        zero_mask = posteriors.sum(2) == 0
+        posteriors[~zero_mask] /= posteriors[~zero_mask].sum(1, keepdims=True)
 
         if impute_missing is None:
             posteriors[zero_mask] = self.empirical_prior_
         else:
             posteriors[zero_mask] = impute_missing
 
-        return posteriors
+        if len(posteriors) == 1:
+            return posteriors[0]
+        else:
+            return posteriors
 
     @property
     def structure_indices_(self):
@@ -493,37 +491,11 @@ def _accumulate_prediction(tree, X, out, lock, indices=None):
 
     if indices is None:
         indices = np.arange(X.shape[0])
-    proba = tree.tree_.predict(X[indices])
+    proba = tree.predict_proba(X[indices], check_input=False)
 
-    # for single output cases:
-    if tree.n_outputs_ == 1:
-        proba = proba[:, : tree._tree_n_classes_]
-        normalizer = proba.sum(axis=1)[:, np.newaxis]
-        normalizer[normalizer == 0.0] = 1.0
-        proba /= normalizer
-
-        if tree._tree_n_classes_ != tree.n_classes_:
-            proba = tree._impute_missing_classes(proba)
-        proba = tree._empty_leaf_correction(proba)
-
-        with lock:
-            out[indices] += proba
-
-    # for multi-output cases
-    else:
-        all_proba = []
-
-        for k in range(tree.n_outputs_):
-            proba_k = proba[:, k, : tree._tree_n_classes_[k]]
-            normalizer = proba_k.sum(axis=1)[:, np.newaxis]
-            normalizer[normalizer == 0.0] = 1.0
-            proba_k /= normalizer
-
-            if tree._tree_n_classes_[k] != tree.n_classes_[k]:
-                proba_k = tree._impute_missing_classes(proba_k)
-            proba_k = tree._empty_leaf_correction(proba_k, k)
-            all_proba.append(proba_k)
-
-        with lock:
-            for k in range(tree.n_outputs_):
-                out[k][indices] += all_proba[k]
+    with lock:
+        if len(out) == 1:
+            out[0][indices] += proba
+        else:
+            for i in range(len(out)):
+                out[i][indices] += proba[i]
