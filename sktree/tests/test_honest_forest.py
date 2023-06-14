@@ -145,10 +145,10 @@ def test_sklearn_compatible_estimator(estimator, check):
     #  for fitting the tree's splits
     if check.func.__name__ in [
         "check_class_weight_classifiers",
-        "check_classifiers_multilabel_output_format_decision_function",
-        "check_classifiers_multilabel_output_format_predict_proba",
-        "check_classifiers_multilabel_output_format_predict",
-        "check_classifiers_multilabel_representation_invariance",
+        # "check_classifiers_multilabel_output_format_decision_function",
+        # "check_classifiers_multilabel_output_format_predict_proba",
+        # "check_classifiers_multilabel_output_format_predict",
+        # "check_classifiers_multilabel_representation_invariance",
     ]:
         pytest.skip()
     check(estimator)
