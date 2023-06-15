@@ -451,6 +451,7 @@ class HonestForestClassifier(ForestClassifier):
             delayed(_accumulate_prediction)(tree, X, posteriors, lock, idx)
             for tree, idx in zip(self.estimators_, indices)
         )
+
         # Normalize to unit length, due to prior weighting
         posteriors = np.array(posteriors)
         zero_mask = posteriors.sum(2) == 0
@@ -460,6 +461,10 @@ class HonestForestClassifier(ForestClassifier):
             posteriors[zero_mask] = self.empirical_prior_
         else:
             posteriors[zero_mask] = impute_missing
+
+        # preserve shape of multi-outputs
+        if self.n_outputs_ > 1:
+            posteriors = [post for post in posteriors]
 
         if len(posteriors) == 1:
             return posteriors[0]
