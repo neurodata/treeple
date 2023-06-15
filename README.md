@@ -101,6 +101,10 @@ You can also do the same thing using Meson/Ninja itself. Run the following to bu
     python -c "from sktree import tree"
     python -c "import sklearn; print(sklearn.__version__);"
 
+Alternatively, you can use editable installs
+
+    pip install --no-build-isolation --editable .
+
 References
 ==========
 [1]: [`Li, Adam, et al. "Manifold Oblique Random Forests: Towards Closing the Gap on Convolutional Deep Networks." arXiv preprint arXiv:1909.11799 (2019)`](https://arxiv.org/abs/1909.11799)

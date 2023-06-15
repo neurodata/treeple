@@ -3,6 +3,7 @@ extensions = [
   '_oblique_splitter',
   '_oblique_tree',
   '_utils',
+  '_marginal',
 ]
 
 foreach ext: extensions
@@ -20,7 +21,8 @@ python_sources = [
   '__init__.py',
   '_classes.py',
   '_neighbors.py',
-  '_honest_tree.py'
+  '_honest_tree.py',
+  '_marginalize.py',
 ]
 
 py3.install_sources(

@@ -1,5 +1,3 @@
-import pytest
-
 from sktree.experimental.simulate import (
     simulate_helix,
     simulate_multivariate_gaussian,

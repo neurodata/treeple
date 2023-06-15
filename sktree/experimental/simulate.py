@@ -9,7 +9,9 @@ def simulate_helix(
     radius_b=1,
     obs_noise_func=None,
     nature_noise_func=None,
+    alpha=0.005,
     n_samples=1000,
+    return_mi_lb=False,
     random_seed=None,
 ):
     """Simulate data from a helix.
@@ -28,8 +30,12 @@ def simulate_helix(
         By defauult None, which will add no noise. The nature noise func
         is just an independent noise term added to ``P`` before it is
         passed to the generation of the X, Y, and Z terms.
+    alpha : float, optional
+        The value of the noise, by default 0.005.
     n_samples : int, optional
         Number of samples to generate, by default 1000.
+    return_mi_lb : bool, optional
+        Whether to return the mutual information lower bound, by default False.
     random_seed : int, optional
         The random seed.
 
@@ -43,6 +49,8 @@ def simulate_helix(
         The X dimension.
     Z : array-like of shape (n_samples,)
         The X dimension.
+    lb : float
+        The mutual information lower bound.
 
     Notes
     -----
@@ -80,25 +88,31 @@ def simulate_helix(
     Z_arr = np.zeros((n_samples,))
 
     if obs_noise_func is None:
-        obs_noise_func = lambda: rng.uniform(-0.005, 0.005)
+        obs_noise_func = lambda: rng.uniform(-alpha, alpha)
     if nature_noise_func is None:
         nature_noise_func = lambda: 0.0
 
     for idx in range(n_samples):
         Radii[idx] = rng.uniform(radius_a, radius_b)
         P_arr[idx] = 5 * np.pi + 3 * np.pi * Radii[idx]
-        X_arr[idx] = (P_arr[idx] + nature_noise_func) * np.cos(P_arr[idx] + nature_noise_func) / (
-            8 * np.pi
-        ) + obs_noise_func()
-        Y_arr[idx] = (P_arr[idx] + nature_noise_func) * np.sin(P_arr[idx] + nature_noise_func) / (
-            8 * np.pi
-        ) + obs_noise_func()
-        Z_arr[idx] = (P_arr[idx] + nature_noise_func) / (8 * np.pi) + obs_noise_func()
+        X_arr[idx] = (P_arr[idx] + nature_noise_func()) * np.cos(
+            P_arr[idx] + nature_noise_func()
+        ) / (8 * np.pi) + obs_noise_func()
+        Y_arr[idx] = (P_arr[idx] + nature_noise_func()) * np.sin(
+            P_arr[idx] + nature_noise_func()
+        ) / (8 * np.pi) + obs_noise_func()
+        Z_arr[idx] = (P_arr[idx] + nature_noise_func()) / (8 * np.pi) + obs_noise_func()
+
+    if return_mi_lb:
+        lb = alpha / 2 - np.log(alpha)
+        return P_arr, X_arr, Y_arr, Z_arr, lb
 
     return P_arr, X_arr, Y_arr, Z_arr
 
 
-def simulate_sphere(radius=1, noise_func=None, n_samples=1000, random_seed=None):
+def simulate_sphere(
+    radius=1, noise_func=None, alpha=0.005, n_samples=1000, return_mi_lb=False, random_seed=None
+):
     """Simulate samples generated on a sphere.
 
     Parameters
@@ -107,9 +121,13 @@ def simulate_sphere(radius=1, noise_func=None, n_samples=1000, random_seed=None)
         The radius of the sphere, by default 1.
     noise_func : callable, optional
         The noise function to call to add to samples, by default None,
-        which defaults to sampling from the uniform distribution [-0.005, 0.005].
+        which defaults to sampling from the uniform distribution [-alpha, alpha].
+    alpha : float, optional
+        The value of the noise, by default 0.005.
     n_samples : int, optional
         Number of samples to generate, by default 1000.
+    return_mi_lb : bool, optional
+        Whether to return the mutual information lower bound, by default False.
     random_seed : int, optional
         Random seed, by default None.
 
@@ -125,10 +143,12 @@ def simulate_sphere(radius=1, noise_func=None, n_samples=1000, random_seed=None)
         The Y coordinate.
     Y3 : array-like of shape (n_samples,)
         The Z coordinate.
+    lb : float
+        The mutual information lower bound.
     """
     rng = np.random.default_rng(random_seed)
     if noise_func is None:
-        noise_func = lambda: rng.uniform(-0.005, 0.005)
+        noise_func = lambda: rng.uniform(-alpha, alpha)
 
     latitude = np.zeros((n_samples,))
     longitude = np.zeros((n_samples,))
@@ -136,14 +156,19 @@ def simulate_sphere(radius=1, noise_func=None, n_samples=1000, random_seed=None)
     Y2 = np.zeros((n_samples,))
     Y3 = np.zeros((n_samples,))
 
+    # sample latitude and longitude
     for idx in range(n_samples):
         # sample latitude and longitude
-        latitude[idx] = rng.uniform(0, 1)
-        longitude[idx] = rng.uniform(0, 1)
+        latitude[idx] = rng.uniform(0, 2 * np.pi)
+        longitude[idx] = np.arccos(1 - 2 * rng.uniform(0, 1))
 
-        Y1[idx] = np.cos(latitude[idx]) * np.cos(longitude[idx]) * radius + noise_func()
-        Y2[idx] = np.cos(latitude[idx]) * np.sin(longitude[idx]) * radius + noise_func()
-        Y3[idx] = np.sin(longitude[idx]) * radius + noise_func()
+        Y1[idx] = np.sin(longitude[idx]) * np.cos(latitude[idx]) * radius + noise_func()
+        Y2[idx] = np.sin(longitude[idx]) * np.sin(latitude[idx]) * radius + noise_func()
+        Y3[idx] = np.cos(longitude[idx]) * radius + noise_func()
+
+    if return_mi_lb:
+        lb = alpha / 2 - np.log(alpha)
+        return latitude, longitude, Y1, Y2, Y3, lb
 
     return latitude, longitude, Y1, Y2, Y3
 
@@ -184,12 +209,14 @@ def simulate_multivariate_gaussian(mean=None, cov=None, d=2, n_samples=1000, see
     if cov is None:
         # generate random covariance matrix and enure it is symmetric and positive-definite
         cov = rng.normal(size=(d, d))
-        cov = 0.5 * (cov + cov.T)
-    else:
-        if not np.all(np.linalg.eigvals(cov) > 0):
-            raise RuntimeError("Passed in covariance matrix should be positive definite")
-        if not scipy.linalg.issymmetric(cov):
-            raise RuntimeError("Passed in covariance matrix should be symmetric")
+        cov = 0.5 * (cov.dot(cov.T))
+    if not np.all(np.linalg.eigvals(cov) > 0):
+        raise RuntimeError("Passed in covariance matrix should be positive definite")
+    if not scipy.linalg.issymmetric(cov):
+        raise RuntimeError(f"Passed in covariance matrix {cov} should be symmetric")
+
+    if len(mean) != d or len(cov) != d:
+        raise RuntimeError(f"Dimensionality of mean and covariance matrix should match {d}")
 
     data = rng.multivariate_normal(mean=mean, cov=cov, size=(n_samples))
 

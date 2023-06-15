@@ -207,31 +207,12 @@ def mutual_info_ksg(
     """
     rng = np.random.default_rng(random_seed)
 
-    n_samples, n_features_x = X.shape
-    _, n_features_y = Y.shape
     data = np.hstack((X, Y))
-
     if Z is not None:
-        _, n_features_z = Z.shape
         data = np.hstack((data, Z))
-    else:
-        n_features_z = 0
-    n_features = n_features_x + n_features_y + n_features_z
 
-    # add minor noise to make sure there are no ties
-    random_noise = rng.random((n_samples, n_features_x))
-    data += 1e-5 * random_noise @ np.std(data, axis=0).reshape(n_features, 1)
-
-    if transform == "standardize":
-        # standardize with standard scaling
-        data = data.astype(np.float64)
-        scaler = StandardScaler()
-        data = scaler.fit_transform(data)
-    elif transform == "uniform":
-        data = _trafo2uniform(data)
-    elif transform == "rank":
-        # rank transform each column
-        data = scipy.stats.rankdata(data, axis=0)
+    data = _preprocess_data(data, transform, rng)
+    n_samples = data.shape[0]
 
     if k < 1:
         knn_here = max(1, int(k * n_samples))
@@ -245,15 +226,34 @@ def mutual_info_ksg(
     return val
 
 
+def _preprocess_data(data, transform, rng):
+    n_samples, n_features = data.shape
+
+    # add minor noise to make sure there are no ties
+    random_noise = rng.random((n_samples, n_features))
+    data += 1e-5 * random_noise @ np.std(data, axis=0).reshape(n_features, 1)
+
+    if transform == "standardize":
+        # standardize with standard scaling
+        data = data.astype(np.float64)
+        scaler = StandardScaler()
+        data = scaler.fit_transform(data)
+    elif transform == "uniform":
+        data = _trafo2uniform(data)
+    elif transform == "rank":
+        # rank transform each column
+        data = scipy.stats.rankdata(data, axis=0)
+    return data
+
+
 def _mi_ksg(data, X, Y, metric, algorithm, knn_here, n_jobs):
     """Compute KSG estimate of MI."""
     n_samples = X.shape[0]
 
     # estimate distance to the kth NN in XYZ subspace for each sample
+    # - get the radius we want to use per sample as the distance to the kth neighbor
+    #   in the joint distribution space
     neigh = _compute_nn(data, algorithm=algorithm, metric=metric, k=knn_here, n_jobs=n_jobs)
-
-    # get the radius we want to use per sample as the distance to the kth neighbor
-    # in the joint distribution space
     dists, _ = neigh.kneighbors()
     radius_per_sample = dists[:, -1]
 
@@ -352,14 +352,14 @@ def _compute_radius_nbrs(
 
     num_nn_data = np.zeros((n_samples,))
     for idx in range(n_samples):
-        num_nn = neigh.radius_neighbors(radius=radius_per_sample[idx])
-        num_nn_data[idx] = num_nn
+        nn = neigh.radius_neighbors(radius=radius_per_sample[idx], return_distance=False)
+        num_nn_data[idx] = len(nn)
     return num_nn_data
 
 
 def _compute_nn(
     X: ArrayLike, algorithm: str = "kd_tree", metric="l2", k: int = 1, n_jobs: Optional[int] = None
-) -> ArrayLike:
+) -> NearestNeighbors:
     """Compute kNN in subspace.
 
     Parameters
@@ -397,7 +397,7 @@ def _compute_nn(
     """
     if metric == "forest":
         est = UnsupervisedObliqueRandomForest()
-        dists = compute_forest_similarity_matrix(est, X, n_jobs=n_jobs)
+        dists = compute_forest_similarity_matrix(est, X)
 
         # we have a precomputed distance matrix, so we can use the NearestNeighbor
         # implementation of sklearn
