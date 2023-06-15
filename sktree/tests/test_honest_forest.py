@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 from sklearn import datasets
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, mean_squared_error
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
@@ -55,6 +55,37 @@ def test_iris(criterion, max_features, estimator):
 
     score = accuracy_score(clf.predict(iris.data), clf.predict_proba(iris.data).argmax(1))
     assert score == 1.0, "Failed with {0}, criterion = {1} and score = {2}".format(
+        "HForest", criterion, score
+    )
+
+
+@pytest.mark.parametrize("criterion", ["gini", "entropy"])
+@pytest.mark.parametrize("max_features", [None, 2])
+@pytest.mark.parametrize(
+    "estimator",
+    [
+        DecisionTreeClassifier(),
+        ObliqueDecisionTreeClassifier(),
+        PatchObliqueDecisionTreeClassifier(),
+    ],
+)
+def test_iris_multi(criterion, max_features, estimator):
+    # Check consistency on dataset iris.
+    clf = HonestForestClassifier(
+        criterion=criterion,
+        random_state=0,
+        max_features=max_features,
+        n_estimators=10,
+        tree_estimator=estimator,
+    )
+
+    second_y = np.concatenate([(np.ones(10) * 3), (np.ones(20) * 4), (np.ones(120) * 5)])
+
+    X = iris.data
+    y = np.stack((iris.target, second_y)).T
+    clf.fit(X, y)
+    score = mean_squared_error(clf.predict(X), y)
+    assert score < 0.5 and score < 1.0, "Failed with {0}, criterion = {1} and score = {2}".format(
         "HForest", criterion, score
     )
 

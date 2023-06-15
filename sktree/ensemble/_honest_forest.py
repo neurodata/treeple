@@ -401,8 +401,6 @@ class HonestForestClassifier(ForestClassifier):
         """
         super().fit(X, y, sample_weight)
         X, y = check_X_y(X, y, multi_output=True)
-        classes_k, y_encoded = np.unique(y, return_inverse=True)
-        self.empirical_prior_ = np.bincount(y_encoded, minlength=classes_k.shape[0]) / len(y)
 
         # Compute honest decision function
         self.honest_decision_function_ = self._predict_proba(
@@ -458,7 +456,7 @@ class HonestForestClassifier(ForestClassifier):
         posteriors[~zero_mask] /= posteriors[~zero_mask].sum(1, keepdims=True)
 
         if impute_missing is None:
-            posteriors[zero_mask] = self.empirical_prior_
+            pass
         else:
             posteriors[zero_mask] = impute_missing
 
