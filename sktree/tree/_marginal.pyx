@@ -1,10 +1,15 @@
 # cython: language_level=3
 # cython: boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
+import numpy as np
+
+cimport numpy as cnp
+
+cnp.import_array()
 
 from libc.math cimport isnan
 from libcpp.unordered_set cimport unordered_set
 
-from sktree._lib.sklearn.tree._utils cimport RAND_R_MAX
+from sktree._lib.sklearn.tree._utils cimport RAND_R_MAX, rand_uniform
 
 from ._utils cimport rand_weighted_binary
 
@@ -17,10 +22,11 @@ cdef SIZE_t _TREE_UNDEFINED = TREE_UNDEFINED
 
 
 cpdef apply_marginal_tree(
-    Tree tree,
-    const DTYPE_t[:, :] X,
+    BaseTree tree,
+    object X,
     const SIZE_t[:] marginal_indices,
-    unsigned char weighted,
+    int traversal_method,
+    unsigned char use_sample_weight,
     object random_state
 ):
     """Apply a dataset to a marginalized tree.
@@ -34,7 +40,10 @@ cpdef apply_marginal_tree(
     marginal_indices : ndarray of shape (n_marginals,)
         The indices of the features to marginalize, which
         are columns in ``X``.
-    weighted : unsigned char
+    traversal_method : int
+        The traversal method to use. 0 for 'random', 1 for
+        'weighted'.
+    use_sample_weight : unsigned char
         Whether or not to use the weighted number of samples
         in each node.
     random_state : object
@@ -42,9 +51,16 @@ cpdef apply_marginal_tree(
 
     Returns
     -------
-    out : ndarray of shape (n_samples, )
+    out : ndarray of shape (n_samples,)
         The indices of the leaf that each sample falls into.
     """
+    # Check input
+    if not isinstance(X, np.ndarray):
+        raise ValueError("X should be in np.ndarray format, got %s" % type(X))
+
+    if X.dtype != DTYPE:
+        raise ValueError("X.dtype should be np.float32, got %s" % X.dtype)
+
     cdef SIZE_t n_marginals = marginal_indices.shape[0]
 
     # sklearn_rand_r random number state
@@ -67,14 +83,15 @@ cpdef apply_marginal_tree(
         tree,
         X,
         marginal_indices_map,
-        weighted,
+        traversal_method,
+        use_sample_weight,
         &rand_r_state
     )
     return out
 
 
 cdef void _resample_split_node(
-    Tree tree,
+    BaseTree tree,
     Node* node,
     unordered_set[SIZE_t] marginal_indices_map,
     const DTYPE_t[:, :] X,
@@ -85,10 +102,11 @@ cdef void _resample_split_node(
 
 
 cdef inline cnp.ndarray _apply_dense_marginal(
-    Tree tree,
+    BaseTree tree,
     const DTYPE_t[:, :] X,
     unordered_set[SIZE_t] marginal_indices_map,
-    unsigned char weighted,
+    int traversal_method,
+    unsigned char use_sample_weight,
     UINT32_t* rand_r_state
 ):
     """Finds the terminal region (=leaf node) for each sample in X.
@@ -103,20 +121,18 @@ cdef inline cnp.ndarray _apply_dense_marginal(
         The tree to apply.
     X : const ndarray of shape (n_samples, n_features)
         The data matrix.
-    weighted : unsigned char
+    marginal_indices_map : unordered_set[SIZE_t]
+        The indices of the features to marginalize, which
+        are columns in ``X``.
+    traversal_method : int
+        The traversal method to use. 0 for 'random', 1 for
+        'weighted'.
+    use_sample_weight : unsigned char
         Whether or not to use the weighted number of samples
         in each node.
     rand_r_state : UINT32_t
         The random number state.
     """
-
-    # Check input
-    if not isinstance(X, np.ndarray):
-        raise ValueError("X should be in np.ndarray format, got %s" % type(X))
-
-    if X.dtype != DTYPE:
-        raise ValueError("X.dtype should be np.float32, got %s" % X.dtype)
-
     # Extract input
     cdef const DTYPE_t[:, :] X_ndarray = X
     cdef SIZE_t n_samples = X.shape[0]
@@ -141,28 +157,37 @@ cdef inline cnp.ndarray _apply_dense_marginal(
             while node.left_child != _TREE_LEAF:
                 # XXX: this will only work for axis-aligned features
                 if is_element_present(marginal_indices_map, node.feature):
-                    # if the feature is in the marginal indices, then we
-                    # will flip a weighted coin to go down the left, or
-                    # right child
-                    if weighted:
-                        n_node_samples = node.weighted_n_node_samples
-                        n_left_samples = tree.nodes[node.left_child].weighted_n_node_samples
-                        n_right_samples = tree.nodes[node.right_child].weighted_n_node_samples
+                    if traversal_method == 1:
+                        # if the feature is in the marginal indices, then we
+                        # will flip a weighted coin to go down the left, or
+                        # right child
+                        if use_sample_weight:
+                            n_node_samples = node.weighted_n_node_samples
+                            n_left_samples = tree.nodes[node.left_child].weighted_n_node_samples
+                            n_right_samples = tree.nodes[node.right_child].weighted_n_node_samples
+                        else:
+                            n_node_samples = node.n_node_samples
+                            n_left_samples = tree.nodes[node.left_child].n_node_samples
+                            n_right_samples = tree.nodes[node.right_child].n_node_samples
+
+                        # compute the probabilies for going left and right
+                        p_left = (<double>n_left_samples / n_node_samples)
+
+                        # randomly sample a direction
+                        is_left = rand_weighted_binary(p_left, rand_r_state)
+
+                        if is_left:
+                            node = &tree.nodes[node.left_child]
+                        else:
+                            node = &tree.nodes[node.right_child]
                     else:
-                        n_node_samples = node.n_node_samples
-                        n_left_samples = tree.nodes[node.left_child].n_node_samples
-                        n_right_samples = tree.nodes[node.right_child].n_node_samples
-
-                    # compute the probabilies for going left and right
-                    p_left = (<double>n_left_samples / n_node_samples)
-
-                    # randomly sample a direction
-                    is_left = rand_weighted_binary(p_left, rand_r_state)
-
-                    if is_left:
-                        node = &tree.nodes[node.left_child]
-                    else:
-                        node = &tree.nodes[node.right_child]
+                        # traversal method is 0, so it is completely random
+                        # and defined by a coin-flip
+                        p_left = rand_uniform(0, 1, rand_r_state)
+                        if p_left <= 0.5:
+                            node = &tree.nodes[node.left_child]
+                        else:
+                            node = &tree.nodes[node.right_child]
                 else:
                     X_i_node_feature = tree._compute_feature(X_ndarray, i, node)
                     # ... and node.right_child != _TREE_LEAF:

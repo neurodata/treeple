@@ -23,7 +23,7 @@ def main():
     mat = [d1, d2, d3]
     tmat = np.transpose(mat)
     diag = [[3, 0, 0], [0, 1, 0], [0, 0, 1]]
-    mean = np.array([0, 0, 0])
+    # mean = np.array([0, 0, 0])
     cov = np.dot(tmat, np.dot(diag, mat))
     print("covariance matrix")
     print(cov)
@@ -37,7 +37,7 @@ def test_mi():
     mat = [d1, d2, d3]
     tmat = np.transpose(mat)
     diag = [[3, 0, 0], [0, 1, 0], [0, 0, 1]]
-    mean = np.array([0, 0, 0])
+    # mean = np.array([0, 0, 0])
     cov = np.dot(tmat, np.dot(diag, mat))
     print("covariance matrix")
     print(cov)

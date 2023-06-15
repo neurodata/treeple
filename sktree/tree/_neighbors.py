@@ -45,7 +45,10 @@ def compute_forest_similarity_matrix(forest, X):
 
 # ported from https://github.com/neurodata/hyppo/blob/main/hyppo/independence/_utils.py
 class SimMatrixMixin:
-    """Mixin class to calculate similarity and dissimilarity matrices."""
+    """Mixin class to calculate similarity and dissimilarity matrices.
+
+    This augments tree/forest models with the sklearn's nearest-neighbors API.
+    """
 
     def compute_similarity_matrix(self, X):
         """
@@ -114,9 +117,9 @@ class SimMatrixMixin:
             self.neigh_est_ = neigh_est
 
         if n_neighbors != self.neigh_est_.n_neighbors:
-            raise RuntimeError(f"n_neighbors must be the same as the one used in the fit method.")
+            raise RuntimeError("n_neighbors must be the same as the one used in the fit method.")
         if metric != self.neigh_est_.metric:
-            raise RuntimeError(f"metric must be the same as the one used in the fit method.")
+            raise RuntimeError("metric must be the same as the one used in the fit method.")
 
         # get the fitted forest distance matrix
         dists = compute_forest_similarity_matrix(self, X)
