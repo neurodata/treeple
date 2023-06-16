@@ -405,8 +405,8 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
     def _set_leaf_nodes(self, X, y):
         "Traverse the already built tree with X and set leaf nodes with y"
         self.tree_.value[:, :, :] = 0
-        for leaf_id, yval in zip(X, y[self.honest_indices_, 0]):
-            self.tree_.value[leaf_id][0, yval] += 1
+        for leaf_id, yval in zip(X, y[self.honest_indices_, :]):
+            self.tree_.value[leaf_id][:, yval] += 1
 
     def _inherit_estimator_attributes(self):
         """Initialize necessary attributes from the provided tree estimator"""
@@ -442,12 +442,18 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
                 raise ValueError(f"honest_prior {self.honest_prior} not a valid input.")
         return proba
 
-    def _impute_missing_classes(self, proba):
+    def _impute_missing_classes(self, proba, pos=0):
         """Due to splitting, provide proba outputs for some classes"""
-        new_proba = np.zeros((proba.shape[0], self.n_classes_))
-        for i, old_class in enumerate(self._tree_classes_):
-            j = np.where(self.classes_ == old_class)[0][0]
-            new_proba[:, j] = proba[:, i]
+        if self.n_outputs_ > 1:
+            new_proba = np.zeros((proba.shape[0], self.n_classes_[pos]))
+            for i, old_class in enumerate(self._tree_classes_[pos]):
+                j = np.where(self.classes_[pos] == old_class)[0][0]
+                new_proba[:, j] = proba[:, i]
+        else:
+            new_proba = np.zeros((proba.shape[0], self.n_classes_))
+            for i, old_class in enumerate(self._tree_classes_):
+                j = np.where(self.classes_ == old_class)[0][0]
+                new_proba[:, j] = proba[:, i]
 
         return new_proba
 
@@ -499,7 +505,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
                 normalizer[normalizer == 0.0] = 1.0
                 proba_k /= normalizer
                 if self._tree_n_classes_[k] != self.n_classes_[k]:
-                    proba_k = self._impute_missing_classes(proba_k)
+                    proba_k = self._impute_missing_classes(proba_k, k)
                 proba_k = self._empty_leaf_correction(proba_k, k)
                 all_proba.append(proba_k)
 

@@ -83,19 +83,19 @@ def test_iris_multi(criterion, max_features, honest_prior, estimator):
         tree_estimator=estimator,
     )
 
-    second_y = np.concatenate([(np.ones(10) * 3), (np.ones(20) * 4), (np.ones(120) * 5)])
+    second_y = np.concatenate([(np.ones(50) * 3), (np.ones(50) * 4), (np.ones(50) * 5)])
 
     X = iris.data
-    y = np.stack((iris.target, second_y)).T
+    y = np.stack((iris.target, second_y[perm])).T
     clf.fit(X, y)
     score = r2_score(clf.predict(X), y)
     if honest_prior == "ignore":
-        assert score < 1.0, "Failed with {0}, criterion = {1} and score = {2}".format(
-            "HForest", criterion, score
-        )
+        assert (
+            score > 0.6 and score < 1.0
+        ), "Failed with {0}, criterion = {1} and score = {2}".format("HForest", criterion, score)
     else:
         assert (
-            score > 0.0 and score < 1.0
+            score > 0.9 and score < 1.0
         ), "Failed with {0}, criterion = {1} and score = {2}".format("HForest", criterion, score)
 
 
