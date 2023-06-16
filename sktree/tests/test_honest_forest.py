@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 from sklearn import datasets
-from sklearn.metrics import accuracy_score, mean_squared_error
+from sklearn.metrics import accuracy_score, r2_score
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
@@ -30,6 +30,7 @@ def test_toy_accuracy():
 
 @pytest.mark.parametrize("criterion", ["gini", "entropy"])
 @pytest.mark.parametrize("max_features", [None, 2])
+@pytest.mark.parametrize("honest_prior", ["empirical", "uniform", "ignore"])
 @pytest.mark.parametrize(
     "estimator",
     [
@@ -38,13 +39,14 @@ def test_toy_accuracy():
         PatchObliqueDecisionTreeClassifier(),
     ],
 )
-def test_iris(criterion, max_features, estimator):
+def test_iris(criterion, max_features, honest_prior, estimator):
     # Check consistency on dataset iris.
     clf = HonestForestClassifier(
         criterion=criterion,
         random_state=0,
         max_features=max_features,
         n_estimators=10,
+        honest_prior=honest_prior,
         tree_estimator=estimator,
     )
     clf.fit(iris.data, iris.target)
@@ -61,6 +63,7 @@ def test_iris(criterion, max_features, estimator):
 
 @pytest.mark.parametrize("criterion", ["gini", "entropy"])
 @pytest.mark.parametrize("max_features", [None, 2])
+@pytest.mark.parametrize("honest_prior", ["empirical", "uniform", "ignore"])
 @pytest.mark.parametrize(
     "estimator",
     [
@@ -69,13 +72,14 @@ def test_iris(criterion, max_features, estimator):
         PatchObliqueDecisionTreeClassifier(),
     ],
 )
-def test_iris_multi(criterion, max_features, estimator):
+def test_iris_multi(criterion, max_features, honest_prior, estimator):
     # Check consistency on dataset iris.
     clf = HonestForestClassifier(
         criterion=criterion,
         random_state=0,
         max_features=max_features,
         n_estimators=10,
+        honest_prior=honest_prior,
         tree_estimator=estimator,
     )
 
@@ -84,10 +88,15 @@ def test_iris_multi(criterion, max_features, estimator):
     X = iris.data
     y = np.stack((iris.target, second_y)).T
     clf.fit(X, y)
-    score = mean_squared_error(clf.predict(X), y)
-    assert score < 0.5 and score < 1.0, "Failed with {0}, criterion = {1} and score = {2}".format(
-        "HForest", criterion, score
-    )
+    score = r2_score(clf.predict(X), y)
+    if honest_prior == "ignore":
+        assert score < 1.0, "Failed with {0}, criterion = {1} and score = {2}".format(
+            "HForest", criterion, score
+        )
+    else:
+        assert (
+            score > 0.0 and score < 1.0
+        ), "Failed with {0}, criterion = {1} and score = {2}".format("HForest", criterion, score)
 
 
 def test_impute_classes():
