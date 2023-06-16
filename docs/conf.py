@@ -162,6 +162,7 @@ numpydoc_xref_aliases = {
     "PatchObliqueDecisionTreeClassifier": "sktree.tree.PatchObliqueDecisionTreeClassifier",
     "ObliqueDecisionTreeRegressor": "sktree.tree.ObliqueDecisionTreeRegressor",
     "PatchObliqueDecisionTreeRegressor": "sktree.tree.PatchObliqueDecisionTreeRegressor",
+    "UnsupervisedObliqueRandomForest": "sktree.ensemble.UnsupervisedObliqueRandomForest",
     "DecisionTreeClassifier": "sklearn.tree.DecisionTreeClassifier",
     "DecisionTreeRegressor": "sklearn.tree.DecisionTreeRegressor",
     "pipeline.Pipeline": "sklearn.pipeline.Pipeline",
@@ -215,6 +216,7 @@ numpydoc_xref_ignore = {
     "n_features_x",
     "n_features_y",
     "n_features_z",
+    'n_neighbors', 'one',
 }
 
 # validation
@@ -365,7 +367,8 @@ def replace_sklearn_fork_with_sklearn(app, what, name, obj, options, lines):
     # Use regular expressions to replace 'sklearn_fork' with 'sklearn'
     content = re.sub(r"`pipeline.Pipeline", r"`~sklearn.pipeline.Pipeline", content)
     content = re.sub(r"`~utils.metadata_routing.MetadataRequest", r"``MetadataRequest``", content)
-    content = re.sub(r"`np.quantile", r"`~np.quantile`", content)
+    content = re.sub(r"`np.quantile", r"`numpy.quantile", content)
+    content = re.sub(r"`~np.quantile", r"`numpy.quantile", content)
 
     # Convert the modified string back to a list of lines
     lines[:] = content.split("\n")

@@ -73,11 +73,11 @@ Trees inherently produce a "distance-like" metric. We provide an API for
 extracting pairwise distances from the trees that include a correction
 that turns the "tree-distance" into a proper distance metric.
 
-.. currentmodule:: sktree.ensemble
+.. currentmodule:: sktree.tree
 .. autosummary::
    :toctree: generated/
 
-   pairwise_forest_distance
+   compute_forest_similarity_matrix
 
 In addition to providing a distance metric based on leaves, tree-models
 provide a natural way to compute neighbors based on the splits. We provide
@@ -106,11 +106,18 @@ and conditional mutual information (CMI) estimators. Specifically, functions tha
 help simulate multivariate gaussian data and compute the analytical solutions
 for the entropy, MI and CMI of the Gaussian distributions.
 
-.. currentmodule:: sktree.experimental
+.. currentmodule:: sktree.experimental.simulate
+.. autosummary::
+   :toctree: generated/
+
+   simulate_multivariate_gaussian
+   simulate_helix
+   simulate_sphere
+
+.. currentmodule:: sktree.experimental.mutual_info
 .. autosummary::
    :toctree: generated/
 
    mi_gaussian
    cmi_gaussian
    entropy_gaussian
-   simulate_multivariate_gaussian

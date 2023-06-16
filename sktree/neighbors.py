@@ -22,11 +22,11 @@ class NearestNeighborsMetaEstimator(BaseEstimator, MetaEstimatorMixin):
         The estimator to use for computing distances.
     n_neighbors : int, optional
         Number of neighbors to use by default for kneighbors queries, by default 5.
+    radius : float, optional
+        Range of parameter space to use by default for radius_neighbors queries, by default 1.0.
     algorithm : str, optional
         Algorithm used to compute the nearest-neighbors, by default 'auto'.
         See :class:`sklearn.neighbors.NearestNeighbors` for details.
-    radius : float, optional
-        Range of parameter space to use by default for radius_neighbors queries, by default 1.0.
     n_jobs : int, optional
         The number of parallel jobs to run for neighbors, by default None.
     """
@@ -39,7 +39,23 @@ class NearestNeighborsMetaEstimator(BaseEstimator, MetaEstimatorMixin):
         self.n_jobs = n_jobs
 
     def fit(self, X, y=None):
-        """Fit the nearest neighbors estimator from the training dataset."""
+        """Fit the nearest neighbors estimator from the training dataset.
+
+        Parameters
+        ----------
+        X : {array-like, sparse matrix} of shape (n_samples, n_features)
+            The training input samples. Internally, it will be converted to
+            ``dtype=np.float32`` and if a sparse matrix is provided
+            to a sparse ``csc_matrix``.
+
+        y : array-like of shape (n_samples,) or (n_samples, n_outputs)
+            The target values, by default None.
+
+        Returns
+        -------
+        self : NearestNeighborsMetaEstimator
+            Fitted estimator.
+        """
         X, y = self._validate_data(X, y, accept_sparse="csc")
 
         self.estimator_ = copy(self.estimator)

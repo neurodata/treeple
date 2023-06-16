@@ -10,7 +10,7 @@ def compute_forest_similarity_matrix(forest, X):
 
     Parameters
     ----------
-    forest : sklearn.ensemble._forest.BaseForest or sklearn.tree.BaseDecisionTree
+    forest : BaseForest or BaseDecisionTree
         The fitted forest.
     X : array-like of shape (n_samples, n_features)
         The input data.

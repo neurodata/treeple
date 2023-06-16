@@ -181,9 +181,9 @@ def simulate_multivariate_gaussian(mean=None, cov=None, d=2, n_samples=1000, see
 
     Parameters
     ----------
-    mean : array-like of shape (d,)
+    mean : array-like of shape (n_features,)
         The optional mean array. If None (default), a random standard normal vector is drawn.
-    cov : array-like of shape (d,d)
+    cov : array-like of shape (n_features, n_features)
         The covariance array. If None (default), a random standard normal 2D array is drawn.
         It is then converted to a PD matrix.
     d : int
@@ -195,11 +195,11 @@ def simulate_multivariate_gaussian(mean=None, cov=None, d=2, n_samples=1000, see
 
     Returns
     -------
-    data : array-like of shape (n_samples, d)
+    data : array-like of shape (n_samples, n_features)
         The generated data from the distribution.
-    mean : array-like of shape (d,)
+    mean : array-like of shape (n_features,)
         The mean vector of the distribution.
-    cov : array-like of shape (d,d)
+    cov : array-like of shape (n_features, n_features)
         The covariance matrix of the distribution.
     """
     rng = np.random.default_rng(seed)
