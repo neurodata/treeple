@@ -68,7 +68,7 @@ def mi_gaussian(cov):
 
 
 def cmi_gaussian(cov, x_index, y_index, z_index):
-    """Computes the analytical CMI for a multivariate Gaussian distribution.
+    """Compute the analytical CMI for a multivariate Gaussian distribution.
 
     Parameters
     ----------
