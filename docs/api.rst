@@ -79,6 +79,18 @@ that turns the "tree-distance" into a proper distance metric.
 
    pairwise_forest_distance
 
+In addition to providing a distance metric based on leaves, tree-models
+provide a natural way to compute neighbors based on the splits. We provide
+an API for extracting the nearest neighbors from a tree-model. This provides
+an API-like interface similar to :class:`~sklearn.neighbors.NearestNeighbors`.
+
+.. currentmodule:: sktree.neighbors
+.. autosummary::
+   :toctree: generated/
+
+   NearestNeighborsMetaEstimator
+
+
 Experimental Functionality
 --------------------------
 We also include experimental functionality that is works in progress.

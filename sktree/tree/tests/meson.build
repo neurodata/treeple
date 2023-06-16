@@ -4,7 +4,6 @@ python_sources = [
   'test_utils.py',
   'test_honest_tree.py',
   'test_marginal.py',
-  'test_neighbors.py',
 ]
 
 py3.install_sources(
