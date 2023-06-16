@@ -204,6 +204,8 @@ numpydoc_xref_ignore = {
     "_type_",
     "MetadataRequest",
     "~utils.metadata_routing.MetadataRequest",
+    "quantiles",
+    "n_quantiles",
 }
 
 # validation
