@@ -31,5 +31,6 @@ def test_similarity_matrix(forest):
     clf.fit(X, y)
     sim_mat = clf.compute_similarity_matrix(X)
 
+    assert sim_mat.shape == (n_samples, n_samples)
     assert np.allclose(sim_mat, sim_mat.T)
     assert np.all((sim_mat.diagonal() == 1))

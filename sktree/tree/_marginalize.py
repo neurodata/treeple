@@ -228,7 +228,7 @@ def compute_conditional(self, X, S, y=None, n_repeats=10):
     # that leaf = I_{b,l, Z=z}
     for tree in self.estimators_:
         # tree node value (n_leaves, n_outputs, max_classes)
-        tree_leaves = tree.tree_.value
+        # tree_leaves = tree.tree_.value
 
         for leaf in range(tree.tree_.n_leaves):
             # get the size of the leaf
@@ -236,7 +236,7 @@ def compute_conditional(self, X, S, y=None, n_repeats=10):
             # compute interval that reaches this leaf
 
             # now compute P(Y | x \in l) for every leaf
-            proba_y_x = tree_leaves[leaf, :, :]
+            # proba_y_x = tree_leaves[leaf, :, :]
 
             # get sample indices that reach this leaf in Z=z
             sample_indices = []

@@ -1,6 +1,7 @@
 import numbers
 
 import numpy as np
+from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from sklearn.neighbors import NearestNeighbors
 from sklearn.utils.validation import check_is_fitted
 
@@ -26,7 +27,7 @@ def compute_forest_similarity_matrix(forest, X):
     aff_matrix : array-like of shape (n_samples, n_samples)
         The estimated distance matrix.
     """
-    if isinstance(forest, BaseForest):
+    if hasattr(forest, "estimator_"):
         # apply to the leaves
         X_leaves = forest.apply(X)
 
@@ -37,10 +38,15 @@ def compute_forest_similarity_matrix(forest, X):
         n_est = 1
 
     aff_matrix = sum(np.equal.outer(X_leaves[:, i], X_leaves[:, i]) for i in range(n_est))
-
     # normalize by the number of trees
     aff_matrix = np.divide(aff_matrix, n_est)
     return aff_matrix
+
+
+def _compute_distance_matrix(aff_matrix):
+    """Private function to compute distance matrix after `compute_similarity_matrix`."""
+    dists = 1.0 - aff_matrix
+    return dists
 
 
 # ported from https://github.com/neurodata/hyppo/blob/main/hyppo/independence/_utils.py
@@ -66,7 +72,58 @@ class SimMatrixMixin:
         """
         return compute_forest_similarity_matrix(self, X)
 
-    def kneighbors(self, X=None, n_neighbors=None, return_distance=True, metric="l2"):
+
+class NearestNeighborsMetaEstimator(BaseEstimator, MetaEstimatorMixin):
+    """Meta-estimator for nearest neighbors.
+
+    Uses a decision-tree, or forest model to compute distances between samples
+    and then uses the sklearn's nearest-neighbors API to compute neighbors.
+
+    Parameters
+    ----------
+    estimator : BaseDecisionTree, BaseForest
+        The estimator to use for computing distances.
+    n_neighbors : int, optional
+        Number of neighbors to use by default for kneighbors queries, by default 5.
+    algorithm : str, optional
+        Algorithm used to compute the nearest-neighbors, by default 'auto'.
+        See :class:`sklearn.neighbors.NearestNeighbors` for details.
+    radius : float, optional
+        Range of parameter space to use by default for radius_neighbors queries, by default 1.0.
+    n_jobs : int, optional
+        The number of parallel jobs to run for neighbors, by default None.
+    """
+
+    def __init__(self, estimator, n_neighbors=5, radius=1.0, algorithm="auto", n_jobs=None):
+        self.estimator = estimator
+        self.n_neighbors = n_neighbors
+        self.algorithm = algorithm
+        self.radius = radius
+        self.n_jobs = n_jobs
+
+    def fit(self, X, y=None):
+        # self._validate_params()
+        self.estimator_ = self.estimator
+        check_is_fitted(self.estimator_)
+        self._fit(X, self.n_neighbors)
+        return self
+
+    def _fit(self, X, n_neighbors):
+        self.neigh_est_ = NearestNeighbors(
+            n_neighbors=n_neighbors,
+            algorithm=self.algorithm,
+            metric="precomputed",
+            n_jobs=self.n_jobs,
+        )
+
+        # compute the distance matrix
+        aff_matrix = compute_forest_similarity_matrix(self.estimator_, X)
+        dists = _compute_distance_matrix(aff_matrix)
+
+        # fit the nearest-neighbors estimator
+        self.neigh_est_.fit(dists)
+
+    def kneighbors(self, X=None, n_neighbors=None, return_distance=True):
         """Find the K-neighbors of a point.
 
         Returns indices of and distances to the neighbors of each point.
@@ -105,28 +162,9 @@ class SimMatrixMixin:
             )
 
         if X is not None:
-            raise RuntimeError("X cannot be passed in.")
+            self._fit(X, n_neighbors)
 
-        if not hasattr(self, "neigh_est_"):
-            # compute the nearest neighbors in the space using specified NN algorithm
-            # then get the K nearest nbrs and their distances
-            neigh_est = NearestNeighbors(
-                n_neighbors=n_neighbors, algorithm="precomputed", metric=metric, n_jobs=self.n_jobs
-            )
-
-            self.neigh_est_ = neigh_est
-
-        if n_neighbors != self.neigh_est_.n_neighbors:
-            raise RuntimeError("n_neighbors must be the same as the one used in the fit method.")
-        if metric != self.neigh_est_.metric:
-            raise RuntimeError("metric must be the same as the one used in the fit method.")
-
-        # get the fitted forest distance matrix
-        dists = compute_forest_similarity_matrix(self, X)
-
-        # now fit the nearest neighbors algorithm to the forest-distance matrix
-        neigh_est.fit(dists)
-        return neigh_est.kneighbors(n_neighbors=n_neighbors, return_distance=return_distance)
+        return self.neigh_est_.kneighbors(n_neighbors=n_neighbors, return_distance=return_distance)
 
     def radius_neighbors(self, X=None, radius=None, return_distance=True, sort_results=False):
         """Find the neighbors within a given radius of a point or points.
@@ -145,9 +183,10 @@ class SimMatrixMixin:
             If not provided, neighbors of each indexed point are returned.
             In this case, the query point is not considered its own neighbor.
 
-        radius : float, default=None
+        radius : float, or array-like of shape (n_samples,) default=None
             Limiting distance of neighbors to return. The default is the value
-            passed to the constructor.
+            passed to the constructor. If an array-like of shape (n_samples),
+            then will query for each sample point with a different radius.
 
         return_distance : bool, default=True
             Whether or not to return the distances.
@@ -180,15 +219,22 @@ class SimMatrixMixin:
         For efficiency, `radius_neighbors` returns arrays of objects, where
         each object is a 1D array of indices or distances.
         """
-        dists, _ = self.neigh_est_.kneighbors()
-        radius_per_sample = dists[:, -1]
-        n_samples = radius_per_sample.shape[0]
+        check_is_fitted(self)
 
-        nn_ind_data = np.zeros((n_samples,))
-        nn_dist_data = np.zeros((n_samples,))
+        if X is not None:
+            n_samples = X.shape[0]
+        else:
+            n_samples = self.neigh_est_.n_samples_fit_
+
+        if isinstance(radius, numbers.Number):
+            radius = [radius] * n_samples
+
+        # now construct nearest neighbor indices and distances within radius
+        nn_ind_data = np.zeros((n_samples,), dtype=object)
+        nn_dist_data = np.zeros((n_samples,), dtype=object)
         for idx in range(n_samples):
             nn = self.neigh_est_.radius_neighbors(
-                X=X, radius=radius, return_distance=return_distance, sort_results=sort_results
+                X=X, radius=radius[idx], return_distance=return_distance, sort_results=sort_results
             )
 
             if return_distance:
