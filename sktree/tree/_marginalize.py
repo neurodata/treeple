@@ -156,10 +156,10 @@ def _apply_marginal_tree(
     check_is_fitted(est)
     X = est._validate_X_predict(X, check_input=check_input)
 
-    traversal_method = TRAVERSAL_METHOD_MAP[traversal_method]
+    traversal_method_int = TRAVERSAL_METHOD_MAP[traversal_method]
 
     X_leaves = apply_marginal_tree(
-        est.tree_, X, S, traversal_method, use_sample_weight, random_state=random_state
+        est.tree_, X, S, traversal_method_int, use_sample_weight, random_state=random_state
     )
     return X_leaves
 

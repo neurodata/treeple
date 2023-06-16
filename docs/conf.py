@@ -206,6 +206,15 @@ numpydoc_xref_ignore = {
     "~utils.metadata_routing.MetadataRequest",
     "quantiles",
     "n_quantiles",
+    "metric",
+    "n_queries",
+    "BaseForest",
+    "BaseDecisionTree",
+    "n_indexed",
+    "n_queries",
+    "n_features_x",
+    "n_features_y",
+    "n_features_z",
 }
 
 # validation
@@ -356,6 +365,7 @@ def replace_sklearn_fork_with_sklearn(app, what, name, obj, options, lines):
     # Use regular expressions to replace 'sklearn_fork' with 'sklearn'
     content = re.sub(r"`pipeline.Pipeline", r"`~sklearn.pipeline.Pipeline", content)
     content = re.sub(r"`~utils.metadata_routing.MetadataRequest", r"``MetadataRequest``", content)
+    content = re.sub(r"`np.quantile", r"`~np.quantile`", content)
 
     # Convert the modified string back to a list of lines
     lines[:] = content.split("\n")
