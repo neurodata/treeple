@@ -164,8 +164,8 @@ def mutual_info_ksg(
         The number of neighbors to use in defining the radius, by default 0.2.
     metric : str
         Any distance metric accepted by :class:`sklearn.neighbors.NearestNeighbors`.
-        If 'forest' (default), then uses an :class:`UnsupervisedObliqueRandomForest` to compute
-        geodesic distances.
+        If 'forest' (default), then uses an :class:`UnsupervisedObliqueRandomForest`
+        to compute geodesic distances.
     algorithm : str, optional
         Method to use, by default 'knn'. Can be ('ball_tree', 'kd_tree', 'brute').
     n_jobs : int, optional
@@ -191,11 +191,13 @@ def mutual_info_ksg(
     5. Apply analytic solution for KSG estimate
 
     For MI :footcite:`Kraskov_2004`, the analytical solution is::
+    .. math:: 
 
         \\psi(k) - E[(\\psi(n_x) + \\psi(n_y))] + \\psi(n)
 
     For CMI :footcite:`Frenzel2007`m the analytical solution is::
-
+    .. math:: 
+    
         \\psi(k) - E[(\\psi(n_{xz}) + \\psi(n_{yz}) - \\psi(n_{z}))]
 
     where :math:`\\psi` is the DiGamma function, and each expectation term
