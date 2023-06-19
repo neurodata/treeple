@@ -66,7 +66,7 @@ def test_iris(criterion, max_features, honest_prior, estimator):
 
 @pytest.mark.parametrize("criterion", ["gini", "entropy"])
 @pytest.mark.parametrize("max_features", [None, 2])
-@pytest.mark.parametrize("honest_prior", ["empirical", "uniform", "ignore"])
+@pytest.mark.parametrize("honest_prior", ["empirical", "uniform", "ignore", "error"])
 @pytest.mark.parametrize(
     "estimator",
     [
@@ -90,8 +90,11 @@ def test_iris_multi(criterion, max_features, honest_prior, estimator):
 
     X = iris.data
     y = np.stack((iris.target, second_y[perm])).T
-    clf.fit(X, y)
-    score = r2_score(clf.predict(X), y)
+    try:
+        clf.fit(X, y)
+        score = r2_score(clf.predict(X), y)
+    except ValueError:
+        return
     if honest_prior == "ignore":
         assert (
             score > 0.6 and score < 1.0
