@@ -100,6 +100,7 @@ def test_iris_multi(criterion, max_features, honest_prior, estimator):
 
 
 def test_impute_classes():
+    # This test is unnecessary as sample_weight method doesn't impute
     np.random.seed(0)
     X = np.random.normal(0, 1, (101, 2))
     y = [0] * 50 + [1] * 50 + [2]
