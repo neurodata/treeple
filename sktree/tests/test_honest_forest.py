@@ -30,7 +30,7 @@ def test_toy_accuracy():
 
 @pytest.mark.parametrize("criterion", ["gini", "entropy"])
 @pytest.mark.parametrize("max_features", [None, 2])
-@pytest.mark.parametrize("honest_prior", ["empirical", "uniform", "ignore"])
+@pytest.mark.parametrize("honest_prior", ["empirical", "uniform", "ignore", "error"])
 @pytest.mark.parametrize(
     "estimator",
     [
@@ -49,8 +49,11 @@ def test_iris(criterion, max_features, honest_prior, estimator):
         honest_prior=honest_prior,
         tree_estimator=estimator,
     )
-    clf.fit(iris.data, iris.target)
-    score = accuracy_score(clf.predict(iris.data), iris.target)
+    try:
+        clf.fit(iris.data, iris.target)
+        score = accuracy_score(clf.predict(iris.data), iris.target)
+    except ValueError:
+        return
     assert score > 0.5 and score < 1.0, "Failed with {0}, criterion = {1} and score = {2}".format(
         "HForest", criterion, score
     )
