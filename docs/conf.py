@@ -216,7 +216,8 @@ numpydoc_xref_ignore = {
     "n_features_x",
     "n_features_y",
     "n_features_z",
-    'n_neighbors', 'one',
+    "n_neighbors",
+    "one",
 }
 
 # validation

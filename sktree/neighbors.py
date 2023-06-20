@@ -53,7 +53,7 @@ class NearestNeighborsMetaEstimator(BaseEstimator, MetaEstimatorMixin):
 
         Returns
         -------
-        self : NearestNeighborsMetaEstimator
+        self : object
             Fitted estimator.
         """
         X, y = self._validate_data(X, y, accept_sparse="csc")

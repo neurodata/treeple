@@ -22,7 +22,7 @@ def simulate_helix(
         The value of the smallest radius, by default 0.0.
     radius_b : int, optional
         The value of the largest radius, by default 1.0
-    obs_noise_func : scipy.stats.distribution, optional
+    obs_noise_func : Callable, optional
         By default None, which defaults to a Uniform distribution from
         (-0.005, 0.005). If passed in, then must be a callable that when
         called returns a random number denoting the noise.
