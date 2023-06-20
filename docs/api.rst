@@ -84,7 +84,7 @@ provide a natural way to compute neighbors based on the splits. We provide
 an API for extracting the nearest neighbors from a tree-model. This provides
 an API-like interface similar to :class:`~sklearn.neighbors.NearestNeighbors`.
 
-.. currentmodule:: sktree.neighbors
+.. currentmodule:: sktree
 .. autosummary::
    :toctree: generated/
 
