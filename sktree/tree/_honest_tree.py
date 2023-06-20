@@ -426,7 +426,12 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
         self.tree_ = self.estimator_.tree_
 
     def _empty_leaf_correction(self, proba, pos=0):
-        """Leaves with empty posteriors are assigned values"""
+        """Leaves with empty posteriors are assigned values.
+
+        The posteriors are corrected according to the honest prior.
+        In multi-output cases, the posterior corrections only correspond
+        to the respective y dimention, indicated by the position param pos.
+        """
         zero_mask = proba.sum(axis=1) == 0.0
 
         # For multi-output cases

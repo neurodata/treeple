@@ -105,19 +105,6 @@ def test_iris_multi(criterion, max_features, honest_prior, estimator):
         ), "Failed with {0}, criterion = {1} and score = {2}".format("HForest", criterion, score)
 
 
-def test_impute_classes():
-    # This test is unnecessary as sample_weight method doesn't impute
-    np.random.seed(0)
-    X = np.random.normal(0, 1, (101, 2))
-    y = [0] * 50 + [1] * 50 + [2]
-    clf = HonestForestClassifier(honest_fraction=0.02, random_state=0)
-    clf = clf.fit(X, y)
-
-    y_proba = clf.predict_proba(X)
-
-    assert y_proba.shape[1] == 3
-
-
 def test_max_samples():
     max_samples_list = [8, 0.5, None]
     depths = []
