@@ -12,6 +12,8 @@ from sktree._lib.sklearn.tree._tree cimport SIZE_t  # Type for indices and count
 from sktree._lib.sklearn.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
 
 
+cdef int rand_weighted_binary(double p0, UINT32_t* random_state) noexcept nogil
+
 cpdef unravel_index(
     SIZE_t index, cnp.ndarray[SIZE_t, ndim=1] shape
 )

@@ -48,11 +48,12 @@ cc = meson.get_compiler('c')
 # py3.extension_module('_name',
 #   'source_fname',
 #   numpy_nodepr_api)
-numpy_nodepr_api = '-DNPY_NO_DEPRECATED_API=NPY_1_9_API_VERSION'
+numpy_nodepr_api = '-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION'
 cython_c_args += numpy_nodepr_api
 
 python_sources = [
   '__init__.py',
+  'neighbors.py',
 ]
 
 py3.install_sources(
@@ -81,4 +82,5 @@ cython_cpp_args = cython_c_args
 subdir('_lib')
 subdir('tree')
 subdir('ensemble')
+subdir('experimental')
 subdir('tests')

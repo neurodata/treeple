@@ -3,6 +3,7 @@ extensions = [
   '_oblique_splitter',
   '_oblique_tree',
   '_utils',
+  '_marginal',
 ]
 
 foreach ext: extensions
@@ -15,12 +16,12 @@ foreach ext: extensions
   )
 endforeach
 
-# TODO: comment in _classes.py when we have a working Cython unsupervised tree with a Python API
 python_sources = [
   '__init__.py',
   '_classes.py',
   '_neighbors.py',
-  '_honest_tree.py'
+  '_honest_tree.py',
+  '_marginalize.py',
 ]
 
 py3.install_sources(

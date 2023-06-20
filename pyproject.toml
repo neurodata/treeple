@@ -204,7 +204,7 @@ exclude_lines = ['pragma: no cover', 'if __name__ == .__main__.:']
 precision = 2
 
 [tool.bandit]
-exclude_dirs = ["sktree/tests", "sktree/tree/tests", 'sktree/_build_utils/*', 'sktree/_lib/*']
+exclude_dirs = ["sktree/tests", "sktree/**/tests/*", 'sktree/_build_utils/*', 'sktree/_lib/*']
 skips = ['B404', 'B603']
 
 [tool.spin]

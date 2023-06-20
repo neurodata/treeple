@@ -12,7 +12,6 @@ import numpy as np
 
 cimport numpy as cnp
 from libcpp.vector cimport vector
-from sklearn.utils._sorting cimport simultaneous_sort
 
 from ..._lib.sklearn.tree._splitter cimport SplitRecord
 from ..._lib.sklearn.tree._tree cimport DOUBLE_t  # Type of y, sample_weight

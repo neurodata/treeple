@@ -402,11 +402,19 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
 
         return self
 
-    def _set_leaf_nodes(self, X, y):
-        "Traverse the already built tree with X and set leaf nodes with y"
+    def _set_leaf_nodes(self, leaf_ids, y):
+        """Traverse the already built tree with X and set leaf nodes with y.
+
+        tree_.value has shape (n_nodes, n_outputs, max_n_classes), where
+        n_nodes are the number of nodes in the tree (each node is either a split,
+        or leaf node), n_outputs is the number of outputs (1 for classification,
+        n for regression), and max_n_classes is the maximum number of classes
+        across all outputs. For classification with n_classes classes, the
+        classes are ordered by their index in the tree_.value array.
+        """
         self.tree_.value[:, :, :] = 0
-        for leaf_id, yval in zip(X, y[self.honest_indices_, :]):
-            self.tree_.value[leaf_id][:, yval] += 1
+        for leaf_id, yval in zip(leaf_ids, y[self.honest_indices_, 0]):
+            self.tree_.value[leaf_id][0, yval] += 1
 
     def _inherit_estimator_attributes(self):
         """Initialize necessary attributes from the provided tree estimator"""

@@ -778,6 +778,8 @@ class UnsupervisedObliqueRandomForest(ForestCluster):
         only when ``oob_score`` is True.
     """
 
+    tree_type = "oblique"
+
     def __init__(
         self,
         n_estimators=100,
