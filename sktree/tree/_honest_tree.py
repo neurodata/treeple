@@ -413,8 +413,8 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
         classes are ordered by their index in the tree_.value array.
         """
         self.tree_.value[:, :, :] = 0
-        for leaf_id, yval in zip(leaf_ids, y[self.honest_indices_, 0]):
-            self.tree_.value[leaf_id][0, yval] += 1
+        for leaf_id, yval in zip(leaf_ids, y[self.honest_indices_, :]):
+            self.tree_.value[leaf_id][:, yval] += 1
 
     def _inherit_estimator_attributes(self):
         """Initialize necessary attributes from the provided tree estimator"""
