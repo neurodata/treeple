@@ -366,6 +366,25 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="generated/sktree.tree.UnsupervisedDecisionTree.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.UnsupervisedDecisionTree</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sktree.tree.UnsupervisedObliqueDecisionTree.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.UnsupervisedObliqueDecisionTree</a></li>
 </ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.tree.compute_forest_similarity_matrix.html">sktree.tree.compute_forest_similarity_matrix</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.NearestNeighborsMetaEstimator.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.NearestNeighborsMetaEstimator</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.experimental.mutual_info_ksg.html">sktree.experimental.mutual_info_ksg</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.experimental.simulate.simulate_multivariate_gaussian.html">sktree.experimental.simulate.simulate_multivariate_gaussian</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.experimental.simulate.simulate_helix.html">sktree.experimental.simulate.simulate_helix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.experimental.simulate.simulate_sphere.html">sktree.experimental.simulate.simulate_sphere</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.experimental.mutual_info.mi_gaussian.html">sktree.experimental.mutual_info.mi_gaussian</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.experimental.mutual_info.cmi_gaussian.html">sktree.experimental.mutual_info.cmi_gaussian</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.experimental.mutual_info.entropy_gaussian.html">sktree.experimental.mutual_info.entropy_gaussian</a></li>
+</ul>
 </div>
 </nav></div>
     </div>
@@ -477,7 +496,7 @@ how scikit-learn builds trees.</p>
 <h2>Unsupervised<a class="headerlink" href="#unsupervised" title="Permalink to this heading">#</a></h2>
 <p>Decision-tree models are traditionally used for classification and regression.
 However, they are also powerful non-parametric embedding and clustering models.
-The <a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.ensemble.RandomTreesEmbedding.html#sklearn.ensemble.RandomTreesEmbedding" title="(in scikit-learn v1.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomTreesEmbedding</span></code></a> is an example of unsupervised
+The <a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.ensemble.RandomTreesEmbedding.html#sklearn.ensemble.RandomTreesEmbedding" title="(in scikit-learn v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomTreesEmbedding</span></code></a> is an example of unsupervised
 tree model. We implement other state-of-the-art models that explicitly split based
 on unsupervised criterion such as variance and BIC.</p>
 <table class="autosummary longtable table autosummary">
@@ -498,6 +517,71 @@ on unsupervised criterion such as variance and BIC.</p>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.tree.UnsupervisedObliqueDecisionTree.html#sktree.tree.UnsupervisedObliqueDecisionTree" title="sktree.tree.UnsupervisedObliqueDecisionTree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tree.UnsupervisedObliqueDecisionTree</span></code></a>(*[, ...])</p></td>
 <td><p>Unsupervised oblique decision tree.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="distance-metrics">
+<h2>Distance Metrics<a class="headerlink" href="#distance-metrics" title="Permalink to this heading">#</a></h2>
+<p>Trees inherently produce a “distance-like” metric. We provide an API for
+extracting pairwise distances from the trees that include a correction
+that turns the “tree-distance” into a proper distance metric.</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.tree.compute_forest_similarity_matrix.html#sktree.tree.compute_forest_similarity_matrix" title="sktree.tree.compute_forest_similarity_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_forest_similarity_matrix</span></code></a>(forest, X)</p></td>
+<td><p>Compute the similarity matrix of samples in X using a trained forest.</p></td>
+</tr>
+</tbody>
+</table>
+<p>In addition to providing a distance metric based on leaves, tree-models
+provide a natural way to compute neighbors based on the splits. We provide
+an API for extracting the nearest neighbors from a tree-model. This provides
+an API-like interface similar to <a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.neighbors.NearestNeighbors.html#sklearn.neighbors.NearestNeighbors" title="(in scikit-learn v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">NearestNeighbors</span></code></a>.</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.NearestNeighborsMetaEstimator.html#sktree.NearestNeighborsMetaEstimator" title="sktree.NearestNeighborsMetaEstimator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NearestNeighborsMetaEstimator</span></code></a>(estimator[, ...])</p></td>
+<td><p>Meta-estimator for nearest neighbors.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="experimental-functionality">
+<h2>Experimental Functionality<a class="headerlink" href="#experimental-functionality" title="Permalink to this heading">#</a></h2>
+<p>We also include experimental functionality that is works in progress.</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.experimental.mutual_info_ksg.html#sktree.experimental.mutual_info_ksg" title="sktree.experimental.mutual_info_ksg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mutual_info_ksg</span></code></a>(X, Y[, Z, k, metric, ...])</p></td>
+<td><p>Compute the generalized (conditional) mutual information KSG estimate.</p></td>
+</tr>
+</tbody>
+</table>
+<p>We also include functions that help simulate and evaluate mutual information (MI)
+and conditional mutual information (CMI) estimators. Specifically, functions that
+help simulate multivariate gaussian data and compute the analytical solutions
+for the entropy, MI and CMI of the Gaussian distributions.</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.experimental.simulate.simulate_multivariate_gaussian.html#sktree.experimental.simulate.simulate_multivariate_gaussian" title="sktree.experimental.simulate.simulate_multivariate_gaussian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_multivariate_gaussian</span></code></a>([mean, cov, ...])</p></td>
+<td><p>Multivariate gaussian simulation for testing entropy and MI estimators.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.experimental.simulate.simulate_helix.html#sktree.experimental.simulate.simulate_helix" title="sktree.experimental.simulate.simulate_helix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_helix</span></code></a>([radius_a, radius_b, ...])</p></td>
+<td><p>Simulate data from a helix.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.experimental.simulate.simulate_sphere.html#sktree.experimental.simulate.simulate_sphere" title="sktree.experimental.simulate.simulate_sphere"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_sphere</span></code></a>([radius, noise_func, alpha, ...])</p></td>
+<td><p>Simulate samples generated on a sphere.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.experimental.mutual_info.mi_gaussian.html#sktree.experimental.mutual_info.mi_gaussian" title="sktree.experimental.mutual_info.mi_gaussian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mi_gaussian</span></code></a>(cov)</p></td>
+<td><p>Compute mutual information of a multivariate Gaussian.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.experimental.mutual_info.cmi_gaussian.html#sktree.experimental.mutual_info.cmi_gaussian" title="sktree.experimental.mutual_info.cmi_gaussian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cmi_gaussian</span></code></a>(cov, x_index, y_index, z_index)</p></td>
+<td><p>Compute the analytical CMI for a multivariate Gaussian distribution.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.experimental.mutual_info.entropy_gaussian.html#sktree.experimental.mutual_info.entropy_gaussian" title="sktree.experimental.mutual_info.entropy_gaussian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">entropy_gaussian</span></code></a>(cov)</p></td>
+<td><p>Compute entropy of a multivariate Gaussian.</p></td>
 </tr>
 </tbody>
 </table>
@@ -557,6 +641,12 @@ on unsupervised criterion such as variance and BIC.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#unsupervised">Unsupervised</a><ul class="nav section-nav flex-column">
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#distance-metrics">Distance Metrics</a><ul class="nav section-nav flex-column">
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#experimental-functionality">Experimental Functionality</a><ul class="nav section-nav flex-column">
+</ul>
+</li>
 </ul>
   </nav></div>
 
@@ -584,7 +674,7 @@ on unsupervised criterion such as variance and BIC.</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-06-15.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-06-20.
       <br/>
     
   </p>

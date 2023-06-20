@@ -796,10 +796,18 @@ document.write(`
 
         <span class="k">return</span> <span class="bp">self</span></div>
 
-    <span class="k">def</span> <span class="nf">_set_leaf_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-        <span class="s2">&quot;Traverse the already built tree with X and set leaf nodes with y&quot;</span>
+    <span class="k">def</span> <span class="nf">_set_leaf_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">leaf_ids</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Traverse the already built tree with X and set leaf nodes with y.</span>
+
+<span class="sd">        tree_.value has shape (n_nodes, n_outputs, max_n_classes), where</span>
+<span class="sd">        n_nodes are the number of nodes in the tree (each node is either a split,</span>
+<span class="sd">        or leaf node), n_outputs is the number of outputs (1 for classification,</span>
+<span class="sd">        n for regression), and max_n_classes is the maximum number of classes</span>
+<span class="sd">        across all outputs. For classification with n_classes classes, the</span>
+<span class="sd">        classes are ordered by their index in the tree_.value array.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">value</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">leaf_id</span><span class="p">,</span> <span class="n">yval</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span><span class="p">,</span> <span class="mi">0</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">leaf_id</span><span class="p">,</span> <span class="n">yval</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">leaf_ids</span><span class="p">,</span> <span class="n">y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span><span class="p">,</span> <span class="mi">0</span><span class="p">]):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">leaf_id</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="n">yval</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
 
     <span class="k">def</span> <span class="nf">_inherit_estimator_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -947,7 +955,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-06-15.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-06-20.
       <br/>
     
   </p>
