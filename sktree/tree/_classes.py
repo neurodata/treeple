@@ -455,6 +455,8 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
         Clustering function class keyword arguments. Passed to `clustering_func`.
     """
 
+    tree_type = "oblique"
+
     def __init__(
         self,
         *,
@@ -773,6 +775,8 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
     array([ 1.     ,  0.93...,  0.86...,  0.93...,  0.93...,
             0.93...,  0.93...,  1.     ,  0.93...,  1.      ])
     """
+
+    tree_type = "oblique"
 
     _parameter_constraints = {
         **DecisionTreeClassifier._parameter_constraints,
@@ -1131,6 +1135,8 @@ class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
     array([-0.68908909, -0.35854406,  0.35223873, -0.03616902, -0.56008907,
             0.32235221,  0.06945264, -1.1465216 ,  0.34597007, -0.15308512])
     """
+
+    tree_type = "oblique"
 
     _parameter_constraints = {
         **DecisionTreeRegressor._parameter_constraints,
@@ -1509,6 +1515,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
     .. footbibliography::
     """
 
+    tree_type = "oblique"
     _parameter_constraints = {
         **DecisionTreeClassifier._parameter_constraints,
         "min_patch_dims": ["array-like", None],
@@ -1987,6 +1994,7 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
             0.41881754,  0.0588273 , -1.48722913, -0.07927208, -0.15600762])
     """
 
+    tree_type = "oblique"
     _parameter_constraints = {
         **DecisionTreeRegressor._parameter_constraints,
         "min_patch_dims": ["array-like", None],

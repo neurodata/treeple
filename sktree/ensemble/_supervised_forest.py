@@ -271,6 +271,7 @@ class ObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
     [1]
     """
 
+    tree_type = "oblique"
     _parameter_constraints: dict = {
         **ForestClassifier._parameter_constraints,
         **ObliqueDecisionTreeClassifier._parameter_constraints,
@@ -578,6 +579,7 @@ class ObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
     [-5.86327109]
     """
 
+    tree_type = "oblique"
     _parameter_constraints: dict = {
         **ForestRegressor._parameter_constraints,
         **ObliqueDecisionTreeRegressor._parameter_constraints,
@@ -899,6 +901,7 @@ class PatchObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
     .. footbibliography::
     """
 
+    tree_type = "oblique"
     _parameter_constraints: dict = {
         **ForestClassifier._parameter_constraints,
         **PatchObliqueDecisionTreeClassifier._parameter_constraints,
@@ -1223,6 +1226,7 @@ class PatchObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
     [-5.82818509]
     """
 
+    tree_type = "oblique"
     _parameter_constraints: dict = {
         **ForestRegressor._parameter_constraints,
         **PatchObliqueDecisionTreeRegressor._parameter_constraints,

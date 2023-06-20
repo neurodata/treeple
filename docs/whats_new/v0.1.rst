@@ -36,6 +36,8 @@ Changelog
 - |Feature| A general-kernel MORF is now implemented where users can pass in a kernel library, by `Adam Li`_ (:pr:`70`)
 - |Feature| Implementation of ObliqueDecisionTreeRegressor, PatchObliqueDecisionTreeRegressor, ObliqueRandomForestRegressor, PatchObliqueRandomForestRegressor, by `SUKI-O`_ (:pr:`72`)
 - |Feature| Implementation of HonestTreeClassifier, HonestForestClassifier, by `Sambit Panda`_, `Adam Li`_, `Ronan Perry`_ and `Haoyin Xu`_ (:pr:`57`)
+- |Feature| Implementation of (conditional) mutual information estimation via unsupervised tree models and added NearestNeighborsMetaEstimator by `Adam Li`_ (:pr:`83`)
+
 
 Code and Documentation Contributors
 -----------------------------------
