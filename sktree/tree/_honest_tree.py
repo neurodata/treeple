@@ -430,7 +430,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
 
         The posteriors are corrected according to the honest prior.
         In multi-output cases, the posterior corrections only correspond
-        to the respective y dimention, indicated by the position param pos.
+        to the respective y dimension, indicated by the position param pos.
         """
         zero_mask = proba.sum(axis=1) == 0.0
 
