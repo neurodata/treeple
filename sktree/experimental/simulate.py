@@ -221,3 +221,16 @@ def simulate_multivariate_gaussian(mean=None, cov=None, d=2, n_samples=1000, see
     data = rng.multivariate_normal(mean=mean, cov=cov, size=(n_samples))
 
     return data, mean, cov
+
+
+def embed_high_dims(data, n_dims=50, random_state=None):
+    rng = np.random.default_rng(random_state)
+
+    new_data = np.zeros((data.shape[0], n_dims + data.shape[1])) 
+    new_data[:, :data.shape[1]] = data
+
+    for idim in range(n_dims):
+        new_col = rng.standard_normal(size=(data.shape[0],))
+        new_data[:, data.shape[1] + idim] = new_col
+
+    return new_data

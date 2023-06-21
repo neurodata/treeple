@@ -7,5 +7,5 @@ from .mutual_info import (
     mi_from_entropy,
     mi_gamma,
     mi_gaussian,
-    mutual_info_ksg,
 )
+from .ksg import mutual_info_ksg

@@ -38,7 +38,7 @@ class NearestNeighborsMetaEstimator(BaseEstimator, MetaEstimatorMixin):
         self.radius = radius
         self.n_jobs = n_jobs
 
-    def fit(self, X, y=None):
+    def fit(self, X, y=None, force_fit=False):
         """Fit the nearest neighbors estimator from the training dataset.
 
         Parameters
@@ -56,13 +56,19 @@ class NearestNeighborsMetaEstimator(BaseEstimator, MetaEstimatorMixin):
         self : object
             Fitted estimator.
         """
-        X, y = self._validate_data(X, y, accept_sparse="csc")
+        if y is not None:
+            X, y = self._validate_data(X, y, accept_sparse="csc")
+        else:
+            X = self._validate_data(X, accept_sparse="csc")
 
         self.estimator_ = copy(self.estimator)
-        try:
-            check_is_fitted(self.estimator_)
-        except NotFittedError:
+        if force_fit:
             self.estimator_.fit(X, y)
+        else:
+            try:
+                check_is_fitted(self.estimator_)
+            except NotFittedError:
+                self.estimator_.fit(X, y)
 
         self._fit(X, self.n_neighbors)
         return self
