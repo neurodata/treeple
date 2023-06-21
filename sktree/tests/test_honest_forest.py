@@ -112,7 +112,7 @@ def test_max_samples():
     X[:50] *= -1
     y = [0, 1] * 50
     for ms in max_samples_list:
-        uf = HonestForestClassifier(n_estimators=2, max_samples=ms, bootstrap=True)
+        uf = HonestForestClassifier(n_estimators=2, random_state=0, max_samples=ms, bootstrap=True)
         uf = uf.fit(X, y)
         depths.append(uf.estimators_[0].get_depth())
 
