@@ -1341,6 +1341,8 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
         the input samples) required to be at a leaf node. Samples have
         equal weight when sample_weight is not provided.
 
+    n_features_1:
+
     max_features : int, float or {"auto", "sqrt", "log2"}, default=None
         The number of features to consider when looking for the best split:
 
@@ -1528,6 +1530,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
         min_samples_split=2,
         min_samples_leaf=1,
         min_weight_fraction_leaf=0.0,
+        n_features_1 = None,
         max_features=None,
         random_state=None,
         max_leaf_nodes=None,
@@ -1656,7 +1659,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
                     f"The maximum patch width {self.max_patch_dims_[idx]} is "
                     f"greater than the data width {self.data_dims_[idx]}"
                 )
-
+        
         return super().fit(X, y, sample_weight, check_input=False)
 
     def _build_tree(

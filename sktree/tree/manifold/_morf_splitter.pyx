@@ -27,6 +27,7 @@ cdef class PatchSplitter(BaseObliqueSplitter):
     def __cinit__(
         self,
         Criterion criterion,
+        int n_features_1,
         SIZE_t max_features,
         SIZE_t min_samples_leaf,
         double min_weight_leaf,
@@ -177,6 +178,7 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
             BestPatchSplitter,
             (
                 self.criterion,
+                self.n_features_1
                 self.max_features,
                 self.min_samples_leaf,
                 self.min_weight_leaf,
@@ -281,7 +283,17 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
         # (\prod_i self.patch_dims_buff[i])
         cdef SIZE_t patch_size
 
-        for proj_i in range(0, max_features):
+
+        ##### suposse randomly select one feature set to find a best split
+        cdef np.ndarray[int, ndim=1] choices = np.array([0, n_features_1])
+        
+        cdef int n_feature_selected
+        if n_features_1 == n_features:
+            n_feature_selected = 0
+        else: 
+            n_feature_selected = np.random.choice(choices)
+
+        for proj_i in range(n_feature_selected, n_feature_selected+max_features):
             # now get the top-left seed that is used to then determine the top-left
             # position in patch
             # compute top-left seed for the multi-dimensional patch
