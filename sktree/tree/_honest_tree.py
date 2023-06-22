@@ -360,12 +360,6 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
         )
         self._inherit_estimator_attributes()
 
-        if self.n_outputs_ > 1:
-            raise NotImplementedError(
-                "Multi-target honest trees not yet \
-                implemented"
-            )
-
         # update the number of classes, unsplit
         if y.ndim == 1:
             # reshape is necessary to preserve the data contiguity against vs
@@ -419,8 +413,8 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
         classes are ordered by their index in the tree_.value array.
         """
         self.tree_.value[:, :, :] = 0
-        for leaf_id, yval in zip(leaf_ids, y[self.honest_indices_, 0]):
-            self.tree_.value[leaf_id][0, yval] += 1
+        for leaf_id, yval in zip(leaf_ids, y[self.honest_indices_, :]):
+            self.tree_.value[leaf_id][:, yval] += 1
 
     def _inherit_estimator_attributes(self):
         """Initialize necessary attributes from the provided tree estimator"""
@@ -431,28 +425,35 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
         self.n_outputs_ = self.estimator_.n_outputs_
         self.tree_ = self.estimator_.tree_
 
-    def _empty_leaf_correction(self, proba, normalizer):
-        """Leaves with empty posteriors are assigned values"""
+    def _empty_leaf_correction(self, proba, pos=0):
+        """Leaves with empty posteriors are assigned values.
+
+        The posteriors are corrected according to the honest prior.
+        In multi-output cases, the posterior corrections only correspond
+        to the respective y dimension, indicated by the position param pos.
+        """
         zero_mask = proba.sum(axis=1) == 0.0
-        if self.honest_prior == "empirical":
-            proba[zero_mask] = self.empirical_prior_
-        elif self.honest_prior == "uniform":
-            proba[zero_mask] = 1 / self.n_classes_
-        elif self.honest_prior == "ignore":
-            proba[zero_mask] = np.nan
+
+        # For multi-output cases
+        if self.n_outputs_ > 1:
+            if self.honest_prior == "empirical":
+                proba[zero_mask] = self.empirical_prior_[pos]
+            elif self.honest_prior == "uniform":
+                proba[zero_mask] = 1 / self.n_classes_[pos]
+            elif self.honest_prior == "ignore":
+                proba[zero_mask] = np.nan
+            else:
+                raise ValueError(f"honest_prior {self.honest_prior} not a valid input.")
         else:
-            raise ValueError(f"honest_prior {self.honest_prior} not a valid input.")
-
+            if self.honest_prior == "empirical":
+                proba[zero_mask] = self.empirical_prior_
+            elif self.honest_prior == "uniform":
+                proba[zero_mask] = 1 / self.n_classes_
+            elif self.honest_prior == "ignore":
+                proba[zero_mask] = np.nan
+            else:
+                raise ValueError(f"honest_prior {self.honest_prior} not a valid input.")
         return proba
-
-    def _impute_missing_classes(self, proba):
-        """Due to splitting, provide proba outputs for some classes"""
-        new_proba = np.zeros((proba.shape[0], self.n_classes_))
-        for i, old_class in enumerate(self._tree_classes_):
-            j = np.where(self.classes_ == old_class)[0][0]
-            new_proba[:, j] = proba[:, i]
-
-        return new_proba
 
     def predict_proba(self, X, check_input=True):
         """Predict class probabilities of the input samples X.
@@ -487,17 +488,22 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
             normalizer = proba.sum(axis=1)[:, np.newaxis]
             normalizer[normalizer == 0.0] = 1.0
             proba /= normalizer
-            if self._tree_n_classes_ != self.n_classes_:
-                proba = self._impute_missing_classes(proba)
-            proba = self._empty_leaf_correction(proba, normalizer)
+            proba = self._empty_leaf_correction(proba)
 
             return proba
 
         else:
-            raise NotImplementedError(
-                "Multi-target honest trees not yet \
-                implemented"
-            )
+            all_proba = []
+
+            for k in range(self.n_outputs_):
+                proba_k = proba[:, k, : self._tree_n_classes_[k]]
+                normalizer = proba_k.sum(axis=1)[:, np.newaxis]
+                normalizer[normalizer == 0.0] = 1.0
+                proba_k /= normalizer
+                proba_k = self._empty_leaf_correction(proba_k, k)
+                all_proba.append(proba_k)
+
+            return all_proba
 
     def predict(self, X, check_input=True):
         """Predict class for X.

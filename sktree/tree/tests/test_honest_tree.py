@@ -106,7 +106,4 @@ def test_impute_classes():
 
 @parametrize_with_checks([HonestTreeClassifier(random_state=0)])
 def test_sklearn_compatible_estimator(estimator, check):
-    # TODO: remove when we implement Regressor classes
-    # if TREE_ESTIMATORS[estimator].__name__ in TREE_CLASSIFIERS:
-    #     pytest.skip()
     check(estimator)

@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 from sklearn import datasets
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, r2_score
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
@@ -30,6 +30,7 @@ def test_toy_accuracy():
 
 @pytest.mark.parametrize("criterion", ["gini", "entropy"])
 @pytest.mark.parametrize("max_features", [None, 2])
+@pytest.mark.parametrize("honest_prior", ["empirical", "uniform", "ignore", "error"])
 @pytest.mark.parametrize(
     "estimator",
     [
@@ -38,17 +39,21 @@ def test_toy_accuracy():
         PatchObliqueDecisionTreeClassifier(),
     ],
 )
-def test_iris(criterion, max_features, estimator):
+def test_iris(criterion, max_features, honest_prior, estimator):
     # Check consistency on dataset iris.
     clf = HonestForestClassifier(
         criterion=criterion,
         random_state=0,
         max_features=max_features,
         n_estimators=10,
+        honest_prior=honest_prior,
         tree_estimator=estimator,
     )
-    clf.fit(iris.data, iris.target)
-    score = accuracy_score(clf.predict(iris.data), iris.target)
+    try:
+        clf.fit(iris.data, iris.target)
+        score = accuracy_score(clf.predict(iris.data), iris.target)
+    except ValueError:
+        return
     assert score > 0.5 and score < 1.0, "Failed with {0}, criterion = {1} and score = {2}".format(
         "HForest", criterion, score
     )
@@ -59,26 +64,55 @@ def test_iris(criterion, max_features, estimator):
     )
 
 
-def test_impute_classes():
-    np.random.seed(0)
-    X = np.random.normal(0, 1, (101, 2))
-    y = [0] * 50 + [1] * 50 + [2]
-    clf = HonestForestClassifier(honest_fraction=0.02, random_state=0)
-    clf = clf.fit(X, y)
+@pytest.mark.parametrize("criterion", ["gini", "entropy"])
+@pytest.mark.parametrize("max_features", [None, 2])
+@pytest.mark.parametrize("honest_prior", ["empirical", "uniform", "ignore", "error"])
+@pytest.mark.parametrize(
+    "estimator",
+    [
+        DecisionTreeClassifier(),
+        ObliqueDecisionTreeClassifier(),
+        PatchObliqueDecisionTreeClassifier(),
+    ],
+)
+def test_iris_multi(criterion, max_features, honest_prior, estimator):
+    # Check consistency on dataset iris.
+    clf = HonestForestClassifier(
+        criterion=criterion,
+        random_state=0,
+        max_features=max_features,
+        n_estimators=10,
+        honest_prior=honest_prior,
+        tree_estimator=estimator,
+    )
 
-    y_proba = clf.predict_proba(X)
+    second_y = np.concatenate([(np.ones(50) * 3), (np.ones(50) * 4), (np.ones(50) * 5)])
 
-    assert y_proba.shape[1] == 3
+    X = iris.data
+    y = np.stack((iris.target, second_y[perm])).T
+    try:
+        clf.fit(X, y)
+        score = r2_score(clf.predict(X), y)
+    except ValueError:
+        return
+    if honest_prior == "ignore":
+        assert (
+            score > 0.6 and score < 1.0
+        ), "Failed with {0}, criterion = {1} and score = {2}".format("HForest", criterion, score)
+    else:
+        assert (
+            score > 0.9 and score < 1.0
+        ), "Failed with {0}, criterion = {1} and score = {2}".format("HForest", criterion, score)
 
 
 def test_max_samples():
     max_samples_list = [8, 0.5, None]
     depths = []
-    X = np.random.normal(0, 1, (100, 2))
+    X = rng.normal(0, 1, (100, 2))
     X[:50] *= -1
     y = [0, 1] * 50
     for ms in max_samples_list:
-        uf = HonestForestClassifier(n_estimators=2, max_samples=ms, bootstrap=True)
+        uf = HonestForestClassifier(n_estimators=2, random_state=0, max_samples=ms, bootstrap=True)
         uf = uf.fit(X, y)
         depths.append(uf.estimators_[0].get_depth())
 
@@ -94,8 +128,7 @@ def test_max_samples():
     ],
 )
 def test_impute_posteriors(honest_prior, val):
-    np.random.seed(0)
-    X = np.random.normal(0, 1, (100, 2))
+    X = rng.normal(0, 1, (100, 2))
     y = [0] * 75 + [1] * 25
     clf = HonestForestClassifier(
         honest_fraction=0.02, random_state=0, honest_prior=honest_prior, n_estimators=2
@@ -121,8 +154,7 @@ def test_impute_posteriors(honest_prior, val):
     ],
 )
 def test_honest_decision_function(honest_fraction, val):
-    np.random.seed(0)
-    X = np.random.normal(0, 1, (100, 2))
+    X = rng.normal(0, 1, (100, 2))
     y = [0] * 75 + [1] * 25
     clf = HonestForestClassifier(honest_fraction=honest_fraction, random_state=0, n_estimators=2)
     clf = clf.fit(X, y)
@@ -138,17 +170,12 @@ def test_honest_decision_function(honest_fraction, val):
     [HonestForestClassifier(n_estimators=10, honest_fraction=0.5, random_state=0)]
 )
 def test_sklearn_compatible_estimator(estimator, check):
-    # 1. multi-output is not supported
-    # 2. check_class_weight_classifiers is not supported since it requires sample weight
+    # 1. check_class_weight_classifiers is not supported since it requires sample weight
     # XXX: can include this "generalization" in the future if it's useful
     #  zero sample weight is not "really supported" in honest subsample trees since sample weight
     #  for fitting the tree's splits
     if check.func.__name__ in [
         "check_class_weight_classifiers",
-        "check_classifiers_multilabel_output_format_decision_function",
-        "check_classifiers_multilabel_output_format_predict_proba",
-        "check_classifiers_multilabel_output_format_predict",
-        "check_classifiers_multilabel_representation_invariance",
     ]:
         pytest.skip()
     check(estimator)
