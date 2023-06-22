@@ -108,8 +108,7 @@ def test_iris_multi(criterion, max_features, honest_prior, estimator):
 def test_max_samples():
     max_samples_list = [8, 0.5, None]
     depths = []
-    np.random.seed(0)
-    X = np.random.normal(0, 1, (100, 2))
+    X = rng.normal(0, 1, (100, 2))
     X[:50] *= -1
     y = [0, 1] * 50
     for ms in max_samples_list:
@@ -129,8 +128,7 @@ def test_max_samples():
     ],
 )
 def test_impute_posteriors(honest_prior, val):
-    np.random.seed(0)
-    X = np.random.normal(0, 1, (100, 2))
+    X = rng.normal(0, 1, (100, 2))
     y = [0] * 75 + [1] * 25
     clf = HonestForestClassifier(
         honest_fraction=0.02, random_state=0, honest_prior=honest_prior, n_estimators=2
@@ -156,8 +154,7 @@ def test_impute_posteriors(honest_prior, val):
     ],
 )
 def test_honest_decision_function(honest_fraction, val):
-    np.random.seed(0)
-    X = np.random.normal(0, 1, (100, 2))
+    X = rng.normal(0, 1, (100, 2))
     y = [0] * 75 + [1] * 25
     clf = HonestForestClassifier(honest_fraction=honest_fraction, random_state=0, n_estimators=2)
     clf = clf.fit(X, y)
