@@ -108,6 +108,7 @@ def test_iris_multi(criterion, max_features, honest_prior, estimator):
 def test_max_samples():
     max_samples_list = [8, 0.5, None]
     depths = []
+    np.random.seed(0)
     X = np.random.normal(0, 1, (100, 2))
     X[:50] *= -1
     y = [0, 1] * 50
