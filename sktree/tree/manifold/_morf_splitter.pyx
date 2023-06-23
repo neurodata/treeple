@@ -281,21 +281,38 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
         # (\prod_i self.patch_dims_buff[i])
         cdef SIZE_t patch_size
 
-        for proj_i in range(0, max_features):
-            # now get the top-left seed that is used to then determine the top-left
-            # position in patch
-            # compute top-left seed for the multi-dimensional patch
-            top_left_patch_seed, patch_size = self.sample_top_left_seed()
+        rand_feature_set = rand_int(0,1,random_state)
+        if rand_feature_set == 0:
+            for proj_i in range(0, max_features):
+                # now get the top-left seed that is used to then determine the top-left
+                # position in patch
+                # compute top-left seed for the multi-dimensional patch
+                top_left_patch_seed, patch_size = self.sample_top_left_seed()
 
-            # sample a projection vector given the top-left seed point in n-dimensional space
-            self.sample_proj_vec(
-                proj_mat_weights,
-                proj_mat_indices,
-                proj_i,
-                patch_size,
-                top_left_patch_seed,
-                self.patch_dims_buff
-            )
+                # sample a projection vector given the top-left seed point in n-dimensional space
+                self.sample_proj_vec(
+                    proj_mat_weights,
+                    proj_mat_indices,
+                    proj_i,
+                    patch_size,
+                    top_left_patch_seed,
+                    self.patch_dims_buff
+                )
+        else:
+            for proj_i in range(n_features/2, n_features/2 + max_features):
+                    # now get the top-left seed that is used to then determine the top-left
+                    # position in patch
+                    # compute top-left seed for the multi-dimensional patch
+                    top_left_patch_seed, patch_size = self.sample_top_left_seed()
+
+                    # sample a projection vector given the top-left seed point in n-dimensional space
+                    self.sample_proj_vec(
+                        proj_mat_weights,
+                        proj_mat_indices,
+                        proj_i,
+                        patch_size,
+                        top_left_patch_seed,
+                        self.patch_dims_buff)
 
     cdef void sample_proj_vec(
         self,
