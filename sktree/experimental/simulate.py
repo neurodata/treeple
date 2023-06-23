@@ -2,7 +2,8 @@ import numpy as np
 import scipy.linalg
 import scipy.special
 import scipy.stats
-
+from scipy.stats import entropy, multivariate_normal
+from scipy.integrate import nquad
 
 def simulate_helix(
     radius_a=0,
@@ -226,11 +227,110 @@ def simulate_multivariate_gaussian(mean=None, cov=None, d=2, n_samples=1000, see
 def embed_high_dims(data, n_dims=50, random_state=None):
     rng = np.random.default_rng(random_state)
 
-    new_data = np.zeros((data.shape[0], n_dims + data.shape[1])) 
-    new_data[:, :data.shape[1]] = data
+    new_data = np.zeros((data.shape[0], n_dims + data.shape[1]))
+    new_data[:, : data.shape[1]] = data
 
     for idim in range(n_dims):
         new_col = rng.standard_normal(size=(data.shape[0],))
         new_data[:, data.shape[1] + idim] = new_col
 
     return new_data
+
+
+def simulate_separate_gaussians(n_dims=2, n_samples=1000, n_classes=2, pi=None, seed=None):
+    """Simulate data from separate multivariate Gaussians.
+    
+    Parameters
+    ----------
+    n_dims : int
+        The dimensionality of the data. The default is 2.
+    n_samples : int
+        The number of samples to generate. The default is 1000.
+    n_classes : int
+        The number of classes to generate. The default is 2.
+    pi : array-like of shape (n_classes,)
+        The class probabilities. If None (default), then uniform class probabilities are used.
+    seed : int
+        The random seed to feed to :func:`numpy.random.default_rng`. The default is None.  
+
+    Returns
+    -------
+    data : array-like of shape (n_samples, n_dims)
+        The generated data.
+    y : array-like of shape (n_samples,)
+        The class labels.
+    means : list of array-like of shape (n_dims,)
+        The means of the Gaussians from each class.
+    sigmas : list of array-like of shape (n_dims, n_dims)
+        The covariance matrices of the Gaussians from each class.
+    pi : array-like of shape (n_classes,)
+        The class probabilities.
+    I_XY : float
+        The ground-truth mutual information between the class labels and the data.
+        
+    Notes
+    -----
+    This simulates data from separate multivariate Gaussians, where each class has its own
+    multivariate Gaussian distribution. The class labels are sampled from a multinomial distribution
+    with probabilities `pi`.
+
+    The ground-truth computation of the MI depends on 
+    """
+    rng = np.random.default_rng(seed)
+
+    if pi is None:
+        pi = np.ones((n_classes,)) / n_classes
+    else:
+        if len(pi) != n_classes:
+            raise RuntimeError(f"pi should be of length {n_classes}")
+        
+    # first sample the class labels according to class probabilities
+    counts = rng.multinomial(n_samples, pi, size = 1)[0]
+    
+    # now sample the multivariate Gaussian for each class
+    means = [np.zeros((n_dims,))]
+    sigmas = [np.eye(n_dims)]
+    for _ in range(1, n_classes):
+        mean = rng.standard_normal(size=(n_dims,))
+        sigma = np.eye(n_dims)
+
+        means.append(mean)
+        sigmas.append(sigma)
+
+    # now sample the data
+    X_data = []
+    y_data = []
+    for k in range(n_classes):
+        X_data.append(rng.multivariate_normal(means[k], sigmas[k], counts[k]))
+        y_data.append(np.repeat(k, counts[k]))
+    X = np.concatenate(tuple(X_data))
+    y = np.concatenate(tuple(y_data))
+    
+    # compute ground-truth MI
+    base = np.exp(1)
+    H_Y = entropy(pi, base=base)
+
+    def func(*args):
+        # points at which to evaluate the multivariate-Gaussian
+        x_points = np.array(args)
+
+        # compute the probability of the multivariate-Gaussian at various points in the
+        # d-dimensional space
+        p = 0.0
+        for k in range(n_classes):
+            p += pi[k] * multivariate_normal.pdf(x_points, mean=means[k], cov=sigmas[k], seed=seed)
+
+        # compute the log-probability
+        return -p * np.log(p) / np.log(base)
+    
+    # limits over each dimension of the multivariate-Gaussian
+    lims = [[-10, 10]]*n_dims
+    H_X = nquad(func, range=lims)
+
+    # now compute H(Y|X)
+    H_YX = 0.0
+    for k in range(n_classes):
+        # [d * log(2 * pi) + log(det(sigma)) + d] / (2 * log(base))
+        H_YX += pi[k] * (n_dims * np.log(2*np.pi) + np.log(np.linalg.det(sigmas[k])) + n_dims) / (2. * np.log(base))
+    I_XY = H_Y + H_X - H_YX
+    return X, y, means, sigmas, pi, I_XY

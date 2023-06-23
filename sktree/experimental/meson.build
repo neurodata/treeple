@@ -3,6 +3,7 @@ python_sources = [
   'mutual_info.py',
   'simulate.py',
   'ksg.py',
+  'forest.py',
 ]
 
 py3.install_sources(
