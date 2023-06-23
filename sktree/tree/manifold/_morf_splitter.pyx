@@ -299,7 +299,7 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
                     self.patch_dims_buff
                 )
         else:
-            for proj_i in range(n_features/2, n_features/2 + max_features):
+            for proj_i in range(self.n_features/2, self.n_features/2 + max_features):
                     # now get the top-left seed that is used to then determine the top-left
                     # position in patch
                     # compute top-left seed for the multi-dimensional patch
