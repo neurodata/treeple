@@ -1,11 +1,10 @@
 import numbers
 from copy import copy
 
-from joblib import Parallel, delayed
 import numpy as np
+from joblib import Parallel, delayed
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from sklearn.exceptions import NotFittedError
-from sklearn.metrics import DistanceMetric
 from sklearn.neighbors import NearestNeighbors
 from sklearn.utils.validation import check_is_fitted
 
@@ -13,6 +12,7 @@ from sktree.tree._neighbors import _compute_distance_matrix, compute_forest_simi
 
 
 def forest_distance(clf, X, Y) -> float:
+    """Compute a valid distance metric between two samples using a decision-tree or forest model."""
     X = np.atleast_2d(X)
     Y = np.atleast_2d(Y)
     XY = np.concatenate((X, Y), axis=0)
@@ -21,7 +21,7 @@ def forest_distance(clf, X, Y) -> float:
     # dists should be (2, 2)
     dists = _compute_distance_matrix(aff_matrix)
     if dists.shape != (2, 2):
-        raise RuntimeError("This shouldnt happen")
+        raise RuntimeError("This shouldn't happen")
 
     return dists[0, 1]
 
@@ -48,6 +48,7 @@ class NearestNeighborsMetaEstimator(BaseEstimator, MetaEstimatorMixin):
     force_fit : bool, optional
         If True, the estimator will be fit even if it is already fitted, by default False.
     """
+
     _supports_multi_radii: bool = True
 
     def __init__(
@@ -266,11 +267,17 @@ class NearestNeighborsMetaEstimator(BaseEstimator, MetaEstimatorMixin):
 
             # compute radius neighbors for each sample in parallel
             if self.verbose:
-                print('Computing radius neighbors in parallel...')
-                
-            result = Parallel(n_jobs=self.n_jobs)(delayed(_parallel_radius_nbrs)(
-                self.neigh_est_.radius_neighbors, np.atleast_2d(X[idx, :]), radius[idx], return_distance
-            ) for idx in range(n_samples))
+                print("Computing radius neighbors in parallel...")
+
+            result = Parallel(n_jobs=self.n_jobs)(
+                delayed(_parallel_radius_nbrs)(
+                    self.neigh_est_.radius_neighbors,
+                    np.atleast_2d(X[idx, :]),
+                    radius[idx],
+                    return_distance,
+                )
+                for idx in range(n_samples)
+            )
 
             for idx, nn in enumerate(result):
                 if return_distance:

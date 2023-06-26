@@ -4,6 +4,7 @@ python_sources = [
   'simulate.py',
   'ksg.py',
   'forest.py',
+  'monte_carlo.py',
 ]
 
 py3.install_sources(

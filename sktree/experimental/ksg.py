@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import Optional
 
 import numpy as np
 import scipy.linalg
@@ -14,7 +14,8 @@ def entropy_continuous(X, k=1, norm="max", min_dist=0.0, n_jobs=-1):
     """Estimates the entropy H of a continuous random variable.
 
     The approach uses the kth-nearest neighbour distances between sample points
-    from :footcite:`kozachenko1987sample`. See: https://github.com/paulbrodersen/entropy_estimators/blob/master/
+    from :footcite:`kozachenko1987sample`. See:
+    https://github.com/paulbrodersen/entropy_estimators/blob/master/
 
     Parameters
     ----------
@@ -84,7 +85,7 @@ def mutual_info_ksg_nn(
     Y,
     Z=None,
     k: float = 0.2,
-    norm='max',
+    norm="max",
     n_jobs: int = -1,
     transform: str = "rank",
     random_seed: int = None,
@@ -123,11 +124,15 @@ def mutual_info_ksg_nn(
     else:
         val = _mi_ksg_scipy(data, x_idx, y_idx, knn_here, n_jobs=n_jobs)
 
-    if norm == 'max':
+    if norm == "max":
         norm_constant = np.log(1)
     else:
-        norm_constant = np.log(np.pi ** (data.shape[1] / 2) / scipy.special.gamma(data.shape[1] / 2 + 1) / 2 ** data.shape[1])
-    
+        norm_constant = np.log(
+            np.pi ** (data.shape[1] / 2)
+            / scipy.special.gamma(data.shape[1] / 2 + 1)
+            / 2 ** data.shape[1]
+        )
+
     return val + norm_constant
 
 
@@ -136,7 +141,7 @@ def mutual_info_ksg(
     Y,
     Z=None,
     k: float = 0.2,
-    norm='max',
+    norm="max",
     nn_estimator=None,
     n_jobs: int = -1,
     transform: str = "rank",
@@ -160,12 +165,12 @@ def mutual_info_ksg(
         ``k * n_samples``.
     norm : str, optional, {'max', 'euclidean'}
         The norm to use in computing the distance, by default 'max'. This is the norm
-        used for computing the distance between points in the covariate space and 
+        used for computing the distance between points in the covariate space and
         affects the constant term in the KSG estimator. For 'max' norm, the constant
         term is :math:`\\log(1) = 0`, and for 'euclidean' norm, the constant term is
         :math:`\\pi^{d/2} / \\Gamma(d/2 + 1) / 2^d)`, where :math:`d` is the dimension.
     nn_estimator : str, optional
-        The nearest neighbor estimator to use, by default None. If None willl default
+        The nearest neighbor estimator to use, by default None. If None will default
         to using :class:`sklearn.neighbors.NearestNeighbors` with default parameters.
     n_jobs : int, optional
         Number of parallel jobs, by default -1.
@@ -250,11 +255,15 @@ def mutual_info_ksg(
     else:
         val = _mi_ksg(data, x_idx, y_idx, nn_estimator, knn_here)
 
-    if norm == 'max':
+    if norm == "max":
         norm_constant = np.log(1)
     else:
-        norm_constant = np.log(np.pi ** (data.shape[1] / 2) / scipy.special.gamma(data.shape[1] / 2 + 1) / 2 ** data.shape[1])
-    
+        norm_constant = np.log(
+            np.pi ** (data.shape[1] / 2)
+            / scipy.special.gamma(data.shape[1] / 2 + 1)
+            / 2 ** data.shape[1]
+        )
+
     return val + norm_constant
 
 
@@ -278,13 +287,11 @@ def _preprocess_data(data, transform, rng):
     return data
 
 
-def _cmi_ksg_scipy(
-    data, x_idx, y_idx, z_idx, knn_here: int, n_jobs: int=-1
-) -> float:
+def _cmi_ksg_scipy(data, x_idx, y_idx, z_idx, knn_here: int, n_jobs: int = -1) -> float:
     tree_xyz = scipy.spatial.KDTree(data)
-    radius_per_sample = tree_xyz.query(
-        data, k=[knn_here + 1], p=np.inf, eps=0.0, workers=n_jobs
-    )[0][:, 0].astype(np.float64)
+    radius_per_sample = tree_xyz.query(data, k=[knn_here + 1], p=np.inf, eps=0.0, workers=n_jobs)[
+        0
+    ][:, 0].astype(np.float64)
 
     # To search neighbors < eps
     radius_per_sample = np.multiply(radius_per_sample, 0.99999)
@@ -317,15 +324,13 @@ def _cmi_ksg_scipy(
     return val
 
 
-def _mi_ksg_scipy(
-    data, x_idx, y_idx, knn_here: int, n_jobs: int=-1
-) -> float:
+def _mi_ksg_scipy(data, x_idx, y_idx, knn_here: int, n_jobs: int = -1) -> float:
     n_samples = data.shape[0]
 
     tree_xyz = scipy.spatial.KDTree(data)
-    radius_per_sample = tree_xyz.query(
-        data, k=[knn_here + 1], p=np.inf, eps=0.0, workers=n_jobs
-    )[0][:, 0].astype(np.float64)
+    radius_per_sample = tree_xyz.query(data, k=[knn_here + 1], p=np.inf, eps=0.0, workers=n_jobs)[
+        0
+    ][:, 0].astype(np.float64)
 
     # To search neighbors < eps
     radius_per_sample = np.multiply(radius_per_sample, 0.99999)
@@ -352,9 +357,7 @@ def _mi_ksg_scipy(
     return val
 
 
-def _mi_ksg(
-    data, x_idx, y_idx, nn_estimator: BaseEstimator, knn_here: int
-) -> float:
+def _mi_ksg(data, x_idx, y_idx, nn_estimator: BaseEstimator, knn_here: int) -> float:
     """Compute KSG estimate of MI.
 
     Parameters
@@ -429,15 +432,15 @@ def _cmi_ksg(
         Estimated CMI value.
     """
     # estimate distance to the kth NN in XYZ subspace for each sample
-    neigh = nn_estimator.fit(data)
+    nn_estimator = nn_estimator.fit(data)
+    dists, _ = nn_estimator.kneighbors(n_neighbors=knn_here)
 
     # get the radius we want to use per sample as the distance to the kth neighbor
     # in the joint distribution space
-    dists, _ = neigh.kneighbors(knn_here)
     radius_per_sample = dists[:, -1]
 
     # compute on the subspace of XZ
-    xz_idx = np.concatenate((x_idx, z_idx))
+    xz_idx = np.concatenate((x_idx, z_idx)).squeeze()
     num_nn_xz = _compute_radius_nbrs(
         data,
         radius_per_sample,
@@ -446,7 +449,7 @@ def _cmi_ksg(
     )
 
     # compute on the subspace of YZ
-    yz_idx = np.concatenate((y_idx, z_idx))
+    yz_idx = np.concatenate((y_idx, z_idx)).squeeze()
     num_nn_yz = _compute_radius_nbrs(
         data,
         radius_per_sample,
@@ -481,7 +484,7 @@ def _compute_radius_nbrs(
     nn_estimator.fit(data[:, col_idx])
 
     # compute the radius neighbors for each sample
-    if getattr(nn_estimator, '_supports_multi_radii', False):
+    if getattr(nn_estimator, "_supports_multi_radii", False):
         nn = nn_estimator.radius_neighbors(
             X=data[:, col_idx], radius=radius_per_sample, return_distance=False
         )
