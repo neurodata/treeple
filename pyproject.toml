@@ -17,6 +17,7 @@ classifiers = [
     'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
 ]
 keywords = ['tree', 'oblique trees', 'manifold-learning', 'scikit-learn']
 include = [
@@ -35,7 +36,7 @@ requires = [
     "setuptools<=65.5",
     "packaging",
     "Cython>=0.29.24",
-    "scikit-learn",
+    "scikit-learn>=1.3",
     "lazy_loader>=0.1",
 
     # We follow scipy for much of these pinnings
@@ -68,11 +69,11 @@ vcs = "git"
 files = ["sktree/__init__.py"]
 
 [tool.poetry.dependencies]
-python = ">=3.8,<3.11"
+python = ">=3.8,<3.12"
 numpy = "^1.23.0"
 scipy = "^1.9.0"
 scikit-learn = "^1.2.2"
-importlib-resources = { version = "*", python = "<3.9" }
+importlib-resources = { version = "*", python = "<3.10" }
 
 [tool.poetry.group.test]
 optional = true
