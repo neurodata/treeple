@@ -43,7 +43,7 @@ We minimally require:
     * Python (>=3.8)
     * numpy
     * scipy
-    * scikit-learn
+    * scikit-learn >= 1.3
 
 Building locally with Meson (RECOMMENDED)
 -----------------------------------------
