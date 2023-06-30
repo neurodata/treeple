@@ -12,3 +12,4 @@ nbsphinx
 memory_profiler
 pandas
 seaborn
+joblib

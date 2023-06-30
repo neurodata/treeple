@@ -166,7 +166,6 @@ numpydoc_xref_aliases = {
     "DecisionTreeClassifier": "sklearn.tree.DecisionTreeClassifier",
     "DecisionTreeRegressor": "sklearn.tree.DecisionTreeRegressor",
     "pipeline.Pipeline": "sklearn.pipeline.Pipeline",
-    "joblib.parallel_backend": "~joblib.parallel_backend",
     # "sklearn_fork.inspection.permutation_importance": "sklearn.inspection.permutation_importance",
 }
 
@@ -220,6 +219,7 @@ numpydoc_xref_ignore = {
     "n_features_z",
     "n_neighbors",
     "one",
+    "joblib.parallel_backend",
 }
 
 # validation
@@ -256,7 +256,7 @@ copybutton_prompt_is_regexp = True
 
 # -- intersphinx -------------------------------------------------------------
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/3", None),
+    "python": ("https://docs.python.org/{.major}".format(sys.version_info), None),
     "numpy": ("https://numpy.org/devdocs", None),
     "scipy": ("https://scipy.github.io/devdocs", None),
     "sklearn": ("https://scikit-learn.org/dev", None),
