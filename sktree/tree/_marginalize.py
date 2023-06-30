@@ -165,7 +165,7 @@ def _apply_marginal_tree(
 
 
 def compute_marginal(self: BaseForest, X, S, n_repeats=10):
-    """Compute marginal distribution of P(S = s) for each s in X.
+    r"""Compute marginal distribution of P(S = s) for each s in X.
 
     Parameters
     ----------
@@ -194,7 +194,7 @@ def compute_marginal(self: BaseForest, X, S, n_repeats=10):
 
 
 def compute_conditional(self, X, S, y=None, n_repeats=10):
-    """Compute conditional P(Y | X, Z = z) for each X and Z.
+    r"""Compute conditional P(Y | X, Z = z) for each X and Z.
 
     Parameters
     ----------
