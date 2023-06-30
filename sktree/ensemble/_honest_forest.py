@@ -479,9 +479,81 @@ class HonestForestClassifier(ForestClassifier):
         check_is_fitted(self)
         return [tree.honest_indices_ for tree in self.estimators_]
 
+    @property
+    def feature_importances_(self):
+        return self.estimator_.feature_importances_
+
     def _more_tags(self):
         return {"multioutput": False}
 
+    def apply(self, X):
+        """
+        Apply trees in the forest to X, return leaf indices.
+
+        Parameters
+        ----------
+        X : {array-like, sparse matrix} of shape (n_samples, n_features)
+            The input samples. Internally, its dtype will be converted to
+            ``dtype=np.float32``. If a sparse matrix is provided, it will be
+            converted into a sparse ``csr_matrix``.
+
+        Returns
+        -------
+        X_leaves : ndarray of shape (n_samples, n_estimators)
+            For each datapoint x in X and for each tree in the forest,
+            return the index of the leaf x ends up in.
+        """
+        return self.estimator_.apply(X)
+
+    def decision_path(self, X):
+        """
+        Return the decision path in the forest.
+
+        .. versionadded:: 0.18
+
+        Parameters
+        ----------
+        X : {array-like, sparse matrix} of shape (n_samples, n_features)
+            The input samples. Internally, its dtype will be converted to
+            ``dtype=np.float32``. If a sparse matrix is provided, it will be
+            converted into a sparse ``csr_matrix``.
+
+        Returns
+        -------
+        indicator : sparse matrix of shape (n_samples, n_nodes)
+            Return a node indicator matrix where non zero elements indicates
+            that the samples goes through the nodes. The matrix is of CSR
+            format.
+
+        n_nodes_ptr : ndarray of shape (n_estimators + 1,)
+            The columns from indicator[n_nodes_ptr[i]:n_nodes_ptr[i+1]]
+            gives the indicator value for the i-th estimator.
+        """
+        return self.estimator_.decision_path(X)
+    
+    def predict_quantiles(self, X, quantiles=0.5, method="nearest"):
+        """Predict class or regression value for X at given quantiles.
+
+        Parameters
+        ----------
+        X : {array-like, sparse matrix} of shape (n_samples, n_features)
+            Input data.
+        quantiles : float, optional
+            The quantiles at which to evaluate, by default 0.5 (median).
+        method : str, optional
+            The method to interpolate, by default 'linear'. Can be any keyword
+            argument accepted by :func:`~np.quantile`.
+
+        Returns
+        -------
+        y : ndarray of shape (n_samples, n_quantiles, [n_outputs])
+            The predicted values. The ``n_outputs`` dimension is present only
+            for multi-output regressors.
+        """
+        return self.estimator_.predict_quantiles(X, quantiles, method)
+
+    def get_leaf_node_samples(self, X):
+        return self.estimator_.get_leaf_node_samples(X)
 
 def _accumulate_prediction(tree, X, out, lock, indices=None):
     """
