@@ -748,12 +748,6 @@ document.write(`
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inherit_estimator_attributes</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                <span class="s2">&quot;Multi-target honest trees not yet </span><span class="se">\</span>
-<span class="s2">                implemented&quot;</span>
-            <span class="p">)</span>
-
         <span class="c1"># update the number of classes, unsplit</span>
         <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="c1"># reshape is necessary to preserve the data contiguity against vs</span>
@@ -807,8 +801,8 @@ document.write(`
 <span class="sd">        classes are ordered by their index in the tree_.value array.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">value</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">leaf_id</span><span class="p">,</span> <span class="n">yval</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">leaf_ids</span><span class="p">,</span> <span class="n">y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span><span class="p">,</span> <span class="mi">0</span><span class="p">]):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">leaf_id</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="n">yval</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">leaf_id</span><span class="p">,</span> <span class="n">yval</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">leaf_ids</span><span class="p">,</span> <span class="n">y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span><span class="p">,</span> <span class="p">:]):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">leaf_id</span><span class="p">][:,</span> <span class="n">yval</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
 
     <span class="k">def</span> <span class="nf">_inherit_estimator_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize necessary attributes from the provided tree estimator&quot;&quot;&quot;</span>
@@ -819,28 +813,35 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">n_outputs_</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">tree_</span>
 
-    <span class="k">def</span> <span class="nf">_empty_leaf_correction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">proba</span><span class="p">,</span> <span class="n">normalizer</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Leaves with empty posteriors are assigned values&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_empty_leaf_correction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">proba</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Leaves with empty posteriors are assigned values.</span>
+
+<span class="sd">        The posteriors are corrected according to the honest prior.</span>
+<span class="sd">        In multi-output cases, the posterior corrections only correspond</span>
+<span class="sd">        to the respective y dimension, indicated by the position param pos.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">zero_mask</span> <span class="o">=</span> <span class="n">proba</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mf">0.0</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">honest_prior</span> <span class="o">==</span> <span class="s2">&quot;empirical&quot;</span><span class="p">:</span>
-            <span class="n">proba</span><span class="p">[</span><span class="n">zero_mask</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">empirical_prior_</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">honest_prior</span> <span class="o">==</span> <span class="s2">&quot;uniform&quot;</span><span class="p">:</span>
-            <span class="n">proba</span><span class="p">[</span><span class="n">zero_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">honest_prior</span> <span class="o">==</span> <span class="s2">&quot;ignore&quot;</span><span class="p">:</span>
-            <span class="n">proba</span><span class="p">[</span><span class="n">zero_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+        <span class="c1"># For multi-output cases</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">honest_prior</span> <span class="o">==</span> <span class="s2">&quot;empirical&quot;</span><span class="p">:</span>
+                <span class="n">proba</span><span class="p">[</span><span class="n">zero_mask</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">empirical_prior_</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">honest_prior</span> <span class="o">==</span> <span class="s2">&quot;uniform&quot;</span><span class="p">:</span>
+                <span class="n">proba</span><span class="p">[</span><span class="n">zero_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">honest_prior</span> <span class="o">==</span> <span class="s2">&quot;ignore&quot;</span><span class="p">:</span>
+                <span class="n">proba</span><span class="p">[</span><span class="n">zero_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;honest_prior </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_prior</span><span class="si">}</span><span class="s2"> not a valid input.&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;honest_prior </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_prior</span><span class="si">}</span><span class="s2"> not a valid input.&quot;</span><span class="p">)</span>
-
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">honest_prior</span> <span class="o">==</span> <span class="s2">&quot;empirical&quot;</span><span class="p">:</span>
+                <span class="n">proba</span><span class="p">[</span><span class="n">zero_mask</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">empirical_prior_</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">honest_prior</span> <span class="o">==</span> <span class="s2">&quot;uniform&quot;</span><span class="p">:</span>
+                <span class="n">proba</span><span class="p">[</span><span class="n">zero_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">honest_prior</span> <span class="o">==</span> <span class="s2">&quot;ignore&quot;</span><span class="p">:</span>
+                <span class="n">proba</span><span class="p">[</span><span class="n">zero_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;honest_prior </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_prior</span><span class="si">}</span><span class="s2"> not a valid input.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">proba</span>
-
-    <span class="k">def</span> <span class="nf">_impute_missing_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">proba</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Due to splitting, provide proba outputs for some classes&quot;&quot;&quot;</span>
-        <span class="n">new_proba</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">proba</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">))</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">old_class</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tree_classes_</span><span class="p">):</span>
-            <span class="n">j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">classes_</span> <span class="o">==</span> <span class="n">old_class</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">new_proba</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">proba</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span>
-
-        <span class="k">return</span> <span class="n">new_proba</span>
 
 <div class="viewcode-block" id="HonestTreeClassifier.predict_proba"><a class="viewcode-back" href="../../../generated/sktree.tree.HonestTreeClassifier.html#sktree.tree.HonestTreeClassifier.predict_proba">[docs]</a>    <span class="k">def</span> <span class="nf">predict_proba</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">check_input</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Predict class probabilities of the input samples X.</span>
@@ -875,17 +876,22 @@ document.write(`
             <span class="n">normalizer</span> <span class="o">=</span> <span class="n">proba</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
             <span class="n">normalizer</span><span class="p">[</span><span class="n">normalizer</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
             <span class="n">proba</span> <span class="o">/=</span> <span class="n">normalizer</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tree_n_classes_</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">:</span>
-                <span class="n">proba</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_impute_missing_classes</span><span class="p">(</span><span class="n">proba</span><span class="p">)</span>
-            <span class="n">proba</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_empty_leaf_correction</span><span class="p">(</span><span class="n">proba</span><span class="p">,</span> <span class="n">normalizer</span><span class="p">)</span>
+            <span class="n">proba</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_empty_leaf_correction</span><span class="p">(</span><span class="n">proba</span><span class="p">)</span>
 
             <span class="k">return</span> <span class="n">proba</span>
 
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                <span class="s2">&quot;Multi-target honest trees not yet </span><span class="se">\</span>
-<span class="s2">                implemented&quot;</span>
-            <span class="p">)</span></div>
+            <span class="n">all_proba</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">):</span>
+                <span class="n">proba_k</span> <span class="o">=</span> <span class="n">proba</span><span class="p">[:,</span> <span class="n">k</span><span class="p">,</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tree_n_classes_</span><span class="p">[</span><span class="n">k</span><span class="p">]]</span>
+                <span class="n">normalizer</span> <span class="o">=</span> <span class="n">proba_k</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+                <span class="n">normalizer</span><span class="p">[</span><span class="n">normalizer</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+                <span class="n">proba_k</span> <span class="o">/=</span> <span class="n">normalizer</span>
+                <span class="n">proba_k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_empty_leaf_correction</span><span class="p">(</span><span class="n">proba_k</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+                <span class="n">all_proba</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">proba_k</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">all_proba</span></div>
 
 <div class="viewcode-block" id="HonestTreeClassifier.predict"><a class="viewcode-back" href="../../../generated/sktree.tree.HonestTreeClassifier.html#sktree.tree.HonestTreeClassifier.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">check_input</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Predict class for X.</span>
@@ -955,7 +961,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-06-20.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-06-30.
       <br/>
     
   </p>

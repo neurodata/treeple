@@ -528,7 +528,7 @@ Only available if bootstrap=True.</p>
 </dd>
 <dt><strong>n_jobs</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, default=None</span></dt><dd><p>The number of jobs to run in parallel. <a class="reference internal" href="#sktree.HonestForestClassifier.fit" title="sktree.HonestForestClassifier.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a>, <a class="reference internal" href="#sktree.HonestForestClassifier.predict" title="sktree.HonestForestClassifier.predict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">predict()</span></code></a>,
 <a class="reference internal" href="#sktree.HonestForestClassifier.decision_path" title="sktree.HonestForestClassifier.decision_path"><code class="xref py py-meth docutils literal notranslate"><span class="pre">decision_path()</span></code></a> and <a class="reference internal" href="#sktree.HonestForestClassifier.apply" title="sktree.HonestForestClassifier.apply"><code class="xref py py-meth docutils literal notranslate"><span class="pre">apply()</span></code></a> are all parallelized over the
-trees. <code class="docutils literal notranslate"><span class="pre">None</span></code> means 1 unless in a <a class="reference external" href="https://joblib.readthedocs.io/en/latest/parallel.html#joblib.parallel_backend" title="(in joblib v1.3.0.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">joblib.parallel_backend</span></code></a>
+trees. <code class="docutils literal notranslate"><span class="pre">None</span></code> means 1 unless in a <code class="docutils literal notranslate"><span class="pre">joblib.parallel_backend</span></code>
 context. <code class="docutils literal notranslate"><span class="pre">-1</span></code> means using all processors. See <a class="reference external" href="https://scikit-learn.org/dev/glossary.html#term-n_jobs" title="(in scikit-learn v1.4)"><span class="xref std std-term">Glossary</span></a> for more details.</p>
 </dd>
 <dt><strong>random_state</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://numpy.org/devdocs/reference/random/legacy.html#numpy.random.RandomState" title="(in NumPy v2.0.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RandomState</span></code></a> instance or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a>, default=None</span></dt><dd><p>Controls both the randomness of the bootstrapping of the samples used
@@ -1256,7 +1256,7 @@ array of zeros.</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-06-20.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-06-30.
       <br/>
     
   </p>

@@ -501,7 +501,7 @@ document.write(`
 <span class="sd">    n_jobs : int, default=None</span>
 <span class="sd">        The number of jobs to run in parallel. :meth:`fit`, :meth:`predict`,</span>
 <span class="sd">        :meth:`decision_path` and :meth:`apply` are all parallelized over the</span>
-<span class="sd">        trees. ``None`` means 1 unless in a :obj:`joblib.parallel_backend`</span>
+<span class="sd">        trees. ``None`` means 1 unless in a `joblib.parallel_backend`</span>
 <span class="sd">        context. ``-1`` means using all processors. See :term:`Glossary</span>
 <span class="sd">        &lt;n_jobs&gt;` for more details.</span>
 
@@ -788,9 +788,7 @@ document.write(`
 <span class="sd">            Fitted tree estimator.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">)</span>
-        <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">check_X_y</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">multi_output</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="n">classes_k</span><span class="p">,</span> <span class="n">y_encoded</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">empirical_prior_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">y_encoded</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">classes_k</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">check_X_y</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">multi_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="c1"># Compute honest decision function</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">honest_decision_function_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_proba</span><span class="p">(</span>
@@ -828,7 +826,9 @@ document.write(`
         <span class="n">n_jobs</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_partition_estimators</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_estimators</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">)</span>
 
         <span class="c1"># avoid storing the output of every tree estimator by summing them here</span>
-        <span class="n">posteriors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">posteriors</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">j</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">)</span>
+        <span class="p">]</span>
         <span class="n">lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">indices</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -839,14 +839,23 @@ document.write(`
         <span class="p">)</span>
 
         <span class="c1"># Normalize to unit length, due to prior weighting</span>
-        <span class="n">zero_mask</span> <span class="o">=</span> <span class="n">posteriors</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="n">posteriors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">posteriors</span><span class="p">)</span>
+        <span class="n">zero_mask</span> <span class="o">=</span> <span class="n">posteriors</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
         <span class="n">posteriors</span><span class="p">[</span><span class="o">~</span><span class="n">zero_mask</span><span class="p">]</span> <span class="o">/=</span> <span class="n">posteriors</span><span class="p">[</span><span class="o">~</span><span class="n">zero_mask</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">impute_missing</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">posteriors</span><span class="p">[</span><span class="n">zero_mask</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">empirical_prior_</span>
+            <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">posteriors</span><span class="p">[</span><span class="n">zero_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">impute_missing</span>
 
-        <span class="k">return</span> <span class="n">posteriors</span>
+        <span class="c1"># preserve shape of multi-outputs</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">posteriors</span> <span class="o">=</span> <span class="p">[</span><span class="n">post</span> <span class="k">for</span> <span class="n">post</span> <span class="ow">in</span> <span class="n">posteriors</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">posteriors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">posteriors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">posteriors</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">structure_indices_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -873,18 +882,14 @@ document.write(`
 
     <span class="k">if</span> <span class="n">indices</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="n">proba</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">indices</span><span class="p">])</span>
-    <span class="n">proba</span> <span class="o">=</span> <span class="n">proba</span><span class="p">[:,</span> <span class="p">:</span> <span class="n">tree</span><span class="o">.</span><span class="n">_tree_n_classes_</span><span class="p">]</span>
-    <span class="n">normalizer</span> <span class="o">=</span> <span class="n">proba</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
-    <span class="n">normalizer</span><span class="p">[</span><span class="n">normalizer</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
-    <span class="n">proba</span> <span class="o">/=</span> <span class="n">normalizer</span>
-
-    <span class="k">if</span> <span class="n">tree</span><span class="o">.</span><span class="n">_tree_n_classes_</span> <span class="o">!=</span> <span class="n">tree</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">:</span>
-        <span class="n">proba</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">_impute_missing_classes</span><span class="p">(</span><span class="n">proba</span><span class="p">)</span>
-    <span class="n">proba</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">_empty_leaf_correction</span><span class="p">(</span><span class="n">proba</span><span class="p">,</span> <span class="n">normalizer</span><span class="p">)</span>
+    <span class="n">proba</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">indices</span><span class="p">],</span> <span class="n">check_input</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">with</span> <span class="n">lock</span><span class="p">:</span>
-        <span class="n">out</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span> <span class="o">+=</span> <span class="n">proba</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">indices</span><span class="p">]</span> <span class="o">+=</span> <span class="n">proba</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="p">)):</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">indices</span><span class="p">]</span> <span class="o">+=</span> <span class="n">proba</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 </pre></div>
 
                 </article>
@@ -929,7 +934,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-06-20.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-06-30.
       <br/>
     
   </p>
