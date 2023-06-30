@@ -6,6 +6,7 @@ on:
       - "**.py"
       - "**.pxd"
       - "**.pyx"
+      - "**"
   push:
     branches: [main]
   workflow_dispatch:
