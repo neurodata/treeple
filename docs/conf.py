@@ -166,8 +166,10 @@ numpydoc_xref_aliases = {
     "DecisionTreeClassifier": "sklearn.tree.DecisionTreeClassifier",
     "DecisionTreeRegressor": "sklearn.tree.DecisionTreeRegressor",
     "pipeline.Pipeline": "sklearn.pipeline.Pipeline",
+    "joblib.parallel_backend": "~joblib.parallel_backend",
     # "sklearn_fork.inspection.permutation_importance": "sklearn.inspection.permutation_importance",
 }
+
 numpydoc_xref_ignore = {
     "of",
     "or",
