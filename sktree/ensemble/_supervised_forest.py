@@ -1,6 +1,6 @@
-from sklearn_fork.ensemble._forest import ForestClassifier, ForestRegressor
-from sklearn_fork.utils._param_validation import StrOptions
+from sklearn.utils._param_validation import StrOptions
 
+from sktree._lib.sklearn.ensemble._forest import ForestClassifier, ForestRegressor
 from sktree.tree import (
     ExtraObliqueDecisionTreeClassifier,
     ExtraObliqueDecisionTreeRegressor,
@@ -116,7 +116,7 @@ class ObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
     n_jobs : int, default=None
         The number of jobs to run in parallel. :meth:`fit`, :meth:`predict`,
         :meth:`decision_path` and :meth:`apply` are all parallelized over the
-        trees. ``None`` means 1 unless in a :obj:`joblib.parallel_backend`
+        trees. ``None`` means 1 unless in a `joblib.parallel_backend`
         context. ``-1`` means using all processors. See :term:`Glossary
         <n_jobs>` for more details.
 
@@ -273,6 +273,7 @@ class ObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
     [1]
     """
 
+    tree_type = "oblique"
     _parameter_constraints: dict = {
         **ForestClassifier._parameter_constraints,
         **ObliqueDecisionTreeClassifier._parameter_constraints,
@@ -455,7 +456,7 @@ class ObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
     n_jobs : int, default=None
         The number of jobs to run in parallel. :meth:`fit`, :meth:`predict`,
         :meth:`decision_path` and :meth:`apply` are all parallelized over the
-        trees. ``None`` means 1 unless in a :obj:`joblib.parallel_backend`
+        trees. ``None`` means 1 unless in a `joblib.parallel_backend`
         context. ``-1`` means using all processors. See :term:`Glossary
         <n_jobs>` for more details.
 
@@ -580,6 +581,7 @@ class ObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
     [-5.86327109]
     """
 
+    tree_type = "oblique"
     _parameter_constraints: dict = {
         **ForestRegressor._parameter_constraints,
         **ObliqueDecisionTreeRegressor._parameter_constraints,
@@ -743,7 +745,7 @@ class PatchObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
     n_jobs : int, default=None
         The number of jobs to run in parallel. :meth:`fit`, :meth:`predict`,
         :meth:`decision_path` and :meth:`apply` are all parallelized over the
-        trees. ``None`` means 1 unless in a :obj:`joblib.parallel_backend`
+        trees. ``None`` means 1 unless in a `joblib.parallel_backend`
         context. ``-1`` means using all processors. See :term:`Glossary
         <n_jobs>` for more details.
 
@@ -901,6 +903,7 @@ class PatchObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
     .. footbibliography::
     """
 
+    tree_type = "oblique"
     _parameter_constraints: dict = {
         **ForestClassifier._parameter_constraints,
         **PatchObliqueDecisionTreeClassifier._parameter_constraints,
@@ -1094,7 +1097,7 @@ class PatchObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
     n_jobs : int, default=None
         The number of jobs to run in parallel. :meth:`fit`, :meth:`predict`,
         :meth:`decision_path` and :meth:`apply` are all parallelized over the
-        trees. ``None`` means 1 unless in a :obj:`joblib.parallel_backend`
+        trees. ``None`` means 1 unless in a `joblib.parallel_backend`
         context. ``-1`` means using all processors. See :term:`Glossary
         <n_jobs>` for more details.
 
@@ -1225,6 +1228,7 @@ class PatchObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
     [-5.82818509]
     """
 
+    tree_type = "oblique"
     _parameter_constraints: dict = {
         **ForestRegressor._parameter_constraints,
         **PatchObliqueDecisionTreeRegressor._parameter_constraints,

@@ -1,14 +1,35 @@
-# cython: cdivision=True
 # distutils: language=c++
+# cython: cdivision=True
 # cython: language_level=3
 # cython: boundscheck=False
 # cython: wraparound=False
+# cython: initializedcheck=False
 
 import numpy as np
 
 cimport numpy as cnp
 
 cnp.import_array()
+
+from sktree._lib.sklearn.tree._utils cimport rand_uniform
+
+
+cdef inline int rand_weighted_binary(double p0, UINT32_t* random_state) noexcept nogil:
+    """Sample from integers 0 and 1 with different probabilities.
+
+    Parameters
+    ----------
+    p0 : double
+        The probability of sampling 0.
+    random_state : UINT32_t*
+        The random state.
+    """
+    cdef double random_value = rand_uniform(0.0, 1.0, random_state)
+
+    if random_value < p0:
+        return 0
+    else:
+        return 1
 
 cpdef unravel_index(
     SIZE_t index,

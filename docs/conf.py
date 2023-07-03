@@ -157,17 +157,18 @@ numpydoc_xref_aliases = {
     # Python
     "Path": "pathlib.Path",
     "bool": ":class:`python:bool`",
-    "~sklearn_fork": "~sklearn",
     "UnsupervisedDecisionTree": "sktree.tree.UnsupervisedDecisionTree",
     "ObliqueDecisionTreeClassifier": "sktree.tree.ObliqueDecisionTreeClassifier",
     "PatchObliqueDecisionTreeClassifier": "sktree.tree.PatchObliqueDecisionTreeClassifier",
     "ObliqueDecisionTreeRegressor": "sktree.tree.ObliqueDecisionTreeRegressor",
     "PatchObliqueDecisionTreeRegressor": "sktree.tree.PatchObliqueDecisionTreeRegressor",
+    "UnsupervisedObliqueRandomForest": "sktree.ensemble.UnsupervisedObliqueRandomForest",
     "DecisionTreeClassifier": "sklearn.tree.DecisionTreeClassifier",
     "DecisionTreeRegressor": "sklearn.tree.DecisionTreeRegressor",
-    # "sklearn_fork.pipeline.Pipeline": "sklearn.pipeline.Pipeline",
+    "pipeline.Pipeline": "sklearn.pipeline.Pipeline",
     # "sklearn_fork.inspection.permutation_importance": "sklearn.inspection.permutation_importance",
 }
+
 numpydoc_xref_ignore = {
     "of",
     "or",
@@ -185,6 +186,9 @@ numpydoc_xref_ignore = {
     "n_features_new",
     "n_estimators",
     "n_outputs",
+    "n_honest",
+    "n_structure",
+    "lists",
     "n_nodes",
     "X",
     "default",
@@ -200,6 +204,22 @@ numpydoc_xref_ignore = {
     "a",
     "Tree",
     "_type_",
+    "MetadataRequest",
+    "~utils.metadata_routing.MetadataRequest",
+    "quantiles",
+    "n_quantiles",
+    "metric",
+    "n_queries",
+    "BaseForest",
+    "BaseDecisionTree",
+    "n_indexed",
+    "n_queries",
+    "n_features_x",
+    "n_features_y",
+    "n_features_z",
+    "n_neighbors",
+    "one",
+    "joblib.parallel_backend",
 }
 
 # validation
@@ -236,10 +256,10 @@ copybutton_prompt_is_regexp = True
 
 # -- intersphinx -------------------------------------------------------------
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/3", None),
+    "python": ("https://docs.python.org/{.major}".format(sys.version_info), None),
     "numpy": ("https://numpy.org/devdocs", None),
     "scipy": ("https://scipy.github.io/devdocs", None),
-    "sklearn": ("https://scikit-learn.org/stable", None),
+    "sklearn": ("https://scikit-learn.org/dev", None),
     "pandas": ("https://pandas.pydata.org/pandas-docs/dev", None),
     "joblib": ("https://joblib.readthedocs.io/en/latest", None),
     "matplotlib": ("https://matplotlib.org/stable", None),
@@ -341,15 +361,17 @@ issues_github_path = "neurodata/scikit-tree"
 
 def replace_sklearn_fork_with_sklearn(app, what, name, obj, options, lines):
     """
-    This function replaces all instances of 'sklearn_fork' with 'sklearn'
+    This function replaces all instances of 'sklearn' with 'sklearn'
     in the docstring content.
     """
     # Convert the list of lines to a string
     content = "\n".join(lines)
 
     # Use regular expressions to replace 'sklearn_fork' with 'sklearn'
-    content = re.sub(r"`~sklearn_fork\.", r"`~sklearn.", content)
-    content = re.sub(r"`sklearn_fork\.", r"`sklearn.", content)
+    content = re.sub(r"`pipeline.Pipeline", r"`~sklearn.pipeline.Pipeline", content)
+    content = re.sub(r"`~utils.metadata_routing.MetadataRequest", r"``MetadataRequest``", content)
+    content = re.sub(r"`np.quantile", r"`numpy.quantile", content)
+    content = re.sub(r"`~np.quantile", r"`numpy.quantile", content)
 
     # Convert the modified string back to a list of lines
     lines[:] = content.split("\n")

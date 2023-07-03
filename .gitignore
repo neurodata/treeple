@@ -8,6 +8,11 @@ coverage
 *.xml
 .venv
 
+commit.txt
+sktree/_lib/sklearn/
+
+*.png
+
 # Sphinx documentation
 docs/_build/
 docs/generated/

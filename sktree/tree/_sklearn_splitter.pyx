@@ -1,5 +1,6 @@
 # cython: language_level=3
 # cython: boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
+# distutils: define_macros=NPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION
 
 from libc.stdlib cimport qsort
 from libc.string cimport memcpy

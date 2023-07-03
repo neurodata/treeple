@@ -36,7 +36,8 @@ if __sktree_SETUP__:
     # process, as it may not be compiled yet
 else:
     try:
-        from . import tree, ensemble
+        from . import _lib, tree, ensemble, experimental
+        from .neighbors import NearestNeighborsMetaEstimator
         from .ensemble._unsupervised_forest import (
             UnsupervisedRandomForest,
             UnsupervisedObliqueRandomForest,
@@ -49,6 +50,7 @@ else:
             PatchObliqueRandomForestClassifier,
             PatchObliqueRandomForestRegressor,
         )
+        from .ensemble._honest_forest import HonestForestClassifier
     except ImportError as e:
         msg = """Error importing scikit-tree: you cannot import scikit-tree while
         being in scikit-tree source directory; please exit the scikit-tree source
@@ -56,14 +58,18 @@ else:
         raise ImportError(msg) from e
 
     __all__ = [
+        "_lib",
         "tree",
+        "experimental",
         "ensemble",
         "ExtraObliqueRandomForestClassifier",
         # "ExtraObliqueRandomForestRegressor",
+        "NearestNeighborsMetaEstimator",
         "ObliqueRandomForestClassifier",
         "ObliqueRandomForestRegressor",
         "PatchObliqueRandomForestClassifier",
         "PatchObliqueRandomForestRegressor",
         "UnsupervisedRandomForest",
         "UnsupervisedObliqueRandomForest",
+        "HonestForestClassifier",
     ]

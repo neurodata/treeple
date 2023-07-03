@@ -31,6 +31,7 @@ how scikit-learn builds trees.
    ObliqueRandomForestRegressor
    PatchObliqueRandomForestClassifier
    PatchObliqueRandomForestRegressor
+   HonestForestClassifier
 
 .. currentmodule:: sktree.tree
 .. autosummary::
@@ -40,6 +41,7 @@ how scikit-learn builds trees.
    ObliqueDecisionTreeRegressor
    PatchObliqueDecisionTreeClassifier
    PatchObliqueDecisionTreeRegressor
+   HonestTreeClassifier
 
 Unsupervised
 ------------
@@ -63,3 +65,59 @@ The trees that comprise those forests are also available as standalone classes.
    
    tree.UnsupervisedDecisionTree
    tree.UnsupervisedObliqueDecisionTree
+
+
+Distance Metrics
+----------------
+Trees inherently produce a "distance-like" metric. We provide an API for
+extracting pairwise distances from the trees that include a correction
+that turns the "tree-distance" into a proper distance metric.
+
+.. currentmodule:: sktree.tree
+.. autosummary::
+   :toctree: generated/
+
+   compute_forest_similarity_matrix
+
+In addition to providing a distance metric based on leaves, tree-models
+provide a natural way to compute neighbors based on the splits. We provide
+an API for extracting the nearest neighbors from a tree-model. This provides
+an API-like interface similar to :class:`~sklearn.neighbors.NearestNeighbors`.
+
+.. currentmodule:: sktree
+.. autosummary::
+   :toctree: generated/
+
+   NearestNeighborsMetaEstimator
+
+
+Experimental Functionality
+--------------------------
+We also include experimental functionality that is works in progress.
+
+.. currentmodule:: sktree.experimental
+.. autosummary::
+   :toctree: generated/
+
+   mutual_info_ksg
+
+We also include functions that help simulate and evaluate mutual information (MI)
+and conditional mutual information (CMI) estimators. Specifically, functions that
+help simulate multivariate gaussian data and compute the analytical solutions
+for the entropy, MI and CMI of the Gaussian distributions.
+
+.. currentmodule:: sktree.experimental.simulate
+.. autosummary::
+   :toctree: generated/
+
+   simulate_multivariate_gaussian
+   simulate_helix
+   simulate_sphere
+
+.. currentmodule:: sktree.experimental.mutual_info
+.. autosummary::
+   :toctree: generated/
+
+   mi_gaussian
+   cmi_gaussian
+   entropy_gaussian
