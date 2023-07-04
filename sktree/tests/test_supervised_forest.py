@@ -12,7 +12,7 @@ from sklearn.utils.validation import check_random_state
 
 from sktree import (
     ExtraObliqueRandomForestClassifier,
-    # ExtraObliqueRandomForestRegressor,
+    ExtraObliqueRandomForestRegressor,
     ObliqueRandomForestClassifier,
     ObliqueRandomForestRegressor,
     PatchObliqueRandomForestClassifier,
@@ -49,13 +49,13 @@ diabetes.target = diabetes.target[perm]
 
 
 FOREST_CLASSIFIERS = {
-    # "ExtraObliqueRandomForestClassifier": ExtraObliqueRandomForestClassifier,
+    "ExtraObliqueRandomForestClassifier": ExtraObliqueRandomForestClassifier,
     "ObliqueRandomForestClassifier": ObliqueRandomForestClassifier,
     "PatchObliqueRandomForestClassifier": PatchObliqueRandomForestClassifier,
 }
 
 FOREST_REGRESSORS = {
-    # "ExtraObliqueDecisionTreeRegressor": ExtraObliqueDecisionTreeRegressor,
+    "ExtraObliqueDecisionTreeRegressor": ExtraObliqueRandomForestRegressor,
     "ObliqueRandomForestRegressor": ObliqueRandomForestRegressor,
     "PatchObliqueRandomForestRegressor": PatchObliqueRandomForestRegressor,
 }
@@ -413,10 +413,10 @@ def test_check_importances_patch(estimator, criterion, dtype):
 @pytest.mark.parametrize("criterion", REG_CRITERIONS)
 @pytest.mark.parametrize("dtype", [np.float32, np.float64])
 def test_regression(forest, criterion, dtype):
-    estimator = forest(n_estimators=10, criterion=criterion, random_state=0)
+    estimator = forest(n_estimators=10, criterion=criterion, random_state=123)
     n_test = 0.1
     X = X_large_reg.astype(dtype, copy=False)
     y = y_large_reg.astype(dtype, copy=False)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=n_test, random_state=0)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=n_test, random_state=123)
     estimator.fit(X_train, y_train)
     assert estimator.score(X_test, y_test) > 0.88

@@ -1,7 +1,7 @@
 from ._honest_forest import HonestForestClassifier
 from ._supervised_forest import (
-    # ExtraObliqueRandomForestRegressor,
     ExtraObliqueRandomForestClassifier,
+    ExtraObliqueRandomForestRegressor,
     ObliqueRandomForestClassifier,
     ObliqueRandomForestRegressor,
     PatchObliqueRandomForestClassifier,

@@ -1310,10 +1310,10 @@ class PatchObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
 
 class ExtraObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
     """
-    An oblique random forest classifier.
+    An extra oblique random forest classifier.
 
-    A oblique random forest is a meta estimator similar to a random
-    forest that fits a number of oblique decision tree classifiers
+    An extra oblique random forest is a meta estimator similar to a random
+    forest that fits a number of extra oblique decision tree classifiers
     on various sub-samples of the dataset and uses averaging to
     improve the predictive accuracy and control over-fitting.
 
@@ -1477,11 +1477,11 @@ class ExtraObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
 
     Attributes
     ----------
-    base_estimator_ : sktree.tree.ObliqueDecisionTreeClassifier
+    base_estimator_ : sktree.tree.ExtraObliqueDecisionTreeClassifier
         The child estimator template used to create the collection of fitted
         sub-estimators.
 
-    estimators_ : list of sktree.tree.ObliqueDecisionTreeClassifier
+    estimators_ : list of sktree.tree.ExtraObliqueDecisionTreeClassifier
         The collection of fitted sub-estimators.
 
     classes_ : ndarray of shape (n_classes,) or a list of such arrays
@@ -1530,8 +1530,9 @@ class ExtraObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
 
     See Also
     --------
-    sktree.tree.ObliqueDecisionTreeClassifier : An oblique decision
+    sktree.tree.ExtraObliqueDecisionTreeClassifier : An extremely randomized oblique decision
         tree classifier.
+    sktree.tree.ObliqueDecisionTreeClassifier : An oblique decision tree classifier.
     sklearn.ensemble.RandomForestClassifier : An axis-aligned decision
         forest classifier.
 
@@ -1553,17 +1554,19 @@ class ExtraObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
     References
     ----------
     .. [1] L. Breiman, "Random Forests", Machine Learning, 45(1), 5-32, 2001.
+    .. [2] P. Geurts, D. Ernst., and L. Wehenkel, "Extremely randomized trees",
+        Machine Learning, 63(1), 3-42, 2006.
 
     Examples
     --------
-    >>> from sktree.ensemble import ObliqueRandomForestClassifier
+    >>> from sktree.ensemble import ExtraObliqueRandomForestClassifier
     >>> from sklearn.datasets import make_classification
     >>> X, y = make_classification(n_samples=1000, n_features=4,
     ...                            n_informative=2, n_redundant=0,
     ...                            random_state=0, shuffle=False)
-    >>> clf = ObliqueRandomForestClassifier(max_depth=2, random_state=0)
+    >>> clf = ExtraObliqueRandomForestClassifier(max_depth=2, random_state=0)
     >>> clf.fit(X, y)
-    ObliqueRandomForestClassifier(...)
+    ExtraObliqueRandomForestClassifier(...)
     >>> print(clf.predict([[0, 0, 0, 0]]))
     [1]
     """
@@ -1640,10 +1643,10 @@ class ExtraObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
 
 
 class ExtraObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
-    """An oblique random forest regressor.
+    """An extra oblique random forest regressor.
 
-    A oblique random forest is a meta estimator similar to a random
-    forest that fits a number of oblique decision tree regressor
+    An extra oblique random forest is a meta estimator similar to a random
+    forest that fits a number of extra oblique decision tree regressor
     on various sub-samples of the dataset and uses averaging to
     improve the predictive accuracy and control over-fitting.
 
@@ -1790,11 +1793,11 @@ class ExtraObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
 
     Attributes
     ----------
-    base_estimator_ : ObliqueDecisionTreeRegressor
+    base_estimator_ : ExtraObliqueDecisionTreeRegressor
         The child estimator template used to create the collection of fitted
         sub-estimators.
 
-    estimators_ : list of ObliqueDecisionTreeRegressor
+    estimators_ : list of ExtraObliqueDecisionTreeRegressor
         The collection of fitted sub-estimators.
 
     n_features_ : int
@@ -1835,6 +1838,8 @@ class ExtraObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
 
     See Also
     --------
+    sktree.tree.ExtraObliqueDecisionTreeRegressor : An extra oblique decision
+        tree regressor.
     sktree.tree.ObliqueDecisionTreeRegressor : An oblique decision
         tree regressor.
     sklearn.ensemble.RandomForestRegressor : An axis-aligned decision
@@ -1862,17 +1867,20 @@ class ExtraObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
     .. [2] T. Tomita, "Sparse Projection Oblique Randomer Forests", \
         Journal of Machine Learning Research, 21(104), 1-39, 2020.
 
+    .. [3] P. Geurts, D. Ernst., and L. Wehenkel, "Extremely randomized trees", \
+        Machine Learning, 63(1), 3-42, 2006.
+
     Examples
     --------
-    >>> from sktree.ensemble import ObliqueRandomForestRegressor
+    >>> from sktree.ensemble import ExtraObliqueRandomForestRegressor
     >>> from sklearn.datasets import make_regression
     >>> X, y = make_regression(n_features=4, n_informative=2,
     ...                        random_state=0, shuffle=False)
-    >>> regr = ObliqueRandomForestRegressor(max_depth=2, random_state=0)
+    >>> regr = ExtraObliqueRandomForestRegressor(max_depth=2, random_state=0)
     >>> regr.fit(X, y)
-    ObliqueRandomForestRegressor(...)
+    ExtraObliqueRandomForestRegressor(...)
     >>> print(regr.predict([[0, 0, 0, 0]]))
-    [-5.86327109]
+    [-3.05063517]
     """
 
     _parameter_constraints: dict = {

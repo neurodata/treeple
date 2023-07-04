@@ -637,7 +637,7 @@ cdef class RandomObliqueSplitter(BestObliqueSplitter):
 
     cdef inline void find_min_max(
         self,
-        SIZE_t feature_values,
+        DTYPE_t[::1] feature_values,
         DTYPE_t* min_feature_value_out,
         DTYPE_t* max_feature_value_out,
     ) noexcept nogil:
@@ -646,9 +646,12 @@ cdef class RandomObliqueSplitter(BestObliqueSplitter):
             DTYPE_t current_feature_value
             DTYPE_t min_feature_value = INFINITY
             DTYPE_t max_feature_value = -INFINITY
-            DTYPE_t[::1] feature_values = feature_values
+            SIZE_t start = self.start
+            SIZE_t end = self.end
+            SIZE_t p
 
-        for current_feature_value in feature_values:
+        for p in range(start, end):
+            current_feature_value = feature_values[p]
             if current_feature_value < min_feature_value:
                 min_feature_value = current_feature_value
             elif current_feature_value > max_feature_value:
@@ -697,6 +700,7 @@ cdef class RandomObliqueSplitter(BestObliqueSplitter):
         cdef SIZE_t[::1] samples = self.samples
         cdef SIZE_t start = self.start
         cdef SIZE_t end = self.end
+        cdef UINT32_t* random_state = &self.rand_r_state
 
         # pointer array to store feature values to split on
         cdef DTYPE_t[::1]  feature_values = self.feature_values
@@ -759,15 +763,20 @@ cdef class RandomObliqueSplitter(BestObliqueSplitter):
                 current_split.threshold = min_feature_value
 
             # Partition
-            current_split.pos = partitioner.partition_samples(current_split.threshold)
+            current_split.pos = self.partition_samples(current_split.threshold)
+
+            # Reject if min_samples_leaf is not guaranteed
+            if (((current_split.pos - start) < min_samples_leaf) or
+                    ((end - current_split.pos) < min_samples_leaf)):
+                continue
 
             # evaluate split
             self.criterion.reset()
             self.criterion.update(current_split.pos)
 
             # Reject if min_weight_leaf is not satisfied
-            if ((criterion.weighted_n_left < min_weight_leaf) or
-                    (criterion.weighted_n_right < min_weight_leaf)):
+            if ((self.criterion.weighted_n_left < min_weight_leaf) or
+                    (self.criterion.weighted_n_right < min_weight_leaf)):
                 continue
 
             current_proxy_improvement = self.criterion.proxy_impurity_improvement()
