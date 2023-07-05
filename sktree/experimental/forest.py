@@ -1,13 +1,13 @@
 from copy import copy
-from numpy.typing import ArrayLike
 
 import numpy as np
+from numpy.typing import ArrayLike
 from scipy.stats import entropy
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from sklearn.ensemble._forest import BaseForest
 
-from sklearn.calibration import CalibratedClassifierCV
 from sktree.utils import check_is_forest
+
 from .ksg import entropy_continuous
 
 
@@ -16,7 +16,7 @@ class SupervisedInfoForest(BaseEstimator, MetaEstimatorMixin):
         """Meta estimator for mutual information.
 
         This supervised forest estimator uses two supervised forests to estimate
-        the (conditional) mutual information between X and Y given Z. 
+        the (conditional) mutual information between X and Y given Z.
 
         Parameters
         ----------
@@ -80,7 +80,7 @@ class SupervisedInfoForest(BaseEstimator, MetaEstimatorMixin):
             XZ = X
 
         # if not fitted yet
-        if not hasattr(self.estimator, "estimator_yz_"):
+        if not hasattr(self, "estimator_yz_"):
             self.fit(X, y, Z)
 
         sample_indices = np.arange(0, X.shape[0])
@@ -269,8 +269,3 @@ def approx_joint(est: BaseForest, X: ArrayLike, P_Y: ArrayLike):
         raise ValueError("Multioutput is not supported.")
 
     est.apply(X)
-
-    y_proba = est.predict_proba(X)
-
-    for iclass in range(est.n_classes_):
-        y_proba[:, iclass] *= P_X

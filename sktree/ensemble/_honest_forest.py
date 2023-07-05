@@ -530,7 +530,7 @@ class HonestForestClassifier(ForestClassifier):
             gives the indicator value for the i-th estimator.
         """
         return self.estimator_.decision_path(X)
-    
+
     def predict_quantiles(self, X, quantiles=0.5, method="nearest"):
         """Predict class or regression value for X at given quantiles.
 
@@ -554,6 +554,7 @@ class HonestForestClassifier(ForestClassifier):
 
     def get_leaf_node_samples(self, X):
         return self.estimator_.get_leaf_node_samples(X)
+
 
 def _accumulate_prediction(tree, X, out, lock, indices=None):
     """

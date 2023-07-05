@@ -3,10 +3,8 @@ import scipy.linalg
 import scipy.special
 import scipy.stats
 from scipy.integrate import nquad
-from scipy.stats import entropy, multivariate_normal
+from scipy.stats import multivariate_normal
 
-
-from .mutual_info import entropy_gaussian
 
 def simulate_helix(
     radius_a=0,
@@ -335,7 +333,7 @@ def mi_separated_gaussians(means, sigmas, pi, seed=None):
 
     # compute ground-truth MI
     base = np.exp(1)
-    H_Y = entropy(pi, base=base)
+    # H_Y = entropy(pi, base=base)
 
     def func(*args):
         # points at which to evaluate the multivariate-Gaussian
@@ -363,7 +361,7 @@ def mi_separated_gaussians(means, sigmas, pi, seed=None):
 
 def _conditional_entropy_separated_gaussians(sigmas, pi, base):
     """Conditional entropy.
-    
+
     Computes H(X | Y), where X can be multivariate and is assumed to be multivariate-Gaussian.
     The determinant of the covariance matrix of X is used to compute the entropy.
 
@@ -387,7 +385,10 @@ def _conditional_entropy_separated_gaussians(sigmas, pi, base):
 
 
 def cmi_separated_gaussians(means, sigmas, pi, condition_idx, seed=None):
-    """Compute the ground-truth conditional mutual information between the class labels and the data."""
+    """Compute the ground-truth conditional mutual information.
+
+    This computes the CMI between the class labels and the data.
+    """
     n_classes = len(means)
 
     x_idx = np.ones((means[0].shape[0],), dtype=np.bool)
@@ -439,7 +440,7 @@ def cmi_separated_gaussians(means, sigmas, pi, condition_idx, seed=None):
 
     # lastly compute H(Z |Y)
     H_ZY = _conditional_entropy_separated_gaussians(z_sigmas, pi, base)
-    
+
     # now compute H(X|Y,Z)
     print(H_XZ, H_Z, H_XZY, H_ZY)
     I_XYZ = H_XZ - H_Z - H_XZY + H_ZY
