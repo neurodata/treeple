@@ -168,6 +168,7 @@ numpydoc_xref_aliases = {
     "pipeline.Pipeline": "sklearn.pipeline.Pipeline",
     # "sklearn_fork.inspection.permutation_importance": "sklearn.inspection.permutation_importance",
 }
+
 numpydoc_xref_ignore = {
     "of",
     "or",
@@ -218,6 +219,7 @@ numpydoc_xref_ignore = {
     "n_features_z",
     "n_neighbors",
     "one",
+    "joblib.parallel_backend",
 }
 
 # validation
@@ -254,7 +256,7 @@ copybutton_prompt_is_regexp = True
 
 # -- intersphinx -------------------------------------------------------------
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/3", None),
+    "python": ("https://docs.python.org/{.major}".format(sys.version_info), None),
     "numpy": ("https://numpy.org/devdocs", None),
     "scipy": ("https://scipy.github.io/devdocs", None),
     "sklearn": ("https://scikit-learn.org/dev", None),

@@ -9,16 +9,18 @@ scikit-tree
 
 scikit-tree is a scikit-learn compatible API for building state-of-the-art decision trees. These include unsupervised trees, oblique trees, uncertainty trees, quantile trees and causal trees.
 
+Tree-models have withstood the test of time, and are consistently used for modern-day data science and machine learning applications. They especially perform well when there are limited samples for a problem and are flexible learners that can be applied to a wide variety of different settings, such as tabular, images, time-series, genomics, EEG data and more.
+
 We welcome contributions for modern tree-based algorithms. We use Cython to achieve fast C/C++ speeds, while abiding by a scikit-learn compatible (tested) API. Moreover, our Cython internals are easily extensible because they follow the internal Cython API of scikit-learn as well.
 
-**Dependency on a fork of scikit-learn**
+**Submodule dependency on a fork of scikit-learn**
 Due to the current state of scikit-learn's internal Cython code for trees, we have to instead leverage a maintained fork of scikit-learn at https://github.com/neurodata/scikit-learn, where specifically, the `fork` branch is used to build and install this repo. We keep that fork well-maintained and up-to-date with respect to the main sklearn repo. The only difference is the refactoring of the `tree/` submodule. This fork is used internally under the namespace ``sktree._lib.sklearn``. It is necessary to use this fork for anything related to:
 
 - `RandomForest*`
 - `ExtraTrees*`
 - or any importable items from the `tree/` submodule, whether it is a Cython or Python object
 
-If you are developing for scikit-tree, we will always depend on the most up-to-date commit of `https://github.com/neurodata/scikit-learn/submodule` as a submodule within scikit-tee. This branch is consistently maintained for changes upstream that occur in the scikit-learn tree submodule. This ensures that our fork maintains consistency and robustness due to bug fixes and improvements upstream.
+If you are developing for scikit-tree, we will always depend on the most up-to-date commit of `https://github.com/neurodata/scikit-learn/submodulev2` as a submodule within scikit-tee. This branch is consistently maintained for changes upstream that occur in the scikit-learn tree submodule. This ensures that our fork maintains consistency and robustness due to bug fixes and improvements upstream.
 
 Documentation
 =============
@@ -43,7 +45,7 @@ We minimally require:
     * Python (>=3.8)
     * numpy
     * scipy
-    * scikit-learn
+    * scikit-learn >= 1.3
 
 Building locally with Meson (RECOMMENDED)
 -----------------------------------------
@@ -54,9 +56,6 @@ Make sure you have the necessary packages installed
 
     # you may need these optional dependencies to build scikit-learn locally
     conda install -c conda-forge joblib threadpoolctl pytest compilers llvm-openmp
-
-    # (caution only if you know what you're doing) or if you're a developer and need some latest changes on the fork:
-    pip install scikit-learn-tree@git+https://git@github.com/neurodata/scikit-learn.git@fork
 
 We use the ``spin`` CLI to abstract away build details:
 
