@@ -173,6 +173,7 @@ jobs:
           pip install -r build_requirements.txt
           pip install -r test_requirements.txt
           pip install spin
+          pip install numpy==1.22.4
 
       - name: openblas-libs
         # shell: bash
