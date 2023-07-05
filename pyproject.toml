@@ -13,8 +13,6 @@ repository = "https://github.com/neurodata/scikit-tree"
 readme = "README.md"
 classifiers = [
     'Development Status :: 4 - Beta',
-    'License :: OSI Approved :: BSD-3 License',
-    'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
@@ -69,7 +67,7 @@ vcs = "git"
 files = ["sktree/__init__.py"]
 
 [tool.poetry.dependencies]
-python = ">=3.8,<3.12"
+python = ">=3.9,<3.12"
 numpy = "^1.23.0"
 scipy = "^1.9.0"
 scikit-learn = "^1.2.2"
