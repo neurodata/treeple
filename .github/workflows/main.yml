@@ -171,6 +171,7 @@ jobs:
       - name: pip-packages
         run: |
           pip install -r build_requirements.txt
+          pip install -r test_requirements.txt
           pip install spin
 
       - name: openblas-libs
