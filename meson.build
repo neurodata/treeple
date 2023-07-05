@@ -4,7 +4,7 @@ project(
   # Note that the git commit hash cannot be added dynamically here
   # That only happens when importing from a git repository.
   # See `sktree/__init__.py`
-  version: '0.1.1',
+  version: '0.1.2',
   license: 'BSD-3',
   meson_version: '>= 0.64.0',
   default_options: [
@@ -45,7 +45,8 @@ if not cython.found()
   error('MESON_BUILD_FAILED: Cython3 not found. Please install it.')
 endif
 
-run_command('git', 'submodule', 'update', '--init', check: true)
+# r = run_command('git', 'submodule', 'update', '--init', check: false)
+r = run_command('mv', 'sktree/_lib/sklearn_fork/sklearn', 'sktree/_lib/sklearn', check: false)
 
 # Setup Python:
 # https://mesonbuild.com/Python-module.html
@@ -62,8 +63,8 @@ py3 = py3_mod.find_installation(
 # print some debugging output
 message(py3.full_path())
 message(py3.get_install_dir())
-if py3.language_version().version_compare('<3.8')
-    error('At least Python 3.8 is required.')
+if py3.language_version().version_compare('<3.9')
+    error('At least Python 3.9 is required.')
 endif
 py3_dep = py3.dependency()
 
