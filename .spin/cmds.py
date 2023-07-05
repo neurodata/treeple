@@ -162,8 +162,6 @@ def build(ctx, meson_args, jobs=None, clean=False, forcesubmodule=False, verbose
     ctx.invoke(meson.build, meson_args=meson_args, jobs=jobs, clean=clean, verbose=verbose)
 
 
-
-
 @click.command()
 def sdist():
     """📦 Build a source distribution in `dist/`"""
