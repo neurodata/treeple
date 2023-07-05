@@ -109,10 +109,9 @@ jobs:
           python spin setup-submodule
 
       - name: Build wheels
-        # uses: pypa/cibuildwheel@v2.13.1
+        uses: pypa/cibuildwheel@v2.13.1
         env:
-          CIBW_ARCHS_MACOS: x86_64 arm64
-        run: python -m cibuildwheel --output-dir dist
+          CIBW_ARCHS_MACOS: arm64
 
       - uses: actions/upload-artifact@v3
         with: 
