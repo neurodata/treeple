@@ -114,7 +114,7 @@ class ObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
     n_jobs : int, default=None
         The number of jobs to run in parallel. :meth:`fit`, :meth:`predict`,
         :meth:`decision_path` and :meth:`apply` are all parallelized over the
-        trees. ``None`` means 1 unless in a :obj:`joblib.parallel_backend`
+        trees. ``None`` means 1 unless in a `joblib.parallel_backend`
         context. ``-1`` means using all processors. See :term:`Glossary
         <n_jobs>` for more details.
 
@@ -454,7 +454,7 @@ class ObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
     n_jobs : int, default=None
         The number of jobs to run in parallel. :meth:`fit`, :meth:`predict`,
         :meth:`decision_path` and :meth:`apply` are all parallelized over the
-        trees. ``None`` means 1 unless in a :obj:`joblib.parallel_backend`
+        trees. ``None`` means 1 unless in a `joblib.parallel_backend`
         context. ``-1`` means using all processors. See :term:`Glossary
         <n_jobs>` for more details.
 
@@ -743,7 +743,7 @@ class PatchObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
     n_jobs : int, default=None
         The number of jobs to run in parallel. :meth:`fit`, :meth:`predict`,
         :meth:`decision_path` and :meth:`apply` are all parallelized over the
-        trees. ``None`` means 1 unless in a :obj:`joblib.parallel_backend`
+        trees. ``None`` means 1 unless in a `joblib.parallel_backend`
         context. ``-1`` means using all processors. See :term:`Glossary
         <n_jobs>` for more details.
 
@@ -1095,7 +1095,7 @@ class PatchObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
     n_jobs : int, default=None
         The number of jobs to run in parallel. :meth:`fit`, :meth:`predict`,
         :meth:`decision_path` and :meth:`apply` are all parallelized over the
-        trees. ``None`` means 1 unless in a :obj:`joblib.parallel_backend`
+        trees. ``None`` means 1 unless in a `joblib.parallel_backend`
         context. ``-1`` means using all processors. See :term:`Glossary
         <n_jobs>` for more details.
 
