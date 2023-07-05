@@ -216,6 +216,7 @@ Build = [
     # "spin.cmds.meson.build", 
     ".spin/cmds.py:build",
     ".spin/cmds.py:setup_submodule",
+    ".spin/cmds.py:sdist",
     "spin.cmds.meson.test",
 ]
 Environments = [
