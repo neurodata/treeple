@@ -101,7 +101,7 @@ jobs:
         with:
           python-version: 3.9  # Replace with the desired Python version
 
-      - name: Install cibuildwheel
+      - name: Install cibuildwheel dependencies
         run: |
           python -m pip install cibuildwheel
           python -m pip install -r build_requirements.txt
@@ -109,6 +109,9 @@ jobs:
           python spin setup-submodule
 
       - name: Build wheels
+        # uses: pypa/cibuildwheel@v2.13.1
+        env:
+          CIBW_ARCHS_MACOS: x86_64 arm64
         run: python -m cibuildwheel --output-dir dist
 
       - uses: actions/upload-artifact@v3
