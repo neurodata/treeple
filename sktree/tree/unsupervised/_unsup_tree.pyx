@@ -295,6 +295,8 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
         bint is_left,
         Node* parent,
         SIZE_t depth,
+        double lower_bound,
+        double upper_bound,
         FrontierRecord* res
     ) except -1 nogil:
         """Adds node w/ partition ``[start, end)`` to the frontier. """
@@ -325,7 +327,13 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
                    )
 
         if not is_leaf:
-            splitter.node_split(impurity, split_ptr, &n_constant_features)
+            splitter.node_split(
+                impurity,
+                split_ptr,
+                &n_constant_features,
+                lower_bound,
+                upper_bound
+            )
 
             # assign local copy of SplitRecord to assign
             # pos, improvement, and impurity scores
@@ -348,12 +356,17 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
 
         # compute values also for split nodes (might become leafs later).
         splitter.node_value(tree.value + node_id * tree.value_stride)
+        if splitter.with_monotonic_cst:
+            splitter.clip_node_value(tree.value + node_id * tree.value_stride, lower_bound, upper_bound)
 
         res.node_id = node_id
         res.start = start
         res.end = end
         res.depth = depth
         res.impurity = impurity
+        res.lower_bound = lower_bound
+        res.upper_bound = upper_bound
+        res.middle_value = splitter.criterion.middle_value()
 
         if not is_leaf:
             # is split node

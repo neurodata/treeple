@@ -3,7 +3,7 @@ from numbers import Real
 
 import numpy as np
 from scipy.sparse import issparse
-from sklearn.base import ClusterMixin, TransformerMixin
+from sklearn.base import ClusterMixin, TransformerMixin, is_classifier
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.utils._param_validation import Interval
 from sklearn.utils.validation import check_is_fitted
@@ -234,6 +234,43 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
         max_depth,
         random_state,
     ):
+        if self.monotonic_cst is None:
+            monotonic_cst = None
+        else:
+            if self.n_outputs_ > 1:
+                raise ValueError(
+                    "Monotonicity constraints are not supported with multiple outputs."
+                )
+            # Check to correct monotonicity constraint' specification,
+            # by applying element-wise logical conjunction
+            # Note: we do not cast `np.asarray(self.monotonic_cst, dtype=np.int8)`
+            # straight away here so as to generate error messages for invalid
+            # values using the original values prior to any dtype related conversion.
+            monotonic_cst = np.asarray(self.monotonic_cst)
+            if monotonic_cst.shape[0] != X.shape[1]:
+                raise ValueError(
+                    "monotonic_cst has shape {} but the input data "
+                    "X has {} features.".format(monotonic_cst.shape[0], X.shape[1])
+                )
+            valid_constraints = np.isin(monotonic_cst, (-1, 0, 1))
+            if not np.all(valid_constraints):
+                unique_constaints_value = np.unique(monotonic_cst)
+                raise ValueError(
+                    "monotonic_cst must be None or an array-like of -1, 0 or 1, but"
+                    f" got {unique_constaints_value}"
+                )
+            monotonic_cst = np.asarray(monotonic_cst, dtype=np.int8)
+            if self.n_classes_[0] > 2:
+                raise ValueError(
+                    "Monotonicity constraints are not supported for unsupervised yet."
+                )
+            # Binary classification trees are built by constraining probabilities
+            # of the *negative class* in order to make the implementation similar
+            # to regression trees.
+            # Since self.monotonic_cst encodes constraints on probabilities of the
+            # *positive class*, all signs must be flipped.
+            monotonic_cst *= -1
+
         criterion = self.criterion
         if not isinstance(criterion, UnsupervisedCriterion):
             criterion = UNSUPERVISED_CRITERIA[self.criterion]()
@@ -250,6 +287,7 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
                 min_samples_leaf,
                 min_weight_leaf,
                 random_state,
+                monotonic_cst,
             )
 
         self.tree_ = UnsupervisedTree(self.n_features_in_)
@@ -503,8 +541,44 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
         max_depth,
         random_state,
     ):
-        # TODO: add feature_combinations fix that was used in obliquedecisiontreeclassifier
+        if self.monotonic_cst is None:
+            monotonic_cst = None
+        else:
+            if self.n_outputs_ > 1:
+                raise ValueError(
+                    "Monotonicity constraints are not supported with multiple outputs."
+                )
+            # Check to correct monotonicity constraint' specification,
+            # by applying element-wise logical conjunction
+            # Note: we do not cast `np.asarray(self.monotonic_cst, dtype=np.int8)`
+            # straight away here so as to generate error messages for invalid
+            # values using the original values prior to any dtype related conversion.
+            monotonic_cst = np.asarray(self.monotonic_cst)
+            if monotonic_cst.shape[0] != X.shape[1]:
+                raise ValueError(
+                    "monotonic_cst has shape {} but the input data "
+                    "X has {} features.".format(monotonic_cst.shape[0], X.shape[1])
+                )
+            valid_constraints = np.isin(monotonic_cst, (-1, 0, 1))
+            if not np.all(valid_constraints):
+                unique_constaints_value = np.unique(monotonic_cst)
+                raise ValueError(
+                    "monotonic_cst must be None or an array-like of -1, 0 or 1, but"
+                    f" got {unique_constaints_value}"
+                )
+            monotonic_cst = np.asarray(monotonic_cst, dtype=np.int8)
+            if self.n_classes_[0] > 2:
+                raise ValueError(
+                    "Monotonicity constraints are not supported for unsupervised yet."
+                )
+            # Binary classification trees are built by constraining probabilities
+            # of the *negative class* in order to make the implementation similar
+            # to regression trees.
+            # Since self.monotonic_cst encodes constraints on probabilities of the
+            # *positive class*, all signs must be flipped.
+            monotonic_cst *= -1
 
+        # TODO: add feature_combinations fix that was used in obliquedecisiontreeclassifier
         criterion = self.criterion
         if not isinstance(criterion, UnsupervisedCriterion):
             criterion = UNSUPERVISED_CRITERIA[self.criterion]()
@@ -521,6 +595,7 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
                 min_samples_leaf,
                 min_weight_leaf,
                 random_state,
+                monotonic_cst,
                 self.feature_combinations,
             )
 
@@ -882,6 +957,45 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         else:
             self.feature_combinations_ = self.feature_combinations
 
+        if self.monotonic_cst is None:
+            monotonic_cst = None
+        else:
+            if self.n_outputs_ > 1:
+                raise ValueError(
+                    "Monotonicity constraints are not supported with multiple outputs."
+                )
+            # Check to correct monotonicity constraint' specification,
+            # by applying element-wise logical conjunction
+            # Note: we do not cast `np.asarray(self.monotonic_cst, dtype=np.int8)`
+            # straight away here so as to generate error messages for invalid
+            # values using the original values prior to any dtype related conversion.
+            monotonic_cst = np.asarray(self.monotonic_cst)
+            if monotonic_cst.shape[0] != X.shape[1]:
+                raise ValueError(
+                    "monotonic_cst has shape {} but the input data "
+                    "X has {} features.".format(monotonic_cst.shape[0], X.shape[1])
+                )
+            valid_constraints = np.isin(monotonic_cst, (-1, 0, 1))
+            if not np.all(valid_constraints):
+                unique_constaints_value = np.unique(monotonic_cst)
+                raise ValueError(
+                    "monotonic_cst must be None or an array-like of -1, 0 or 1, but"
+                    f" got {unique_constaints_value}"
+                )
+            monotonic_cst = np.asarray(monotonic_cst, dtype=np.int8)
+            if is_classifier(self):
+                if self.n_classes_[0] > 2:
+                    raise ValueError(
+                        "Monotonicity constraints are not supported with multiclass "
+                        "classification"
+                    )
+                # Binary classification trees are built by constraining probabilities
+                # of the *negative class* in order to make the implementation similar
+                # to regression trees.
+                # Since self.monotonic_cst encodes constraints on probabilities of the
+                # *positive class*, all signs must be flipped.
+                monotonic_cst *= -1
+
         # Build tree
         criterion = self.criterion
         if not isinstance(criterion, BaseCriterion):
@@ -907,6 +1021,7 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                 min_samples_leaf,
                 min_weight_leaf,
                 random_state,
+                monotonic_cst,
                 self.feature_combinations_,
             )
 
@@ -1239,6 +1354,45 @@ class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         else:
             self.feature_combinations_ = self.feature_combinations
 
+        if self.monotonic_cst is None:
+            monotonic_cst = None
+        else:
+            if self.n_outputs_ > 1:
+                raise ValueError(
+                    "Monotonicity constraints are not supported with multiple outputs."
+                )
+            # Check to correct monotonicity constraint' specification,
+            # by applying element-wise logical conjunction
+            # Note: we do not cast `np.asarray(self.monotonic_cst, dtype=np.int8)`
+            # straight away here so as to generate error messages for invalid
+            # values using the original values prior to any dtype related conversion.
+            monotonic_cst = np.asarray(self.monotonic_cst)
+            if monotonic_cst.shape[0] != X.shape[1]:
+                raise ValueError(
+                    "monotonic_cst has shape {} but the input data "
+                    "X has {} features.".format(monotonic_cst.shape[0], X.shape[1])
+                )
+            valid_constraints = np.isin(monotonic_cst, (-1, 0, 1))
+            if not np.all(valid_constraints):
+                unique_constaints_value = np.unique(monotonic_cst)
+                raise ValueError(
+                    "monotonic_cst must be None or an array-like of -1, 0 or 1, but"
+                    f" got {unique_constaints_value}"
+                )
+            monotonic_cst = np.asarray(monotonic_cst, dtype=np.int8)
+            if is_classifier(self):
+                if self.n_classes_[0] > 2:
+                    raise ValueError(
+                        "Monotonicity constraints are not supported with multiclass "
+                        "classification"
+                    )
+                # Binary classification trees are built by constraining probabilities
+                # of the *negative class* in order to make the implementation similar
+                # to regression trees.
+                # Since self.monotonic_cst encodes constraints on probabilities of the
+                # *positive class*, all signs must be flipped.
+                monotonic_cst *= -1
+
         # Build tree
         criterion = self.criterion
         if not isinstance(criterion, BaseCriterion):
@@ -1264,6 +1418,7 @@ class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
                 min_samples_leaf,
                 min_weight_leaf,
                 random_state,
+                monotonic_cst,
                 self.feature_combinations_,
             )
 
@@ -1718,6 +1873,45 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
         random_state : int, RandomState instance or None, default=None
             Controls the randomness of the estimator.
         """
+        if self.monotonic_cst is None:
+            monotonic_cst = None
+        else:
+            if self.n_outputs_ > 1:
+                raise ValueError(
+                    "Monotonicity constraints are not supported with multiple outputs."
+                )
+            # Check to correct monotonicity constraint' specification,
+            # by applying element-wise logical conjunction
+            # Note: we do not cast `np.asarray(self.monotonic_cst, dtype=np.int8)`
+            # straight away here so as to generate error messages for invalid
+            # values using the original values prior to any dtype related conversion.
+            monotonic_cst = np.asarray(self.monotonic_cst)
+            if monotonic_cst.shape[0] != X.shape[1]:
+                raise ValueError(
+                    "monotonic_cst has shape {} but the input data "
+                    "X has {} features.".format(monotonic_cst.shape[0], X.shape[1])
+                )
+            valid_constraints = np.isin(monotonic_cst, (-1, 0, 1))
+            if not np.all(valid_constraints):
+                unique_constaints_value = np.unique(monotonic_cst)
+                raise ValueError(
+                    "monotonic_cst must be None or an array-like of -1, 0 or 1, but"
+                    f" got {unique_constaints_value}"
+                )
+            monotonic_cst = np.asarray(monotonic_cst, dtype=np.int8)
+            if is_classifier(self):
+                if self.n_classes_[0] > 2:
+                    raise ValueError(
+                        "Monotonicity constraints are not supported with multiclass "
+                        "classification"
+                    )
+                # Binary classification trees are built by constraining probabilities
+                # of the *negative class* in order to make the implementation similar
+                # to regression trees.
+                # Since self.monotonic_cst encodes constraints on probabilities of the
+                # *positive class*, all signs must be flipped.
+                monotonic_cst *= -1
+
         # Build tree
         criterion = self.criterion
         if not isinstance(criterion, BaseCriterion):
@@ -1743,6 +1937,8 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
                 min_samples_leaf,
                 min_weight_leaf,
                 random_state,
+                monotonic_cst,
+                None,
                 self.min_patch_dims_,
                 self.max_patch_dims_,
                 self.dim_contiguous_,
@@ -2193,8 +2389,46 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         random_state : int, RandomState instance or None, default=None
             Controls the randomness of the estimator.
         """
-
         n_samples = X.shape[0]
+
+        if self.monotonic_cst is None:
+            monotonic_cst = None
+        else:
+            if self.n_outputs_ > 1:
+                raise ValueError(
+                    "Monotonicity constraints are not supported with multiple outputs."
+                )
+            # Check to correct monotonicity constraint' specification,
+            # by applying element-wise logical conjunction
+            # Note: we do not cast `np.asarray(self.monotonic_cst, dtype=np.int8)`
+            # straight away here so as to generate error messages for invalid
+            # values using the original values prior to any dtype related conversion.
+            monotonic_cst = np.asarray(self.monotonic_cst)
+            if monotonic_cst.shape[0] != X.shape[1]:
+                raise ValueError(
+                    "monotonic_cst has shape {} but the input data "
+                    "X has {} features.".format(monotonic_cst.shape[0], X.shape[1])
+                )
+            valid_constraints = np.isin(monotonic_cst, (-1, 0, 1))
+            if not np.all(valid_constraints):
+                unique_constaints_value = np.unique(monotonic_cst)
+                raise ValueError(
+                    "monotonic_cst must be None or an array-like of -1, 0 or 1, but"
+                    f" got {unique_constaints_value}"
+                )
+            monotonic_cst = np.asarray(monotonic_cst, dtype=np.int8)
+            if is_classifier(self):
+                if self.n_classes_[0] > 2:
+                    raise ValueError(
+                        "Monotonicity constraints are not supported with multiclass "
+                        "classification"
+                    )
+                # Binary classification trees are built by constraining probabilities
+                # of the *negative class* in order to make the implementation similar
+                # to regression trees.
+                # Since self.monotonic_cst encodes constraints on probabilities of the
+                # *positive class*, all signs must be flipped.
+                monotonic_cst *= -1
 
         # Build tree
         criterion = self.criterion
@@ -2221,6 +2455,8 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
                 min_samples_leaf,
                 min_weight_leaf,
                 random_state,
+                monotonic_cst,
+                None,
                 self.min_patch_dims_,
                 self.max_patch_dims_,
                 self.dim_contiguous_,

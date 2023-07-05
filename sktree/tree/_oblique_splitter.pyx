@@ -169,7 +169,9 @@ cdef class BaseObliqueSplitter(Splitter):
         self,
         double impurity,
         SplitRecord* split,
-        SIZE_t* n_constant_features
+        SIZE_t* n_constant_features,
+        double lower_bound,
+        double upper_bound
     ) except -1 nogil:
         """Find the best_split split on node samples[start:end]
 
@@ -456,7 +458,9 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
         self,
         double impurity,
         SplitRecord* split,
-        SIZE_t* n_constant_features
+        SIZE_t* n_constant_features,
+        double lower_bound,
+        double upper_bound
     ) except -1 nogil:
         """Find the best_split split on node samples[start:end]
 

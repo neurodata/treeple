@@ -201,8 +201,14 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
             proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
             proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
 
-    cdef int node_split(self, double impurity, SplitRecord* split,
-                        SIZE_t* n_constant_features) except -1 nogil:
+    cdef int node_split(
+        self,
+        double impurity,
+        SplitRecord* split,
+        SIZE_t* n_constant_features,
+        double lower_bound,
+        double upper_bound
+    ) except -1 nogil:
         """Find the best_split split on node samples[start:end]
 
         Returns -1 in case of failure to allocate memory (and raise MemoryError)
