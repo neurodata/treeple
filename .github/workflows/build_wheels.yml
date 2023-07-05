@@ -115,5 +115,5 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with: 
-          path: ./wheelhouse/*.whl
-          name: ${{ matrix.python[0] }}-arm
+          path: ./wheelhouse/
+          name: ${{ matrix.python[0] }}-MacArm

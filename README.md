@@ -42,7 +42,7 @@ Dependencies
 
 We minimally require:
 
-    * Python (>=3.8)
+    * Python (>=3.9)
     * numpy
     * scipy
     * scikit-learn >= 1.3

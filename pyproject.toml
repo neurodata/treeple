@@ -4,7 +4,7 @@ name = "sktree"
 # 0.0.0 is standard placeholder for poetry-dynamic-versioning
 # any changes to this should not be checked in
 #
-version = "0.0.0"
+version = "0.1.0"
 description = "Modern decision trees in Python"
 authors = ["Neurodata <adam.li@columbia.edu>"]
 license = "BSD-3"
