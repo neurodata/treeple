@@ -188,7 +188,7 @@ jobs:
         shell: bash
         run: |
           set -xe
-          bash ./setup_window.sh
+          bash ./tools/setup_window.sh
 
       - name: Set PKG_CONFIG_PATH for openblas-libs
         run: echo "PKG_CONFIG_PATH=c:\opt\64\lib\pkgconfig;" >> $GITHUB_ENV
