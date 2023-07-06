@@ -188,6 +188,7 @@ jobs:
         shell: bash
         run: |
           set -xe
+          ls
           bash ./tools/setup_window.sh
 
       - name: Set PKG_CONFIG_PATH for openblas-libs
