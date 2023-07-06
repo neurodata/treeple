@@ -175,14 +175,14 @@ jobs:
           pip install spin
           pip install numpy==1.22.4
 
-      - name: Download cibw_before_build_win.sh for openblas-libs
-        shell: bash
-        run: |
-          mkdir tools
-          mkdir tools/wheels
-          curl -L https://raw.githubusercontent.com/scipy/scipy/main/tools/wheels/cibw_before_build_win.sh -o cibw_before_build_win.sh
-          curl -L https://raw.githubusercontent.com/scipy/scipy/main/tools/openblas_support.py -o tools/openblas_support.py
-          curl -L https://raw.githubusercontent.com/scipy/scipy/main/tools/wheels/LICENSE_win32.txt -o tools/wheels/LICENSE_win32.txt
+      # - name: Download cibw_before_build_win.sh for openblas-libs
+      #   shell: bash
+      #   run: |
+      #     # mkdir tools
+      #     # mkdir tools/wheels
+      #     # curl -L https://raw.githubusercontent.com/scipy/scipy/main/tools/wheels/cibw_before_build_win.sh -o cibw_before_build_win.sh
+      #     # curl -L https://raw.githubusercontent.com/scipy/scipy/main/tools/openblas_support.py -o tools/openblas_support.py
+      #     # curl -L https://raw.githubusercontent.com/scipy/scipy/main/tools/wheels/LICENSE_win32.txt -o tools/wheels/LICENSE_win32.txt
 
       - name: Run cibw_before_build_win.sh for openblas-libs
         shell: bash
