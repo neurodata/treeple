@@ -185,7 +185,7 @@ jobs:
           set -xe
           ls cibw_before_build_win.sh
           chmod +x cibw_before_build_win.sh
-          bash cibw_before_build_win.sh .
+          ./cibw_before_build_win.sh .
 
       - name: Set PKG_CONFIG_PATH for openblas-libs
         run: echo "PKG_CONFIG_PATH=c:\opt\64\lib\pkgconfig;" >> $GITHUB_ENV
