@@ -4,7 +4,7 @@ project(
   # Note that the git commit hash cannot be added dynamically here
   # That only happens when importing from a git repository.
   # See `sktree/__init__.py`
-  version: '0.1.2',
+  version: '0.1.3',
   license: 'BSD-3',
   meson_version: '>= 0.64.0',
   default_options: [
