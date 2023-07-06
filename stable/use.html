@@ -1,0 +1,336 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Examples using scikit-tree &#8212; scikit-tree 0.1.3 documentation</title>
+<script>
+  document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+  document.documentElement.dataset.theme = localStorage.getItem("theme") || "light"
+</script>
+
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=92025949c220c2e29695" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=92025949c220c2e29695" rel="stylesheet">
+
+
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="_static/style.css" />
+
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695">
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Plot honest forest calibrations on overlapping gaussian simulations" href="auto_examples/plot_overlapping_gaussians.html" />
+    <link rel="prev" title="Installation" href="install.html" />
+    <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
+    <script type="text/javascript" src="_static/copybutton.js"></script>
+    <script type="text/javascript" src="_static/scrollfix.js"></script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="docsearch:language" content="en">
+
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+    <div class="bd-header-announcement container-fluid" id="banner">
+      
+
+    </div>
+
+    
+    <nav class="bd-header navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="bd-header__inner container-xl">
+
+  <div id="navbar-start">
+    
+    
+  
+
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">scikit-tree 0.1.3 documentation</p>
+  
+</a>
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="fas fa-bars"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="api.html">
+  API Documentation
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="user_guide.html">
+  User Guide
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="whats_new.html">
+  Release History
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="install.html">
+  Installation
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="current reference internal nav-link" href="#">
+  Examples using scikit-tree
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <div class="dropdown">
+    <button type="button" class="btn btn-primary btn-sm navbar-btn dropdown-toggle" id="dLabelMore" data-toggle="dropdown">
+        v0.1.3
+        <span class="caret"></span>
+    </button>
+    <div class="dropdown-menu list-group-flush py-0" aria-labelledby="dLabelMore">
+        <a class="list-group-item list-group-item-action py-1" href="https://pywhy.github.io/dodiscover/dev/index.html">v0.1 (devel)</a>
+    </div>
+</div>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/neurodata/scikit-tree" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="bd-container container-xl">
+      <div class="bd-container__inner row">
+          
+
+<!-- Only show if we have sidebars configured, else just a small margin  -->
+<div class="bd-sidebar-primary col-12 col-md-3 bd-sidebar">
+  <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="auto_examples/plot_overlapping_gaussians.html">
+   Plot honest forest calibrations on overlapping gaussian simulations
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="auto_examples/plot_oblique_random_forest.html">
+   Plot oblique forest and axis-aligned random forest predictions on cc18 datasets
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="auto_examples/plot_oblique_axis_aligned_forests_sparse_parity.html">
+   Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="auto_examples/plot_iris_dtc.html">
+   Plot the decision surface of decision trees trained on the iris dataset
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="auto_examples/plot_projection_matrices.html">
+   Plot the projection matrices of an oblique tree
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+  </div>
+  <div class="sidebar-end-items">
+  </div>
+</div>
+
+
+          
+
+
+<div class="bd-sidebar-secondary d-none d-xl-block col-xl-2 bd-toc">
+  
+    
+    <div class="toc-item">
+      
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#examples">
+   Examples
+  </a>
+ </li>
+</ul>
+
+</nav>
+    </div>
+    
+    <div class="toc-item">
+      
+    </div>
+    
+  
+</div>
+
+
+          
+          
+          <div class="bd-content col-12 col-md-9 col-xl-7">
+              
+              <article class="bd-article" role="main">
+                
+  <section id="examples-using-scikit-tree">
+<h1>Examples using scikit-tree<a class="headerlink" href="#examples-using-scikit-tree" title="Permalink to this heading">#</a></h1>
+<p>To be able to effectively use scikit-tree, look at some of the examples here
+to learn everything you need!</p>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this heading">#</a></h2>
+<p>Examples demonstrating how to use scikit-tree algorithms.</p>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Compare the prediction results of honest forests and random forests with various methods of cal..."><img alt="Plot honest forest calibrations on overlapping gaussian simulations" src="_images/sphx_glr_plot_overlapping_gaussians_thumb.png" />
+<p><a class="reference internal" href="auto_examples/plot_overlapping_gaussians.html#sphx-glr-auto-examples-plot-overlapping-gaussians-py"><span class="std std-ref">Plot honest forest calibrations on overlapping gaussian simulations</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Plot honest forest calibrations on overlapping gaussian simulations</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="A performance comparison between oblique forest and standard axis- aligned random forest using ..."><img alt="Plot oblique forest and axis-aligned random forest predictions on cc18 datasets" src="_images/sphx_glr_plot_oblique_random_forest_thumb.png" />
+<p><a class="reference internal" href="auto_examples/plot_oblique_random_forest.html#sphx-glr-auto-examples-plot-oblique-random-forest-py"><span class="std std-ref">Plot oblique forest and axis-aligned random forest predictions on cc18 datasets</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Plot oblique forest and axis-aligned random forest predictions on cc18 datasets</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation"><img alt="Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation" src="_images/sphx_glr_plot_oblique_axis_aligned_forests_sparse_parity_thumb.png" />
+<p><a class="reference internal" href="auto_examples/plot_oblique_axis_aligned_forests_sparse_parity.html#sphx-glr-auto-examples-plot-oblique-axis-aligned-forests-sparse-parity-py"><span class="std std-ref">Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Plot the decision surface of a decision tree and oblique decision tree trained on pairs of feat..."><img alt="Plot the decision surface of decision trees trained on the iris dataset" src="_images/sphx_glr_plot_iris_dtc_thumb.png" />
+<p><a class="reference internal" href="auto_examples/plot_iris_dtc.html#sphx-glr-auto-examples-plot-iris-dtc-py"><span class="std std-ref">Plot the decision surface of decision trees trained on the iris dataset</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Plot the decision surface of decision trees trained on the iris dataset</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example shows how projection matrices are generated for an oblique tree, specifically the ..."><img alt="Plot the projection matrices of an oblique tree" src="_images/sphx_glr_plot_projection_matrices_thumb.png" />
+<p><a class="reference internal" href="auto_examples/plot_projection_matrices.html#sphx-glr-auto-examples-plot-projection-matrices-py"><span class="std std-ref">Plot the projection matrices of an oblique tree</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Plot the projection matrices of an oblique tree</div>
+</div></div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-footer sphx-glr-footer-gallery docutils container">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="_downloads/07fcc19ba03226cd3d83d4e40ec44385/auto_examples_python.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">all</span> <span class="pre">examples</span> <span class="pre">in</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">auto_examples_python.zip</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="_downloads/6f1e7a639e0699d6164445b55e6c116d/auto_examples_jupyter.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">all</span> <span class="pre">examples</span> <span class="pre">in</span> <span class="pre">Jupyter</span> <span class="pre">notebooks:</span> <span class="pre">auto_examples_jupyter.zip</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+              </article>
+              
+
+              
+              <footer class="bd-footer-article">
+                  <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+  <a class='left-prev' id="prev-link" href="install.html" title="previous page">
+      <i class="fas fa-angle-left"></i>
+      <div class="prev-next-info">
+          <p class="prev-next-subtitle">previous</p>
+          <p class="prev-next-title">Installation</p>
+      </div>
+  </a>
+  <a class='right-next' id="next-link" href="auto_examples/plot_overlapping_gaussians.html" title="next page">
+  <div class="prev-next-info">
+      <p class="prev-next-subtitle">next</p>
+      <p class="prev-next-title">Plot honest forest calibrations on overlapping gaussian simulations</p>
+  </div>
+  <i class="fas fa-angle-right"></i>
+  </a>
+</div>
+              </footer>
+              
+          </div>
+          
+      </div>
+    </div>
+
+  
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695"></script>
+
+<footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    <p class="copyright">
+    &copy; Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-07-05.<br>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
+</p>
+  </div>
+  
+</div>
+</footer>
+  </body>
+</html>
