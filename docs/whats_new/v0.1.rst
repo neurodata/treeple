@@ -20,9 +20,6 @@ Here we list a changelog of scikit-tree.
 Version 0.1
 ===========
 
-**In Development**
-
-
 Changelog
 ---------
 - |Feature| Implementation of the two-means Unsupervised Random Forest, by `Adam Li`_ (:pr:`9`)
