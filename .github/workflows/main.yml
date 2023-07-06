@@ -178,13 +178,12 @@ jobs:
       - name: Download cibw_before_build_win.sh for openblas-libs
         run: |
           curl -L https://raw.githubusercontent.com/scipy/scipy/main/tools/cibw_before_build_win.sh -o cibw_before_build_win.sh
-          chmod +x cibw_before_build_win.sh
 
       - name: Run cibw_before_build_win.sh for openblas-libs
         shell: bash
         run: |
           set -xe
-          ls
+          ls cibw_before_build_win.sh
           chmod +x cibw_before_build_win.sh
           bash cibw_before_build_win.sh .
 
