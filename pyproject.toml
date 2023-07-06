@@ -1,3 +1,41 @@
+[project]
+name = "sktree"
+#
+# 0.0.0 is standard placeholder for poetry-dynamic-versioning
+# any changes to this should not be checked in
+#
+version = "0.1.3"
+description = "Modern decision trees in Python"
+maintainers = [
+    {name="Neurodata", email="adam.li@columbia.edu"}
+]
+documentation = "https://scikit-tree.neurodata.io"
+repository = "https://github.com/neurodata/scikit-tree"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    'Development Status :: 4 - Beta',
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: C",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+    "Topic :: Scientific/Engineering",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: POSIX",
+    "Operating System :: Unix",
+    "Operating System :: MacOS",
+]
+keywords = ['tree', 'oblique trees', 'manifold-learning', 'scikit-learn']
+include = [
+    { path = "meson.build", format = "sdist" },
+]
+
 [tool.poetry]
 name = "sktree"
 #
@@ -13,8 +51,6 @@ repository = "https://github.com/neurodata/scikit-tree"
 readme = "README.md"
 classifiers = [
     'Development Status :: 4 - Beta',
-    'License :: OSI Approved :: BSD-3 License',
-    'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
@@ -216,6 +252,7 @@ Build = [
     # "spin.cmds.meson.build", 
     ".spin/cmds.py:build",
     ".spin/cmds.py:setup_submodule",
+    ".spin/cmds.py:sdist",
     "spin.cmds.meson.test",
 ]
 Environments = [
