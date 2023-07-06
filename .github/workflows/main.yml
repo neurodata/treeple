@@ -179,25 +179,26 @@ jobs:
         # shell: bash
         run: |
           # download openblas setup from scipy
-          # curl https://raw.githubusercontent.com/scipy/scipy/main/tools/cibw_before_build_win.sh -o cibw_before_build_win.sh
-          # chmod +x cibw_before_build_win.sh
-          # set -xe
-          # bash cibw_before_build_win.sh .
-          # echo "PKG_CONFIG_PATH=c:\opt\64\lib\pkgconfig;" >> $GITHUB_ENV
+          curl https://raw.githubusercontent.com/scipy/scipy/main/tools/cibw_before_build_win.sh -o cibw_before_build_win.sh
+          chmod +x cibw_before_build_win.sh
+          set -xe
+          bash cibw_before_build_win.sh .
+          echo "PKG_CONFIG_PATH=c:\opt\64\lib\pkgconfig;" >> $GITHUB_ENV
 
           # Download and install pre-built OpenBLAS library
           # Built with mingw-w64, -ucrt -static.
           # https://github.com/matthew-brett/openblas-libs/blob/ucrt-build/build_openblas.ps1
-          choco install unzip -y
-          choco install wget -y
-          wget https://github.com/scipy/scipy-ci-artifacts/raw/main/openblas_32_if.zip
-          unzip -d c:\ openblas_32_if.zip
-          echo "PKG_CONFIG_PATH=c:\opt\openblas\if_32\64\lib\pkgconfig;" >> $env:GITHUB_ENV
+          # choco install unzip -y
+          # choco install wget -y
+          # wget https://github.com/scipy/scipy-ci-artifacts/raw/main/openblas_32_if.zip
+          # unzip -d c:\ openblas_32_if.zip
+          # echo "PKG_CONFIG_PATH=c:\opt\openblas\if_32\64\lib\pkgconfig;" >> $env:GITHUB_ENV
 
       - name: Build
         run: |
           echo "SCIPY_USE_PROPACK=1" >> $env:GITHUB_ENV
           echo "FORCE_SUBMODULE=True" >> $env:GITHUB_ENV
+          python spin setup_submodule --forcesubmodule
           python spin build -j 2
           # Necessary because GitHub Actions checks out the repo to D:\ while OpenBLAS
           # got installed to C:\ higher up. The copying with `--win-cp-openblas` fails
