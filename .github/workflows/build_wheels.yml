@@ -138,15 +138,7 @@ jobs:
           python -m pip install -r build_requirements.txt
           python -m pip install spin
           python spin setup-submodule
-          python spin sdist
-        # run: bash build_tools/github/build_source.sh
-        # env:
-          # SKLEARN_BUILD_PARALLEL: 3
-
-      # - name: Test source distribution
-      #   run: bash build_tools/github/test_source.sh
-      #   env:
-      #     SKLEARN_SKIP_NETWORK_TESTS: 1
+          python -m build
 
       - name: Store artifacts
         uses: actions/upload-artifact@v3
