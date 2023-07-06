@@ -3,7 +3,7 @@ import logging
 import os
 import sys
 
-__version__ = "0.1.3"
+__version__ = "0.2.0dev0"
 logger = logging.getLogger(__name__)
 
 
