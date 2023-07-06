@@ -168,6 +168,15 @@ jobs:
         run: |
           gcc --version
 
+      - name: Install system dependencies
+        run: |
+          choco install miniconda3 -y --params="'/AddToPath:1'"
+          conda init cmd.exe
+          choco upgrade conda -y
+          echo "conda activate base" >> $GITHUB_PATH
+          conda config --add channels conda-forge
+          conda install openblas -y
+
       - name: pip-packages
         run: |
           pip install -r build_requirements.txt
