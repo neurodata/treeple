@@ -170,12 +170,19 @@ jobs:
 
       - name: Install system dependencies
         run: |
-          choco install miniconda3 -y --params="'/AddToPath:1'"
-          conda init cmd.exe
-          choco upgrade conda -y
-          echo "conda activate base" >> $GITHUB_PATH
+          # Download and install Miniconda
+          Invoke-WebRequest -Uri https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe -OutFile miniconda.exe
+          Start-Process -Wait -FilePath miniconda.exe -ArgumentList '/S', '/AddToPath=1'
+  
+          # Add Miniconda to the PATH
+          $env:Path += ";C:\Users\runneradmin\Miniconda3\Scripts;C:\Users\runneradmin\Miniconda3"
+  
+          # Update conda
+          conda update -y conda
+  
+          # Add conda-forge channel and install openblas
           conda config --add channels conda-forge
-          conda install openblas -y
+          conda install -y openblas
 
       - name: pip-packages
         run: |
@@ -203,9 +210,9 @@ jobs:
       # - name: Set PKG_CONFIG_PATH for openblas-libs
       #   run: echo "PKG_CONFIG_PATH=c:\opt\64\lib\pkgconfig;" >> $GITHUB_ENV
 
-      - name: Install system dependencies like openblas
-        run: |
-          choco install openblas -y
+      # - name: Install system dependencies like openblas
+      #   run: |
+      #     choco install openblas -y
 
       - name: Build
         run: |
