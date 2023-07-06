@@ -47,6 +47,11 @@ We minimally require:
     * scipy
     * scikit-learn >= 1.3
 
+Installation with Pip
+---------------------
+
+    pip install sktree
+
 Building locally with Meson (RECOMMENDED)
 -----------------------------------------
 Make sure you have the necessary packages installed
