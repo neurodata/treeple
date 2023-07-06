@@ -176,7 +176,9 @@ jobs:
           pip install numpy==1.22.4
 
       - name: Download cibw_before_build_win.sh for openblas-libs
+        shell: bash
         run: |
+          mkdir tools
           curl -L https://raw.githubusercontent.com/scipy/scipy/main/tools/wheels/cibw_before_build_win.sh -o cibw_before_build_win.sh
           curl -L https://raw.githubusercontent.com/scipy/scipy/main/tools/openblas_support.py -o tools/openblas_support.py
 
