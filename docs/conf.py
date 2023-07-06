@@ -130,6 +130,7 @@ html_context = {
     "pygment_dark_style": "native",
     "versions_dropdown": {
         "dev": "v0.1 (devel)",
+        "stable": "v0.1",
     },
 }
 
