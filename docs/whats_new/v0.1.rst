@@ -15,7 +15,7 @@ Here we list a changelog of scikit-tree.
 
 .. currentmodule:: sktree
 
-.. _current:
+.. _v0_1:
 
 Version 0.1
 ===========
