@@ -25,7 +25,7 @@ Version 0.2
 
 Changelog
 ---------
-- 
+- |Feature| Implement extended isolation forest, by `Adam Li`_ (:pr:`90`)
 
 Code and Documentation Contributors
 -----------------------------------
