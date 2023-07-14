@@ -57,3 +57,23 @@ In order for any code to be added to the repository, we require unit tests to pa
 The general design of scikit-tree follows that of the tree-models inside scikit-learn, where tree-based models are inherently Cythonized, or written with C++. Then the actual forest (e.g. RandomForest, or ExtraForest) is just a Python API wrapper that creates an ensemble of the trees.
 
 In order to develop new tree models, generally Cython and C++ code will need to be written in order to optimize the tree building process, otherwise fitting a single forest model would take very long.
+
+# Making a Release
+
+Scikit-tree is in-line with scikit-learn and thus relies on each new version released there. Moreover, scikit-tree relies on compiled code, so releases are a bit more complex than the typical Python package.
+
+1. Download wheels from GH Actions and put all wheels into a ``dist/`` folder
+
+https://github.com/neurodata/scikit-tree/actions/workflows/build_wheels.yml will have all the wheels for common OSes built for each Python version.
+
+2. Upload wheels to test PyPi
+
+    twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+
+Verify that installations work as expected on your machine.
+
+3. Upload wheels
+
+    twine upload dist/*
+
+4. Update version number on ``meson.build`` and ``_version.py`` to the relevant version.

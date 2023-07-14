@@ -9,3 +9,4 @@ rich-click
 doit
 pydevtool
 spin
+build

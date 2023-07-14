@@ -7,12 +7,12 @@ Dependencies
 ------------
 
 * ``numpy`` (>=1.23)
-* ``scipy`` (>=1.6.0)
+* ``scipy`` (>=1.5.0)
 * ``scikit-learn`` (>=1.3)
 * ``joblib`` (>=1.0.0)
 * ``matplotlib`` (optional)
 
-**scikit-tree** supports Python >= 3.8.
+**scikit-tree** supports Python >= 3.9.
 
 Installing with ``pip``
 -----------------------
@@ -22,9 +22,6 @@ Installing with ``pip``
 .. code-block:: bash
 
     pip install scikit-tree
-
-    # or if you use poetry which is recommended
-    poetry add scikit-tree
 
 Installing from source with Meson
 ---------------------------------
