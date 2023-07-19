@@ -31,6 +31,7 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         SIZE_t min_samples_leaf,
         double min_weight_leaf,
         object random_state,
+        const cnp.int8_t[:] monotonic_cst,
         SIZE_t[:] min_patch_dims,
         SIZE_t[:] max_patch_dims,
         cnp.uint8_t[::1] dim_contiguous,

@@ -234,6 +234,7 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
         max_depth,
         random_state,
     ):
+        monotonic_cst = None
         criterion = self.criterion
         if not isinstance(criterion, UnsupervisedCriterion):
             criterion = UNSUPERVISED_CRITERIA[self.criterion]()
@@ -250,6 +251,7 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
                 min_samples_leaf,
                 min_weight_leaf,
                 random_state,
+                monotonic_cst
             )
 
         self.tree_ = UnsupervisedTree(self.n_features_in_)
@@ -503,8 +505,9 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
         max_depth,
         random_state,
     ):
-        # TODO: add feature_combinations fix that was used in obliquedecisiontreeclassifier
+        monotonic_cst = None
 
+        # TODO: add feature_combinations fix that was used in obliquedecisiontreeclassifier
         criterion = self.criterion
         if not isinstance(criterion, UnsupervisedCriterion):
             criterion = UNSUPERVISED_CRITERIA[self.criterion]()
@@ -521,6 +524,7 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
                 min_samples_leaf,
                 min_weight_leaf,
                 random_state,
+                monotonic_cst,
                 self.feature_combinations,
             )
 
@@ -870,6 +874,7 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         random_state : int, RandomState instance or None, default=None
             Controls the randomness of the estimator.
         """
+        monotonic_cst = None
         _, n_features = X.shape
 
         if self.feature_combinations is None:
@@ -907,6 +912,7 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                 min_samples_leaf,
                 min_weight_leaf,
                 random_state,
+                monotonic_cst,
                 self.feature_combinations_,
             )
 
@@ -1227,6 +1233,7 @@ class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         random_state : int, RandomState instance or None, default=None
             Controls the randomness of the estimator.
         """
+        monotonic_cst = None
         n_samples, n_features = X.shape
 
         if self.feature_combinations is None:
@@ -1264,6 +1271,7 @@ class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
                 min_samples_leaf,
                 min_weight_leaf,
                 random_state,
+                monotonic_cst,
                 self.feature_combinations_,
             )
 
@@ -1718,6 +1726,8 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
         random_state : int, RandomState instance or None, default=None
             Controls the randomness of the estimator.
         """
+        monotonic_cst = None
+        
         # Build tree
         criterion = self.criterion
         if not isinstance(criterion, BaseCriterion):
@@ -1743,6 +1753,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
                 min_samples_leaf,
                 min_weight_leaf,
                 random_state,
+                monotonic_cst,
                 self.min_patch_dims_,
                 self.max_patch_dims_,
                 self.dim_contiguous_,
@@ -2193,7 +2204,7 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         random_state : int, RandomState instance or None, default=None
             Controls the randomness of the estimator.
         """
-
+        monotonic_cst = None
         n_samples = X.shape[0]
 
         # Build tree
@@ -2221,6 +2232,7 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
                 min_samples_leaf,
                 min_weight_leaf,
                 random_state,
+                monotonic_cst,
                 self.min_patch_dims_,
                 self.max_patch_dims_,
                 self.dim_contiguous_,

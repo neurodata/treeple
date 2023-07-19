@@ -44,6 +44,7 @@ cdef class BaseObliqueSplitter(Splitter):
         SIZE_t min_samples_leaf,
         double min_weight_leaf,
         object random_state,
+        const cnp.int8_t[:] monotonic_cst,
         *argv
     ):
         """
@@ -318,6 +319,7 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         SIZE_t min_samples_leaf,
         double min_weight_leaf,
         object random_state,
+        const cnp.int8_t[:] monotonic_cst,
         double feature_combinations,
         *argv
     ):
