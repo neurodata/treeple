@@ -83,7 +83,9 @@ cdef class BaseObliqueSplitter(Splitter):
         self,
         double impurity,   # Impurity of the node
         SplitRecord* split,
-        SIZE_t* n_constant_features
+        SIZE_t* n_constant_features,
+        double lower_bound,
+        double upper_bound,
     ) except -1 nogil
 
 

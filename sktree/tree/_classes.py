@@ -524,7 +524,6 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
                 min_samples_leaf,
                 min_weight_leaf,
                 random_state,
-                monotonic_cst,
                 self.feature_combinations,
             )
 
@@ -1727,7 +1726,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
             Controls the randomness of the estimator.
         """
         monotonic_cst = None
-        
+
         # Build tree
         criterion = self.criterion
         if not isinstance(criterion, BaseCriterion):
