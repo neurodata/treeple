@@ -47,9 +47,11 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
     # All oblique splitters (i.e. non-axis aligned splitters) require a
     # function to sample a projection matrix that is applied to the feature matrix
     # to quickly obtain the sampled projections for candidate splits.
-    cdef void sample_proj_mat(self,
-                              vector[vector[DTYPE_t]]& proj_mat_weights,
-                              vector[vector[SIZE_t]]& proj_mat_indices) nogil
+    cdef void sample_proj_mat(
+        self,
+        vector[vector[DTYPE_t]]& proj_mat_weights,
+        vector[vector[SIZE_t]]& proj_mat_indices
+    ) noexcept nogil
 
     # Redefined here since the new logic requires calling sample_proj_mat
     cdef int node_reset(self, SIZE_t start, SIZE_t end,

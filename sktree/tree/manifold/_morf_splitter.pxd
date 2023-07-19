@@ -81,12 +81,12 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
         vector[vector[SIZE_t]]& proj_mat_indices
-    ) nogil
+    ) noexcept nogil
 
 
-cdef class UserKernelSplitter(PatchSplitter):
-    """A class to hold user-specified kernels."""
-    cdef vector[DTYPE_t[:, ::1]] kernel_dictionary  # A list of C-contiguous 2D kernels
+# cdef class UserKernelSplitter(PatchSplitter):
+#     """A class to hold user-specified kernels."""
+#     cdef vector[DTYPE_t[:, ::1]] kernel_dictionary  # A list of C-contiguous 2D kernels
 
 
 cdef class GaussianKernelSplitter(PatchSplitter):
@@ -101,4 +101,4 @@ cdef class GaussianKernelSplitter(PatchSplitter):
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
         vector[vector[SIZE_t]]& proj_mat_indices
-    ) nogil
+    ) noexcept nogil
