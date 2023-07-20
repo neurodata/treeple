@@ -5,7 +5,7 @@ version: 2.1
 _defaults: &defaults
   docker:
     # CircleCI maintains a library of pre-built images
-    # documented at https://circleci.com/docs/2.0/circleci-images/
+    # documented at https://circleci.com/doc/2.0/circleci-images/
     - image: cimg/python:3.9
 
 # document commands used by downstream jobs
@@ -131,15 +131,15 @@ jobs:
             python ./spin docs
 
       - store_artifacts:
-          path: docs/_build/html
+          path: doc/_build/html
           destination: dev
       
       - store_artifacts:
-          path: docs/_build/html_stable/
+          path: doc/_build/html_stable/
           destination: stable
           
       - persist_to_workspace:
-          root: docs/_build
+          root: doc/_build
           paths:
             - html
             - html_stable
@@ -151,7 +151,7 @@ jobs:
       - checkout
 
       - attach_workspace:
-          at: docs/_build
+          at: doc/_build
 
       - restore_cache:
           keys:
@@ -174,10 +174,10 @@ jobs:
           command: |
             if [ "${CIRCLE_BRANCH}" == "main" ]; then
               echo "Deploying dev docs for ${CIRCLE_BRANCH}.";
-              gh-pages --dotfiles --message "docs updates [skip ci] (${CIRCLE_BUILD_NUM})" --dist docs/_build/html --dest ./dev
+              gh-pages --dotfiles --message "docs updates [skip ci] (${CIRCLE_BUILD_NUM})" --dist doc/_build/html --dest ./dev
             else
               echo "Deploying stable docs for ${CIRCLE_BRANCH}.";
-              gh-pages --dotfiles --message "docs updates [skip ci] (${CIRCLE_BUILD_NUM})" --dist docs/_build/html --dest ./stable
+              gh-pages --dotfiles --message "docs updates [skip ci] (${CIRCLE_BUILD_NUM})" --dist doc/_build/html --dest ./stable
             fi;
 
       - save_cache:
