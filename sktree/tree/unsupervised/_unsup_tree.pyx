@@ -26,6 +26,8 @@ cimport numpy as cnp
 
 cnp.import_array()
 
+from ..._lib.sklearn.tree._utils cimport safe_realloc, sizet_ptr_to_ndarray, int32_ptr_to_ndarray
+
 cdef extern from "numpy/arrayobject.h":
     object PyArray_NewFromDescr(PyTypeObject* subtype, cnp.dtype descr,
                                 int nd, cnp.npy_intp* dims,
@@ -655,7 +657,7 @@ cdef class UnsupervisedTree(BaseTree):
         def __get__(self):
             return self._get_value_ndarray()[:self.node_count]
 
-    def __cinit__(self, int n_features):
+    def __cinit__(self, int n_features, cnp.ndarray[INT32_t, ndim=1] n_categories=None):
         """Constructor."""
         # Input/Output layout
         self.n_features = n_features
@@ -668,7 +670,12 @@ cdef class UnsupervisedTree(BaseTree):
         self.capacity = 0
         self.value = NULL
         self.nodes = NULL
-
+        self.n_categories = NULL
+        safe_realloc(&self.n_categories, n_features)
+        if n_categories is not None:
+            for k in range(n_features):
+                self.n_categories[k] = n_categories[k]
+            
     def __dealloc__(self):
         """Destructor."""
         # Free all inner structures
@@ -677,7 +684,7 @@ cdef class UnsupervisedTree(BaseTree):
 
     def __reduce__(self):
         """Reduce re-implementation, for pickling."""
-        return (UnsupervisedTree, (self.n_features,), self.__getstate__())
+        return (UnsupervisedTree, (self.n_features, int32_ptr_to_ndarray(self.n_categories, self.n_features)), self.__getstate__())
 
     def __getstate__(self):
         """Getstate re-implementation, for pickling."""

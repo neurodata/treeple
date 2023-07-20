@@ -226,7 +226,8 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
         X,
         y,
         sample_weight,
-        feature_has_missing,
+        missing_values_in_feature_mask,
+        categorical,
         min_samples_leaf,
         min_weight_leaf,
         max_leaf_nodes,
@@ -497,7 +498,8 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
         X,
         y,
         sample_weight,
-        feature_has_missing,
+        missing_values_in_feature_mask,
+        categorical,
         min_samples_leaf,
         min_weight_leaf,
         max_leaf_nodes,
@@ -824,7 +826,8 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         X,
         y,
         sample_weight,
-        feature_has_missing,
+        missing_values_in_feature_mask,
+        categorical,
         min_samples_leaf,
         min_weight_leaf,
         max_leaf_nodes,
@@ -872,6 +875,14 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
             Controls the randomness of the estimator.
         """
         monotonic_cst = None
+        self.n_categories_ = np.array(
+            [
+                np.int32(X[:, i].max()) + 1 if i in categorical else -1
+                for i in range(self.n_features_in_)
+            ],
+            dtype=np.int32,
+        )
+        breiman_shortcut = False
         _, n_features = X.shape
 
         if self.feature_combinations is None:
@@ -910,10 +921,11 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                 min_weight_leaf,
                 random_state,
                 monotonic_cst,
+                breiman_shortcut,
                 self.feature_combinations_,
             )
 
-        self.tree_ = ObliqueTree(self.n_features_in_, self.n_classes_, self.n_outputs_)
+        self.tree_ = ObliqueTree(self.n_features_in_, self.n_classes_, self.n_outputs_, self.n_categories_)
 
         # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
         if max_leaf_nodes < 0:
@@ -1184,7 +1196,8 @@ class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         X,
         y,
         sample_weight,
-        feature_has_missing,
+        missing_values_in_feature_mask,
+        categorical,
         min_samples_leaf,
         min_weight_leaf,
         max_leaf_nodes,
@@ -1231,6 +1244,15 @@ class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
             Controls the randomness of the estimator.
         """
         monotonic_cst = None
+        self.n_categories_ = np.array(
+            [
+                np.int32(X[:, i].max()) + 1 if i in categorical else -1
+                for i in range(self.n_features_in_)
+            ],
+            dtype=np.int32,
+        )
+        breiman_shortcut = False
+
         n_samples, n_features = X.shape
 
         if self.feature_combinations is None:
@@ -1269,6 +1291,7 @@ class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
                 min_weight_leaf,
                 random_state,
                 monotonic_cst,
+                breiman_shortcut,
                 self.feature_combinations_,
             )
 
@@ -1276,6 +1299,7 @@ class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
             self.n_features_in_,
             np.array([1] * self.n_outputs_, dtype=np.intp),
             self.n_outputs_,
+            self.n_categories_
         )
 
         # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
@@ -1676,7 +1700,8 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
         X,
         y,
         sample_weight,
-        feature_has_missing,
+        missing_values_in_feature_mask,
+        categorical,
         min_samples_leaf,
         min_weight_leaf,
         max_leaf_nodes,
@@ -1724,6 +1749,14 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
             Controls the randomness of the estimator.
         """
         monotonic_cst = None
+        self.n_categories_ = np.array(
+            [
+                np.int32(X[:, i].max()) + 1 if i in categorical else -1
+                for i in range(self.n_features_in_)
+            ],
+            dtype=np.int32,
+        )
+        breiman_shortcut = False
 
         # Build tree
         criterion = self.criterion
@@ -1751,6 +1784,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
                 min_weight_leaf,
                 random_state,
                 monotonic_cst,
+                breiman_shortcut,
                 self.min_patch_dims_,
                 self.max_patch_dims_,
                 self.dim_contiguous_,
@@ -1759,7 +1793,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
                 self.feature_weight,
             )
 
-        self.tree_ = ObliqueTree(self.n_features_in_, self.n_classes_, self.n_outputs_)
+        self.tree_ = ObliqueTree(self.n_features_in_, self.n_classes_, self.n_outputs_, self.n_categories_)
 
         # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
         if max_leaf_nodes < 0:
@@ -2155,7 +2189,8 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         X,
         y,
         sample_weight,
-        feature_has_missing,
+        missing_values_in_feature_mask,
+        categorical,
         min_samples_leaf,
         min_weight_leaf,
         max_leaf_nodes,
@@ -2202,6 +2237,14 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
             Controls the randomness of the estimator.
         """
         monotonic_cst = None
+        self.n_categories_ = np.array(
+            [
+                np.int32(X[:, i].max()) + 1 if i in categorical else -1
+                for i in range(self.n_features_in_)
+            ],
+            dtype=np.int32,
+        )
+        breiman_shortcut = False
         n_samples = X.shape[0]
 
         # Build tree
@@ -2230,6 +2273,7 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
                 min_weight_leaf,
                 random_state,
                 monotonic_cst,
+                breiman_shortcut,
                 self.min_patch_dims_,
                 self.max_patch_dims_,
                 self.dim_contiguous_,
@@ -2242,6 +2286,7 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
             self.n_features_in_,
             np.array([1] * self.n_outputs_, dtype=np.intp),
             self.n_outputs_,
+            self.n_categories_,
         )
 
         # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise

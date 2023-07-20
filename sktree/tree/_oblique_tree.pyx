@@ -20,7 +20,7 @@ cnp.import_array()
 
 from cython.operator cimport dereference as deref
 
-from .._lib.sklearn.tree._utils cimport safe_realloc, sizet_ptr_to_ndarray
+from .._lib.sklearn.tree._utils cimport safe_realloc, sizet_ptr_to_ndarray, int32_ptr_to_ndarray
 
 
 # Gets Node dtype exposed inside oblique_tree.
@@ -125,7 +125,8 @@ cdef class ObliqueTree(Tree):
         return (ObliqueTree, (
             self.n_features,
             sizet_ptr_to_ndarray(self.n_classes, self.n_outputs),
-            self.n_outputs), self.__getstate__()
+            self.n_outputs,
+            int32_ptr_to_ndarray(self.n_categories, self.n_features)), self.__getstate__()
             )
 
     def __getstate__(self):

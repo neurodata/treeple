@@ -34,6 +34,9 @@ cdef class UnsupervisedTree(BaseTree):
     # Input/Output layout
     cdef public SIZE_t n_features        # Number of features in X
 
+    cdef INT32_t* n_categories          # (n_features,) array of number of categories per feature
+    #                                   # is <0 for non-categorial (i.e. -1)
+
     # Methods
     cdef cnp.ndarray _get_value_ndarray(self)
     cdef cnp.ndarray _get_node_ndarray(self)
