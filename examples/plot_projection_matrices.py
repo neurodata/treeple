@@ -61,6 +61,7 @@ random_state = np.random.RandomState(100)
 
 boundary = None
 feature_weight = None
+missing_value_feature_mask = None
 
 # initialize some dummy data
 X = np.repeat(np.arange(25).astype(np.float32), 5).reshape(5, -1)
@@ -86,8 +87,7 @@ splitter = BestPatchSplitterTester(
     min_samples_leaf,
     min_weight_leaf,
     random_state,
-    None,
-    None,
+    missing_value_feature_mask,
     min_patch_dims,
     max_patch_dims,
     dim_contiguous,
@@ -132,8 +132,7 @@ splitter = BestPatchSplitterTester(
     min_samples_leaf,
     min_weight_leaf,
     random_state,
-    None,
-    None,
+    missing_value_feature_mask,
     min_patch_dims,
     max_patch_dims,
     dim_contiguous,
@@ -182,8 +181,7 @@ splitter = BestPatchSplitterTester(
     min_samples_leaf,
     min_weight_leaf,
     random_state,
-    None,
-    None,
+    missing_value_feature_mask,
     min_patch_dims,
     max_patch_dims,
     dim_contiguous,
@@ -246,8 +244,7 @@ splitter = BestPatchSplitterTester(
     min_samples_leaf,
     min_weight_leaf,
     random_state,
-    None,
-    None,
+    missing_value_feature_mask,
     min_patch_dims,
     max_patch_dims,
     dim_contiguous,
@@ -285,8 +282,7 @@ splitter = BestPatchSplitterTester(
     min_samples_leaf,
     min_weight_leaf,
     random_state,
-    None,
-    None,
+    missing_value_feature_mask,
     min_patch_dims,
     max_patch_dims,
     dim_contiguous,

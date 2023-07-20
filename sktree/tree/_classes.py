@@ -234,7 +234,7 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
         max_depth,
         random_state,
     ):
-        monotonic_cst = None
+        # monotonic_cst = None
         # self.n_categories_ = np.array(
         #     [
         #         np.int32(X[:, i].max()) + 1 if i in categorical else -1
