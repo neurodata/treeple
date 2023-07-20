@@ -160,7 +160,8 @@ cdef class BaseDensePatchSplitter(PatchSplitter):
         object X,
         const DOUBLE_t[:, ::1] y,
         const DOUBLE_t[:] sample_weight,
-        const unsigned char[::1] missing_values_in_feature_mask
+        const unsigned char[::1] missing_values_in_feature_mask,
+        const INT32_t[:] n_categories
     ) except -1:
         """Initialize the splitter
 
@@ -168,7 +169,7 @@ cdef class BaseDensePatchSplitter(PatchSplitter):
         or 0 otherwise.
         """
         # Call parent init
-        PatchSplitter.init(self, X, y, sample_weight, missing_values_in_feature_mask)
+        PatchSplitter.init(self, X, y, sample_weight, missing_values_in_feature_mask, n_categories)
 
         self.X = X
         return 0
@@ -501,7 +502,7 @@ cdef class BestPatchSplitterTester(BestPatchSplitter):
 
         return proj_vecs
 
-    cpdef init_test(self, X, y, sample_weight, missing_values_in_feature_mask=None):
+    cpdef init_test(self, X, y, sample_weight, missing_values_in_feature_mask=None, n_categories=None):
         """Initializes the state of the splitter.
 
         Used for testing purposes.
@@ -518,4 +519,4 @@ cdef class BestPatchSplitterTester(BestPatchSplitter):
         missing_values_in_feature_mask : array-like, shape (n_features,)
             Whether or not a feature has missing values.
         """
-        self.init(X, y, sample_weight, missing_values_in_feature_mask)
+        self.init(X, y, sample_weight, missing_values_in_feature_mask, n_categories)

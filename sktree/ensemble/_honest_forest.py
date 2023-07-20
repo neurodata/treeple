@@ -556,7 +556,7 @@ class HonestForestClassifier(ForestClassifier):
         return self.estimator_.predict_quantiles(X, quantiles, method)
 
     def get_leaf_node_samples(self, X):
-        """Samples in each leaf node across the forest.
+        """Get samples in each leaf node across the forest.
 
         Parameters
         ----------

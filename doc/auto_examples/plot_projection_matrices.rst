@@ -126,7 +126,7 @@ Now that we have th patch splitter initialized, we can generate some patches
 and visualize how they appear on the data. We will make the patch 1D, which
 samples multiple rows contiguously. This is a 1D patch of size 3.
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-116
+.. GENERATED FROM PYTHON SOURCE LINES 78-118
 
 .. code-block:: default
 
@@ -141,6 +141,8 @@ samples multiple rows contiguously. This is a 1D patch of size 3.
         min_samples_leaf,
         min_weight_leaf,
         random_state,
+        None,
+        None,
         min_patch_dims,
         max_patch_dims,
         dim_contiguous,
@@ -170,27 +172,30 @@ samples multiple rows contiguously. This is a 1D patch of size 3.
 
 
 
+
+.. image-sg:: /auto_examples/images/sphx_glr_plot_projection_matrices_001.png
+   :alt: 1D Patch Visualization, Patch 0, Patch 1, Patch 2, Patch 3, Patch 4, Patch 5
+   :srcset: /auto_examples/images/sphx_glr_plot_projection_matrices_001.png
+   :class: sphx-glr-single-img
+
+
 .. rst-class:: sphx-glr-script-out
 
-.. code-block:: pytb
+ .. code-block:: none
 
-    Traceback (most recent call last):
-      File "/Users/adam2392/Documents/scikit-tree/examples/plot_projection_matrices.py", line 83, in <module>
-        splitter = BestPatchSplitterTester(
-      File "_splitter.pyx", line 151, in sktree._lib.sklearn.tree._splitter.Splitter.__cinit__
-    ValueError: Buffer dtype mismatch, expected 'const int8_t' but got 'long'
+    (6, 25)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-121
+.. GENERATED FROM PYTHON SOURCE LINES 119-123
 
 Generate 2D patches
 -------------------
 We will make the patch 2D, which samples multiple rows contiguously. This is
 a 2D patch of size 3 in the columns and 2 in the rows.
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-159
+.. GENERATED FROM PYTHON SOURCE LINES 123-163
 
 .. code-block:: default
 
@@ -206,6 +211,8 @@ a 2D patch of size 3 in the columns and 2 in the rows.
         min_samples_leaf,
         min_weight_leaf,
         random_state,
+        None,
+        None,
         min_patch_dims,
         max_patch_dims,
         dim_contiguous,
@@ -233,12 +240,23 @@ a 2D patch of size 3 in the columns and 2 in the rows.
     plt.show()
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 160-162
+
+
+.. image-sg:: /auto_examples/images/sphx_glr_plot_projection_matrices_002.png
+   :alt: 2D Patch Visualization, Patch 0, Patch 1, Patch 2, Patch 3, Patch 4, Patch 5
+   :srcset: /auto_examples/images/sphx_glr_plot_projection_matrices_002.png
+   :class: sphx-glr-single-img
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 164-166
 
 Generate 3D patches
 -------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 162-214
+.. GENERATED FROM PYTHON SOURCE LINES 166-220
 
 .. code-block:: default
 
@@ -261,6 +279,8 @@ Generate 3D patches
         min_samples_leaf,
         min_weight_leaf,
         random_state,
+        None,
+        None,
         min_patch_dims,
         max_patch_dims,
         dim_contiguous,
@@ -295,7 +315,24 @@ Generate 3D patches
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 215-223
+
+
+.. image-sg:: /auto_examples/images/sphx_glr_plot_projection_matrices_003.png
+   :alt: 3D Patch Visualization, Patch 0, Patch 1, Patch 2, Patch 3, Patch 4, Patch 5
+   :srcset: /auto_examples/images/sphx_glr_plot_projection_matrices_003.png
+   :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    (6, 125)
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 221-229
 
 Discontiguous Patches
 ---------------------
@@ -306,7 +343,7 @@ multivariate time series, where the data consists of ``(n_channels, n_times)``
 and the patches are discontiguous in the channel dimension, but contiguous
 in the time dimension. Here, we show an example patch.
 
-.. GENERATED FROM PYTHON SOURCE LINES 223-269
+.. GENERATED FROM PYTHON SOURCE LINES 229-277
 
 .. code-block:: default
 
@@ -330,6 +367,8 @@ in the time dimension. Here, we show an example patch.
         min_samples_leaf,
         min_weight_leaf,
         random_state,
+        None,
+        None,
         min_patch_dims,
         max_patch_dims,
         dim_contiguous,
@@ -357,12 +396,23 @@ in the time dimension. Here, we show an example patch.
     plt.show()
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 270-272
+
+
+.. image-sg:: /auto_examples/images/sphx_glr_plot_projection_matrices_004.png
+   :alt: 2D Discontiguous Patch Visualization, Patch 0, Patch 1, Patch 2, Patch 3, Patch 4, Patch 5, Patch 6, Patch 7, Patch 8
+   :srcset: /auto_examples/images/sphx_glr_plot_projection_matrices_004.png
+   :class: sphx-glr-single-img
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 278-280
 
 We will make the patch 2D, which samples multiple rows contiguously. This is
 a 2D patch of size 3 in the columns and 2 in the rows.
 
-.. GENERATED FROM PYTHON SOURCE LINES 272-305
+.. GENERATED FROM PYTHON SOURCE LINES 280-315
 
 .. code-block:: default
 
@@ -374,6 +424,8 @@ a 2D patch of size 3 in the columns and 2 in the rows.
         min_samples_leaf,
         min_weight_leaf,
         random_state,
+        None,
+        None,
         min_patch_dims,
         max_patch_dims,
         dim_contiguous,
@@ -399,6 +451,22 @@ a 2D patch of size 3 in the columns and 2 in the rows.
 
     fig.suptitle("2D Discontiguous In All Dims Patch Visualization")
     plt.show()
+
+
+
+.. image-sg:: /auto_examples/images/sphx_glr_plot_projection_matrices_005.png
+   :alt: 2D Discontiguous In All Dims Patch Visualization, Patch 0, Patch 1, Patch 2, Patch 3, Patch 4, Patch 5, Patch 6, Patch 7, Patch 8
+   :srcset: /auto_examples/images/sphx_glr_plot_projection_matrices_005.png
+   :class: sphx-glr-single-img
+
+
+
+
+
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 0 minutes  3.895 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_projection_matrices.py:

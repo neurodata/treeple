@@ -1111,7 +1111,7 @@ document.write(`
 <span class="sd">        ----------</span>
 <span class="sd">        X : {array-like, sparse matrix} of shape (n_samples, n_features)</span>
 <span class="sd">            Input data.</span>
-<span class="sd">        quantiles : float, optional</span>
+<span class="sd">        quantiles : array-like, float, optional</span>
 <span class="sd">            The quantiles at which to evaluate, by default 0.5 (median).</span>
 <span class="sd">        method : str, optional</span>
 <span class="sd">            The method to interpolate, by default &#39;linear&#39;. Can be any keyword</span>
@@ -1132,7 +1132,7 @@ document.write(`
         <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_X_predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">quantiles</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
-            <span class="n">quantiles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">quantiles</span><span class="p">])</span>
+            <span class="n">quantiles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">quantiles</span><span class="p">))</span>
 
         <span class="c1"># if we trained a binning tree, then we should re-bin the data</span>
         <span class="c1"># XXX: this is inefficient and should be improved to be in line with what</span>
@@ -1163,15 +1163,15 @@ document.write(`
 
             <span class="c1"># (n_total_leaf_samples, n_outputs)</span>
             <span class="n">leaf_node_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
-                <span class="p">(</span>
+                <span class="p">[</span>
                     <span class="n">est</span><span class="o">.</span><span class="n">leaf_nodes_samples_</span><span class="p">[</span><span class="n">leaf_nodes</span><span class="p">[</span><span class="n">jdx</span><span class="p">]]</span>
                     <span class="k">for</span> <span class="n">jdx</span><span class="p">,</span> <span class="n">est</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimators_</span><span class="p">)</span>
-                <span class="p">)</span>
+                <span class="p">]</span>
             <span class="p">)</span>
 
             <span class="c1"># get quantiles across all leaf node samples</span>
             <span class="n">y_hat</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span>
-                <span class="n">leaf_node_samples</span><span class="p">,</span> <span class="n">quantiles</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">method</span>
+                <span class="n">leaf_node_samples</span><span class="p">,</span> <span class="n">quantiles</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span>
             <span class="p">)</span>
 
             <span class="k">if</span> <span class="n">is_classifier</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1936,6 +1936,17 @@ document.write(`
 
 <span class="sd">        .. versionadded:: 1.4</span>
 
+<span class="sd">    categorical : array-like or str</span>
+<span class="sd">        Array of feature indices, boolean array of length n_features,</span>
+<span class="sd">        ``&#39;all&#39;`` or `None`. Indicates which features should be</span>
+<span class="sd">        considered as categorical rather than ordinal. For decision trees,</span>
+<span class="sd">        the maximum number of categories is 64. In practice, the limit will</span>
+<span class="sd">        often be lower because the process of searching for the best possible</span>
+<span class="sd">        split grows exponentially with the number of categories. However, a</span>
+<span class="sd">        shortcut due to Breiman (1984) is used when fitting data with binary</span>
+<span class="sd">        labels using the ``Gini`` or ``Entropy`` criteria. In this case,</span>
+<span class="sd">        the runtime is linear in the number of categories.</span>
+
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    estimator_ : :class:`~sklearn.tree.DecisionTreeClassifier`</span>
@@ -2079,6 +2090,7 @@ document.write(`
         <span class="n">max_bins</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">store_leaf_values</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">monotonic_cst</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">categorical</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">estimator</span><span class="o">=</span><span class="n">DecisionTreeClassifier</span><span class="p">(),</span>
@@ -2096,6 +2108,7 @@ document.write(`
                 <span class="s2">&quot;ccp_alpha&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;store_leaf_values&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;monotonic_cst&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;categorical&quot;</span><span class="p">,</span>
             <span class="p">),</span>
             <span class="n">bootstrap</span><span class="o">=</span><span class="n">bootstrap</span><span class="p">,</span>
             <span class="n">oob_score</span><span class="o">=</span><span class="n">oob_score</span><span class="p">,</span>
@@ -2118,7 +2131,8 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">max_leaf_nodes</span> <span class="o">=</span> <span class="n">max_leaf_nodes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span> <span class="o">=</span> <span class="n">min_impurity_decrease</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">monotonic_cst</span> <span class="o">=</span> <span class="n">monotonic_cst</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ccp_alpha</span> <span class="o">=</span> <span class="n">ccp_alpha</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ccp_alpha</span> <span class="o">=</span> <span class="n">ccp_alpha</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">categorical</span> <span class="o">=</span> <span class="n">categorical</span></div>
 
 
 <div class="viewcode-block" id="RandomForestRegressor"><a class="viewcode-back" href="../../../../../generated/sktree.RandomForestRegressor.html#sktree.RandomForestRegressor">[docs]</a><span class="k">class</span> <span class="nc">RandomForestRegressor</span><span class="p">(</span><span class="n">ForestRegressor</span><span class="p">):</span>
@@ -2321,6 +2335,17 @@ document.write(`
 
 <span class="sd">        .. versionadded:: 1.4</span>
 
+<span class="sd">    categorical : array-like or str</span>
+<span class="sd">        Array of feature indices, boolean array of length n_features,</span>
+<span class="sd">        ``&#39;all&#39;`` or `None`. Indicates which features should be</span>
+<span class="sd">        considered as categorical rather than ordinal. For decision trees,</span>
+<span class="sd">        the maximum number of categories is 64. In practice, the limit will</span>
+<span class="sd">        often be lower because the process of searching for the best possible</span>
+<span class="sd">        split grows exponentially with the number of categories. However, a</span>
+<span class="sd">        shortcut due to Breiman (1984) is used when fitting data with binary</span>
+<span class="sd">        labels using the ``Gini`` or ``Entropy`` criteria. In this case,</span>
+<span class="sd">        the runtime is linear in the number of categories.</span>
+
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    estimator_ : :class:`~sklearn.tree.DecisionTreeRegressor`</span>
@@ -2451,6 +2476,7 @@ document.write(`
         <span class="n">max_bins</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">store_leaf_values</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">monotonic_cst</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">categorical</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">estimator</span><span class="o">=</span><span class="n">DecisionTreeRegressor</span><span class="p">(),</span>
@@ -2468,6 +2494,7 @@ document.write(`
                 <span class="s2">&quot;ccp_alpha&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;store_leaf_values&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;monotonic_cst&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;categorical&quot;</span><span class="p">,</span>
             <span class="p">),</span>
             <span class="n">bootstrap</span><span class="o">=</span><span class="n">bootstrap</span><span class="p">,</span>
             <span class="n">oob_score</span><span class="o">=</span><span class="n">oob_score</span><span class="p">,</span>
@@ -2489,7 +2516,8 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">max_leaf_nodes</span> <span class="o">=</span> <span class="n">max_leaf_nodes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span> <span class="o">=</span> <span class="n">min_impurity_decrease</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ccp_alpha</span> <span class="o">=</span> <span class="n">ccp_alpha</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">monotonic_cst</span> <span class="o">=</span> <span class="n">monotonic_cst</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">monotonic_cst</span> <span class="o">=</span> <span class="n">monotonic_cst</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">categorical</span> <span class="o">=</span> <span class="n">categorical</span></div>
 
 
 <div class="viewcode-block" id="ExtraTreesClassifier"><a class="viewcode-back" href="../../../../../generated/sktree.ExtraTreesClassifier.html#sktree.ExtraTreesClassifier">[docs]</a><span class="k">class</span> <span class="nc">ExtraTreesClassifier</span><span class="p">(</span><span class="n">ForestClassifier</span><span class="p">):</span>
@@ -2702,24 +2730,16 @@ document.write(`
 
 <span class="sd">        .. versionadded:: 1.4</span>
 
-<span class="sd">    monotonic_cst : array-like of int of shape (n_features), default=None</span>
-<span class="sd">        Indicates the monotonicity constraint to enforce on each feature.</span>
-<span class="sd">          - 1: monotonically increasing</span>
-<span class="sd">          - 0: no constraint</span>
-<span class="sd">          - -1: monotonically decreasing</span>
-
-<span class="sd">        If monotonic_cst is None, no constraints are applied.</span>
-
-<span class="sd">        Monotonicity constraints are not supported for:</span>
-<span class="sd">          - multiclass classifications (i.e. when `n_classes &gt; 2`),</span>
-<span class="sd">          - multioutput classifications (i.e. when `n_outputs_ &gt; 1`),</span>
-<span class="sd">          - classifications trained on data with missing values.</span>
-
-<span class="sd">        The constraints hold over the probability of the positive class.</span>
-
-<span class="sd">        Read more in the :ref:`User Guide &lt;monotonic_cst_gbdt&gt;`.</span>
-
-<span class="sd">        .. versionadded:: 1.4</span>
+<span class="sd">    categorical : array-like or str</span>
+<span class="sd">        Array of feature indices, boolean array of length n_features,</span>
+<span class="sd">        ``&#39;all&#39;`` or `None`. Indicates which features should be</span>
+<span class="sd">        considered as categorical rather than ordinal. For decision trees,</span>
+<span class="sd">        the maximum number of categories is 64. In practice, the limit will</span>
+<span class="sd">        often be lower because the process of searching for the best possible</span>
+<span class="sd">        split grows exponentially with the number of categories. However, a</span>
+<span class="sd">        shortcut due to Breiman (1984) is used when fitting data with binary</span>
+<span class="sd">        labels using the ``Gini`` or ``Entropy`` criteria. In this case,</span>
+<span class="sd">        the runtime is linear in the number of categories.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -2853,6 +2873,7 @@ document.write(`
         <span class="n">max_bins</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">store_leaf_values</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">monotonic_cst</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">categorical</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">estimator</span><span class="o">=</span><span class="n">ExtraTreeClassifier</span><span class="p">(),</span>
@@ -2870,6 +2891,7 @@ document.write(`
                 <span class="s2">&quot;ccp_alpha&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;store_leaf_values&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;monotonic_cst&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;categorical&quot;</span><span class="p">,</span>
             <span class="p">),</span>
             <span class="n">bootstrap</span><span class="o">=</span><span class="n">bootstrap</span><span class="p">,</span>
             <span class="n">oob_score</span><span class="o">=</span><span class="n">oob_score</span><span class="p">,</span>
@@ -2892,7 +2914,8 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">max_leaf_nodes</span> <span class="o">=</span> <span class="n">max_leaf_nodes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span> <span class="o">=</span> <span class="n">min_impurity_decrease</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ccp_alpha</span> <span class="o">=</span> <span class="n">ccp_alpha</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">monotonic_cst</span> <span class="o">=</span> <span class="n">monotonic_cst</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">monotonic_cst</span> <span class="o">=</span> <span class="n">monotonic_cst</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">categorical</span> <span class="o">=</span> <span class="n">categorical</span></div>
 
 
 <div class="viewcode-block" id="ExtraTreesRegressor"><a class="viewcode-back" href="../../../../../generated/sktree.ExtraTreesRegressor.html#sktree.ExtraTreesRegressor">[docs]</a><span class="k">class</span> <span class="nc">ExtraTreesRegressor</span><span class="p">(</span><span class="n">ForestRegressor</span><span class="p">):</span>
@@ -3090,6 +3113,17 @@ document.write(`
 
 <span class="sd">        .. versionadded:: 1.4</span>
 
+<span class="sd">    categorical : array-like or str</span>
+<span class="sd">        Array of feature indices, boolean array of length n_features,</span>
+<span class="sd">        ``&#39;all&#39;`` or `None`. Indicates which features should be</span>
+<span class="sd">        considered as categorical rather than ordinal. For decision trees,</span>
+<span class="sd">        the maximum number of categories is 64. In practice, the limit will</span>
+<span class="sd">        often be lower because the process of searching for the best possible</span>
+<span class="sd">        split grows exponentially with the number of categories. However, a</span>
+<span class="sd">        shortcut due to Breiman (1984) is used when fitting data with binary</span>
+<span class="sd">        labels using the ``Gini`` or ``Entropy`` criteria. In this case,</span>
+<span class="sd">        the runtime is linear in the number of categories.</span>
+
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    estimator_ : :class:`~sklearn.tree.ExtraTreeRegressor`</span>
@@ -3205,6 +3239,7 @@ document.write(`
         <span class="n">max_bins</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">store_leaf_values</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">monotonic_cst</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">categorical</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">estimator</span><span class="o">=</span><span class="n">ExtraTreeRegressor</span><span class="p">(),</span>
@@ -3222,6 +3257,7 @@ document.write(`
                 <span class="s2">&quot;ccp_alpha&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;store_leaf_values&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;monotonic_cst&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;categorical&quot;</span><span class="p">,</span>
             <span class="p">),</span>
             <span class="n">bootstrap</span><span class="o">=</span><span class="n">bootstrap</span><span class="p">,</span>
             <span class="n">oob_score</span><span class="o">=</span><span class="n">oob_score</span><span class="p">,</span>
@@ -3243,7 +3279,8 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">max_leaf_nodes</span> <span class="o">=</span> <span class="n">max_leaf_nodes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span> <span class="o">=</span> <span class="n">min_impurity_decrease</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ccp_alpha</span> <span class="o">=</span> <span class="n">ccp_alpha</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">monotonic_cst</span> <span class="o">=</span> <span class="n">monotonic_cst</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">monotonic_cst</span> <span class="o">=</span> <span class="n">monotonic_cst</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">categorical</span> <span class="o">=</span> <span class="n">categorical</span></div>
 
 
 <span class="k">class</span> <span class="nc">RandomTreesEmbedding</span><span class="p">(</span><span class="n">TransformerMixin</span><span class="p">,</span> <span class="n">BaseForest</span><span class="p">):</span>
@@ -3355,6 +3392,17 @@ document.write(`
 <span class="sd">        new forest. See :term:`Glossary &lt;warm_start&gt;` and</span>
 <span class="sd">        :ref:`gradient_boosting_warm_start` for details.</span>
 
+<span class="sd">    categorical : array-like or str</span>
+<span class="sd">        Array of feature indices, boolean array of length n_features,</span>
+<span class="sd">        ``&#39;all&#39;`` or `None`. Indicates which features should be</span>
+<span class="sd">        considered as categorical rather than ordinal. For decision trees,</span>
+<span class="sd">        the maximum number of categories is 64. In practice, the limit will</span>
+<span class="sd">        often be lower because the process of searching for the best possible</span>
+<span class="sd">        split grows exponentially with the number of categories. However, a</span>
+<span class="sd">        shortcut due to Breiman (1984) is used when fitting data with binary</span>
+<span class="sd">        labels using the ``Gini`` or ``Entropy`` criteria. In this case,</span>
+<span class="sd">        the runtime is linear in the number of categories.</span>
+
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    estimator_ : :class:`~sklearn.tree.ExtraTreeRegressor` instance</span>
@@ -3459,6 +3507,7 @@ document.write(`
         <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">warm_start</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">store_leaf_values</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">categorical</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">estimator</span><span class="o">=</span><span class="n">ExtraTreeRegressor</span><span class="p">(),</span>
@@ -3474,6 +3523,7 @@ document.write(`
                 <span class="s2">&quot;min_impurity_decrease&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;random_state&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;store_leaf_values&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;categorical&quot;</span><span class="p">,</span>
             <span class="p">),</span>
             <span class="n">bootstrap</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">oob_score</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -3492,6 +3542,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">max_leaf_nodes</span> <span class="o">=</span> <span class="n">max_leaf_nodes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span> <span class="o">=</span> <span class="n">min_impurity_decrease</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sparse_output</span> <span class="o">=</span> <span class="n">sparse_output</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">categorical</span> <span class="o">=</span> <span class="n">categorical</span>
 
     <span class="k">def</span> <span class="nf">_set_oob_score_and_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">scoring_function</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;OOB score not supported by tree embedding&quot;</span><span class="p">)</span>

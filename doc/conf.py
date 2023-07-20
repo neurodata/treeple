@@ -18,7 +18,10 @@ sys.path.append(
 )
 sys.path.insert(0, os.path.abspath("sphinxext"))
 import sktree
-from sktree._lib.sklearn.ensemble._forest import RandomForestClassifier, RandomForestRegressor, ExtraTreesClassifier, ExtraTreesRegressor  # noqa: E402
+from sktree._lib.sklearn.ensemble._forest import ExtraTreesClassifier  # noqa
+from sktree._lib.sklearn.ensemble._forest import ExtraTreesRegressor  # noqa
+from sktree._lib.sklearn.ensemble._forest import RandomForestClassifier  # noqa
+from sktree._lib.sklearn.ensemble._forest import RandomForestRegressor  # noqa
 
 sys.path.append(os.path.abspath(os.path.join(curdir, "..", "sktree")))
 sys.path.append(os.path.abspath(os.path.join(curdir, "..", "sktree/_lib")))
@@ -168,6 +171,7 @@ numpydoc_xref_aliases = {
     "UnsupervisedObliqueRandomForest": "sktree.ensemble.UnsupervisedObliqueRandomForest",
     "DecisionTreeClassifier": "sklearn.tree.DecisionTreeClassifier",
     "DecisionTreeRegressor": "sklearn.tree.DecisionTreeRegressor",
+    "ExtraTreesRegressor": "sklearn.ensemble.ExtraTreesRegressor",
     "pipeline.Pipeline": "sklearn.pipeline.Pipeline",
     # "sklearn_fork.inspection.permutation_importance": "sklearn.inspection.permutation_importance",
 }

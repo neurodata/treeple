@@ -6,14 +6,14 @@
 
 Computation times
 =================
-**00:12.586** total execution time for **auto_examples** files:
+**00:03.895** total execution time for **auto_examples** files:
 
 +-------------------------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_oblique_axis_aligned_forests_sparse_parity.py` (``plot_oblique_axis_aligned_forests_sparse_parity.py``) | 00:09.007 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_projection_matrices.py` (``plot_projection_matrices.py``)                                               | 00:03.895 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_iris_dtc.py` (``plot_iris_dtc.py``)                                                                     | 00:03.572 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_iris_dtc.py` (``plot_iris_dtc.py``)                                                                     | 00:00.000 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_projection_matrices.py` (``plot_projection_matrices.py``)                                               | 00:00.008 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_oblique_axis_aligned_forests_sparse_parity.py` (``plot_oblique_axis_aligned_forests_sparse_parity.py``) | 00:00.000 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------------------------+-----------+--------+
 | :ref:`sphx_glr_auto_examples_plot_oblique_random_forest.py` (``plot_oblique_random_forest.py``)                                           | 00:00.000 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------------------------+-----------+--------+
