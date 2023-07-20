@@ -107,6 +107,14 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
     def __setstate__(self, d):
         pass
 
+    def __reduce__(self):
+        return (type(self), (self.criterion,
+                             self.max_features,
+                             self.min_samples_leaf,
+                             self.min_weight_leaf,
+                             self.random_state,
+                             self.feature_combinations), self.__getstate__())
+
     cdef int init(
         self,
         const DTYPE_t[:, :] X,

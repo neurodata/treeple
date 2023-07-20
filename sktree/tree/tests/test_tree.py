@@ -11,7 +11,6 @@ from sklearn.metrics import (
     mean_squared_error,
 )
 from sklearn.model_selection import cross_val_score
-from sklearn.tree._tree import TREE_LEAF
 from sklearn.utils._testing import skip_if_32bit
 from sklearn.utils.estimator_checks import parametrize_with_checks
 

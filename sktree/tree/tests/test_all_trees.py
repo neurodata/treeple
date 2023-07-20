@@ -16,6 +16,8 @@ from sktree.tree import (
     UnsupervisedDecisionTree,
     UnsupervisedObliqueDecisionTree,
 )
+from sklearn.tree._tree import TREE_LEAF
+
 
 ALL_TREES = [
     ObliqueDecisionTreeRegressor,

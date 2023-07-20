@@ -34,9 +34,15 @@ cdef inline void _init_split(SplitRecord* self, SIZE_t start_pos) noexcept nogil
 cdef class UnsupervisedSplitter(BaseSplitter):
     """Base class for unsupervised splitters."""
 
-    def __cinit__(self, UnsupervisedCriterion criterion, SIZE_t max_features,
-                  SIZE_t min_samples_leaf, double min_weight_leaf,
-                  object random_state, *argv):
+    def __cinit__(
+        self,
+        UnsupervisedCriterion criterion,
+        SIZE_t max_features,
+        SIZE_t min_samples_leaf,
+        double min_weight_leaf,
+        object random_state,
+        *argv
+    ):
         """
         Parameters
         ----------

@@ -11,12 +11,13 @@ import numpy as np
 cimport numpy as cnp
 
 from ..._lib.sklearn.tree._splitter cimport SplitRecord
-from ..._lib.sklearn.tree._tree cimport DOUBLE_t  # Type of y, sample_weight
-from ..._lib.sklearn.tree._tree cimport DTYPE_t  # Type of X
-from ..._lib.sklearn.tree._tree cimport INT32_t  # Signed 32 bit integer
-from ..._lib.sklearn.tree._tree cimport SIZE_t  # Type for indices and counters
-from ..._lib.sklearn.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
-from ..._lib.sklearn.tree._tree cimport BaseTree, Node
+from ..._lib.sklearn.tree._utils cimport DOUBLE_t  # Type of y, sample_weight
+from ..._lib.sklearn.tree._utils cimport DTYPE_t  # Type of X
+from ..._lib.sklearn.tree._utils cimport INT32_t  # Signed 32 bit integer
+from ..._lib.sklearn.tree._utils cimport SIZE_t  # Type for indices and counters
+from ..._lib.sklearn.tree._utils cimport UINT32_t  # Unsigned 32 bit integer
+from ..._lib.sklearn.tree._tree cimport Node
+from ..._lib.sklearn.tree._tree cimport BaseTree
 from ._unsup_splitter cimport UnsupervisedSplitter
 
 
@@ -34,7 +35,7 @@ cdef class UnsupervisedTree(BaseTree):
     # Input/Output layout
     cdef public SIZE_t n_features        # Number of features in X
 
-    cdef INT32_t* n_categories          # (n_features,) array of number of categories per feature
+    # cdef INT32_t* n_categories          # (n_features,) array of number of categories per feature
     #                                   # is <0 for non-categorial (i.e. -1)
 
     # Methods

@@ -20,7 +20,7 @@ cnp.import_array()
 
 from cython.operator cimport dereference as deref
 
-from .._lib.sklearn.tree._utils cimport int32_ptr_to_ndarray, safe_realloc, sizet_ptr_to_ndarray
+from .._lib.sklearn.tree._utils cimport safe_realloc, sizet_ptr_to_ndarray
 
 
 # Gets Node dtype exposed inside oblique_tree.
@@ -94,7 +94,7 @@ cdef class ObliqueTree(Tree):
         int n_features,
         cnp.ndarray[SIZE_t, ndim=1] n_classes,
         int n_outputs,
-        cnp.ndarray[INT32_t, ndim=1] n_categories
+        # cnp.ndarray[INT32_t, ndim=1] n_categories
     ):
         """Constructor."""
         # Input/Output layout
@@ -110,10 +110,10 @@ cdef class ObliqueTree(Tree):
         for k in range(n_outputs):
             self.n_classes[k] = n_classes[k]
 
-        self.n_categories = NULL
-        safe_realloc(&self.n_categories, n_features)
-        for k in range(n_features):
-            self.n_categories[k] = n_categories[k]
+        # self.n_categories = NULL
+        # safe_realloc(&self.n_categories, n_features)
+        # for k in range(n_features):
+        #     self.n_categories[k] = n_categories[k]
 
         # Inner structures
         self.max_depth = 0
@@ -131,7 +131,8 @@ cdef class ObliqueTree(Tree):
             self.n_features,
             sizet_ptr_to_ndarray(self.n_classes, self.n_outputs),
             self.n_outputs,
-            int32_ptr_to_ndarray(self.n_categories, self.n_features)), self.__getstate__()
+            # int32_ptr_to_ndarray(self.n_categories, self.n_features)
+            ), self.__getstate__()
             )
 
     def __getstate__(self):
