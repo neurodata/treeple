@@ -1,13 +1,11 @@
 import joblib
-from numpy.testing import (
-    assert_almost_equal,
-    assert_array_almost_equal,
-    assert_array_equal,
-)
 import numpy as np
 import pytest
+from numpy.testing import assert_almost_equal, assert_array_almost_equal, assert_array_equal
 from sklearn.base import is_classifier
 from sklearn.datasets import make_blobs
+from sklearn.tree._tree import TREE_LEAF
+
 from sktree.tree import (
     ObliqueDecisionTreeClassifier,
     ObliqueDecisionTreeRegressor,
@@ -16,8 +14,6 @@ from sktree.tree import (
     UnsupervisedDecisionTree,
     UnsupervisedObliqueDecisionTree,
 )
-from sklearn.tree._tree import TREE_LEAF
-
 
 ALL_TREES = [
     ObliqueDecisionTreeRegressor,
@@ -27,6 +23,7 @@ ALL_TREES = [
     UnsupervisedDecisionTree,
     UnsupervisedObliqueDecisionTree,
 ]
+
 
 def assert_tree_equal(d, s, message):
     assert s.node_count == d.node_count, "{0}: inequal number of node ({1} != {2})".format(

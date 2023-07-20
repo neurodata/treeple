@@ -262,7 +262,6 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
         min_impurity_decrease=0.0,
         class_weight=None,
         ccp_alpha=0.0,
-        categorical=None,
         tree_estimator=None,
         honest_fraction=0.5,
         honest_prior="empirical",
@@ -282,7 +281,6 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
         self.ccp_alpha = ccp_alpha
         self.honest_fraction = honest_fraction
         self.honest_prior = honest_prior
-        self.categorical = categorical
 
     def fit(self, X, y, sample_weight=None, check_input=True):
         """Build an honest tree classifier from the training set (X, y).
@@ -348,7 +346,6 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
                 random_state=self.random_state,
                 min_impurity_decrease=self.min_impurity_decrease,
                 ccp_alpha=self.ccp_alpha,
-                categorical=self.categorical,
             )
         else:
             # XXX: maybe error out if the tree_estimator is already fitted

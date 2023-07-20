@@ -255,11 +255,7 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
         splitter = self.splitter
         if not isinstance(self.splitter, UnsupervisedSplitter):
             splitter = UNSUPERVISED_SPLITTERS[self.splitter](
-                criterion,
-                self.max_features_,
-                min_samples_leaf,
-                min_weight_leaf,
-                random_state
+                criterion, self.max_features_, min_samples_leaf, min_weight_leaf, random_state
             )
 
         self.tree_ = UnsupervisedTree(self.n_features_in_)
@@ -940,9 +936,7 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                 self.feature_combinations_,
             )
 
-        self.tree_ = ObliqueTree(
-            self.n_features_in_, self.n_classes_, self.n_outputs_
-        )
+        self.tree_ = ObliqueTree(self.n_features_in_, self.n_classes_, self.n_outputs_)
 
         # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
         if max_leaf_nodes < 0:
@@ -1808,9 +1802,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
                 self.feature_weight,
             )
 
-        self.tree_ = ObliqueTree(
-            self.n_features_in_, self.n_classes_, self.n_outputs_
-        )
+        self.tree_ = ObliqueTree(self.n_features_in_, self.n_classes_, self.n_outputs_)
 
         # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
         if max_leaf_nodes < 0:

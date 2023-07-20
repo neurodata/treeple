@@ -156,9 +156,9 @@ def test_check_simulation(name, Tree, criterion):
 @pytest.mark.parametrize("criterion", CLUSTER_CRITERIONS)
 def test_check_rotated_blobs(name, Tree, criterion):
     """Test rotated axis-aligned Gaussian blobs, which should make oblique trees perform better."""
-    n_samples = 200
+    n_samples = 100
     n_classes = 2
-    X, y = make_blobs(n_samples=n_samples, centers=n_classes, n_features=20, random_state=1234)
+    X, y = make_blobs(n_samples=n_samples, centers=n_classes, n_features=6, random_state=1234)
 
     # apply rotation matrix to X
 

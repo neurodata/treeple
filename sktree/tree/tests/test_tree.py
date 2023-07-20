@@ -1,15 +1,9 @@
 import numpy as np
 import pytest
-from numpy.testing import (
-    assert_allclose,
-)
+from numpy.testing import assert_allclose
 from sklearn import datasets
 from sklearn.base import is_classifier
-from sklearn.metrics import (
-    accuracy_score,
-    mean_poisson_deviance,
-    mean_squared_error,
-)
+from sklearn.metrics import accuracy_score, mean_poisson_deviance, mean_squared_error
 from sklearn.model_selection import cross_val_score
 from sklearn.utils._testing import skip_if_32bit
 from sklearn.utils.estimator_checks import parametrize_with_checks

@@ -26,8 +26,6 @@ cimport numpy as cnp
 
 cnp.import_array()
 
-from ..._lib.sklearn.tree._utils cimport safe_realloc, sizet_ptr_to_ndarray
-
 
 cdef extern from "numpy/arrayobject.h":
     object PyArray_NewFromDescr(PyTypeObject* subtype, cnp.dtype descr,
@@ -681,7 +679,7 @@ cdef class UnsupervisedTree(BaseTree):
         # if n_categories is not None:
         #     for k in range(n_features):
         #         self.n_categories[k] = n_categories[k]
-            
+
     def __dealloc__(self):
         """Destructor."""
         # Free all inner structures
@@ -691,7 +689,7 @@ cdef class UnsupervisedTree(BaseTree):
 
     def __reduce__(self):
         """Reduce re-implementation, for pickling."""
-        return (UnsupervisedTree, (self.n_features), self.__getstate__())
+        return (UnsupervisedTree, (self.n_features,), self.__getstate__())
 
     def __getstate__(self):
         """Getstate re-implementation, for pickling."""
