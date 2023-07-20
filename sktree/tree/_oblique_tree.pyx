@@ -20,7 +20,7 @@ cnp.import_array()
 
 from cython.operator cimport dereference as deref
 
-from .._lib.sklearn.tree._utils cimport safe_realloc, sizet_ptr_to_ndarray, int32_ptr_to_ndarray
+from .._lib.sklearn.tree._utils cimport int32_ptr_to_ndarray, safe_realloc, sizet_ptr_to_ndarray
 
 
 # Gets Node dtype exposed inside oblique_tree.
@@ -109,6 +109,11 @@ cdef class ObliqueTree(Tree):
         cdef SIZE_t k
         for k in range(n_outputs):
             self.n_classes[k] = n_classes[k]
+
+        self.n_categories = NULL
+        safe_realloc(&self.n_categories, n_features)
+        for k in range(n_features):
+            self.n_categories[k] = n_categories[k]
 
         # Inner structures
         self.max_depth = 0

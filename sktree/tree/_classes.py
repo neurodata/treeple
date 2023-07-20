@@ -236,6 +236,14 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
         random_state,
     ):
         monotonic_cst = None
+        self.n_categories_ = np.array(
+            [
+                np.int32(X[:, i].max()) + 1 if i in categorical else -1
+                for i in range(self.n_features_in_)
+            ],
+            dtype=np.int32,
+        )
+
         criterion = self.criterion
         if not isinstance(criterion, UnsupervisedCriterion):
             criterion = UNSUPERVISED_CRITERIA[self.criterion]()
@@ -255,7 +263,7 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
                 monotonic_cst,
             )
 
-        self.tree_ = UnsupervisedTree(self.n_features_in_)
+        self.tree_ = UnsupervisedTree(self.n_features_in_, self.n_categories_)
 
         # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
         if max_leaf_nodes < 0:
@@ -507,6 +515,14 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
         max_depth,
         random_state,
     ):
+        self.n_categories_ = np.array(
+            [
+                np.int32(X[:, i].max()) + 1 if i in categorical else -1
+                for i in range(self.n_features_in_)
+            ],
+            dtype=np.int32,
+        )
+
         # TODO: add feature_combinations fix that was used in obliquedecisiontreeclassifier
         criterion = self.criterion
         if not isinstance(criterion, UnsupervisedCriterion):
@@ -527,7 +543,7 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
                 self.feature_combinations,
             )
 
-        self.tree_ = UnsupervisedObliqueTree(self.n_features_in_)
+        self.tree_ = UnsupervisedObliqueTree(self.n_features_in_, self.n_categories_)
 
         # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
         if max_leaf_nodes < 0:
@@ -925,7 +941,9 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                 self.feature_combinations_,
             )
 
-        self.tree_ = ObliqueTree(self.n_features_in_, self.n_classes_, self.n_outputs_, self.n_categories_)
+        self.tree_ = ObliqueTree(
+            self.n_features_in_, self.n_classes_, self.n_outputs_, self.n_categories_
+        )
 
         # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
         if max_leaf_nodes < 0:
@@ -948,7 +966,7 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                 self.min_impurity_decrease,
             )
 
-        builder.build(self.tree_, X, y, sample_weight)
+        builder.build(self.tree_, X, y, sample_weight, None, None)
 
         if self.n_outputs_ == 1:
             self.n_classes_ = self.n_classes_[0]
@@ -1299,7 +1317,7 @@ class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
             self.n_features_in_,
             np.array([1] * self.n_outputs_, dtype=np.intp),
             self.n_outputs_,
-            self.n_categories_
+            self.n_categories_,
         )
 
         # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
@@ -1793,7 +1811,9 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
                 self.feature_weight,
             )
 
-        self.tree_ = ObliqueTree(self.n_features_in_, self.n_classes_, self.n_outputs_, self.n_categories_)
+        self.tree_ = ObliqueTree(
+            self.n_features_in_, self.n_classes_, self.n_outputs_, self.n_categories_
+        )
 
         # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
         if max_leaf_nodes < 0:

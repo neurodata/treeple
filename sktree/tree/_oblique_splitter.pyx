@@ -45,6 +45,7 @@ cdef class BaseObliqueSplitter(Splitter):
         double min_weight_leaf,
         object random_state,
         const cnp.int8_t[:] monotonic_cst,
+        bint breiman_shortcut,
         *argv
     ):
         """

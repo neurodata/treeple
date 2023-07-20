@@ -26,7 +26,8 @@ cimport numpy as cnp
 
 cnp.import_array()
 
-from ..._lib.sklearn.tree._utils cimport safe_realloc, sizet_ptr_to_ndarray, int32_ptr_to_ndarray
+from ..._lib.sklearn.tree._utils cimport int32_ptr_to_ndarray, safe_realloc, sizet_ptr_to_ndarray
+
 
 cdef extern from "numpy/arrayobject.h":
     object PyArray_NewFromDescr(PyTypeObject* subtype, cnp.dtype descr,
@@ -681,6 +682,7 @@ cdef class UnsupervisedTree(BaseTree):
         # Free all inner structures
         free(self.value)
         free(self.nodes)
+        free(self.n_categories)
 
     def __reduce__(self):
         """Reduce re-implementation, for pickling."""

@@ -18,7 +18,7 @@ cnp.import_array()
 
 from cython.operator cimport dereference as deref
 
-from ..._lib.sklearn.tree._utils cimport safe_realloc
+from ..._lib.sklearn.tree._utils cimport int32_ptr_to_ndarray, safe_realloc
 
 
 # Gets Node dtype exposed inside oblique_tree.
@@ -87,7 +87,7 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
         weighted_n_node_samples[i] holds the weighted number of training samples
         reaching node i.
     """
-    def __cinit__(self, int n_features):
+    def __cinit__(self, int n_features, cnp.ndarray[INT32_t, ndim=1] n_categories=None):
         """Constructor."""
         # Input/Output layout
         self.n_features = n_features
@@ -105,7 +105,7 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
 
     def __reduce__(self):
         """Reduce re-implementation, for pickling."""
-        return (UnsupervisedObliqueTree, (self.n_features,), self.__getstate__())
+        return (UnsupervisedObliqueTree, (self.n_features, int32_ptr_to_ndarray(self.n_categories, self.n_features)), self.__getstate__())
 
     def __getstate__(self):
         """Getstate re-implementation, for pickling."""
