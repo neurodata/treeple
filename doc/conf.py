@@ -171,7 +171,7 @@ numpydoc_xref_aliases = {
     "UnsupervisedObliqueRandomForest": "sktree.ensemble.UnsupervisedObliqueRandomForest",
     "DecisionTreeClassifier": "sklearn.tree.DecisionTreeClassifier",
     "DecisionTreeRegressor": "sklearn.tree.DecisionTreeRegressor",
-    "ExtraTreesRegressor": "sklearn.ensemble.ExtraTreesRegressor",
+    "ExtraTreeRegressor": "sklearn.tree.ExtraTreeRegressor",
     "pipeline.Pipeline": "sklearn.pipeline.Pipeline",
     # "sklearn_fork.inspection.permutation_importance": "sklearn.inspection.permutation_importance",
 }
