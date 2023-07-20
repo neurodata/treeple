@@ -93,7 +93,8 @@ cdef class ObliqueTree(Tree):
         self,
         int n_features,
         cnp.ndarray[SIZE_t, ndim=1] n_classes,
-        int n_outputs
+        int n_outputs,
+        cnp.ndarray[INT32_t, ndim=1] n_categories
     ):
         """Constructor."""
         # Input/Output layout

@@ -86,6 +86,8 @@ splitter = BestPatchSplitterTester(
     min_samples_leaf,
     min_weight_leaf,
     random_state,
+    None,
+    None,
     min_patch_dims,
     max_patch_dims,
     dim_contiguous,

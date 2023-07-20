@@ -251,7 +251,7 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
                 min_samples_leaf,
                 min_weight_leaf,
                 random_state,
-                monotonic_cst
+                monotonic_cst,
             )
 
         self.tree_ = UnsupervisedTree(self.n_features_in_)
@@ -505,8 +505,6 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
         max_depth,
         random_state,
     ):
-        monotonic_cst = None
-
         # TODO: add feature_combinations fix that was used in obliquedecisiontreeclassifier
         criterion = self.criterion
         if not isinstance(criterion, UnsupervisedCriterion):

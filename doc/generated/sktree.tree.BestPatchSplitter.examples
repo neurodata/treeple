@@ -1,0 +1,39 @@
+
+
+Examples using ``sktree.tree.BestPatchSplitter``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. start-sphx-glr-thumbnails
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how projection matrices are generated for an oblique tree, specifically the ...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_projection_matrices_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_projection_matrices.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Plot the projection matrices of an oblique tree</div>
+    </div>
+
+
+.. only:: not html
+
+ * :ref:`sphx_glr_auto_examples_plot_projection_matrices.py`
+
+.. raw:: html
+
+    </div>
+

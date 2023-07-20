@@ -37,7 +37,7 @@ if __sktree_SETUP__:
 else:
     try:
         from . import _lib, tree, ensemble, experimental
-        from ._lib.sklearn.ensemble import (
+        from ._lib.sklearn.ensemble._forest import (
             RandomForestClassifier,
             RandomForestRegressor,
             ExtraTreesClassifier,

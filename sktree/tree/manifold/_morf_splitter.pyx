@@ -32,6 +32,7 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         double min_weight_leaf,
         object random_state,
         const cnp.int8_t[:] monotonic_cst,
+        bint breiman_shortcut,
         SIZE_t[:] min_patch_dims,
         SIZE_t[:] max_patch_dims,
         cnp.uint8_t[::1] dim_contiguous,
@@ -93,8 +94,9 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         const DOUBLE_t[:, ::1] y,
         const DOUBLE_t[:] sample_weight,
         const unsigned char[::1] missing_values_in_feature_mask,
+        const INT32_t[:] n_categories
     ) except -1:
-        BaseObliqueSplitter.init(self, X, y, sample_weight, missing_values_in_feature_mask)
+        BaseObliqueSplitter.init(self, X, y, sample_weight, missing_values_in_feature_mask, n_categories)
 
         return 0
 

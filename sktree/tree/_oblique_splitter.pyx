@@ -322,6 +322,7 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         double min_weight_leaf,
         object random_state,
         const cnp.int8_t[:] monotonic_cst,
+        bint breiman_shortcut,
         double feature_combinations,
         *argv
     ):
@@ -370,8 +371,9 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         const DOUBLE_t[:, ::1] y,
         const DOUBLE_t[:] sample_weight,
         const unsigned char[::1] missing_values_in_feature_mask,
+        const INT32_t[:] n_categories
     ) except -1:
-        Splitter.init(self, X, y, sample_weight, missing_values_in_feature_mask)
+        Splitter.init(self, X, y, sample_weight, missing_values_in_feature_mask, n_categories)
 
         self.X = X
 
@@ -452,8 +454,10 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
                     self.max_features,
                     self.min_samples_leaf,
                     self.min_weight_leaf,
+                    self.random_state,
+                    self.monotonic_cst,
+                    self.breiman_shortcut,
                     self.feature_combinations,
-                    self.random_state
                 ), self.__getstate__())
 
     cdef int node_split(

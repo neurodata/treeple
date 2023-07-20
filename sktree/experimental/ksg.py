@@ -178,6 +178,8 @@ def mutual_info_ksg(
         Preprocessing, by default "rank".
     random_seed : int, optional
         Random seed, by default None.
+    verbose : bool, optional
+        Whether to print verbose output, by default False.
 
     Returns
     -------
