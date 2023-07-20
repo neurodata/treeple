@@ -325,7 +325,7 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
                    )
 
         if not is_leaf:
-            splitter.node_split(impurity, split_ptr, &n_constant_features)
+            splitter.node_split(impurity, split_ptr, &n_constant_features, 0., 0.)
 
             # assign local copy of SplitRecord to assign
             # pos, improvement, and impurity scores
@@ -491,7 +491,7 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
                 is_leaf = is_leaf or impurity <= EPSILON
 
                 if not is_leaf:
-                    splitter.node_split(impurity, split_ptr, &n_constant_features)
+                    splitter.node_split(impurity, split_ptr, &n_constant_features, 0., 0.)
 
                     # assign local copy of SplitRecord to assign
                     # pos, improvement, and impurity scores

@@ -57,10 +57,14 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
     cdef int node_reset(self, SIZE_t start, SIZE_t end,
                         double* weighted_n_node_samples) except -1 nogil
 
-    cdef int node_split(self,
-                        double impurity,   # Impurity of the node
-                        SplitRecord* split,
-                        SIZE_t* n_constant_features) except -1 nogil
+    cdef int node_split(
+        self,
+        double impurity,   # Impurity of the node
+        SplitRecord* split,
+        SIZE_t* n_constant_features,
+        double lower_bound,
+        double upper_bound,
+    ) except -1 nogil
     cdef int init(
         self,
         const DTYPE_t[:, :] X,

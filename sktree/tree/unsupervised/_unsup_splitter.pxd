@@ -40,7 +40,9 @@ cdef class UnsupervisedSplitter(BaseSplitter):
         self,
         double impurity,   # Impurity of the node
         SplitRecord* split,
-        SIZE_t* n_constant_features
+        SIZE_t* n_constant_features,
+        double lower_bound,
+        double upper_bound,
     ) except -1 nogil
     cdef void node_value(self, double* dest) noexcept nogil
     cdef double node_impurity(self) noexcept nogil

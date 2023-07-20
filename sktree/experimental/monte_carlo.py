@@ -96,7 +96,7 @@ def conditional_resample(
 
     Parameters
     ----------
-    condtional_array : array-like of shape (n_samples, k)
+    conditional_array : array-like of shape (n_samples, n_features)
         The array, which we preserve the conditional distribution of.
 
     *arrays : sequence of array-like of shape (n_samples,) or \
@@ -139,10 +139,6 @@ def conditional_resample(
             (n_samples, n_outputs)
         Sequence of resampled copies of the collections. The original arrays
         are not impacted.
-
-    See Also
-    --------
-    shuffle : Shuffle arrays or sparse matrices in a consistent way.
     """
     max_n_samples = n_samples
     rng = np.random.default_rng(random_state)

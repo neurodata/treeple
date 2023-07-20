@@ -471,16 +471,19 @@ class HonestForestClassifier(ForestClassifier):
 
     @property
     def structure_indices_(self):
+        """The indices used to learn the structure of the trees."""
         check_is_fitted(self)
         return [tree.structure_indices_ for tree in self.estimators_]
 
     @property
     def honest_indices_(self):
+        """The indices used to fit the leaf nodes."""
         check_is_fitted(self)
         return [tree.honest_indices_ for tree in self.estimators_]
 
     @property
     def feature_importances_(self):
+        """The feature importances."""
         return self.estimator_.feature_importances_
 
     def _more_tags(self):
@@ -553,6 +556,18 @@ class HonestForestClassifier(ForestClassifier):
         return self.estimator_.predict_quantiles(X, quantiles, method)
 
     def get_leaf_node_samples(self, X):
+        """Samples in each leaf node across the forest.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            The data array.
+
+        Returns
+        -------
+        leaf_node_samples : array-like of shape (n_samples, n_estimators)
+            Samples within each leaf node.
+        """
         return self.estimator_.get_leaf_node_samples(X)
 
 

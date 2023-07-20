@@ -47,6 +47,8 @@ class NearestNeighborsMetaEstimator(BaseEstimator, MetaEstimatorMixin):
         The number of parallel jobs to run for neighbors, by default None.
     force_fit : bool, optional
         If True, the estimator will be fit even if it is already fitted, by default False.
+    verbose : bool, optional
+        If True, print out additional information, by default False.
     """
 
     _supports_multi_radii: bool = True
