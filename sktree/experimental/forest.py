@@ -1,4 +1,4 @@
-from copy import copy
+from copy import deepcopy
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -38,8 +38,8 @@ class SupervisedInfoForest(BaseEstimator, MetaEstimatorMixin):
         X, y = self._validate_data(X, y, accept_sparse="csc")
         check_is_forest(self.estimator, allow_tree=False, ensure_fitted=False)
 
-        self.estimator_yxz_ = copy(self.estimator)
-        self.estimator_yz_ = copy(self.estimator)
+        self.estimator_yxz_ = deepcopy(self.estimator)
+        self.estimator_yz_ = deepcopy(self.estimator)
         # self.estimator_yxz_ = CalibratedClassifierCV(
         #     copy(self.estimator), method='isotonic', cv=5,
         # )

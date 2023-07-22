@@ -391,7 +391,7 @@ def cmi_separated_gaussians(means, sigmas, pi, condition_idx, seed=None):
     """
     n_classes = len(means)
 
-    x_idx = np.ones((means[0].shape[0],), dtype=np.bool)
+    x_idx = np.ones((means[0].shape[0],), dtype=np.bool_)
     x_idx[condition_idx] = False
     # Z_sigmas = [sigma[condition_idx, condition_idx] for sigma in sigmas]
     # X_sigmas = [sigma[x_idx, x_idx] for sigma in sigmas]

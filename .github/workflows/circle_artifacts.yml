@@ -15,7 +15,7 @@ jobs:
         id: step1
         uses: larsoner/circleci-artifacts-redirector-action@master
         with:
-          api-token: ${{ secrets.CIRCLECI_TOKEN }}
+          api-token: ${{ secrets.CIRCLE_TOKEN }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           artifact-path: 0/dev/index.html
           circleci-jobs: build_docs

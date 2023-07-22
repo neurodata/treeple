@@ -298,7 +298,10 @@ class HonestForestClassifier(ForestClassifier):
     >>> X, y = make_classification(n_samples=1000, n_features=4,
     ...                            n_informative=2, n_redundant=0,
     ...                            random_state=0, shuffle=False)
-    >>> clf = HonestForestClassifier(max_depth=2, random_state=0)
+    >>> clf = HonestForestClassifier(
+    >>>        max_depth=2,
+    >>>        random_state=0,
+    >>>        tree_estimator=ObliqueDecisionTreeClassifier())
     >>> clf.fit(X, y)
     HonestForestClassifier(...)
     >>> print(clf.predict([[0, 0, 0, 0]]))
