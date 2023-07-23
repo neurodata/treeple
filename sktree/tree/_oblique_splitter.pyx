@@ -32,29 +32,6 @@ cdef inline void _init_split(ObliqueSplitRecord* self, SIZE_t start_pos) noexcep
     self.improvement = -INFINITY
 
 
-cdef INT32_t find_index(DTYPE_t[:] feature_values, DOUBLE_t threshold) noexcept nogil:
-    """Finds the index of the first element in `feature_values` that is greater than `threshold`.
-
-    Parameters
-    ----------
-    feature_values : numpy.ndarray[SIZE_t, ndim=1]
-        An array of feature values.
-    threshold : double
-        The threshold value.
-
-    Returns
-    -------
-    int
-        The index of the first element in `feature_values` that is greater than `threshold`.
-    """
-    cdef SIZE_t i, n
-    n = feature_values.shape[0]
-    for i in range(n):
-        if feature_values[i] > threshold:
-            return i
-    return -1
-
-
 cdef class BaseObliqueSplitter(Splitter):
     """Abstract oblique splitter class.
 
@@ -622,7 +599,7 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
         return 0
 
 
-cdef class RandomObliqueSplitter(BestObliqueSplitter):
+cdef class RandomObliqueSplitter(ObliqueSplitter):
     def __reduce__(self):
         """Enable pickling the splitter."""
         return (RandomObliqueSplitter,
@@ -681,6 +658,20 @@ cdef class RandomObliqueSplitter(BestObliqueSplitter):
 
         return partition_end
 
+    cdef inline void swap_feature_values(
+        self,
+        SIZE_t i,
+        SIZE_t j,
+        DTYPE_t[:] feature_values,
+        vector[vector[DTYPE_t]]& proj_mat_weights,
+        vector[vector[SIZE_t]]& proj_mat_indices
+    ) noexcept nogil:
+        """Swap the projection matrix weights and indices at indices i and j"""
+        feature_values[i], feature_values[j] = feature_values[j], feature_values[i]
+        proj_mat_weights[i], proj_mat_weights[j] = proj_mat_weights[j], proj_mat_weights[i]
+        proj_mat_indices[i], proj_mat_indices[j] = proj_mat_indices[j], proj_mat_indices[i]
+
+
     # overwrite the node_split method with random threshold selection
     cdef int node_split(
         self,
@@ -701,6 +692,7 @@ cdef class RandomObliqueSplitter(BestObliqueSplitter):
         cdef SIZE_t start = self.start
         cdef SIZE_t end = self.end
         cdef UINT32_t* random_state = &self.rand_r_state
+        cdef SIZE_t n_features = self.n_features
 
         # pointer array to store feature values to split on
         cdef DTYPE_t[::1]  feature_values = self.feature_values
@@ -714,11 +706,23 @@ cdef class RandomObliqueSplitter(BestObliqueSplitter):
         cdef double current_proxy_improvement = -INFINITY
         cdef double best_proxy_improvement = -INFINITY
 
-        cdef SIZE_t feat_i, p       # index over computed features and start/end
+        cdef SIZE_t p
+        cdef SIZE_t feat_i
+        cdef SIZE_t f_i = n_features # index over computed features and start/end
+        cdef SIZE_t f_j 
         cdef SIZE_t partition_end
         cdef DTYPE_t temp_d         # to compute a projection feature value
         cdef DTYPE_t min_feature_value
         cdef DTYPE_t max_feature_value
+
+        # Number of features discovered to be constant during the split search
+        cdef SIZE_t n_found_constants = 0
+        # Number of features known to be constant and drawn without replacement
+        cdef SIZE_t n_drawn_constants = 0
+        cdef SIZE_t n_known_constants = n_constant_features[0]
+        # n_total_constants = n_known_constants + n_found_constants
+        cdef SIZE_t n_total_constants = n_known_constants
+        cdef SIZE_t n_visited_features = 0
 
         # instantiate the split records
         _init_split(&best_split, end)
@@ -728,6 +732,12 @@ cdef class RandomObliqueSplitter(BestObliqueSplitter):
 
         # For every vector in the projection matrix
         for feat_i in range(max_features):
+            # Break if already reached max_features
+            if n_visited_features >= max_features:
+                break
+            # Skip features known to be constant
+            if feat_i < n_total_constants:
+                continue
             # Projection vector has no nonzeros
             if self.proj_mat_weights[feat_i].empty():
                 continue
@@ -751,6 +761,12 @@ cdef class RandomObliqueSplitter(BestObliqueSplitter):
 
             # find min, max of the feature_values
             self.find_min_max(feature_values, &min_feature_value, &max_feature_value)
+
+            # XXX: Add logic to keep track of constant features if they exist
+            if max_feature_value <= min_feature_value + FEATURE_THRESHOLD:
+                n_found_constants += 1
+                n_total_constants += 1
+                continue
 
             # Draw a random threshold
             current_split.threshold = rand_uniform(
@@ -784,6 +800,8 @@ cdef class RandomObliqueSplitter(BestObliqueSplitter):
             if current_proxy_improvement > best_proxy_improvement:
                 best_proxy_improvement = current_proxy_improvement
                 best_split = current_split  # copy
+            
+            n_visited_features += 1
 
         # Reorganize into samples[start:best_split.pos] + samples[best_split.pos:end]
         if best_split.pos < end:

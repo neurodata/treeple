@@ -25,7 +25,7 @@ Version 0.2
 
 Changelog
 ---------
-- 
+- |Feature| Implementation of  ExtraObliqueDecisionTreeClassifier, ExtraObliqueDecisionTreeRegressor by `SUKI-O`_ (:pr:`75`)
 
 Code and Documentation Contributors
 -----------------------------------
@@ -34,4 +34,4 @@ Thanks to everyone who has contributed to the maintenance and improvement of
 the project since version inception, including:
 
 * `Adam Li`_
-
+* `SUKI-O`_
