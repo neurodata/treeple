@@ -30,19 +30,20 @@ References
         Machine Learning, 63(1), 3-42, 2006.
 """
 
-from datetime import datetime
-import numpy as np
 import math
+from datetime import datetime
+
 import matplotlib.pyplot as plt
-from matplotlib.colors import ListedColormap
+import numpy as np
 import pandas as pd
 import seaborn as sns
+from matplotlib.colors import ListedColormap
 from sklearn.datasets import fetch_openml, load_iris
 from sklearn.model_selection import RepeatedKFold, cross_validate
 from sklearn.tree import DecisionTreeClassifier
 
 from sktree import ExtraObliqueRandomForestClassifier, ObliqueRandomForestClassifier
-from sktree.tree import ObliqueDecisionTreeClassifier, ExtraObliqueDecisionTreeClassifier
+from sktree.tree import ExtraObliqueDecisionTreeClassifier, ObliqueDecisionTreeClassifier
 
 random_state = 12345
 # data_ids = [4534, 1510, 1468]  # openml dataset id
@@ -92,9 +93,7 @@ def get_scores(X, y, d_name, n_cv=5, n_repeats=1, **kwargs):
             ]
         )
 
-    df = pd.DataFrame(
-        tmp, columns=["dataset", "model", "score", "mean", "time_taken"]
-    )  
+    df = pd.DataFrame(tmp, columns=["dataset", "model", "score", "mean", "time_taken"])
     df = df.explode("score")
     df["score"] = df["score"].astype(float)
     df.reset_index(inplace=True, drop=True)
@@ -242,8 +241,15 @@ for pair in pairs:
         model_details = model_title
         if hasattr(model, "estimators_"):
             model_details += " with {} estimators".format(len(model.estimators_))
-        print(model_details + " with features", pair, "has a score of", round(scores, 5), \
-            "took", (datetime.now() - t0).total_seconds(), "seconds")
+        print(
+            model_details + " with features",
+            pair,
+            "has a score of",
+            round(scores, 5),
+            "took",
+            (datetime.now() - t0).total_seconds(),
+            "seconds",
+        )
 
         plt.subplot(3, 3, plot_idx)
         if plot_idx <= len(models):
@@ -254,19 +260,19 @@ for pair in pairs:
         # filled contour plot
         x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
         y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
-        xx, yy = np.meshgrid(
-            np.arange(x_min, x_max, plot_step), np.arange(y_min, y_max, plot_step)
-        )
+        xx, yy = np.meshgrid(np.arange(x_min, x_max, plot_step), np.arange(y_min, y_max, plot_step))
 
         # Plot either a single DecisionTreeClassifier or alpha blend the
         # decision surfaces of the ensemble of classifiers
-        if isinstance(model, DecisionTreeClassifier) or \
-            isinstance(model, ObliqueDecisionTreeClassifier) or \
-            isinstance(model, ExtraObliqueDecisionTreeClassifier):
+        if (
+            isinstance(model, DecisionTreeClassifier)
+            or isinstance(model, ObliqueDecisionTreeClassifier)
+            or isinstance(model, ExtraObliqueDecisionTreeClassifier)
+        ):
             Z = model.predict(np.c_[xx.ravel(), yy.ravel()])
             Z = Z.reshape(xx.shape)
             cs = plt.contourf(xx, yy, Z, cmap=cmap)
-            
+
         else:
             # Choose alpha blend level with respect to the number
             # of estimators
@@ -286,9 +292,9 @@ for pair in pairs:
             np.arange(x_min, x_max, plot_step_coarser),
             np.arange(y_min, y_max, plot_step_coarser),
         )
-        Z_points_coarser = model.predict(
-            np.c_[xx_coarser.ravel(), yy_coarser.ravel()]
-        ).reshape(xx_coarser.shape)
+        Z_points_coarser = model.predict(np.c_[xx_coarser.ravel(), yy_coarser.ravel()]).reshape(
+            xx_coarser.shape
+        )
         cs_points = plt.scatter(
             xx_coarser,
             yy_coarser,

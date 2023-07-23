@@ -671,7 +671,6 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
         proj_mat_weights[i], proj_mat_weights[j] = proj_mat_weights[j], proj_mat_weights[i]
         proj_mat_indices[i], proj_mat_indices[j] = proj_mat_indices[j], proj_mat_indices[i]
 
-
     # overwrite the node_split method with random threshold selection
     cdef int node_split(
         self,
@@ -692,7 +691,6 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
         cdef SIZE_t start = self.start
         cdef SIZE_t end = self.end
         cdef UINT32_t* random_state = &self.rand_r_state
-        cdef SIZE_t n_features = self.n_features
 
         # pointer array to store feature values to split on
         cdef DTYPE_t[::1]  feature_values = self.feature_values
@@ -708,8 +706,6 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
 
         cdef SIZE_t p
         cdef SIZE_t feat_i
-        cdef SIZE_t f_i = n_features # index over computed features and start/end
-        cdef SIZE_t f_j 
         cdef SIZE_t partition_end
         cdef DTYPE_t temp_d         # to compute a projection feature value
         cdef DTYPE_t min_feature_value
@@ -717,8 +713,6 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
 
         # Number of features discovered to be constant during the split search
         cdef SIZE_t n_found_constants = 0
-        # Number of features known to be constant and drawn without replacement
-        cdef SIZE_t n_drawn_constants = 0
         cdef SIZE_t n_known_constants = n_constant_features[0]
         # n_total_constants = n_known_constants + n_found_constants
         cdef SIZE_t n_total_constants = n_known_constants
@@ -800,7 +794,7 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
             if current_proxy_improvement > best_proxy_improvement:
                 best_proxy_improvement = current_proxy_improvement
                 best_split = current_split  # copy
-            
+
             n_visited_features += 1
 
         # Reorganize into samples[start:best_split.pos] + samples[best_split.pos:end]
