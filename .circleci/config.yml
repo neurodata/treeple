@@ -185,7 +185,7 @@ jobs:
             - ~/sktree
 
 workflows:
-  default:
+  build-docs:
     jobs:
       - build_scikit_tree:
           name: build_scikit_tree
