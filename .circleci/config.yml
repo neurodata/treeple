@@ -1,13 +1,6 @@
 # See: https://circleci.com/blog/deploying-documentation-to-github-pages-with-continuous-integration/
 version: 2.1
 
-# Aliases to reuse
-_defaults: &defaults
-  docker:
-    # CircleCI maintains a library of pre-built images
-    # documented at https://circleci.com/doc/2.0/circleci-images/
-    - image: cimg/python:3.9
-
 # document commands used by downstream jobs
 commands:
   check-skip:
@@ -70,7 +63,10 @@ commands:
 jobs:
   # Build scikit-tree from source
   build_scikit_tree:
-    <<: *defaults
+    docker:
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/doc/2.0/circleci-images/
+      - image: cimg/python:3.9
     steps:
       - checkout
       - check-skip
@@ -110,7 +106,10 @@ jobs:
             - .
 
   build_docs:
-    <<: *defaults
+    docker:
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/doc/2.0/circleci-images/
+      - image: cimg/python:3.9
     steps:
       - attach_workspace:
           at: ~/
