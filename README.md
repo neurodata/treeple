@@ -62,18 +62,18 @@ We use the ``spin`` CLI to abstract away build details:
 
     # run the build using Meson/Ninja
     ./spin build
-    
+
     # you can run the following command to see what other options there are
     ./spin --help
     ./spin build --help
-    
+
     # For example, you might want to start from a clean build
     ./spin build --clean
-    
+
     # or build in parallel for faster builds
     ./spin build -j 2
 
-    # you will need to double check the build-install has the proper path 
+    # you will need to double check the build-install has the proper path
     # this might be different from machine to machine
     export PYTHONPATH=${PWD}/build-install/usr/lib/python3.9/site-packages
 
@@ -107,4 +107,4 @@ Alternatively, you can use editable installs
 
 References
 ==========
-[1]: [`Li, Adam, et al. "Manifold Oblique Random Forests: Towards Closing the Gap on Convolutional Deep Networks." arXiv preprint arXiv:1909.11799 (2019)`](https://arxiv.org/abs/1909.11799)
+[1]: [`Li, Adam, et al. "Manifold Oblique Random Forests: Towards Closing the Gap on Convolutional Deep Networks" SIAM Journal on Mathematics of Data Science, 5(1), 77-96, 2023`](https://doi.org/10.1137/21M1449117)
