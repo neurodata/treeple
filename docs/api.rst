@@ -54,7 +54,7 @@ on unsupervised criterion such as variance and BIC.
 .. currentmodule:: sktree
 .. autosummary::
    :toctree: generated/
-   
+
    UnsupervisedRandomForest
    UnsupervisedObliqueRandomForest
 
@@ -62,7 +62,7 @@ The trees that comprise those forests are also available as standalone classes.
 
 .. autosummary::
    :toctree: generated/
-   
+
    tree.UnsupervisedDecisionTree
    tree.UnsupervisedObliqueDecisionTree
 
@@ -84,7 +84,7 @@ provide a natural way to compute neighbors based on the splits. We provide
 an API for extracting the nearest neighbors from a tree-model. This provides
 an API-like interface similar to :class:`~sklearn.neighbors.NearestNeighbors`.
 
-.. currentmodule:: sktree
+.. currentmodule:: sktree.neighbors
 .. autosummary::
    :toctree: generated/
 

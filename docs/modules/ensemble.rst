@@ -27,9 +27,9 @@ more information and intuition, see
 
 .. topic:: References
 
- .. [B2001] L. Breiman, "Random Forests", Machine Learning, 45(1), 5-32, 2001.
+ .. [B2001] Breiman, L. "Random Forests", Machine Learning, 45(1), 5-32, 2001.
 
- * P. Geurts, D. Ernst., and L. Wehenkel, "Extremely randomized
+ .. [G2006] Geurts, P. and Ernst., D. and Wehenkel, L. "Extremely randomized
    trees", Machine Learning, 63(1), 3-42, 2006.
 
 .. _oblique_forest_feature_importance:
@@ -76,7 +76,7 @@ to the prediction function.
 
 .. topic:: References
 
- .. [L2014] G. Louppe, :arxiv:`"Understanding Random Forests: From Theory to
+ .. [L2014] Louppe, G. :arxiv:`"Understanding Random Forests: From Theory to
     Practice" <1407.7502>`,
     PhD Thesis, U. of Liege, 2014.
 
