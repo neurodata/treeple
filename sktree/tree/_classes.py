@@ -1301,7 +1301,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
     """A oblique decision tree classifier that operates over patches of data.
 
     A patch oblique decision tree is also known as a manifold oblique decision tree
-    (called MORF in :footcite:`Li2019manifold`), where the splitter is aware of
+    (called MORF in :footcite:`Li2023manifold`), where the splitter is aware of
     the structure in the data. For example, in an image, a patch would be contiguous
     along the rows and columns of the image. In a multivariate time-series, a patch
     would be contiguous over time, but possibly discontiguous over the sensors.
@@ -1791,7 +1791,7 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
     """A oblique decision tree regressor that operates over patches of data.
 
     A patch oblique decision tree is also known as a manifold oblique decision tree
-    (called MORF in :footcite:`Li2019manifold`), where the splitter is aware of
+    (called MORF in :footcite:`Li2023manifold`), where the splitter is aware of
     the structure in the data. For example, in an image, a patch would be contiguous
     along the rows and columns of the image. In a multivariate time-series, a patch
     would be contiguous over time, but possibly discontiguous over the sensors.
