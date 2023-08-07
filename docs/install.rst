@@ -21,7 +21,7 @@ Installing with ``pip``
 
 .. code-block:: bash
 
-    pip install scikit-tree
+    pip install sktree
 
 Installing from source with Meson
 ---------------------------------
@@ -43,12 +43,12 @@ Then run installation of build packages
 
     pip install -r build_requirements.txt
     pip install spin
-    
+
     # use spin CLI to run Meson build locally
     ./spin build -j 2
 
     # you can now run tests
-    ./spin test 
+    ./spin test
 
 via pip, you will be able to install in editable mode (pending Meson-Python support).
 
@@ -70,7 +70,7 @@ First, create a virtual environment using Conda.
     conda create -n sklearn-dev python=3.9
 
 # activate the virtual environment and install necessary packages to build from source
-    
+
     conda activate sklearn-dev
     conda install -c conda-forge numpy scipy cython joblib threadpoolctl pytest compilers llvm-openmp poetry
 
