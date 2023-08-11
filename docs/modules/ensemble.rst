@@ -27,9 +27,9 @@ more information and intuition, see
 
 .. topic:: References
 
- .. [B2001] L. Breiman, "Random Forests", Machine Learning, 45(1), 5-32, 2001.
+ .. [B2001] Breiman, L. "Random Forests", Machine Learning, 45(1), 5-32, 2001.
 
- * P. Geurts, D. Ernst., and L. Wehenkel, "Extremely randomized
+ .. [G2006] Geurts, P. and Ernst., D. and Wehenkel, L. "Extremely randomized
    trees", Machine Learning, 63(1), 3-42, 2006.
 
 .. _oblique_forest_feature_importance:
@@ -52,8 +52,8 @@ By **averaging** the estimates of predictive ability over several randomized
 trees one can **reduce the variance** of such an estimate and use it
 for feature selection. This is known as the mean decrease in impurity, or MDI.
 Refer to [L2014]_ for more information on MDI and feature importance
-evaluation with Random Forests. We implement the approach taken in [Li2019]_
-and [Tomita2015]_.
+evaluation with Random Forests. We implement the approach taken in [Li2023]_
+and [Tomita2020]_.
 
 .. warning::
 
@@ -76,12 +76,14 @@ to the prediction function.
 
 .. topic:: References
 
- .. [L2014] G. Louppe, :arxiv:`"Understanding Random Forests: From Theory to
+ .. [L2014] Louppe, G. :arxiv:`"Understanding Random Forests: From Theory to
     Practice" <1407.7502>`,
     PhD Thesis, U. of Liege, 2014.
 
- .. [Li2019] Li, Adam, et al. :arxiv:`"Manifold Oblique Random Forests: Towards
-    Closing the Gap on Convolutional Deep Networks."` arXiv preprint arXiv:1909.11799 (2019).
+ .. [Li2023] Li, Adam, et al. :doi:`"Manifold Oblique Random Forests: Towards
+    Closing the Gap on Convolutional Deep Networks" <10.1137/21M1449117>`,
+    SIAM Journal on Mathematics of Data Science, 5(1), 77-96, 2023.
 
- .. [Tomita2015] Tomita, Tyler M., et al. :arxiv:`"Sparse Projection Oblique Randomer Forests."`
-    arXiv preprint arXiv:1506.03410 (2015).
+ .. [Tomita2020] Tomita, Tyler M., et al. "Sparse Projection Oblique
+    Randomer Forests", The Journal of Machine Learning Research, 21(104),
+    1-39, 2020.
