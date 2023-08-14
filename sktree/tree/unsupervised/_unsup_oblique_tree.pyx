@@ -209,7 +209,7 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
         self.capacity = capacity
         return 0
 
-    cdef int _set_split_node(self, SplitRecord* split_node, Node *node, SIZE_t node_id) except -1 nogil:
+    cdef inline int _set_split_node(self, SplitRecord* split_node, Node *node, SIZE_t node_id) except -1 nogil:
         """Set node data.
         """
         # Cython type cast split record into its inherited split record
