@@ -35,7 +35,8 @@ cdef class ObliqueTree(Tree):
     cdef int _set_split_node(
         self,
         SplitRecord* split_node,
-        Node *node
+        Node *node,
+        SIZE_t node_id
     )  nogil except -1
     cdef DTYPE_t _compute_feature(
         self,
