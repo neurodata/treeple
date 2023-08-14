@@ -209,14 +209,13 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
         self.capacity = capacity
         return 0
 
-    cdef int _set_split_node(self, SplitRecord* split_node, Node *node) except -1 nogil:
+    cdef int _set_split_node(self, SplitRecord* split_node, Node *node, SIZE_t node_id) except -1 nogil:
         """Set node data.
         """
         # Cython type cast split record into its inherited split record
         # For reference, see:
         # https://www.codementor.io/@arpitbhayani/powering-inheritance-in-c-using-structure-composition-176sygr724
         cdef ObliqueSplitRecord* oblique_split_node = <ObliqueSplitRecord*>(split_node)
-        cdef SIZE_t node_id = self.node_count
 
         node.feature = deref(oblique_split_node).feature
         node.threshold = deref(oblique_split_node).threshold
