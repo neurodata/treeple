@@ -10,6 +10,30 @@ API Documentation
    :no-members:
    :no-inherited-members:
 
+Scikit-learn Tree Estimators
+----------------------------
+We provide a drop-in replacement for the scikit-learn tree estimators
+with **experimental** features that we have developed. These estimators
+are still compatible with the scikit-learn API. These estimators all have
+the capability of binning features, which theoretically will improve runtime
+significantly for high-dimensional and high-sample size data.
+
+Use at your own risk! We have not tested these estimators extensively, compared
+to the scikit-learn estimators.
+
+.. automodule:: sktree._lib.sklearn.ensemble
+   :members:
+   :show-inheritance:
+
+.. currentmodule:: sktree
+.. autosummary::
+   :toctree: generated/
+
+   RandomForestClassifier
+   RandomForestRegressor
+   ExtraTreesClassifier
+   ExtraTreesRegressor
+
 Supervised
 ----------
 Decision-tree models are traditionally implemented with axis-aligned splits and

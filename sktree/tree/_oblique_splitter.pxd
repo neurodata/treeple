@@ -83,7 +83,9 @@ cdef class BaseObliqueSplitter(Splitter):
         self,
         double impurity,   # Impurity of the node
         SplitRecord* split,
-        SIZE_t* n_constant_features
+        SIZE_t* n_constant_features,
+        double lower_bound,
+        double upper_bound,
     ) except -1 nogil
 
 
@@ -103,4 +105,4 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
         vector[vector[SIZE_t]]& proj_mat_indices
-    ) nogil
+    ) noexcept nogil

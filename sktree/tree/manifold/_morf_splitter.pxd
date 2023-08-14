@@ -81,7 +81,7 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
         vector[vector[SIZE_t]]& proj_mat_indices
-    ) nogil
+    ) noexcept nogil
 
 
 cdef class UserKernelSplitter(PatchSplitter):
@@ -101,4 +101,4 @@ cdef class GaussianKernelSplitter(PatchSplitter):
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
         vector[vector[SIZE_t]]& proj_mat_indices
-    ) nogil
+    ) noexcept nogil
