@@ -364,6 +364,19 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
     def __setstate__(self, d):
         pass
 
+    def __reduce__(self):
+        """Enable pickling the splitter."""
+        return (type(self),
+                (
+                    self.criterion,
+                    self.max_features,
+                    self.min_samples_leaf,
+                    self.min_weight_leaf,
+                    self.random_state,
+                    self.monotonic_cst.base if self.monotonic_cst is not None else None,
+                    self.feature_combinations,
+                ), self.__getstate__())
+
     cdef int init(
         self,
         object X,
@@ -444,20 +457,6 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
 
 
 cdef class BestObliqueSplitter(ObliqueSplitter):
-    def __reduce__(self):
-        """Enable pickling the splitter."""
-        return (BestObliqueSplitter,
-                (
-                    self.criterion,
-                    self.max_features,
-                    self.min_samples_leaf,
-                    self.min_weight_leaf,
-                    self.random_state,
-                    self.monotonic_cst,
-                    # self.breiman_shortcut,
-                    self.feature_combinations,
-                ), self.__getstate__())
-
     cdef int node_split(
         self,
         double impurity,

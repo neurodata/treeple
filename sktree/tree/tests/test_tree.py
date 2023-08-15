@@ -122,6 +122,59 @@ ALL_TREES = [
 ]
 
 
+def test_pickle_splitters():
+    """Test that splitters are picklable."""
+    import tempfile
+
+    import joblib
+
+    from sktree._lib.sklearn.tree._criterion import Gini
+    from sktree.tree._oblique_splitter import BestObliqueSplitter
+    from sktree.tree.manifold._morf_splitter import BestPatchSplitter
+
+    criterion = Gini(1, np.array((0, 1)))
+    max_features = 6
+    min_samples_leaf = 1
+    min_weight_leaf = 0.0
+    monotonic_cst = np.array([1, 1, 1, 1, 1, 1], dtype=np.int8)
+    random_state = np.random.RandomState(100)
+    boundary = None
+    feature_weight = None
+    min_patch_dims = np.array((1, 1))
+    max_patch_dims = np.array((3, 1))
+    dim_contiguous = np.array((True, True))
+    data_dims = np.array((5, 5))
+
+    splitter = BestObliqueSplitter(
+        criterion,
+        max_features,
+        min_samples_leaf,
+        min_weight_leaf,
+        random_state,
+        monotonic_cst,
+        1.5,
+    )
+    with tempfile.TemporaryFile() as f:
+        joblib.dump(splitter, f)
+
+    splitter = BestPatchSplitter(
+        criterion,
+        max_features,
+        min_samples_leaf,
+        min_weight_leaf,
+        random_state,
+        monotonic_cst,
+        min_patch_dims,
+        max_patch_dims,
+        dim_contiguous,
+        data_dims,
+        boundary,
+        feature_weight,
+    )
+    with tempfile.TemporaryFile() as f:
+        joblib.dump(splitter, f)
+
+
 @parametrize_with_checks(
     [
         ObliqueDecisionTreeClassifier(random_state=12),
@@ -320,7 +373,7 @@ def test_patch_oblique_tree_feature_weights():
             max_patch_dims=(6, 6),
             data_dims=(8, 8),
             random_state=1,
-            feature_weight=np.ones((X.shape[0], 2)),
+            feature_weight=np.ones((X.shape[0], 1), dtype=np.float32),
         )
         clf.fit(X, y)
 
