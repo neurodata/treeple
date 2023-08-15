@@ -2,9 +2,9 @@ import numpy as np
 import pytest
 from sklearn import datasets
 from sklearn.metrics import accuracy_score
-from sklearn.tree import DecisionTreeClassifier
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
+from sktree._lib.sklearn.tree import DecisionTreeClassifier
 from sktree.tree import (
     HonestTreeClassifier,
     ObliqueDecisionTreeClassifier,
@@ -45,6 +45,10 @@ def test_iris(criterion, max_features, estimator):
     assert score == 1.0, "Failed with {0}, criterion = {1} and score = {2}".format(
         "HonestTree", criterion, score
     )
+
+    print(clf.honest_indices_)
+    assert len(clf.honest_indices_) < len(iris.target)
+    assert len(clf.structure_indices_) < len(iris.target)
 
 
 def test_toy_accuracy():
@@ -104,6 +108,6 @@ def test_impute_classes():
     assert y_proba.shape[1] == 3
 
 
-@parametrize_with_checks([HonestTreeClassifier(random_state=0)])
+@parametrize_with_checks([HonestTreeClassifier(random_state=12345)])
 def test_sklearn_compatible_estimator(estimator, check):
     check(estimator)
