@@ -208,7 +208,7 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
                 if X.indices.dtype != np.intc or X.indptr.dtype != np.intc:
                     raise ValueError("No support for np.int64 index based sparse matrices")
 
-        super()._fit(X=X, y=None, sample_weight=sample_weight, check_input=check_input)
+        self = super()._fit(X, y=None, sample_weight=sample_weight, check_input=False)
 
         # apply to the leaves
         n_samples = X.shape[0]
@@ -226,7 +226,7 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
         X,
         y,
         sample_weight,
-        feature_has_missing,
+        missing_values_in_feature_mask,
         min_samples_leaf,
         min_weight_leaf,
         max_leaf_nodes,
@@ -245,11 +245,7 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
         splitter = self.splitter
         if not isinstance(self.splitter, UnsupervisedSplitter):
             splitter = UNSUPERVISED_SPLITTERS[self.splitter](
-                criterion,
-                self.max_features_,
-                min_samples_leaf,
-                min_weight_leaf,
-                random_state,
+                criterion, self.max_features_, min_samples_leaf, min_weight_leaf, random_state
             )
 
         self.tree_ = UnsupervisedTree(self.n_features_in_)
@@ -495,7 +491,7 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
         X,
         y,
         sample_weight,
-        feature_has_missing,
+        missing_values_in_feature_mask,
         min_samples_leaf,
         min_weight_leaf,
         max_leaf_nodes,
@@ -504,7 +500,6 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
         random_state,
     ):
         # TODO: add feature_combinations fix that was used in obliquedecisiontreeclassifier
-
         criterion = self.criterion
         if not isinstance(criterion, UnsupervisedCriterion):
             criterion = UNSUPERVISED_CRITERIA[self.criterion]()
@@ -823,7 +818,7 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         X,
         y,
         sample_weight,
-        feature_has_missing,
+        missing_values_in_feature_mask,
         min_samples_leaf,
         min_weight_leaf,
         max_leaf_nodes,
@@ -870,6 +865,7 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         random_state : int, RandomState instance or None, default=None
             Controls the randomness of the estimator.
         """
+        monotonic_cst = None
         _, n_features = X.shape
 
         if self.feature_combinations is None:
@@ -907,6 +903,7 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                 min_samples_leaf,
                 min_weight_leaf,
                 random_state,
+                monotonic_cst,
                 self.feature_combinations_,
             )
 
@@ -914,7 +911,7 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
 
         # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
         if max_leaf_nodes < 0:
-            builder = DepthFirstTreeBuilder(
+            self.builder_ = DepthFirstTreeBuilder(
                 splitter,
                 min_samples_split,
                 min_samples_leaf,
@@ -923,7 +920,7 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                 self.min_impurity_decrease,
             )
         else:
-            builder = BestFirstTreeBuilder(
+            self.builder_ = BestFirstTreeBuilder(
                 splitter,
                 min_samples_split,
                 min_samples_leaf,
@@ -933,7 +930,7 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                 self.min_impurity_decrease,
             )
 
-        builder.build(self.tree_, X, y, sample_weight)
+        self.builder_.build(self.tree_, X, y, sample_weight, None)
 
         if self.n_outputs_ == 1:
             self.n_classes_ = self.n_classes_[0]
@@ -1181,7 +1178,7 @@ class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         X,
         y,
         sample_weight,
-        feature_has_missing,
+        missing_values_in_feature_mask,
         min_samples_leaf,
         min_weight_leaf,
         max_leaf_nodes,
@@ -1227,6 +1224,7 @@ class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         random_state : int, RandomState instance or None, default=None
             Controls the randomness of the estimator.
         """
+        monotonic_cst = None
         n_samples, n_features = X.shape
 
         if self.feature_combinations is None:
@@ -1264,6 +1262,7 @@ class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
                 min_samples_leaf,
                 min_weight_leaf,
                 random_state,
+                monotonic_cst,
                 self.feature_combinations_,
             )
 
@@ -1294,7 +1293,7 @@ class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
                 self.min_impurity_decrease,
             )
 
-        builder.build(self.tree_, X, y, sample_weight)
+        builder.build(self.tree_, X, y, sample_weight, None)
 
 
 class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
@@ -1568,110 +1567,12 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
         self.boundary = boundary
         self.feature_weight = feature_weight
 
-    def fit(self, X, y, sample_weight=None, check_input=True):
-        """Fit tree.
-
-        Parameters
-        ----------
-        X : {array-like, sparse matrix} of shape (n_samples, n_features)
-            The training input samples. Internally, it will be converted to
-            ``dtype=np.float32`` and if a sparse matrix is provided
-            to a sparse ``csc_matrix``.
-
-        y : array-like of shape (n_samples,) or (n_samples, n_outputs)
-            The target values (class labels) as integers or strings.
-
-        sample_weight : array-like of shape (n_samples,), default=None
-            Sample weights. If None, then samples are equally weighted. Splits
-            that would create child nodes with net zero or negative weight are
-            ignored while searching for a split in each node. Splits are also
-            ignored if they would result in any single class carrying a
-            negative weight in either child node.
-
-        check_input : bool, optional
-            Whether or not to check input, by default True.
-        """
-        if check_input:
-            # Need to validate separately here.
-            # We can't pass multi_output=True because that would allow y to be
-            # csr.
-            check_X_params = dict(dtype=DTYPE, accept_sparse="csc")
-            check_y_params = dict(ensure_2d=False, dtype=None)
-            X, y = self._validate_data(X, y, validate_separately=(check_X_params, check_y_params))
-            if self.feature_weight is not None:
-                self.feature_weight = self._validate_data(
-                    self.feature_weight, ensure_2d=True, dtype=DTYPE
-                )
-                if self.feature_weight.shape != X.shape:
-                    raise ValueError(
-                        f"feature_weight has shape {self.feature_weight.shape} but X has "
-                        f"shape {X.shape}"
-                    )
-            if issparse(X):
-                X.sort_indices()
-
-                if X.indices.dtype != np.intc or X.indptr.dtype != np.intc:
-                    raise ValueError("No support for np.int64 index based sparse matrices")
-
-        if self.data_dims is None:
-            self.data_dims_ = np.array((1, X.shape[1]))
-        else:
-            if np.prod(self.data_dims) != X.shape[1]:
-                raise RuntimeError(f"Data dimensions {self.data_dims} do not match {X.shape[1]}.")
-            self.data_dims_ = np.array(self.data_dims)
-        ndim = len(self.data_dims_)
-
-        # validate contiguous parameter
-        if self.dim_contiguous is None:
-            self.dim_contiguous_ = np.ones((ndim,), dtype=np.bool_)
-        else:
-            if len(self.dim_contiguous) != ndim:
-                raise ValueError(f"Contiguous dimensions should equal {ndim} dimensions.")
-            self.dim_contiguous_ = np.array(self.dim_contiguous).astype(np.bool_)
-
-        # validate data height/width
-        if self.min_patch_dims is None:
-            self.min_patch_dims_ = np.ones((ndim,), dtype=np.intp)
-        else:
-            self.min_patch_dims_ = np.array(self.min_patch_dims)
-
-        if self.max_patch_dims is None:
-            self.max_patch_dims_ = np.ones((ndim,), dtype=np.intp)
-            self.max_patch_dims_[-1] = X.shape[1]
-        else:
-            self.max_patch_dims_ = np.array(self.max_patch_dims)
-
-        if len(self.min_patch_dims_) != ndim:
-            raise ValueError(f"Minimum patch dimensions should equal {ndim} dimensions.")
-        if len(self.max_patch_dims_) != ndim:
-            raise ValueError(f"Maximum patch dimensions should equal {ndim} dimensions.")
-
-        # validate patch parameters
-        for idx in range(ndim):
-            if self.min_patch_dims_[idx] > self.max_patch_dims_[idx]:
-                raise RuntimeError(
-                    f"The minimum patch width {self.min_patch_dims_[idx]} is "
-                    f"greater than the maximum patch width {self.max_patch_dims_[idx]}"
-                )
-            if self.min_patch_dims_[idx] > self.data_dims_[idx]:
-                raise RuntimeError(
-                    f"The minimum patch width {self.min_patch_dims_[idx]} is "
-                    f"greater than the data width {self.data_dims_[idx]}"
-                )
-            if self.max_patch_dims_[idx] > self.data_dims_[idx]:
-                raise RuntimeError(
-                    f"The maximum patch width {self.max_patch_dims_[idx]} is "
-                    f"greater than the data width {self.data_dims_[idx]}"
-                )
-
-        return super().fit(X, y, sample_weight, check_input=False)
-
     def _build_tree(
         self,
         X,
         y,
         sample_weight,
-        feature_has_missing,
+        missing_values_in_feature_mask,
         min_samples_leaf,
         min_weight_leaf,
         max_leaf_nodes,
@@ -1718,6 +1619,69 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
         random_state : int, RandomState instance or None, default=None
             Controls the randomness of the estimator.
         """
+        if self.feature_weight is not None:
+            self.feature_weight = self._validate_data(
+                self.feature_weight, ensure_2d=True, dtype=DTYPE
+            )
+            if self.feature_weight.shape != X.shape:
+                raise ValueError(
+                    f"feature_weight has shape {self.feature_weight.shape} but X has "
+                    f"shape {X.shape}"
+                )
+
+        if self.data_dims is None:
+            self.data_dims_ = np.array((1, X.shape[1]), dtype=np.intp)
+        else:
+            if np.prod(self.data_dims) != X.shape[1]:
+                raise RuntimeError(f"Data dimensions {self.data_dims} do not match {X.shape[1]}.")
+            self.data_dims_ = np.array(self.data_dims, dtype=np.intp)
+        ndim = len(self.data_dims_)
+
+        # validate contiguous parameter
+        if self.dim_contiguous is None:
+            self.dim_contiguous_ = np.ones((ndim,), dtype=np.bool_)
+        else:
+            if len(self.dim_contiguous) != ndim:
+                raise ValueError(f"Contiguous dimensions should equal {ndim} dimensions.")
+            self.dim_contiguous_ = np.array(self.dim_contiguous).astype(np.bool_)
+
+        # validate data height/width
+        if self.min_patch_dims is None:
+            self.min_patch_dims_ = np.ones((ndim,), dtype=np.intp)
+        else:
+            self.min_patch_dims_ = np.array(self.min_patch_dims, dtype=np.intp)
+
+        if self.max_patch_dims is None:
+            self.max_patch_dims_ = np.ones((ndim,), dtype=np.intp)
+            self.max_patch_dims_[-1] = X.shape[1]
+        else:
+            self.max_patch_dims_ = np.array(self.max_patch_dims, dtype=np.intp)
+
+        if len(self.min_patch_dims_) != ndim:
+            raise ValueError(f"Minimum patch dimensions should equal {ndim} dimensions.")
+        if len(self.max_patch_dims_) != ndim:
+            raise ValueError(f"Maximum patch dimensions should equal {ndim} dimensions.")
+
+        # validate patch parameters
+        for idx in range(ndim):
+            if self.min_patch_dims_[idx] > self.max_patch_dims_[idx]:
+                raise RuntimeError(
+                    f"The minimum patch width {self.min_patch_dims_[idx]} is "
+                    f"greater than the maximum patch width {self.max_patch_dims_[idx]}"
+                )
+            if self.min_patch_dims_[idx] > self.data_dims_[idx]:
+                raise RuntimeError(
+                    f"The minimum patch width {self.min_patch_dims_[idx]} is "
+                    f"greater than the data width {self.data_dims_[idx]}"
+                )
+            if self.max_patch_dims_[idx] > self.data_dims_[idx]:
+                raise RuntimeError(
+                    f"The maximum patch width {self.max_patch_dims_[idx]} is "
+                    f"greater than the data width {self.data_dims_[idx]}"
+                )
+
+        monotonic_cst = None
+
         # Build tree
         criterion = self.criterion
         if not isinstance(criterion, BaseCriterion):
@@ -1743,6 +1707,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
                 min_samples_leaf,
                 min_weight_leaf,
                 random_state,
+                monotonic_cst,
                 self.min_patch_dims_,
                 self.max_patch_dims_,
                 self.dim_contiguous_,
@@ -1755,7 +1720,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
 
         # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
         if max_leaf_nodes < 0:
-            builder = DepthFirstTreeBuilder(
+            self.builder_ = DepthFirstTreeBuilder(
                 splitter,
                 min_samples_split,
                 min_samples_leaf,
@@ -1764,7 +1729,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
                 self.min_impurity_decrease,
             )
         else:
-            builder = BestFirstTreeBuilder(
+            self.builder_ = BestFirstTreeBuilder(
                 splitter,
                 min_samples_split,
                 min_samples_leaf,
@@ -1774,7 +1739,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
                 self.min_impurity_decrease,
             )
 
-        builder.build(self.tree_, X, y, sample_weight)
+        self.builder_.build(self.tree_, X, y, sample_weight, None)
 
         if self.n_outputs_ == 1:
             self.n_classes_ = self.n_classes_[0]
@@ -2045,109 +2010,12 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         self.boundary = boundary
         self.feature_weight = feature_weight
 
-    def fit(self, X, y, sample_weight=None, check_input=True):
-        """Fit tree.
-
-        Parameters
-        ----------
-        X : {array-like, sparse matrix} of shape (n_samples, n_features)
-            The training input samples. Internally, it will be converted to
-            ``dtype=np.float32`` and if a sparse matrix is provided
-            to a sparse ``csc_matrix``.
-
-        y : array-like of shape (n_samples,) or (n_samples, n_outputs)
-            The target values (real numbers). Use ``dtype=np.float64`` and
-            ``order='C'`` for maximum efficiency.
-
-        sample_weight : array-like of shape (n_samples,), default=None
-            Sample weights. If None, then samples are equally weighted. Splits
-            that would create child nodes with net zero or negative weight are
-            ignored while searching for a split in each node.
-
-        check_input : bool, optional
-            Whether or not to check input, by default True.
-        """
-        if check_input:
-            # Need to validate separately here.
-            # We can't pass multi_output=True because that would allow y to be
-            # csr.
-            check_X_params = dict(dtype=DTYPE, accept_sparse="csc")
-            check_y_params = dict(ensure_2d=False, dtype=None)
-            X, y = self._validate_data(X, y, validate_separately=(check_X_params, check_y_params))
-            if self.feature_weight is not None:
-                self.feature_weight = self._validate_data(
-                    self.feature_weight, ensure_2d=True, dtype=DTYPE
-                )
-                if self.feature_weight.shape != X.shape:
-                    raise ValueError(
-                        f"feature_weight has shape {self.feature_weight.shape} but X has "
-                        f"shape {X.shape}"
-                    )
-            if issparse(X):
-                X.sort_indices()
-
-                if X.indices.dtype != np.intc or X.indptr.dtype != np.intc:
-                    raise ValueError("No support for np.int64 index based sparse matrices")
-
-        if self.data_dims is None:
-            self.data_dims_ = np.array((1, X.shape[1]))
-        else:
-            if np.prod(self.data_dims) != X.shape[1]:
-                raise RuntimeError(f"Data dimensions {self.data_dims} do not match {X.shape[1]}.")
-            self.data_dims_ = np.array(self.data_dims)
-        ndim = len(self.data_dims_)
-
-        # validate contiguous parameter
-        if self.dim_contiguous is None:
-            self.dim_contiguous_ = np.ones((ndim,), dtype=np.bool_)
-        else:
-            if len(self.dim_contiguous) != ndim:
-                raise ValueError(f"Contiguous dimensions should equal {ndim} dimensions.")
-            self.dim_contiguous_ = np.array(self.dim_contiguous).astype(np.bool_)
-
-        # validate data height/width
-        if self.min_patch_dims is None:
-            self.min_patch_dims_ = np.ones((ndim,), dtype=np.intp)
-        else:
-            self.min_patch_dims_ = np.array(self.min_patch_dims)
-
-        if self.max_patch_dims is None:
-            self.max_patch_dims_ = np.ones((ndim,), dtype=np.intp)
-            self.max_patch_dims_[-1] = X.shape[1]
-        else:
-            self.max_patch_dims_ = np.array(self.max_patch_dims)
-
-        if len(self.min_patch_dims_) != ndim:
-            raise ValueError(f"Minimum patch dimensions should equal {ndim} dimensions.")
-        if len(self.max_patch_dims_) != ndim:
-            raise ValueError(f"Maximum patch dimensions should equal {ndim} dimensions.")
-
-        # validate patch parameters
-        for idx in range(ndim):
-            if self.min_patch_dims_[idx] > self.max_patch_dims_[idx]:
-                raise RuntimeError(
-                    f"The minimum patch width {self.min_patch_dims_[idx]} is "
-                    f"greater than the maximum patch width {self.max_patch_dims_[idx]}"
-                )
-            if self.min_patch_dims_[idx] > self.data_dims_[idx]:
-                raise RuntimeError(
-                    f"The minimum patch width {self.min_patch_dims_[idx]} is "
-                    f"greater than the data width {self.data_dims_[idx]}"
-                )
-            if self.max_patch_dims_[idx] > self.data_dims_[idx]:
-                raise RuntimeError(
-                    f"The maximum patch width {self.max_patch_dims_[idx]} is "
-                    f"greater than the data width {self.data_dims_[idx]}"
-                )
-
-        return super().fit(X, y, sample_weight, check_input=False)
-
     def _build_tree(
         self,
         X,
         y,
         sample_weight,
-        feature_has_missing,
+        missing_values_in_feature_mask,
         min_samples_leaf,
         min_weight_leaf,
         max_leaf_nodes,
@@ -2193,7 +2061,68 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         random_state : int, RandomState instance or None, default=None
             Controls the randomness of the estimator.
         """
+        if self.feature_weight is not None:
+            self.feature_weight = self._validate_data(
+                self.feature_weight, ensure_2d=True, dtype=DTYPE
+            )
+            if self.feature_weight.shape != X.shape:
+                raise ValueError(
+                    f"feature_weight has shape {self.feature_weight.shape} but X has "
+                    f"shape {X.shape}"
+                )
 
+        if self.data_dims is None:
+            self.data_dims_ = np.array((1, X.shape[1]), dtype=np.intp)
+        else:
+            if np.prod(self.data_dims) != X.shape[1]:
+                raise RuntimeError(f"Data dimensions {self.data_dims} do not match {X.shape[1]}.")
+            self.data_dims_ = np.array(self.data_dims, dtype=np.intp)
+        ndim = len(self.data_dims_)
+
+        # validate contiguous parameter
+        if self.dim_contiguous is None:
+            self.dim_contiguous_ = np.ones((ndim,), dtype=np.bool_)
+        else:
+            if len(self.dim_contiguous) != ndim:
+                raise ValueError(f"Contiguous dimensions should equal {ndim} dimensions.")
+            self.dim_contiguous_ = np.array(self.dim_contiguous).astype(np.bool_)
+
+        # validate data height/width
+        if self.min_patch_dims is None:
+            self.min_patch_dims_ = np.ones((ndim,), dtype=np.intp)
+        else:
+            self.min_patch_dims_ = np.array(self.min_patch_dims, dtype=np.intp)
+
+        if self.max_patch_dims is None:
+            self.max_patch_dims_ = np.ones((ndim,), dtype=np.intp)
+            self.max_patch_dims_[-1] = X.shape[1]
+        else:
+            self.max_patch_dims_ = np.array(self.max_patch_dims)
+
+        if len(self.min_patch_dims_) != ndim:
+            raise ValueError(f"Minimum patch dimensions should equal {ndim} dimensions.")
+        if len(self.max_patch_dims_) != ndim:
+            raise ValueError(f"Maximum patch dimensions should equal {ndim} dimensions.")
+
+        # validate patch parameters
+        for idx in range(ndim):
+            if self.min_patch_dims_[idx] > self.max_patch_dims_[idx]:
+                raise RuntimeError(
+                    f"The minimum patch width {self.min_patch_dims_[idx]} is "
+                    f"greater than the maximum patch width {self.max_patch_dims_[idx]}"
+                )
+            if self.min_patch_dims_[idx] > self.data_dims_[idx]:
+                raise RuntimeError(
+                    f"The minimum patch width {self.min_patch_dims_[idx]} is "
+                    f"greater than the data width {self.data_dims_[idx]}"
+                )
+            if self.max_patch_dims_[idx] > self.data_dims_[idx]:
+                raise RuntimeError(
+                    f"The maximum patch width {self.max_patch_dims_[idx]} is "
+                    f"greater than the data width {self.data_dims_[idx]}"
+                )
+
+        monotonic_cst = None
         n_samples = X.shape[0]
 
         # Build tree
@@ -2221,6 +2150,7 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
                 min_samples_leaf,
                 min_weight_leaf,
                 random_state,
+                monotonic_cst,
                 self.min_patch_dims_,
                 self.max_patch_dims_,
                 self.dim_contiguous_,
@@ -2256,7 +2186,7 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
                 self.min_impurity_decrease,
             )
 
-        builder.build(self.tree_, X, y, sample_weight)
+        builder.build(self.tree_, X, y, sample_weight, None)
 
     def _more_tags(self):
         # XXX: nans should be supportable in SPORF by just using RF-like splits on missing values

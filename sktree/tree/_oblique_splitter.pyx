@@ -44,6 +44,7 @@ cdef class BaseObliqueSplitter(Splitter):
         SIZE_t min_samples_leaf,
         double min_weight_leaf,
         object random_state,
+        const cnp.int8_t[:] monotonic_cst,
         *argv
     ):
         """
@@ -169,7 +170,9 @@ cdef class BaseObliqueSplitter(Splitter):
         self,
         double impurity,
         SplitRecord* split,
-        SIZE_t* n_constant_features
+        SIZE_t* n_constant_features,
+        double lower_bound,
+        double upper_bound,
     ) except -1 nogil:
         """Find the best_split split on node samples[start:end]
 
@@ -318,6 +321,7 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         SIZE_t min_samples_leaf,
         double min_weight_leaf,
         object random_state,
+        const cnp.int8_t[:] monotonic_cst,
         double feature_combinations,
         *argv
     ):
@@ -365,9 +369,9 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         object X,
         const DOUBLE_t[:, ::1] y,
         const DOUBLE_t[:] sample_weight,
-        const unsigned char[::1] feature_has_missing,
+        const unsigned char[::1] missing_values_in_feature_mask,
     ) except -1:
-        Splitter.init(self, X, y, sample_weight, feature_has_missing)
+        Splitter.init(self, X, y, sample_weight, missing_values_in_feature_mask)
 
         self.X = X
 
@@ -442,21 +446,24 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
 cdef class BestObliqueSplitter(ObliqueSplitter):
     def __reduce__(self):
         """Enable pickling the splitter."""
-        return (BestObliqueSplitter,
+        return (type(self),
                 (
                     self.criterion,
                     self.max_features,
                     self.min_samples_leaf,
                     self.min_weight_leaf,
+                    self.random_state,
+                    self.monotonic_cst.base if self.monotonic_cst is not None else None,
                     self.feature_combinations,
-                    self.random_state
                 ), self.__getstate__())
 
     cdef int node_split(
         self,
         double impurity,
         SplitRecord* split,
-        SIZE_t* n_constant_features
+        SIZE_t* n_constant_features,
+        double lower_bound,
+        double upper_bound,
     ) except -1 nogil:
         """Find the best_split split on node samples[start:end]
 
