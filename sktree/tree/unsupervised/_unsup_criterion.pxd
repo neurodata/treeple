@@ -56,10 +56,10 @@ cdef class UnsupervisedCriterion(BaseCriterion):
     cdef void init_feature_vec(
         self,
         const DTYPE_t[:] Xf,
-    ) nogil
+    ) noexcept nogil
 
     cdef void set_sample_pointers(
         self,
         SIZE_t start,
         SIZE_t end
-    ) nogil
+    ) noexcept nogil

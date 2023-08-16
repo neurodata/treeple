@@ -32,7 +32,7 @@ jobs:
       matrix:
         os: [ubuntu-22.04, macos-latest]
         python-version: [3.9, "3.10", "3.11"]
-        poetry-version: [1.3.0]
+        poetry-version: [1.5.0]
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -84,7 +84,7 @@ jobs:
 
       - name: Setup compiler cache
         uses: actions/cache@v3
-        id: cache-ccache
+        id: cache-ccachev1
         # Reference: https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows#matching-a-cache-key
         # NOTE: The caching strategy is modeled in a way that it will always have a unique cache key for each workflow run
         # (even if the same workflow is run multiple times). The restore keys are not unique and for a partial match, they will
