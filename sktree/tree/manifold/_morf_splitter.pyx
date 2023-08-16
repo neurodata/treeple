@@ -113,10 +113,6 @@ cdef class BaseDensePatchSplitter(PatchSplitter):
         PatchSplitter.init(self, X, y, sample_weight, missing_values_in_feature_mask)
 
         self.X = X
-
-        # create a buffer for storing the patch dimensions sampled per projection matrix
-        self.patch_dims_buff = np.zeros(self.data_dims.shape[0], dtype=np.intp)
-        self.unraveled_patch_point = np.zeros(self.data_dims.shape[0], dtype=np.intp)
         return 0
 
 

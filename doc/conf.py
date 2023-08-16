@@ -227,7 +227,7 @@ numpydoc_xref_ignore = {
     "n_neighbors",
     "one",
     "joblib.parallel_backend",
-    "length"
+    "length",
 }
 
 # validation
