@@ -141,14 +141,6 @@ digits.data = digits.data[perm]
 digits.target = digits.target[perm]
 
 
-ALL_TREES = [
-    ObliqueDecisionTreeClassifier,
-    PatchObliqueDecisionTreeClassifier,
-    UnsupervisedDecisionTree,
-    UnsupervisedObliqueDecisionTree,
-]
-
-
 def assert_tree_equal(d, s, message):
     assert s.node_count == d.node_count, "{0}: inequal number of node ({1} != {2})".format(
         message, s.node_count, d.node_count
@@ -232,9 +224,9 @@ def test_pickle_splitters():
 )
 def test_sklearn_compatible_estimator(estimator, check):
     # TODO: remove when we can replicate the CI error...
-    if isinstance(estimator, PatchObliqueDecisionTreeClassifier) and check.func.__name__ in [
-        "check_fit_score_takes_y"
-    ]:
+    if isinstance(
+        estimator, [PatchObliqueDecisionTreeClassifier, ExtraObliqueDecisionTreeClassifier]
+    ) and check.func.__name__ in ["check_fit_score_takes_y"]:
         pytest.skip()
     check(estimator)
 
