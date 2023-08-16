@@ -1630,7 +1630,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
                 )
 
         if self.data_dims is None:
-            self.data_dims_ = np.array((1, X.shape[1]), dtype=np.intp)
+            self.data_dims_ = np.array((1, X.shape[1]), dtype=np.int8)
         else:
             if np.prod(self.data_dims) != X.shape[1]:
                 raise RuntimeError(f"Data dimensions {self.data_dims} do not match {X.shape[1]}.")
