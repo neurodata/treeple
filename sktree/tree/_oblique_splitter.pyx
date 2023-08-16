@@ -156,6 +156,8 @@ cdef class BaseObliqueSplitter(Splitter):
         """
         cdef SIZE_t idx, jdx
 
+        # XXX: this should be able to be improved, if we can flip the order of the for-loops
+        # XXX: we can add a hashmap here to keep track of the min/max of each feature
         # Compute linear combination of features and then
         # sort samples according to the feature values.
         for idx in range(start, end):
