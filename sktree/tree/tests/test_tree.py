@@ -185,7 +185,7 @@ def test_pickle_splitters():
 )
 def test_sklearn_compatible_estimator(estimator, check):
     # TODO: remove when we can replicate the CI error...
-    if estimator.__name__ == "PatchObliqueDecisionTreeClassifier" and check.func.__name__ in [
+    if isinstance(estimator, PatchObliqueDecisionTreeClassifier) and check.func.__name__ in [
         "check_fit_score_takes_y"
     ]:
         pytest.skip()
