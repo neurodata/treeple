@@ -154,6 +154,7 @@ def assert_tree_equal(d, s, message):
         message, s.node_count, d.node_count
     )
 
+
 def test_pickle_splitters():
     """Test that splitters are picklable."""
     import tempfile
