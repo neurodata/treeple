@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 
 
@@ -7,7 +6,7 @@
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>scikit-tree &#8212; scikit-tree 0.2.0dev0 documentation</title>
   
@@ -29,27 +28,24 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
-    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css" />
-    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css" />
-    <link rel="stylesheet" type="text/css" href="_static/style.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=e5fbc548" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="_static/style.css?v=a6733705" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/sphinx_highlight.js"></script>
-    <script src="_static/clipboard.min.js"></script>
-    <script src="_static/copybutton.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=141ad0fc"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -389,16 +385,52 @@ document.write(`
 <p>Scikit-tree is a package for modern tree-based algorithms for supervised and unsupervised
 learning problems. It extends the robust API of <a class="reference external" href="https://github.com/scikit-learn/scikit-learn">scikit-learn</a>
 for tree algorithms that achieve strong performance in benchmark tasks.</p>
+<p>Our package has implemented unsupervised forests (Geodesic Forests
+<a class="reference internal" href="#madhyastha2020" id="id1"><span>[Madhyastha2020]</span></a>), oblique random forests (SPORF <a class="reference internal" href="#tomita2020" id="id2"><span>[Tomita2020]</span></a> and
+MORF <a class="reference internal" href="#li2023" id="id3"><span>[Li2023]</span></a>), and honest forests <a class="reference internal" href="#perry2021" id="id4"><span>[Perry2021]</span></a>.
+In the near future, we also plan to include extended isolation forests
+and stream decision forests <a class="reference internal" href="#xu2022" id="id5"><span>[Xu2022]</span></a>.</p>
 <p>We encourage you to use the package for your research and also build on top
 with relevant Pull Requests. See our examples for walk-throughs of how to use the package.
 Also, see our <a class="reference external" href="https://github.com/neurodata/scikit-tree/blob/main/CONTRIBUTING.md">contributing guide</a>.</p>
 <p>We are licensed under BSD-3 (see <a class="reference external" href="https://github.com/neurodata/scikit-tree/blob/main/LICENSE">License</a>).</p>
+<aside class="topic">
+<p class="topic-title">References</p>
+<div role="list" class="citation-list">
+<div class="citation" id="madhyastha2020" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">Madhyastha2020</a><span class="fn-bracket">]</span></span>
+<p>Madhyastha, Meghana, et al. <a class="reference external" href="https://doi.org/10.1145/3394486.3403094">“Geodesic Forests”</a>, KDD 2020, 513-523, 2020.</p>
+</div>
+<div class="citation" id="tomita2020" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">Tomita2020</a><span class="fn-bracket">]</span></span>
+<p>Tomita, Tyler M., et al. “Sparse Projection Oblique
+Randomer Forests”, The Journal of Machine Learning Research, 21(104),
+1-39, 2020.</p>
+</div>
+<div class="citation" id="li2023" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">Li2023</a><span class="fn-bracket">]</span></span>
+<p>Li, Adam, et al. <a class="reference external" href="https://doi.org/10.1137/21M1449117">“Manifold Oblique Random Forests: Towards
+Closing the Gap on Convolutional Deep Networks”</a>,
+SIAM Journal on Mathematics of Data Science, 5(1), 77-96, 2023.</p>
+</div>
+<div class="citation" id="perry2021" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">Perry2021</a><span class="fn-bracket">]</span></span>
+<p>Perry, Ronan, et al. <a class="reference external" href="https://arxiv.org/abs/1907.00325">“Random Forests for Adaptive
+Nearest Neighbor Estimation of Information-Theoretic Quantities”</a>, arXiv preprint arXiv:1907.00325, 2021.</p>
+</div>
+<div class="citation" id="xu2022" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">Xu2022</a><span class="fn-bracket">]</span></span>
+<p>Xu, Haoyin, et al. <a class="reference external" href="https://arxiv.org/abs/2110.08483">“Simplest Streaming Trees”</a>, arXiv preprint arXiv:2110.08483, 2022.</p>
+</div>
+</div>
+</aside>
 <section id="contents">
 <h2>Contents<a class="headerlink" href="#contents" title="Permalink to this heading">#</a></h2>
 <div class="toctree-wrapper compound">
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#scikit-learn-tree-estimators">Scikit-learn Tree Estimators</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#supervised">Supervised</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#unsupervised">Unsupervised</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#distance-metrics">Distance Metrics</a></li>
@@ -507,7 +539,7 @@ Also, see our <a class="reference external" href="https://github.com/neurodata/s
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-07-06.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-16.
       <br/>
     
   </p>

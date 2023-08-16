@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 
 
@@ -28,27 +27,24 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/style.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=e5fbc548" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/style.css?v=a6733705" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/sphinx_highlight.js"></script>
-    <script src="../../../_static/clipboard.min.js"></script>
-    <script src="../../../_static/copybutton.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=141ad0fc"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sktree/tree/_classes';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -598,7 +594,7 @@ document.write(`
                 <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">intc</span> <span class="ow">or</span> <span class="n">X</span><span class="o">.</span><span class="n">indptr</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">intc</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No support for np.int64 index based sparse matrices&quot;</span><span class="p">)</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">,</span> <span class="n">check_input</span><span class="o">=</span><span class="n">check_input</span><span class="p">)</span>
+        <span class="bp">self</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">,</span> <span class="n">check_input</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="c1"># apply to the leaves</span>
         <span class="n">n_samples</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -616,7 +612,7 @@ document.write(`
         <span class="n">X</span><span class="p">,</span>
         <span class="n">y</span><span class="p">,</span>
         <span class="n">sample_weight</span><span class="p">,</span>
-        <span class="n">feature_has_missing</span><span class="p">,</span>
+        <span class="n">missing_values_in_feature_mask</span><span class="p">,</span>
         <span class="n">min_samples_leaf</span><span class="p">,</span>
         <span class="n">min_weight_leaf</span><span class="p">,</span>
         <span class="n">max_leaf_nodes</span><span class="p">,</span>
@@ -635,11 +631,7 @@ document.write(`
         <span class="n">splitter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splitter</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splitter</span><span class="p">,</span> <span class="n">UnsupervisedSplitter</span><span class="p">):</span>
             <span class="n">splitter</span> <span class="o">=</span> <span class="n">UNSUPERVISED_SPLITTERS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">splitter</span><span class="p">](</span>
-                <span class="n">criterion</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">max_features_</span><span class="p">,</span>
-                <span class="n">min_samples_leaf</span><span class="p">,</span>
-                <span class="n">min_weight_leaf</span><span class="p">,</span>
-                <span class="n">random_state</span><span class="p">,</span>
+                <span class="n">criterion</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_features_</span><span class="p">,</span> <span class="n">min_samples_leaf</span><span class="p">,</span> <span class="n">min_weight_leaf</span><span class="p">,</span> <span class="n">random_state</span>
             <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span> <span class="o">=</span> <span class="n">UnsupervisedTree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span><span class="p">)</span>
@@ -885,7 +877,7 @@ document.write(`
         <span class="n">X</span><span class="p">,</span>
         <span class="n">y</span><span class="p">,</span>
         <span class="n">sample_weight</span><span class="p">,</span>
-        <span class="n">feature_has_missing</span><span class="p">,</span>
+        <span class="n">missing_values_in_feature_mask</span><span class="p">,</span>
         <span class="n">min_samples_leaf</span><span class="p">,</span>
         <span class="n">min_weight_leaf</span><span class="p">,</span>
         <span class="n">max_leaf_nodes</span><span class="p">,</span>
@@ -894,7 +886,6 @@ document.write(`
         <span class="n">random_state</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="c1"># TODO: add feature_combinations fix that was used in obliquedecisiontreeclassifier</span>
-
         <span class="n">criterion</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">criterion</span><span class="p">,</span> <span class="n">UnsupervisedCriterion</span><span class="p">):</span>
             <span class="n">criterion</span> <span class="o">=</span> <span class="n">UNSUPERVISED_CRITERIA</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">]()</span>
@@ -1213,7 +1204,7 @@ document.write(`
         <span class="n">X</span><span class="p">,</span>
         <span class="n">y</span><span class="p">,</span>
         <span class="n">sample_weight</span><span class="p">,</span>
-        <span class="n">feature_has_missing</span><span class="p">,</span>
+        <span class="n">missing_values_in_feature_mask</span><span class="p">,</span>
         <span class="n">min_samples_leaf</span><span class="p">,</span>
         <span class="n">min_weight_leaf</span><span class="p">,</span>
         <span class="n">max_leaf_nodes</span><span class="p">,</span>
@@ -1260,6 +1251,7 @@ document.write(`
 <span class="sd">        random_state : int, RandomState instance or None, default=None</span>
 <span class="sd">            Controls the randomness of the estimator.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">monotonic_cst</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">n_features</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_combinations</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1297,6 +1289,7 @@ document.write(`
                 <span class="n">min_samples_leaf</span><span class="p">,</span>
                 <span class="n">min_weight_leaf</span><span class="p">,</span>
                 <span class="n">random_state</span><span class="p">,</span>
+                <span class="n">monotonic_cst</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">feature_combinations_</span><span class="p">,</span>
             <span class="p">)</span>
 
@@ -1304,7 +1297,7 @@ document.write(`
 
         <span class="c1"># Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise</span>
         <span class="k">if</span> <span class="n">max_leaf_nodes</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">builder</span> <span class="o">=</span> <span class="n">DepthFirstTreeBuilder</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">builder_</span> <span class="o">=</span> <span class="n">DepthFirstTreeBuilder</span><span class="p">(</span>
                 <span class="n">splitter</span><span class="p">,</span>
                 <span class="n">min_samples_split</span><span class="p">,</span>
                 <span class="n">min_samples_leaf</span><span class="p">,</span>
@@ -1313,7 +1306,7 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">builder</span> <span class="o">=</span> <span class="n">BestFirstTreeBuilder</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">builder_</span> <span class="o">=</span> <span class="n">BestFirstTreeBuilder</span><span class="p">(</span>
                 <span class="n">splitter</span><span class="p">,</span>
                 <span class="n">min_samples_split</span><span class="p">,</span>
                 <span class="n">min_samples_leaf</span><span class="p">,</span>
@@ -1323,7 +1316,7 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">builder_</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -1571,7 +1564,7 @@ document.write(`
         <span class="n">X</span><span class="p">,</span>
         <span class="n">y</span><span class="p">,</span>
         <span class="n">sample_weight</span><span class="p">,</span>
-        <span class="n">feature_has_missing</span><span class="p">,</span>
+        <span class="n">missing_values_in_feature_mask</span><span class="p">,</span>
         <span class="n">min_samples_leaf</span><span class="p">,</span>
         <span class="n">min_weight_leaf</span><span class="p">,</span>
         <span class="n">max_leaf_nodes</span><span class="p">,</span>
@@ -1617,6 +1610,7 @@ document.write(`
 <span class="sd">        random_state : int, RandomState instance or None, default=None</span>
 <span class="sd">            Controls the randomness of the estimator.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">monotonic_cst</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">n_samples</span><span class="p">,</span> <span class="n">n_features</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_combinations</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1654,6 +1648,7 @@ document.write(`
                 <span class="n">min_samples_leaf</span><span class="p">,</span>
                 <span class="n">min_weight_leaf</span><span class="p">,</span>
                 <span class="n">random_state</span><span class="p">,</span>
+                <span class="n">monotonic_cst</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">feature_combinations_</span><span class="p">,</span>
             <span class="p">)</span>
 
@@ -1684,14 +1679,14 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">)</span></div>
+        <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="PatchObliqueDecisionTreeClassifier"><a class="viewcode-back" href="../../../generated/sktree.tree.PatchObliqueDecisionTreeClassifier.html#sktree.tree.PatchObliqueDecisionTreeClassifier">[docs]</a><span class="k">class</span> <span class="nc">PatchObliqueDecisionTreeClassifier</span><span class="p">(</span><span class="n">SimMatrixMixin</span><span class="p">,</span> <span class="n">DecisionTreeClassifier</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A oblique decision tree classifier that operates over patches of data.</span>
 
 <span class="sd">    A patch oblique decision tree is also known as a manifold oblique decision tree</span>
-<span class="sd">    (called MORF in :footcite:`Li2019manifold`), where the splitter is aware of</span>
+<span class="sd">    (called MORF in :footcite:`Li2023manifold`), where the splitter is aware of</span>
 <span class="sd">    the structure in the data. For example, in an image, a patch would be contiguous</span>
 <span class="sd">    along the rows and columns of the image. In a multivariate time-series, a patch</span>
 <span class="sd">    would be contiguous over time, but possibly discontiguous over the sensors.</span>
@@ -1958,110 +1953,12 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">boundary</span> <span class="o">=</span> <span class="n">boundary</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span> <span class="o">=</span> <span class="n">feature_weight</span>
 
-<div class="viewcode-block" id="PatchObliqueDecisionTreeClassifier.fit"><a class="viewcode-back" href="../../../generated/sktree.tree.PatchObliqueDecisionTreeClassifier.html#sktree.tree.PatchObliqueDecisionTreeClassifier.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">check_input</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Fit tree.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        X : {array-like, sparse matrix} of shape (n_samples, n_features)</span>
-<span class="sd">            The training input samples. Internally, it will be converted to</span>
-<span class="sd">            ``dtype=np.float32`` and if a sparse matrix is provided</span>
-<span class="sd">            to a sparse ``csc_matrix``.</span>
-
-<span class="sd">        y : array-like of shape (n_samples,) or (n_samples, n_outputs)</span>
-<span class="sd">            The target values (class labels) as integers or strings.</span>
-
-<span class="sd">        sample_weight : array-like of shape (n_samples,), default=None</span>
-<span class="sd">            Sample weights. If None, then samples are equally weighted. Splits</span>
-<span class="sd">            that would create child nodes with net zero or negative weight are</span>
-<span class="sd">            ignored while searching for a split in each node. Splits are also</span>
-<span class="sd">            ignored if they would result in any single class carrying a</span>
-<span class="sd">            negative weight in either child node.</span>
-
-<span class="sd">        check_input : bool, optional</span>
-<span class="sd">            Whether or not to check input, by default True.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">check_input</span><span class="p">:</span>
-            <span class="c1"># Need to validate separately here.</span>
-            <span class="c1"># We can&#39;t pass multi_output=True because that would allow y to be</span>
-            <span class="c1"># csr.</span>
-            <span class="n">check_X_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">,</span> <span class="n">accept_sparse</span><span class="o">=</span><span class="s2">&quot;csc&quot;</span><span class="p">)</span>
-            <span class="n">check_y_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">ensure_2d</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-            <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_data</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">validate_separately</span><span class="o">=</span><span class="p">(</span><span class="n">check_X_params</span><span class="p">,</span> <span class="n">check_y_params</span><span class="p">))</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_data</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span><span class="p">,</span> <span class="n">ensure_2d</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span>
-                <span class="p">)</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;feature_weight has shape </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> but X has &quot;</span>
-                        <span class="sa">f</span><span class="s2">&quot;shape </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
-                    <span class="p">)</span>
-            <span class="k">if</span> <span class="n">issparse</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
-                <span class="n">X</span><span class="o">.</span><span class="n">sort_indices</span><span class="p">()</span>
-
-                <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">intc</span> <span class="ow">or</span> <span class="n">X</span><span class="o">.</span><span class="n">indptr</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">intc</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No support for np.int64 index based sparse matrices&quot;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dims</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dims</span><span class="p">)</span> <span class="o">!=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Data dimensions </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dims</span><span class="si">}</span><span class="s2"> do not match </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dims</span><span class="p">)</span>
-        <span class="n">ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span><span class="p">)</span>
-
-        <span class="c1"># validate contiguous parameter</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_contiguous</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">dim_contiguous_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">ndim</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim_contiguous</span><span class="p">)</span> <span class="o">!=</span> <span class="n">ndim</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Contiguous dimensions should equal </span><span class="si">{</span><span class="n">ndim</span><span class="si">}</span><span class="s2"> dimensions.&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">dim_contiguous_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim_contiguous</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span>
-
-        <span class="c1"># validate data height/width</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">ndim</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">ndim</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span><span class="p">)</span> <span class="o">!=</span> <span class="n">ndim</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Minimum patch dimensions should equal </span><span class="si">{</span><span class="n">ndim</span><span class="si">}</span><span class="s2"> dimensions.&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">)</span> <span class="o">!=</span> <span class="n">ndim</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Maximum patch dimensions should equal </span><span class="si">{</span><span class="n">ndim</span><span class="si">}</span><span class="s2"> dimensions.&quot;</span><span class="p">)</span>
-
-        <span class="c1"># validate patch parameters</span>
-        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndim</span><span class="p">):</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;The minimum patch width </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="s2"> is &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;greater than the maximum patch width </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;The minimum patch width </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="s2"> is &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;greater than the data width </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;The maximum patch width </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="s2"> is &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;greater than the data width </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="p">)</span>
-
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">,</span> <span class="n">check_input</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
-
     <span class="k">def</span> <span class="nf">_build_tree</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">X</span><span class="p">,</span>
         <span class="n">y</span><span class="p">,</span>
         <span class="n">sample_weight</span><span class="p">,</span>
-        <span class="n">feature_has_missing</span><span class="p">,</span>
+        <span class="n">missing_values_in_feature_mask</span><span class="p">,</span>
         <span class="n">min_samples_leaf</span><span class="p">,</span>
         <span class="n">min_weight_leaf</span><span class="p">,</span>
         <span class="n">max_leaf_nodes</span><span class="p">,</span>
@@ -2108,6 +2005,69 @@ document.write(`
 <span class="sd">        random_state : int, RandomState instance or None, default=None</span>
 <span class="sd">            Controls the randomness of the estimator.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_data</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span><span class="p">,</span> <span class="n">ensure_2d</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;feature_weight has shape </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> but X has &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;shape </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dims</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dims</span><span class="p">)</span> <span class="o">!=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Data dimensions </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dims</span><span class="si">}</span><span class="s2"> do not match </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dims</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">)</span>
+        <span class="n">ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span><span class="p">)</span>
+
+        <span class="c1"># validate contiguous parameter</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_contiguous</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dim_contiguous_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">ndim</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim_contiguous</span><span class="p">)</span> <span class="o">!=</span> <span class="n">ndim</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Contiguous dimensions should equal </span><span class="si">{</span><span class="n">ndim</span><span class="si">}</span><span class="s2"> dimensions.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dim_contiguous_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim_contiguous</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span>
+
+        <span class="c1"># validate data height/width</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">ndim</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">ndim</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span><span class="p">)</span> <span class="o">!=</span> <span class="n">ndim</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Minimum patch dimensions should equal </span><span class="si">{</span><span class="n">ndim</span><span class="si">}</span><span class="s2"> dimensions.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">)</span> <span class="o">!=</span> <span class="n">ndim</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Maximum patch dimensions should equal </span><span class="si">{</span><span class="n">ndim</span><span class="si">}</span><span class="s2"> dimensions.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># validate patch parameters</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndim</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;The minimum patch width </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="s2"> is &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;greater than the maximum patch width </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;The minimum patch width </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="s2"> is &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;greater than the data width </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;The maximum patch width </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="s2"> is &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;greater than the data width </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+        <span class="n">monotonic_cst</span> <span class="o">=</span> <span class="kc">None</span>
+
         <span class="c1"># Build tree</span>
         <span class="n">criterion</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">criterion</span><span class="p">,</span> <span class="n">BaseCriterion</span><span class="p">):</span>
@@ -2133,6 +2093,7 @@ document.write(`
                 <span class="n">min_samples_leaf</span><span class="p">,</span>
                 <span class="n">min_weight_leaf</span><span class="p">,</span>
                 <span class="n">random_state</span><span class="p">,</span>
+                <span class="n">monotonic_cst</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">dim_contiguous_</span><span class="p">,</span>
@@ -2145,7 +2106,7 @@ document.write(`
 
         <span class="c1"># Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise</span>
         <span class="k">if</span> <span class="n">max_leaf_nodes</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">builder</span> <span class="o">=</span> <span class="n">DepthFirstTreeBuilder</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">builder_</span> <span class="o">=</span> <span class="n">DepthFirstTreeBuilder</span><span class="p">(</span>
                 <span class="n">splitter</span><span class="p">,</span>
                 <span class="n">min_samples_split</span><span class="p">,</span>
                 <span class="n">min_samples_leaf</span><span class="p">,</span>
@@ -2154,7 +2115,7 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">builder</span> <span class="o">=</span> <span class="n">BestFirstTreeBuilder</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">builder_</span> <span class="o">=</span> <span class="n">BestFirstTreeBuilder</span><span class="p">(</span>
                 <span class="n">splitter</span><span class="p">,</span>
                 <span class="n">min_samples_split</span><span class="p">,</span>
                 <span class="n">min_samples_leaf</span><span class="p">,</span>
@@ -2164,7 +2125,7 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">builder_</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -2181,7 +2142,7 @@ document.write(`
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A oblique decision tree regressor that operates over patches of data.</span>
 
 <span class="sd">    A patch oblique decision tree is also known as a manifold oblique decision tree</span>
-<span class="sd">    (called MORF in :footcite:`Li2019manifold`), where the splitter is aware of</span>
+<span class="sd">    (called MORF in :footcite:`Li2023manifold`), where the splitter is aware of</span>
 <span class="sd">    the structure in the data. For example, in an image, a patch would be contiguous</span>
 <span class="sd">    along the rows and columns of the image. In a multivariate time-series, a patch</span>
 <span class="sd">    would be contiguous over time, but possibly discontiguous over the sensors.</span>
@@ -2435,109 +2396,12 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">boundary</span> <span class="o">=</span> <span class="n">boundary</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span> <span class="o">=</span> <span class="n">feature_weight</span>
 
-<div class="viewcode-block" id="PatchObliqueDecisionTreeRegressor.fit"><a class="viewcode-back" href="../../../generated/sktree.tree.PatchObliqueDecisionTreeRegressor.html#sktree.tree.PatchObliqueDecisionTreeRegressor.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">check_input</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Fit tree.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        X : {array-like, sparse matrix} of shape (n_samples, n_features)</span>
-<span class="sd">            The training input samples. Internally, it will be converted to</span>
-<span class="sd">            ``dtype=np.float32`` and if a sparse matrix is provided</span>
-<span class="sd">            to a sparse ``csc_matrix``.</span>
-
-<span class="sd">        y : array-like of shape (n_samples,) or (n_samples, n_outputs)</span>
-<span class="sd">            The target values (real numbers). Use ``dtype=np.float64`` and</span>
-<span class="sd">            ``order=&#39;C&#39;`` for maximum efficiency.</span>
-
-<span class="sd">        sample_weight : array-like of shape (n_samples,), default=None</span>
-<span class="sd">            Sample weights. If None, then samples are equally weighted. Splits</span>
-<span class="sd">            that would create child nodes with net zero or negative weight are</span>
-<span class="sd">            ignored while searching for a split in each node.</span>
-
-<span class="sd">        check_input : bool, optional</span>
-<span class="sd">            Whether or not to check input, by default True.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">check_input</span><span class="p">:</span>
-            <span class="c1"># Need to validate separately here.</span>
-            <span class="c1"># We can&#39;t pass multi_output=True because that would allow y to be</span>
-            <span class="c1"># csr.</span>
-            <span class="n">check_X_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">,</span> <span class="n">accept_sparse</span><span class="o">=</span><span class="s2">&quot;csc&quot;</span><span class="p">)</span>
-            <span class="n">check_y_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">ensure_2d</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-            <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_data</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">validate_separately</span><span class="o">=</span><span class="p">(</span><span class="n">check_X_params</span><span class="p">,</span> <span class="n">check_y_params</span><span class="p">))</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_data</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span><span class="p">,</span> <span class="n">ensure_2d</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span>
-                <span class="p">)</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;feature_weight has shape </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> but X has &quot;</span>
-                        <span class="sa">f</span><span class="s2">&quot;shape </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
-                    <span class="p">)</span>
-            <span class="k">if</span> <span class="n">issparse</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
-                <span class="n">X</span><span class="o">.</span><span class="n">sort_indices</span><span class="p">()</span>
-
-                <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">intc</span> <span class="ow">or</span> <span class="n">X</span><span class="o">.</span><span class="n">indptr</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">intc</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No support for np.int64 index based sparse matrices&quot;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dims</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dims</span><span class="p">)</span> <span class="o">!=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Data dimensions </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dims</span><span class="si">}</span><span class="s2"> do not match </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dims</span><span class="p">)</span>
-        <span class="n">ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span><span class="p">)</span>
-
-        <span class="c1"># validate contiguous parameter</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_contiguous</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">dim_contiguous_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">ndim</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim_contiguous</span><span class="p">)</span> <span class="o">!=</span> <span class="n">ndim</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Contiguous dimensions should equal </span><span class="si">{</span><span class="n">ndim</span><span class="si">}</span><span class="s2"> dimensions.&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">dim_contiguous_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim_contiguous</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span>
-
-        <span class="c1"># validate data height/width</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">ndim</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">ndim</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span><span class="p">)</span> <span class="o">!=</span> <span class="n">ndim</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Minimum patch dimensions should equal </span><span class="si">{</span><span class="n">ndim</span><span class="si">}</span><span class="s2"> dimensions.&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">)</span> <span class="o">!=</span> <span class="n">ndim</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Maximum patch dimensions should equal </span><span class="si">{</span><span class="n">ndim</span><span class="si">}</span><span class="s2"> dimensions.&quot;</span><span class="p">)</span>
-
-        <span class="c1"># validate patch parameters</span>
-        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndim</span><span class="p">):</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;The minimum patch width </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="s2"> is &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;greater than the maximum patch width </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;The minimum patch width </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="s2"> is &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;greater than the data width </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;The maximum patch width </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="s2"> is &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;greater than the data width </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="p">)</span>
-
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">,</span> <span class="n">check_input</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
-
     <span class="k">def</span> <span class="nf">_build_tree</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">X</span><span class="p">,</span>
         <span class="n">y</span><span class="p">,</span>
         <span class="n">sample_weight</span><span class="p">,</span>
-        <span class="n">feature_has_missing</span><span class="p">,</span>
+        <span class="n">missing_values_in_feature_mask</span><span class="p">,</span>
         <span class="n">min_samples_leaf</span><span class="p">,</span>
         <span class="n">min_weight_leaf</span><span class="p">,</span>
         <span class="n">max_leaf_nodes</span><span class="p">,</span>
@@ -2583,7 +2447,68 @@ document.write(`
 <span class="sd">        random_state : int, RandomState instance or None, default=None</span>
 <span class="sd">            Controls the randomness of the estimator.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_data</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span><span class="p">,</span> <span class="n">ensure_2d</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;feature_weight has shape </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> but X has &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;shape </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dims</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dims</span><span class="p">)</span> <span class="o">!=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Data dimensions </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dims</span><span class="si">}</span><span class="s2"> do not match </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dims</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">)</span>
+        <span class="n">ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span><span class="p">)</span>
+
+        <span class="c1"># validate contiguous parameter</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_contiguous</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dim_contiguous_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">ndim</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim_contiguous</span><span class="p">)</span> <span class="o">!=</span> <span class="n">ndim</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Contiguous dimensions should equal </span><span class="si">{</span><span class="n">ndim</span><span class="si">}</span><span class="s2"> dimensions.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dim_contiguous_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim_contiguous</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span>
+
+        <span class="c1"># validate data height/width</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">ndim</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">ndim</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span><span class="p">)</span> <span class="o">!=</span> <span class="n">ndim</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Minimum patch dimensions should equal </span><span class="si">{</span><span class="n">ndim</span><span class="si">}</span><span class="s2"> dimensions.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">)</span> <span class="o">!=</span> <span class="n">ndim</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Maximum patch dimensions should equal </span><span class="si">{</span><span class="n">ndim</span><span class="si">}</span><span class="s2"> dimensions.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># validate patch parameters</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndim</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;The minimum patch width </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="s2"> is &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;greater than the maximum patch width </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;The minimum patch width </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="s2"> is &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;greater than the data width </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;The maximum patch width </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="s2"> is &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;greater than the data width </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dims_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+        <span class="n">monotonic_cst</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">n_samples</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="c1"># Build tree</span>
@@ -2611,6 +2536,7 @@ document.write(`
                 <span class="n">min_samples_leaf</span><span class="p">,</span>
                 <span class="n">min_weight_leaf</span><span class="p">,</span>
                 <span class="n">random_state</span><span class="p">,</span>
+                <span class="n">monotonic_cst</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">dim_contiguous_</span><span class="p">,</span>
@@ -2646,7 +2572,7 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">)</span>
+        <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_more_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># XXX: nans should be supportable in SPORF by just using RF-like splits on missing values</span>
@@ -2697,7 +2623,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-07-06.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-16.
       <br/>
     
   </p>

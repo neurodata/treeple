@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 
 
@@ -7,7 +6,7 @@
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>sktree.PatchObliqueRandomForestRegressor &#8212; scikit-tree 0.2.0dev0 documentation</title>
   
@@ -29,27 +28,24 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/style.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=e5fbc548" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.css?v=a6733705" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=141ad0fc"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=fd10adb8"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'generated/sktree.PatchObliqueRandomForestRegressor';</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -347,7 +343,13 @@ document.write(`
         <div class="sidebar-primary-item"><nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="sktree.RandomForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.RandomForestClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.RandomForestRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.RandomForestRegressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.ExtraTreesClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ExtraTreesClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.ExtraTreesRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ExtraTreesRegressor</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="sktree.ObliqueRandomForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ObliqueRandomForestClassifier</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sktree.ObliqueRandomForestRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ObliqueRandomForestRegressor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sktree.PatchObliqueRandomForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.PatchObliqueRandomForestClassifier</a></li>
@@ -454,7 +456,7 @@ document.write(`
 forest that fits a number of patch oblique decision tree regressors
 on various sub-samples of the dataset and uses averaging to
 improve the predictive accuracy and control over-fitting. For more
-details, see <a class="footnote-reference brackets" href="#footcite-li2019manifold" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
+details, see <a class="footnote-reference brackets" href="#footcite-li2023manifold" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
@@ -607,9 +609,10 @@ search of the best split. To obtain a deterministic behaviour during
 fitting, <code class="docutils literal notranslate"><span class="pre">random_state</span></code> has to be fixed.</p>
 <p class="rubric">References</p>
 <div class="docutils container" id="id2">
-<aside class="footnote brackets" id="footcite-li2019manifold" role="note">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-li2023manifold" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
-<p>Adam Li, Ronan Perry, Chester Huynh, Tyler M Tomita, Ronak Mehta, Jesus Arroyo, Jesse Patsolic, Benjamin Falk, and Joshua T Vogelstein. Manifold oblique random forests: towards closing the gap on convolutional deep networks. <em>arXiv preprint arXiv:1909.11799</em>, 2019.</p>
+<p>Adam Li, Ronan Perry, Chester Huynh, Tyler M. Tomita, Ronak Mehta, Jesus Arroyo, Jesse Patsolic, Ben Falk, Sridevi Sarma, and Joshua Vogelstein. Manifold oblique random forests: towards closing the gap on convolutional deep networks. <em>SIAM Journal on Mathematics of Data Science</em>, 5(1):77–96, 2023. <a class="reference external" href="https://doi.org/10.1137/21M1449117">doi:10.1137/21M1449117</a>.</p>
 </aside>
 </aside>
 </div>
@@ -1188,7 +1191,7 @@ array of zeros.</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-07-06.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-16.
       <br/>
     
   </p>

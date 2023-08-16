@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 
 
@@ -7,7 +6,7 @@
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>sktree.tree.PatchObliqueDecisionTreeRegressor &#8212; scikit-tree 0.2.0dev0 documentation</title>
   
@@ -29,27 +28,24 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/style.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=e5fbc548" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.css?v=a6733705" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=141ad0fc"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=fd10adb8"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'generated/sktree.tree.PatchObliqueDecisionTreeRegressor';</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -348,6 +344,12 @@ document.write(`
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="sktree.RandomForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.RandomForestClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.RandomForestRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.RandomForestRegressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.ExtraTreesClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ExtraTreesClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.ExtraTreesRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ExtraTreesRegressor</a></li>
+</ul>
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="sktree.ObliqueRandomForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ObliqueRandomForestClassifier</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sktree.ObliqueRandomForestRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ObliqueRandomForestRegressor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sktree.PatchObliqueRandomForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.PatchObliqueRandomForestClassifier</a></li>
@@ -451,7 +453,7 @@ document.write(`
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sktree.tree.</span></span><span class="sig-name descname"><span class="pre">PatchObliqueDecisionTreeRegressor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criterion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'squared_error'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splitter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'best'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_samples_split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_samples_leaf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_weight_fraction_leaf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_features</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_leaf_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_impurity_decrease</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_patch_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_patch_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim_contiguous</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sktree/tree/_classes.html#PatchObliqueDecisionTreeRegressor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sktree.tree.PatchObliqueDecisionTreeRegressor" title="Permalink to this definition">#</a></dt>
 <dd><p>A oblique decision tree regressor that operates over patches of data.</p>
 <p>A patch oblique decision tree is also known as a manifold oblique decision tree
-(called MORF in <a class="footnote-reference brackets" href="#footcite-li2019manifold" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>), where the splitter is aware of
+(called MORF in <a class="footnote-reference brackets" href="#footcite-li2023manifold" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>), where the splitter is aware of
 the structure in the data. For example, in an image, a patch would be contiguous
 along the rows and columns of the image. In a multivariate time-series, a patch
 would be contiguous over time, but possibly discontiguous over the sensors.</p>
@@ -582,9 +584,10 @@ recommended to set the range of patch heights and widths based on the structure 
 expected input data.</p>
 <p class="rubric">References</p>
 <div class="docutils container" id="id2">
-<aside class="footnote brackets" id="footcite-li2019manifold" role="note">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-li2023manifold" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
-<p>Adam Li, Ronan Perry, Chester Huynh, Tyler M Tomita, Ronak Mehta, Jesus Arroyo, Jesse Patsolic, Benjamin Falk, and Joshua T Vogelstein. Manifold oblique random forests: towards closing the gap on convolutional deep networks. <em>arXiv preprint arXiv:1909.11799</em>, 2019.</p>
+<p>Adam Li, Ronan Perry, Chester Huynh, Tyler M. Tomita, Ronak Mehta, Jesus Arroyo, Jesse Patsolic, Ben Falk, Sridevi Sarma, and Joshua Vogelstein. Manifold oblique random forests: towards closing the gap on convolutional deep networks. <em>SIAM Journal on Mathematics of Data Science</em>, 5(1):77–96, 2023. <a class="reference external" href="https://doi.org/10.1137/21M1449117">doi:10.1137/21M1449117</a>.</p>
 </aside>
 </aside>
 </div>
@@ -643,8 +646,8 @@ attributes of Tree object.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#sktree.tree.PatchObliqueDecisionTreeRegressor.decision_path" title="sktree.tree.PatchObliqueDecisionTreeRegressor.decision_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decision_path</span></code></a>(X[, check_input])</p></td>
 <td><p>Return the decision path in the tree.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sktree.tree.PatchObliqueDecisionTreeRegressor.fit" title="sktree.tree.PatchObliqueDecisionTreeRegressor.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(X, y[, sample_weight, check_input])</p></td>
-<td><p>Fit tree.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sktree.tree.PatchObliqueDecisionTreeRegressor.fit" title="sktree.tree.PatchObliqueDecisionTreeRegressor.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(X, y[, sample_weight, check_input, classes])</p></td>
+<td><p>Build a decision tree regressor from the training set (X, y).</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#sktree.tree.PatchObliqueDecisionTreeRegressor.get_depth" title="sktree.tree.PatchObliqueDecisionTreeRegressor.get_depth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_depth</span></code></a>()</p></td>
 <td><p>Return the depth of the decision tree.</p></td>
@@ -670,7 +673,7 @@ attributes of Tree object.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#sktree.tree.PatchObliqueDecisionTreeRegressor.score" title="sktree.tree.PatchObliqueDecisionTreeRegressor.score"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score</span></code></a>(X, y[, sample_weight])</p></td>
 <td><p>Return the coefficient of determination of the prediction.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sktree.tree.PatchObliqueDecisionTreeRegressor.set_fit_request" title="sktree.tree.PatchObliqueDecisionTreeRegressor.set_fit_request"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_fit_request</span></code></a>(*[, check_input, sample_weight])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#sktree.tree.PatchObliqueDecisionTreeRegressor.set_fit_request" title="sktree.tree.PatchObliqueDecisionTreeRegressor.set_fit_request"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_fit_request</span></code></a>(*[, check_input, classes, ...])</p></td>
 <td><p>Request metadata passed to the <code class="docutils literal notranslate"><span class="pre">fit</span></code> method.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#sktree.tree.PatchObliqueDecisionTreeRegressor.set_params" title="sktree.tree.PatchObliqueDecisionTreeRegressor.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</p></td>
@@ -805,8 +808,8 @@ indicates that the samples goes through the nodes.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="sktree.tree.PatchObliqueDecisionTreeRegressor.fit">
-<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sktree/tree/_classes.html#PatchObliqueDecisionTreeRegressor.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sktree.tree.PatchObliqueDecisionTreeRegressor.fit" title="Permalink to this definition">#</a></dt>
-<dd><p>Fit tree.</p>
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sktree.tree.PatchObliqueDecisionTreeRegressor.fit" title="Permalink to this definition">#</a></dt>
+<dd><p>Build a decision tree regressor from the training set (X, y).</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
@@ -821,7 +824,16 @@ to a sparse <code class="docutils literal notranslate"><span class="pre">csc_mat
 that would create child nodes with net zero or negative weight are
 ignored while searching for a split in each node.</p>
 </dd>
-<dt><strong>check_input</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>Whether or not to check input, by default True.</p>
+<dt><strong>check_input</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=True</span></dt><dd><p>Allow to bypass several input checking.
+Don’t use this parameter unless you know what you’re doing.</p>
+</dd>
+<dt><strong>classes</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.0.dev0)"><span>array_like</span></a> of shape (n_classes,), default=None</span></dt><dd><p>List of all the classes that can possibly appear in the y vector.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>self</strong><span class="classifier"><a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.tree.DecisionTreeRegressor.html#sklearn.tree.DecisionTreeRegressor" title="(in scikit-learn v1.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DecisionTreeRegressor</span></code></a></span></dt><dd><p>Fitted estimator.</p>
 </dd>
 </dl>
 </dd>
@@ -859,7 +871,7 @@ and any leaf.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>leaf_nodes_samples</strong><span class="classifier">a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.0.dev0)"><span>array_like</span></a></span></dt><dd><p>Each sample is represented by the indices of the training samples that
+<dt><strong>leaf_nodes_samples</strong><span class="classifier">a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.0.dev0)"><span>array_like</span></a> of length (n_samples,)</span></dt><dd><p>Each sample is represented by the indices of the training samples that
 reached the leaf node. The <code class="docutils literal notranslate"><span class="pre">n_leaf_node_samples</span></code> may vary between
 samples, since the number of samples that fall in a leaf node is
 variable. Each array has shape (n_leaf_node_samples, n_outputs).</p>
@@ -1020,7 +1032,7 @@ regressors (except for
 
 <dl class="py method">
 <dt class="sig sig-object py" id="sktree.tree.PatchObliqueDecisionTreeRegressor.set_fit_request">
-<span class="sig-name descname"><span class="pre">set_fit_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'$UNCHANGED$'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'$UNCHANGED$'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sktree.tree.PatchObliqueDecisionTreeRegressor.set_fit_request" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">set_fit_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'$UNCHANGED$'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'$UNCHANGED$'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'$UNCHANGED$'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sktree.tree.PatchObliqueDecisionTreeRegressor.set_fit_request" title="Permalink to this definition">#</a></dt>
 <dd><p>Request metadata passed to the <code class="docutils literal notranslate"><span class="pre">fit</span></code> method.</p>
 <p>Note that this method is only relevant if
 <code class="docutils literal notranslate"><span class="pre">enable_metadata_routing=True</span></code> (see <a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.set_config.html#sklearn.set_config" title="(in scikit-learn v1.4)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.set_config()</span></code></a>).
@@ -1049,6 +1061,8 @@ sub-estimator of a meta-estimator, e.g. used inside a
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
 <dt><strong>check_input</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">True</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">False</span></code></a>, or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a>,                     default=sklearn.utils.metadata_routing.UNCHANGED</span></dt><dd><p>Metadata routing for <code class="docutils literal notranslate"><span class="pre">check_input</span></code> parameter in <code class="docutils literal notranslate"><span class="pre">fit</span></code>.</p>
+</dd>
+<dt><strong>classes</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">True</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">False</span></code></a>, or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a>,                     default=sklearn.utils.metadata_routing.UNCHANGED</span></dt><dd><p>Metadata routing for <code class="docutils literal notranslate"><span class="pre">classes</span></code> parameter in <code class="docutils literal notranslate"><span class="pre">fit</span></code>.</p>
 </dd>
 <dt><strong>sample_weight</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">True</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">False</span></code></a>, or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a>,                     default=sklearn.utils.metadata_routing.UNCHANGED</span></dt><dd><p>Metadata routing for <code class="docutils literal notranslate"><span class="pre">sample_weight</span></code> parameter in <code class="docutils literal notranslate"><span class="pre">fit</span></code>.</p>
 </dd>
@@ -1293,7 +1307,7 @@ high cardinality features (many unique values). See
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-07-06.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-16.
       <br/>
     
   </p>

@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 
 
@@ -7,7 +6,7 @@
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>sktree.HonestForestClassifier &#8212; scikit-tree 0.2.0dev0 documentation</title>
   
@@ -29,27 +28,24 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/style.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=e5fbc548" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.css?v=a6733705" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=141ad0fc"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'generated/sktree.HonestForestClassifier';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -346,7 +342,13 @@ document.write(`
         <div class="sidebar-primary-item"><nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="sktree.RandomForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.RandomForestClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.RandomForestRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.RandomForestRegressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.ExtraTreesClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ExtraTreesClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.ExtraTreesRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ExtraTreesRegressor</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="sktree.ObliqueRandomForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ObliqueRandomForestClassifier</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sktree.ObliqueRandomForestRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ObliqueRandomForestRegressor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sktree.PatchObliqueRandomForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.PatchObliqueRandomForestClassifier</a></li>
@@ -638,7 +640,10 @@ Random Forests”, Annals of Statistics, 2019.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">make_classification</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">n_features</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
 <span class="gp">... </span>                           <span class="n">n_informative</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_redundant</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
 <span class="gp">... </span>                           <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">clf</span> <span class="o">=</span> <span class="n">HonestForestClassifier</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clf</span> <span class="o">=</span> <span class="n">HonestForestClassifier</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>       <span class="n">max_depth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>       <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>       <span class="n">tree_estimator</span><span class="o">=</span><span class="n">ObliqueDecisionTreeClassifier</span><span class="p">())</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 <span class="go">HonestForestClassifier(...)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]))</span>
@@ -668,7 +673,7 @@ has feature names that are all strings.</p>
 </dd>
 <dt><strong>n_outputs_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>The number of outputs when <code class="docutils literal notranslate"><span class="pre">fit</span></code> is performed.</p>
 </dd>
-<dt><a class="reference internal" href="#sktree.HonestForestClassifier.feature_importances_" title="sktree.HonestForestClassifier.feature_importances_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">feature_importances_</span></code></a><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_features,)</span></dt><dd><p>The impurity-based feature importances.</p>
+<dt><a class="reference internal" href="#sktree.HonestForestClassifier.feature_importances_" title="sktree.HonestForestClassifier.feature_importances_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">feature_importances_</span></code></a><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_features,)</span></dt><dd><p>The feature importances.</p>
 </dd>
 <dt><strong>oob_score_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>Score of the training dataset obtained using an out-of-bag estimate.
 This attribute exists only when <code class="docutils literal notranslate"><span class="pre">oob_score</span></code> is True.</p>
@@ -684,9 +689,9 @@ for which it was in the honest subsample. It is possible that a sample
 is never in the honest subset in which case <code class="docutils literal notranslate"><span class="pre">honest_decision_function_</span></code>
 might contain NaN.</p>
 </dd>
-<dt><strong>structure_indices_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of lists, shape=(n_estimators, n_structure)</span></dt><dd><p>Indices of training samples used to learn the structure.</p>
+<dt><a class="reference internal" href="#sktree.HonestForestClassifier.structure_indices_" title="sktree.HonestForestClassifier.structure_indices_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">structure_indices_</span></code></a><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of lists, shape=(n_estimators, n_structure)</span></dt><dd><p>The indices used to learn the structure of the trees.</p>
 </dd>
-<dt><strong>honest_indices_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of lists, shape=(n_estimators, n_honest)</span></dt><dd><p>Indices of training samples used to learn leaf estimates.</p>
+<dt><a class="reference internal" href="#sktree.HonestForestClassifier.honest_indices_" title="sktree.HonestForestClassifier.honest_indices_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">honest_indices_</span></code></a><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of lists, shape=(n_estimators, n_honest)</span></dt><dd><p>The indices used to fit the leaf nodes.</p>
 </dd>
 </dl>
 </dd>
@@ -704,7 +709,7 @@ might contain NaN.</p>
 <td><p>Build a forest of trees from the training set (X, y).</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#sktree.HonestForestClassifier.get_leaf_node_samples" title="sktree.HonestForestClassifier.get_leaf_node_samples"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_leaf_node_samples</span></code></a>(X)</p></td>
-<td><p>For each datapoint x in X, get the training samples in the leaf node.</p></td>
+<td><p>Get samples in each leaf node across the forest.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#sktree.HonestForestClassifier.get_metadata_routing" title="sktree.HonestForestClassifier.get_metadata_routing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metadata_routing</span></code></a>()</p></td>
 <td><p>Get metadata routing of this object.</p></td>
@@ -740,7 +745,7 @@ might contain NaN.</p>
 </table>
 <dl class="py method">
 <dt class="sig sig-object py" id="sktree.HonestForestClassifier.apply">
-<span class="sig-name descname"><span class="pre">apply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sktree.HonestForestClassifier.apply" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">apply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sktree/ensemble/_honest_forest.html#HonestForestClassifier.apply"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sktree.HonestForestClassifier.apply" title="Permalink to this definition">#</a></dt>
 <dd><p>Apply trees in the forest to X, return leaf indices.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -763,7 +768,7 @@ return the index of the leaf x ends up in.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="sktree.HonestForestClassifier.decision_path">
-<span class="sig-name descname"><span class="pre">decision_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sktree.HonestForestClassifier.decision_path" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">decision_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sktree/ensemble/_honest_forest.html#HonestForestClassifier.decision_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sktree.HonestForestClassifier.decision_path" title="Permalink to this definition">#</a></dt>
 <dd><p>Return the decision path in the forest.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.18.</span></p>
@@ -824,21 +829,18 @@ single class carrying a negative weight in either child node.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="sktree.HonestForestClassifier.get_leaf_node_samples">
-<span class="sig-name descname"><span class="pre">get_leaf_node_samples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sktree.HonestForestClassifier.get_leaf_node_samples" title="Permalink to this definition">#</a></dt>
-<dd><p>For each datapoint x in X, get the training samples in the leaf node.</p>
+<span class="sig-name descname"><span class="pre">get_leaf_node_samples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sktree/ensemble/_honest_forest.html#HonestForestClassifier.get_leaf_node_samples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sktree.HonestForestClassifier.get_leaf_node_samples" title="Permalink to this definition">#</a></dt>
+<dd><p>Get samples in each leaf node across the forest.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>X</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.0.dev0)"><span>array_like</span></a> of shape (n_samples, n_features)</span></dt><dd><p>Dataset to apply the forest to.</p>
+<dt><strong>X</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.0.dev0)"><span>array_like</span></a> of shape (n_samples, n_features)</span></dt><dd><p>The data array.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>leaf_node_samples</strong><span class="classifier">a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.0.dev0)"><span>array_like</span></a></span></dt><dd><p>Each sample is represented by the indices of the training samples that
-reached the leaf node. The <code class="docutils literal notranslate"><span class="pre">n_leaf_node_samples</span></code> may vary between
-samples, since the number of samples that fall in a leaf node is
-variable. Each array-like has shape (n_leaf_node_samples, n_outputs).</p>
+<dt><strong>leaf_node_samples</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.0.dev0)"><span>array_like</span></a> of shape (n_samples, n_estimators)</span></dt><dd><p>Samples within each leaf node.</p>
 </dd>
 </dl>
 </dd>
@@ -964,7 +966,7 @@ classes corresponds to that in the attribute <a class="reference external" href=
 
 <dl class="py method">
 <dt class="sig sig-object py" id="sktree.HonestForestClassifier.predict_quantiles">
-<span class="sig-name descname"><span class="pre">predict_quantiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantiles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nearest'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sktree.HonestForestClassifier.predict_quantiles" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">predict_quantiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantiles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nearest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sktree/ensemble/_honest_forest.html#HonestForestClassifier.predict_quantiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sktree.HonestForestClassifier.predict_quantiles" title="Permalink to this definition">#</a></dt>
 <dd><p>Predict class or regression value for X at given quantiles.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1134,24 +1136,19 @@ sub-estimator of a meta-estimator, e.g. used inside a
 <dl class="py property">
 <dt class="sig sig-object py" id="sktree.HonestForestClassifier.feature_importances_">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">feature_importances_</span></span><a class="headerlink" href="#sktree.HonestForestClassifier.feature_importances_" title="Permalink to this definition">#</a></dt>
-<dd><p>The impurity-based feature importances.</p>
-<p>The higher, the more important the feature.
-The importance of a feature is computed as the (normalized)
-total reduction of the criterion brought by that feature.  It is also
-known as the Gini importance.</p>
-<p>Warning: impurity-based feature importances can be misleading for
-high cardinality features (many unique values). See
-<a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.inspection.permutation_importance.html#sklearn.inspection.permutation_importance" title="(in scikit-learn v1.4)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.inspection.permutation_importance()</span></code></a> as an alternative.</p>
-<dl class="field-list">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><dl>
-<dt><strong>feature_importances_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_features,)</span></dt><dd><p>The values of this array sum to 1, unless all trees are single node
-trees consisting of only the root node, in which case it will be an
-array of zeros.</p>
-</dd>
-</dl>
-</dd>
-</dl>
+<dd><p>The feature importances.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sktree.HonestForestClassifier.honest_indices_">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">honest_indices_</span></span><a class="headerlink" href="#sktree.HonestForestClassifier.honest_indices_" title="Permalink to this definition">#</a></dt>
+<dd><p>The indices used to fit the leaf nodes.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sktree.HonestForestClassifier.structure_indices_">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">structure_indices_</span></span><a class="headerlink" href="#sktree.HonestForestClassifier.structure_indices_" title="Permalink to this definition">#</a></dt>
+<dd><p>The indices used to learn the structure of the trees.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1228,6 +1225,8 @@ array of zeros.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.HonestForestClassifier.set_score_request"><code class="docutils literal notranslate"><span class="pre">HonestForestClassifier.set_score_request()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.HonestForestClassifier.base_estimator_"><code class="docutils literal notranslate"><span class="pre">HonestForestClassifier.base_estimator_</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.HonestForestClassifier.feature_importances_"><code class="docutils literal notranslate"><span class="pre">HonestForestClassifier.feature_importances_</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.HonestForestClassifier.honest_indices_"><code class="docutils literal notranslate"><span class="pre">HonestForestClassifier.honest_indices_</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.HonestForestClassifier.structure_indices_"><code class="docutils literal notranslate"><span class="pre">HonestForestClassifier.structure_indices_</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples-using-sktree-honestforestclassifier">Examples using <code class="docutils literal notranslate"><span class="pre">sktree.HonestForestClassifier</span></code></a></li>
@@ -1258,7 +1257,7 @@ array of zeros.</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-07-06.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-16.
       <br/>
     
   </p>

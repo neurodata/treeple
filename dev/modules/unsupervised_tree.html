@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 
 
@@ -7,7 +6,7 @@
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>2. Unsupervised Decision Trees &#8212; scikit-tree 0.2.0dev0 documentation</title>
   
@@ -29,27 +28,24 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/style.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=e5fbc548" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.css?v=a6733705" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=141ad0fc"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=fd10adb8"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'modules/unsupervised_tree';</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -435,10 +431,11 @@ the mu terms are the estimated means of each cluster 1 and 2.</p>
 <h3><span class="section-number">2.1.2. </span>Fast-BIC<a class="headerlink" href="#fast-bic" title="Permalink to this heading">#</a></h3>
 <p>The Bayesian Information Criterion (BIC) is a popular model seleciton
 criteria that is based on the log likelihood of the model given data.
-Fast-BIC is a method that combines the speed of the <a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.cluster.KMeans.html#sklearn.cluster.KMeans" title="(in scikit-learn v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.cluster.KMeans</span></code></a> clustering
-method with the model flexibility of Mclust-BIC. It sorts data for each
-feature and tries all possible splits to assign data points to one of
-two Gaussian distributions based on their position relative to the split.
+Fast-BIC <a class="footnote-reference brackets" href="#footcite-meghana2019-geodesicrf" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> is a method that combines the speed of the
+<a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.cluster.KMeans.html#sklearn.cluster.KMeans" title="(in scikit-learn v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.cluster.KMeans</span></code></a> clustering method with the model flexibility
+of Mclust-BIC. It sorts data for each feature and tries all possible splits to
+assign data points to one of two Gaussian distributions based on their position
+relative to the split.
 The parameters for each cluster are estimated using maximum likelihood
 estimation (MLE).The method performs hard clustering rather than soft
 clustering like in GMM, resulting in a simpler calculation of the likelihood.</p>
@@ -457,6 +454,17 @@ clustering like in GMM, resulting in a simpler calculation of the likelihood.</p
 <p>In clustering settings, there may be no natural
 notion of “true” class-labels, thus the efficacy of the clustering scheme is
 often measured based on distance based metrics such as <a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.metrics.adjusted_rand_score.html#sklearn.metrics.adjusted_rand_score" title="(in scikit-learn v1.4)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.metrics.adjusted_rand_score()</span></code></a>.</p>
+<aside class="topic">
+<p class="topic-title">References</p>
+<div class="docutils container" id="id2">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-meghana2019-geodesicrf" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Meghana Madhyastha, Percy Li, James Browne, Veronika Strnadova-Neeley, Carey E. Priebe, Randal Burns, and Joshua T. Vogelstein. Geodesic forests. In <em>Proceedings of the 26th ACM SIGKDD International Conference on Knowledge Discovery &amp; Data Mining</em>, KDD ‘20, 513––523. New York, NY, USA, 2020. Association for Computing Machinery. URL: <a class="reference external" href="https://doi.org/10.1145/3394486.3403094">https://doi.org/10.1145/3394486.3403094</a>, <a class="reference external" href="https://doi.org/10.1145/3394486.3403094">doi:10.1145/3394486.3403094</a>.</p>
+</aside>
+</aside>
+</div>
+</aside>
 </section>
 </section>
 
@@ -540,7 +548,7 @@ often measured based on distance based metrics such as <a class="reference exter
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-07-06.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-16.
       <br/>
     
   </p>
