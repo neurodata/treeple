@@ -38,53 +38,6 @@ cdef class BaseObliqueSplitter(Splitter):
     Splitters are called by tree builders to find the best_split splits on
     both sparse and dense data, one split at a time.
     """
-    def __cinit__(
-        self,
-        Criterion criterion,
-        SIZE_t max_features,
-        SIZE_t min_samples_leaf,
-        double min_weight_leaf,
-        object random_state,
-        const cnp.int8_t[:] monotonic_cst,
-        *argv
-    ):
-        """
-        Parameters
-        ----------
-        criterion : Criterion
-            The criterion to measure the quality of a split.
-
-        max_features : SIZE_t
-            The maximal number of randomly selected features which can be
-            considered for a split.
-
-        min_samples_leaf : SIZE_t
-            The minimal number of samples each leaf can have, where splits
-            which would result in having less samples in a leaf are not
-            considered.
-
-        min_weight_leaf : double
-            The minimal weight each leaf can have, where the weight is the sum
-            of the weights of each sample in it.
-
-        random_state : object
-            The user inputted random state to be used for pseudo-randomness
-        """
-        self.criterion = criterion
-
-        self.n_samples = 0
-        self.n_features = 0
-
-        # Max features = output dimensionality of projection vectors
-        self.max_features = max_features
-        self.min_samples_leaf = min_samples_leaf
-        self.min_weight_leaf = min_weight_leaf
-        self.random_state = random_state
-
-        # Sparse max_features x n_features projection matrix
-        self.proj_mat_weights = vector[vector[DTYPE_t]](self.max_features)
-        self.proj_mat_indices = vector[vector[SIZE_t]](self.max_features)
-
     def __getstate__(self):
         return {}
 
@@ -353,6 +306,22 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         random_state : object
             The user inputted random state to be used for pseudo-randomness
         """
+        self.criterion = criterion
+
+        self.n_samples = 0
+        self.n_features = 0
+
+        # Max features = output dimensionality of projection vectors
+        self.max_features = max_features
+        self.min_samples_leaf = min_samples_leaf
+        self.min_weight_leaf = min_weight_leaf
+        self.random_state = random_state
+        self.monotonic_cst = monotonic_cst
+
+        # Sparse max_features x n_features projection matrix
+        self.proj_mat_weights = vector[vector[DTYPE_t]](self.max_features)
+        self.proj_mat_indices = vector[vector[SIZE_t]](self.max_features)
+
         # Oblique tree parameters
         self.feature_combinations = feature_combinations
 
@@ -603,7 +572,6 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
         deref(oblique_split).impurity_left = best_split.impurity_left
         deref(oblique_split).impurity_right = best_split.impurity_right
         return 0
-
 
 cdef class RandomObliqueSplitter(ObliqueSplitter):
     def __reduce__(self):

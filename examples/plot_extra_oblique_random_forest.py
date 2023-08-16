@@ -11,7 +11,7 @@ decision trees in the way they are built. When looking for the best split to
 separate the samples of a node into two groups, random splits are drawn for each
 of the `max_features` randomly selected features and the best split among those is
 chosen. When `max_features` is set 1, this amounts to building a totally random
-decision tree.
+decision tree. For details of the algorithm, see [1]_.
 
 Two of these datasets, namely
 [WDBC](https://www.openml.org/search?type=data&sort=runs&id=1510)
