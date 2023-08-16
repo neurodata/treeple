@@ -58,7 +58,7 @@ cpdef unravel_index(
     return coords
 
 
-cpdef ravel_multi_index(SIZE_t[:] coords, SIZE_t[:] shape):
+cpdef ravel_multi_index(SIZE_t[:] coords, const SIZE_t[:] shape):
     """Converts a tuple of coordinate arrays into a flat index.
 
     Purely used for testing purposes.
@@ -109,7 +109,7 @@ cdef void unravel_index_cython(SIZE_t index, const SIZE_t[:] shape, SIZE_t[:] co
         index //= size
 
 
-cdef SIZE_t ravel_multi_index_cython(SIZE_t[:] coords, SIZE_t[:] shape) noexcept nogil:
+cdef SIZE_t ravel_multi_index_cython(SIZE_t[:] coords, const SIZE_t[:] shape) noexcept nogil:
     """Converts a tuple of coordinate arrays into a flat index.
 
     Parameters

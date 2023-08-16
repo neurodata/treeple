@@ -37,6 +37,12 @@ if __sktree_SETUP__:
 else:
     try:
         from . import _lib, tree, ensemble, experimental
+        from ._lib.sklearn.ensemble._forest import (
+            RandomForestClassifier,
+            RandomForestRegressor,
+            ExtraTreesClassifier,
+            ExtraTreesRegressor,
+        )
         from .neighbors import NearestNeighborsMetaEstimator
         from .ensemble._unsupervised_forest import (
             UnsupervisedRandomForest,
@@ -72,4 +78,8 @@ else:
         "UnsupervisedRandomForest",
         "UnsupervisedObliqueRandomForest",
         "HonestForestClassifier",
+        "RandomForestClassifier",
+        "RandomForestRegressor",
+        "ExtraTreesClassifier",
+        "ExtraTreesRegressor",
     ]

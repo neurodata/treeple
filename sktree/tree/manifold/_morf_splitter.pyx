@@ -24,62 +24,6 @@ cdef class PatchSplitter(BaseObliqueSplitter):
 
     A convolutional 2D patch splitter.
     """
-    def __cinit__(
-        self,
-        Criterion criterion,
-        SIZE_t max_features,
-        SIZE_t min_samples_leaf,
-        double min_weight_leaf,
-        object random_state,
-        SIZE_t[:] min_patch_dims,
-        SIZE_t[:] max_patch_dims,
-        cnp.uint8_t[::1] dim_contiguous,
-        SIZE_t[:] data_dims,
-        str boundary,
-        DTYPE_t[:, :] feature_weight,
-        *argv
-    ):
-        self.criterion = criterion
-
-        self.n_samples = 0
-        self.n_features = 0
-
-        # Max features = output dimensionality of projection vectors
-        self.max_features = max_features
-        self.min_samples_leaf = min_samples_leaf
-        self.min_weight_leaf = min_weight_leaf
-        self.random_state = random_state
-
-        # Sparse max_features x n_features projection matrix
-        self.proj_mat_weights = vector[vector[DTYPE_t]](self.max_features)
-        self.proj_mat_indices = vector[vector[SIZE_t]](self.max_features)
-
-        # initialize state to allow generalization to higher-dimensional tensors
-        self.ndim = data_dims.shape[0]
-        self.data_dims = data_dims
-
-        # create a buffer for storing the patch dimensions sampled per projection matrix
-        self.patch_dims_buff = np.zeros(self.ndim, dtype=np.intp)
-        self.unraveled_patch_point = np.zeros(self.ndim, dtype=np.intp)
-
-        # store the min and max patch dimension constraints
-        self.min_patch_dims = min_patch_dims
-        self.max_patch_dims = max_patch_dims
-        self.dim_contiguous = dim_contiguous
-
-        # initialize a buffer to allow for Fisher-Yates
-        self._index_patch_buffer = np.zeros(np.max(self.max_patch_dims), dtype=np.intp)
-        self._index_data_buffer = np.zeros(np.max(self.data_dims), dtype=np.intp)
-
-        # whether or not to perform some discontinuous sampling
-        if not all(self.dim_contiguous):
-            self._discontiguous = True
-        else:
-            self._discontiguous = False
-
-        self.boundary = boundary
-        self.feature_weight = feature_weight
-
     def __getstate__(self):
         return {}
 
@@ -91,9 +35,9 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         object X,
         const DOUBLE_t[:, ::1] y,
         const DOUBLE_t[:] sample_weight,
-        const unsigned char[::1] feature_has_missing,
+        const unsigned char[::1] missing_values_in_feature_mask,
     ) except -1:
-        BaseObliqueSplitter.init(self, X, y, sample_weight, feature_has_missing)
+        BaseObliqueSplitter.init(self, X, y, sample_weight, missing_values_in_feature_mask)
 
         return 0
 
@@ -157,7 +101,8 @@ cdef class BaseDensePatchSplitter(PatchSplitter):
         object X,
         const DOUBLE_t[:, ::1] y,
         const DOUBLE_t[:] sample_weight,
-        const unsigned char[::1] feature_has_missing
+        const unsigned char[::1] missing_values_in_feature_mask,
+        # const INT32_t[:] n_categories
     ) except -1:
         """Initialize the splitter
 
@@ -165,26 +110,87 @@ cdef class BaseDensePatchSplitter(PatchSplitter):
         or 0 otherwise.
         """
         # Call parent init
-        PatchSplitter.init(self, X, y, sample_weight, feature_has_missing)
+        PatchSplitter.init(self, X, y, sample_weight, missing_values_in_feature_mask)
 
         self.X = X
         return 0
 
+
 cdef class BestPatchSplitter(BaseDensePatchSplitter):
+    def __cinit__(
+        self,
+        Criterion criterion,
+        SIZE_t max_features,
+        SIZE_t min_samples_leaf,
+        double min_weight_leaf,
+        object random_state,
+        const cnp.int8_t[:] monotonic_cst,
+        const SIZE_t[:] min_patch_dims,
+        const SIZE_t[:] max_patch_dims,
+        const cnp.uint8_t[:] dim_contiguous,
+        const SIZE_t[:] data_dims,
+        bytes boundary,
+        const DTYPE_t[:, :] feature_weight,
+        *argv
+    ):
+        self.criterion = criterion
+
+        self.n_samples = 0
+        self.n_features = 0
+
+        # Max features = output dimensionality of projection vectors
+        self.max_features = max_features
+        self.min_samples_leaf = min_samples_leaf
+        self.min_weight_leaf = min_weight_leaf
+        self.random_state = random_state
+
+        # Sparse max_features x n_features projection matrix
+        self.proj_mat_weights = vector[vector[DTYPE_t]](self.max_features)
+        self.proj_mat_indices = vector[vector[SIZE_t]](self.max_features)
+
+        # initialize state to allow generalization to higher-dimensional tensors
+        self.ndim = data_dims.shape[0]
+        self.data_dims = data_dims
+
+        # create a buffer for storing the patch dimensions sampled per projection matrix
+        self.patch_dims_buff = np.zeros(data_dims.shape[0], dtype=np.intp)
+        self.unraveled_patch_point = np.zeros(data_dims.shape[0], dtype=np.intp)
+
+        # store the min and max patch dimension constraints
+        self.min_patch_dims = min_patch_dims
+        self.max_patch_dims = max_patch_dims
+        self.dim_contiguous = dim_contiguous
+
+        # initialize a buffer to allow for Fisher-Yates
+        self._index_patch_buffer = np.zeros(np.max(self.max_patch_dims), dtype=np.intp)
+        self._index_data_buffer = np.zeros(np.max(self.data_dims), dtype=np.intp)
+
+        # whether or not to perform some discontinuous sampling
+        if not all(self.dim_contiguous):
+            self._discontiguous = True
+        else:
+            self._discontiguous = False
+
+        self.boundary = boundary
+        self.feature_weight = feature_weight
+
     def __reduce__(self):
         """Enable pickling the splitter."""
         return (
-            BestPatchSplitter,
+            type(self),
             (
                 self.criterion,
                 self.max_features,
                 self.min_samples_leaf,
                 self.min_weight_leaf,
                 self.random_state,
-                self.min_patch_dims,
-                self.max_patch_dims,
-                self.dim_contiguous,
-                self.data_dims
+                self.monotonic_cst.base if self.monotonic_cst is not None else None,
+                self.min_patch_dims.base if self.min_patch_dims is not None else None,
+                self.max_patch_dims.base if self.max_patch_dims is not None else None,
+                self.dim_contiguous.base if self.dim_contiguous is not None else None,
+                self.data_dims.base if self.data_dims is not None else None,
+                self.boundary,
+                self.feature_weight.base if self.feature_weight is not None else None,
             ), self.__getstate__())
 
     cdef (SIZE_t, SIZE_t) sample_top_left_seed(self) noexcept nogil:
@@ -498,7 +504,7 @@ cdef class BestPatchSplitterTester(BestPatchSplitter):
 
         return proj_vecs
 
-    cpdef init_test(self, X, y, sample_weight, feature_has_missing=None):
+    cpdef init_test(self, X, y, sample_weight, missing_values_in_feature_mask=None):
         """Initializes the state of the splitter.
 
         Used for testing purposes.
@@ -512,7 +518,7 @@ cdef class BestPatchSplitterTester(BestPatchSplitter):
             regression).
         sample_weight : array-like, shape (n_samples,)
             Sample weights.
-        feature_has_missing : array-like, shape (n_features,)
+        missing_values_in_feature_mask : array-like, shape (n_features,)
             Whether or not a feature has missing values.
         """
-        self.init(X, y, sample_weight, feature_has_missing)
+        self.init(X, y, sample_weight, missing_values_in_feature_mask)

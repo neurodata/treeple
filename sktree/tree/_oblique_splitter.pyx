@@ -45,6 +45,7 @@ cdef class BaseObliqueSplitter(Splitter):
         SIZE_t min_samples_leaf,
         double min_weight_leaf,
         object random_state,
+        const cnp.int8_t[:] monotonic_cst,
         *argv
     ):
         """
@@ -170,7 +171,9 @@ cdef class BaseObliqueSplitter(Splitter):
         self,
         double impurity,
         SplitRecord* split,
-        SIZE_t* n_constant_features
+        SIZE_t* n_constant_features,
+        double lower_bound,
+        double upper_bound,
     ) except -1 nogil:
         """Find the best_split split on node samples[start:end]
 
@@ -319,6 +322,7 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         SIZE_t min_samples_leaf,
         double min_weight_leaf,
         object random_state,
+        const cnp.int8_t[:] monotonic_cst,
         double feature_combinations,
         *argv
     ):
@@ -366,9 +370,9 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         object X,
         const DOUBLE_t[:, ::1] y,
         const DOUBLE_t[:] sample_weight,
-        const unsigned char[::1] feature_has_missing,
+        const unsigned char[::1] missing_values_in_feature_mask,
     ) except -1:
-        Splitter.init(self, X, y, sample_weight, feature_has_missing)
+        Splitter.init(self, X, y, sample_weight, missing_values_in_feature_mask)
 
         self.X = X
 
@@ -439,25 +443,27 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
             proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
             proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
 
-
 cdef class BestObliqueSplitter(ObliqueSplitter):
     def __reduce__(self):
         """Enable pickling the splitter."""
-        return (BestObliqueSplitter,
+        return (type(self),
                 (
                     self.criterion,
                     self.max_features,
                     self.min_samples_leaf,
                     self.min_weight_leaf,
+                    self.random_state,
+                    self.monotonic_cst.base if self.monotonic_cst is not None else None,
                     self.feature_combinations,
-                    self.random_state
                 ), self.__getstate__())
 
     cdef int node_split(
         self,
         double impurity,
         SplitRecord* split,
-        SIZE_t* n_constant_features
+        SIZE_t* n_constant_features,
+        double lower_bound,
+        double upper_bound,
     ) except -1 nogil:
         """Find the best_split split on node samples[start:end]
 
@@ -602,14 +608,15 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
 cdef class RandomObliqueSplitter(ObliqueSplitter):
     def __reduce__(self):
         """Enable pickling the splitter."""
-        return (RandomObliqueSplitter,
+        return (type(self),
                 (
                     self.criterion,
                     self.max_features,
                     self.min_samples_leaf,
                     self.min_weight_leaf,
+                    self.random_state,
+                    self.monotonic_cst.base if self.monotonic_cst is not None else None,
                     self.feature_combinations,
-                    self.random_state
                 ), self.__getstate__())
 
     cdef inline void find_min_max(
@@ -676,7 +683,9 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
         self,
         double impurity,
         SplitRecord* split,
-        SIZE_t* n_constant_features
+        SIZE_t* n_constant_features,
+        double lower_bound,
+        double upper_bound,
     ) except -1 nogil:
         """Find the best_split split on node samples[start:end]
 
@@ -693,7 +702,7 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
         cdef UINT32_t* random_state = &self.rand_r_state
 
         # pointer array to store feature values to split on
-        cdef DTYPE_t[::1]  feature_values = self.feature_values
+        cdef DTYPE_t[::1] feature_values = self.feature_values
         cdef SIZE_t max_features = self.max_features
         cdef SIZE_t min_samples_leaf = self.min_samples_leaf
         cdef double min_weight_leaf = self.min_weight_leaf
@@ -712,11 +721,11 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
         cdef DTYPE_t max_feature_value
 
         # Number of features discovered to be constant during the split search
-        cdef SIZE_t n_found_constants = 0
-        cdef SIZE_t n_known_constants = n_constant_features[0]
+        # cdef SIZE_t n_found_constants = 0
+        # cdef SIZE_t n_known_constants = n_constant_features[0]
         # n_total_constants = n_known_constants + n_found_constants
-        cdef SIZE_t n_total_constants = n_known_constants
-        cdef SIZE_t n_visited_features = 0
+        # cdef SIZE_t n_total_constants = n_known_constants
+        # cdef SIZE_t n_visited_features = 0
 
         # instantiate the split records
         _init_split(&best_split, end)
@@ -730,8 +739,8 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
             if n_visited_features >= max_features:
                 break
             # Skip features known to be constant
-            if feat_i < n_total_constants:
-                continue
+            # if feat_i < n_total_constants:
+            #     continue
             # Projection vector has no nonzeros
             if self.proj_mat_weights[feat_i].empty():
                 continue
@@ -742,8 +751,7 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
             current_split.proj_vec_weights = &self.proj_mat_weights[feat_i]
             current_split.proj_vec_indices = &self.proj_mat_indices[feat_i]
 
-            # Compute linear combination of features and then
-            # sort samples according to the feature values.
+            # Compute linear combination of features
             self.compute_features_over_samples(
                 start,
                 end,
@@ -757,10 +765,10 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
             self.find_min_max(feature_values, &min_feature_value, &max_feature_value)
 
             # XXX: Add logic to keep track of constant features if they exist
-            if max_feature_value <= min_feature_value + FEATURE_THRESHOLD:
-                n_found_constants += 1
-                n_total_constants += 1
-                continue
+            # if max_feature_value <= min_feature_value + FEATURE_THRESHOLD:
+            #     n_found_constants += 1
+            #     n_total_constants += 1
+            #     continue
 
             # Draw a random threshold
             current_split.threshold = rand_uniform(
