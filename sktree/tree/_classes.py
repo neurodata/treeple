@@ -1655,7 +1655,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
             self.max_patch_dims_ = np.ones((ndim,), dtype=np.intp)
             self.max_patch_dims_[-1] = X.shape[1]
         else:
-            self.max_patch_dims_ = np.array(self.max_patch_dims)
+            self.max_patch_dims_ = np.array(self.max_patch_dims, dtype=np.intp)
 
         if len(self.min_patch_dims_) != ndim:
             raise ValueError(f"Minimum patch dimensions should equal {ndim} dimensions.")
