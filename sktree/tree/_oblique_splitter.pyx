@@ -725,7 +725,7 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
         # cdef SIZE_t n_known_constants = n_constant_features[0]
         # n_total_constants = n_known_constants + n_found_constants
         # cdef SIZE_t n_total_constants = n_known_constants
-        # cdef SIZE_t n_visited_features = 0
+        cdef SIZE_t n_visited_features = 0
 
         # instantiate the split records
         _init_split(&best_split, end)
