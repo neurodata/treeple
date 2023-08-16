@@ -419,4 +419,4 @@ def test_regression(forest, criterion, dtype):
     y = y_large_reg.astype(dtype, copy=False)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=n_test, random_state=123)
     estimator.fit(X_train, y_train)
-    assert estimator.score(X_test, y_test) > 0.88
+    assert estimator.score(X_test, y_test) > 0.88, f"Failed for {estimator} and {criterion}"

@@ -655,7 +655,7 @@ class PatchObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
     forest that fits a number of patch oblique decision tree classifiers
     on various sub-samples of the dataset and uses averaging to
     improve the predictive accuracy and control over-fitting. For more
-    details, see :footcite:`Li2019manifold`.
+    details, see :footcite:`Li2023manifold`.
 
     Parameters
     ----------
@@ -998,7 +998,7 @@ class PatchObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
     forest that fits a number of patch oblique decision tree regressors
     on various sub-samples of the dataset and uses averaging to
     improve the predictive accuracy and control over-fitting. For more
-    details, see :footcite:`Li2019manifold`.
+    details, see :footcite:`Li2023manifold`.
 
     Parameters
     ----------
