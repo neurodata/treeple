@@ -27,6 +27,7 @@ Changelog
 ---------
 - |Efficiency| Upgraded build process to rely on Cython 3.0+, by `Adam Li`_  (:pr:`109`)
 - |Feature| Allow decision trees to take advantage of ``partial_fit`` and ``monotonic_cst`` when available, by `Adam Li`_  (:pr:`109`)
+- |Feature| Add a variety of different mutual information estimators based on decision trees, by `Adam Li`_  (:pr:`110`)
 
 
 Code and Documentation Contributors
