@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from numpy.testing import assert_array_equal
 from sklearn import datasets
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.datasets import make_blobs
@@ -8,7 +9,7 @@ from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from sktree.tree import UnsupervisedDecisionTree, UnsupervisedObliqueDecisionTree
 
-CLUSTER_CRITERIONS = ("twomeans", "fastbic")
+CLUSTER_CRITERIONS = ("twomeans", "fastbic", "fasterbic")
 REG_CRITERIONS = ("squared_error", "absolute_error", "friedman_mse", "poisson")
 
 TREE_CLUSTERS = {
@@ -133,7 +134,7 @@ def test_check_simulation(name, Tree, criterion):
             expected_score = 0.02
         else:
             expected_score = 0.3
-    elif criterion == "fastbic":
+    elif criterion in ("fastbic", 'fasterbic'):
         if "oblique" in name.lower():
             expected_score = 0.01
         else:
@@ -172,7 +173,7 @@ def test_check_rotated_blobs(name, Tree, criterion):
             expected_score = 0.02
         else:
             expected_score = 0.3
-    elif criterion == "fastbic":
+    elif criterion in ("fastbic", 'fasterbic'):
         if "oblique" in name.lower():
             expected_score = 0.01
         else:
@@ -196,7 +197,8 @@ def test_check_rotated_blobs(name, Tree, criterion):
 def test_check_iris(name, Tree, criterion):
     # Check consistency on dataset iris.
     n_classes = len(np.unique(iris.target))
-    est = Tree(criterion=criterion, random_state=12345)
+
+    est = Tree(criterion=criterion, min_samples_split=np.sqrt(len(iris)).astype(int), random_state=12345)
     est.fit(iris.data, iris.target)
     sim_mat = est.compute_similarity_matrix(iris.data)
 
@@ -206,7 +208,7 @@ def test_check_iris(name, Tree, criterion):
             expected_score = 0.2
         else:
             expected_score = 0.01
-    elif criterion == "fastbic":
+    elif criterion in ("fastbic", 'fasterbic'):
         if "oblique" in name.lower():
             expected_score = 0.001
         else:
@@ -220,3 +222,26 @@ def test_check_iris(name, Tree, criterion):
     assert score > expected_score, "Iris failed with {0}, criterion = {1} and score = {2}".format(
         name, criterion, score
     )
+
+
+def test_fasterbic_vs_fastbic_on_iris():
+    fastbic_tree = UnsupervisedDecisionTree(criterion="fastbic", random_state=1)
+    fasterbic_tree = UnsupervisedDecisionTree(criterion="fasterbic", random_state=0)
+
+    n_classes = len(np.unique(iris.target))
+    fastbic_tree.fit(iris.data, iris.target)
+    fasterbic_tree.fit(iris.data, iris.target)
+
+    sim_mat = fastbic_tree.compute_similarity_matrix(iris.data)
+    cluster = AgglomerativeClustering(n_clusters=n_classes).fit(sim_mat)
+    predict_labels = cluster.fit_predict(sim_mat)
+    fastbic_score = adjusted_rand_score(iris.target, predict_labels)
+
+    sim_mat = fasterbic_tree.compute_similarity_matrix(iris.data)
+    cluster = AgglomerativeClustering(n_clusters=n_classes).fit(sim_mat)
+    predict_labels = cluster.fit_predict(sim_mat)
+    fasterbic_score = adjusted_rand_score(iris.target, predict_labels)
+
+    print(fastbic_score, fasterbic_score)
+    assert False
+    # assert_array_equal(fastbic_tree.compute_similarity_matrix(iris.data), fasterbic_tree.compute_similarity_matrix(iris.data))

@@ -280,8 +280,8 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
 
             # initialize feature vector for criterion to evaluate
             # GIL is needed since we are changing the criterion's internal memory
-            with gil:
-                self.criterion.init_feature_vec(feature_values)
+            # with gil:
+            self.criterion.init_feature_vec()
 
             # Evaluate all splits
             self.criterion.reset()

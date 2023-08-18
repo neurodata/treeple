@@ -57,7 +57,11 @@ PATCH_DENSE_SPLITTERS = {
     "best": _morf_splitter.BestPatchSplitter,
 }
 
-UNSUPERVISED_CRITERIA = {"twomeans": _unsup_criterion.TwoMeans, "fastbic": _unsup_criterion.FastBIC}
+UNSUPERVISED_CRITERIA = {
+    "twomeans": _unsup_criterion.TwoMeans,
+    "fastbic": _unsup_criterion.FastBIC,
+    "fasterbic": _unsup_criterion.FasterBIC
+}
 UNSUPERVISED_SPLITTERS = {
     "best": _unsup_splitter.BestUnsupervisedSplitter,
 }
@@ -70,7 +74,7 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
 
     Parameters
     ----------
-    criterion : {"twomeans", "fastbic"}, default="twomeans"
+    criterion : {"twomeans", "fastbic", "fasterbic"}, default="twomeans"
         The function to measure the quality of a split. Supported criteria are
         "twomeans" for the variance impurity and "fastbic" for the
         BIC criterion. If ``UnsupervisedCriterion`` instance is passed in, then
@@ -163,6 +167,16 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
 
     clustering_func_args : dict
         Clustering function class keyword arguments. Passed to `clustering_func`.
+
+    Notes
+    -----
+    The "faster" BIC criterion is computed by enabling computation of the split point evaluations
+    in O(n log(n)) time. This implements the algorithm described in :footcite:`marx2022estimating` and
+    :footcite:`terzi2006efficient`.
+
+    References
+    ----------
+    .. footbibliography::
     """
 
     def __init__(

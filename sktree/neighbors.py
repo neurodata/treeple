@@ -30,7 +30,12 @@ class NearestNeighborsMetaEstimator(BaseEstimator, MetaEstimatorMixin):
     """Meta-estimator for nearest neighbors.
 
     Uses a decision-tree, or forest model to compute distances between samples
-    and then uses the sklearn's nearest-neighbors API to compute neighbors.
+    and then uses the sklearn's nearest-neighbors API to compute neighbors. Thus,
+    this meta-estimator is a two-stage process:
+
+    1. Fit a forest on X (n_samples, n_features) to compute a distance matrix (n_samples, n_samples).
+    2. Fit an instance of `sklearn.neighbors.NearestNeighbors` on the distance matrix to compute
+         nearest neighbors.
 
     Parameters
     ----------

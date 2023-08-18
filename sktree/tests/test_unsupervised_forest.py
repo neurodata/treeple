@@ -8,7 +8,7 @@ from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from sktree.ensemble import UnsupervisedObliqueRandomForest, UnsupervisedRandomForest
 
-CLUSTER_CRITERIONS = ("twomeans", "fastbic")
+CLUSTER_CRITERIONS = ("twomeans", "fastbic", "fasterbic")
 
 FOREST_CLUSTERS = {
     "UnsupervisedRandomForest": UnsupervisedRandomForest,
@@ -53,7 +53,7 @@ def test_check_simulation(name, forest, criterion):
         n_features = 5
         if criterion == "twomeans":
             expected_score = 0.05
-        elif criterion == "fastbic":
+        elif criterion in ("fastbic", "fasterbic"):
             expected_score = 0.35
     else:
         n_features = 20
@@ -96,7 +96,7 @@ def test_check_iris(name, forest, criterion):
             expected_score = 0.21
         else:
             expected_score = 0.2
-    elif criterion == "fastbic":
+    elif criterion in ("fastbic", "fasterbic"):
         if "oblique" in name.lower():
             expected_score = 0.55
         else:
