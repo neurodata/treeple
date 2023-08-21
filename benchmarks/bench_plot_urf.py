@@ -12,15 +12,14 @@ def compute_bench(samples_range, features_range):
     results = defaultdict(lambda: [])
 
     est_params = {
-        'criterion': 'fastbic',
+        "criterion": "fastbic",
     }
 
     max_it = len(samples_range) * len(features_range)
     for n_samples in samples_range:
         for n_features in features_range:
             it += 1
-            if it < 20:
-                continue
+
             print("==============================")
             print("Iteration %03d of %03d" % (it, max_it))
             print("==============================")
@@ -30,7 +29,9 @@ def compute_bench(samples_range, features_range):
 
             print("Unsupervised RF")
             tstart = time()
-            est = UnsupervisedRandomForest(**est_params).fit(data)
+            est = UnsupervisedRandomForest(
+                min_samples_split=2 * np.sqrt(n_samples).astype(int), **est_params
+            ).fit(data)
 
             delta = time() - tstart
             max_depth = max(tree.get_depth() for tree in est.estimators_)
@@ -43,7 +44,9 @@ def compute_bench(samples_range, features_range):
 
             print("Unsupervised Oblique RF")
             # let's prepare the data in small chunks
-            est = UnsupervisedObliqueRandomForest(**est_params)
+            est = UnsupervisedObliqueRandomForest(
+                min_samples_split=2 * np.sqrt(n_samples).astype(int), **est_params
+            )
             tstart = time()
             est.fit(data)
             delta = time() - tstart
@@ -86,6 +89,7 @@ if __name__ == "__main__":
         X, Y = np.meshgrid(samples_range, features_range)
         Z = np.asarray(timings).reshape(samples_range.shape[0], features_range.shape[0])
         ax.plot_surface(X, Y, Z.T, cstride=1, rstride=1, color=c, alpha=0.5)
+        ax.set_title(f"{label}")
         ax.set_xlabel("n_samples")
         ax.set_ylabel("n_features")
 

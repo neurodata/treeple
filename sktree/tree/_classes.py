@@ -1,12 +1,12 @@
 import copy
 import numbers
-from numbers import Integral, Real
+from numbers import Real
 
 import numpy as np
 from scipy.sparse import issparse
 from sklearn.base import ClusterMixin, TransformerMixin
 from sklearn.cluster import AgglomerativeClustering
-from sklearn.utils._param_validation import Interval, RealNotInt, StrOptions
+from sklearn.utils._param_validation import Interval
 from sklearn.utils.validation import check_is_fitted
 
 from .._lib.sklearn.tree import (
@@ -172,7 +172,7 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
         criterion="twomeans",
         splitter="best",
         max_depth=None,
-        min_samples_split='sqrt',
+        min_samples_split="sqrt",
         min_samples_leaf=1,
         min_weight_fraction_leaf=0.0,
         max_features=None,
@@ -476,7 +476,7 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
         criterion="twomeans",
         splitter="best",
         max_depth=None,
-        min_samples_split=5,
+        min_samples_split="sqrt",
         min_samples_leaf=1,
         min_weight_fraction_leaf=0,
         max_features=None,

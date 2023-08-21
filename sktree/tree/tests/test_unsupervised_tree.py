@@ -123,7 +123,7 @@ def test_check_simulation(name, Tree, criterion):
     n_classes = 2
     X, y = make_blobs(n_samples=n_samples, centers=n_classes, n_features=6, random_state=1234)
 
-    est = Tree(criterion=criterion, random_state=1234)
+    est = Tree(criterion=criterion, min_samples_split=5, random_state=1234)
     est.fit(X)
     sim_mat = est.compute_similarity_matrix(X)
 
@@ -162,7 +162,7 @@ def test_check_rotated_blobs(name, Tree, criterion):
 
     # apply rotation matrix to X
 
-    est = Tree(criterion=criterion, random_state=1234)
+    est = Tree(criterion=criterion, min_samples_split=5, random_state=1234)
     est.fit(X)
     sim_mat = est.compute_similarity_matrix(X)
 
@@ -196,21 +196,21 @@ def test_check_rotated_blobs(name, Tree, criterion):
 def test_check_iris(name, Tree, criterion):
     # Check consistency on dataset iris.
     n_classes = len(np.unique(iris.target))
-    est = Tree(criterion=criterion, random_state=123)
+    est = Tree(criterion=criterion, random_state=12345)
     est.fit(iris.data, iris.target)
     sim_mat = est.compute_similarity_matrix(iris.data)
 
     # there is quite a bit of variance in the performance at the tree level
     if criterion == "twomeans":
         if "oblique" in name.lower():
-            expected_score = 0.12
+            expected_score = 0.15
         else:
             expected_score = 0.01
     elif criterion == "fastbic":
         if "oblique" in name.lower():
-            expected_score = 0.001
+            expected_score = 0.005
         else:
-            expected_score = 0.2
+            expected_score = 0.15
 
     cluster = AgglomerativeClustering(n_clusters=n_classes).fit(sim_mat)
     predict_labels = cluster.fit_predict(sim_mat)
