@@ -11,6 +11,10 @@ def compute_bench(samples_range, features_range):
     it = 0
     results = defaultdict(lambda: [])
 
+    est_params = {
+        'criterion': 'fastbic',
+    }
+
     max_it = len(samples_range) * len(features_range)
     for n_samples in samples_range:
         for n_features in features_range:
@@ -26,7 +30,7 @@ def compute_bench(samples_range, features_range):
 
             print("Unsupervised RF")
             tstart = time()
-            est = UnsupervisedRandomForest().fit(data)
+            est = UnsupervisedRandomForest(**est_params).fit(data)
 
             delta = time() - tstart
             max_depth = max(tree.get_depth() for tree in est.estimators_)
@@ -39,7 +43,7 @@ def compute_bench(samples_range, features_range):
 
             print("Unsupervised Oblique RF")
             # let's prepare the data in small chunks
-            est = UnsupervisedObliqueRandomForest()
+            est = UnsupervisedObliqueRandomForest(**est_params)
             tstart = time()
             est.fit(data)
             delta = time() - tstart

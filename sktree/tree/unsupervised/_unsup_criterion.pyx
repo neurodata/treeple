@@ -310,13 +310,6 @@ cdef class TwoMeans(UnsupervisedCriterion):
         """
         cdef double impurity
 
-        # If calling without setting the
-        if self.feature_values is None:
-            with gil:
-                raise MemoryError(
-                    'Xf has not been set yet, so one must call init_feature_vec.'
-                )
-
         # then compute the impurity as the variance
         impurity = self.fast_variance(self.weighted_n_node_samples, self.sumsq_total, self.sum_total)
         return impurity
@@ -431,13 +424,6 @@ cdef class FastBIC(TwoMeans):
         cdef double variance
         cdef double impurity
 
-        # If calling without setting the
-        if self.feature_values is None:
-            with gil:
-                raise MemoryError(
-                    'Xf has not been set yet, so one must call init_feature_vec.'
-                )
-
         # then compute the variance of the cluster
         variance = self.fast_variance(self.weighted_n_node_samples, self.sumsq_total, self.sum_total)
 
@@ -484,8 +470,6 @@ cdef class FastBIC(TwoMeans):
 
         # compute the estimated combined variance
         variance_comb = (self.sumsq_left + self.sumsq_right) / (self.weighted_n_left + self.weighted_n_right)
-        # self.fast_variance(self.weighted_n_node_samples, self.sumsq_total, self.sum_total)
-        # (self.sumsq_total) / (self.weighted_n_left + self.weighted_n_right)
 
         # Compute the BIC using different variances for left and right
         BIC_diff_var_left = self.bic_cluster(n_samples_left, variance_left)
