@@ -39,12 +39,15 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         self.sum_left = 0.0
         self.sum_right = 0.0
 
+        self.sumsq_total = 0.0
+        self.sumsq_left = 0.0
+        self.sumsq_right = 0.0
+
     def __reduce__(self):
         return (type(self), (), self.__getstate__())
 
     cdef void init_feature_vec(
         self,
-        const DTYPE_t[:] Xf,
     ) noexcept nogil:
         """Initialize the 1D feature vector, which is used for computing criteria.
 
@@ -59,8 +62,6 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         Xf : array-like, dtype=DTYPE_t
             The read-only memoryview 1D feature vector with (n_samples,) shape.
         """
-        self.Xf = Xf
-
         # also compute the sum total
         self.sum_total = 0.0
         self.weighted_n_node_samples = 0.0
@@ -76,7 +77,8 @@ cdef class UnsupervisedCriterion(BaseCriterion):
             if self.sample_weight is not None:
                 w = self.sample_weight[s_idx]
 
-            self.sum_total += self.Xf[s_idx] * w
+            self.sum_total += self.feature_values[s_idx] * w
+            self.sumsq_total += self.feature_values[s_idx] * self.feature_values[s_idx] * w * w
             self.weighted_n_node_samples += w
 
         # Reset to pos=start
@@ -84,6 +86,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
 
     cdef int init(
         self,
+        const DTYPE_t[:] feature_values,
         const DOUBLE_t[:] sample_weight,
         double weighted_n_samples,
         const SIZE_t[:] sample_indices,
@@ -102,6 +105,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         sample_indices : array-like, dtype=SIZE_t
             A mask on the sample_indices, showing which ones we want to use
         """
+        self.feature_values = feature_values
         self.sample_weight = sample_weight
         self.weighted_n_samples = weighted_n_samples
         self.sample_indices = sample_indices
@@ -177,8 +181,8 @@ cdef class UnsupervisedCriterion(BaseCriterion):
 
                 # accumulate the values of the feature vectors weighted
                 # by the sample weight
-                self.sum_left += self.Xf[i] * w
-
+                self.sum_left += self.feature_values[i] * w
+                self.sumsq_left += self.feature_values[i] * self.feature_values[i] * w * w
                 # keep track of the weighted count of each sample
                 self.weighted_n_left += w
         else:
@@ -190,15 +194,15 @@ cdef class UnsupervisedCriterion(BaseCriterion):
                 if sample_weight is not None:
                     w = sample_weight[i]
 
-                self.sum_left -= self.Xf[i] * w
-
+                self.sum_left -= self.feature_values[i] * w
+                self.sumsq_left -= self.feature_values[i] * self.feature_values[i] * w * w
                 self.weighted_n_left -= w
 
         # Update right part statistics
         self.weighted_n_right = (self.weighted_n_node_samples -
                                  self.weighted_n_left)
         self.sum_right = self.sum_total - self.sum_left
-
+        self.sumsq_right = self.sumsq_total - self.sumsq_left
         self.pos = new_pos
         return 0
 
@@ -302,7 +306,7 @@ cdef class TwoMeans(UnsupervisedCriterion):
         cdef double impurity
 
         # If calling without setting the
-        if self.Xf is None:
+        if self.feature_values is None:
             with gil:
                 raise MemoryError(
                     'Xf has not been set yet, so one must call init_feature_vec.'
@@ -399,7 +403,7 @@ cdef class TwoMeans(UnsupervisedCriterion):
             if self.sample_weight is not None:
                 w = self.sample_weight[s_idx]
 
-            ss += w * (self.Xf[s_idx] - mean) * (self.Xf[s_idx] - mean)
+            ss += w * (self.feature_values[s_idx] - mean) * (self.feature_values[s_idx] - mean)
         return ss
 
 cdef class FastBIC(TwoMeans):
@@ -484,7 +488,7 @@ cdef class FastBIC(TwoMeans):
         cdef SIZE_t n_node_samples = self.n_node_samples
 
         # If calling without setting the
-        if self.Xf is None:
+        if self.feature_values is None:
             with gil:
                 raise MemoryError(
                     'Xf has not been set yet, so one must call init_feature_vec.'

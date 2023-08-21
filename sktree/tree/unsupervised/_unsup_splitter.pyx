@@ -120,6 +120,7 @@ cdef class UnsupervisedSplitter(BaseSplitter):
 
         # initialize criterion
         self.criterion.init(
+            self.feature_values,
             self.sample_weight,
             self.weighted_n_samples,
             self.samples
@@ -296,8 +297,7 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
 
             # initialize feature vector for criterion to evaluate
             # GIL is needed since we are changing the criterion's internal memory
-            with gil:
-                self.criterion.init_feature_vec(Xf)
+            self.criterion.init_feature_vec()
 
             # Evaluate all splits along the feature vector
             p = start
