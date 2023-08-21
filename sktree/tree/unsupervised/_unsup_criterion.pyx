@@ -69,6 +69,8 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         cdef SIZE_t s_idx
         cdef SIZE_t p_idx
 
+        # XXX: this can be further optimized by computing a cumulative sum hash map of the sum_total and sumsq_total
+        # and then update will never have to iterate through even
         cdef DOUBLE_t w = 1.0
         for p_idx in range(self.start, self.end):
             s_idx = self.sample_indices[p_idx]
