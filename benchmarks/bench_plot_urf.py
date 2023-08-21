@@ -4,7 +4,7 @@ from time import time
 import numpy as np
 from numpy import random as nr
 
-from sktree import UnsupervisedRandomForest, UnsupervisedObliqueRandomForest
+from sktree import UnsupervisedObliqueRandomForest, UnsupervisedRandomForest
 
 
 def compute_bench(samples_range, features_range):
@@ -15,6 +15,8 @@ def compute_bench(samples_range, features_range):
     for n_samples in samples_range:
         for n_features in features_range:
             it += 1
+            if it < 20:
+                continue
             print("==============================")
             print("Iteration %03d of %03d" % (it, max_it))
             print("==============================")
@@ -53,10 +55,9 @@ def compute_bench(samples_range, features_range):
     return results
 
 
-
 if __name__ == "__main__":
-    from mpl_toolkits.mplot3d import axes3d  # noqa register the 3d projection
     import matplotlib.pyplot as plt
+    from mpl_toolkits.mplot3d import axes3d  # noqa register the 3d projection
 
     samples_range = np.linspace(50, 150, 5).astype(int)
     features_range = np.linspace(150, 50000, 5).astype(int)
@@ -64,9 +65,7 @@ if __name__ == "__main__":
 
     results = compute_bench(samples_range, features_range)
 
-    max_time = max(
-        [max(i) for i in [t for (label, t) in results.items() if "speed" in label]]
-    )
+    max_time = max([max(i) for i in [t for (label, t) in results.items() if "speed" in label]])
     max_inertia = max(
         [max(i) for i in [t for (label, t) in results.items() if "speed" not in label]]
     )
