@@ -158,27 +158,33 @@ cdef class BaseObliqueSplitter(Splitter):
 
         # Compute linear combination of features and then
         # sort samples according to the feature values.
-        for idx in range(start, end):
-            # initialize the feature value to 0
-            feature_values[idx] = 0.0
-            for jdx in range(0, proj_vec_indices.size()):
-                feature_values[idx] += self.X[
-                    samples[idx], deref(proj_vec_indices)[jdx]
-                ] * deref(proj_vec_weights)[jdx]
+        # for idx in range(start, end):
+        #     # initialize the feature value to 0
+        #     feature_values[idx] = 0.0
+        #     for jdx in range(0, proj_vec_indices.size()):
+        #         feature_values[idx] += self.X[
+        #             samples[idx], deref(proj_vec_indices)[jdx]
+        #         ] * deref(proj_vec_weights)[jdx]
 
         cdef SIZE_t col_idx
+        cdef DTYPE_t col_weight
         # Compute linear combination of features and then
         # sort samples according to the feature values.
         # initialize the feature value to 0
         for jdx in range(0, proj_vec_indices.size()):
             col_idx = deref(proj_vec_indices)[jdx]
+            col_weight = deref(proj_vec_weights)[jdx]
+
             for idx in range(start, end):
                 if jdx == 0:
                     feature_values[idx] = 0.0
 
                 feature_values[idx] += self.X[
                     samples[idx], col_idx
-                ] * deref(proj_vec_weights)[jdx]
+                ] * col_weight
+
+                # keep track of the min/max of X[samples[:], col_idx]
+                
 
     cdef int node_split(
         self,

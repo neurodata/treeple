@@ -12,6 +12,7 @@ import numpy as np
 
 cimport numpy as cnp
 from libcpp.vector cimport vector
+from libcpp.unordered_map cimport unordered_map
 
 from .._lib.sklearn.tree._criterion cimport Criterion
 from .._lib.sklearn.tree._splitter cimport SplitRecord, Splitter
@@ -51,6 +52,11 @@ cdef class BaseObliqueSplitter(Splitter):
 
     # feature weights across (n_dims,)
     cdef DTYPE_t[:] feature_weights
+
+    # create a hashmap mapping each column idx to a minimum/maximum value
+    # for O(1) computation of constant columns
+    cdef unordered_map[SIZE_t, DTYPE_t] min_val_map
+    cdef unordered_map[SIZE_t, DTYPE_t] max_val_map
 
     # All oblique splitters (i.e. non-axis aligned splitters) require a
     # function to sample a projection matrix that is applied to the feature matrix
