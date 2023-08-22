@@ -11,8 +11,8 @@
 import numpy as np
 
 cimport numpy as cnp
-from libcpp.vector cimport vector
 from libcpp.unordered_map cimport unordered_map
+from libcpp.vector cimport vector
 
 from .._lib.sklearn.tree._criterion cimport Criterion
 from .._lib.sklearn.tree._splitter cimport SplitRecord, Splitter
