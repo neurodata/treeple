@@ -423,9 +423,6 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
 
         _sample_weight[self.honest_indices_] = 0
 
-        if classes is None:
-            classes = np.unique(y).tolist()
-
         self.estimator_.partial_fit(
             X,
             y,
@@ -559,9 +556,6 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         else:
             # XXX: maybe error out if the tree_estimator is already fitted
             self.estimator_ = deepcopy(self.tree_estimator)
-
-        if classes is None:
-            classes = np.unique(y).tolist()
 
         # Learn structure on subsample
         self.estimator_._fit(
