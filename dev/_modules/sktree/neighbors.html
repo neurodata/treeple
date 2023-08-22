@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=e5fbc548" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
     <link rel="stylesheet" type="text/css" href="../../_static/style.css?v=a6733705" />
   
@@ -40,9 +40,9 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=141ad0fc"></script>
+    <script src="../../_static/documentation_options.js?v=81728e97"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sktree/neighbors';</script>
@@ -396,7 +396,9 @@ document.write(`
 <span class="kn">from</span> <span class="nn">sktree.tree._neighbors</span> <span class="kn">import</span> <span class="n">_compute_distance_matrix</span><span class="p">,</span> <span class="n">compute_forest_similarity_matrix</span>
 
 
-<div class="viewcode-block" id="NearestNeighborsMetaEstimator"><a class="viewcode-back" href="../../generated/sktree.NearestNeighborsMetaEstimator.html#sktree.NearestNeighborsMetaEstimator">[docs]</a><span class="k">class</span> <span class="nc">NearestNeighborsMetaEstimator</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">MetaEstimatorMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="NearestNeighborsMetaEstimator">
+<a class="viewcode-back" href="../../generated/sktree.NearestNeighborsMetaEstimator.html#sktree.NearestNeighborsMetaEstimator">[docs]</a>
+<span class="k">class</span> <span class="nc">NearestNeighborsMetaEstimator</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">MetaEstimatorMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Meta-estimator for nearest neighbors.</span>
 
 <span class="sd">    Uses a decision-tree, or forest model to compute distances between samples</span>
@@ -424,7 +426,9 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">radius</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span> <span class="o">=</span> <span class="n">n_jobs</span>
 
-<div class="viewcode-block" id="NearestNeighborsMetaEstimator.fit"><a class="viewcode-back" href="../../generated/sktree.NearestNeighborsMetaEstimator.html#sktree.NearestNeighborsMetaEstimator.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="NearestNeighborsMetaEstimator.fit">
+<a class="viewcode-back" href="../../generated/sktree.NearestNeighborsMetaEstimator.html#sktree.NearestNeighborsMetaEstimator.fit">[docs]</a>
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Fit the nearest neighbors estimator from the training dataset.</span>
 
 <span class="sd">        Parameters</span>
@@ -453,6 +457,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_neighbors</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
+
     <span class="k">def</span> <span class="nf">_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">n_neighbors</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">neigh_est_</span> <span class="o">=</span> <span class="n">NearestNeighbors</span><span class="p">(</span>
             <span class="n">n_neighbors</span><span class="o">=</span><span class="n">n_neighbors</span><span class="p">,</span>
@@ -468,7 +473,9 @@ document.write(`
         <span class="c1"># fit the nearest-neighbors estimator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">neigh_est_</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">dists</span><span class="p">)</span>
 
-<div class="viewcode-block" id="NearestNeighborsMetaEstimator.kneighbors"><a class="viewcode-back" href="../../generated/sktree.NearestNeighborsMetaEstimator.html#sktree.NearestNeighborsMetaEstimator.kneighbors">[docs]</a>    <span class="k">def</span> <span class="nf">kneighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_neighbors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_distance</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="NearestNeighborsMetaEstimator.kneighbors">
+<a class="viewcode-back" href="../../generated/sktree.NearestNeighborsMetaEstimator.html#sktree.NearestNeighborsMetaEstimator.kneighbors">[docs]</a>
+    <span class="k">def</span> <span class="nf">kneighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_neighbors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_distance</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Find the K-neighbors of a point.</span>
 
 <span class="sd">        Returns indices of and distances to the neighbors of each point.</span>
@@ -511,7 +518,10 @@ document.write(`
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">neigh_est_</span><span class="o">.</span><span class="n">kneighbors</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="n">n_neighbors</span><span class="p">,</span> <span class="n">return_distance</span><span class="o">=</span><span class="n">return_distance</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="NearestNeighborsMetaEstimator.radius_neighbors"><a class="viewcode-back" href="../../generated/sktree.NearestNeighborsMetaEstimator.html#sktree.NearestNeighborsMetaEstimator.radius_neighbors">[docs]</a>    <span class="k">def</span> <span class="nf">radius_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_distance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sort_results</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+<div class="viewcode-block" id="NearestNeighborsMetaEstimator.radius_neighbors">
+<a class="viewcode-back" href="../../generated/sktree.NearestNeighborsMetaEstimator.html#sktree.NearestNeighborsMetaEstimator.radius_neighbors">[docs]</a>
+    <span class="k">def</span> <span class="nf">radius_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_distance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sort_results</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Find the neighbors within a given radius of a point or points.</span>
 
 <span class="sd">        Return the indices and distances of each point from the dataset</span>
@@ -590,7 +600,9 @@ document.write(`
 
         <span class="k">if</span> <span class="n">return_distance</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">nn_dist_data</span><span class="p">,</span> <span class="n">nn_ind_data</span>
-        <span class="k">return</span> <span class="n">nn_ind_data</span></div></div>
+        <span class="k">return</span> <span class="n">nn_ind_data</span></div>
+</div>
+
 </pre></div>
 
                 </article>
@@ -635,7 +647,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-16.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-22.
       <br/>
     
   </p>

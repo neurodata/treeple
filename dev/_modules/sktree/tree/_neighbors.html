@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=61a4c737" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=e5fbc548" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
     <link rel="stylesheet" type="text/css" href="../../../_static/style.css?v=a6733705" />
   
@@ -40,9 +40,9 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=141ad0fc"></script>
+    <script src="../../../_static/documentation_options.js?v=81728e97"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sktree/tree/_neighbors';</script>
@@ -387,7 +387,9 @@ document.write(`
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 
-<div class="viewcode-block" id="compute_forest_similarity_matrix"><a class="viewcode-back" href="../../../generated/sktree.tree.compute_forest_similarity_matrix.html#sktree.tree.compute_forest_similarity_matrix">[docs]</a><span class="k">def</span> <span class="nf">compute_forest_similarity_matrix</span><span class="p">(</span><span class="n">forest</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+<div class="viewcode-block" id="compute_forest_similarity_matrix">
+<a class="viewcode-back" href="../../../generated/sktree.tree.compute_forest_similarity_matrix.html#sktree.tree.compute_forest_similarity_matrix">[docs]</a>
+<span class="k">def</span> <span class="nf">compute_forest_similarity_matrix</span><span class="p">(</span><span class="n">forest</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the similarity matrix of samples in X using a trained forest.</span>
 
 <span class="sd">    As an intermediate calculation, the forest applies the dataset and gets</span>
@@ -420,6 +422,7 @@ document.write(`
     <span class="c1"># normalize by the number of trees</span>
     <span class="n">aff_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">aff_matrix</span><span class="p">,</span> <span class="n">n_est</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">aff_matrix</span></div>
+
 
 
 <span class="k">def</span> <span class="nf">_compute_distance_matrix</span><span class="p">(</span><span class="n">aff_matrix</span><span class="p">):</span>
@@ -494,7 +497,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-16.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-22.
       <br/>
     
   </p>

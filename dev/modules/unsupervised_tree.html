@@ -33,7 +33,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=e5fbc548" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
     <link rel="stylesheet" type="text/css" href="../_static/style.css?v=a6733705" />
   
@@ -41,9 +41,9 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=141ad0fc"></script>
+    <script src="../_static/documentation_options.js?v=81728e97"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=fd10adb8"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -406,7 +406,7 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <section id="unsupervised-decision-trees">
-<span id="unsupervised-tree"></span><h1><span class="section-number">2. </span>Unsupervised Decision Trees<a class="headerlink" href="#unsupervised-decision-trees" title="Permalink to this heading">#</a></h1>
+<span id="unsupervised-tree"></span><h1><span class="section-number">2. </span>Unsupervised Decision Trees<a class="headerlink" href="#unsupervised-decision-trees" title="Link to this heading">#</a></h1>
 <p>In unsupervised learning, the goal is to identify patterns
 or structure in data without using labeled examples. Clustering is a common
 unsupervised learning technique that groups similar examples together
@@ -415,10 +415,10 @@ clusters of samples. For information on supervised tree models, see <a class="re
 <p>In this guide, we overview the <a class="reference internal" href="#unsup-criterion"><span class="std std-ref">Unsupervised Criterion</span></a> used for splitting unsupervised trees,
 and methods for evaluating the quality of the tree model in <a class="reference internal" href="#unsup-evaluation"><span class="std std-ref">Evaluating Unsupervised Trees</span></a>.</p>
 <section id="unsupervised-criterion">
-<span id="unsup-criterion"></span><h2><span class="section-number">2.1. </span>Unsupervised Criterion<a class="headerlink" href="#unsupervised-criterion" title="Permalink to this heading">#</a></h2>
+<span id="unsup-criterion"></span><h2><span class="section-number">2.1. </span>Unsupervised Criterion<a class="headerlink" href="#unsupervised-criterion" title="Link to this heading">#</a></h2>
 <p>Unsupervised tree models use a variety of criteria to split nodes.</p>
 <section id="two-means">
-<h3><span class="section-number">2.1.1. </span>Two-Means<a class="headerlink" href="#two-means" title="Permalink to this heading">#</a></h3>
+<h3><span class="section-number">2.1.1. </span>Two-Means<a class="headerlink" href="#two-means" title="Link to this heading">#</a></h3>
 <p>The two means split finds the cutpoint that minimizes the one-dimensional
 2-means objective, which is finding the cutoff point where the total variance
 from cluster 1 and cluster 2 are minimal.</p>
@@ -428,7 +428,7 @@ from cluster 1 and cluster 2 are minimal.</p>
 the mu terms are the estimated means of each cluster 1 and 2.</p>
 </section>
 <section id="fast-bic">
-<h3><span class="section-number">2.1.2. </span>Fast-BIC<a class="headerlink" href="#fast-bic" title="Permalink to this heading">#</a></h3>
+<h3><span class="section-number">2.1.2. </span>Fast-BIC<a class="headerlink" href="#fast-bic" title="Link to this heading">#</a></h3>
 <p>The Bayesian Information Criterion (BIC) is a popular model seleciton
 criteria that is based on the log likelihood of the model given data.
 Fast-BIC <a class="footnote-reference brackets" href="#footcite-meghana2019-geodesicrf" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> is a method that combines the speed of the
@@ -450,7 +450,7 @@ clustering like in GMM, resulting in a simpler calculation of the likelihood.</p
 </section>
 </section>
 <section id="evaluating-unsupervised-trees">
-<span id="unsup-evaluation"></span><h2><span class="section-number">2.2. </span>Evaluating Unsupervised Trees<a class="headerlink" href="#evaluating-unsupervised-trees" title="Permalink to this heading">#</a></h2>
+<span id="unsup-evaluation"></span><h2><span class="section-number">2.2. </span>Evaluating Unsupervised Trees<a class="headerlink" href="#evaluating-unsupervised-trees" title="Link to this heading">#</a></h2>
 <p>In clustering settings, there may be no natural
 notion of “true” class-labels, thus the efficacy of the clustering scheme is
 often measured based on distance based metrics such as <a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.metrics.adjusted_rand_score.html#sklearn.metrics.adjusted_rand_score" title="(in scikit-learn v1.4)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.metrics.adjusted_rand_score()</span></code></a>.</p>
@@ -548,7 +548,7 @@ often measured based on distance based metrics such as <a class="reference exter
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-16.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-22.
       <br/>
     
   </p>

@@ -33,7 +33,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=e5fbc548" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
     <link rel="stylesheet" type="text/css" href="../_static/style.css?v=a6733705" />
   
@@ -41,9 +41,9 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=141ad0fc"></script>
+    <script src="../_static/documentation_options.js?v=81728e97"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'auto_examples/plot_projection_matrices';</script>
@@ -410,7 +410,7 @@ document.write(`
 to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="plot-the-projection-matrices-of-an-oblique-tree">
-<span id="sphx-glr-auto-examples-plot-projection-matrices-py"></span><h1>Plot the projection matrices of an oblique tree<a class="headerlink" href="#plot-the-projection-matrices-of-an-oblique-tree" title="Permalink to this heading">#</a></h1>
+<span id="sphx-glr-auto-examples-plot-projection-matrices-py"></span><h1>Plot the projection matrices of an oblique tree<a class="headerlink" href="#plot-the-projection-matrices-of-an-oblique-tree" title="Link to this heading">#</a></h1>
 <p>This example shows how projection matrices are generated for an oblique tree,
 specifically the <a class="reference internal" href="../generated/sktree.tree.PatchObliqueDecisionTreeClassifier.html#sktree.tree.PatchObliqueDecisionTreeClassifier" title="sktree.tree.PatchObliqueDecisionTreeClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">sktree.tree.PatchObliqueDecisionTreeClassifier</span></code></a>.</p>
 <p>For a tree, one can specify the structure of the data that it will be trained on
@@ -450,7 +450,7 @@ is <code class="docutils literal notranslate"><span class="pre">(5,</span> <span
 </pre></div>
 </div>
 <section id="initialize-patch-splitter">
-<h2>Initialize patch splitter<a class="headerlink" href="#initialize-patch-splitter" title="Permalink to this heading">#</a></h2>
+<h2>Initialize patch splitter<a class="headerlink" href="#initialize-patch-splitter" title="Link to this heading">#</a></h2>
 <p>The patch splitter is used to generate patches for the projection matrices.
 We will initialize the patch with some dummy values for the sake of this
 example.</p>
@@ -477,7 +477,7 @@ example.</p>
 </div>
 </section>
 <section id="generate-1d-patches">
-<h2>Generate 1D patches<a class="headerlink" href="#generate-1d-patches" title="Permalink to this heading">#</a></h2>
+<h2>Generate 1D patches<a class="headerlink" href="#generate-1d-patches" title="Link to this heading">#</a></h2>
 <p>Now that we have th patch splitter initialized, we can generate some patches
 and visualize how they appear on the data. We will make the patch 1D, which
 samples multiple rows contiguously. This is a 1D patch of size 3.</p>
@@ -526,7 +526,7 @@ samples multiple rows contiguously. This is a 1D patch of size 3.</p>
 </div>
 </section>
 <section id="generate-2d-patches">
-<h2>Generate 2D patches<a class="headerlink" href="#generate-2d-patches" title="Permalink to this heading">#</a></h2>
+<h2>Generate 2D patches<a class="headerlink" href="#generate-2d-patches" title="Link to this heading">#</a></h2>
 <p>We will make the patch 2D, which samples multiple rows contiguously. This is
 a 2D patch of size 3 in the columns and 2 in the rows.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">min_patch_dims</span></a> <span class="o">=</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
@@ -570,7 +570,7 @@ a 2D patch of size 3 in the columns and 2 in the rows.</p>
 </div>
 <img src="../_images/sphx_glr_plot_projection_matrices_002.png" srcset="../_images/sphx_glr_plot_projection_matrices_002.png" alt="2D Patch Visualization, Patch 0, Patch 1, Patch 2, Patch 3, Patch 4, Patch 5" class = "sphx-glr-single-img"/></section>
 <section id="generate-3d-patches">
-<h2>Generate 3D patches<a class="headerlink" href="#generate-3d-patches" title="Permalink to this heading">#</a></h2>
+<h2>Generate 3D patches<a class="headerlink" href="#generate-3d-patches" title="Link to this heading">#</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># initialize some dummy data</span>
 <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a> <span class="o">=</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.repeat.html#numpy.repeat" title="numpy.repeat" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">repeat</span></a><span class="p">(</span><a href="https://numpy.org/devdocs/reference/generated/numpy.arange.html#numpy.arange" title="numpy.arange" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">arange</span></a><span class="p">(</span><span class="mi">25</span> <span class="o">*</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.float32" title="numpy.float32" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">np</span><span class="o">.</span><span class="n">float32</span></a><span class="p">),</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a> <span class="o">=</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">np</span><span class="o">.</span><span class="n">float64</span></a><span class="p">)</span>
@@ -628,7 +628,7 @@ a 2D patch of size 3 in the columns and 2 in the rows.</p>
 </div>
 </section>
 <section id="discontiguous-patches">
-<h2>Discontiguous Patches<a class="headerlink" href="#discontiguous-patches" title="Permalink to this heading">#</a></h2>
+<h2>Discontiguous Patches<a class="headerlink" href="#discontiguous-patches" title="Link to this heading">#</a></h2>
 <p>We can also generate patches that are not contiguous. This is useful for
 analyzing data that is structured, but not necessarily contiguous in certain
 dimensions. For example, we can generate patches that sample the data in a
@@ -720,8 +720,8 @@ a 2D patch of size 3 in the columns and 2 in the rows.</p>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plot_projection_matrices_005.png" srcset="../_images/sphx_glr_plot_projection_matrices_005.png" alt="2D Discontiguous In All Dims Patch Visualization, Patch 0, Patch 1, Patch 2, Patch 3, Patch 4, Patch 5, Patch 6, Patch 7, Patch 8" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  5.424 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  11 MB</p>
+<img src="../_images/sphx_glr_plot_projection_matrices_005.png" srcset="../_images/sphx_glr_plot_projection_matrices_005.png" alt="2D Discontiguous In All Dims Patch Visualization, Patch 0, Patch 1, Patch 2, Patch 3, Patch 4, Patch 5, Patch 6, Patch 7, Patch 8" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 5.150 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  12 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-projection-matrices-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/0a65e88a0e06f6c9a3b9c7f9b8a19554/plot_projection_matrices.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_projection_matrices.py</span></code></a></p>
@@ -804,7 +804,7 @@ a 2D patch of size 3 in the columns and 2 in the rows.</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-16.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-22.
       <br/>
     
   </p>

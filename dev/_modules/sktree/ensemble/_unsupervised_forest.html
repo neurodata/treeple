@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=61a4c737" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=e5fbc548" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
     <link rel="stylesheet" type="text/css" href="../../../_static/style.css?v=a6733705" />
   
@@ -40,9 +40,9 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=141ad0fc"></script>
+    <script src="../../../_static/documentation_options.js?v=81728e97"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sktree/ensemble/_unsupervised_forest';</script>
@@ -760,7 +760,9 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">oob_score_</span> <span class="o">=</span> <span class="n">scoring_function</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">predict_labels</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="UnsupervisedRandomForest"><a class="viewcode-back" href="../../../generated/sktree.UnsupervisedRandomForest.html#sktree.UnsupervisedRandomForest">[docs]</a><span class="k">class</span> <span class="nc">UnsupervisedRandomForest</span><span class="p">(</span><span class="n">ForestCluster</span><span class="p">):</span>
+<div class="viewcode-block" id="UnsupervisedRandomForest">
+<a class="viewcode-back" href="../../../generated/sktree.UnsupervisedRandomForest.html#sktree.UnsupervisedRandomForest">[docs]</a>
+<span class="k">class</span> <span class="nc">UnsupervisedRandomForest</span><span class="p">(</span><span class="n">ForestCluster</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Unsupervised random forest.</span>
 
 <span class="sd">    An unsupervised random forest is inherently a clustering algorithm that also</span>
@@ -940,7 +942,7 @@ document.write(`
         <span class="o">*</span><span class="p">,</span>
         <span class="n">criterion</span><span class="o">=</span><span class="s2">&quot;twomeans&quot;</span><span class="p">,</span>
         <span class="n">max_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">min_samples_split</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">min_samples_split</span><span class="o">=</span><span class="s2">&quot;sqrt&quot;</span><span class="p">,</span>
         <span class="n">min_samples_leaf</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">min_weight_fraction_leaf</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
         <span class="n">max_features</span><span class="o">=</span><span class="s2">&quot;sqrt&quot;</span><span class="p">,</span>
@@ -991,7 +993,10 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">clustering_func_args</span> <span class="o">=</span> <span class="n">clustering_func_args</span></div>
 
 
-<div class="viewcode-block" id="UnsupervisedObliqueRandomForest"><a class="viewcode-back" href="../../../generated/sktree.UnsupervisedObliqueRandomForest.html#sktree.UnsupervisedObliqueRandomForest">[docs]</a><span class="k">class</span> <span class="nc">UnsupervisedObliqueRandomForest</span><span class="p">(</span><span class="n">ForestCluster</span><span class="p">):</span>
+
+<div class="viewcode-block" id="UnsupervisedObliqueRandomForest">
+<a class="viewcode-back" href="../../../generated/sktree.UnsupervisedObliqueRandomForest.html#sktree.UnsupervisedObliqueRandomForest">[docs]</a>
+<span class="k">class</span> <span class="nc">UnsupervisedObliqueRandomForest</span><span class="p">(</span><span class="n">ForestCluster</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Unsupervised oblique random forest.</span>
 
 <span class="sd">    An unsupervised random forest is inherently a clustering algorithm that also</span>
@@ -1172,7 +1177,7 @@ document.write(`
         <span class="o">*</span><span class="p">,</span>
         <span class="n">criterion</span><span class="o">=</span><span class="s2">&quot;twomeans&quot;</span><span class="p">,</span>
         <span class="n">max_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">min_samples_split</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">min_samples_split</span><span class="o">=</span><span class="s2">&quot;sqrt&quot;</span><span class="p">,</span>
         <span class="n">min_samples_leaf</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">min_weight_fraction_leaf</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
         <span class="n">max_features</span><span class="o">=</span><span class="s2">&quot;sqrt&quot;</span><span class="p">,</span>
@@ -1224,6 +1229,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">feature_combinations</span> <span class="o">=</span> <span class="n">feature_combinations</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">clustering_func</span> <span class="o">=</span> <span class="n">clustering_func</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">clustering_func_args</span> <span class="o">=</span> <span class="n">clustering_func_args</span></div>
+
 </pre></div>
 
                 </article>
@@ -1268,7 +1274,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-16.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-22.
       <br/>
     
   </p>

@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=61a4c737" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=e5fbc548" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
     <link rel="stylesheet" type="text/css" href="../../../_static/style.css?v=a6733705" />
   
@@ -40,9 +40,9 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=141ad0fc"></script>
+    <script src="../../../_static/documentation_options.js?v=81728e97"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sktree/tree/_honest_tree';</script>
@@ -391,14 +391,16 @@ document.write(`
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">ClassifierMixin</span><span class="p">,</span> <span class="n">MetaEstimatorMixin</span><span class="p">,</span> <span class="n">_fit_context</span>
-<span class="kn">from</span> <span class="nn">sklearn.utils.multiclass</span> <span class="kn">import</span> <span class="n">check_classification_targets</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.multiclass</span> <span class="kn">import</span> <span class="n">_check_partial_fit_first_call</span><span class="p">,</span> <span class="n">check_classification_targets</span>
 <span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">check_is_fitted</span><span class="p">,</span> <span class="n">check_X_y</span>
 
 <span class="kn">from</span> <span class="nn">sktree._lib.sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span>
 <span class="kn">from</span> <span class="nn">sktree._lib.sklearn.tree._classes</span> <span class="kn">import</span> <span class="n">BaseDecisionTree</span>
 
 
-<div class="viewcode-block" id="HonestTreeClassifier"><a class="viewcode-back" href="../../../generated/sktree.tree.HonestTreeClassifier.html#sktree.tree.HonestTreeClassifier">[docs]</a><span class="k">class</span> <span class="nc">HonestTreeClassifier</span><span class="p">(</span><span class="n">MetaEstimatorMixin</span><span class="p">,</span> <span class="n">ClassifierMixin</span><span class="p">,</span> <span class="n">BaseDecisionTree</span><span class="p">):</span>
+<div class="viewcode-block" id="HonestTreeClassifier">
+<a class="viewcode-back" href="../../../generated/sktree.tree.HonestTreeClassifier.html#sktree.tree.HonestTreeClassifier">[docs]</a>
+<span class="k">class</span> <span class="nc">HonestTreeClassifier</span><span class="p">(</span><span class="n">MetaEstimatorMixin</span><span class="p">,</span> <span class="n">ClassifierMixin</span><span class="p">,</span> <span class="n">BaseDecisionTree</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A decision tree classifier with honest predictions.</span>
 
@@ -690,7 +692,9 @@ document.write(`
         <span class="c1"># XXX: to enable this, we need to also reset the leaf node samples during `_set_leaf_nodes`</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">store_leaf_values</span> <span class="o">=</span> <span class="kc">False</span>
 
-<div class="viewcode-block" id="HonestTreeClassifier.fit"><a class="viewcode-back" href="../../../generated/sktree.tree.HonestTreeClassifier.html#sktree.tree.HonestTreeClassifier.fit">[docs]</a>    <span class="nd">@_fit_context</span><span class="p">(</span><span class="n">prefer_skip_nested_validation</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="viewcode-block" id="HonestTreeClassifier.fit">
+<a class="viewcode-back" href="../../../generated/sktree.tree.HonestTreeClassifier.html#sktree.tree.HonestTreeClassifier.fit">[docs]</a>
+    <span class="nd">@_fit_context</span><span class="p">(</span><span class="n">prefer_skip_nested_validation</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">X</span><span class="p">,</span>
@@ -729,7 +733,7 @@ document.write(`
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        self : DecisionTreeClassifier</span>
+<span class="sd">        self : HonestTreeClassifier</span>
 <span class="sd">            Fitted estimator.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_fit</span><span class="p">(</span>
@@ -741,14 +745,138 @@ document.write(`
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
+
+<div class="viewcode-block" id="HonestTreeClassifier.partial_fit">
+<a class="viewcode-back" href="../../../generated/sktree.tree.HonestTreeClassifier.html#sktree.tree.HonestTreeClassifier.partial_fit">[docs]</a>
+    <span class="k">def</span> <span class="nf">partial_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">check_input</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update a decision tree classifier from the training set (X, y).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : {array-like, sparse matrix} of shape (n_samples, n_features)</span>
+<span class="sd">            The training input samples. Internally, it will be converted to</span>
+<span class="sd">            ``dtype=np.float32`` and if a sparse matrix is provided</span>
+<span class="sd">            to a sparse ``csc_matrix``.</span>
+
+<span class="sd">        y : array-like of shape (n_samples,) or (n_samples, n_outputs)</span>
+<span class="sd">            The target values (class labels) as integers or strings.</span>
+
+<span class="sd">        sample_weight : array-like of shape (n_samples,), default=None</span>
+<span class="sd">            Sample weights. If None, then samples are equally weighted. Splits</span>
+<span class="sd">            that would create child nodes with net zero or negative weight are</span>
+<span class="sd">            ignored while searching for a split in each node. Splits are also</span>
+<span class="sd">            ignored if they would result in any single class carrying a</span>
+<span class="sd">            negative weight in either child node.</span>
+
+<span class="sd">        check_input : bool, default=True</span>
+<span class="sd">            Allow to bypass several input checking.</span>
+<span class="sd">            Don&#39;t use this parameter unless you know what you do.</span>
+
+<span class="sd">        classes : array-like of shape (n_classes,), default=None</span>
+<span class="sd">            List of all the classes that can possibly appear in the y vector.</span>
+<span class="sd">            Must be provided at the first call to partial_fit, can be omitted</span>
+<span class="sd">            in subsequent calls.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self : HonestTreeClassifier</span>
+<span class="sd">            Fitted estimator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_params</span><span class="p">()</span>
+
+        <span class="c1"># validate input parameters</span>
+        <span class="n">first_call</span> <span class="o">=</span> <span class="n">_check_partial_fit_first_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">)</span>
+
+        <span class="c1"># Fit if no tree exists yet</span>
+        <span class="k">if</span> <span class="n">first_call</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fit</span><span class="p">(</span>
+                <span class="n">X</span><span class="p">,</span>
+                <span class="n">y</span><span class="p">,</span>
+                <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">,</span>
+                <span class="n">check_input</span><span class="o">=</span><span class="n">check_input</span><span class="p">,</span>
+                <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span>
+
+        <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">sample_weight</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_sample_weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_sample_weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sample_weight</span><span class="p">)</span>
+
+        <span class="n">nonzero_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">_sample_weight</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">structure_indices_</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+            <span class="n">nonzero_indices</span><span class="p">,</span>
+            <span class="nb">int</span><span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">honest_fraction</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">nonzero_indices</span><span class="p">)),</span>
+            <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">(</span><span class="n">nonzero_indices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">structure_indices_</span><span class="p">)</span>
+
+        <span class="n">_sample_weight</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">partial_fit</span><span class="p">(</span>
+            <span class="n">X</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">,</span>
+            <span class="n">sample_weight</span><span class="o">=</span><span class="n">_sample_weight</span><span class="p">,</span>
+            <span class="n">check_input</span><span class="o">=</span><span class="n">check_input</span><span class="p">,</span>
+            <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_inherit_estimator_attributes</span><span class="p">()</span>
+
+        <span class="c1"># update the number of classes, unsplit</span>
+        <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># reshape is necessary to preserve the data contiguity against vs</span>
+            <span class="c1"># [:, np.newaxis] that does not.</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">check_classification_targets</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>  <span class="c1"># .astype(int)</span>
+
+        <span class="c1"># Normally called by super</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">_validate_X_predict</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Fit leaves using other subsample</span>
+        <span class="n">honest_leaves</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span><span class="p">])</span>
+
+        <span class="c1"># preserve from underlying tree</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tree_classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tree_n_classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">empirical_prior_</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">y_encoded</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">):</span>
+            <span class="n">classes_k</span><span class="p">,</span> <span class="n">y_encoded</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y</span><span class="p">[:,</span> <span class="n">k</span><span class="p">],</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">classes_k</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">classes_k</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">empirical_prior_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">y_encoded</span><span class="p">[:,</span> <span class="n">k</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">classes_k</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y_encoded</span>
+
+        <span class="c1"># y-encoded ensures that y values match the indices of the classes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_leaf_nodes</span><span class="p">(</span><span class="n">honest_leaves</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">empirical_prior_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">empirical_prior_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
     <span class="k">def</span> <span class="nf">_fit</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">X</span><span class="p">,</span>
         <span class="n">y</span><span class="p">,</span>
         <span class="n">sample_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">classes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">check_input</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">missing_values_in_feature_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">classes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Build an honest tree classifier from the training set (X, y).</span>
 
@@ -772,6 +900,9 @@ document.write(`
 <span class="sd">        check_input : bool, default=True</span>
 <span class="sd">            Allow to bypass several input checking.</span>
 <span class="sd">            Don&#39;t use this parameter unless you know what you do.</span>
+
+<span class="sd">        classes : array-like of shape (n_classes,), default=None</span>
+<span class="sd">            List of all the classes that can possibly appear in the y vector.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -825,9 +956,9 @@ document.write(`
             <span class="n">X</span><span class="p">,</span>
             <span class="n">y</span><span class="p">,</span>
             <span class="n">sample_weight</span><span class="o">=</span><span class="n">_sample_weight</span><span class="p">,</span>
-            <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span>
             <span class="n">check_input</span><span class="o">=</span><span class="n">check_input</span><span class="p">,</span>
             <span class="n">missing_values_in_feature_mask</span><span class="o">=</span><span class="n">missing_values_in_feature_mask</span><span class="p">,</span>
+            <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inherit_estimator_attributes</span><span class="p">()</span>
 
@@ -928,7 +1059,9 @@ document.write(`
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;honest_prior </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_prior</span><span class="si">}</span><span class="s2"> not a valid input.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">proba</span>
 
-<div class="viewcode-block" id="HonestTreeClassifier.predict_proba"><a class="viewcode-back" href="../../../generated/sktree.tree.HonestTreeClassifier.html#sktree.tree.HonestTreeClassifier.predict_proba">[docs]</a>    <span class="k">def</span> <span class="nf">predict_proba</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">check_input</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="HonestTreeClassifier.predict_proba">
+<a class="viewcode-back" href="../../../generated/sktree.tree.HonestTreeClassifier.html#sktree.tree.HonestTreeClassifier.predict_proba">[docs]</a>
+    <span class="k">def</span> <span class="nf">predict_proba</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">check_input</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Predict class probabilities of the input samples X.</span>
 
 <span class="sd">        The predicted class probability is the fraction of samples of the same</span>
@@ -978,7 +1111,10 @@ document.write(`
 
             <span class="k">return</span> <span class="n">all_proba</span></div>
 
-<div class="viewcode-block" id="HonestTreeClassifier.predict"><a class="viewcode-back" href="../../../generated/sktree.tree.HonestTreeClassifier.html#sktree.tree.HonestTreeClassifier.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">check_input</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+<div class="viewcode-block" id="HonestTreeClassifier.predict">
+<a class="viewcode-back" href="../../../generated/sktree.tree.HonestTreeClassifier.html#sktree.tree.HonestTreeClassifier.predict">[docs]</a>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">check_input</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Predict class for X.</span>
 
 <span class="sd">        For a classification model, the predicted class for each sample in X is</span>
@@ -1002,7 +1138,9 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_X_predict</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">check_input</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
+</div>
+
 </pre></div>
 
                 </article>
@@ -1047,7 +1185,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-16.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-22.
       <br/>
     
   </p>

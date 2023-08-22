@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=61a4c737" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=e5fbc548" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
     <link rel="stylesheet" type="text/css" href="../../../_static/style.css?v=a6733705" />
   
@@ -40,9 +40,9 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=141ad0fc"></script>
+    <script src="../../../_static/documentation_options.js?v=81728e97"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sktree/tree/_classes';</script>
@@ -385,6 +385,7 @@ document.write(`
                   
   <h1>Source code for sktree.tree._classes</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">numbers</span>
 <span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Real</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -451,7 +452,9 @@ document.write(`
 <span class="n">UNSUPERVISED_OBLIQUE_SPLITTERS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;best&quot;</span><span class="p">:</span> <span class="n">_unsup_oblique_splitter</span><span class="o">.</span><span class="n">BestObliqueUnsupervisedSplitter</span><span class="p">}</span>
 
 
-<div class="viewcode-block" id="UnsupervisedDecisionTree"><a class="viewcode-back" href="../../../generated/sktree.tree.UnsupervisedDecisionTree.html#sktree.tree.UnsupervisedDecisionTree">[docs]</a><span class="k">class</span> <span class="nc">UnsupervisedDecisionTree</span><span class="p">(</span><span class="n">SimMatrixMixin</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">,</span> <span class="n">ClusterMixin</span><span class="p">,</span> <span class="n">BaseDecisionTree</span><span class="p">):</span>
+<div class="viewcode-block" id="UnsupervisedDecisionTree">
+<a class="viewcode-back" href="../../../generated/sktree.tree.UnsupervisedDecisionTree.html#sktree.tree.UnsupervisedDecisionTree">[docs]</a>
+<span class="k">class</span> <span class="nc">UnsupervisedDecisionTree</span><span class="p">(</span><span class="n">SimMatrixMixin</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">,</span> <span class="n">ClusterMixin</span><span class="p">,</span> <span class="n">BaseDecisionTree</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Unsupervised decision tree.</span>
 
 <span class="sd">    Parameters</span>
@@ -557,7 +560,7 @@ document.write(`
         <span class="n">criterion</span><span class="o">=</span><span class="s2">&quot;twomeans&quot;</span><span class="p">,</span>
         <span class="n">splitter</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">,</span>
         <span class="n">max_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">min_samples_split</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">min_samples_split</span><span class="o">=</span><span class="s2">&quot;sqrt&quot;</span><span class="p">,</span>
         <span class="n">min_samples_leaf</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">min_weight_fraction_leaf</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
         <span class="n">max_features</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -620,6 +623,22 @@ document.write(`
         <span class="n">max_depth</span><span class="p">,</span>
         <span class="n">random_state</span><span class="p">,</span>
     <span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_samples_split</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_samples_split</span> <span class="o">==</span> <span class="s2">&quot;sqrt&quot;</span><span class="p">:</span>
+                <span class="n">min_samples_split</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span><span class="p">)))</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_samples_split</span> <span class="o">==</span> <span class="s2">&quot;log2&quot;</span><span class="p">:</span>
+                <span class="n">min_samples_split</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span><span class="p">)))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_samples_split</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">min_samples_split</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_samples_split</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Integral</span><span class="p">):</span>
+            <span class="n">min_samples_split</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_samples_split</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># float</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_samples_split</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
+                <span class="n">min_samples_split</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_samples_split</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">min_samples_split</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_samples_split_</span> <span class="o">=</span> <span class="n">min_samples_split</span>
+
         <span class="n">criterion</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">criterion</span><span class="p">,</span> <span class="n">UnsupervisedCriterion</span><span class="p">):</span>
             <span class="n">criterion</span> <span class="o">=</span> <span class="n">UNSUPERVISED_CRITERIA</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">]()</span>
@@ -640,7 +659,7 @@ document.write(`
         <span class="k">if</span> <span class="n">max_leaf_nodes</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">builder</span> <span class="o">=</span> <span class="n">UnsupervisedDepthFirstTreeBuilder</span><span class="p">(</span>
                 <span class="n">splitter</span><span class="p">,</span>
-                <span class="n">min_samples_split</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">min_samples_split_</span><span class="p">,</span>
                 <span class="n">min_samples_leaf</span><span class="p">,</span>
                 <span class="n">min_weight_leaf</span><span class="p">,</span>
                 <span class="n">max_depth</span><span class="p">,</span>
@@ -649,7 +668,7 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="n">builder</span> <span class="o">=</span> <span class="n">UnsupervisedBestFirstTreeBuilder</span><span class="p">(</span>
                 <span class="n">splitter</span><span class="p">,</span>
-                <span class="n">min_samples_split</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">min_samples_split_</span><span class="p">,</span>
                 <span class="n">min_samples_leaf</span><span class="p">,</span>
                 <span class="n">min_weight_leaf</span><span class="p">,</span>
                 <span class="n">max_depth</span><span class="p">,</span>
@@ -659,7 +678,9 @@ document.write(`
 
         <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">)</span>
 
-<div class="viewcode-block" id="UnsupervisedDecisionTree.predict"><a class="viewcode-back" href="../../../generated/sktree.tree.UnsupervisedDecisionTree.html#sktree.tree.UnsupervisedDecisionTree.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">check_input</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="UnsupervisedDecisionTree.predict">
+<a class="viewcode-back" href="../../../generated/sktree.tree.UnsupervisedDecisionTree.html#sktree.tree.UnsupervisedDecisionTree.predict">[docs]</a>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">check_input</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Assign labels based on clustering the affinity matrix.</span>
 
 <span class="sd">        Parameters</span>
@@ -682,7 +703,10 @@ document.write(`
         <span class="c1"># compute the labels and set it</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_assign_labels</span><span class="p">(</span><span class="n">affinity_matrix</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="UnsupervisedDecisionTree.transform"><a class="viewcode-back" href="../../../generated/sktree.tree.UnsupervisedDecisionTree.html#sktree.tree.UnsupervisedDecisionTree.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+
+<div class="viewcode-block" id="UnsupervisedDecisionTree.transform">
+<a class="viewcode-back" href="../../../generated/sktree.tree.UnsupervisedDecisionTree.html#sktree.tree.UnsupervisedDecisionTree.transform">[docs]</a>
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Transform X to a cluster-distance space.</span>
 
 <span class="sd">        In the new space, each dimension is the distance to the cluster</span>
@@ -704,6 +728,7 @@ document.write(`
         <span class="c1"># now compute the affinity matrix and set it</span>
         <span class="n">affinity_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_similarity_matrix</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">affinity_matrix</span></div>
+
 
     <span class="k">def</span> <span class="nf">_assign_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">affinity_matrix</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Assign cluster labels given X.</span>
@@ -733,7 +758,10 @@ document.write(`
         <span class="k">return</span> <span class="n">predict_labels</span></div>
 
 
-<div class="viewcode-block" id="UnsupervisedObliqueDecisionTree"><a class="viewcode-back" href="../../../generated/sktree.tree.UnsupervisedObliqueDecisionTree.html#sktree.tree.UnsupervisedObliqueDecisionTree">[docs]</a><span class="k">class</span> <span class="nc">UnsupervisedObliqueDecisionTree</span><span class="p">(</span><span class="n">UnsupervisedDecisionTree</span><span class="p">):</span>
+
+<div class="viewcode-block" id="UnsupervisedObliqueDecisionTree">
+<a class="viewcode-back" href="../../../generated/sktree.tree.UnsupervisedObliqueDecisionTree.html#sktree.tree.UnsupervisedObliqueDecisionTree">[docs]</a>
+<span class="k">class</span> <span class="nc">UnsupervisedObliqueDecisionTree</span><span class="p">(</span><span class="n">UnsupervisedDecisionTree</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Unsupervised oblique decision tree.</span>
 
 <span class="sd">    Parameters</span>
@@ -845,7 +873,7 @@ document.write(`
         <span class="n">criterion</span><span class="o">=</span><span class="s2">&quot;twomeans&quot;</span><span class="p">,</span>
         <span class="n">splitter</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">,</span>
         <span class="n">max_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">min_samples_split</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">min_samples_split</span><span class="o">=</span><span class="s2">&quot;sqrt&quot;</span><span class="p">,</span>
         <span class="n">min_samples_leaf</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">min_weight_fraction_leaf</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">max_features</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -931,7 +959,10 @@ document.write(`
         <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="ObliqueDecisionTreeClassifier"><a class="viewcode-back" href="../../../generated/sktree.tree.ObliqueDecisionTreeClassifier.html#sktree.tree.ObliqueDecisionTreeClassifier">[docs]</a><span class="k">class</span> <span class="nc">ObliqueDecisionTreeClassifier</span><span class="p">(</span><span class="n">SimMatrixMixin</span><span class="p">,</span> <span class="n">DecisionTreeClassifier</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ObliqueDecisionTreeClassifier">
+<a class="viewcode-back" href="../../../generated/sktree.tree.ObliqueDecisionTreeClassifier.html#sktree.tree.ObliqueDecisionTreeClassifier">[docs]</a>
+<span class="k">class</span> <span class="nc">ObliqueDecisionTreeClassifier</span><span class="p">(</span><span class="n">SimMatrixMixin</span><span class="p">,</span> <span class="n">DecisionTreeClassifier</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A decision tree classifier.</span>
 
 <span class="sd">    Read more in the :ref:`User Guide &lt;sklearn:tree&gt;`. The implementation follows</span>
@@ -1323,7 +1354,10 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="ObliqueDecisionTreeRegressor"><a class="viewcode-back" href="../../../generated/sktree.tree.ObliqueDecisionTreeRegressor.html#sktree.tree.ObliqueDecisionTreeRegressor">[docs]</a><span class="k">class</span> <span class="nc">ObliqueDecisionTreeRegressor</span><span class="p">(</span><span class="n">SimMatrixMixin</span><span class="p">,</span> <span class="n">DecisionTreeRegressor</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ObliqueDecisionTreeRegressor">
+<a class="viewcode-back" href="../../../generated/sktree.tree.ObliqueDecisionTreeRegressor.html#sktree.tree.ObliqueDecisionTreeRegressor">[docs]</a>
+<span class="k">class</span> <span class="nc">ObliqueDecisionTreeRegressor</span><span class="p">(</span><span class="n">SimMatrixMixin</span><span class="p">,</span> <span class="n">DecisionTreeRegressor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;An oblique decision tree Regressor.</span>
 
 <span class="sd">    Read more in the :ref:`User Guide &lt;sklearn:tree&gt;`. The implementation follows</span>
@@ -1682,7 +1716,10 @@ document.write(`
         <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="PatchObliqueDecisionTreeClassifier"><a class="viewcode-back" href="../../../generated/sktree.tree.PatchObliqueDecisionTreeClassifier.html#sktree.tree.PatchObliqueDecisionTreeClassifier">[docs]</a><span class="k">class</span> <span class="nc">PatchObliqueDecisionTreeClassifier</span><span class="p">(</span><span class="n">SimMatrixMixin</span><span class="p">,</span> <span class="n">DecisionTreeClassifier</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PatchObliqueDecisionTreeClassifier">
+<a class="viewcode-back" href="../../../generated/sktree.tree.PatchObliqueDecisionTreeClassifier.html#sktree.tree.PatchObliqueDecisionTreeClassifier">[docs]</a>
+<span class="k">class</span> <span class="nc">PatchObliqueDecisionTreeClassifier</span><span class="p">(</span><span class="n">SimMatrixMixin</span><span class="p">,</span> <span class="n">DecisionTreeClassifier</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A oblique decision tree classifier that operates over patches of data.</span>
 
 <span class="sd">    A patch oblique decision tree is also known as a manifold oblique decision tree</span>
@@ -2138,7 +2175,10 @@ document.write(`
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;multilabel&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;allow_nan&quot;</span><span class="p">:</span> <span class="n">allow_nan</span><span class="p">}</span></div>
 
 
-<div class="viewcode-block" id="PatchObliqueDecisionTreeRegressor"><a class="viewcode-back" href="../../../generated/sktree.tree.PatchObliqueDecisionTreeRegressor.html#sktree.tree.PatchObliqueDecisionTreeRegressor">[docs]</a><span class="k">class</span> <span class="nc">PatchObliqueDecisionTreeRegressor</span><span class="p">(</span><span class="n">SimMatrixMixin</span><span class="p">,</span> <span class="n">DecisionTreeRegressor</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PatchObliqueDecisionTreeRegressor">
+<a class="viewcode-back" href="../../../generated/sktree.tree.PatchObliqueDecisionTreeRegressor.html#sktree.tree.PatchObliqueDecisionTreeRegressor">[docs]</a>
+<span class="k">class</span> <span class="nc">PatchObliqueDecisionTreeRegressor</span><span class="p">(</span><span class="n">SimMatrixMixin</span><span class="p">,</span> <span class="n">DecisionTreeRegressor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A oblique decision tree regressor that operates over patches of data.</span>
 
 <span class="sd">    A patch oblique decision tree is also known as a manifold oblique decision tree</span>
@@ -2579,6 +2619,7 @@ document.write(`
         <span class="c1"># However, for MORF it is not supported</span>
         <span class="n">allow_nan</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;multilabel&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;allow_nan&quot;</span><span class="p">:</span> <span class="n">allow_nan</span><span class="p">}</span></div>
+
 </pre></div>
 
                 </article>
@@ -2623,7 +2664,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-16.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-22.
       <br/>
     
   </p>

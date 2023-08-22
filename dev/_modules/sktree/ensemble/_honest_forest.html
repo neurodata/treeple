@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=61a4c737" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=e5fbc548" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
     <link rel="stylesheet" type="text/css" href="../../../_static/style.css?v=a6733705" />
   
@@ -40,9 +40,9 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=141ad0fc"></script>
+    <script src="../../../_static/documentation_options.js?v=81728e97"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sktree/ensemble/_honest_forest';</script>
@@ -402,7 +402,9 @@ document.write(`
 <span class="n">DTYPE</span> <span class="o">=</span> <span class="n">_sklearn_tree</span><span class="o">.</span><span class="n">DTYPE</span>
 
 
-<div class="viewcode-block" id="HonestForestClassifier"><a class="viewcode-back" href="../../../generated/sktree.HonestForestClassifier.html#sktree.HonestForestClassifier">[docs]</a><span class="k">class</span> <span class="nc">HonestForestClassifier</span><span class="p">(</span><span class="n">ForestClassifier</span><span class="p">):</span>
+<div class="viewcode-block" id="HonestForestClassifier">
+<a class="viewcode-back" href="../../../generated/sktree.HonestForestClassifier.html#sktree.HonestForestClassifier">[docs]</a>
+<span class="k">class</span> <span class="nc">HonestForestClassifier</span><span class="p">(</span><span class="n">ForestClassifier</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A forest classifier with honest leaf estimates.</span>
 
@@ -761,7 +763,9 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">honest_prior</span> <span class="o">=</span> <span class="n">honest_prior</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tree_estimator</span> <span class="o">=</span> <span class="n">tree_estimator</span>
 
-<div class="viewcode-block" id="HonestForestClassifier.fit"><a class="viewcode-back" href="../../../generated/sktree.HonestForestClassifier.html#sktree.HonestForestClassifier.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="HonestForestClassifier.fit">
+<a class="viewcode-back" href="../../../generated/sktree.HonestForestClassifier.html#sktree.HonestForestClassifier.fit">[docs]</a>
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Build a forest of trees from the training set (X, y).</span>
 
@@ -783,13 +787,16 @@ document.write(`
 <span class="sd">            classification, splits are also ignored if they would result in any</span>
 <span class="sd">            single class carrying a negative weight in either child node.</span>
 
+<span class="sd">        classes : array-like of shape (n_classes,), default=None</span>
+<span class="sd">            List of all the classes that can possibly appear in the y vector.</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        self : HonestForestClassifier</span>
 <span class="sd">            Fitted tree estimator.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">check_X_y</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">multi_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">)</span>
 
         <span class="c1"># Compute honest decision function</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">honest_decision_function_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_proba</span><span class="p">(</span>
@@ -797,7 +804,10 @@ document.write(`
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
-<div class="viewcode-block" id="HonestForestClassifier.predict_proba"><a class="viewcode-back" href="../../../generated/sktree.HonestForestClassifier.html#sktree.HonestForestClassifier.predict_proba">[docs]</a>    <span class="k">def</span> <span class="nf">predict_proba</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+
+<div class="viewcode-block" id="HonestForestClassifier.predict_proba">
+<a class="viewcode-back" href="../../../generated/sktree.HonestForestClassifier.html#sktree.HonestForestClassifier.predict_proba">[docs]</a>
+    <span class="k">def</span> <span class="nf">predict_proba</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Predict class probabilities for X.</span>
 
@@ -820,6 +830,7 @@ document.write(`
 <span class="sd">            classes corresponds to that in the attribute :term:`classes_`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_proba</span><span class="p">(</span><span class="n">X</span><span class="p">)</span></div>
+
 
     <span class="k">def</span> <span class="nf">_predict_proba</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">impute_missing</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;predict_proba helper class&quot;&quot;&quot;</span>
@@ -879,7 +890,9 @@ document.write(`
     <span class="k">def</span> <span class="nf">_more_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;multioutput&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
 
-<div class="viewcode-block" id="HonestForestClassifier.apply"><a class="viewcode-back" href="../../../generated/sktree.HonestForestClassifier.html#sktree.HonestForestClassifier.apply">[docs]</a>    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+<div class="viewcode-block" id="HonestForestClassifier.apply">
+<a class="viewcode-back" href="../../../generated/sktree.HonestForestClassifier.html#sktree.HonestForestClassifier.apply">[docs]</a>
+    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Apply trees in the forest to X, return leaf indices.</span>
 
@@ -898,7 +911,10 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">X</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="HonestForestClassifier.decision_path"><a class="viewcode-back" href="../../../generated/sktree.HonestForestClassifier.html#sktree.HonestForestClassifier.decision_path">[docs]</a>    <span class="k">def</span> <span class="nf">decision_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+
+<div class="viewcode-block" id="HonestForestClassifier.decision_path">
+<a class="viewcode-back" href="../../../generated/sktree.HonestForestClassifier.html#sktree.HonestForestClassifier.decision_path">[docs]</a>
+    <span class="k">def</span> <span class="nf">decision_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the decision path in the forest.</span>
 
@@ -924,7 +940,10 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">decision_path</span><span class="p">(</span><span class="n">X</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="HonestForestClassifier.predict_quantiles"><a class="viewcode-back" href="../../../generated/sktree.HonestForestClassifier.html#sktree.HonestForestClassifier.predict_quantiles">[docs]</a>    <span class="k">def</span> <span class="nf">predict_quantiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">quantiles</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">):</span>
+
+<div class="viewcode-block" id="HonestForestClassifier.predict_quantiles">
+<a class="viewcode-back" href="../../../generated/sktree.HonestForestClassifier.html#sktree.HonestForestClassifier.predict_quantiles">[docs]</a>
+    <span class="k">def</span> <span class="nf">predict_quantiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">quantiles</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Predict class or regression value for X at given quantiles.</span>
 
 <span class="sd">        Parameters</span>
@@ -945,7 +964,10 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">predict_quantiles</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">quantiles</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="HonestForestClassifier.get_leaf_node_samples"><a class="viewcode-back" href="../../../generated/sktree.HonestForestClassifier.html#sktree.HonestForestClassifier.get_leaf_node_samples">[docs]</a>    <span class="k">def</span> <span class="nf">get_leaf_node_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+
+<div class="viewcode-block" id="HonestForestClassifier.get_leaf_node_samples">
+<a class="viewcode-back" href="../../../generated/sktree.HonestForestClassifier.html#sktree.HonestForestClassifier.get_leaf_node_samples">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_leaf_node_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get samples in each leaf node across the forest.</span>
 
 <span class="sd">        Parameters</span>
@@ -958,7 +980,9 @@ document.write(`
 <span class="sd">        leaf_node_samples : array-like of shape (n_samples, n_estimators)</span>
 <span class="sd">            Samples within each leaf node.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">get_leaf_node_samples</span><span class="p">(</span><span class="n">X</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">get_leaf_node_samples</span><span class="p">(</span><span class="n">X</span><span class="p">)</span></div>
+</div>
+
 
 
 <span class="k">def</span> <span class="nf">_accumulate_prediction</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">lock</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -1024,7 +1048,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-16.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-22.
       <br/>
     
   </p>

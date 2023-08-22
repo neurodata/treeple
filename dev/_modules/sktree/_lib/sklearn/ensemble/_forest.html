@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../../../../../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sg_gallery.css?v=61a4c737" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/sg_gallery-dataframe.css?v=e5fbc548" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/style.css?v=a6733705" />
   
@@ -40,9 +40,9 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js?v=141ad0fc"></script>
+    <script src="../../../../../_static/documentation_options.js?v=81728e97"></script>
     <script src="../../../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../../../_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sktree/_lib/sklearn/ensemble/_forest';</script>
@@ -453,7 +453,11 @@ document.write(`
 <span class="kn">from</span> <span class="nn">sklearn.utils._openmp_helpers</span> <span class="kn">import</span> <span class="n">_openmp_effective_n_threads</span>
 <span class="kn">from</span> <span class="nn">sklearn.utils._param_validation</span> <span class="kn">import</span> <span class="n">Interval</span><span class="p">,</span> <span class="n">RealNotInt</span><span class="p">,</span> <span class="n">StrOptions</span>
 <span class="kn">from</span> <span class="nn">sklearn.utils._tags</span> <span class="kn">import</span> <span class="n">_safe_tags</span>
-<span class="kn">from</span> <span class="nn">sklearn.utils.multiclass</span> <span class="kn">import</span> <span class="n">check_classification_targets</span><span class="p">,</span> <span class="n">type_of_target</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.multiclass</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_check_partial_fit_first_call</span><span class="p">,</span>
+    <span class="n">check_classification_targets</span><span class="p">,</span>
+    <span class="n">type_of_target</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">sklearn.utils.parallel</span> <span class="kn">import</span> <span class="n">Parallel</span><span class="p">,</span> <span class="n">delayed</span>
 <span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_check_feature_names_in</span><span class="p">,</span>
@@ -551,6 +555,7 @@ document.write(`
     <span class="n">class_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">n_samples_bootstrap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">missing_values_in_feature_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">classes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Private function used to fit a single tree in parallel.&quot;&quot;&quot;</span>
@@ -583,6 +588,7 @@ document.write(`
             <span class="n">sample_weight</span><span class="o">=</span><span class="n">curr_sample_weight</span><span class="p">,</span>
             <span class="n">check_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">missing_values_in_feature_mask</span><span class="o">=</span><span class="n">missing_values_in_feature_mask</span><span class="p">,</span>
+            <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">tree</span><span class="o">.</span><span class="n">_fit</span><span class="p">(</span>
@@ -591,6 +597,50 @@ document.write(`
             <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">,</span>
             <span class="n">check_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">missing_values_in_feature_mask</span><span class="o">=</span><span class="n">missing_values_in_feature_mask</span><span class="p">,</span>
+            <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tree</span>
+
+
+<span class="k">def</span> <span class="nf">_parallel_update_trees</span><span class="p">(</span>
+    <span class="n">tree</span><span class="p">,</span>
+    <span class="n">bootstrap</span><span class="p">,</span>
+    <span class="n">X</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">,</span>
+    <span class="n">sample_weight</span><span class="p">,</span>
+    <span class="n">tree_idx</span><span class="p">,</span>
+    <span class="n">n_trees</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">class_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">n_samples_bootstrap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">classes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Private function used to fit a single tree in parallel.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Updating tree </span><span class="si">%d</span><span class="s2"> of </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tree_idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_trees</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">bootstrap</span><span class="p">:</span>
+        <span class="n">n_samples</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">_generate_sample_indices</span><span class="p">(</span>
+            <span class="n">tree</span><span class="o">.</span><span class="n">random_state</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span> <span class="n">n_samples_bootstrap</span>
+        <span class="p">)</span>
+
+        <span class="n">tree</span><span class="o">.</span><span class="n">partial_fit</span><span class="p">(</span>
+            <span class="n">X</span><span class="p">[</span><span class="n">indices</span><span class="p">,</span> <span class="p">:],</span>
+            <span class="n">y</span><span class="p">[</span><span class="n">indices</span><span class="p">],</span>
+            <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">,</span>
+            <span class="n">check_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">tree</span><span class="o">.</span><span class="n">partial_fit</span><span class="p">(</span>
+            <span class="n">X</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">,</span>
+            <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">,</span>
+            <span class="n">check_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">tree</span>
@@ -737,7 +787,7 @@ document.write(`
         <span class="k">return</span> <span class="n">sparse_hstack</span><span class="p">(</span><span class="n">indicators</span><span class="p">)</span><span class="o">.</span><span class="n">tocsr</span><span class="p">(),</span> <span class="n">n_nodes_ptr</span>
 
     <span class="nd">@_fit_context</span><span class="p">(</span><span class="n">prefer_skip_nested_validation</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Build a forest of trees from the training set (X, y).</span>
 
@@ -758,6 +808,9 @@ document.write(`
 <span class="sd">            ignored while searching for a split in each node. In the case of</span>
 <span class="sd">            classification, splits are also ignored if they would result in any</span>
 <span class="sd">            single class carrying a negative weight in either child node.</span>
+
+<span class="sd">        classes : array-like of shape (n_classes,), default=None</span>
+<span class="sd">            List of all the classes that can possibly appear in the y vector.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -826,7 +879,7 @@ document.write(`
 
         <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
-        <span class="n">y</span><span class="p">,</span> <span class="n">expanded_class_weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_y_class_weight</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">y</span><span class="p">,</span> <span class="n">expanded_class_weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_y_class_weight</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="n">DOUBLE</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">y</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">contiguous</span><span class="p">:</span>
             <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DOUBLE</span><span class="p">)</span>
@@ -941,6 +994,7 @@ document.write(`
                     <span class="n">class_weight</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">class_weight</span><span class="p">,</span>
                     <span class="n">n_samples_bootstrap</span><span class="o">=</span><span class="n">n_samples_bootstrap</span><span class="p">,</span>
                     <span class="n">missing_values_in_feature_mask</span><span class="o">=</span><span class="n">missing_values_in_feature_mask</span><span class="p">,</span>
+                    <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span>
                 <span class="p">)</span>
                 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">trees</span><span class="p">)</span>
             <span class="p">)</span>
@@ -1060,7 +1114,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">oob_pred</span>
 
-    <span class="k">def</span> <span class="nf">_validate_y_class_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_validate_y_class_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># Default implementation</span>
         <span class="k">return</span> <span class="n">y</span><span class="p">,</span> <span class="kc">None</span>
 
@@ -1417,7 +1471,7 @@ document.write(`
             <span class="n">y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">oob_decision_function_</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_validate_y_class_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_validate_y_class_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">check_classification_targets</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
 
         <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
@@ -1430,12 +1484,28 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="n">y_store_unique_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">):</span>
-            <span class="n">classes_k</span><span class="p">,</span> <span class="n">y_store_unique_indices</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span>
-                <span class="n">y</span><span class="p">[:,</span> <span class="n">k</span><span class="p">],</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span>
-            <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">classes_k</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">classes_k</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">classes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">classes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">classes</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">classes</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">classes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">classes</span><span class="p">])</span>
+
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">):</span>
+                    <span class="n">y_store_unique_indices</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+                    <span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">):</span>
+                <span class="n">classes_k</span><span class="p">,</span> <span class="n">y_store_unique_indices</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span>
+                    <span class="n">y</span><span class="p">[:,</span> <span class="n">k</span><span class="p">],</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">classes_k</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">classes_k</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
         <span class="n">y</span> <span class="o">=</span> <span class="n">y_store_unique_indices</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1470,6 +1540,224 @@ document.write(`
                 <span class="n">expanded_class_weight</span> <span class="o">=</span> <span class="n">compute_sample_weight</span><span class="p">(</span><span class="n">class_weight</span><span class="p">,</span> <span class="n">y_original</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">y</span><span class="p">,</span> <span class="n">expanded_class_weight</span>
+
+    <span class="k">def</span> <span class="nf">partial_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update a decision tree classifier from the training set (X, y).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : {array-like, sparse matrix} of shape (n_samples, n_features)</span>
+<span class="sd">            The training input samples. Internally, it will be converted to</span>
+<span class="sd">            ``dtype=np.float32`` and if a sparse matrix is provided</span>
+<span class="sd">            to a sparse ``csc_matrix``.</span>
+
+<span class="sd">        y : array-like of shape (n_samples,) or (n_samples, n_outputs)</span>
+<span class="sd">            The target values (class labels) as integers or strings.</span>
+
+<span class="sd">        sample_weight : array-like of shape (n_samples,), default=None</span>
+<span class="sd">            Sample weights. If None, then samples are equally weighted. Splits</span>
+<span class="sd">            that would create child nodes with net zero or negative weight are</span>
+<span class="sd">            ignored while searching for a split in each node. Splits are also</span>
+<span class="sd">            ignored if they would result in any single class carrying a</span>
+<span class="sd">            negative weight in either child node.</span>
+
+<span class="sd">        classes : array-like of shape (n_classes,), default=None</span>
+<span class="sd">            List of all the classes that can possibly appear in the y vector.</span>
+<span class="sd">            Must be provided at the first call to partial_fit, can be omitted</span>
+<span class="sd">            in subsequent calls.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self : object</span>
+<span class="sd">            Returns the instance itself.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_params</span><span class="p">()</span>
+
+        <span class="c1"># validate input parameters</span>
+        <span class="n">first_call</span> <span class="o">=</span> <span class="n">_check_partial_fit_first_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">)</span>
+
+        <span class="c1"># Fit if no tree exists yet</span>
+        <span class="k">if</span> <span class="n">first_call</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+                <span class="n">X</span><span class="p">,</span>
+                <span class="n">y</span><span class="p">,</span>
+                <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">,</span>
+                <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span>
+
+        <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_data</span><span class="p">(</span>
+            <span class="n">X</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">,</span>
+            <span class="n">multi_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">accept_sparse</span><span class="o">=</span><span class="s2">&quot;csc&quot;</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">,</span>
+            <span class="n">force_all_finite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">reset</span><span class="o">=</span><span class="n">first_call</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">issparse</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;sparse multilabel-indicator for y is not supported.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">sample_weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sample_weight</span> <span class="o">=</span> <span class="n">_check_sample_weight</span><span class="p">(</span><span class="n">sample_weight</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">issparse</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+            <span class="c1"># Pre-sort indices to avoid that each individual tree of the</span>
+            <span class="c1"># ensemble sorts the indices.</span>
+            <span class="n">X</span><span class="o">.</span><span class="n">sort_indices</span><span class="p">()</span>
+
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">warn</span><span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;A column-vector y was passed when a 1d array was&quot;</span>
+                    <span class="s2">&quot; expected. Please change the shape of y to &quot;</span>
+                    <span class="s2">&quot;(n_samples,), for example using ravel().&quot;</span>
+                <span class="p">),</span>
+                <span class="n">DataConversionWarning</span><span class="p">,</span>
+                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># reshape is necessary to preserve the data contiguity against vs</span>
+            <span class="c1"># [:, np.newaxis] that does not.</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span> <span class="o">==</span> <span class="s2">&quot;poisson&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">y</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Some value(s) of y are negative which is &quot;</span>
+                    <span class="s2">&quot;not allowed for Poisson regression.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Sum of y is not strictly positive which &quot;</span>
+                    <span class="s2">&quot;is necessary for Poisson regression.&quot;</span>
+                <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">y</span><span class="p">,</span> <span class="n">expanded_class_weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_y_class_weight</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="n">DOUBLE</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">y</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">contiguous</span><span class="p">:</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DOUBLE</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">expanded_class_weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sample_weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">sample_weight</span> <span class="o">=</span> <span class="n">sample_weight</span> <span class="o">*</span> <span class="n">expanded_class_weight</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sample_weight</span> <span class="o">=</span> <span class="n">expanded_class_weight</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">bootstrap</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_samples</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;`max_sample` cannot be set if `bootstrap=False`. &quot;</span>
+                <span class="s2">&quot;Either switch to `bootstrap=True` or set &quot;</span>
+                <span class="s2">&quot;`max_sample=None`.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">bootstrap</span><span class="p">:</span>
+            <span class="n">n_samples_bootstrap</span> <span class="o">=</span> <span class="n">_get_n_samples_bootstrap</span><span class="p">(</span>
+                <span class="n">n_samples</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">max_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_samples</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">n_samples_bootstrap</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_estimator</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">bootstrap</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">oob_score</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Out of bag estimation only available if bootstrap=True&quot;</span><span class="p">)</span>
+
+        <span class="n">random_state</span> <span class="o">=</span> <span class="n">check_random_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_bins</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># `_openmp_effective_n_threads` is used to take cgroups CPU quotes</span>
+            <span class="c1"># into account when determine the maximum number of threads to use.</span>
+            <span class="n">n_threads</span> <span class="o">=</span> <span class="n">_openmp_effective_n_threads</span><span class="p">()</span>
+
+            <span class="c1"># Bin the data</span>
+            <span class="c1"># For ease of use of the API, the user-facing GBDT classes accept the</span>
+            <span class="c1"># parameter max_bins, which doesn&#39;t take into account the bin for</span>
+            <span class="c1"># missing values (which is always allocated). However, since max_bins</span>
+            <span class="c1"># isn&#39;t the true maximal number of bins, all other private classes</span>
+            <span class="c1"># (binmapper, histbuilder...) accept n_bins instead, which is the</span>
+            <span class="c1"># actual total number of bins. Everywhere in the code, the</span>
+            <span class="c1"># convention is that n_bins == max_bins + 1</span>
+            <span class="n">n_bins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_bins</span> <span class="o">+</span> <span class="mi">1</span>  <span class="c1"># + 1 for missing values</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bin_mapper</span> <span class="o">=</span> <span class="n">_BinMapper</span><span class="p">(</span>
+                <span class="n">n_bins</span><span class="o">=</span><span class="n">n_bins</span><span class="p">,</span>
+                <span class="c1"># is_categorical=self.is_categorical_,</span>
+                <span class="n">known_categories</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">,</span>
+                <span class="n">n_threads</span><span class="o">=</span><span class="n">n_threads</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># XXX: in order for this to work with the underlying tree submodule&#39;s Cython</span>
+            <span class="c1"># code, we need to convert this into the original data&#39;s DTYPE because</span>
+            <span class="c1"># the Cython code assumes that `DTYPE` is used.</span>
+            <span class="c1"># The proper implementation will be a lot more complicated and should be</span>
+            <span class="c1"># tackled once scikit-learn has finalized their inclusion of missing data</span>
+            <span class="c1"># and categorical support for decision trees</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bin_data</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">is_training_data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># .astype(DTYPE)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bin_mapper</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># We draw from the random state to get the random state we</span>
+        <span class="c1"># would have got if we hadn&#39;t used a warm_start.</span>
+        <span class="n">random_state</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">MAX_INT</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimators_</span><span class="p">))</span>
+
+        <span class="c1"># Parallel loop: we prefer the threading backend as the Cython code</span>
+        <span class="c1"># for fitting the trees is internally releasing the Python GIL</span>
+        <span class="c1"># making threading more efficient than multiprocessing in</span>
+        <span class="c1"># that case. However, for joblib 0.12+ we respect any</span>
+        <span class="c1"># parallel_backend contexts set at a higher level,</span>
+        <span class="c1"># since correctness does not rely on using threads.</span>
+        <span class="n">Parallel</span><span class="p">(</span>
+            <span class="n">n_jobs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">prefer</span><span class="o">=</span><span class="s2">&quot;threads&quot;</span><span class="p">,</span>
+        <span class="p">)(</span>
+            <span class="n">delayed</span><span class="p">(</span><span class="n">_parallel_update_trees</span><span class="p">)(</span>
+                <span class="n">t</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bootstrap</span><span class="p">,</span>
+                <span class="n">X</span><span class="p">,</span>
+                <span class="n">y</span><span class="p">,</span>
+                <span class="n">sample_weight</span><span class="p">,</span>
+                <span class="n">i</span><span class="p">,</span>
+                <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimators_</span><span class="p">),</span>
+                <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span>
+                <span class="n">class_weight</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">class_weight</span><span class="p">,</span>
+                <span class="n">n_samples_bootstrap</span><span class="o">=</span><span class="n">n_samples_bootstrap</span><span class="p">,</span>
+                <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimators_</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">oob_score</span><span class="p">:</span>
+            <span class="n">y_type</span> <span class="o">=</span> <span class="n">type_of_target</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">y_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;multiclass-multioutput&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">):</span>
+                <span class="c1"># FIXME: we could consider to support multiclass-multioutput if</span>
+                <span class="c1"># we introduce or reuse a constructor parameter (e.g.</span>
+                <span class="c1"># oob_score) allowing our user to pass a callable defining the</span>
+                <span class="c1"># scoring strategy on OOB sample.</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;The type of target cannot be used to compute OOB &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;estimates. Got </span><span class="si">{</span><span class="n">y_type</span><span class="si">}</span><span class="s2"> while only the following are &quot;</span>
+                    <span class="s2">&quot;supported: continuous, continuous-multioutput, binary, &quot;</span>
+                    <span class="s2">&quot;multiclass, multilabel-indicator.&quot;</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">oob_score</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_set_oob_score_and_attributes</span><span class="p">(</span>
+                    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">scoring_function</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">oob_score</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_set_oob_score_and_attributes</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+        <span class="c1"># Decapsulate classes_ attributes</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;classes_&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1779,7 +2067,9 @@ document.write(`
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;multilabel&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
 
 
-<div class="viewcode-block" id="RandomForestClassifier"><a class="viewcode-back" href="../../../../../generated/sktree.RandomForestClassifier.html#sktree.RandomForestClassifier">[docs]</a><span class="k">class</span> <span class="nc">RandomForestClassifier</span><span class="p">(</span><span class="n">ForestClassifier</span><span class="p">):</span>
+<div class="viewcode-block" id="RandomForestClassifier">
+<a class="viewcode-back" href="../../../../../generated/sktree.RandomForestClassifier.html#sktree.RandomForestClassifier">[docs]</a>
+<span class="k">class</span> <span class="nc">RandomForestClassifier</span><span class="p">(</span><span class="n">ForestClassifier</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A random forest classifier.</span>
 
@@ -2179,7 +2469,10 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">ccp_alpha</span> <span class="o">=</span> <span class="n">ccp_alpha</span></div>
 
 
-<div class="viewcode-block" id="RandomForestRegressor"><a class="viewcode-back" href="../../../../../generated/sktree.RandomForestRegressor.html#sktree.RandomForestRegressor">[docs]</a><span class="k">class</span> <span class="nc">RandomForestRegressor</span><span class="p">(</span><span class="n">ForestRegressor</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RandomForestRegressor">
+<a class="viewcode-back" href="../../../../../generated/sktree.RandomForestRegressor.html#sktree.RandomForestRegressor">[docs]</a>
+<span class="k">class</span> <span class="nc">RandomForestRegressor</span><span class="p">(</span><span class="n">ForestRegressor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A random forest regressor.</span>
 
@@ -2554,7 +2847,10 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">monotonic_cst</span> <span class="o">=</span> <span class="n">monotonic_cst</span></div>
 
 
-<div class="viewcode-block" id="ExtraTreesClassifier"><a class="viewcode-back" href="../../../../../generated/sktree.ExtraTreesClassifier.html#sktree.ExtraTreesClassifier">[docs]</a><span class="k">class</span> <span class="nc">ExtraTreesClassifier</span><span class="p">(</span><span class="n">ForestClassifier</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExtraTreesClassifier">
+<a class="viewcode-back" href="../../../../../generated/sktree.ExtraTreesClassifier.html#sktree.ExtraTreesClassifier">[docs]</a>
+<span class="k">class</span> <span class="nc">ExtraTreesClassifier</span><span class="p">(</span><span class="n">ForestClassifier</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An extra-trees classifier.</span>
 
@@ -2942,7 +3238,10 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">monotonic_cst</span> <span class="o">=</span> <span class="n">monotonic_cst</span></div>
 
 
-<div class="viewcode-block" id="ExtraTreesRegressor"><a class="viewcode-back" href="../../../../../generated/sktree.ExtraTreesRegressor.html#sktree.ExtraTreesRegressor">[docs]</a><span class="k">class</span> <span class="nc">ExtraTreesRegressor</span><span class="p">(</span><span class="n">ForestRegressor</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExtraTreesRegressor">
+<a class="viewcode-back" href="../../../../../generated/sktree.ExtraTreesRegressor.html#sktree.ExtraTreesRegressor">[docs]</a>
+<span class="k">class</span> <span class="nc">ExtraTreesRegressor</span><span class="p">(</span><span class="n">ForestRegressor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An extra-trees regressor.</span>
 
@@ -3297,6 +3596,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">monotonic_cst</span> <span class="o">=</span> <span class="n">monotonic_cst</span></div>
 
 
+
 <span class="k">class</span> <span class="nc">RandomTreesEmbedding</span><span class="p">(</span><span class="n">TransformerMixin</span><span class="p">,</span> <span class="n">BaseForest</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An ensemble of totally random trees.</span>
@@ -3550,7 +3850,7 @@ document.write(`
     <span class="k">def</span> <span class="nf">_set_oob_score_and_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">scoring_function</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;OOB score not supported by tree embedding&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Fit estimator.</span>
 
@@ -3571,17 +3871,20 @@ document.write(`
 <span class="sd">            classification, splits are also ignored if they would result in any</span>
 <span class="sd">            single class carrying a negative weight in either child node.</span>
 
+<span class="sd">        classes : array-like of shape (n_classes,), default=None</span>
+<span class="sd">            List of all the classes that can possibly appear in the y vector.</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        self : object</span>
 <span class="sd">            Returns the instance itself.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Parameters are validated in fit_transform</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="nd">@_fit_context</span><span class="p">(</span><span class="n">prefer_skip_nested_validation</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Fit estimator and transform dataset.</span>
 
@@ -3601,6 +3904,9 @@ document.write(`
 <span class="sd">            classification, splits are also ignored if they would result in any</span>
 <span class="sd">            single class carrying a negative weight in either child node.</span>
 
+<span class="sd">        classes : array-like of shape (n_classes,), default=None</span>
+<span class="sd">            List of all the classes that can possibly appear in the y vector.</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        X_transformed : sparse matrix of shape (n_samples, n_out)</span>
@@ -3608,7 +3914,7 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">rnd</span> <span class="o">=</span> <span class="n">check_random_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">rnd</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">_num_samples</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">one_hot_encoder_</span> <span class="o">=</span> <span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">sparse_output</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sparse_output</span><span class="p">)</span>
         <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">one_hot_encoder_</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
@@ -3709,7 +4015,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-16.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-22.
       <br/>
     
   </p>

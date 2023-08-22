@@ -33,7 +33,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=e5fbc548" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
     <link rel="stylesheet" type="text/css" href="../_static/style.css?v=a6733705" />
   
@@ -41,9 +41,9 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=141ad0fc"></script>
+    <script src="../_static/documentation_options.js?v=81728e97"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=fd10adb8"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -406,13 +406,13 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <section id="supervised-decision-trees">
-<span id="supervised-tree"></span><h1><span class="section-number">1. </span>Supervised Decision Trees<a class="headerlink" href="#supervised-decision-trees" title="Permalink to this heading">#</a></h1>
+<span id="supervised-tree"></span><h1><span class="section-number">1. </span>Supervised Decision Trees<a class="headerlink" href="#supervised-decision-trees" title="Link to this heading">#</a></h1>
 <p>Supervised decision tree models are models where there is a ground-truth label, typically
 denoted <code class="docutils literal notranslate"><span class="pre">y</span></code> that is associated with each sample of data. In scikit-learn, the axis-aligned
 decision tree model is implemented and described. We extend those models beyond the axis-aligned
 tree model and describe their use-cases here.</p>
 <section id="oblique-trees">
-<span id="id1"></span><h2><span class="section-number">1.1. </span>Oblique Trees<a class="headerlink" href="#oblique-trees" title="Permalink to this heading">#</a></h2>
+<span id="id1"></span><h2><span class="section-number">1.1. </span>Oblique Trees<a class="headerlink" href="#oblique-trees" title="Link to this heading">#</a></h2>
 <p>Similar to DTs, <strong>Oblique Trees (OTs)</strong> are a non-parametric supervised learning
 method used for <a class="reference external" href="https://scikit-learn.org/dev/modules/tree.html#tree-classification" title="(in scikit-learn v1.4)"><span class="xref std std-ref">:ref: classification</span></a> and <a class="reference external" href="https://scikit-learn.org/dev/modules/tree.html#tree-regression" title="(in scikit-learn v1.4)"><span class="xref std std-ref">:ref: regression</span></a>. It was originally described as <code class="docutils literal notranslate"><span class="pre">Forest-RC</span></code> in Breiman’s
 landmark paper on Random Forests <a class="reference internal" href="#rf" id="id2"><span>[RF]</span></a>. Breiman found that combining data features
@@ -423,7 +423,7 @@ as a split, <span class="math notranslate nohighlight">\(\lambda\)</span>. If <s
 it is equivalent to <code class="docutils literal notranslate"><span class="pre">Forest-RC</span></code>. <span class="math notranslate nohighlight">\(\lambda\)</span> presents a tradeoff between
 considering dense combinations of features vs sparse combinations of features.</p>
 <section id="differences-compared-to-decision-trees">
-<h3><span class="section-number">1.1.1. </span>Differences compared to decision trees<a class="headerlink" href="#differences-compared-to-decision-trees" title="Permalink to this heading">#</a></h3>
+<h3><span class="section-number">1.1.1. </span>Differences compared to decision trees<a class="headerlink" href="#differences-compared-to-decision-trees" title="Link to this heading">#</a></h3>
 <p>Compared to DTs, OTs differ in how they compute a candidate split. DTs split
 along the passed in data columns in an axis-aligned fashion, whereas OTs split
 along oblique curves. Using the Iris dataset, we can similarly construct an OT
@@ -446,7 +446,7 @@ whereas OTs can sample possibly up to <span class="math notranslate nohighlight"
 because they are combining features.</p>
 </section>
 <section id="mathematical-formulation">
-<h3><span class="section-number">1.1.2. </span>Mathematical formulation<a class="headerlink" href="#mathematical-formulation" title="Permalink to this heading">#</a></h3>
+<h3><span class="section-number">1.1.2. </span>Mathematical formulation<a class="headerlink" href="#mathematical-formulation" title="Link to this heading">#</a></h3>
 <p>Given training vectors <span class="math notranslate nohighlight">\(x_i \in R^n\)</span>, i=1,…, l and a label vector
 <span class="math notranslate nohighlight">\(y \in R^l\)</span>, an oblique decision tree recursively partitions the
 feature space such that the samples with the same labels or similar target
@@ -470,12 +470,12 @@ impurity function or loss function <span class="math notranslate nohighlight">\(
 decision trees.</p>
 </section>
 <section id="classification-regression-and-multi-output-problems">
-<h3><span class="section-number">1.1.3. </span>Classification, regression and multi-output problems<a class="headerlink" href="#classification-regression-and-multi-output-problems" title="Permalink to this heading">#</a></h3>
+<h3><span class="section-number">1.1.3. </span>Classification, regression and multi-output problems<a class="headerlink" href="#classification-regression-and-multi-output-problems" title="Link to this heading">#</a></h3>
 <p>OTs can be used for both classification and regression, and can handle multi-output
 problems in the same manner as DTs.</p>
 </section>
 <section id="complexity">
-<h3><span class="section-number">1.1.4. </span>Complexity<a class="headerlink" href="#complexity" title="Permalink to this heading">#</a></h3>
+<h3><span class="section-number">1.1.4. </span>Complexity<a class="headerlink" href="#complexity" title="Link to this heading">#</a></h3>
 <p>The run time cost to construct an OT will be similar to that of a DT, with the
 added complexity of a (possibly sparse) matrix multiplication to combine random
 data columns into candidate split values. The cost at each node is
@@ -490,7 +490,7 @@ at every node need to store an additional vector of feature indices and vector o
 feature weights that are used together to form the candidate splits.</p>
 </section>
 <section id="tips-on-practical-use">
-<h3><span class="section-number">1.1.5. </span>Tips on practical use<a class="headerlink" href="#tips-on-practical-use" title="Permalink to this heading">#</a></h3>
+<h3><span class="section-number">1.1.5. </span>Tips on practical use<a class="headerlink" href="#tips-on-practical-use" title="Link to this heading">#</a></h3>
 <p>Similar to DTs, the intuition for most parameters are the same. Therefore refer
 to <a class="reference external" href="https://scikit-learn.org/stable/modules/tree.html#tips-on-practical-use">tips for using decision trees</a>
 for information on standard
@@ -519,7 +519,7 @@ distributed along its features, such as data being axis-aligned, then one might 
 Other considerations are runtime and space complexity.</p>
 </section>
 <section id="limitations-compared-to-decision-trees">
-<h3><span class="section-number">1.1.6. </span>Limitations compared to decision trees<a class="headerlink" href="#limitations-compared-to-decision-trees" title="Permalink to this heading">#</a></h3>
+<h3><span class="section-number">1.1.6. </span>Limitations compared to decision trees<a class="headerlink" href="#limitations-compared-to-decision-trees" title="Link to this heading">#</a></h3>
 <blockquote>
 <div><ul class="simple">
 <li><p>There currently does not exist support for pruning OTs, such as with the minimal
@@ -551,7 +551,7 @@ Learning, Springer, 2009.</p></li>
 </section>
 </section>
 <section id="honest-trees">
-<span id="id3"></span><h2><span class="section-number">1.2. </span>Honest Trees<a class="headerlink" href="#honest-trees" title="Permalink to this heading">#</a></h2>
+<span id="id3"></span><h2><span class="section-number">1.2. </span>Honest Trees<a class="headerlink" href="#honest-trees" title="Link to this heading">#</a></h2>
 <p>Honesty is a property of decision trees where the data used to determine splitting is independent
 of the data used to estimate the prediction at each leaf. This is in contrast to standard decision
 where the data used to determine splitting is also used to estimate the prediction at each leaf.</p>
@@ -652,7 +652,7 @@ subsampled honest trees have higher MSE, but are better calibrated. See :</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-16.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-22.
       <br/>
     
   </p>
