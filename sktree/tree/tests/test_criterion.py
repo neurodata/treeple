@@ -1,13 +1,10 @@
-import pytest
 import numpy as np
+
 from sktree.tree.unsupervised._unsup_criterion import CriterionTester
 
 
 def test_node_impurity_equality():
     # Create instances of FastBIC and FasterBIC with test data
-    n_outputs = 1
-    n_classes = np.array([2])
-
     X = np.array([0, 1, 2, 3, 5, 10, 20, 200]).reshape(-1).astype(np.float32)
     n_samples = X.shape[0]
 
@@ -16,7 +13,7 @@ def test_node_impurity_equality():
     samples = np.arange(n_samples, dtype=np.intp)
     sample_weight = np.ones(n_samples, dtype=np.float64)
     weighted_n_samples = np.sum(sample_weight)
-    
+
     crit_tester = CriterionTester()
     crit_tester.init(sample_weight, weighted_n_samples, samples, X)
     crit_tester.reset()
@@ -27,7 +24,10 @@ def test_node_impurity_equality():
         print(fast_bic_imp, faster_bic_imp)
         assert fast_bic_imp == faster_bic_imp
 
-        (fast_bic_left, fast_bic_right), (faster_bic_left, faster_bic_right) = crit_tester.children_impurity()
+        (fast_bic_left, fast_bic_right), (
+            faster_bic_left,
+            faster_bic_right,
+        ) = crit_tester.children_impurity()
         print((fast_bic_left, fast_bic_right), (faster_bic_left, faster_bic_right))
         assert fast_bic_left == faster_bic_left
         assert fast_bic_right == faster_bic_right
@@ -37,7 +37,10 @@ def test_node_impurity_equality():
         assert fast_bic_imp == faster_bic_imp
 
         (fast_bic_weights, faster_bic_weights) = crit_tester.weighted_n_samples()
-        assert all(weight == other_weight for weight, other_weight in zip(fast_bic_weights, faster_bic_weights))
+        assert all(
+            weight == other_weight
+            for weight, other_weight in zip(fast_bic_weights, faster_bic_weights)
+        )
         print(crit_tester.weighted_n_samples())
 
         fast_sum_right, faster_sum_right = crit_tester.sum_right()
@@ -57,14 +60,19 @@ def test_node_impurity_equality():
     print(fast_bic_imp, faster_bic_imp)
     assert fast_bic_imp == faster_bic_imp
 
-    (fast_bic_left, fast_bic_right), (faster_bic_left, faster_bic_right) = crit_tester.children_impurity()
+    (fast_bic_left, fast_bic_right), (
+        faster_bic_left,
+        faster_bic_right,
+    ) = crit_tester.children_impurity()
     print((fast_bic_left, fast_bic_right), (faster_bic_left, faster_bic_right))
     assert fast_bic_left == faster_bic_left
     assert fast_bic_right == faster_bic_right
 
     print(crit_tester.weighted_n_samples())
-    (fast_bic_weights,faster_bic_weights) = crit_tester.weighted_n_samples()
-    assert all(weight == other_weight for weight, other_weight in zip(fast_bic_weights, faster_bic_weights))
+    (fast_bic_weights, faster_bic_weights) = crit_tester.weighted_n_samples()
+    assert all(
+        weight == other_weight for weight, other_weight in zip(fast_bic_weights, faster_bic_weights)
+    )
 
     fast_bic_imp, faster_bic_imp = crit_tester.proxy_impurity()
     print(fast_bic_imp, faster_bic_imp)
@@ -78,14 +86,20 @@ def test_node_impurity_equality():
         print(fast_bic_imp, faster_bic_imp)
         assert fast_bic_imp == faster_bic_imp
 
-        (fast_bic_left, fast_bic_right), (faster_bic_left, faster_bic_right) = crit_tester.children_impurity()
+        (fast_bic_left, fast_bic_right), (
+            faster_bic_left,
+            faster_bic_right,
+        ) = crit_tester.children_impurity()
         print((fast_bic_left, fast_bic_right), (faster_bic_left, faster_bic_right))
         assert fast_bic_left == faster_bic_left
         assert fast_bic_right == faster_bic_right
 
         print(crit_tester.weighted_n_samples())
-        (fast_bic_weights,faster_bic_weights) = crit_tester.weighted_n_samples()
-        assert all(weight == other_weight for weight, other_weight in zip(fast_bic_weights, faster_bic_weights))
+        (fast_bic_weights, faster_bic_weights) = crit_tester.weighted_n_samples()
+        assert all(
+            weight == other_weight
+            for weight, other_weight in zip(fast_bic_weights, faster_bic_weights)
+        )
 
         fast_bic_imp, faster_bic_imp = crit_tester.proxy_impurity()
         print(fast_bic_imp, faster_bic_imp)

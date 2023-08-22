@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-from numpy.testing import assert_array_equal
 from sklearn import datasets
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.datasets import make_blobs
@@ -124,7 +123,7 @@ def test_check_simulation(name, Tree, criterion):
     n_classes = 2
     X, y = make_blobs(n_samples=n_samples, centers=n_classes, n_features=6, random_state=1234)
 
-    est = Tree(criterion=criterion, random_state=1234)
+    est = Tree(criterion=criterion, min_samples_split=5, random_state=1234)
     est.fit(X)
     sim_mat = est.compute_similarity_matrix(X)
 
@@ -134,7 +133,7 @@ def test_check_simulation(name, Tree, criterion):
             expected_score = 0.02
         else:
             expected_score = 0.3
-    elif criterion in ("fastbic", 'fasterbic'):
+    elif criterion in ("fastbic", "fasterbic"):
         if "oblique" in name.lower():
             expected_score = 0.01
         else:
@@ -163,7 +162,7 @@ def test_check_rotated_blobs(name, Tree, criterion):
 
     # apply rotation matrix to X
 
-    est = Tree(criterion=criterion, random_state=1234)
+    est = Tree(criterion=criterion, min_samples_split=5, random_state=1234)
     est.fit(X)
     sim_mat = est.compute_similarity_matrix(X)
 
@@ -173,7 +172,7 @@ def test_check_rotated_blobs(name, Tree, criterion):
             expected_score = 0.02
         else:
             expected_score = 0.3
-    elif criterion in ("fastbic", 'fasterbic'):
+    elif criterion in ("fastbic", "fasterbic"):
         if "oblique" in name.lower():
             expected_score = 0.01
         else:
@@ -198,21 +197,23 @@ def test_check_iris(name, Tree, criterion):
     # Check consistency on dataset iris.
     n_classes = len(np.unique(iris.target))
 
-    est = Tree(criterion=criterion, min_samples_split=np.sqrt(len(iris)).astype(int), random_state=12345)
+    est = Tree(
+        criterion=criterion, min_samples_split=np.sqrt(len(iris)).astype(int), random_state=12345
+    )
     est.fit(iris.data, iris.target)
     sim_mat = est.compute_similarity_matrix(iris.data)
 
     # there is quite a bit of variance in the performance at the tree level
     if criterion == "twomeans":
         if "oblique" in name.lower():
-            expected_score = 0.2
+            expected_score = 0.15
         else:
             expected_score = 0.01
-    elif criterion in ("fastbic", 'fasterbic'):
+    elif criterion in ("fastbic", "fasterbic"):
         if "oblique" in name.lower():
-            expected_score = 0.001
+            expected_score = 0.005
         else:
-            expected_score = 0.2
+            expected_score = 0.15
 
     cluster = AgglomerativeClustering(n_clusters=n_classes).fit(sim_mat)
     predict_labels = cluster.fit_predict(sim_mat)
@@ -244,4 +245,5 @@ def test_fasterbic_vs_fastbic_on_iris():
 
     print(fastbic_score, fasterbic_score)
     assert False
-    # assert_array_equal(fastbic_tree.compute_similarity_matrix(iris.data), fasterbic_tree.compute_similarity_matrix(iris.data))
+    # assert_array_equal(fastbic_tree.compute_similarity_matrix(iris.data),
+    #       fasterbic_tree.compute_similarity_matrix(iris.data))

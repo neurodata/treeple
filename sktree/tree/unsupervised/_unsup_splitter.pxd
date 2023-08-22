@@ -15,12 +15,18 @@ cdef class UnsupervisedSplitter(BaseSplitter):
     of '1'.
     2. `X` array instead of `y` array is stored as the criterions are computed over the X
     array.
+    3. The feature_values memoryview is a feature vector with shared memory among the splitter
+    and the criterion object. This enables the splitter to assign values to it within the
+    `node_split` function and then `criterion` automatically can compute relevant statistics
+    on the shared memoryview into the array.
     """
 
     # XXX: requires BaseSplitter to not define "criterion"
     cdef public UnsupervisedCriterion criterion         # criterion computer
     cdef const DTYPE_t[:, :] X                                       # feature matrix
     cdef SIZE_t n_total_samples                         # store the total number of samples
+
+    cdef DTYPE_t[:] feature_values          # a 1D memoryview into an array that is shared with criterion
 
     # Initialization method for unsupervised splitters
     cdef int init(

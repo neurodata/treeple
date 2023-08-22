@@ -272,9 +272,11 @@ def mutual_info_ksg(
 
 def _preprocess_data(data, transform, rng):
     if transform not in ("rank", "standardize", "uniform", None):
-        raise ValueError(f"Unknown transform {transform}. Must "
-                         f"be one of 'rank', 'standardize', 'uniform', or None.")
-    
+        raise ValueError(
+            f"Unknown transform {transform}. Must "
+            f"be one of 'rank', 'standardize', 'uniform', or None."
+        )
+
     n_samples, n_features = data.shape
 
     # add minor noise to make sure there are no ties
@@ -365,7 +367,9 @@ def _mi_ksg_scipy(data, x_idx, y_idx, knn_here: int, n_jobs: int = -1) -> float:
     return val
 
 
-def _mi_ksg(data, x_idx, y_idx, nn_estimator: BaseEstimator, knn_here: int, verbose: bool=False) -> float:
+def _mi_ksg(
+    data, x_idx, y_idx, nn_estimator: BaseEstimator, knn_here: int, verbose: bool = False
+) -> float:
     """Compute KSG estimate of MI.
 
     Parameters
@@ -390,14 +394,14 @@ def _mi_ksg(data, x_idx, y_idx, nn_estimator: BaseEstimator, knn_here: int, verb
     n_samples = data.shape[0]
 
     if verbose:
-        print(f'Fitting nearest neighbors estimator with {data.shape} data.')
+        print(f"Fitting nearest neighbors estimator with {data.shape} data.")
 
     # estimate distance to the kth NN in XYZ subspace for each sample
     neigh = nn_estimator.fit(data)
     dists, _ = neigh.kneighbors(n_neighbors=knn_here)
 
     if verbose:
-        print(f'Computing radii for {knn_here} nn and got dists {dists.shape}.')
+        print(f"Computing radii for {knn_here} nn and got dists {dists.shape}.")
 
     # - get the radius we want to use per sample as the distance to the kth neighbor
     #   in the joint distribution space
@@ -405,12 +409,12 @@ def _mi_ksg(data, x_idx, y_idx, nn_estimator: BaseEstimator, knn_here: int, verb
 
     # compute on the subspace of X
     if verbose:
-        print(f'Computing radius neighbors for X with {x_idx.shape} indices.')
+        print(f"Computing radius neighbors for X with {x_idx.shape} indices.")
     num_nn_x = _compute_radius_nbrs(data, radius_per_sample, nn_estimator, col_idx=x_idx)
 
     # compute on the subspace of Y
     if verbose:
-        print(f'Computing radius neighbors for Y with {y_idx.shape} indices.')
+        print(f"Computing radius neighbors for Y with {y_idx.shape} indices.")
     num_nn_y = _compute_radius_nbrs(data, radius_per_sample, nn_estimator, col_idx=y_idx)
 
     # compute the final MI value
