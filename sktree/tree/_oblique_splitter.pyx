@@ -155,17 +155,6 @@ cdef class BaseObliqueSplitter(Splitter):
         or 0 otherwise.
         """
         cdef SIZE_t idx, jdx
-
-        # Compute linear combination of features and then
-        # sort samples according to the feature values.
-        # for idx in range(start, end):
-        #     # initialize the feature value to 0
-        #     feature_values[idx] = 0.0
-        #     for jdx in range(0, proj_vec_indices.size()):
-        #         feature_values[idx] += self.X[
-        #             samples[idx], deref(proj_vec_indices)[jdx]
-        #         ] * deref(proj_vec_weights)[jdx]
-
         cdef SIZE_t col_idx
         cdef DTYPE_t col_weight
         # Compute linear combination of features and then
@@ -184,7 +173,12 @@ cdef class BaseObliqueSplitter(Splitter):
                 ] * col_weight
 
                 # keep track of the min/max of X[samples[:], col_idx]
-                
+                if (self.min_val_map.find(col_idx) == self.min_val_map.end() or 
+                        self.X[samples[idx], col_idx] < self.min_val_map[col_idx]):
+                    self.min_val_map[col_idx] = self.X[samples[idx], col_idx]
+                if (self.max_val_map.find(col_idx) == self.max_val_map.end() or 
+                        self.X[samples[idx], col_idx] > self.max_val_map[col_idx]):
+                    self.max_val_map[col_idx] = self.X[samples[idx], col_idx]
 
     cdef int node_split(
         self,
@@ -399,6 +393,12 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         self.indices_to_sample = np.arange(self.max_features * self.n_features,
                                            dtype=np.intp)
 
+        # re-initialize the hashmap for looking at constant features
+        cdef unordered_map[SIZE_t, DTYPE_t] min_val_map
+        cdef unordered_map[SIZE_t, DTYPE_t] max_val_map
+        self.min_val_map = min_val_map
+        self.max_val_map = max_val_map
+
         # XXX: Just to initialize stuff
         # self.feature_weights = np.ones((self.n_features,), dtype=DTYPE_t) / self.n_features
         return 0
@@ -439,6 +439,8 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         # construct an array to sample from mTry x n_features set of indices
         cdef SIZE_t[::1] indices_to_sample = self.indices_to_sample
         cdef SIZE_t grid_size = self.max_features * self.n_features
+
+        # TODO: refactor this to account for constants
 
         # shuffle indices over the 2D grid to sample using Fisher-Yates
         for i in range(0, grid_size):
@@ -612,6 +614,10 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
                                              &best_split.impurity_right)
             best_split.improvement = self.criterion.impurity_improvement(
                 impurity, best_split.impurity_left, best_split.impurity_right)
+
+        if self._track_constants:
+            # we will move constants around
+
 
         # Return values
         deref(oblique_split).proj_vec_indices = best_split.proj_vec_indices
