@@ -31,7 +31,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
     # impurity of a split on that node. It also computes the output statistics.
 
     # Internal structures
-    cdef const DTYPE_t[:] Xf  # 1D memview for the feature vector to compute criterion on
+    cdef const DTYPE_t[:] feature_values  # 1D memview for the feature vector to compute criterion on
 
     # Keep running total of Xf[samples[start:end]] and the corresponding sum in
     # the left and right node. For example, this can then efficiently compute the
@@ -41,6 +41,10 @@ cdef class UnsupervisedCriterion(BaseCriterion):
     cdef double sum_left      # Same as above, but for the left side of the split
     cdef double sum_right     # Same as above, but for the right side of the split
 
+    cdef double sumsq_total     # The sum of the weighted count of each feature.
+    cdef double sumsq_left      # Same as above, but for the left side of the split
+    cdef double sumsq_right     # Same as above, but for the right side of the split
+
     # Methods
     # -------
     # The 'init' method is copied here with the almost the exact same signature
@@ -48,14 +52,14 @@ cdef class UnsupervisedCriterion(BaseCriterion):
     # Unsupervised criterion can be used with splitter and tree methods.
     cdef int init(
         self,
+        const DTYPE_t[:] feature_values,
         const DOUBLE_t[:] sample_weight,
         double weighted_n_samples,
         const SIZE_t[:] samples,
     ) except -1 nogil
 
     cdef void init_feature_vec(
-        self,
-        const DTYPE_t[:] Xf,
+        self
     ) noexcept nogil
 
     cdef void set_sample_pointers(

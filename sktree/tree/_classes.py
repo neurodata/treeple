@@ -1,4 +1,5 @@
 import copy
+import numbers
 from numbers import Real
 
 import numpy as np
@@ -171,7 +172,7 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
         criterion="twomeans",
         splitter="best",
         max_depth=None,
-        min_samples_split=5,
+        min_samples_split="sqrt",
         min_samples_leaf=1,
         min_weight_fraction_leaf=0.0,
         max_features=None,
@@ -234,6 +235,22 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
         max_depth,
         random_state,
     ):
+        if isinstance(self.min_samples_split, str):
+            if self.min_samples_split == "sqrt":
+                min_samples_split = max(1, int(np.sqrt(self.n_features_in_)))
+            elif self.min_samples_split == "log2":
+                min_samples_split = max(1, int(np.log2(self.n_features_in_)))
+        elif self.min_samples_split is None:
+            min_samples_split = self.n_features_in_
+        elif isinstance(self.min_samples_split, numbers.Integral):
+            min_samples_split = self.min_samples_split
+        else:  # float
+            if self.min_samples_split > 0.0:
+                min_samples_split = max(1, int(self.min_samples_split * self.n_features_in_))
+            else:
+                min_samples_split = 0
+        self.min_samples_split_ = min_samples_split
+
         criterion = self.criterion
         if not isinstance(criterion, UnsupervisedCriterion):
             criterion = UNSUPERVISED_CRITERIA[self.criterion]()
@@ -254,7 +271,7 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
         if max_leaf_nodes < 0:
             builder = UnsupervisedDepthFirstTreeBuilder(
                 splitter,
-                min_samples_split,
+                self.min_samples_split_,
                 min_samples_leaf,
                 min_weight_leaf,
                 max_depth,
@@ -263,7 +280,7 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
         else:
             builder = UnsupervisedBestFirstTreeBuilder(
                 splitter,
-                min_samples_split,
+                self.min_samples_split_,
                 min_samples_leaf,
                 min_weight_leaf,
                 max_depth,
@@ -459,7 +476,7 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
         criterion="twomeans",
         splitter="best",
         max_depth=None,
-        min_samples_split=5,
+        min_samples_split="sqrt",
         min_samples_leaf=1,
         min_weight_fraction_leaf=0,
         max_features=None,

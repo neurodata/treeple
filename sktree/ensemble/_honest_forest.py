@@ -375,7 +375,7 @@ class HonestForestClassifier(ForestClassifier):
         self.honest_prior = honest_prior
         self.tree_estimator = tree_estimator
 
-    def fit(self, X, y, sample_weight=None):
+    def fit(self, X, y, sample_weight=None, classes=None):
         """
         Build a forest of trees from the training set (X, y).
 
@@ -397,13 +397,16 @@ class HonestForestClassifier(ForestClassifier):
             classification, splits are also ignored if they would result in any
             single class carrying a negative weight in either child node.
 
+        classes : array-like of shape (n_classes,), default=None
+            List of all the classes that can possibly appear in the y vector.
+
         Returns
         -------
         self : HonestForestClassifier
             Fitted tree estimator.
         """
         X, y = check_X_y(X, y, multi_output=True)
-        super().fit(X, y, sample_weight)
+        super().fit(X, y, sample_weight=sample_weight, classes=classes)
 
         # Compute honest decision function
         self.honest_decision_function_ = self._predict_proba(
