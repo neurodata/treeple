@@ -404,6 +404,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
                 classes=classes,
             )
             return self
+        rng = np.random.default_rng(self.random_state)
 
         if sample_weight is None:
             _sample_weight = np.ones((X.shape[0],), dtype=np.float64)
