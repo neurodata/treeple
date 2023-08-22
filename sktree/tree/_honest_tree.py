@@ -5,7 +5,7 @@ from copy import deepcopy
 
 import numpy as np
 from sklearn.base import ClassifierMixin, MetaEstimatorMixin, _fit_context
-from sklearn.utils.multiclass import check_classification_targets
+from sklearn.utils.multiclass import _check_partial_fit_first_call, check_classification_targets
 from sklearn.utils.validation import check_is_fitted, check_X_y
 
 from sktree._lib.sklearn.tree import DecisionTreeClassifier
