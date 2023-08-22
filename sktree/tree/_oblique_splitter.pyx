@@ -166,6 +166,20 @@ cdef class BaseObliqueSplitter(Splitter):
                     samples[idx], deref(proj_vec_indices)[jdx]
                 ] * deref(proj_vec_weights)[jdx]
 
+        cdef SIZE_t col_idx
+        # Compute linear combination of features and then
+        # sort samples according to the feature values.
+        # initialize the feature value to 0
+        for jdx in range(0, proj_vec_indices.size()):
+            col_idx = deref(proj_vec_indices)[jdx]
+            for idx in range(start, end):
+                if jdx == 0:
+                    feature_values[idx] = 0.0
+
+                feature_values[idx] += self.X[
+                    samples[idx], col_idx
+                ] * deref(proj_vec_weights)[jdx]
+
     cdef int node_split(
         self,
         double impurity,
