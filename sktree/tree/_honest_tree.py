@@ -420,13 +420,11 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         )
         self.honest_indices_ = np.setdiff1d(nonzero_indices, self.structure_indices_)
 
-        _X = X[self.structure_indices_]
-        _y = y[self.structure_indices_]
-        _sample_weight = _sample_weight[self.structure_indices_]
+        _sample_weight[self.honest_indices_] = 0
 
         self.estimator_.partial_fit(
-            _X,
-            _y,
+            X,
+            y,
             sample_weight=_sample_weight,
             check_input=check_input,
             classes=classes if classes else np.unique(y),
@@ -535,9 +533,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         )
         self.honest_indices_ = np.setdiff1d(nonzero_indices, self.structure_indices_)
 
-        _X = X[self.structure_indices_]
-        _y = y[self.structure_indices_]
-        _sample_weight = _sample_weight[self.structure_indices_]
+        _sample_weight[self.honest_indices_] = 0
 
         if not self.tree_estimator:
             self.estimator_ = DecisionTreeClassifier(
@@ -562,8 +558,8 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
 
         # Learn structure on subsample
         self.estimator_._fit(
-            _X,
-            _y,
+            X,
+            y,
             sample_weight=_sample_weight,
             check_input=check_input,
             missing_values_in_feature_mask=missing_values_in_feature_mask,
