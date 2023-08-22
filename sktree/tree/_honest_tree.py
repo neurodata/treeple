@@ -421,7 +421,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
 
         _X = X[self.structure_indices_]
         _y = y[self.structure_indices_]
-        _sample_weight = sample_weight[self.structure_indices_]
+        _sample_weight = _sample_weight[self.structure_indices_]
 
         self.estimator_.partial_fit(
             _X,
@@ -536,7 +536,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
 
         _X = X[self.structure_indices_]
         _y = y[self.structure_indices_]
-        _sample_weight = sample_weight[self.structure_indices_]
+        _sample_weight = _sample_weight[self.structure_indices_]
 
         if not self.tree_estimator:
             self.estimator_ = DecisionTreeClassifier(
