@@ -259,7 +259,7 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
             if self.proj_mat_weights[feat_i].empty():
                 continue
 
-            # XXX: 'feature' is not actually used in oblique split records
+            # XXX: 'feature' is not actually used in oblique split records because it normally indicates the column
             # Just indicates which split was sampled
             current_split.feature = feat_i
             current_split.proj_vec_weights = &self.proj_mat_weights[feat_i]
@@ -280,8 +280,7 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
 
             # initialize feature vector for criterion to evaluate
             # GIL is needed since we are changing the criterion's internal memory
-            with gil:
-                self.criterion.init_feature_vec(feature_values)
+            self.criterion.init_feature_vec()
 
             # Evaluate all splits
             self.criterion.reset()
