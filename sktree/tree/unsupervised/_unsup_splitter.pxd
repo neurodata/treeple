@@ -26,8 +26,6 @@ cdef class UnsupervisedSplitter(BaseSplitter):
     cdef const DTYPE_t[:, :] X                                       # feature matrix
     cdef SIZE_t n_total_samples                         # store the total number of samples
 
-    cdef DTYPE_t[:] feature_values          # a 1D memoryview into an array that is shared with criterion
-
     # Initialization method for unsupervised splitters
     cdef int init(
         self,

@@ -96,7 +96,6 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         const DOUBLE_t[:] sample_weight,
         double weighted_n_samples,
         const SIZE_t[:] sample_indices,
-        const DTYPE_t[:] Xf,
     ) except -1 nogil:
         """Initialize the unsuperivsed criterion.
 
@@ -105,20 +104,19 @@ cdef class UnsupervisedCriterion(BaseCriterion):
 
         Parameters
         ----------
+        feature_values : array-like, dtype=DTYPE_t
+            The memoryview 1D feature vector with (n_samples,) shape.
         sample_weight : array-like, dtype=DOUBLE_t
             The weight of each sample (i.e. row of X).
         weighted_n_samples : double
             The total weight of all sample_indices.
         sample_indices : array-like, dtype=SIZE_t
             A mask on the sample_indices, showing which ones we want to use
-        Xf : array-like, dtype=DTYPE_t
-            The memoryview 1D feature vector with (n_samples,) shape.
         """
         self.feature_values = feature_values
         self.sample_weight = sample_weight
         self.weighted_n_samples = weighted_n_samples
         self.sample_indices = sample_indices
-        self.Xf = Xf
 
         return 0
 
@@ -351,7 +349,12 @@ cdef class TwoMeans(UnsupervisedCriterion):
         impurity_left[0] = self.fast_variance(self.weighted_n_left, self.sumsq_left, self.sum_left)
         impurity_right[0] = self.fast_variance(self.weighted_n_right, self.sumsq_right, self.sum_right)
 
-    cdef inline double fast_variance(self, double weighted_n_node_samples, double sumsq_total, double sum_total) noexcept nogil:
+    cdef inline double fast_variance(
+        self,
+        double weighted_n_node_samples,
+        double sumsq_total,
+        double sum_total
+    ) noexcept nogil:
         return (1. / weighted_n_node_samples) * \
             ((sumsq_total) - (1. / weighted_n_node_samples) * (sum_total * sum_total))
 
@@ -387,7 +390,11 @@ cdef class FastBIC(TwoMeans):
 
     Reference: https://arxiv.org/abs/1907.02844
     """
-    cdef inline double bic_cluster(self, SIZE_t n_samples, double variance) noexcept nogil:
+    cdef inline double bic_cluster(
+        self,
+        SIZE_t n_samples,
+        double variance
+    ) noexcept nogil:
         """Help compute the BIC from assigning to a specific cluster.
 
         Parameters
@@ -689,12 +696,12 @@ cdef class FasterBIC(UnsupervisedCriterion):
             if self.sample_weight is not None:
                 w = self.sample_weight[s_idx]
 
-            self.sum_total += self.Xf[s_idx] * w
+            self.sum_total += self.feature_values[s_idx] * w
             self.weighted_n_node_samples += w
 
             if p_idx != self.start:
-                self.cumsum_of_squares_map[s_idx] = self.cumsum_of_squares_map[prev_s_idx] + (self.Xf[s_idx] * self.Xf[s_idx] * w * w)
-                self.cumsum_map[s_idx] = self.cumsum_map[prev_s_idx] + (self.Xf[s_idx] * w)
+                self.cumsum_of_squares_map[s_idx] = self.cumsum_of_squares_map[prev_s_idx] + (self.feature_values[s_idx] * self.feature_values[s_idx] * w * w)
+                self.cumsum_map[s_idx] = self.cumsum_map[prev_s_idx] + (self.feature_values[s_idx] * w)
                 self.cumsum_weights_map[s_idx] = self.cumsum_weights_map[prev_s_idx] + w
             else:
                 self.cumsum_of_squares_map[s_idx] = 0.0
