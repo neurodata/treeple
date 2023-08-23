@@ -23,9 +23,9 @@ from sklearn.metrics import calinski_harabasz_score
 from sklearn.utils.parallel import Parallel, delayed
 from sklearn.utils.validation import _check_sample_weight, check_is_fitted, check_random_state
 
-from sktree._lib.sklearn.ensemble._forest import BaseForest
-from sktree._lib.sklearn.tree._tree import DTYPE
-from sktree.tree import UnsupervisedDecisionTree, UnsupervisedObliqueDecisionTree
+from .._lib.sklearn.ensemble._forest import BaseForest
+from .._lib.sklearn.tree._tree import DTYPE
+from ..tree import UnsupervisedDecisionTree, UnsupervisedObliqueDecisionTree
 
 from ..tree._neighbors import SimMatrixMixin
 

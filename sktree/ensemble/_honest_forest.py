@@ -8,7 +8,7 @@ from joblib import Parallel, delayed
 from sklearn.ensemble._base import _partition_estimators
 from sklearn.utils.validation import check_is_fitted, check_X_y
 
-from sktree._lib.sklearn.ensemble._forest import ForestClassifier
+from .._lib.sklearn.ensemble._forest import ForestClassifier
 
 from .._lib.sklearn.tree import _tree as _sklearn_tree
 from ..tree import HonestTreeClassifier
