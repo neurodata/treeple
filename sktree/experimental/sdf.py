@@ -132,10 +132,9 @@ class StreamDecisionForest(RandomForestClassifier):
             max_bins=max_bins,
             store_leaf_values=store_leaf_values,
         )
-        self.n_batches_ = 0
         self.n_swaps = n_swaps
 
-    def fit(self, X, y, classes=None):
+    def fit(self, X, y, sample_weight=None, classes=None):
         """
         Partially fits the forest to data X with labels y.
 
@@ -159,7 +158,7 @@ class StreamDecisionForest(RandomForestClassifier):
         """
         self.n_batches_ = 1
 
-        return super().fit(X, y, classes=classes)
+        return super().fit(X, y, sample_weight=sample_weight, classes=classes)
 
     def partial_fit(self, X, y, sample_weight=None, classes=None):
         """
@@ -192,7 +191,6 @@ class StreamDecisionForest(RandomForestClassifier):
         self : StreamDecisionForest
             The object itself.
         """
-        self.n_batches_ += 1
         self._validate_params()
 
         # validate input parameters
@@ -207,6 +205,7 @@ class StreamDecisionForest(RandomForestClassifier):
                 classes=classes,
             )
             return self
+        self.n_batches_ += 1
 
         if self.bootstrap:
             n_samples_bootstrap = _get_n_samples_bootstrap(X.shape[0], self.max_samples)
