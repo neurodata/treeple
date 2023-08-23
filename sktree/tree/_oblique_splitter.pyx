@@ -7,6 +7,7 @@
 import numpy as np
 
 from cython.operator cimport dereference as deref
+from cython.operator cimport postincrement
 from libcpp.vector cimport vector
 from sklearn.tree._utils cimport rand_int
 
@@ -83,6 +84,10 @@ cdef class BaseObliqueSplitter(Splitter):
         # Sparse max_features x n_features projection matrix
         self.proj_mat_weights = vector[vector[DTYPE_t]](self.max_features)
         self.proj_mat_indices = vector[vector[SIZE_t]](self.max_features)
+
+        # keeping track of constant columns is turned off by default, override
+        # this attribute in subclass's cinit function to turn on tracking constants
+        self.track_constants = False
 
     def __getstate__(self):
         return {}
@@ -194,8 +199,13 @@ cdef class BaseObliqueSplitter(Splitter):
         cdef SIZE_t start = self.start
         cdef SIZE_t end = self.end
 
+        cdef SIZE_t[::1] features = self.features
+        cdef SIZE_t[::1] constant_features = self.constant_features
+        cdef SIZE_t const_col_idx
+        cdef SIZE_t n_known_constants = n_constant_features[0]
+
         # pointer array to store feature values to split on
-        cdef DTYPE_t[::1]  feature_values = self.feature_values
+        cdef DTYPE_t[::1] feature_values = self.feature_values
         cdef SIZE_t max_features = self.max_features
         cdef SIZE_t min_samples_leaf = self.min_samples_leaf
         cdef double min_weight_leaf = self.min_weight_leaf
@@ -213,13 +223,13 @@ cdef class BaseObliqueSplitter(Splitter):
         # instantiate the split records
         _init_split(&best_split, end)
 
-        cdef SIZE_t n_known_constants = n_constant_features[0]
-
         # Sample the projection matrix
         self.sample_proj_mat(self.proj_mat_weights, self.proj_mat_indices, n_known_constants)
 
         # For every vector in the projection matrix
         for feat_i in range(max_features):
+            if n_known_constants >= self.n_features:
+                break
             # Projection vector has no nonzeros
             if self.proj_mat_weights[feat_i].empty():
                 continue
@@ -311,6 +321,21 @@ cdef class BaseObliqueSplitter(Splitter):
             best_split.improvement = self.criterion.impurity_improvement(
                 impurity, best_split.impurity_left, best_split.impurity_right)
 
+        # move constant features to the front of the array, so that way
+        # self.features[:n_known_constants] corresponds to constant columns
+        # if self.track_constants:
+        #     for idx in range(self.n_features):
+        #         if self.constant_features[idx] != True:
+        #             continue
+
+        #         # now move these features towards the front of the array
+        #         # and increment the counter for number of constant features
+        #         self.features[idx], self.features[n_known_constants] = \
+        #             self.features[n_known_constants], self.features[idx]
+        #         n_known_constants += 1
+
+        #     n_constant_features[0] = n_known_constants
+
         # Return values
         deref(oblique_split).proj_vec_indices = best_split.proj_vec_indices
         deref(oblique_split).proj_vec_weights = best_split.proj_vec_weights
@@ -387,10 +412,6 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
 
         self.X = X
 
-        # create a helper array for allowing efficient Fisher-Yates
-        self.indices_to_sample = np.arange(self.max_features * self.n_features,
-                                           dtype=np.intp)
-
         # re-initialize the hashmap for looking at constant features
         cdef unordered_map[SIZE_t, DTYPE_t] min_val_map
         cdef unordered_map[SIZE_t, DTYPE_t] max_val_map
@@ -399,6 +420,10 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
 
         # XXX: Just to initialize stuff
         # self.feature_weights = np.ones((self.n_features,), dtype=DTYPE_t) / self.n_features
+
+        # re-initialize some data structures
+        self.features = np.arange(self.n_features, dtype=np.intp)
+        self.constant_features = np.empty(self.n_features, dtype=np.intp)
         return 0
 
     cdef void sample_proj_mat(
@@ -420,6 +445,8 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
             The memory address of projection matrix non-zero weights.
         proj_mat_indices : vector of vectors reference
             The memory address of projection matrix non-zero indices.
+        n_known_constants : SIZE_t
+            The number of known constants.
 
         Notes
         -----
@@ -431,15 +458,17 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         cdef SIZE_t n_features = self.n_features
         cdef SIZE_t n_non_zeros = self.n_non_zeros
         cdef UINT32_t* random_state = &self.rand_r_state
+        cdef SIZE_t col_idx
 
         cdef int i, feat_i, proj_i, rand_vec_index
         cdef DTYPE_t weight
 
         # construct an array to sample from mTry x n_features set of indices
-        cdef SIZE_t[::1] indices_to_sample = self.indices_to_sample
-        cdef SIZE_t grid_size = self.max_features * self.n_features
-
-        # TODO: refactor this to account for constants
+        cdef SIZE_t grid_size = self.max_features * (self.n_features - n_known_constants)
+        cdef vector[SIZE_t] indices_to_sample = vector[SIZE_t](grid_size)
+        for i in range(grid_size):
+            indices_to_sample.push_back(i)
+        
         # shuffle indices over the 2D grid to sample using Fisher-Yates
         for i in range(0, grid_size):
             j = rand_int(0, grid_size - i, random_state)
@@ -452,16 +481,20 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
             # get the next index from the shuffled index array
             rand_vec_index = indices_to_sample[i]
 
-            # get the projection index and feature index
+            # get the projection index and feature index, which correspond
+            # to the row and column
             proj_i = rand_vec_index // n_features
-            feat_i = rand_vec_index % n_features
+            feat_i = rand_vec_index % n_features + n_known_constants
 
             # sample a random weight
             weight = 1 if (rand_int(0, 2, random_state) == 1) else -1
 
-            proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
-            proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
+            # get the actual column index
+            col_idx = self.features[feat_i]
 
+            # Store index and weight of nonzero element involved in projection
+            proj_mat_indices[proj_i].push_back(col_idx)  
+            proj_mat_weights[proj_i].push_back(weight)
 
     
     cdef void compute_features_over_samples(
@@ -505,7 +538,7 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
                     self.max_val_map[col_idx] = self.X[samples[idx], col_idx]
 
             if self.max_val_map[col_idx] <= self.min_val_map[col_idx] + FEATURE_THRESHOLD:
-                self.constant_col_map[col_idx] = True
+                self.constant_features[col_idx] = 1
 
 cdef class BestObliqueSplitter(ObliqueSplitter):
     def __reduce__(self):
