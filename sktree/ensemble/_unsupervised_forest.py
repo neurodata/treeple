@@ -26,7 +26,6 @@ from sklearn.utils.validation import _check_sample_weight, check_is_fitted, chec
 from .._lib.sklearn.ensemble._forest import BaseForest
 from .._lib.sklearn.tree._tree import DTYPE
 from ..tree import UnsupervisedDecisionTree, UnsupervisedObliqueDecisionTree
-
 from ..tree._neighbors import SimMatrixMixin
 
 

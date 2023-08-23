@@ -5,15 +5,15 @@ Corresponding Email: haoyinxu@gmail.com
 # import the necessary packages
 import numpy as np
 from joblib import Parallel, delayed
+from sklearn.metrics import accuracy_score
+from sklearn.utils.multiclass import _check_partial_fit_first_call
 
 from .._lib.sklearn.ensemble._forest import (
     RandomForestClassifier,
     _generate_sample_indices,
     _get_n_samples_bootstrap,
 )
-from sklearn.metrics import accuracy_score
 from .._lib.sklearn.tree import DecisionTreeClassifier
-from sklearn.utils.multiclass import _check_partial_fit_first_call
 
 
 def _partial_fit(tree, X, y, n_samples_bootstrap, classes):

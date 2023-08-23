@@ -1,4 +1,4 @@
-from . import mutual_info, simulate, sdf
+from . import mutual_info, sdf, simulate
 from .mutual_info import (
     cmi_from_entropy,
     cmi_gaussian,

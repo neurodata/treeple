@@ -7,7 +7,6 @@ from ..tree import (
     PatchObliqueDecisionTreeClassifier,
     PatchObliqueDecisionTreeRegressor,
 )
-
 from ..tree._neighbors import SimMatrixMixin
 
 
