@@ -55,8 +55,7 @@ cdef class BaseObliqueSplitter(Splitter):
 
     # create a hashmap mapping each column idx to a minimum/maximum value
     # for O(1) computation of constant columns
-    cdef unordered_map[SIZE_t, DTYPE_t] min_val_map
-    cdef unordered_map[SIZE_t, DTYPE_t] max_val_map
+    cdef bint track_constants
 
     # All oblique splitters (i.e. non-axis aligned splitters) require a
     # function to sample a projection matrix that is applied to the feature matrix
@@ -64,7 +63,8 @@ cdef class BaseObliqueSplitter(Splitter):
     cdef void sample_proj_mat(
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
-        vector[vector[SIZE_t]]& proj_mat_indices
+        vector[vector[SIZE_t]]& proj_mat_indices,
+        SIZE_t n_known_constants
     ) noexcept nogil
 
     # Redefined here since the new logic requires calling sample_proj_mat
@@ -104,11 +104,16 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
     cdef SIZE_t n_non_zeros                             # Number of non-zero features
     cdef SIZE_t[::1] indices_to_sample                  # an array of indices to sample of size mtry X n_features
 
+    cdef unordered_map[SIZE_t, DTYPE_t] min_val_map
+    cdef unordered_map[SIZE_t, DTYPE_t] max_val_map
+    cdef unordered_map[SIZE_t, bint] constant_col_map
+
     # All oblique splitters (i.e. non-axis aligned splitters) require a
     # function to sample a projection matrix that is applied to the feature matrix
     # to quickly obtain the sampled projections for candidate splits.
     cdef void sample_proj_mat(
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
-        vector[vector[SIZE_t]]& proj_mat_indices
+        vector[vector[SIZE_t]]& proj_mat_indices,
+        SIZE_t n_known_constants
     ) noexcept nogil

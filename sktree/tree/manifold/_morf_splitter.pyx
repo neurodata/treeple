@@ -82,7 +82,8 @@ cdef class PatchSplitter(BaseObliqueSplitter):
     cdef void sample_proj_mat(
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
-        vector[vector[SIZE_t]]& proj_mat_indices
+        vector[vector[SIZE_t]]& proj_mat_indices,
+        SIZE_t n_known_constants
     ) noexcept nogil:
         """ Sample the projection vector.
 
@@ -270,7 +271,8 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
     cdef void sample_proj_mat(
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
-        vector[vector[SIZE_t]]& proj_mat_indices
+        vector[vector[SIZE_t]]& proj_mat_indices,
+        SIZE_t n_known_constants
     ) noexcept nogil:
         """Sample projection matrix using a contiguous patch.
 
@@ -491,7 +493,7 @@ cdef class BestPatchSplitterTester(BestPatchSplitter):
         cdef SIZE_t i, j
 
         # sample projection matrix in C/C++
-        self.sample_proj_mat(proj_mat_weights, proj_mat_indices)
+        self.sample_proj_mat(proj_mat_weights, proj_mat_indices, 0)
 
         # convert the projection matrix to something that can be used in Python
         proj_vecs = np.zeros((self.max_features, self.n_features), dtype=np.float64)
