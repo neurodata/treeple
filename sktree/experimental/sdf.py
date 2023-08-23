@@ -239,7 +239,7 @@ class StreamDecisionForest(RandomForestClassifier):
                         min_weight_fraction_leaf=self.min_weight_fraction_leaf,
                         max_features=self.max_features,
                         max_leaf_nodes=self.max_leaf_nodes,
-                        class_weight=cself.lass_weight,
+                        class_weight=self.lass_weight,
                         random_state=self.random_state,
                         min_impurity_decrease=self.min_impurity_decrease,
                         monotonic_cst=self.monotonic_cst,
