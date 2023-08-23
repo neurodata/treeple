@@ -200,7 +200,7 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
         cdef SIZE_t[::1] constant_features = self.constant_features
         cdef SIZE_t n_features = self.n_features
 
-        cdef DTYPE_t[::1] Xf = self.feature_values
+        cdef DTYPE_t[::1] feature_values = self.feature_values
         cdef SIZE_t max_features = self.max_features
         cdef SIZE_t min_samples_leaf = self.min_samples_leaf
         cdef UINT32_t* random_state = &self.rand_r_state
@@ -279,12 +279,12 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
             # sorting the array in a manner which utilizes the cache more
             # effectively.
             for i in range(start, end):
-                Xf[i] = self.X[samples[i], current_split.feature]
+                feature_values[i] = self.X[samples[i], current_split.feature]
 
-            sort(&Xf[start], &samples[start], end - start)
+            sort(&feature_values[start], &samples[start], end - start)
 
             # check if we have found a "constant" feature
-            if Xf[end - 1] <= Xf[start] + FEATURE_THRESHOLD:
+            if feature_values[end - 1] <= feature_values[start] + FEATURE_THRESHOLD:
                 features[f_j], features[n_total_constants] = \
                     features[n_total_constants], features[f_j]
 
@@ -295,15 +295,14 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
             f_i -= 1
             features[f_i], features[f_j] = features[f_j], features[f_i]
 
-            # initialize feature vector for criterion to evaluate
-            # GIL is needed since we are changing the criterion's internal memory
+            # tell criterion to compute relevant statistics given the feature values
             self.criterion.init_feature_vec()
 
             # Evaluate all splits along the feature vector
             p = start
 
             while p < end:
-                while p + 1 < end and Xf[p + 1] <= Xf[p] + FEATURE_THRESHOLD:
+                while p + 1 < end and feature_values[p + 1] <= feature_values[p] + FEATURE_THRESHOLD:
                     p += 1
 
                 # (p + 1 >= end) or (X[samples[p + 1], current_split.feature] >
@@ -334,14 +333,14 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
                 if current_proxy_improvement > best_proxy_improvement:
                     best_proxy_improvement = current_proxy_improvement
                     # sum of halves is used to avoid infinite value
-                    current_split.threshold = Xf[p - 1] / 2.0 + Xf[p] / 2.0
+                    current_split.threshold = feature_values[p - 1] / 2.0 + feature_values[p] / 2.0
 
                     if (
-                        current_split.threshold == Xf[p] or
+                        current_split.threshold == feature_values[p] or
                         current_split.threshold == INFINITY or
                         current_split.threshold == -INFINITY
                     ):
-                        current_split.threshold = Xf[p - 1]
+                        current_split.threshold = feature_values[p - 1]
 
                     best_split = current_split  # copy
 

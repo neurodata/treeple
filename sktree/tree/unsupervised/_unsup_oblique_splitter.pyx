@@ -278,8 +278,7 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
             # Sort the samples
             sort(&feature_values[start], &samples[start], end - start)
 
-            # initialize feature vector for criterion to evaluate
-            # GIL is needed since we are changing the criterion's internal memory
+            # tell criterion to compute relevant statistics given the feature values
             self.criterion.init_feature_vec()
 
             # Evaluate all splits

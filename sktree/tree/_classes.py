@@ -164,6 +164,16 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
 
     clustering_func_args : dict
         Clustering function class keyword arguments. Passed to `clustering_func`.
+
+    Notes
+    -----
+    The "faster" BIC criterion is computed by enabling computation of the split point evaluations
+    in O(n) time given that the samples are sorted. This implements the algorithm described in
+    :footcite:`marx2022estimating` and :footcite:`terzi2006efficient`.
+
+    References
+    ----------
+    .. footbibliography::
     """
 
     def __init__(
