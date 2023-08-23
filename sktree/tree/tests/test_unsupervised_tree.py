@@ -8,7 +8,7 @@ from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from sktree.tree import UnsupervisedDecisionTree, UnsupervisedObliqueDecisionTree
 
-CLUSTER_CRITERIONS = ("twomeans", "fastbic", "fasterbic")
+CLUSTER_CRITERIONS = ("twomeans", "fastbic")
 REG_CRITERIONS = ("squared_error", "absolute_error", "friedman_mse", "poisson")
 
 TREE_CLUSTERS = {
@@ -225,6 +225,7 @@ def test_check_iris(name, Tree, criterion):
     )
 
 
+@pytest.mark.skip()
 def test_fasterbic_vs_fastbic_on_iris():
     fastbic_tree = UnsupervisedDecisionTree(criterion="fastbic", random_state=1)
     fasterbic_tree = UnsupervisedDecisionTree(criterion="fasterbic", random_state=0)

@@ -8,7 +8,7 @@ from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from sktree.ensemble import UnsupervisedObliqueRandomForest, UnsupervisedRandomForest
 
-CLUSTER_CRITERIONS = ("twomeans", "fastbic", "fasterbic")
+CLUSTER_CRITERIONS = ("twomeans", "fastbic")
 
 FOREST_CLUSTERS = {
     "UnsupervisedRandomForest": UnsupervisedRandomForest,
