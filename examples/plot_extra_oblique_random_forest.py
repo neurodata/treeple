@@ -4,7 +4,7 @@ Plot extra oblique forest and oblique random forest predictions on cc18 datasets
 ================================================================================
 
 A performance comparison between extra oblique forest and standard oblique random
-forest using three datasets from OpenML benchmarking suites.
+forest using four datasets from OpenML benchmarking suites.
 
 Extra oblique forest uses extra oblique trees as base model which differ from classic
 decision trees in the way they are built. When looking for the best split to
@@ -13,16 +13,23 @@ of the `max_features` randomly selected features and the best split among those 
 chosen. When `max_features` is set 1, this amounts to building a totally random
 decision tree. For details of the algorithm, see [1]_.
 
-Two of these datasets, namely
-[WDBC](https://www.openml.org/search?type=data&sort=runs&id=1510)
-and [Phishing Website](https://www.openml.org/search?type=data&sort=runs&id=4534)
-datasets consist of 31 features where the former dataset is entirely numeric
-and the latter dataset is entirely norminal. The third dataset, dubbed
-[cnae-9](https://www.openml.org/search?type=data&status=active&id=1468), is a
-numeric dataset that has notably large feature space of 857 features. As you
-will notice, of these three datasets, the oblique forest outperforms axis-aligned
-random forest on cnae-9 utilizing sparse random projection mechanism. All datasets
-are subsampled due to computational constraints.
+The datasets used in this example are from the OpenML benchmarking suite are:
+
+[Phishing Website](https://www.openml.org/search?type=data&sort=runs&id=4534),
+[WDBC](https://www.openml.org/search?type=data&sort=runs&id=1510),
+[Lsvt](https://www.openml.org/search?type=data&sort=runs&id=1484),
+[har]((https://www.openml.org/search?type=data&sort=runs&id=1478), and
+[cnae-9](https://www.openml.org/search?type=data&sort=runs&id==1468).
+ All datasets are subsampled due to computational constraints. Note that `cnae-9` is
+ an high dimensional dataset with very sparse 856 features, mostly consisting of zeros.
+
+dataset| samples | features | datatype
+-------|---------|----------|---------
+Phishing Website | 8844 | 30 | nominal
+WDBC | 455 | 30 | numeric
+Lsvt | 100 | 310 | numeric
+har | 100 | 561 | numeric
+cnae-9 | 100 | 856 | numeric
 
 References
 ----------
@@ -40,8 +47,15 @@ from sklearn.model_selection import RepeatedKFold, cross_validate
 
 from sktree import ExtraObliqueRandomForestClassifier, ObliqueRandomForestClassifier
 
+# Parameters
 random_state = 12345
-data_ids = [4534, 1510, 1484, 1468]
+phishing_website = 4534
+wdbc = 1510
+lsvt = 1484
+har = 1478
+cnae_9 = 1468
+
+data_ids = [phishing_website, wdbc, lsvt, har, cnae_9]
 df = pd.DataFrame()
 
 
@@ -52,7 +66,7 @@ def load_cc18(data_id):
     d_name = df.details["name"]
 
     # Subsampling large datasets
-    if data_id == 1468:
+    if data_id in [1468, 1478]:
         n = 100
     else:
         n = int(df.frame.shape[0] * 0.8)
@@ -65,7 +79,7 @@ def load_cc18(data_id):
 
 def get_scores(X, y, d_name, n_cv=5, n_repeats=1, **kwargs):
     clfs = [ExtraObliqueRandomForestClassifier(**kwargs), ObliqueRandomForestClassifier(**kwargs)]
-
+    dim = X.shape
     tmp = []
 
     for i, clf in enumerate(clfs):
@@ -75,22 +89,19 @@ def get_scores(X, y, d_name, n_cv=5, n_repeats=1, **kwargs):
         time_taken = datetime.now() - t0
         # convert the time taken to seconds
         time_taken = time_taken.total_seconds()
-        tree_depth = clf.get_params()["max_depth"]
 
         tmp.append(
             [
                 d_name,
+                dim,
                 ["EORF", "ORF"][i],
                 test_score["test_score"],
                 test_score["test_score"].mean(),
                 time_taken,
-                tree_depth,
             ]
         )
 
-    df = pd.DataFrame(
-        tmp, columns=["dataset", "model", "score", "mean", "time_taken", "tree_depth"]
-    )
+    df = pd.DataFrame(tmp, columns=["dataset", "dimension", "model", "score", "mean", "time_taken"])
     df = df.explode("score")
     df["score"] = df["score"].astype(float)
     df.reset_index(inplace=True, drop=True)
@@ -100,8 +111,8 @@ def get_scores(X, y, d_name, n_cv=5, n_repeats=1, **kwargs):
 
 params = {
     "max_features": None,
-    "n_estimators": 2,
-    "max_depth": None,
+    "n_estimators": 50,
+    "max_depth": 10,
     "random_state": random_state,
     "n_cv": 10,
     "n_repeats": 1,
@@ -109,12 +120,11 @@ params = {
 
 for data_id in data_ids:
     X, y, d_name = load_cc18(data_id=data_id)
-    print(f"Loading [{d_name}] dataset..")
     tmp = get_scores(X=X, y=y, d_name=d_name, **params)
     df = pd.concat([df, tmp])
 
 # Show the time taken to train each model
-print(df.groupby(["dataset", "model"])[["time_taken"]].mean())
+print(df.groupby(["dataset", "dimension", "model"])[["time_taken"]].mean())
 
 # Draw a comparison plot
 d_names = df.dataset.unique()
@@ -147,7 +157,8 @@ plt.show()
 
 
 # Discussion
-# ----------``
-# Extra Oblique Tree runs faster compared to the standard Oblique Tree,
-# while the performance is comparable or better in some cases that are
-# tested.
+# ----------
+# Extra Oblique Tree demonstrates performance similar to that of regular Oblique Tree on average
+# with some increase in variance.
+# However, Extra Oblique Tree runs substantially faster than Oblique Tree on some datasets due to
+# the random_splits process which omits the computationally expensive search for the best split.

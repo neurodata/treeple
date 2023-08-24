@@ -1,0 +1,395 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>3. Oblique Random Forests &#8212; scikit-tree 0.2.0dev0 documentation</title>
+<script>
+  document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+  document.documentElement.dataset.theme = localStorage.getItem("theme") || "light"
+</script>
+
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=92025949c220c2e29695" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=92025949c220c2e29695" rel="stylesheet">
+
+
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.css" />
+
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Release History" href="../whats_new.html" />
+    <link rel="prev" title="2. Unsupervised Decision Trees" href="unsupervised_tree.html" />
+    <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <script type="text/javascript" src="../_static/scrollfix.js"></script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="docsearch:language" content="en">
+
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+    <div class="bd-header-announcement container-fluid" id="banner">
+      
+
+    </div>
+
+    
+    <nav class="bd-header navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="bd-header__inner container-xl">
+
+  <div id="navbar-start">
+    
+    
+  
+
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">scikit-tree 0.2.0dev0 documentation</p>
+  
+</a>
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="fas fa-bars"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../api.html">
+  API Documentation
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../user_guide.html">
+  User Guide
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../whats_new.html">
+  Release History
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../install.html">
+  Installation
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../use.html">
+  Examples using scikit-tree
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <div class="dropdown">
+    <button type="button" class="btn btn-primary btn-sm navbar-btn dropdown-toggle" id="dLabelMore" data-toggle="dropdown">
+        v0.2.0dev0
+        <span class="caret"></span>
+    </button>
+    <div class="dropdown-menu list-group-flush py-0" aria-labelledby="dLabelMore">
+        <a class="list-group-item list-group-item-action py-1" href="https:///docs.neurodata.io/scikit-tree/dev/index.html">v0.2 (devel)</a>
+        <a class="list-group-item list-group-item-action py-1" href="https:///docs.neurodata.io/scikit-tree/stable/index.html">v0.1</a>
+    </div>
+</div>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/neurodata/scikit-tree" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="bd-container container-xl">
+      <div class="bd-container__inner row">
+          
+
+<!-- Only show if we have sidebars configured, else just a small margin  -->
+<div class="bd-sidebar-primary col-12 col-md-3 bd-sidebar">
+  <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="supervised_tree.html">
+   1. Supervised Decision Trees
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="unsupervised_tree.html">
+   2. Unsupervised Decision Trees
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   3. Oblique Random Forests
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+  </div>
+  <div class="sidebar-end-items">
+  </div>
+</div>
+
+
+          
+
+
+<div class="bd-sidebar-secondary d-none d-xl-block col-xl-2 bd-toc">
+  
+    
+    <div class="toc-item">
+      
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#">
+   3. Oblique Random Forests
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#feature-importance-evaluation">
+   4. Feature importance evaluation
+  </a>
+ </li>
+</ul>
+
+</nav>
+    </div>
+    
+    <div class="toc-item">
+      
+    </div>
+    
+  
+</div>
+
+
+          
+          
+          <div class="bd-content col-12 col-md-9 col-xl-7">
+              
+              <article class="bd-article" role="main">
+                
+  <section id="oblique-random-forests">
+<span id="oblique-forests"></span><h1><span class="section-number">3. </span>Oblique Random Forests<a class="headerlink" href="#oblique-random-forests" title="Permalink to this heading">#</a></h1>
+<p>In oblique random forests (see <a class="reference internal" href="../generated/sktree.ObliqueRandomForestClassifier.html#sktree.ObliqueRandomForestClassifier" title="sktree.ObliqueRandomForestClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObliqueRandomForestClassifier</span></code></a> and
+<code class="docutils literal notranslate"><span class="pre">ObliqueRandomForestRegressor</span></code> classes), each tree in the ensemble is built
+from a sample drawn with replacement (i.e., a bootstrap sample) from the
+training set. The oblique random forest is the same as that of a random forest,
+except in how the splits are computed in each tree.</p>
+<p>Similar to how random forests achieve a reduced variance by combining diverse trees,
+sometimes at the cost of a slight increase in bias, oblique random forests aim to do the same.
+They are motivated to construct even more diverse trees, thereby improving model generalization.
+In practice the variance reduction is often significant hence yielding an overall better model.</p>
+<p>In contrast to the original publication <a class="reference internal" href="#b2001" id="id1"><span>[B2001]</span></a>, the scikit-learn
+implementation allows the user to control the number of features to combine in computing
+candidate splits. This is done via the <code class="docutils literal notranslate"><span class="pre">feature_combinations</span></code> parameter. For
+more information and intuition, see
+<a class="reference internal" href="supervised_tree.html#oblique-trees"><span class="std std-ref">documentation on oblique decision trees</span></a>.</p>
+<aside class="topic">
+<p class="topic-title">Examples:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../auto_examples/plot_oblique_random_forest.html#sphx-glr-auto-examples-plot-oblique-random-forest-py"><span class="std std-ref">Plot oblique forest and axis-aligned random forest predictions on cc18 datasets</span></a></p></li>
+<li><p><a class="reference internal" href="../auto_examples/plot_oblique_axis_aligned_forests_sparse_parity.html#sphx-glr-auto-examples-plot-oblique-axis-aligned-forests-sparse-parity-py"><span class="std std-ref">Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation</span></a></p></li>
+</ul>
+</aside>
+<aside class="topic">
+<p class="topic-title">References</p>
+<div role="list" class="citation-list">
+<div class="citation" id="b2001" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">B2001</a><span class="fn-bracket">]</span></span>
+<p>Breiman, L. “Random Forests”, Machine Learning, 45(1), 5-32, 2001.</p>
+</div>
+<div class="citation" id="g2006" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>G2006<span class="fn-bracket">]</span></span>
+<p>Geurts, P. and Ernst., D. and Wehenkel, L. “Extremely randomized
+trees”, Machine Learning, 63(1), 3-42, 2006.</p>
+</div>
+</div>
+</aside>
+</section>
+<section id="feature-importance-evaluation">
+<span id="oblique-forest-feature-importance"></span><h1><span class="section-number">4. </span>Feature importance evaluation<a class="headerlink" href="#feature-importance-evaluation" title="Permalink to this heading">#</a></h1>
+<p>The relative rank (i.e. depth) of a feature used as a decision node in a
+tree can be used to assess the relative importance of that feature with
+respect to the predictability of the target variable. Features used at
+the top of the tree contribute to the final prediction decision of a
+larger fraction of the input samples. The <strong>expected fraction of the
+samples</strong> they contribute to can thus be used as an estimate of the
+<strong>relative importance of the features</strong>. In scikit-tree, the fraction of
+samples a feature contributes to is combined with the decrease in impurity
+from splitting them to create a normalized estimate of the predictive power
+of that feature. This is essentially exactly the same it is done in scikit-learn.</p>
+<p>By <strong>averaging</strong> the estimates of predictive ability over several randomized
+trees one can <strong>reduce the variance</strong> of such an estimate and use it
+for feature selection. This is known as the mean decrease in impurity, or MDI.
+Refer to <a class="reference internal" href="#l2014" id="id2"><span>[L2014]</span></a> for more information on MDI and feature importance
+evaluation with Random Forests. We implement the approach taken in <a class="reference internal" href="#li2023" id="id3"><span>[Li2023]</span></a>
+and <a class="reference internal" href="#tomita2020" id="id4"><span>[Tomita2020]</span></a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The impurity-based feature importances computed on tree-based models suffer
+from two flaws that can lead to misleading conclusions. First they are
+computed on statistics derived from the training dataset and therefore <strong>do
+not necessarily inform us on which features are most important to make good
+predictions on held-out dataset</strong>. Secondly, <strong>they favor high cardinality
+features</strong>, that is features with many unique values.
+<a class="reference external" href="https://scikit-learn.org/dev/modules/permutation_importance.html#permutation-importance" title="(in scikit-learn v1.4)"><span>Permutation feature importance</span></a> is an alternative to impurity-based feature
+importance that does not suffer from these flaws. These two methods of
+obtaining feature importance are explored in:
+<a class="reference external" href="https://scikit-learn.org/dev/auto_examples/inspection/plot_permutation_importance.html#sphx-glr-auto-examples-inspection-plot-permutation-importance-py" title="(in scikit-learn v1.4)"><span>Permutation Importance vs Random Forest Feature Importance (MDI)</span></a>.</p>
+</div>
+<p>In practice those estimates are stored as an attribute named
+<code class="docutils literal notranslate"><span class="pre">feature_importances_</span></code> on the fitted model. This is an array with shape
+<code class="docutils literal notranslate"><span class="pre">(n_features,)</span></code> whose values are positive and sum to 1.0. The higher
+the value, the more important is the contribution of the matching feature
+to the prediction function.</p>
+<aside class="topic">
+<p class="topic-title">References</p>
+<div role="list" class="citation-list">
+<div class="citation" id="l2014" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">L2014</a><span class="fn-bracket">]</span></span>
+<p>Louppe, G. <a class="reference external" href="https://arxiv.org/abs/1407.7502">“Understanding Random Forests: From Theory to
+Practice”</a>,
+PhD Thesis, U. of Liege, 2014.</p>
+</div>
+<div class="citation" id="li2023" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">Li2023</a><span class="fn-bracket">]</span></span>
+<p>Li, Adam, et al. <a class="reference external" href="https://doi.org/10.1137/21M1449117">“Manifold Oblique Random Forests: Towards
+Closing the Gap on Convolutional Deep Networks”</a>,
+SIAM Journal on Mathematics of Data Science, 5(1), 77-96, 2023.</p>
+</div>
+<div class="citation" id="tomita2020" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">Tomita2020</a><span class="fn-bracket">]</span></span>
+<p>Tomita, Tyler M., et al. “Sparse Projection Oblique
+Randomer Forests”, The Journal of Machine Learning Research, 21(104),
+1-39, 2020.</p>
+</div>
+</div>
+</aside>
+</section>
+
+
+              </article>
+              
+
+              
+              <footer class="bd-footer-article">
+                  <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+  <a class='left-prev' id="prev-link" href="unsupervised_tree.html" title="previous page">
+      <i class="fas fa-angle-left"></i>
+      <div class="prev-next-info">
+          <p class="prev-next-subtitle">previous</p>
+          <p class="prev-next-title"><span class="section-number">2. </span>Unsupervised Decision Trees</p>
+      </div>
+  </a>
+  <a class='right-next' id="next-link" href="../whats_new.html" title="next page">
+  <div class="prev-next-info">
+      <p class="prev-next-subtitle">next</p>
+      <p class="prev-next-title">Release History</p>
+  </div>
+  <i class="fas fa-angle-right"></i>
+  </a>
+</div>
+              </footer>
+              
+          </div>
+          
+      </div>
+    </div>
+
+  
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695"></script>
+
+<footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    <p class="copyright">
+    &copy; Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-12.<br>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
+</p>
+  </div>
+  
+</div>
+</footer>
+  </body>
+</html>

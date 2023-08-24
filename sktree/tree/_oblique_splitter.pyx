@@ -633,19 +633,6 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
 
         return partition_end
 
-    cdef inline void swap_feature_values(
-        self,
-        SIZE_t i,
-        SIZE_t j,
-        DTYPE_t[:] feature_values,
-        vector[vector[DTYPE_t]]& proj_mat_weights,
-        vector[vector[SIZE_t]]& proj_mat_indices
-    ) noexcept nogil:
-        """Swap the projection matrix weights and indices at indices i and j"""
-        feature_values[i], feature_values[j] = feature_values[j], feature_values[i]
-        proj_mat_weights[i], proj_mat_weights[j] = proj_mat_weights[j], proj_mat_weights[i]
-        proj_mat_indices[i], proj_mat_indices[j] = proj_mat_indices[j], proj_mat_indices[i]
-
     # overwrite the node_split method with random threshold selection
     cdef int node_split(
         self,

@@ -1,0 +1,102 @@
+
+
+Examples using ``sktree.ForestClassifier``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. start-sphx-glr-thumbnails
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="A performance comparison between extra oblique forest and standard oblique random forest using ...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_extra_oblique_random_forest_thumb.png
+    :alt: Plot extra oblique forest and oblique random forest predictions on cc18 datasets
+
+  :ref:`sphx_glr_auto_examples_plot_extra_oblique_random_forest.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Plot extra oblique forest and oblique random forest predictions on cc18 datasets</div>
+    </div>
+
+
+.. only:: not html
+
+ * :ref:`sphx_glr_auto_examples_plot_extra_oblique_random_forest.py`
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Compare the prediction results of honest forests and random forests with various methods of cal...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_overlapping_gaussians_thumb.png
+    :alt: Plot honest forest calibrations on overlapping gaussian simulations
+
+  :ref:`sphx_glr_auto_examples_plot_overlapping_gaussians.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Plot honest forest calibrations on overlapping gaussian simulations</div>
+    </div>
+
+
+.. only:: not html
+
+ * :ref:`sphx_glr_auto_examples_plot_overlapping_gaussians.py`
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="A performance comparison between oblique forest and standard axis- aligned random forest using ...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_oblique_random_forest_thumb.png
+    :alt: Plot oblique forest and axis-aligned random forest predictions on cc18 datasets
+
+  :ref:`sphx_glr_auto_examples_plot_oblique_random_forest.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Plot oblique forest and axis-aligned random forest predictions on cc18 datasets</div>
+    </div>
+
+
+.. only:: not html
+
+ * :ref:`sphx_glr_auto_examples_plot_oblique_random_forest.py`
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_oblique_axis_aligned_forests_sparse_parity_thumb.png
+    :alt: Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation
+
+  :ref:`sphx_glr_auto_examples_plot_oblique_axis_aligned_forests_sparse_parity.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation</div>
+    </div>
+
+
+.. only:: not html
+
+ * :ref:`sphx_glr_auto_examples_plot_oblique_axis_aligned_forests_sparse_parity.py`
+
+.. raw:: html
+
+    </div>
+
