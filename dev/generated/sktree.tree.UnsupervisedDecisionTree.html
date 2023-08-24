@@ -541,8 +541,28 @@ and return cluster labels. By default, <a class="reference external" href="https
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Attributes<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
+</dl>
+<p class="rubric">Notes</p>
+<p>The “faster” BIC criterion enablescomputation of the split point evaluations
+in O(n) time given that the samples are sorted. This algorithm is described in
+<a class="footnote-reference brackets" href="#footcite-marx2022estimating" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> and <a class="footnote-reference brackets" href="#footcite-terzi2006efficient" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> and enables fast variance
+computations for the twomeans and fastbic criteria.</p>
+<p class="rubric">References</p>
+<div class="docutils container" id="id3">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-marx2022estimating" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Alexander Marx and Jonas Fischer. Estimating mutual information via geodesic k nn. In <em>Proceedings of the 2022 SIAM International Conference on Data Mining (SDM)</em>, 415–423. SIAM, 2022.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-terzi2006efficient" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Evimaria Terzi and Panayiotis Tsaparas. Efficient algorithms for sequence segmentation. In <em>Proceedings of the 2006 SIAM International Conference on Data Mining</em>, 316–327. SIAM, 2006.</p>
+</aside>
+</aside>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
 <dt><a class="reference internal" href="#sktree.tree.UnsupervisedDecisionTree.feature_importances_" title="sktree.tree.UnsupervisedDecisionTree.feature_importances_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">feature_importances_</span></code></a></dt><dd><p>Return the feature importances.</p>
 </dd>
 </dl>
@@ -1206,7 +1226,7 @@ high cardinality features (many unique values). See
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-22.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-24.
       <br/>
     
   </p>

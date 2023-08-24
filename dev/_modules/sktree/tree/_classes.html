@@ -552,6 +552,17 @@ document.write(`
 
 <span class="sd">    clustering_func_args : dict</span>
 <span class="sd">        Clustering function class keyword arguments. Passed to `clustering_func`.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The &quot;faster&quot; BIC criterion enablescomputation of the split point evaluations</span>
+<span class="sd">    in O(n) time given that the samples are sorted. This algorithm is described in</span>
+<span class="sd">    :footcite:`marx2022estimating` and :footcite:`terzi2006efficient` and enables fast variance</span>
+<span class="sd">    computations for the twomeans and fastbic criteria.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. footbibliography::</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -2664,7 +2675,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-22.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-08-24.
       <br/>
     
   </p>
