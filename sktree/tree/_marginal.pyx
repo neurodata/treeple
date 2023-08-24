@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
-from cython.parallel import prange
 import numpy as np
+from cython.parallel import prange
 
 cimport numpy as cnp
 

@@ -11,18 +11,12 @@ def compute_bench(samples_range, features_range):
     it = 0
     results = defaultdict(lambda: [])
 
-    est_params = {
-        'min_samples_split': 5,
-        "criterion": "fastbic",
-        "n_jobs": None
-    }
+    est_params = {"min_samples_split": 5, "criterion": "fastbic", "n_jobs": None}
 
     max_it = len(samples_range) * len(features_range)
     for n_samples in samples_range:
         for n_features in features_range:
             it += 1
-            if it < 20:
-                continue
 
             print("==============================")
             print("Iteration %03d of %03d" % (it, max_it))
@@ -33,9 +27,7 @@ def compute_bench(samples_range, features_range):
 
             print("Unsupervised RF")
             tstart = time()
-            est = UnsupervisedRandomForest(
-                **est_params
-            ).fit(data)
+            est = UnsupervisedRandomForest(**est_params).fit(data)
 
             delta = time() - tstart
             max_depth = max(tree.get_depth() for tree in est.estimators_)
@@ -48,9 +40,7 @@ def compute_bench(samples_range, features_range):
 
             print("Unsupervised Oblique RF")
             # let's prepare the data in small chunks
-            est = UnsupervisedObliqueRandomForest(
-                **est_params
-            )
+            est = UnsupervisedObliqueRandomForest(**est_params)
             tstart = time()
             est.fit(data)
             delta = time() - tstart

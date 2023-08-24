@@ -195,7 +195,6 @@ cdef class BaseObliqueSplitter(Splitter):
         cdef DTYPE_t[::1]  feature_values = self.feature_values
         cdef SIZE_t max_features = self.max_features
         cdef SIZE_t min_samples_leaf = self.min_samples_leaf
-        cdef double min_weight_leaf = self.min_weight_leaf
 
         # keep track of split record for current_split node and the best_split split
         # found among the sampled projection vectors
@@ -252,12 +251,13 @@ cdef class BaseObliqueSplitter(Splitter):
                     current_split.pos = p
 
                     # Reject if min_samples_leaf is not guaranteed
-                    if self.check_presplit_conditions(&current_split, 0, 0) == 1:
+                    if (((current_split.pos - start) < min_samples_leaf) or
+                            ((end - current_split.pos) < min_samples_leaf)):
                         continue
 
                     self.criterion.update(current_split.pos)
                     # Reject if min_weight_leaf is not satisfied
-                    if splitter.check_postsplit_conditions() == 1:
+                    if self.check_postsplit_conditions() == 1:
                         continue
 
                     current_proxy_improvement = \

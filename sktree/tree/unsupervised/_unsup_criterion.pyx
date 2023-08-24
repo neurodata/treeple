@@ -1,11 +1,13 @@
 # distutils: language = c++
 # cython: language_level=3
-# cython: boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
+# cython: boundscheck=False
+# cython: wraparound=False
+# cython: initializedcheck=False
+# cython: cdivision=True
 
 cimport numpy as cnp
 import numpy as np
 from libc.math cimport log
-from libcpp.unordered_map cimport unordered_map
 
 cnp.import_array()
 
@@ -92,15 +94,6 @@ cdef class UnsupervisedCriterion(BaseCriterion):
             self.sum_total += self.feature_values[s_idx] * w
             self.sumsq_total += self.feature_values[s_idx] * self.feature_values[s_idx] * w * w
             self.weighted_n_node_samples += w
-        #     self.cumsum_of_squares_map[s_idx] = self.cumsum_of_squares_map[prev_s_idx] + (self.feature_values[s_idx] * self.feature_values[s_idx] * w * w)
-        #     self.cumsum_map[s_idx] = self.cumsum_map[prev_s_idx] + (self.feature_values[s_idx] * w)
-        #     self.cumsum_weights_map[s_idx] = self.cumsum_weights_map[prev_s_idx] + w
-                
-        #     prev_s_idx = s_idx
-
-        # self.sum_total = self.cumsum_map[s_idx]
-        # self.sumsq_total = self.cumsum_of_squares_map[s_idx]
-        # self.weighted_n_node_samples = self.cumsum_weights_map[s_idx]
 
         # Reset to pos=start
         self.reset()
@@ -227,10 +220,6 @@ cdef class UnsupervisedCriterion(BaseCriterion):
                 self.sumsq_left -= self.feature_values[i] * self.feature_values[i] * w * w
                 self.weighted_n_left -= w
 
-        # self.sum_left = self.cumsum_map[sample_indices[new_pos - 1]]
-        # self.sumsq_left = self.cumsum_of_squares_map[sample_indices[new_pos - 1]]
-        # self.weighted_n_left = self.cumsum_weights_map[sample_indices[new_pos - 1]]
-
         # Update right part statistics
         self.weighted_n_right = (self.weighted_n_node_samples -
                                  self.weighted_n_left)
@@ -272,14 +261,6 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         self.n_node_samples = end - start
         self.start = start
         self.end = end
-
-        # reset the hashmaps
-        # cdef unordered_map[SIZE_t, DTYPE_t] cumsum_map
-        # cdef unordered_map[SIZE_t, DTYPE_t] cumsum_of_squares_map
-        # cdef unordered_map[SIZE_t, DTYPE_t] cumsum_weights_map
-        # self.cumsum_map = cumsum_map
-        # self.cumsum_of_squares_map = cumsum_of_squares_map
-        # self.cumsum_weights_map = cumsum_weights_map
 
 
 cdef class TwoMeans(UnsupervisedCriterion):
