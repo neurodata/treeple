@@ -2,6 +2,7 @@
 # cython: boundscheck=False
 # cython: wraparound=False
 # cython: initializedcheck=False
+# cython: cdivision=True
 
 import numpy as np
 
@@ -165,12 +166,44 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
         """Get size of a pointer to record for ObliqueSplitter."""
         return sizeof(ObliqueSplitRecord)
 
+    cdef inline void compute_features_over_samples(
+        self,
+        SIZE_t start,
+        SIZE_t end,
+        const SIZE_t[:] samples,
+        DTYPE_t[:] feature_values,
+        vector[DTYPE_t]* proj_vec_weights,  # weights of the vector (max_features,)
+        vector[SIZE_t]* proj_vec_indices    # indices of the features (max_features,)
+    ) noexcept nogil:
+        """Compute the feature values for the samples[start:end] range.
+
+        Returns -1 in case of failure to allocate memory (and raise MemoryError)
+        or 0 otherwise.
+        """
+        cdef SIZE_t idx, jdx
+        cdef SIZE_t col_idx
+        cdef DTYPE_t col_weight
+
+        # Compute linear combination of features and then
+        # sort samples according to the feature values.
+        for jdx in range(0, proj_vec_indices.size()):
+            col_idx = deref(proj_vec_indices)[jdx]
+            col_weight = deref(proj_vec_weights)[jdx]
+
+            for idx in range(start, end):
+                # initialize the feature value to 0
+                if jdx == 0:
+                    feature_values[idx] = 0.0
+                feature_values[idx] += self.X[samples[idx], col_idx] * col_weight
+
 
 cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
     # NOTE: vectors are passed by value, so & is needed to pass by reference
-    cdef void sample_proj_mat(self,
-                              vector[vector[DTYPE_t]]& proj_mat_weights,
-                              vector[vector[SIZE_t]]& proj_mat_indices) noexcept nogil:
+    cdef void sample_proj_mat(
+        self,
+        vector[vector[DTYPE_t]]& proj_mat_weights,
+        vector[vector[SIZE_t]]& proj_mat_indices
+    ) noexcept nogil:
         """
         Sparse Oblique Projection matrix.
         Randomly sample features to put in randomly sampled projection vectors
@@ -243,7 +276,6 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
         cdef double best_proxy_improvement = -INFINITY
 
         cdef SIZE_t feat_i, p       # index over computed features and start/end
-        cdef SIZE_t idx, jdx        # index over max_feature, and
         cdef SIZE_t partition_end
         cdef DTYPE_t temp_d         # to compute a projection feature value
 
@@ -267,19 +299,19 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
 
             # Compute linear combination of features and then
             # sort samples according to the feature values.
-            for idx in range(start, end):
-                # initialize the feature value to 0
-                feature_values[idx] = 0
-                for jdx in range(0, current_split.proj_vec_indices.size()):
-                    feature_values[idx] += self.X[
-                        samples[idx], deref(current_split.proj_vec_indices)[jdx]
-                    ] * deref(current_split.proj_vec_weights)[jdx]
+            self.compute_features_over_samples(
+                start,
+                end,
+                samples,
+                feature_values,
+                &self.proj_mat_weights[feat_i],
+                &self.proj_mat_indices[feat_i]
+            )
 
             # Sort the samples
             sort(&feature_values[start], &samples[start], end - start)
 
-            # initialize feature vector for criterion to evaluate
-            # GIL is needed since we are changing the criterion's internal memory
+            # tell criterion to compute relevant statistics given the feature values
             self.criterion.init_feature_vec()
 
             # Evaluate all splits
