@@ -140,7 +140,7 @@ cdef class BaseObliqueSplitter(Splitter):
 
         return sizeof(ObliqueSplitRecord)
 
-    cdef void compute_features_over_samples(
+    cdef inline void compute_features_over_samples(
         self,
         SIZE_t start,
         SIZE_t end,
@@ -252,14 +252,12 @@ cdef class BaseObliqueSplitter(Splitter):
                     current_split.pos = p
 
                     # Reject if min_samples_leaf is not guaranteed
-                    if (((current_split.pos - start) < min_samples_leaf) or
-                            ((end - current_split.pos) < min_samples_leaf)):
+                    if self.check_presplit_conditions(&current_split, 0, 0) == 1:
                         continue
 
                     self.criterion.update(current_split.pos)
                     # Reject if min_weight_leaf is not satisfied
-                    if ((self.criterion.weighted_n_left < min_weight_leaf) or
-                            (self.criterion.weighted_n_right < min_weight_leaf)):
+                    if splitter.check_postsplit_conditions() == 1:
                         continue
 
                     current_proxy_improvement = \

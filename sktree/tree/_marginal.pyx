@@ -1,5 +1,6 @@
 # cython: language_level=3
 # cython: boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
+from cython.parallel import prange
 import numpy as np
 
 cimport numpy as cnp
@@ -150,7 +151,7 @@ cdef inline cnp.ndarray _apply_dense_marginal(
     cdef SIZE_t i = 0
 
     with nogil:
-        for i in range(n_samples):
+        for i in prange(n_samples):
             node = tree.nodes
 
             # While node not a leaf

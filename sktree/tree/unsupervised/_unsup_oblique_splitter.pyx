@@ -165,7 +165,7 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
         """Get size of a pointer to record for ObliqueSplitter."""
         return sizeof(ObliqueSplitRecord)
 
-    cdef void compute_features_over_samples(
+    cdef inline void compute_features_over_samples(
         self,
         SIZE_t start,
         SIZE_t end,
