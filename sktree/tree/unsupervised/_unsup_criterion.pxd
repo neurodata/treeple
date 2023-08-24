@@ -48,9 +48,9 @@ cdef class UnsupervisedCriterion(BaseCriterion):
     cdef double sumsq_right     # Same as above, but for the right side of the split
 
     # use memoization to re-compute variance of any subsegment in O(1)
-    cdef unordered_map[SIZE_t, DTYPE_t] cumsum_of_squares_map
-    cdef unordered_map[SIZE_t, DTYPE_t] cumsum_map
-    cdef unordered_map[SIZE_t, DTYPE_t] cumsum_weights_map
+    # cdef unordered_map[SIZE_t, DTYPE_t] cumsum_of_squares_map
+    # cdef unordered_map[SIZE_t, DTYPE_t] cumsum_map
+    # cdef unordered_map[SIZE_t, DTYPE_t] cumsum_weights_map
 
     # Methods
     # -------

@@ -69,3 +69,13 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
         const DOUBLE_t[:] sample_weight
     ) except -1
     cdef int pointer_size(self) noexcept nogil
+
+    cdef void compute_features_over_samples(
+        self,
+        SIZE_t start,
+        SIZE_t end,
+        const SIZE_t[:] samples,
+        DTYPE_t[:] feature_values,
+        vector[DTYPE_t]* proj_vec_weights,  # weights of the vector (max_features,)
+        vector[SIZE_t]* proj_vec_indices    # indices of the features (max_features,)
+    ) noexcept nogil

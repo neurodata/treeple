@@ -75,6 +75,12 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         # XXX: this can be further optimized by computing a cumulative sum hash map of the sum_total and sumsq_total
         # and then update will never have to iterate through even
         cdef DOUBLE_t w = 1.0
+
+        # cdef SIZE_t prev_s_idx = -1
+        # self.cumsum_of_squares_map[prev_s_idx] = 0.0
+        # self.cumsum_map[prev_s_idx] = 0.0
+        # self.cumsum_weights_map[prev_s_idx] = 0.0
+
         for p_idx in range(self.start, self.end):
             s_idx = self.sample_indices[p_idx]
 
@@ -83,24 +89,18 @@ cdef class UnsupervisedCriterion(BaseCriterion):
             if self.sample_weight is not None:
                 w = self.sample_weight[s_idx]
 
-            # self.sum_total += self.feature_values[s_idx] * w
-            # self.sumsq_total += self.feature_values[s_idx] * self.feature_values[s_idx] * w * w
-            # self.weighted_n_node_samples += w
+            self.sum_total += self.feature_values[s_idx] * w
+            self.sumsq_total += self.feature_values[s_idx] * self.feature_values[s_idx] * w * w
+            self.weighted_n_node_samples += w
+        #     self.cumsum_of_squares_map[s_idx] = self.cumsum_of_squares_map[prev_s_idx] + (self.feature_values[s_idx] * self.feature_values[s_idx] * w * w)
+        #     self.cumsum_map[s_idx] = self.cumsum_map[prev_s_idx] + (self.feature_values[s_idx] * w)
+        #     self.cumsum_weights_map[s_idx] = self.cumsum_weights_map[prev_s_idx] + w
+                
+        #     prev_s_idx = s_idx
 
-            if p_idx != self.start:
-                self.cumsum_of_squares_map[s_idx] = self.cumsum_of_squares_map[prev_s_idx] + (self.feature_values[s_idx] * self.feature_values[s_idx] * w * w)
-                self.cumsum_map[s_idx] = self.cumsum_map[prev_s_idx] + (self.feature_values[s_idx] * w)
-                self.cumsum_weights_map[s_idx] = self.cumsum_weights_map[prev_s_idx] + w
-            else:
-                self.cumsum_of_squares_map[s_idx] = 0.0
-                self.cumsum_map[s_idx] = 0.0
-                self.cumsum_weights_map[s_idx] = 0.0
-            prev_s_idx = s_idx
-
-
-        self.sum_total = self.cumsum_map[s_idx]
-        self.sumsq_total = self.cumsum_of_squares_map[s_idx]
-        self.weighted_n_node_samples = self.cumsum_weights_map[s_idx]
+        # self.sum_total = self.cumsum_map[s_idx]
+        # self.sumsq_total = self.cumsum_of_squares_map[s_idx]
+        # self.weighted_n_node_samples = self.cumsum_weights_map[s_idx]
 
         # Reset to pos=start
         self.reset()
@@ -201,35 +201,35 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         # and that sum_total is known, we are going to update
         # sum_left from the direction that require the least amount
         # of computations, i.e. from pos to new_pos or from end to new_pos.
-        # if (new_pos - pos) <= (end - new_pos):
-        #     for p in range(pos, new_pos):
-        #         i = sample_indices[p]
+        if (new_pos - pos) <= (end - new_pos):
+            for p in range(pos, new_pos):
+                i = sample_indices[p]
 
-        #         if sample_weight is not None:
-        #             w = sample_weight[i]
+                if sample_weight is not None:
+                    w = sample_weight[i]
 
-        #         # accumulate the values of the feature vectors weighted
-        #         # by the sample weight
-        #         self.sum_left += self.feature_values[i] * w
-        #         self.sumsq_left += self.feature_values[i] * self.feature_values[i] * w * w
-        #         # keep track of the weighted count of each sample
-        #         self.weighted_n_left += w
-        # else:
-        #     self.reverse_reset()
+                # accumulate the values of the feature vectors weighted
+                # by the sample weight
+                self.sum_left += self.feature_values[i] * w
+                self.sumsq_left += self.feature_values[i] * self.feature_values[i] * w * w
+                # keep track of the weighted count of each sample
+                self.weighted_n_left += w
+        else:
+            self.reverse_reset()
 
-        #     for p in range(end - 1, new_pos - 1, -1):
-        #         i = sample_indices[p]
+            for p in range(end - 1, new_pos - 1, -1):
+                i = sample_indices[p]
 
-        #         if sample_weight is not None:
-        #             w = sample_weight[i]
+                if sample_weight is not None:
+                    w = sample_weight[i]
 
-        #         self.sum_left -= self.feature_values[i] * w
-        #         self.sumsq_left -= self.feature_values[i] * self.feature_values[i] * w * w
-        #         self.weighted_n_left -= w
+                self.sum_left -= self.feature_values[i] * w
+                self.sumsq_left -= self.feature_values[i] * self.feature_values[i] * w * w
+                self.weighted_n_left -= w
 
-        self.sum_left = self.cumsum_map[sample_indices[new_pos]]
-        self.sumsq_left = self.cumsum_of_squares_map[sample_indices[new_pos]]
-        self.weighted_n_left = self.cumsum_weights_map[sample_indices[new_pos]]
+        # self.sum_left = self.cumsum_map[sample_indices[new_pos - 1]]
+        # self.sumsq_left = self.cumsum_of_squares_map[sample_indices[new_pos - 1]]
+        # self.weighted_n_left = self.cumsum_weights_map[sample_indices[new_pos - 1]]
 
         # Update right part statistics
         self.weighted_n_right = (self.weighted_n_node_samples -
@@ -274,12 +274,12 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         self.end = end
 
         # reset the hashmaps
-        cdef unordered_map[SIZE_t, DTYPE_t] cumsum_map
-        cdef unordered_map[SIZE_t, DTYPE_t] cumsum_of_squares_map
-        cdef unordered_map[SIZE_t, DTYPE_t] cumsum_weights_map
-        self.cumsum_map = cumsum_map
-        self.cumsum_of_squares_map = cumsum_of_squares_map
-        self.cumsum_weights_map = cumsum_weights_map
+        # cdef unordered_map[SIZE_t, DTYPE_t] cumsum_map
+        # cdef unordered_map[SIZE_t, DTYPE_t] cumsum_of_squares_map
+        # cdef unordered_map[SIZE_t, DTYPE_t] cumsum_weights_map
+        # self.cumsum_map = cumsum_map
+        # self.cumsum_of_squares_map = cumsum_of_squares_map
+        # self.cumsum_weights_map = cumsum_weights_map
 
 
 cdef class TwoMeans(UnsupervisedCriterion):
