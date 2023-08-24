@@ -18,13 +18,13 @@ The datasets used in this example are from the OpenML benchmarking suite are:
 [Phishing Website](https://www.openml.org/search?type=data&sort=runs&id=4534),
 [WDBC](https://www.openml.org/search?type=data&sort=runs&id=1510),
 [Lsvt](https://www.openml.org/search?type=data&sort=runs&id=1484),
-[har]((https://www.openml.org/search?type=data&sort=runs&id=1478), and
+[har](https://www.openml.org/search?type=data&sort=runs&id=1478), and
 [cnae-9](https://www.openml.org/search?type=data&sort=runs&id==1468).
- All datasets are subsampled due to computational constraints. Note that `cnae-9` is
- an high dimensional dataset with very sparse 856 features, mostly consisting of zeros.
+All datasets are subsampled due to computational constraints. Note that `cnae-9` is
+an high dimensional dataset with very sparse 856 features, mostly consisting of zeros.
 
 dataset| samples | features | datatype
--------|---------|----------|---------
+-------|---------|----------|----------
 Phishing Website | 8844 | 30 | nominal
 WDBC | 455 | 30 | numeric
 Lsvt | 100 | 310 | numeric
@@ -38,7 +38,6 @@ References
 """
 
 from datetime import datetime
-
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
