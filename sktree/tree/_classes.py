@@ -2869,7 +2869,7 @@ class ExtraObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         X,
         y,
         sample_weight,
-        feature_has_missing,
+        missing_values_in_feature_mask,
         min_samples_leaf,
         min_weight_leaf,
         max_leaf_nodes,
