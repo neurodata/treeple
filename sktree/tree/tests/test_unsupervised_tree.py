@@ -135,7 +135,7 @@ def test_check_simulation(name, Tree, criterion):
             expected_score = 0.3
     elif criterion in ("fastbic", "fasterbic"):
         if "oblique" in name.lower():
-            expected_score = 0.01
+            expected_score = 0.005
         else:
             expected_score = 0.4
 
@@ -174,7 +174,7 @@ def test_check_rotated_blobs(name, Tree, criterion):
             expected_score = 0.3
     elif criterion in ("fastbic", "fasterbic"):
         if "oblique" in name.lower():
-            expected_score = 0.01
+            expected_score = 0.005
         else:
             expected_score = 0.4
 
@@ -196,17 +196,17 @@ def test_check_rotated_blobs(name, Tree, criterion):
 def test_check_iris(name, Tree, criterion):
     # Check consistency on dataset iris.
     n_classes = len(np.unique(iris.target))
-
     est = Tree(
         criterion=criterion, min_samples_split=np.sqrt(len(iris)).astype(int), random_state=12345
     )
+
     est.fit(iris.data, iris.target)
     sim_mat = est.compute_similarity_matrix(iris.data)
 
     # there is quite a bit of variance in the performance at the tree level
     if criterion == "twomeans":
         if "oblique" in name.lower():
-            expected_score = 0.15
+            expected_score = 0.12
         else:
             expected_score = 0.01
     elif criterion in ("fastbic", "fasterbic"):

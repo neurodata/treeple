@@ -171,9 +171,10 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
 
     Notes
     -----
-    The "faster" BIC criterion is computed by enabling computation of the split point evaluations
-    in O(n log(n)) time. This implements the algorithm described in :footcite:`marx2022estimating`
-    and :footcite:`terzi2006efficient`.
+    The "faster" BIC criterion enables computation of the split point evaluations
+    in O(n) time given that the samples are sorted. This algorithm is described in
+    :footcite:`marx2022estimating` and :footcite:`terzi2006efficient` and enables fast variance
+    computations for the twomeans and fastbic criteria.
 
     References
     ----------

@@ -23,7 +23,7 @@ cdef class UnsupervisedSplitter(BaseSplitter):
 
     # XXX: requires BaseSplitter to not define "criterion"
     cdef public UnsupervisedCriterion criterion         # criterion computer
-    cdef const DTYPE_t[:, :] X                                       # feature matrix
+    cdef const DTYPE_t[:, :] X                          # feature matrix
     cdef SIZE_t n_total_samples                         # store the total number of samples
 
     # Initialization method for unsupervised splitters
@@ -48,5 +48,10 @@ cdef class UnsupervisedSplitter(BaseSplitter):
         double lower_bound,
         double upper_bound
     ) except -1 nogil
-    cdef void node_value(self, double* dest) noexcept nogil
-    cdef double node_impurity(self) noexcept nogil
+    cdef void node_value(
+        self,
+        double* dest
+    ) noexcept nogil
+    cdef double node_impurity(
+        self
+    ) noexcept nogil

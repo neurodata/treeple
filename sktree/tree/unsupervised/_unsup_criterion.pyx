@@ -1,6 +1,9 @@
 # distutils: language = c++
 # cython: language_level=3
-# cython: boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
+# cython: boundscheck=False
+# cython: wraparound=False
+# cython: initializedcheck=False
+# cython: cdivision=True
 
 cimport numpy as cnp
 import numpy as np
@@ -75,6 +78,12 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         # XXX: this can be further optimized by computing a cumulative sum hash map of the sum_total and sumsq_total
         # and then update will never have to iterate through even
         cdef DOUBLE_t w = 1.0
+
+        # cdef SIZE_t prev_s_idx = -1
+        # self.cumsum_of_squares_map[prev_s_idx] = 0.0
+        # self.cumsum_map[prev_s_idx] = 0.0
+        # self.cumsum_weights_map[prev_s_idx] = 0.0
+
         for p_idx in range(self.start, self.end):
             s_idx = self.sample_indices[p_idx]
 
@@ -241,9 +250,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
     ) noexcept nogil:
         """Set sample pointers in the criterion.
 
-        Set given start and end sample_indices. Also will update node statistics,
-        such as the `sum_total`, which tracks the total value within the current
-        node for sample_indices[start:end].
+        Set given start and end sample_indices for a given node.
 
         Parameters
         ----------

@@ -147,7 +147,7 @@ cdef class BaseObliqueSplitter(Splitter):
 
         return sizeof(ObliqueSplitRecord)
 
-    cdef void compute_features_over_samples(
+    cdef inline void compute_features_over_samples(
         self,
         SIZE_t start,
         SIZE_t end,
@@ -162,18 +162,22 @@ cdef class BaseObliqueSplitter(Splitter):
         or 0 otherwise.
         """
         cdef SIZE_t idx, jdx
+        cdef SIZE_t col_idx
+        cdef DTYPE_t col_weight
 
         # XXX: this should be able to be improved, if we can flip the order of the for-loops
         # XXX: we can add a hashmap here to keep track of the min/max of each feature
         # Compute linear combination of features and then
         # sort samples according to the feature values.
-        for idx in range(start, end):
-            # initialize the feature value to 0
-            feature_values[idx] = 0.0
-            for jdx in range(0, proj_vec_indices.size()):
-                feature_values[idx] += self.X[
-                    samples[idx], deref(proj_vec_indices)[jdx]
-                ] * deref(proj_vec_weights)[jdx]
+        for jdx in range(0, proj_vec_indices.size()):
+            col_idx = deref(proj_vec_indices)[jdx]
+            col_weight = deref(proj_vec_weights)[jdx]
+
+            for idx in range(start, end):
+                # initialize the feature value to 0
+                if jdx == 0:
+                    feature_values[idx] = 0.0
+                feature_values[idx] += self.X[samples[idx], col_idx] * col_weight
 
     cdef int node_split(
         self,
@@ -200,7 +204,6 @@ cdef class BaseObliqueSplitter(Splitter):
         cdef DTYPE_t[::1]  feature_values = self.feature_values
         cdef SIZE_t max_features = self.max_features
         cdef SIZE_t min_samples_leaf = self.min_samples_leaf
-        cdef double min_weight_leaf = self.min_weight_leaf
 
         # keep track of split record for current_split node and the best_split split
         # found among the sampled projection vectors
@@ -263,8 +266,7 @@ cdef class BaseObliqueSplitter(Splitter):
 
                     self.criterion.update(current_split.pos)
                     # Reject if min_weight_leaf is not satisfied
-                    if ((self.criterion.weighted_n_left < min_weight_leaf) or
-                            (self.criterion.weighted_n_right < min_weight_leaf)):
+                    if self.check_postsplit_conditions() == 1:
                         continue
 
                     current_proxy_improvement = \
