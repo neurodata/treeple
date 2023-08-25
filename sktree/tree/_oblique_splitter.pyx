@@ -135,6 +135,13 @@ cdef class BaseObliqueSplitter(Splitter):
         """
         pass
 
+    cdef void sample_projection_vector(
+        self,
+        vector[DTYPE_t]& proj_mat_weights,
+        vector[SIZE_t]& proj_mat_indices
+    ) noexcept nogil:
+        pass
+
     cdef int pointer_size(self) noexcept nogil:
         """Get size of a pointer to record for ObliqueSplitter."""
 
@@ -385,6 +392,36 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         # self.feature_weights = np.ones((self.n_features,), dtype=DTYPE_t) / self.n_features
         return 0
 
+<<<<<<< Updated upstream
+=======
+    cdef void sample_projection_vector(
+        self,
+        vector[DTYPE_t]& proj_mat_weights,
+        vector[SIZE_t]& proj_mat_indices
+    ) noexcept nogil:
+        """Sample oblique projection vector.
+
+        Randomly sample features to put in randomly sampled projection vectors
+        weight = 1 or -1 with probability 0.5.
+
+        Note: vectors are passed by value, so & is needed to pass by reference.
+
+        Parameters
+        ----------
+        proj_mat_weights : vector of vectors reference
+            The memory address of projection matrix non-zero weights.
+        proj_mat_indices : vector of vectors reference
+            The memory address of projection matrix non-zero indices.
+
+        Notes
+        -----
+        Note that grid_size must be larger than or equal to n_non_zeros because
+        it is assumed ``feature_combinations`` is forced to be smaller than
+        ``n_features`` before instantiating an oblique splitter.
+        """
+        pass
+
+>>>>>>> Stashed changes
     cdef void sample_proj_mat(
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
