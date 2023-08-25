@@ -392,8 +392,6 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         # self.feature_weights = np.ones((self.n_features,), dtype=DTYPE_t) / self.n_features
         return 0
 
-<<<<<<< Updated upstream
-=======
     cdef void sample_projection_vector(
         self,
         vector[DTYPE_t]& proj_mat_weights,
@@ -421,7 +419,6 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         """
         pass
 
->>>>>>> Stashed changes
     cdef void sample_proj_mat(
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
