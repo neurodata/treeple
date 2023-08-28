@@ -9,7 +9,8 @@ import numpy as np
 from cython.operator cimport dereference as deref
 from cython.operator cimport postincrement
 from libcpp.vector cimport vector
-from sklearn.tree._utils cimport rand_int
+from libcpp.algorithm cimport sort as stdsort
+from sklearn.tree._utils cimport rand_int, rand_uniform
 
 from .._lib.sklearn.tree._criterion cimport Criterion
 
@@ -389,6 +390,9 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         # Oblique tree parameters
         self.feature_combinations = feature_combinations
 
+        # probability of non-zero
+        self.prob_nnz = self.feature_combinations / self.n_features
+
         # or max w/ 1...
         self.n_non_zeros = max(int(self.max_features * self.feature_combinations), 1)
 
@@ -425,6 +429,83 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         self.features = np.arange(self.n_features, dtype=np.intp)
         self.constant_features = np.empty(self.n_features, dtype=np.intp)
         return 0
+
+    cdef void sample_proj_vector(
+        self,
+        vector[DTYPE_t]& proj_mat_weights,
+        vector[SIZE_t]& proj_mat_indices,
+        SIZE_t n_known_constants
+    ) noexcept nogil:
+        """Sample oblique projection matrix.
+
+        Randomly sample features to put in randomly sampled projection vectors
+        weight = 1 or -1 with probability 0.5.
+
+        Note: vectors are passed by value, so & is needed to pass by reference.
+
+        Parameters
+        ----------
+        proj_mat_weights : vector of vectors reference
+            The memory address of projection matrix non-zero weights.
+        proj_mat_indices : vector of vectors reference
+            The memory address of projection matrix non-zero indices.
+        n_known_constants : SIZE_t
+            The number of known constants.
+
+        Notes
+        -----
+        Note that grid_size must be larger than or equal to n_non_zeros because
+        it is assumed ``feature_combinations`` is forced to be smaller than
+        ``n_features`` before instantiating an oblique splitter.
+        """
+        # define a hash of vector of ints
+
+
+        while (rand_uniform())
+        
+
+
+
+        cdef SIZE_t n_features = self.n_features
+        cdef SIZE_t n_non_zeros = self.n_non_zeros
+        cdef UINT32_t* random_state = &self.rand_r_state
+        cdef SIZE_t col_idx
+
+        cdef int i, feat_i, proj_i, rand_vec_index
+        cdef DTYPE_t weight
+
+        # construct an array to sample from mTry x n_features set of indices
+        cdef SIZE_t grid_size = self.max_features * (self.n_features - n_known_constants)
+        cdef vector[SIZE_t] indices_to_sample = vector[SIZE_t](grid_size)
+        for i in range(grid_size):
+            indices_to_sample.push_back(i)
+        
+        # shuffle indices over the 2D grid to sample using Fisher-Yates
+        for i in range(0, grid_size):
+            j = rand_int(0, grid_size - i, random_state)
+            indices_to_sample[j], indices_to_sample[i] = \
+                indices_to_sample[i], indices_to_sample[j]
+
+        # sample 'n_non_zeros' in a mtry X n_features projection matrix
+        # which consists of +/- 1's chosen at a 1/2s rate
+        for i in range(0, n_non_zeros):
+            # get the next index from the shuffled index array
+            rand_vec_index = indices_to_sample[i]
+
+            # get the projection index and feature index, which correspond
+            # to the row and column
+            proj_i = rand_vec_index // n_features
+            feat_i = rand_vec_index % n_features + n_known_constants
+
+            # sample a random weight
+            weight = 1 if (rand_int(0, 2, random_state) == 1) else -1
+
+            # get the actual column index
+            col_idx = self.features[feat_i]
+
+            # Store index and weight of nonzero element involved in projection
+            proj_mat_indices[proj_i].push_back(col_idx)  
+            proj_mat_weights[proj_i].push_back(weight)
 
     cdef void sample_proj_mat(
         self,
