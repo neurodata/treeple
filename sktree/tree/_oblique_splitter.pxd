@@ -13,6 +13,7 @@ import numpy as np
 cimport numpy as cnp
 from libcpp.unordered_map cimport unordered_map
 from libcpp.vector cimport vector
+from libcpp cimport size_t as cpp_size_t
 
 from .._lib.sklearn.tree._criterion cimport Criterion
 from .._lib.sklearn.tree._splitter cimport SplitRecord, Splitter
@@ -47,9 +48,13 @@ cdef class BaseObliqueSplitter(Splitter):
     cdef vector[vector[DTYPE_t]] proj_mat_weights       # nonzero weights of sparse proj_mat matrix
     cdef vector[vector[SIZE_t]] proj_mat_indices        # nonzero indices of sparse proj_mat matrix
 
+    # keep a hashmap of every projection vector indices sampled
+    cdef unordered_map[cpp_size_t, bint] proj_vec_hash
+
     # TODO: assumes all oblique splitters only work with dense data
     cdef const DTYPE_t[:, :] X
 
+    # XXX: remove this possibly
     # feature weights across (n_dims,)
     cdef DTYPE_t[:] feature_weights
 
@@ -61,6 +66,16 @@ cdef class BaseObliqueSplitter(Splitter):
     # function to sample a projection matrix that is applied to the feature matrix
     # to quickly obtain the sampled projections for candidate splits.
     cdef void sample_proj_mat(
+        self,
+        vector[vector[DTYPE_t]]& proj_mat_weights,
+        vector[vector[SIZE_t]]& proj_mat_indices,
+        SIZE_t n_known_constants
+    ) noexcept nogil
+
+    # All oblique splitters (i.e. non-axis aligned splitters) require a
+    # function to sample a projection matrix that is applied to the feature matrix
+    # to quickly obtain the sampled projections for candidate splits.
+    cdef void sample_proj_vector(
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
         vector[vector[SIZE_t]]& proj_mat_indices,
@@ -82,7 +97,8 @@ cdef class BaseObliqueSplitter(Splitter):
         const SIZE_t[:] samples,
         DTYPE_t[:] feature_values,
         vector[DTYPE_t]* proj_vec_weights,  # weights of the vector (max_features,)
-        vector[SIZE_t]* proj_vec_indices    # indices of the features (max_features,)
+        vector[SIZE_t]* proj_vec_indices,   # indices of the features (max_features,)
+        SIZE_t* n_known_constants
     ) noexcept nogil
 
     cdef int node_split(
@@ -112,6 +128,16 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
     # function to sample a projection matrix that is applied to the feature matrix
     # to quickly obtain the sampled projections for candidate splits.
     cdef void sample_proj_mat(
+        self,
+        vector[vector[DTYPE_t]]& proj_mat_weights,
+        vector[vector[SIZE_t]]& proj_mat_indices,
+        SIZE_t n_known_constants
+    ) noexcept nogil
+
+    # All oblique splitters (i.e. non-axis aligned splitters) require a
+    # function to sample a projection matrix that is applied to the feature matrix
+    # to quickly obtain the sampled projections for candidate splits.
+    cdef void sample_proj_vector(
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
         vector[vector[SIZE_t]]& proj_mat_indices,

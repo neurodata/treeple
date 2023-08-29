@@ -10,10 +10,12 @@ from cython.operator cimport dereference as deref
 from cython.operator cimport postincrement
 from libcpp.vector cimport vector
 from libcpp.algorithm cimport sort as stdsort
+from libcpp cimport size_t as cpp_size_t
 from sklearn.tree._utils cimport rand_int, rand_uniform
 
 from .._lib.sklearn.tree._criterion cimport Criterion
 
+from .cpp._vector_hash cimport VectorHash
 
 cdef double INFINITY = np.inf
 
@@ -23,6 +25,9 @@ cdef DTYPE_t FEATURE_THRESHOLD = 1e-7
 # Constant to switch between algorithm non zero value extract algorithm
 # in SparseSplitter
 cdef DTYPE_t EXTRACT_NNZ_SWITCH = 0.1
+
+# Hyperparameter controlling the number of samples per projection
+cdef cpp_size_t MAX_SAMPLES_PER_PROJECTION = 10
 
 
 cdef inline void _init_split(ObliqueSplitRecord* self, SIZE_t start_pos) noexcept nogil:
@@ -96,7 +101,7 @@ cdef class BaseObliqueSplitter(Splitter):
     def __setstate__(self, d):
         pass
 
-    cdef int node_reset(self, SIZE_t start, SIZE_t end,
+    cdef cpp_size_t node_reset(self, SIZE_t start, SIZE_t end,
                         double* weighted_n_node_samples) except -1 nogil:
         """Reset splitter on node samples[start:end].
 
@@ -136,13 +141,25 @@ cdef class BaseObliqueSplitter(Splitter):
         vector[vector[SIZE_t]]& proj_mat_indices,
         SIZE_t n_known_constants
     ) noexcept nogil:
+        """ Sample the projection matrix.
+
+        This is a placeholder method.
+        """
+        pass
+
+    cdef void sample_proj_vector(
+        self,
+        vector[vector[DTYPE_t]]& proj_mat_weights,
+        vector[vector[SIZE_t]]& proj_mat_indices,
+        SIZE_t n_known_constants
+    ) noexcept nogil:
         """ Sample the projection vector.
 
         This is a placeholder method.
         """
         pass
 
-    cdef int pointer_size(self) noexcept nogil:
+    cdef cpp_size_t pointer_size(self) noexcept nogil:
         """Get size of a pointer to record for ObliqueSplitter."""
 
         return sizeof(ObliqueSplitRecord)
@@ -154,7 +171,8 @@ cdef class BaseObliqueSplitter(Splitter):
         const SIZE_t[:] samples,
         DTYPE_t[:] feature_values,
         vector[DTYPE_t]* proj_vec_weights,  # weights of the vector (max_features,)
-        vector[SIZE_t]* proj_vec_indices    # indices of the features (max_features,)
+        vector[SIZE_t]* proj_vec_indices,   # indices of the features (max_features,)
+        SIZE_t* n_known_constants
     ) noexcept nogil:
         """Compute the feature values for the samples[start:end] range.
 
@@ -179,7 +197,7 @@ cdef class BaseObliqueSplitter(Splitter):
                     samples[idx], col_idx
                 ] * col_weight
 
-    cdef int node_split(
+    cdef sizeof node_split(
         self,
         double impurity,
         SplitRecord* split,
@@ -204,6 +222,9 @@ cdef class BaseObliqueSplitter(Splitter):
         cdef SIZE_t[::1] constant_features = self.constant_features
         cdef SIZE_t const_col_idx
         cdef SIZE_t n_known_constants = n_constant_features[0]
+        
+        # The number of sampled feature values (i.e. mtry)
+        cdef SIZE_t n_visited_features = 0
 
         # pointer array to store feature values to split on
         cdef DTYPE_t[::1] feature_values = self.feature_values
@@ -217,7 +238,7 @@ cdef class BaseObliqueSplitter(Splitter):
         cdef double current_proxy_improvement = -INFINITY
         cdef double best_proxy_improvement = -INFINITY
 
-        cdef SIZE_t feat_i, p       # index over computed features and start/end
+        cdef SIZE_t p               # index over start/end samples
         cdef SIZE_t partition_end
         cdef DTYPE_t temp_d         # to compute a projection feature value
 
@@ -225,21 +246,28 @@ cdef class BaseObliqueSplitter(Splitter):
         _init_split(&best_split, end)
 
         # Sample the projection matrix
-        self.sample_proj_mat(self.proj_mat_weights, self.proj_mat_indices, n_known_constants)
+        # self.sample_proj_mat(self.proj_mat_weights, self.proj_mat_indices, n_known_constants)
 
-        # For every vector in the projection matrix
-        for feat_i in range(max_features):
-            if n_known_constants >= self.n_features:
-                break
-            # Projection vector has no nonzeros
-            if self.proj_mat_weights[feat_i].empty():
-                continue
+        # Note: Compared to axis-aligned sampling, we do not keep track of "constant" features
+        # values that are drawn and enforce that we continue drawing features even if
+        # we go over the `max_features` mtry. This implicitly assumes that if we sample a new
+        # projection vector, the probability of sampling a constant feature projection is relatively low.
+        while (self.n_features > n_total_constants and  # Stop early if remaining features
+                                                        # are constant, or
+                                                        # if we have reached max_features mtry
+            n_visited_features < max_features):
+
+            # increment the mtry
+            n_visited_features += 1
+
+            # sample a projection vector for the current mtry
+            self.sample_proj_vector(self.proj_mat_weights, self.proj_mat_indices, n_known_constants)
 
             # XXX: 'feature' is not actually used in oblique split records
             # Just indicates which split was sampled
-            current_split.feature = feat_i
-            current_split.proj_vec_weights = &self.proj_mat_weights[feat_i]
-            current_split.proj_vec_indices = &self.proj_mat_indices[feat_i]
+            current_split.feature = n_visited_features
+            current_split.proj_vec_weights = &self.proj_mat_weights[n_visited_features]
+            current_split.proj_vec_indices = &self.proj_mat_indices[n_visited_features]
 
             # Compute linear combination of features and then
             # sort samples according to the feature values.
@@ -248,8 +276,9 @@ cdef class BaseObliqueSplitter(Splitter):
                 end,
                 samples,
                 feature_values,
-                &self.proj_mat_weights[feat_i],
-                &self.proj_mat_indices[feat_i]
+                &self.proj_mat_weights[n_visited_features],
+                &self.proj_mat_indices[n_visited_features],
+                &n_known_constants
             )
 
             # Sort the samples
@@ -322,20 +351,8 @@ cdef class BaseObliqueSplitter(Splitter):
             best_split.improvement = self.criterion.impurity_improvement(
                 impurity, best_split.impurity_left, best_split.impurity_right)
 
-        # move constant features to the front of the array, so that way
-        # self.features[:n_known_constants] corresponds to constant columns
-        # if self.track_constants:
-        #     for idx in range(self.n_features):
-        #         if self.constant_features[idx] != True:
-        #             continue
-
-        #         # now move these features towards the front of the array
-        #         # and increment the counter for number of constant features
-        #         self.features[idx], self.features[n_known_constants] = \
-        #             self.features[n_known_constants], self.features[idx]
-        #         n_known_constants += 1
-
-        #     n_constant_features[0] = n_known_constants
+        # keep track of the known constants at each depth of the tree
+        n_constant_features[0] = n_known_constants
 
         # Return values
         deref(oblique_split).proj_vec_indices = best_split.proj_vec_indices
@@ -389,9 +406,10 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         """
         # Oblique tree parameters
         self.feature_combinations = feature_combinations
+        self.floor_feature_combinations = <cpp_size_t>(self.feature_combinations)
 
         # probability of non-zero
-        self.prob_nnz = self.feature_combinations / self.n_features
+        # self.prob_nnz = self.feature_combinations / self.n_features
 
         # or max w/ 1...
         self.n_non_zeros = max(int(self.max_features * self.feature_combinations), 1)
@@ -422,6 +440,10 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         self.min_val_map = min_val_map
         self.max_val_map = max_val_map
 
+        # re-initialize the hashmap for projection vector hash
+        cdef unordered_map[cpp_size_t, bint] proj_vec_hash
+        self.proj_vec_hash = proj_vec_hash
+
         # XXX: Just to initialize stuff
         # self.feature_weights = np.ones((self.n_features,), dtype=DTYPE_t) / self.n_features
 
@@ -432,8 +454,8 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
 
     cdef void sample_proj_vector(
         self,
-        vector[DTYPE_t]& proj_mat_weights,
-        vector[SIZE_t]& proj_mat_indices,
+        vector[vector[DTYPE_t]]& proj_mat_weights,
+        vector[vector[SIZE_t]]& proj_mat_indices,
         SIZE_t n_known_constants
     ) noexcept nogil:
         """Sample oblique projection matrix.
@@ -458,54 +480,49 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         it is assumed ``feature_combinations`` is forced to be smaller than
         ``n_features`` before instantiating an oblique splitter.
         """
-        # define a hash of vector of ints
-
-
-        while (rand_uniform())
-        
-
-
-
-        cdef SIZE_t n_features = self.n_features
-        cdef SIZE_t n_non_zeros = self.n_non_zeros
         cdef UINT32_t* random_state = &self.rand_r_state
-        cdef SIZE_t col_idx
-
-        cdef int i, feat_i, proj_i, rand_vec_index
+        cdef cpp_size_t i, feat_i, proj_i, col_idx
         cdef DTYPE_t weight
+        cdef cpp_size_t max_tries = 0
 
-        # construct an array to sample from mTry x n_features set of indices
-        cdef SIZE_t grid_size = self.max_features * (self.n_features - n_known_constants)
-        cdef vector[SIZE_t] indices_to_sample = vector[SIZE_t](grid_size)
-        for i in range(grid_size):
-            indices_to_sample.push_back(i)
-        
-        # shuffle indices over the 2D grid to sample using Fisher-Yates
-        for i in range(0, grid_size):
-            j = rand_int(0, grid_size - i, random_state)
-            indices_to_sample[j], indices_to_sample[i] = \
-                indices_to_sample[i], indices_to_sample[j]
+        # define a hash of vector of ints
+        cdef VectorHash vector_hash = new VectorHash()
 
-        # sample 'n_non_zeros' in a mtry X n_features projection matrix
-        # which consists of +/- 1's chosen at a 1/2s rate
-        for i in range(0, n_non_zeros):
-            # get the next index from the shuffled index array
-            rand_vec_index = indices_to_sample[i]
+        # define the number of indices to sample
+        cdef cpp_size_t num_indices_to_sample = self.floor_feature_combinations if (
+            rand_uniform(0.0, 1.0) < (self.feature_combinations - self.floor_feature_combinations)
+        ) else self.floor_feature_combinations + 1
 
-            # get the projection index and feature index, which correspond
-            # to the row and column
-            proj_i = rand_vec_index // n_features
-            feat_i = rand_vec_index % n_features + n_known_constants
+        # define buffer to assign indices
+        cdef vector[SIZE_t] proj_indices = vector[SIZE_t](num_indices_to_sample)
+        cdef vector[DTYPE_t] proj_weights = vector[DTYPE_t](num_indices_to_sample)
 
-            # sample a random weight
-            weight = 1 if (rand_int(0, 2, random_state) == 1) else -1
+        while max_tries < MAX_SAMPLES_PER_PROJECTION:
+            for i in range(num_indices_to_sample):
+                proj_i = rand_int(0, max_features, random_state)
+                feat_i = rand_int(0, n_features - n_known_constants, random_state)
+                weight = 1 if (rand_int(0, 2, random_state) == 1) else -1
 
-            # get the actual column index
-            col_idx = self.features[feat_i]
+                # get the actual column index from the non-constant columns
+                col_idx = self.features[feat_i + n_known_constants]
 
-            # Store index and weight of nonzero element involved in projection
-            proj_mat_indices[proj_i].push_back(col_idx)  
-            proj_mat_weights[proj_i].push_back(weight)
+                proj_indices.push_back(col_idx)
+                proj_weights.push_back(weight)
+
+            # compute the hash-value on the sorted projection indices
+            stdsort(proj_indices.begin(), proj_indices.end())
+            hash_val = vector_hash(proj_indices)
+
+            # if the hash value is not found, then we have not sampled it yet
+            if self.proj_vec_hash.find(hash_val) == self.proj_vec_hash.end():
+                break
+
+        # store the hash value into our projection-matrix hashmap
+        self.proj_vec_hash[hash_val] = True
+
+        # store the sampled projection vector
+        proj_mat_indices.push_back(proj_indices)
+        proj_mat_weights.push_back(proj_weights)
 
     cdef void sample_proj_mat(
         self,
@@ -576,7 +593,6 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
             # Store index and weight of nonzero element involved in projection
             proj_mat_indices[proj_i].push_back(col_idx)  
             proj_mat_weights[proj_i].push_back(weight)
-
     
     cdef void compute_features_over_samples(
         self,
@@ -585,22 +601,35 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         const SIZE_t[:] samples,
         DTYPE_t[:] feature_values,
         vector[DTYPE_t]* proj_vec_weights,  # weights of the vector (max_features,)
-        vector[SIZE_t]* proj_vec_indices    # indices of the features (max_features,)
+        vector[SIZE_t]* proj_vec_indices,    # indices of the features (max_features,)
+        SIZE_t* n_known_constants
     ) noexcept nogil:
         """Compute the feature values for the samples[start:end] range.
 
         Returns -1 in case of failure to allocate memory (and raise MemoryError)
         or 0 otherwise.
+
+        This also adds the functionality of keeping track of the constant columns
+        in your data, such that they are not sampled as candidate projection dimensions.
         """
         cdef SIZE_t idx, jdx
         cdef SIZE_t col_idx
         cdef DTYPE_t col_weight
+
+        # create a buffer to store the relevant feature columns that we
+        # computed constants over so we can move pointers of `features`
+        # around and update `n_known_constants`.
+        cdef vector[SIZE_t] sampled_features
+
         # Compute linear combination of features and then
         # sort samples according to the feature values.
         # initialize the feature value to 0
         for jdx in range(0, proj_vec_indices.size()):
             col_idx = deref(proj_vec_indices)[jdx]
             col_weight = deref(proj_vec_weights)[jdx]
+
+            # keep track of which columns we sampled
+            sampled_features.push_back(col_idx)
 
             for idx in range(start, end):
                 if jdx == 0:
@@ -620,6 +649,13 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
 
             if self.max_val_map[col_idx] <= self.min_val_map[col_idx] + FEATURE_THRESHOLD:
                 self.constant_features[col_idx] = 1
+
+                # move features pointer around to make sure we keep track of the constant features
+                self.features[col_idx], self.features[n_known_constants] = self.features[n_known_constants], self.features[col_idx]
+
+                # increment the number of known constants
+                n_known_constants[0] += 1
+
 
 cdef class BestObliqueSplitter(ObliqueSplitter):
     def __reduce__(self):

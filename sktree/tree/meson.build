@@ -30,6 +30,7 @@ py3.install_sources(
 )
 
 # TODO: comment in if we include tests
+subdir('cpp')
 subdir('tests')
 subdir('unsupervised')
 subdir('manifold')
