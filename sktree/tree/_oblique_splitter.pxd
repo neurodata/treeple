@@ -13,7 +13,6 @@ import numpy as np
 cimport numpy as cnp
 from libcpp.unordered_map cimport unordered_map
 from libcpp.vector cimport vector
-from libcpp cimport size_t as cpp_size_t
 
 from .._lib.sklearn.tree._criterion cimport Criterion
 from .._lib.sklearn.tree._splitter cimport SplitRecord, Splitter
@@ -49,7 +48,7 @@ cdef class BaseObliqueSplitter(Splitter):
     cdef vector[vector[SIZE_t]] proj_mat_indices        # nonzero indices of sparse proj_mat matrix
 
     # keep a hashmap of every projection vector indices sampled
-    cdef unordered_map[cpp_size_t, bint] proj_vec_hash
+    cdef unordered_map[size_t, bint] proj_vec_hash
 
     # TODO: assumes all oblique splitters only work with dense data
     cdef const DTYPE_t[:, :] X

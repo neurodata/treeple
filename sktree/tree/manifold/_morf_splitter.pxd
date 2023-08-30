@@ -84,6 +84,18 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         SIZE_t n_known_constants,
     ) noexcept nogil
 
+    # XXX: we can possibly reduce code by determining a way to handle constant
+    # columns in our data when using MORF
+    # override the node split algorithm
+    cdef int node_split(
+        self,
+        double impurity,
+        SplitRecord* split,
+        SIZE_t* n_constant_features,
+        double lower_bound,
+        double upper_bound,
+    ) except -1 nogil
+
 
 # cdef class UserKernelSplitter(PatchSplitter):
 #     """A class to hold user-specified kernels."""
