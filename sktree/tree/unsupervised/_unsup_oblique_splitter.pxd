@@ -24,7 +24,7 @@ cdef struct ObliqueSplitRecord:
     double impurity_right       # Impurity of the right split.
 
     vector[DTYPE_t]* proj_vec_weights   # weights of the vector (max_features,)
-    vector[SIZE_t]* proj_vec_indices    # indices of the features (max_features,)
+    vector[size_t]* proj_vec_indices    # indices of the features (max_features,)
 
 
 cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
@@ -41,7 +41,7 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
     cdef public double feature_combinations             # Number of features to combine
     cdef SIZE_t n_non_zeros                             # Number of non-zero features
     cdef vector[vector[DTYPE_t]] proj_mat_weights       # nonzero weights of sparse proj_mat matrix
-    cdef vector[vector[SIZE_t]] proj_mat_indices        # nonzero indices of sparse proj_mat matrix
+    cdef vector[vector[size_t]] proj_mat_indices        # nonzero indices of sparse proj_mat matrix
     cdef SIZE_t[::1] indices_to_sample                  # an array of indices to sample of size mtry X n_features
 
     # All oblique splitters (i.e. non-axis aligned splitters) require a
@@ -49,7 +49,7 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
     # to quickly obtain the sampled projections for candidate splits.
     cdef void sample_proj_mat(self,
                               vector[vector[DTYPE_t]]& proj_mat_weights,
-                              vector[vector[SIZE_t]]& proj_mat_indices) noexcept nogil
+                              vector[vector[size_t]]& proj_mat_indices) noexcept nogil
 
     # Redefined here since the new logic requires calling sample_proj_mat
     cdef int node_reset(self, SIZE_t start, SIZE_t end,
@@ -77,5 +77,5 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
         const SIZE_t[:] samples,
         DTYPE_t[:] feature_values,
         vector[DTYPE_t]* proj_vec_weights,  # weights of the vector (max_features,)
-        vector[SIZE_t]* proj_vec_indices    # indices of the features (max_features,)
+        vector[size_t]* proj_vec_indices    # indices of the features (max_features,)
     ) noexcept nogil

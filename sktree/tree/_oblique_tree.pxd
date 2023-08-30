@@ -25,7 +25,7 @@ from ._oblique_splitter cimport ObliqueSplitRecord
 
 cdef class ObliqueTree(Tree):
     cdef vector[vector[DTYPE_t]] proj_vec_weights  # (capacity, n_features) array of projection vectors
-    cdef vector[vector[SIZE_t]] proj_vec_indices   # (capacity, n_features) array of projection vectors
+    cdef vector[vector[size_t]] proj_vec_indices   # (capacity, n_features) array of projection vectors
 
     # overridden methods
     cdef int _resize_c(
@@ -37,7 +37,7 @@ cdef class ObliqueTree(Tree):
         SplitRecord* split_node,
         Node *node,
         SIZE_t node_id
-    )  nogil except -1
+    ) except -1 nogil
     cdef DTYPE_t _compute_feature(
         self,
         const DTYPE_t[:, :] X_ndarray,

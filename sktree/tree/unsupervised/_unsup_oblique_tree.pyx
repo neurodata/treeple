@@ -101,7 +101,7 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
         self.nodes = NULL
 
         self.proj_vec_weights = vector[vector[DTYPE_t]](self.capacity)
-        self.proj_vec_indices = vector[vector[SIZE_t]](self.capacity)
+        self.proj_vec_indices = vector[vector[size_t]](self.capacity)
 
     def __reduce__(self):
         """Reduce re-implementation, for pickling."""

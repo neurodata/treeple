@@ -93,7 +93,7 @@ cdef class PatchSplitter(BaseObliqueSplitter):
     cdef void sample_proj_mat(
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
-        vector[vector[SIZE_t]]& proj_mat_indices,
+        vector[vector[size_t]]& proj_mat_indices,
         SIZE_t n_known_constants
     ) noexcept nogil:
         """ Sample the projection vector.
@@ -304,7 +304,7 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
 
         # Sparse max_features x n_features projection matrix
         self.proj_mat_weights = vector[vector[DTYPE_t]](self.max_features)
-        self.proj_mat_indices = vector[vector[SIZE_t]](self.max_features)
+        self.proj_mat_indices = vector[vector[size_t]](self.max_features)
 
         # initialize state to allow generalization to higher-dimensional tensors
         self.ndim = data_dims.shape[0]
@@ -428,7 +428,7 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
     cdef void sample_proj_mat(
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
-        vector[vector[SIZE_t]]& proj_mat_indices,
+        vector[vector[size_t]]& proj_mat_indices,
         SIZE_t n_known_constants
     ) noexcept nogil:
         """Sample projection matrix using a contiguous patch.
@@ -465,7 +465,7 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
     cdef void sample_proj_vec(
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
-        vector[vector[SIZE_t]]& proj_mat_indices,
+        vector[vector[size_t]]& proj_mat_indices,
         SIZE_t proj_i,
         SIZE_t patch_size,
         SIZE_t top_left_patch_seed,
@@ -568,7 +568,7 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
         const SIZE_t[:] samples,
         DTYPE_t[:] feature_values,
         vector[DTYPE_t]* proj_vec_weights,  # weights of the vector (max_features,)
-        vector[SIZE_t]* proj_vec_indices,   # indices of the features (max_features,)
+        vector[size_t]* proj_vec_indices,   # indices of the features (max_features,)
         SIZE_t* n_constant_features
     ) noexcept nogil:
         """Compute the feature values for the samples[start:end] range.
@@ -617,7 +617,7 @@ cdef class BestPatchSplitterTester(BestPatchSplitter):
         SIZE_t[:] patch_dims,
     ):
         cdef vector[vector[DTYPE_t]] proj_mat_weights = vector[vector[DTYPE_t]](self.max_features)
-        cdef vector[vector[SIZE_t]] proj_mat_indices = vector[vector[SIZE_t]](self.max_features)
+        cdef vector[vector[size_t]] proj_mat_indices = vector[vector[size_t]](self.max_features)
         cdef SIZE_t i, j
 
         # sample projection matrix in C/C++
@@ -647,7 +647,7 @@ cdef class BestPatchSplitterTester(BestPatchSplitter):
         Randomly sample patches with weight of 1.
         """
         cdef vector[vector[DTYPE_t]] proj_mat_weights = vector[vector[DTYPE_t]](self.max_features)
-        cdef vector[vector[SIZE_t]] proj_mat_indices = vector[vector[SIZE_t]](self.max_features)
+        cdef vector[vector[size_t]] proj_mat_indices = vector[vector[size_t]](self.max_features)
         cdef SIZE_t i, j
 
         # sample projection matrix in C/C++

@@ -14,7 +14,7 @@ from sklearn.tree._utils cimport rand_int, rand_uniform
 
 from .._lib.sklearn.tree._criterion cimport Criterion
 
-from .cpp._vector_hash cimport VectorHash
+from ._utils cimport vector_hash
 
 cdef double INFINITY = np.inf
 
@@ -88,7 +88,7 @@ cdef class BaseObliqueSplitter(Splitter):
 
         # Sparse max_features x n_features projection matrix
         self.proj_mat_weights = vector[vector[DTYPE_t]](self.max_features)
-        self.proj_mat_indices = vector[vector[SIZE_t]](self.max_features)
+        self.proj_mat_indices = vector[vector[size_t]](self.max_features)
 
         # keeping track of constant columns is turned off by default, override
         # this attribute in subclass's cinit function to turn on tracking constants
@@ -137,7 +137,7 @@ cdef class BaseObliqueSplitter(Splitter):
     cdef void sample_proj_mat(
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
-        vector[vector[SIZE_t]]& proj_mat_indices,
+        vector[vector[size_t]]& proj_mat_indices,
         SIZE_t n_known_constants
     ) noexcept nogil:
         """ Sample the projection matrix.
@@ -149,7 +149,7 @@ cdef class BaseObliqueSplitter(Splitter):
     cdef void sample_proj_vector(
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
-        vector[vector[SIZE_t]]& proj_mat_indices,
+        vector[vector[size_t]]& proj_mat_indices,
         SIZE_t n_known_constants
     ) noexcept nogil:
         """ Sample the projection vector.
@@ -170,7 +170,7 @@ cdef class BaseObliqueSplitter(Splitter):
         const SIZE_t[:] samples,
         DTYPE_t[:] feature_values,
         vector[DTYPE_t]* proj_vec_weights,  # weights of the vector (max_features,)
-        vector[SIZE_t]* proj_vec_indices,   # indices of the features (max_features,)
+        vector[size_t]* proj_vec_indices,   # indices of the features (max_features,)
         SIZE_t* n_known_constants
     ) noexcept nogil:
         """Compute the feature values for the samples[start:end] range.
@@ -450,7 +450,7 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
     cdef void sample_proj_vector(
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
-        vector[vector[SIZE_t]]& proj_mat_indices,
+        vector[vector[size_t]]& proj_mat_indices,
         SIZE_t n_known_constants
     ) noexcept nogil:
         """Sample oblique projection matrix.
@@ -476,21 +476,20 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         ``n_features`` before instantiating an oblique splitter.
         """
         cdef UINT32_t* random_state = &self.rand_r_state
-        cdef size_t i, feat_i, proj_i, col_idx
+        cdef SIZE_t i, feat_i, proj_i
         cdef DTYPE_t weight
         cdef size_t max_tries = 0
 
         # define a hash of vector of ints
-        cdef VectorHash vector_hash
         cdef size_t hash_val
 
         # define the number of indices to sample as between the two integers
-        cdef size_t num_indices_to_sample = self.floor_feature_combinations if (
-            rand_uniform(0.0, 1.0, random_state) > (self.feature_combinations - self.floor_feature_combinations)
-        ) else self.floor_feature_combinations + 1
+        cdef double prob_threshold = self.feature_combinations - self.floor_feature_combinations
+        cdef double prob = rand_uniform(0.0, 1.0, random_state)
+        cdef size_t num_indices_to_sample = <size_t>self.floor_feature_combinations if prob > prob_threshold else <size_t>self.floor_feature_combinations + 1
 
         # define buffer to assign indices
-        cdef vector[SIZE_t] proj_indices = vector[SIZE_t](num_indices_to_sample)
+        cdef vector[size_t] proj_indices = vector[size_t](num_indices_to_sample)
         cdef vector[DTYPE_t] proj_weights = vector[DTYPE_t](num_indices_to_sample)
 
         while max_tries < MAX_SAMPLES_PER_PROJECTION:
@@ -525,7 +524,7 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
     cdef void sample_proj_mat(
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
-        vector[vector[SIZE_t]]& proj_mat_indices,
+        vector[vector[size_t]]& proj_mat_indices,
         SIZE_t n_known_constants
     ) noexcept nogil:
         """Sample oblique projection matrix.
@@ -561,7 +560,7 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
 
         # construct an array to sample from mTry x n_features set of indices
         cdef SIZE_t grid_size = self.max_features * (self.n_features - n_known_constants)
-        cdef vector[SIZE_t] indices_to_sample = vector[SIZE_t](grid_size)
+        cdef vector[size_t] indices_to_sample = vector[size_t](grid_size)
         for i in range(grid_size):
             indices_to_sample.push_back(i)
         
@@ -599,7 +598,7 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         const SIZE_t[:] samples,
         DTYPE_t[:] feature_values,
         vector[DTYPE_t]* proj_vec_weights,  # weights of the vector (max_features,)
-        vector[SIZE_t]* proj_vec_indices,    # indices of the features (max_features,)
+        vector[size_t]* proj_vec_indices,    # indices of the features (max_features,)
         SIZE_t* n_known_constants
     ) noexcept nogil:
         """Compute the feature values for the samples[start:end] range.
@@ -617,7 +616,7 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         # create a buffer to store the relevant feature columns that we
         # computed constants over so we can move pointers of `features`
         # around and update `n_known_constants`.
-        cdef vector[SIZE_t] sampled_features
+        cdef vector[size_t] sampled_features
 
         # Compute linear combination of features and then
         # sort samples according to the feature values.

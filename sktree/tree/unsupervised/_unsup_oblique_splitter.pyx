@@ -97,7 +97,7 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
 
         # Sparse max_features x n_features projection matrix
         self.proj_mat_weights = vector[vector[DTYPE_t]](self.max_features)
-        self.proj_mat_indices = vector[vector[SIZE_t]](self.max_features)
+        self.proj_mat_indices = vector[vector[size_t]](self.max_features)
 
         # or max w/ 1...
         self.n_non_zeros = max(int(self.max_features * self.feature_combinations), 1)
@@ -155,7 +155,7 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
 
     cdef void sample_proj_mat(self,
                               vector[vector[DTYPE_t]]& proj_mat_weights,
-                              vector[vector[SIZE_t]]& proj_mat_indices) noexcept nogil:
+                              vector[vector[size_t]]& proj_mat_indices) noexcept nogil:
         """ Sample the projection vector.
 
         This is a placeholder method.
@@ -173,7 +173,7 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
         const SIZE_t[:] samples,
         DTYPE_t[:] feature_values,
         vector[DTYPE_t]* proj_vec_weights,  # weights of the vector (max_features,)
-        vector[SIZE_t]* proj_vec_indices    # indices of the features (max_features,)
+        vector[size_t]* proj_vec_indices    # indices of the features (max_features,)
     ) noexcept nogil:
         """Compute the feature values for the samples[start:end] range.
 
@@ -202,7 +202,7 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
     cdef void sample_proj_mat(
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
-        vector[vector[SIZE_t]]& proj_mat_indices
+        vector[vector[size_t]]& proj_mat_indices
     ) noexcept nogil:
         """
         Sparse Oblique Projection matrix.

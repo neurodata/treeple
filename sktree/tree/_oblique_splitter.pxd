@@ -36,7 +36,7 @@ cdef struct ObliqueSplitRecord:
     double impurity_right       # Impurity of the right split.
 
     vector[DTYPE_t]* proj_vec_weights   # weights of the vector (max_features,)
-    vector[SIZE_t]* proj_vec_indices    # indices of the features (max_features,)
+    vector[size_t]* proj_vec_indices    # indices of the features (max_features,)
 
 
 cdef class BaseObliqueSplitter(Splitter):
@@ -45,7 +45,7 @@ cdef class BaseObliqueSplitter(Splitter):
 
     # Oblique Splitting extra parameters (mtry, n_dims) matrix
     cdef vector[vector[DTYPE_t]] proj_mat_weights       # nonzero weights of sparse proj_mat matrix
-    cdef vector[vector[SIZE_t]] proj_mat_indices        # nonzero indices of sparse proj_mat matrix
+    cdef vector[vector[size_t]] proj_mat_indices        # nonzero indices of sparse proj_mat matrix
 
     # keep a hashmap of every projection vector indices sampled
     cdef unordered_map[size_t, bint] proj_vec_hash
@@ -67,7 +67,7 @@ cdef class BaseObliqueSplitter(Splitter):
     cdef void sample_proj_mat(
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
-        vector[vector[SIZE_t]]& proj_mat_indices,
+        vector[vector[size_t]]& proj_mat_indices,
         SIZE_t n_known_constants
     ) noexcept nogil
 
@@ -77,7 +77,7 @@ cdef class BaseObliqueSplitter(Splitter):
     cdef void sample_proj_vector(
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
-        vector[vector[SIZE_t]]& proj_mat_indices,
+        vector[vector[size_t]]& proj_mat_indices,
         SIZE_t n_known_constants
     ) noexcept nogil
 
@@ -96,7 +96,7 @@ cdef class BaseObliqueSplitter(Splitter):
         const SIZE_t[:] samples,
         DTYPE_t[:] feature_values,
         vector[DTYPE_t]* proj_vec_weights,  # weights of the vector (max_features,)
-        vector[SIZE_t]* proj_vec_indices,   # indices of the features (max_features,)
+        vector[size_t]* proj_vec_indices,   # indices of the features (max_features,)
         SIZE_t* n_known_constants
     ) noexcept nogil
 
@@ -116,6 +116,7 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
 
     # Oblique Splitting extra parameters
     cdef public double feature_combinations             # Number of features to combine
+    cdef double floor_feature_combinations
     cdef SIZE_t n_non_zeros                             # Number of non-zero features
     cdef SIZE_t[::1] indices_to_sample                  # an array of indices to sample of size mtry X n_features
 
@@ -129,7 +130,7 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
     cdef void sample_proj_mat(
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
-        vector[vector[SIZE_t]]& proj_mat_indices,
+        vector[vector[size_t]]& proj_mat_indices,
         SIZE_t n_known_constants
     ) noexcept nogil
 
@@ -139,6 +140,6 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
     cdef void sample_proj_vector(
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
-        vector[vector[SIZE_t]]& proj_mat_indices,
+        vector[vector[size_t]]& proj_mat_indices,
         SIZE_t n_known_constants
     ) noexcept nogil
