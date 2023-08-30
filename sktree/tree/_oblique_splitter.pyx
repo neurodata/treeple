@@ -488,9 +488,9 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         cdef VectorHash vector_hash
         cdef size_t hash_val
 
-        # define the number of indices to sample
+        # define the number of indices to sample as between the two integers
         cdef size_t num_indices_to_sample = self.floor_feature_combinations if (
-            rand_uniform(0.0, 1.0, random_state) < (self.feature_combinations - self.floor_feature_combinations)
+            rand_uniform(0.0, 1.0, random_state) > (self.feature_combinations - self.floor_feature_combinations)
         ) else self.floor_feature_combinations + 1
 
         # define buffer to assign indices
