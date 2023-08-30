@@ -1,6 +1,9 @@
 # distutils: language = c++
 # cython: language_level=3
-# cython: boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
+# cython: boundscheck=False
+# cython: wraparound=False
+# cython: initializedcheck=False
+# cython: cdivision=True
 
 cimport numpy as cnp
 import numpy as np
@@ -9,6 +12,7 @@ from libc.math cimport log
 cnp.import_array()
 
 cdef DTYPE_t PI = np.pi
+
 
 cdef class UnsupervisedCriterion(BaseCriterion):
     """Abstract criterion for unsupervised learning.
@@ -22,6 +26,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
     This object stores methods on how to calculate how good a split is using
     different metrics for unsupervised splitting.
     """
+
     def __cinit__(self):
         """Initialize attributes for unsupervised criterion.
         """
@@ -72,6 +77,12 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         # XXX: this can be further optimized by computing a cumulative sum hash map of the sum_total and sumsq_total
         # and then update will never have to iterate through even
         cdef DOUBLE_t w = 1.0
+
+        # cdef SIZE_t prev_s_idx = -1
+        # self.cumsum_of_squares_map[prev_s_idx] = 0.0
+        # self.cumsum_map[prev_s_idx] = 0.0
+        # self.cumsum_weights_map[prev_s_idx] = 0.0
+
         for p_idx in range(self.start, self.end):
             s_idx = self.sample_indices[p_idx]
 
@@ -101,6 +112,8 @@ cdef class UnsupervisedCriterion(BaseCriterion):
 
         Parameters
         ----------
+        feature_values : array-like, dtype=DTYPE_t
+            The memoryview 1D feature vector with (n_samples,) shape.
         sample_weight : array-like, dtype=DOUBLE_t
             The weight of each sample (i.e. row of X).
         weighted_n_samples : double
@@ -180,7 +193,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         #   sum_left[x] +  sum_right[x] = sum_total[x]
         # and that sum_total is known, we are going to update
         # sum_left from the direction that require the least amount
-        # of computations, i.e. from pos to new_pos or from end to new_po.
+        # of computations, i.e. from pos to new_pos or from end to new_pos.
         if (new_pos - pos) <= (end - new_pos):
             for p in range(pos, new_pos):
                 i = sample_indices[p]
@@ -236,9 +249,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
     ) noexcept nogil:
         """Set sample pointers in the criterion.
 
-        Set given start and end sample_indices. Also will update node statistics,
-        such as the `sum_total`, which tracks the total value within the current
-        node for sample_indices[start:end].
+        Set given start and end sample_indices for a given node.
 
         Parameters
         ----------
@@ -344,7 +355,12 @@ cdef class TwoMeans(UnsupervisedCriterion):
         impurity_left[0] = self.fast_variance(self.weighted_n_left, self.sumsq_left, self.sum_left)
         impurity_right[0] = self.fast_variance(self.weighted_n_right, self.sumsq_right, self.sum_right)
 
-    cdef inline double fast_variance(self, double weighted_n_node_samples, double sumsq_total, double sum_total) noexcept nogil:
+    cdef inline double fast_variance(
+        self,
+        double weighted_n_node_samples,
+        double sumsq_total,
+        double sum_total
+    ) noexcept nogil:
         return (1. / weighted_n_node_samples) * \
             ((sumsq_total) - (1. / weighted_n_node_samples) * (sum_total * sum_total))
 
@@ -379,9 +395,12 @@ cdef class FastBIC(TwoMeans):
     Additionally, Fast-BIC is substantially faster than the traditional BIC method.
 
     Reference: https://arxiv.org/abs/1907.02844
-
     """
-    cdef inline double bic_cluster(self, SIZE_t n_samples, double variance) noexcept nogil:
+    cdef inline double bic_cluster(
+        self,
+        SIZE_t n_samples,
+        double variance
+    ) noexcept nogil:
         """Help compute the BIC from assigning to a specific cluster.
 
         Parameters

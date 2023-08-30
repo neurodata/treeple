@@ -2,6 +2,8 @@
 # cython: wraparound=False
 # cython: language_level=3
 
+from libcpp.unordered_map cimport unordered_map
+
 from ..._lib.sklearn.tree._criterion cimport BaseCriterion
 from ..._lib.sklearn.tree._tree cimport DOUBLE_t  # Type of y, sample_weight
 from ..._lib.sklearn.tree._tree cimport DTYPE_t  # Type of X
@@ -44,6 +46,11 @@ cdef class UnsupervisedCriterion(BaseCriterion):
     cdef double sumsq_total     # The sum of the weighted count of each feature.
     cdef double sumsq_left      # Same as above, but for the left side of the split
     cdef double sumsq_right     # Same as above, but for the right side of the split
+
+    # use memoization to re-compute variance of any subsegment in O(1)
+    # cdef unordered_map[SIZE_t, DTYPE_t] cumsum_of_squares_map
+    # cdef unordered_map[SIZE_t, DTYPE_t] cumsum_map
+    # cdef unordered_map[SIZE_t, DTYPE_t] cumsum_weights_map
 
     # Methods
     # -------

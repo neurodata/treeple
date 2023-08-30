@@ -50,7 +50,7 @@ def coverage(ctx):
 
 
 @click.command()
-@click.option("--forcesubmodule", is_flag=True, help="Force submodule pull.")
+@click.option("--forcesubmodule", is_flag=False, help="Force submodule pull.")
 def setup_submodule(forcesubmodule=False):
     """Build scikit-tree using submodules.
 
@@ -67,7 +67,7 @@ def setup_submodule(forcesubmodule=False):
     This will update the submodule, which then must be commited so that
     git knows the submodule needs to be at a certain commit hash.
     """
-    commit_fpath = "./sktree/_lib/sklearn/commit.txt"
+    commit_fpath = "./sktree/_lib/sklearn_fork/commit.txt"
     submodule = "./sktree/_lib/sklearn_fork"
     commit = ""
     current_hash = ""
@@ -127,10 +127,11 @@ def setup_submodule(forcesubmodule=False):
             ]
         )
 
-        if os.path.exists("sktree/_lib/sklearn_fork/sklearn"):
+        if os.path.exists("sktree/_lib/sklearn_fork/sklearn") and (commit != current_hash):
             util.run(
                 [
-                    "mv",
+                    "cp",
+                    "-r",
                     "sktree/_lib/sklearn_fork/sklearn",
                     "sktree/_lib/sklearn",
                 ]
