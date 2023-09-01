@@ -26,6 +26,6 @@ cdef void unravel_index_cython(SIZE_t index, const SIZE_t[:] shape, SIZE_t[:] co
 
 cdef SIZE_t ravel_multi_index_cython(SIZE_t[:] coords, const SIZE_t[:] shape) nogil
 
-cdef size_t vector_hash(
-    const vector[size_t]& v
+cdef SIZE_t vector_hash(
+    const vector[SIZE_t]& v
 ) noexcept nogil

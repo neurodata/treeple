@@ -1,4 +1,3 @@
-// vector_hash.cpp
 #include "_vector_hash.hpp"
 
 size_t VectorHash::operator()(const std::vector<size_t>& v) const {
