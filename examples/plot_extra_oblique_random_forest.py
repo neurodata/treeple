@@ -22,14 +22,19 @@ The datasets used in this example are from the OpenML benchmarking suite are:
 [cnae-9](https://www.openml.org/search?type=data&sort=runs&id==1468).
 All datasets are subsampled due to computational constraints. Note that `cnae-9` is
 an high dimensional dataset with very sparse 856 features, mostly consisting of zeros.
-
-dataset| samples | features | datatype
--------|---------|----------|----------
-Phishing Website | 8844 | 30 | nominal
-WDBC | 455 | 30 | numeric
-Lsvt | 100 | 310 | numeric
-har | 100 | 561 | numeric
-cnae-9 | 100 | 856 | numeric
++------------------+---------+----------+----------+
+|      dataset     | samples | features | datatype |
++------------------+---------+----------+----------+
+| Phishing Website |   8844  |    30    | nominal  |
++------------------+---------+----------+----------+
+|        WDBC      |   455   |   30     | numeric  |
++------------------+---------+----------+----------+
+|       Lsvt       |   100   |   310    | numeric  |
++------------------+---------+----------+----------+
+|       har        |   100   |   561    | numeric  |
++------------------+---------+----------+----------+
+|       cnae-9     |   100   |   856    | numeric  |
++------------------+---------+----------+----------+
 
 References
 ----------
@@ -38,6 +43,7 @@ References
 """
 
 from datetime import datetime
+
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
@@ -47,7 +53,7 @@ from sklearn.model_selection import RepeatedKFold, cross_validate
 from sktree import ExtraObliqueRandomForestClassifier, ObliqueRandomForestClassifier
 
 # Parameters
-random_state = 12345
+random_state = 123
 phishing_website = 4534
 wdbc = 1510
 lsvt = 1484
@@ -111,7 +117,7 @@ def get_scores(X, y, d_name, n_cv=5, n_repeats=1, **kwargs):
 params = {
     "max_features": None,
     "n_estimators": 50,
-    "max_depth": 10,
+    "max_depth": 5,
     "random_state": random_state,
     "n_cv": 10,
     "n_repeats": 1,
@@ -123,6 +129,7 @@ for data_id in data_ids:
     df = pd.concat([df, tmp])
 
 # Show the time taken to train each model
+print(pd.DataFrame.from_dict(params, orient="index", columns=["value"]))
 print(df.groupby(["dataset", "dimension", "model"])[["time_taken"]].mean())
 
 # Draw a comparison plot
