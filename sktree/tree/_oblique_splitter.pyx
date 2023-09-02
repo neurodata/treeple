@@ -172,6 +172,27 @@ cdef class BaseObliqueSplitter(Splitter):
                     feature_values[idx] = 0.0
                 feature_values[idx] += self.X[samples[idx], col_idx] * col_weight
 
+                # keep track of the min/max of X[samples[:], col_idx]
+                # XXX: can swap the order of the if for optimizing
+                if (self.X[samples[idx], col_idx] < self.min_val_map[col_idx] or
+                        self.min_val_map.find(col_idx) == self.min_val_map.end()):
+                    self.min_val_map[col_idx] = self.X[samples[idx], col_idx]
+                if (self.X[samples[idx], col_idx] > self.max_val_map[col_idx] or
+                        self.max_val_map.find(col_idx) == self.max_val_map.end()):
+                    self.max_val_map[col_idx] = self.X[samples[idx], col_idx]
+
+            # if self.max_val_map[col_idx] <= self.min_val_map[col_idx] + FEATURE_THRESHOLD:
+            #     self.constant_features[col_idx] = 1
+
+            #     # move features pointer around to make sure we keep track of the constant features
+            #     self.features[col_idx], self.features[n_known_constants[0]] = self.features[n_known_constants[0]], self.features[col_idx]
+
+            #     with gil:
+            #         print(col_idx)
+
+            #     # increment the number of known constants
+            #     n_known_constants[0] += 1
+
     cdef int node_split(
         self,
         double impurity,
@@ -234,7 +255,8 @@ cdef class BaseObliqueSplitter(Splitter):
                 samples,
                 feature_values,
                 &self.proj_mat_weights[feat_i],
-                &self.proj_mat_indices[feat_i]
+                &self.proj_mat_indices[feat_i],
+                n_constant_features
             )
 
             # Sort the samples
@@ -383,6 +405,16 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         self.indices_to_sample = np.arange(self.max_features * self.n_features,
                                            dtype=np.intp)
 
+        # re-initialize the hashmap for looking at constant features
+        cdef unordered_map[SIZE_t, DTYPE_t] min_val_map
+        cdef unordered_map[SIZE_t, DTYPE_t] max_val_map
+        self.min_val_map = min_val_map
+        self.max_val_map = max_val_map
+
+        # re-initialize the hashmap for projection vector hash
+        cdef unordered_map[size_t, bint] proj_vec_hash
+        self.proj_vec_hash = proj_vec_hash
+
         # XXX: Just to initialize stuff
         # self.feature_weights = np.ones((self.n_features,), dtype=DTYPE_t) / self.n_features
         return 0
@@ -418,6 +450,7 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         cdef SIZE_t n_non_zeros = self.n_non_zeros
         cdef UINT32_t* random_state = &self.rand_r_state
 
+        cdef SIZE_t col_idx
         cdef int i, feat_i, proj_i, rand_vec_index
         cdef DTYPE_t weight
 
@@ -440,11 +473,12 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
             # get the projection index and feature index
             proj_i = rand_vec_index // n_features
             feat_i = rand_vec_index % n_features
+            col_idx = self.features[feat_i]
 
             # sample a random weight
             weight = 1 if (rand_int(0, 2, random_state) == 1) else -1
 
-            proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
+            proj_mat_indices[proj_i].push_back(col_idx)  # Store index of nonzero
             proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
 
 
@@ -483,8 +517,8 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
         cdef SIZE_t start = self.start
         cdef SIZE_t end = self.end
 
-        cdef SIZE_t[::1] constant_features = self.constant_features
-        cdef SIZE_t const_col_idx
+        # cdef SIZE_t[::1] constant_features = self.constant_features
+        # cdef SIZE_t const_col_idx
         cdef SIZE_t n_known_constants = n_constant_features[0]
 
         # The number of sampled feature values (i.e. mtry)
@@ -501,7 +535,7 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
         cdef double current_proxy_improvement = -INFINITY
         cdef double best_proxy_improvement = -INFINITY
 
-        cdef SIZE_t feat_i, p       # index over computed features and start/end
+        cdef SIZE_t p       # index over computed features and start/end
         cdef SIZE_t partition_end
         cdef DTYPE_t temp_d         # to compute a projection feature value
 
@@ -524,11 +558,11 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
         while (self.n_features > n_known_constants and  # Stop early if remaining features
                                                         # are constant, or
                                                         # if we have reached max_features mtry
-            n_visited_features < max_features):
+               n_visited_features < max_features):
 
             if self.proj_mat_weights[n_visited_features].empty() or self.proj_mat_indices[n_visited_features].empty():
                 with gil:
-                    print(f'Empty projection ', n_visited_features)
+                    print('Empty projection ', n_visited_features)
                     print(self.proj_mat_indices[n_visited_features].size(), self.proj_mat_weights[n_visited_features].size())
                 # increment the mtry
                 n_visited_features += 1

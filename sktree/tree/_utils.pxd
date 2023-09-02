@@ -2,6 +2,7 @@ import numpy as np
 
 cimport numpy as cnp
 from libcpp.vector cimport vector
+
 cnp.import_array()
 
 from sktree._lib.sklearn.tree._splitter cimport SplitRecord
@@ -26,4 +27,4 @@ cdef SIZE_t ravel_multi_index_cython(SIZE_t[:] coords, const SIZE_t[:] shape) no
 
 cdef SIZE_t vector_hash(
     const vector[SIZE_t]& v
-) noexcept nogil 
+) noexcept nogil

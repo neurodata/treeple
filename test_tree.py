@@ -133,4 +133,4 @@ assert rc_cv_scores.mean() > ri_cv_scores.mean(), f"{rc_cv_scores.mean()} <= {ri
 assert rc_cv_scores.std() < ri_cv_scores.std(), f"{rc_cv_scores.std()} >= {ri_cv_scores.std()}"
 assert rc_cv_scores.mean() > 0.91, f"{rc_cv_scores.mean()} <= 0.91"
 
-print('Done!')
+print("Done!")
