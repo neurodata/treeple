@@ -58,7 +58,8 @@ cdef class BaseObliqueSplitter(Splitter):
     cdef void sample_proj_mat(
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
-        vector[vector[SIZE_t]]& proj_mat_indices
+        vector[vector[SIZE_t]]& proj_mat_indices,
+        SIZE_t n_known_constants,
     ) noexcept nogil
 
     # Redefined here since the new logic requires calling sample_proj_mat
@@ -76,7 +77,8 @@ cdef class BaseObliqueSplitter(Splitter):
         const SIZE_t[:] samples,
         DTYPE_t[:] feature_values,
         vector[DTYPE_t]* proj_vec_weights,  # weights of the vector (max_features,)
-        vector[SIZE_t]* proj_vec_indices    # indices of the features (max_features,)
+        vector[SIZE_t]* proj_vec_indices,    # indices of the features (max_features,)
+        SIZE_t* n_known_constants,
     ) noexcept nogil
 
     cdef int node_split(
@@ -104,5 +106,6 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
     cdef void sample_proj_mat(
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
-        vector[vector[SIZE_t]]& proj_mat_indices
+        vector[vector[SIZE_t]]& proj_mat_indices,
+        SIZE_t n_known_constants,
     ) noexcept nogil
