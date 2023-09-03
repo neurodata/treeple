@@ -183,8 +183,10 @@ def _trunk(n, p=10, random_state=None):
 
 @parametrize_with_checks(
     [
+        ExtraObliqueRandomForestClassifier(random_state=12345, n_estimators=10),
         ObliqueRandomForestClassifier(random_state=12345, n_estimators=10),
         PatchObliqueRandomForestClassifier(random_state=12345, n_estimators=10),
+        ExtraObliqueRandomForestRegressor(random_state=12345, n_estimators=10),
         ObliqueRandomForestRegressor(random_state=12345, n_estimators=10),
         PatchObliqueRandomForestRegressor(random_state=12345, n_estimators=10),
     ]
@@ -192,7 +194,12 @@ def _trunk(n, p=10, random_state=None):
 def test_sklearn_compatible_estimator(estimator, check):
     # TODO: remove when we can replicate the CI error...
     if isinstance(
-        estimator, (ObliqueRandomForestClassifier, PatchObliqueRandomForestClassifier)
+        estimator,
+        (
+            ExtraObliqueRandomForestClassifier,
+            ObliqueRandomForestClassifier,
+            PatchObliqueRandomForestClassifier,
+        ),
     ) and check.func.__name__ in ["check_fit_score_takes_y"]:
         pytest.skip()
     check(estimator)
@@ -287,8 +294,13 @@ def test_oblique_forest_trunk():
 @pytest.mark.parametrize(
     "estimator, criterion",
     (
+        [ExtraObliqueRandomForestClassifier, "gini"],
+        [ExtraObliqueRandomForestClassifier, "log_loss"],
         [ObliqueRandomForestClassifier, "gini"],
         [ObliqueRandomForestClassifier, "log_loss"],
+        [ExtraObliqueRandomForestRegressor, "squared_error"],
+        [ExtraObliqueRandomForestRegressor, "friedman_mse"],
+        [ExtraObliqueRandomForestRegressor, "poisson"],
         [ObliqueRandomForestRegressor, "squared_error"],
         [ObliqueRandomForestRegressor, "friedman_mse"],
         [ObliqueRandomForestRegressor, "poisson"],
@@ -304,9 +316,9 @@ def test_check_importances_oblique(estimator, criterion, dtype, feature_combinat
     y = y_large.astype(dtype, copy=False)
 
     est = estimator(
-        n_estimators=10,
+        n_estimators=50,
         criterion=criterion,
-        random_state=0,
+        random_state=123,
         feature_combinations=feature_combinations,
     )
     est.fit(X, y)
