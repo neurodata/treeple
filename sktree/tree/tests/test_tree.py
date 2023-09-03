@@ -214,12 +214,12 @@ def test_pickle_splitters():
 
 @parametrize_with_checks(
     [
+        ExtraObliqueDecisionTreeClassifier(random_state=12),
+        ExtraObliqueDecisionTreeRegressor(random_state=12),
         ObliqueDecisionTreeClassifier(random_state=12),
         ObliqueDecisionTreeRegressor(random_state=12),
         PatchObliqueDecisionTreeClassifier(random_state=12),
         PatchObliqueDecisionTreeRegressor(random_state=12),
-        ExtraObliqueDecisionTreeClassifier(random_state=12),
-        ExtraObliqueDecisionTreeRegressor(random_state=12),
     ]
 )
 def test_sklearn_compatible_estimator(estimator, check):
@@ -231,13 +231,7 @@ def test_sklearn_compatible_estimator(estimator, check):
     check(estimator)
 
 
-@pytest.mark.parametrize(
-    "Tree",
-    [
-        ObliqueDecisionTreeClassifier,
-        PatchObliqueDecisionTreeClassifier,
-    ],
-)
+@pytest.mark.parametrize("Tree", CLF_TREES.values())
 def test_oblique_tree_sampling(Tree, random_state=0):
     """Test Oblique Decision Trees.
 
