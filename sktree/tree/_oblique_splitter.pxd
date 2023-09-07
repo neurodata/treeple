@@ -86,7 +86,7 @@ cdef class BaseObliqueSplitter(Splitter):
         DTYPE_t[:] feature_values,
         vector[DTYPE_t]* proj_vec_weights,  # weights of the vector (max_features,)
         vector[SIZE_t]* proj_vec_indices,    # indices of the features (max_features,)
-        SIZE_t* n_known_constants,
+        SIZE_t* n_known_constants
     ) noexcept nogil
 
     cdef int node_split(
@@ -107,6 +107,7 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
     cdef public double feature_combinations             # Number of features to combine
     cdef SIZE_t n_non_zeros                             # Number of non-zero features
     cdef SIZE_t[::1] indices_to_sample                  # an array of indices to sample of size mtry X n_features
+    cdef SIZE_t floor_feature_combinations
 
     # All oblique splitters (i.e. non-axis aligned splitters) require a
     # function to sample a projection matrix that is applied to the feature matrix

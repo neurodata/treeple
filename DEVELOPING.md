@@ -77,3 +77,10 @@ Verify that installations work as expected on your machine.
     twine upload dist/*
 
 4. Update version number on ``meson.build`` and ``_version.py`` to the relevant version.
+
+# Comparing branches using ASV benchmarks
+
+We use asv to compare performance between the current branch and main branch. For
+example, one can run:
+
+    asv continuous --verbose --split --bench ObliqueRandomForest origin/main constantsv2

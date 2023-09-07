@@ -207,6 +207,8 @@ extend-exclude = '''
       __pycache__
     | \.github
     | sktree/_lib
+    | asv_benchmarks/env/
+    | asv_benchmarks/results
 )
 '''
 
@@ -215,7 +217,7 @@ profile = 'black'
 multi_line_output = 3
 line_length = 100
 py_version = 38
-extend_skip_glob = ['sktree/__init__.py', 'sktree/_lib/*']
+extend_skip_glob = ['sktree/__init__.py', 'sktree/_lib/*', "asv_benchmarks/env/*", "asv_benchmarks/results/*"]
 
 [tool.pydocstyle]
 convention = 'numpy'

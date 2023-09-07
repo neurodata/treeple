@@ -126,7 +126,7 @@ X = np.concatenate((X, X_noise), axis=1)
 # diverse sets of splits and will do better if allowed
 # to sample more
 tree_ri = DecisionTreeClassifier(random_state=0, max_features=n_features)
-tree_rc = ObliqueDecisionTreeClassifier(random_state=0, max_features=n_features * 2)
+tree_rc = ObliqueDecisionTreeClassifier(random_state=0, max_features=int(n_features * 1.5))
 ri_cv_scores = cross_val_score(tree_ri, X, y, scoring="accuracy", cv=10, error_score="raise")
 rc_cv_scores = cross_val_score(tree_rc, X, y, scoring="accuracy", cv=10, error_score="raise")
 assert rc_cv_scores.mean() > ri_cv_scores.mean(), f"{rc_cv_scores.mean()} <= {ri_cv_scores.mean()}"

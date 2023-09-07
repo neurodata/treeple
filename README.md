@@ -5,6 +5,7 @@
 [![codecov](https://codecov.io/gh/neurodata/scikit-tree/branch/main/graph/badge.svg?token=H1reh7Qwf4)](https://codecov.io/gh/neurodata/scikit-tree)
 [![PyPI Download count](https://img.shields.io/pypi/dm/scikit-tree.svg)](https://pypistats.org/packages/scikit-tree)
 [![Latest PyPI release](https://img.shields.io/pypi/v/scikit-tree.svg)](https://pypi.org/project/scikit-tree/)
+[![Benchmark](https://img.shields.io/badge/Benchmarked%20by-asv-blue)](https://img.shields.io/badge/Benchmarked%20by-asv-blue)
 
 scikit-tree
 ===========

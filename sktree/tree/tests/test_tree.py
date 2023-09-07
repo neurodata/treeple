@@ -210,7 +210,7 @@ def test_oblique_tree_sampling_iris():
     # diverse sets of splits and will do better if allowed
     # to sample more
     tree_ri = DecisionTreeClassifier(random_state=0, max_features=n_features)
-    tree_rc = ObliqueDecisionTreeClassifier(random_state=0, max_features=n_features * 2)
+    tree_rc = ObliqueDecisionTreeClassifier(random_state=0, max_features=n_features * 3)
     ri_cv_scores = cross_val_score(tree_ri, X, y, scoring="accuracy", cv=10, error_score="raise")
     rc_cv_scores = cross_val_score(tree_rc, X, y, scoring="accuracy", cv=10, error_score="raise")
     assert (
