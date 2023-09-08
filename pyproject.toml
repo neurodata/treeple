@@ -270,6 +270,7 @@ Environments = [
 Documentation = ['.spin/cmds.py:docs']
 Metrics = [
     '.spin/cmds.py:coverage',
+    '.spin/cmds.py:asv',
 ]
 
 [tool.cython-lint]

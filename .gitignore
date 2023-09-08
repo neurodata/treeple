@@ -28,6 +28,13 @@ doc/samples
 cover
 examples/*.jpg
 
+*__pycache__*
+env/
+html/
+results/
+scikit-learn/
+benchmarks/cache/
+
 # Pycharm
 .idea/
 
