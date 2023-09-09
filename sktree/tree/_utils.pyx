@@ -146,25 +146,3 @@ cdef SIZE_t ravel_multi_index_cython(SIZE_t[:] coords, const SIZE_t[:] shape) no
 
     return flat_index
 
-
-cdef INT32_t find_index(DTYPE_t[:] feature_values, DOUBLE_t threshold) noexcept nogil:
-    """Finds the index of the first element in `feature_values` that is greater than `threshold`.
-
-    Parameters
-    ----------
-    feature_values : numpy.ndarray[SIZE_t, ndim=1]
-        An array of feature values.
-    threshold : double
-        The threshold value.
-
-    Returns
-    -------
-    int
-        The index of the first element in `feature_values` that is greater than `threshold`.
-    """
-    cdef SIZE_t i, n
-    n = feature_values.shape[0]
-    for i in range(n):
-        if feature_values[i] > threshold:
-            return i
-    return -1

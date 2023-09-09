@@ -1,14 +1,14 @@
 """
-====================================================================
-Plot the decision surfaces of ensembles of trees on the iris dataset
-====================================================================
+============================================================================
+Plot the decision surfaces of ensembles of oblique trees on the iris dataset
+============================================================================
 
-Plot the decision surfaces of forests of randomized trees trained on pairs of
+Plot the decision surfaces of forests of randomized oblique trees trained on pairs of
 features of the iris dataset.
 
-This plot compares the decision surfaces learned by a decision tree classifier
-(first column), by a oblique decision tree classifier (second column), and by an
-extra oblique decision tree classifier (third column).
+This plot compares the decision surfaces learned by a oblique decision tree classifier
+(first column) and by an extra oblique decision tree classifier (second column). The
+purpose of this plot is to compare the decision surfaces learned by the two classifiers.
 
 In the first row, the classifiers are built using the sepal width and
 the sepal length features only, on the second row using the petal length and
@@ -21,30 +21,32 @@ from datetime import datetime
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from matplotlib.colors import ListedColormap
 from sklearn.datasets import load_iris
-from sklearn.tree import DecisionTreeClassifier
 
+from sktree.ensemble import ExtraObliqueRandomForestClassifier, ObliqueRandomForestClassifier
 from sktree.tree import ExtraObliqueDecisionTreeClassifier, ObliqueDecisionTreeClassifier
 
 # Parameters
 n_classes = 3
-n_estimators = 30
+n_estimators = 50
 max_depth = 10
-random_state = 12345
+random_state = 123
 
 models = [
-    DecisionTreeClassifier(max_depth=max_depth),
     ObliqueDecisionTreeClassifier(max_depth=max_depth),
     ExtraObliqueDecisionTreeClassifier(max_depth=max_depth),
+    ObliqueRandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth),
+    ExtraObliqueRandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth),
 ]
 
 cmap = plt.cm.Spectral
-plot_step = 0.02  # fine step width for decision surface contours
+plot_step = 0.01  # fine step width for decision surface contours
 plot_step_coarser = 0.25  # step widths for coarse classifier guesses
 # figure size for plotting
 figure_size = (30, 30)
-pairs = [[0, 1], [0, 2], [2, 3]]
+pairs = [[0, 1], [0, 2], [1, 2], [1, 3], [2, 3]]
 N = len(pairs) * len(models)
 plot_idx = 1
 
@@ -54,6 +56,11 @@ fig.set_size_inches(6 * N, 6)
 
 # Load data
 iris = load_iris()
+# Create a dict that maps column names to indices
+feature_names = dict(zip(range(iris.data.shape[1]), iris.feature_names))
+
+# Create a dataframe to store the results from each run
+results = pd.DataFrame(columns=["model", "features", "score (sec)", "time"])
 
 for pair in pairs:
     for model in models:
@@ -84,19 +91,16 @@ for pair in pairs:
         model_title = str(type(model)).split(".")[-1][:-2][: -len("Classifier")]
 
         model_details = model_title
-        if hasattr(model, "estimators_"):
-            model_details += " with {} estimators".format(len(model.estimators_))
-        print(
-            model_details + " with features",
-            pair,
-            "has a score of",
-            round(scores, 5),
-            "took",
-            (datetime.now() - t0).total_seconds(),
-            "seconds",
-        )
+        # add the results in the results dataframe
+        new_result = {
+            "model": model_title,
+            "features": feature_names[pair[0]] + ", " + feature_names[pair[1]],
+            "score (sec)": round(scores, 5),
+            "time": (datetime.now() - t0).total_seconds(),
+        }
+        results = pd.concat([results, pd.DataFrame(new_result, index=[0])], ignore_index=True)
 
-        plt.subplot(3, 3, plot_idx)
+        plt.subplot(len(pairs), len(models), plot_idx)
         if plot_idx <= len(models):
             # Add a title at the top of each column
             plt.title(model_title, fontsize=9)
@@ -109,25 +113,17 @@ for pair in pairs:
 
         # Plot either a single DecisionTreeClassifier or alpha blend the
         # decision surfaces of the ensemble of classifiers
-        if (
-            isinstance(model, DecisionTreeClassifier)
-            or isinstance(model, ObliqueDecisionTreeClassifier)
-            or isinstance(model, ExtraObliqueDecisionTreeClassifier)
+        if isinstance(model, ObliqueDecisionTreeClassifier) or isinstance(
+            model, ExtraObliqueDecisionTreeClassifier
         ):
             Z = model.predict(np.c_[xx.ravel(), yy.ravel()])
             Z = Z.reshape(xx.shape)
             cs = plt.contourf(xx, yy, Z, cmap=cmap)
-
         else:
-            # Choose alpha blend level with respect to the number
-            # of estimators
-            # that are in use (noting that AdaBoost can use fewer estimators
-            # than its maximum if it achieves a good enough fit early on)
-            estimator_alpha = 1.0 / len(model.estimators_)
             for tree in model.estimators_:
                 Z = tree.predict(np.c_[xx.ravel(), yy.ravel()])
                 Z = Z.reshape(xx.shape)
-                cs = plt.contourf(xx, yy, Z, alpha=estimator_alpha, cmap=cmap)
+                cs = plt.contourf(xx, yy, Z, alpha=0.1, cmap=cmap)
 
         # Build a coarser grid to plot a set of ensemble classifications
         # to show how these are different to what we see in the decision
@@ -161,14 +157,17 @@ for pair in pairs:
         )
         plot_idx += 1  # move on to the next plot in sequence
 
+print("Results:")
+print(results)
+
 plt.suptitle("Classifiers on feature subsets of the Iris dataset", fontsize=12)
 plt.axis("tight")
-plt.tight_layout(h_pad=0.2, w_pad=0.2, pad=2.5)
+plt.tight_layout(h_pad=0.25, w_pad=0.25, pad=2.5)
 plt.show()
 
 # Discussion
 # ----------
 # This section demonstrates the decision boundaries of the classification task with
 # ObliqueDecisionTree and ExtraObliqueDecisionTree in contrast to basic DecisionTree.
-# The performance of the three classifiers is very similar, but ObliqueDecisionTree and
-# ExtraObliqueDecisionTree have distinct decision boundaries.
+# The performance of the three classifiers is very similar, however, the ObliqueDecisionTree
+# and ExtraObliqueDecisionTree result in distinct decision boundaries.
