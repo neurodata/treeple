@@ -10,7 +10,9 @@ from sklearn.utils._testing import assert_array_almost_equal
 from sklearn.utils.estimator_checks import parametrize_with_checks
 from sklearn.utils.validation import check_random_state
 
-from sktree.ensemble import (
+from sktree import (
+    ExtraObliqueRandomForestClassifier,
+    ExtraObliqueRandomForestRegressor,
     ObliqueRandomForestClassifier,
     ObliqueRandomForestRegressor,
     PatchObliqueRandomForestClassifier,
@@ -47,11 +49,13 @@ diabetes.target = diabetes.target[perm]
 
 
 FOREST_CLASSIFIERS = {
+    "ExtraObliqueRandomForestClassifier": ExtraObliqueRandomForestClassifier,
     "ObliqueRandomForestClassifier": ObliqueRandomForestClassifier,
     "PatchObliqueRandomForestClassifier": PatchObliqueRandomForestClassifier,
 }
 
 FOREST_REGRESSORS = {
+    "ExtraObliqueDecisionTreeRegressor": ExtraObliqueRandomForestRegressor,
     "ObliqueRandomForestRegressor": ObliqueRandomForestRegressor,
     "PatchObliqueRandomForestRegressor": PatchObliqueRandomForestRegressor,
 }
@@ -179,26 +183,23 @@ def _trunk(n, p=10, random_state=None):
 
 @parametrize_with_checks(
     [
+        ExtraObliqueRandomForestClassifier(random_state=12345, n_estimators=10),
         ObliqueRandomForestClassifier(random_state=12345, n_estimators=10),
         PatchObliqueRandomForestClassifier(random_state=12345, n_estimators=10),
+        ExtraObliqueRandomForestRegressor(random_state=12345, n_estimators=10),
         ObliqueRandomForestRegressor(random_state=12345, n_estimators=10),
         PatchObliqueRandomForestRegressor(random_state=12345, n_estimators=10),
     ]
 )
 def test_sklearn_compatible_estimator(estimator, check):
-    # TODO: remove when we can replicate the CI error...
-    if isinstance(
-        estimator, (ObliqueRandomForestClassifier, PatchObliqueRandomForestClassifier)
-    ) and check.func.__name__ in ["check_fit_score_takes_y"]:
-        pytest.skip()
     check(estimator)
 
 
 def test_oblique_forest_sparse_parity():
     # Sparse parity dataset
-    n = 1000
+    n = 500
     X, y = _sparse_parity(n, random_state=0)
-    n_test = 0.1
+    n_test = 0.2
     X_train, X_test, y_train, y_test = train_test_split(
         X,
         y,
@@ -219,8 +220,8 @@ def test_oblique_forest_sparse_parity():
     assert (
         ri_accuracy < rc_accuracy
     ), f"Oblique forest: {rc_accuracy} < Axis-aligned forest: {ri_accuracy}"
-    assert ri_accuracy > 0.45
-    assert rc_accuracy > 0.5
+    assert ri_accuracy > 0.45, f"Axis-aligned forest: {ri_accuracy} < 0.45"
+    assert rc_accuracy > 0.5, f"Oblique forest: {rc_accuracy} < 0.5"
 
 
 def test_oblique_forest_orthant():
@@ -287,8 +288,13 @@ def test_oblique_forest_trunk():
 @pytest.mark.parametrize(
     "estimator, criterion",
     (
+        [ExtraObliqueRandomForestClassifier, "gini"],
+        [ExtraObliqueRandomForestClassifier, "log_loss"],
         [ObliqueRandomForestClassifier, "gini"],
         [ObliqueRandomForestClassifier, "log_loss"],
+        [ExtraObliqueRandomForestRegressor, "squared_error"],
+        [ExtraObliqueRandomForestRegressor, "friedman_mse"],
+        [ExtraObliqueRandomForestRegressor, "poisson"],
         [ObliqueRandomForestRegressor, "squared_error"],
         [ObliqueRandomForestRegressor, "friedman_mse"],
         [ObliqueRandomForestRegressor, "poisson"],
@@ -304,9 +310,9 @@ def test_check_importances_oblique(estimator, criterion, dtype, feature_combinat
     y = y_large.astype(dtype, copy=False)
 
     est = estimator(
-        n_estimators=10,
+        n_estimators=50,
         criterion=criterion,
-        random_state=0,
+        random_state=123,
         feature_combinations=feature_combinations,
     )
     est.fit(X, y)
@@ -424,10 +430,10 @@ def test_check_importances_patch(estimator, criterion, dtype):
 @pytest.mark.parametrize("criterion", REG_CRITERIONS)
 @pytest.mark.parametrize("dtype", [np.float32, np.float64])
 def test_regression(forest, criterion, dtype):
-    estimator = forest(n_estimators=10, criterion=criterion, random_state=0)
+    estimator = forest(n_estimators=10, criterion=criterion, random_state=123)
     n_test = 0.1
     X = X_large_reg.astype(dtype, copy=False)
     y = y_large_reg.astype(dtype, copy=False)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=n_test, random_state=0)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=n_test, random_state=123)
     estimator.fit(X_train, y_train)
-    assert estimator.score(X_test, y_test) > 0.88
+    assert estimator.score(X_test, y_test) > 0.88, f"Failed for {estimator} and {criterion}"

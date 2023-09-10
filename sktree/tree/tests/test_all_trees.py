@@ -7,6 +7,8 @@ from sklearn.datasets import make_blobs
 from sklearn.tree._tree import TREE_LEAF
 
 from sktree.tree import (
+    ExtraObliqueDecisionTreeClassifier,
+    ExtraObliqueDecisionTreeRegressor,
     ObliqueDecisionTreeClassifier,
     ObliqueDecisionTreeRegressor,
     PatchObliqueDecisionTreeClassifier,
@@ -16,8 +18,10 @@ from sktree.tree import (
 )
 
 ALL_TREES = [
+    ExtraObliqueDecisionTreeRegressor,
     ObliqueDecisionTreeRegressor,
     PatchObliqueDecisionTreeRegressor,
+    ExtraObliqueDecisionTreeClassifier,
     ObliqueDecisionTreeClassifier,
     PatchObliqueDecisionTreeClassifier,
     UnsupervisedDecisionTree,

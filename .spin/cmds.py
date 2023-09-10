@@ -1,5 +1,3 @@
-import contextlib
-import errno
 import os
 import shutil
 import subprocess
@@ -189,6 +187,6 @@ def asv(asv_args):
         print("No built scikit-tree found; run `spin build` first.")
         sys.exit(1)
 
-    os.environ['ASV_ENV_DIR'] = '/Users/adam2392/miniforge3'
-    os.environ['PYTHONPATH'] = f'{site_path}{os.sep}:{os.environ.get("PYTHONPATH", "")}'
-    util.run(['asv'] + list(asv_args))
+    os.environ["ASV_ENV_DIR"] = "/Users/adam2392/miniforge3"
+    os.environ["PYTHONPATH"] = f'{site_path}{os.sep}:{os.environ.get("PYTHONPATH", "")}'
+    util.run(["asv"] + list(asv_args))

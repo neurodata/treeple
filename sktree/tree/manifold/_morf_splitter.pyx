@@ -144,6 +144,7 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
         self.min_samples_leaf = min_samples_leaf
         self.min_weight_leaf = min_weight_leaf
         self.random_state = random_state
+        self.monotonic_cst = monotonic_cst
 
         # Sparse max_features x n_features projection matrix
         self.proj_mat_weights = vector[vector[DTYPE_t]](self.max_features)

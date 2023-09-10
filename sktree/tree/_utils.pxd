@@ -23,7 +23,7 @@ cpdef ravel_multi_index(SIZE_t[:] coords, const SIZE_t[:] shape)
 
 cdef void unravel_index_cython(SIZE_t index, const SIZE_t[:] shape, SIZE_t[:] coords) noexcept nogil
 
-cdef SIZE_t ravel_multi_index_cython(SIZE_t[:] coords, const SIZE_t[:] shape) nogil
+cdef SIZE_t ravel_multi_index_cython(SIZE_t[:] coords, const SIZE_t[:] shape) noexcept nogil
 
 cdef SIZE_t vector_hash(
     const vector[SIZE_t]& v
