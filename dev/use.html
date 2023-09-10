@@ -49,7 +49,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'use';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Plot honest forest calibrations on overlapping gaussian simulations" href="auto_examples/plot_overlapping_gaussians.html" />
+    <link rel="next" title="Compare extra oblique forest and oblique random forest predictions on cc18 datasets" href="auto_examples/plot_extra_oblique_random_forest.html" />
     <link rel="prev" title="Installation" href="install.html" />
     <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
     <script type="text/javascript" src="_static/copybutton.js"></script>
@@ -343,11 +343,14 @@ document.write(`
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/plot_extra_oblique_random_forest.html">Compare extra oblique forest and oblique random forest predictions on cc18 datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/plot_oblique_forests_iris.html">Compare the decision surfaces of oblique extra-trees with standard oblique trees</a></li>
 <li class="toctree-l1"><a class="reference internal" href="auto_examples/plot_overlapping_gaussians.html">Plot honest forest calibrations on overlapping gaussian simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="auto_examples/plot_oblique_random_forest.html">Plot oblique forest and axis-aligned random forest predictions on cc18 datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="auto_examples/plot_oblique_axis_aligned_forests_sparse_parity.html">Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="auto_examples/plot_iris_dtc.html">Plot the decision surface of decision trees trained on the iris dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="auto_examples/plot_projection_matrices.html">Plot the projection matrices of an oblique tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/plot_extra_orf_sample_size.html">Speed of Extra Oblique Random Forest vs Oblique Random Forest on different dataset sizes</a></li>
 </ul>
 </div>
 </nav></div>
@@ -409,7 +412,13 @@ to learn everything you need!</p>
 <section id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h2>
 <p>Examples demonstrating how to use scikit-tree algorithms.</p>
-<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Compare the prediction results of honest forests and random forests with various methods of cal..."><img alt="" src="_images/sphx_glr_plot_overlapping_gaussians_thumb.png" />
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="A performance comparison between extra oblique forest and standard oblique random forest using ..."><img alt="" src="_images/sphx_glr_plot_extra_oblique_random_forest_thumb.png" />
+<p><a class="reference internal" href="auto_examples/plot_extra_oblique_random_forest.html#sphx-glr-auto-examples-plot-extra-oblique-random-forest-py"><span class="std std-ref">Compare extra oblique forest and oblique random forest predictions on cc18 datasets</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Compare extra oblique forest and oblique random forest predictions on cc18 datasets</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Plot the decision surfaces of forests of randomized oblique trees trained on pairs of features ..."><img alt="" src="_images/sphx_glr_plot_oblique_forests_iris_thumb.png" />
+<p><a class="reference internal" href="auto_examples/plot_oblique_forests_iris.html#sphx-glr-auto-examples-plot-oblique-forests-iris-py"><span class="std std-ref">Compare the decision surfaces of oblique extra-trees with standard oblique trees</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Compare the decision surfaces of oblique extra-trees with standard oblique trees</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Compare the prediction results of honest forests and random forests with various methods of cal..."><img alt="" src="_images/sphx_glr_plot_overlapping_gaussians_thumb.png" />
 <p><a class="reference internal" href="auto_examples/plot_overlapping_gaussians.html#sphx-glr-auto-examples-plot-overlapping-gaussians-py"><span class="std std-ref">Plot honest forest calibrations on overlapping gaussian simulations</span></a></p>
   <div class="sphx-glr-thumbnail-title">Plot honest forest calibrations on overlapping gaussian simulations</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="A performance comparison between oblique forest and standard axis- aligned random forest using ..."><img alt="" src="_images/sphx_glr_plot_oblique_random_forest_thumb.png" />
@@ -424,6 +433,9 @@ to learn everything you need!</p>
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example shows how projection matrices are generated for an oblique tree, specifically the ..."><img alt="" src="_images/sphx_glr_plot_projection_matrices_thumb.png" />
 <p><a class="reference internal" href="auto_examples/plot_projection_matrices.html#sphx-glr-auto-examples-plot-projection-matrices-py"><span class="std std-ref">Plot the projection matrices of an oblique tree</span></a></p>
   <div class="sphx-glr-thumbnail-title">Plot the projection matrices of an oblique tree</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="A performance comparison between extra oblique forest and standard oblique random forest on dif..."><img alt="" src="_images/sphx_glr_plot_extra_orf_sample_size_thumb.png" />
+<p><a class="reference internal" href="auto_examples/plot_extra_orf_sample_size.html#sphx-glr-auto-examples-plot-extra-orf-sample-size-py"><span class="std std-ref">Speed of Extra Oblique Random Forest vs Oblique Random Forest on different dataset sizes</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Speed of Extra Oblique Random Forest vs Oblique Random Forest on different dataset sizes</div>
 </div></div><div class="toctree-wrapper compound">
 </div>
 <div class="sphx-glr-footer sphx-glr-footer-gallery docutils container">
@@ -459,11 +471,11 @@ to learn everything you need!</p>
       </div>
     </a>
     <a class="right-next"
-       href="auto_examples/plot_overlapping_gaussians.html"
+       href="auto_examples/plot_extra_oblique_random_forest.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Plot honest forest calibrations on overlapping gaussian simulations</p>
+        <p class="prev-next-title">Compare extra oblique forest and oblique random forest predictions on cc18 datasets</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
