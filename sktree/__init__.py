@@ -49,6 +49,8 @@ else:
             UnsupervisedObliqueRandomForest,
         )
         from .ensemble._supervised_forest import (
+            ExtraObliqueRandomForestClassifier,
+            ExtraObliqueRandomForestRegressor,
             ObliqueRandomForestClassifier,
             ObliqueRandomForestRegressor,
             PatchObliqueRandomForestClassifier,
@@ -66,6 +68,8 @@ else:
         "tree",
         "experimental",
         "ensemble",
+        "ExtraObliqueRandomForestClassifier",
+        "ExtraObliqueRandomForestRegressor",
         "NearestNeighborsMetaEstimator",
         "ObliqueRandomForestClassifier",
         "ObliqueRandomForestRegressor",
