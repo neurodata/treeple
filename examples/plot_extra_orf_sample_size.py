@@ -21,8 +21,8 @@ decision tree. For details of the algorithm, see [1]_.
 
 The datasets used in this example are from the OpenML benchmarking suite are:
 
-[Phishing Website](https://www.openml.org/search?type=data&sort=runs&id=4534),
-[har](https://www.openml.org/search?type=data&sort=runs&id=1478)
+* [Phishing Website](https://www.openml.org/search?type=data&sort=runs&id=4534)
+* [har](https://www.openml.org/search?type=data&sort=runs&id=1478)
 
 +------------------+---------+----------+----------+
 |      dataset     | samples | features | datatype |
@@ -33,15 +33,24 @@ The datasets used in this example are from the OpenML benchmarking suite are:
 +------------------+---------+----------+----------+
 
 .. note:: In the following example, the parameters `max_depth` and 'max_features` are
-set deliberately low in order to pass the CI test suit. For normal usage, these parameters
-should be set to appropriate values depending on the dataset. The default values are
-`max_depth=sqrt(n)` where `n` is the number of samples, `max_features` is set to the number
-of all features.
+    set deliberately low in order to pass the CI test suit. For normal usage, these parameters
+    should be set to appropriate values depending on the dataset. The default values are
+    `max_depth=sqrt(n)` where `n` is the number of samples, `max_features` is set to the number
+    of all features.
+
+Discussion
+----------
+In this section, the focus is on the time taken to train each model. The results show
+that extra oblique random forest is faster than standard oblique random forest on all
+datasets. Notably, the speed of extra oblique random forest and oblique random forest
+grows linearly with the increase in sample size but grows faster for the oblique random
+forest. The difference between the two models is more significant on datasets with higher
+dimensions.
 
 References
 ----------
-.. [1] P. Geurts, D. Ernst., and L. Wehenkel, "Extremely randomized trees",
-        Machine Learning, 63(1), 3-42, 2006.
+.. [1] P. Geurts, D. Ernst., and L. Wehenkel, "Extremely randomized trees", Machine Learning, 63(1),
+    3-42, 2006.
 """
 
 import argparse
@@ -190,13 +199,3 @@ for i, d_name in enumerate(d_names):
     sns.lineplot(data=df_tmp, x="n_row", y="time_taken", hue="model", color="dataset", ax=ax[i])
     ax[i].set_title(d_name)
 plt.show()
-
-
-# Discussion
-# ----------
-# In this section, the focus is on the time taken to train each model. The results show
-# that extra oblique random forest is faster than standard oblique random forest on all
-# datasets. Notably, the speed of extra oblique random forest and oblique random forest
-# grows linearly with the increase in sample size but grows faster for the oblique random
-# forest. The difference between the two models is more significant on datasets with higher
-# dimensions.

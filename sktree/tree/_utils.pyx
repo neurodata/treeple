@@ -145,4 +145,3 @@ cdef SIZE_t ravel_multi_index_cython(SIZE_t[:] coords, const SIZE_t[:] shape) no
             flat_index *= shape[i + 1]
 
     return flat_index
-

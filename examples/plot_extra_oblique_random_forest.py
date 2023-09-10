@@ -18,13 +18,14 @@ decision tree. For details of the algorithm, see [1]_.
 
 The datasets used in this example are from the OpenML benchmarking suite are:
 
-[Phishing Website](https://www.openml.org/search?type=data&sort=runs&id=4534),
-[WDBC](https://www.openml.org/search?type=data&sort=runs&id=1510),
-[Lsvt](https://www.openml.org/search?type=data&sort=runs&id=1484),
-[har](https://www.openml.org/search?type=data&sort=runs&id=1478), and
-[cnae-9](https://www.openml.org/search?type=data&sort=runs&id==1468).
+* [Phishing Website](https://www.openml.org/search?type=data&sort=runs&id=4534)
+* [WDBC](https://www.openml.org/search?type=data&sort=runs&id=1510)
+* [Lsvt](https://www.openml.org/search?type=data&sort=runs&id=1484)
+* [har](https://www.openml.org/search?type=data&sort=runs&id=1478)
+* [cnae-9](https://www.openml.org/search?type=data&sort=runs&id==1468)
+
 Large datasets are subsampled due to computational constraints. Note that `cnae-9` is
-an high dimensional dataset with very sparse 856 features, mostly consisting of zeros.
+an high dimensional dataset with very sparse 856 features, mostly consisting of zeros.\n
 +------------------+---------+----------+----------+
 |      dataset     | samples | features | datatype |
 +------------------+---------+----------+----------+
@@ -40,15 +41,27 @@ an high dimensional dataset with very sparse 856 features, mostly consisting of 
 +------------------+---------+----------+----------+
 
 .. note:: In the following example, the parameters `max_depth` and 'max_features` are
-set deliberately low in order to pass the CI test suit. For normal usage, these parameters
-should be set to appropriate values depending on the dataset. The default values are
-`max_depth=sqrt(n)` where `n` is the number of samples, `max_features` is set to the number
-of all features.
+    set deliberately low in order to pass the CI test suit. For normal usage, these parameters
+    should be set to appropriate values depending on the dataset. The default values are
+    `max_depth=sqrt(n)` where `n` is the number of samples, `max_features` is set to the number
+    of all features.
+
+Discussion
+----------
+Extra Oblique Tree demonstrates performance similar to that of regular Oblique Tree on average
+with some increase in variance.
+However, Extra Oblique Tree runs substantially faster than Oblique Tree on some datasets due to
+the random_splits process which omits the computationally expensive search for the best split.
+The main source of increase in speed stems from the omission of sample sorting steps during the
+splitting. In the standard oblique tree, samples are sorted in ascending order to determine the
+best split hence the complexity goes from `O(n\log(n))` to `O(n)`. In Extra Oblique Tree, samples
+are not sorted and the split is determined by randomly drawing a threshold from the feature's
+range. This makes the algorithm more suitable for large datasets.
 
 References
 ----------
-.. [1] P. Geurts, D. Ernst., and L. Wehenkel, "Extremely randomized trees",
-        Machine Learning, 63(1), 3-42, 2006.
+.. [1] P. Geurts, D. Ernst., and L. Wehenkel, "Extremely randomized trees", Machine Learning, 63(1),
+    3-42, 2006.
 """
 
 import argparse
@@ -213,16 +226,3 @@ for i, name in enumerate(d_names):
     ax[i].set_xlabel("")
 # show the figure
 plt.show()
-
-
-# Discussion
-# ----------
-# Extra Oblique Tree demonstrates performance similar to that of regular Oblique Tree on average
-# with some increase in variance.
-# However, Extra Oblique Tree runs substantially faster than Oblique Tree on some datasets due to
-# the random_splits process which omits the computationally expensive search for the best split.
-# The main source of increase in speed stems from the omission of sample sorting steps during the
-# splitting. In the standard oblique tree, samples are sorted in ascending order to determine the
-# best split hence the complexity goes from $O(n\log(n))$ to $O(n)$. In Extra Oblique Tree, samples
-# are not sorted and the split is determined by randomly drawing a threshold from the feature's
-# range. This makes the algorithm more suitable for large datasets.
