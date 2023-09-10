@@ -5,8 +5,7 @@ Speed of Extra Oblique Random Forest vs Oblique Random Forest on different datas
 
 A performance comparison between extra oblique forest and standard oblique random
 forest on different dataset sizes. The purpose of this comparison is to show the speed of
-changes for each models as dataset size increases. The datasets used in this example are
-from the OpenML dataset.
+changes for each models as dataset size increases. For more information, see [1]_.
 
 The datasets used in this example are from the OpenML benchmarking suite are:
 

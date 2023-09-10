@@ -25,19 +25,19 @@ Large datasets are subsampled due to computational constraints for running
 this example. Note that `cnae-9` is
 an high dimensional dataset with very sparse 856 features, mostly consisting of zeros.
 
-+------------------+------------+-------------+----------+
++------------------+-------------+--------------+----------+
 |     Dataset      |  # Samples  |  # Features  | Datatype |
-+==================+============+=============+==========+
-| Phishing Website |    2000    |      30     | nominal  |
-+------------------+------------+-------------+----------+
-|      WDBC        |    455     |      30     | numeric  |
-+------------------+------------+-------------+----------+
-|       Lsvt       |    100     |     310     | numeric  |
-+------------------+------------+-------------+----------+
-|        har       |    2000    |     561     | numeric  |
-+------------------+------------+-------------+----------+
-|      cnae-9      |    864     |     856     | numeric  |
-+------------------+------------+-------------+----------+
++==================+=============+==============+==========+
+| Phishing Website |    2000     |      30      | nominal  |
++------------------+-------------+--------------+----------+
+|      WDBC        |    455      |      30      | numeric  |
++------------------+-------------+--------------+----------+
+|       Lsvt       |    100      |     310      | numeric  |
++------------------+-------------+--------------+----------+
+|        har       |    2000     |     561      | numeric  |
++------------------+-------------+--------------+----------+
+|      cnae-9      |    864      |     856      | numeric  |
++------------------+-------------+--------------+----------+
 
 .. note:: In the following example, the parameters `max_depth` and 'max_features` are
     set deliberately low in order to allow the example to run in our CI test suite.
