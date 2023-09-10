@@ -8,17 +8,6 @@ forest on different dataset sizes. The purpose of this comparison is to show the
 changes for each models as dataset size increases. The datasets used in this example are
 from the OpenML dataset.
 
-Extra oblique forest uses extra oblique trees as base model which differ from classic
-decision trees in the way they are built. When looking for the best split to
-separate the samples of a node into two groups, random splits are drawn for each
-of the `max_features` randomly selected features and the best split among those is
-chosen. This is in contrast with the greedy approach, which evaluates the best possible
-threshold for each chosen split. Extra trees do not require computationally expensive
-evaluation and sorting steps at each split, which results in speeding up the training.
-
-When `max_features` is set 1, this amounts to building a totally random
-decision tree. For details of the algorithm, see [1]_.
-
 The datasets used in this example are from the OpenML benchmarking suite are:
 
 * [Phishing Website](https://www.openml.org/search?type=data&sort=runs&id=4534)
@@ -34,9 +23,7 @@ The datasets used in this example are from the OpenML benchmarking suite are:
 
 .. note:: In the following example, the parameters `max_depth` and 'max_features` are
     set deliberately low in order to pass the CI test suit. For normal usage, these parameters
-    should be set to appropriate values depending on the dataset. The default values are
-    `max_depth=sqrt(n)` where `n` is the number of samples, `max_features` is set to the number
-    of all features.
+    should be set to appropriate values depending on the dataset.
 
 Discussion
 ----------
@@ -53,7 +40,6 @@ References
     3-42, 2006.
 """
 
-import argparse
 from datetime import datetime
 
 import matplotlib.pyplot as plt
@@ -65,50 +51,13 @@ from sklearn.model_selection import RepeatedKFold, cross_validate
 
 from sktree import ExtraObliqueRandomForestClassifier, ObliqueRandomForestClassifier
 
-# Set up the argument parser
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "--max_depth",
-    type=int,
-    default=3,
-    action="store",
-    help="Maximum depth of the tree.",
-)
-parser.add_argument(
-    "--max_features",
-    type=int,
-    default=30,
-    action="store",
-    help="Maximum number of features to consider at each split.",
-)
-parser.add_argument(
-    "--max_sample_size",
-    type=int,
-    default=10000,
-    action="store",
-    help="Sample size cut off.",
-)
-parser.add_argument(
-    "--n_estimators",
-    type=int,
-    default=50,
-    action="store",
-    help="Number of trees in the forest.",
-)
-parser.add_argument(
-    "--random_state",
-    type=int,
-    default=123,
-    action="store",
-    help="Random state for reproducibility.",
-)
-args = parser.parse_args()
-# Parameters
-max_depth = args.max_depth
-max_features = args.max_features
-max_sample_size = args.max_sample_size
-random_state = args.random_state
-n_estimators = args.n_estimators
+# Model Parameters
+max_depth = 3
+max_features = "sqrt"
+max_sample_size = 10000
+random_state = 123
+n_estimators = 50
+
 # Datasets
 phishing_website = 4534
 har = 1478
@@ -183,9 +132,7 @@ for data_id in data_ids:
         df = pd.concat([df, tmp])
 df["n_row"] = [item[0] for item in df.dimension]
 # Show the time taken to train each model
-print(pd.DataFrame.from_dict(params, orient="index", columns=["value"]))
 df_tmp = df.groupby(["dataset", "n_row", "model"])[["time_taken"]].mean()
-print(df_tmp)
 
 # Draw a comparison plot
 d_names = df.dataset.unique()

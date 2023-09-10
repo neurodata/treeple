@@ -1,7 +1,7 @@
 """
-============================================================================
-Plot the decision surfaces of ensembles of oblique trees on the iris dataset
-============================================================================
+================================================================================
+Compare the decision surfaces of oblique extra-trees with standard oblique trees
+================================================================================
 
 Plot the decision surfaces of forests of randomized oblique trees trained on pairs of
 features of the iris dataset.
@@ -14,45 +14,33 @@ In the first row, the classifiers are built using the sepal width and
 the sepal length features only, on the second row using the petal length and
 sepal length only, and on the third row using the petal width and the
 petal length only.
-
 """
-import math
-from datetime import datetime
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.colors import ListedColormap
 from sklearn.datasets import load_iris
+from sklearn.tree import DecisionTreeClassifier
 
-from sktree.ensemble import ExtraObliqueRandomForestClassifier, ObliqueRandomForestClassifier
-from sktree.tree import ExtraObliqueDecisionTreeClassifier, ObliqueDecisionTreeClassifier
+from sktree import ExtraObliqueRandomForestClassifier, ObliqueRandomForestClassifier
 
 # Parameters
 n_classes = 3
 n_estimators = 50
 max_depth = 10
 random_state = 123
-
+RANDOM_SEED = 1234
 models = [
-    ObliqueDecisionTreeClassifier(max_depth=max_depth),
-    ExtraObliqueDecisionTreeClassifier(max_depth=max_depth),
-    ObliqueRandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth),
-    ExtraObliqueRandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth),
+    ExtraObliqueRandomForestClassifier(n_estimators=n_estimators, random_state=random_state),
+    ObliqueRandomForestClassifier(n_estimators=n_estimators, random_state=random_state),
 ]
 
 cmap = plt.cm.Spectral
 plot_step = 0.01  # fine step width for decision surface contours
 plot_step_coarser = 0.25  # step widths for coarse classifier guesses
-# figure size for plotting
-figure_size = (30, 30)
-pairs = [[0, 1], [0, 2], [1, 2], [1, 3], [2, 3]]
-N = len(pairs) * len(models)
 plot_idx = 1
-
 n_rows = 3
-fig, ax = plt.subplots(n_rows, math.ceil(N / n_rows))
-fig.set_size_inches(6 * N, 6)
+n_models = len(models)
 
 # Load data
 iris = load_iris()
@@ -62,17 +50,15 @@ feature_names = dict(zip(range(iris.data.shape[1]), iris.feature_names))
 # Create a dataframe to store the results from each run
 results = pd.DataFrame(columns=["model", "features", "score (sec)", "time"])
 
-for pair in pairs:
+for pair in ([0, 1], [0, 2], [2, 3]):
     for model in models:
         # We only take the two corresponding features
         X = iris.data[:, pair]
         y = iris.target
-        # starting time
-        t0 = datetime.now()
 
         # Shuffle
         idx = np.arange(X.shape[0])
-        np.random.seed(random_state)
+        np.random.seed(RANDOM_SEED)
         np.random.shuffle(idx)
         X = X[idx]
         y = y[idx]
@@ -91,21 +77,16 @@ for pair in pairs:
         model_title = str(type(model)).split(".")[-1][:-2][: -len("Classifier")]
 
         model_details = model_title
-        # add the results in the results dataframe
-        new_result = {
-            "model": model_title,
-            "features": feature_names[pair[0]] + ", " + feature_names[pair[1]],
-            "score (sec)": round(scores, 5),
-            "time": (datetime.now() - t0).total_seconds(),
-        }
-        results = pd.concat([results, pd.DataFrame(new_result, index=[0])], ignore_index=True)
+        if hasattr(model, "estimators_"):
+            model_details += " with {} estimators".format(len(model.estimators_))
+        print(model_details + " with features", pair, "has a score of", scores)
 
-        plt.subplot(len(pairs), len(models), plot_idx)
+        plt.subplot(n_rows, n_models, plot_idx)
         if plot_idx <= len(models):
             # Add a title at the top of each column
             plt.title(model_title, fontsize=9)
 
-        # Now plot the decision boundary using a fine mesh as input to
+        # Now plot the decision boundary using a fine mesh as input to a
         # filled contour plot
         x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
         y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
@@ -113,17 +94,20 @@ for pair in pairs:
 
         # Plot either a single DecisionTreeClassifier or alpha blend the
         # decision surfaces of the ensemble of classifiers
-        if isinstance(model, ObliqueDecisionTreeClassifier) or isinstance(
-            model, ExtraObliqueDecisionTreeClassifier
-        ):
+        if isinstance(model, DecisionTreeClassifier):
             Z = model.predict(np.c_[xx.ravel(), yy.ravel()])
             Z = Z.reshape(xx.shape)
             cs = plt.contourf(xx, yy, Z, cmap=cmap)
         else:
+            # Choose alpha blend level with respect to the number
+            # of estimators
+            # that are in use (noting that AdaBoost can use fewer estimators
+            # than its maximum if it achieves a good enough fit early on)
+            estimator_alpha = 1.0 / len(model.estimators_)
             for tree in model.estimators_:
                 Z = tree.predict(np.c_[xx.ravel(), yy.ravel()])
                 Z = Z.reshape(xx.shape)
-                cs = plt.contourf(xx, yy, Z, alpha=0.1, cmap=cmap)
+                cs = plt.contourf(xx, yy, Z, alpha=estimator_alpha, cmap=cmap)
 
         # Build a coarser grid to plot a set of ensemble classifications
         # to show how these are different to what we see in the decision
@@ -157,12 +141,9 @@ for pair in pairs:
         )
         plot_idx += 1  # move on to the next plot in sequence
 
-print("Results:")
-print(results)
-
 plt.suptitle("Classifiers on feature subsets of the Iris dataset", fontsize=12)
 plt.axis("tight")
-plt.tight_layout(h_pad=0.25, w_pad=0.25, pad=2.5)
+plt.tight_layout(h_pad=0.2, w_pad=0.2, pad=2.5)
 plt.show()
 
 # Discussion

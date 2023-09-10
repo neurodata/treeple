@@ -11,10 +11,7 @@ decision trees in the way they are built. When looking for the best split to
 separate the samples of a node into two groups, random splits are drawn for each
 of the `max_features` randomly selected features and the best split among those is
 chosen. This is in contrast with the greedy approach, which evaluates the best possible
-threshold for each chosen split.
-
-When `max_features` is set 1, this amounts to building a totally random
-decision tree. For details of the algorithm, see [1]_.
+threshold for each chosen split. For details of the original extra-tree, see [1]_.
 
 The datasets used in this example are from the OpenML benchmarking suite are:
 
@@ -24,39 +21,42 @@ The datasets used in this example are from the OpenML benchmarking suite are:
 * [har](https://www.openml.org/search?type=data&sort=runs&id=1478)
 * [cnae-9](https://www.openml.org/search?type=data&sort=runs&id==1468)
 
-Large datasets are subsampled due to computational constraints. Note that `cnae-9` is
-an high dimensional dataset with very sparse 856 features, mostly consisting of zeros.\n
-+------------------+---------+----------+----------+
-|      dataset     | samples | features | datatype |
-+------------------+---------+----------+----------+
-| Phishing Website |   2000  |    30    | nominal  |
-+------------------+---------+----------+----------+
-|        WDBC      |   455   |   30     | numeric  |
-+------------------+---------+----------+----------+
-|       Lsvt       |   100   |   310    | numeric  |
-+------------------+---------+----------+----------+
-|       har        |   2000  |   561    | numeric  |
-+------------------+---------+----------+----------+
-|       cnae-9     |   864   |   856    | numeric  |
-+------------------+---------+----------+----------+
+Large datasets are subsampled due to computational constraints for running
+this example. Note that `cnae-9` is
+an high dimensional dataset with very sparse 856 features, mostly consisting of zeros.
+
++------------------+------------+-------------+----------+
+|     Dataset      |  # Samples  |  # Features  | Datatype |
++==================+============+=============+==========+
+| Phishing Website |    2000    |      30     | nominal  |
++------------------+------------+-------------+----------+
+|      WDBC        |    455     |      30     | numeric  |
++------------------+------------+-------------+----------+
+|       Lsvt       |    100     |     310     | numeric  |
++------------------+------------+-------------+----------+
+|        har       |    2000    |     561     | numeric  |
++------------------+------------+-------------+----------+
+|      cnae-9      |    864     |     856     | numeric  |
++------------------+------------+-------------+----------+
 
 .. note:: In the following example, the parameters `max_depth` and 'max_features` are
-    set deliberately low in order to pass the CI test suit. For normal usage, these parameters
-    should be set to appropriate values depending on the dataset. The default values are
-    `max_depth=sqrt(n)` where `n` is the number of samples, `max_features` is set to the number
-    of all features.
+    set deliberately low in order to allow the example to run in our CI test suite.
+    For normal usage, these parameters should be set to appropriate values depending
+    on the dataset.
 
 Discussion
 ----------
 Extra Oblique Tree demonstrates performance similar to that of regular Oblique Tree on average
-with some increase in variance.
+with some increase in variance. See [1]_ for a detailed discussion on the bias-variance tradeoff
+of extra-trees vs normal trees.
+
 However, Extra Oblique Tree runs substantially faster than Oblique Tree on some datasets due to
-the random_splits process which omits the computationally expensive search for the best split.
-The main source of increase in speed stems from the omission of sample sorting steps during the
-splitting. In the standard oblique tree, samples are sorted in ascending order to determine the
-best split hence the complexity goes from `O(n\log(n))` to `O(n)`. In Extra Oblique Tree, samples
+the random split process which omits the computationally expensive search for the best split.
+The main source of increase in speed stems from the omission of sorting samples during the
+splitting of a node. In the standard trees, samples are sorted in ascending order to determine the
+best split hence the complexity is `O(n\log(n))`. In Extra trees, samples
 are not sorted and the split is determined by randomly drawing a threshold from the feature's
-range. This makes the algorithm more suitable for large datasets.
+range, hence the complexity is `O(n)`. This makes the algorithm more suitable for large datasets.
 
 References
 ----------
@@ -64,7 +64,6 @@ References
     3-42, 2006.
 """
 
-import argparse
 from datetime import datetime
 
 import matplotlib.pyplot as plt
@@ -75,50 +74,13 @@ from sklearn.model_selection import RepeatedKFold, cross_validate
 
 from sktree import ExtraObliqueRandomForestClassifier, ObliqueRandomForestClassifier
 
-# Set up the argument parser
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "--max_depth",
-    type=int,
-    default=3,
-    action="store",
-    help="Maximum depth of the tree.",
-)
-parser.add_argument(
-    "--max_features",
-    type=int,
-    default=30,
-    action="store",
-    help="Maximum number of features to consider at each split.",
-)
-parser.add_argument(
-    "--max_sample_size",
-    type=int,
-    default=2000,
-    action="store",
-    help="Sample size cut off.",
-)
-parser.add_argument(
-    "--n_estimators",
-    type=int,
-    default=50,
-    action="store",
-    help="Number of trees in the forest.",
-)
-parser.add_argument(
-    "--random_state",
-    type=int,
-    default=123,
-    action="store",
-    help="Random state for reproducibility.",
-)
-args = parser.parse_args()
-# Parameters
-max_depth = args.max_depth
-max_features = args.max_features
-max_sample_size = args.max_sample_size
-random_state = args.random_state
-n_estimators = args.n_estimators
+# Model parameters
+max_depth = 3
+max_features = "sqrt"
+max_sample_size = 2000
+random_state = 123
+n_estimators = 50
+
 # Datasets
 phishing_website = 4534
 wdbc = 1510
