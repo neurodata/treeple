@@ -2,6 +2,7 @@
 # cython: boundscheck=False
 # cython: wraparound=False
 # cython: initializedcheck=False
+# cython: cdivision=True
 
 import numpy as np
 
@@ -107,6 +108,14 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
     def __setstate__(self, d):
         pass
 
+    def __reduce__(self):
+        return (type(self), (self.criterion,
+                             self.max_features,
+                             self.min_samples_leaf,
+                             self.min_weight_leaf,
+                             self.random_state,
+                             self.feature_combinations), self.__getstate__())
+
     cdef int init(
         self,
         const DTYPE_t[:, :] X,
@@ -157,12 +166,44 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
         """Get size of a pointer to record for ObliqueSplitter."""
         return sizeof(ObliqueSplitRecord)
 
+    cdef inline void compute_features_over_samples(
+        self,
+        SIZE_t start,
+        SIZE_t end,
+        const SIZE_t[:] samples,
+        DTYPE_t[:] feature_values,
+        vector[DTYPE_t]* proj_vec_weights,  # weights of the vector (max_features,)
+        vector[SIZE_t]* proj_vec_indices    # indices of the features (max_features,)
+    ) noexcept nogil:
+        """Compute the feature values for the samples[start:end] range.
+
+        Returns -1 in case of failure to allocate memory (and raise MemoryError)
+        or 0 otherwise.
+        """
+        cdef SIZE_t idx, jdx
+        cdef SIZE_t col_idx
+        cdef DTYPE_t col_weight
+
+        # Compute linear combination of features and then
+        # sort samples according to the feature values.
+        for jdx in range(0, proj_vec_indices.size()):
+            col_idx = deref(proj_vec_indices)[jdx]
+            col_weight = deref(proj_vec_weights)[jdx]
+
+            for idx in range(start, end):
+                # initialize the feature value to 0
+                if jdx == 0:
+                    feature_values[idx] = 0.0
+                feature_values[idx] += self.X[samples[idx], col_idx] * col_weight
+
 
 cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
     # NOTE: vectors are passed by value, so & is needed to pass by reference
-    cdef void sample_proj_mat(self,
-                              vector[vector[DTYPE_t]]& proj_mat_weights,
-                              vector[vector[SIZE_t]]& proj_mat_indices) noexcept nogil:
+    cdef void sample_proj_mat(
+        self,
+        vector[vector[DTYPE_t]]& proj_mat_weights,
+        vector[vector[SIZE_t]]& proj_mat_indices
+    ) noexcept nogil:
         """
         Sparse Oblique Projection matrix.
         Randomly sample features to put in randomly sampled projection vectors
@@ -201,8 +242,14 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
             proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
             proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
 
-    cdef int node_split(self, double impurity, SplitRecord* split,
-                        SIZE_t* n_constant_features) except -1 nogil:
+    cdef int node_split(
+        self,
+        double impurity,
+        SplitRecord* split,
+        SIZE_t* n_constant_features,
+        double lower_bound,
+        double upper_bound,
+    ) except -1 nogil:
         """Find the best_split split on node samples[start:end]
 
         Returns -1 in case of failure to allocate memory (and raise MemoryError)
@@ -229,7 +276,6 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
         cdef double best_proxy_improvement = -INFINITY
 
         cdef SIZE_t feat_i, p       # index over computed features and start/end
-        cdef SIZE_t idx, jdx        # index over max_feature, and
         cdef SIZE_t partition_end
         cdef DTYPE_t temp_d         # to compute a projection feature value
 
@@ -245,7 +291,7 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
             if self.proj_mat_weights[feat_i].empty():
                 continue
 
-            # XXX: 'feature' is not actually used in oblique split records
+            # XXX: 'feature' is not actually used in oblique split records because it normally indicates the column
             # Just indicates which split was sampled
             current_split.feature = feat_i
             current_split.proj_vec_weights = &self.proj_mat_weights[feat_i]
@@ -253,21 +299,20 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
 
             # Compute linear combination of features and then
             # sort samples according to the feature values.
-            for idx in range(start, end):
-                # initialize the feature value to 0
-                feature_values[idx] = 0
-                for jdx in range(0, current_split.proj_vec_indices.size()):
-                    feature_values[idx] += self.X[
-                        samples[idx], deref(current_split.proj_vec_indices)[jdx]
-                    ] * deref(current_split.proj_vec_weights)[jdx]
+            self.compute_features_over_samples(
+                start,
+                end,
+                samples,
+                feature_values,
+                &self.proj_mat_weights[feat_i],
+                &self.proj_mat_indices[feat_i]
+            )
 
             # Sort the samples
             sort(&feature_values[start], &samples[start], end - start)
 
-            # initialize feature vector for criterion to evaluate
-            # GIL is needed since we are changing the criterion's internal memory
-            with gil:
-                self.criterion.init_feature_vec(feature_values)
+            # tell criterion to compute relevant statistics given the feature values
+            self.criterion.init_feature_vec()
 
             # Evaluate all splits
             self.criterion.reset()

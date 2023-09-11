@@ -1,0 +1,42 @@
+:orphan:
+
+.. include:: _contributors.rst
+
+.. _changes_0_2:
+
+What's new?
+===========
+
+Here we list a changelog of scikit-tree.
+
+.. contents:: Contents
+   :local:
+   :depth: 3
+
+.. currentmodule:: sktree
+
+.. _current:
+
+Version 0.2
+===========
+
+**In Development**
+
+
+Changelog
+---------
+- |Efficiency| Upgraded build process to rely on Cython 3.0+, by `Adam Li`_  (:pr:`109`)
+- |Feature| Allow decision trees to take advantage of ``partial_fit`` and ``monotonic_cst`` when available, by `Adam Li`_  (:pr:`109`)
+- |Feature| Implementation of  ExtraObliqueDecisionTreeClassifier, ExtraObliqueDecisionTreeRegressor by `SUKI-O`_ (:pr:`75`)
+- |Efficiency| Around 1.5-2x speed improvement for unsupervised forests, by `Adam Li`_  (:pr:`114`)
+- |API| Allow ``sqrt`` and ``log2`` keywords to be used for ``min_samples_split`` parameter in unsupervised forests, by `Adam Li`_  (:pr:`114`)
+- |Feature| Implement extended isolation forest, by `Adam Li`_ (:pr:`90`)
+
+Code and Documentation Contributors
+-----------------------------------
+
+Thanks to everyone who has contributed to the maintenance and improvement of
+the project since version inception, including:
+
+* `Adam Li`_
+* `SUKI-O`_

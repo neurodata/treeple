@@ -53,17 +53,17 @@ cdef class PatchSplitter(BaseObliqueSplitter):
 
     cdef public SIZE_t ndim                       # The number of dimensions of the input data
 
-    cdef SIZE_t[:] data_dims                      # The dimensions of the input data
-    cdef SIZE_t[:] min_patch_dims                 # The minimum size of the patch to sample in each dimension
-    cdef SIZE_t[:] max_patch_dims                 # The maximum size of the patch to sample in each dimension
-    cdef cnp.uint8_t[:] dim_contiguous            # A boolean array indicating whether each dimension is contiguous
+    cdef const SIZE_t[:] data_dims                      # The dimensions of the input data
+    cdef const SIZE_t[:] min_patch_dims                 # The minimum size of the patch to sample in each dimension
+    cdef const SIZE_t[:] max_patch_dims                 # The maximum size of the patch to sample in each dimension
+    cdef const cnp.uint8_t[:] dim_contiguous            # A boolean array indicating whether each dimension is contiguous
 
     # TODO: check if this works and is necessary for discontiguous data
     # cdef SIZE_t[:] stride_offsets                # The stride offsets for each dimension
     cdef bint _discontiguous
 
-    cdef str boundary                            # how to sample the patch with boundary in mind
-    cdef DTYPE_t[:, :] feature_weight               # Whether or not to normalize each column of X when adding in a patch
+    cdef bytes boundary                               # how to sample the patch with boundary in mind
+    cdef const DTYPE_t[:, :] feature_weight               # Whether or not to normalize each column of X when adding in a patch
 
     cdef SIZE_t[::1] _index_data_buffer
     cdef SIZE_t[::1] _index_patch_buffer
@@ -81,12 +81,12 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
         vector[vector[SIZE_t]]& proj_mat_indices
-    ) nogil
+    ) noexcept nogil
 
 
-cdef class UserKernelSplitter(PatchSplitter):
-    """A class to hold user-specified kernels."""
-    cdef vector[DTYPE_t[:, ::1]] kernel_dictionary  # A list of C-contiguous 2D kernels
+# cdef class UserKernelSplitter(PatchSplitter):
+#     """A class to hold user-specified kernels."""
+#     cdef vector[DTYPE_t[:, ::1]] kernel_dictionary  # A list of C-contiguous 2D kernels
 
 
 cdef class GaussianKernelSplitter(PatchSplitter):
@@ -101,4 +101,4 @@ cdef class GaussianKernelSplitter(PatchSplitter):
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,
         vector[vector[SIZE_t]]& proj_mat_indices
-    ) nogil
+    ) noexcept nogil

@@ -16,7 +16,8 @@ def get_git_revision_hash(submodule) -> str:
 @click.option("--build-dir", default="build", help="Build directory; default is `$PWD/build`")
 @click.option("--clean", is_flag=True, help="Clean previously built docs before building")
 @click.option("--noplot", is_flag=True, help="Build docs without plots")
-def docs(build_dir, clean=False, noplot=False):
+@click.pass_context
+def docs(ctx, build_dir, clean=False, noplot=False):
     """📖 Build documentation"""
     if clean:
         doc_dir = "./docs/_build"
@@ -31,12 +32,13 @@ def docs(build_dir, clean=False, noplot=False):
 
     util.run(["pip", "install", "-q", "-r", "doc_requirements.txt"])
 
-    os.environ["SPHINXOPTS"] = "-W"
-    os.environ["PYTHONPATH"] = f'{site_path}{os.sep}:{os.environ.get("PYTHONPATH", "")}'
-    if noplot:
-        util.run(["make", "-C", "docs", "clean", "html-noplot"], replace=True)
-    else:
-        util.run(["make", "-C", "docs", "clean", "html"], replace=True)
+    ctx.invoke(meson.docs)
+    # os.environ["SPHINXOPTS"] = "-W"
+    # os.environ["PYTHONPATH"] = f'{site_path}{os.sep}:{os.environ.get("PYTHONPATH", "")}'
+    # if noplot:
+    #     util.run(["make", "-C", "docs", "clean", "html-noplot"], replace=True)
+    # else:
+    #     util.run(["make", "-C", "docs", "clean", "html"], replace=True)
 
 
 @click.command()
@@ -48,9 +50,11 @@ def coverage(ctx):
 
 
 @click.command()
-@click.option("--forcesubmodule", is_flag=True, help="Force submodule pull.")
+@click.option("--forcesubmodule", is_flag=False, help="Force submodule pull.")
 def setup_submodule(forcesubmodule=False):
     """Build scikit-tree using submodules.
+
+    git submodule set-branch -b submodulev2 sktree/_lib/sklearn
 
     git submodule update --recursive --remote
 
@@ -63,7 +67,7 @@ def setup_submodule(forcesubmodule=False):
     This will update the submodule, which then must be commited so that
     git knows the submodule needs to be at a certain commit hash.
     """
-    commit_fpath = "./sktree/_lib/sklearn/commit.txt"
+    commit_fpath = "./sktree/_lib/sklearn_fork/commit.txt"
     submodule = "./sktree/_lib/sklearn_fork"
     commit = ""
     current_hash = ""
@@ -123,10 +127,11 @@ def setup_submodule(forcesubmodule=False):
             ]
         )
 
-        if os.path.exists("sktree/_lib/sklearn_fork/sklearn"):
+        if os.path.exists("sktree/_lib/sklearn_fork/sklearn") and (commit != current_hash):
             util.run(
                 [
-                    "mv",
+                    "cp",
+                    "-r",
                     "sktree/_lib/sklearn_fork/sklearn",
                     "sktree/_lib/sklearn",
                 ]
@@ -160,3 +165,26 @@ def build(ctx, meson_args, jobs=None, clean=False, forcesubmodule=False, verbose
 
     # run build as normal
     ctx.invoke(meson.build, meson_args=meson_args, jobs=jobs, clean=clean, verbose=verbose)
+
+
+@click.command()
+@click.argument("asv_args", nargs=-1)
+def asv(asv_args):
+    """🏃 Run `asv` to collect benchmarks
+
+    ASV_ARGS are passed through directly to asv, e.g.:
+
+    spin asv -- dev -b TransformSuite
+
+    ./spin asv -- continuous --verbose --split --bench ObliqueRandomForest origin/main constantsv2
+
+    Please see CONTRIBUTING.txt
+    """
+    site_path = meson._get_site_packages()
+    if site_path is None:
+        print("No built scikit-tree found; run `spin build` first.")
+        sys.exit(1)
+
+    os.environ["ASV_ENV_DIR"] = "/Users/adam2392/miniforge3"
+    os.environ["PYTHONPATH"] = f'{site_path}{os.sep}:{os.environ.get("PYTHONPATH", "")}'
+    util.run(["asv"] + list(asv_args))

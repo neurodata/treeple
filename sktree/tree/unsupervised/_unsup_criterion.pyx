@@ -1,6 +1,9 @@
 # distutils: language = c++
 # cython: language_level=3
-# cython: boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
+# cython: boundscheck=False
+# cython: wraparound=False
+# cython: initializedcheck=False
+# cython: cdivision=True
 
 cimport numpy as cnp
 import numpy as np
@@ -9,6 +12,7 @@ from libc.math cimport log
 cnp.import_array()
 
 cdef DTYPE_t PI = np.pi
+
 
 cdef class UnsupervisedCriterion(BaseCriterion):
     """Abstract criterion for unsupervised learning.
@@ -22,6 +26,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
     This object stores methods on how to calculate how good a split is using
     different metrics for unsupervised splitting.
     """
+
     def __cinit__(self):
         """Initialize attributes for unsupervised criterion.
         """
@@ -39,12 +44,15 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         self.sum_left = 0.0
         self.sum_right = 0.0
 
+        self.sumsq_total = 0.0
+        self.sumsq_left = 0.0
+        self.sumsq_right = 0.0
+
     def __reduce__(self):
         return (type(self), (), self.__getstate__())
 
     cdef void init_feature_vec(
         self,
-        const DTYPE_t[:] Xf,
     ) noexcept nogil:
         """Initialize the 1D feature vector, which is used for computing criteria.
 
@@ -59,15 +67,22 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         Xf : array-like, dtype=DTYPE_t
             The read-only memoryview 1D feature vector with (n_samples,) shape.
         """
-        self.Xf = Xf
-
         # also compute the sum total
         self.sum_total = 0.0
+        self.sumsq_total = 0.0
         self.weighted_n_node_samples = 0.0
         cdef SIZE_t s_idx
         cdef SIZE_t p_idx
 
+        # XXX: this can be further optimized by computing a cumulative sum hash map of the sum_total and sumsq_total
+        # and then update will never have to iterate through even
         cdef DOUBLE_t w = 1.0
+
+        # cdef SIZE_t prev_s_idx = -1
+        # self.cumsum_of_squares_map[prev_s_idx] = 0.0
+        # self.cumsum_map[prev_s_idx] = 0.0
+        # self.cumsum_weights_map[prev_s_idx] = 0.0
+
         for p_idx in range(self.start, self.end):
             s_idx = self.sample_indices[p_idx]
 
@@ -76,7 +91,8 @@ cdef class UnsupervisedCriterion(BaseCriterion):
             if self.sample_weight is not None:
                 w = self.sample_weight[s_idx]
 
-            self.sum_total += self.Xf[s_idx] * w
+            self.sum_total += self.feature_values[s_idx] * w
+            self.sumsq_total += self.feature_values[s_idx] * self.feature_values[s_idx] * w * w
             self.weighted_n_node_samples += w
 
         # Reset to pos=start
@@ -84,6 +100,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
 
     cdef int init(
         self,
+        const DTYPE_t[:] feature_values,
         const DOUBLE_t[:] sample_weight,
         double weighted_n_samples,
         const SIZE_t[:] sample_indices,
@@ -95,6 +112,8 @@ cdef class UnsupervisedCriterion(BaseCriterion):
 
         Parameters
         ----------
+        feature_values : array-like, dtype=DTYPE_t
+            The memoryview 1D feature vector with (n_samples,) shape.
         sample_weight : array-like, dtype=DOUBLE_t
             The weight of each sample (i.e. row of X).
         weighted_n_samples : double
@@ -102,6 +121,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         sample_indices : array-like, dtype=SIZE_t
             A mask on the sample_indices, showing which ones we want to use
         """
+        self.feature_values = feature_values
         self.sample_weight = sample_weight
         self.weighted_n_samples = weighted_n_samples
         self.sample_indices = sample_indices
@@ -120,6 +140,9 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         self.weighted_n_right = self.weighted_n_node_samples
         self.sum_left = 0.0
         self.sum_right = self.sum_total
+
+        self.sumsq_left = 0.0
+        self.sumsq_right = self.sumsq_total
         return 0
 
     cdef int reverse_reset(self) except -1 nogil:
@@ -134,6 +157,9 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         self.weighted_n_right = 0.0
         self.sum_right = 0.0
         self.sum_left = self.sum_total
+
+        self.sumsq_right = 0.0
+        self.sumsq_left = self.sumsq_total
         return 0
 
     cdef int update(
@@ -167,7 +193,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         #   sum_left[x] +  sum_right[x] = sum_total[x]
         # and that sum_total is known, we are going to update
         # sum_left from the direction that require the least amount
-        # of computations, i.e. from pos to new_pos or from end to new_po.
+        # of computations, i.e. from pos to new_pos or from end to new_pos.
         if (new_pos - pos) <= (end - new_pos):
             for p in range(pos, new_pos):
                 i = sample_indices[p]
@@ -177,8 +203,8 @@ cdef class UnsupervisedCriterion(BaseCriterion):
 
                 # accumulate the values of the feature vectors weighted
                 # by the sample weight
-                self.sum_left += self.Xf[i] * w
-
+                self.sum_left += self.feature_values[i] * w
+                self.sumsq_left += self.feature_values[i] * self.feature_values[i] * w * w
                 # keep track of the weighted count of each sample
                 self.weighted_n_left += w
         else:
@@ -190,15 +216,15 @@ cdef class UnsupervisedCriterion(BaseCriterion):
                 if sample_weight is not None:
                     w = sample_weight[i]
 
-                self.sum_left -= self.Xf[i] * w
-
+                self.sum_left -= self.feature_values[i] * w
+                self.sumsq_left -= self.feature_values[i] * self.feature_values[i] * w * w
                 self.weighted_n_left -= w
 
         # Update right part statistics
         self.weighted_n_right = (self.weighted_n_node_samples -
                                  self.weighted_n_left)
         self.sum_right = self.sum_total - self.sum_left
-
+        self.sumsq_right = self.sumsq_total - self.sumsq_left
         self.pos = new_pos
         return 0
 
@@ -220,12 +246,10 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         self,
         SIZE_t start,
         SIZE_t end
-    ) nogil:
+    ) noexcept nogil:
         """Set sample pointers in the criterion.
 
-        Set given start and end sample_indices. Also will update node statistics,
-        such as the `sum_total`, which tracks the total value within the current
-        node for sample_indices[start:end].
+        Set given start and end sample_indices for a given node.
 
         Parameters
         ----------
@@ -288,42 +312,26 @@ cdef class TwoMeans(UnsupervisedCriterion):
     pair minimizes the splitting criteria described in the following
     section
     """
-
     cdef double node_impurity(
         self
-    ) nogil:
+    ) noexcept nogil:
         """Evaluate the impurity of the current node.
 
         Evaluate the TwoMeans criterion impurity as variance of the current node,
         i.e. the variance of Xf[sample_indices[start:end]]. The smaller the impurity the
         better.
         """
-        cdef double mean
         cdef double impurity
 
-        # If calling without setting the
-        if self.Xf is None:
-            with gil:
-                raise MemoryError(
-                    'Xf has not been set yet, so one must call init_feature_vec.'
-                )
-
-        # first compute mean
-        mean = self.sum_total / self.weighted_n_node_samples
-
         # then compute the impurity as the variance
-        impurity = self.sum_of_squares(
-            self.start,
-            self.end,
-            mean
-        ) / self.weighted_n_node_samples
+        impurity = self.fast_variance(self.weighted_n_node_samples, self.sumsq_total, self.sum_total)
         return impurity
 
     cdef void children_impurity(
         self,
         double* impurity_left,
         double* impurity_right
-    ) nogil:
+    ) noexcept nogil:
         """Evaluate the impurity in children nodes.
 
         i.e. the impurity of the left child (sample_indices[start:pos]) and the
@@ -342,65 +350,20 @@ cdef class TwoMeans(UnsupervisedCriterion):
         impurity_right : double pointer
             The memory address to save the impurity of the right node
         """
-        cdef SIZE_t pos = self.pos
-        cdef SIZE_t start = self.start
-        cdef SIZE_t end = self.end
-
-        # first compute mean of left and right
-        mean_left = self.sum_left / self.weighted_n_left
-        mean_right = self.sum_right / self.weighted_n_right
-
         # set values at the address pointer is pointing to with the variance
         # of the left and right child
-        impurity_left[0] = self.sum_of_squares(
-            start,
-            pos,
-            mean_left
-        ) / self.weighted_n_left
-        impurity_right[0] = self.sum_of_squares(
-            pos,
-            end,
-            mean_right
-        ) / self.weighted_n_right
+        impurity_left[0] = self.fast_variance(self.weighted_n_left, self.sumsq_left, self.sum_left)
+        impurity_right[0] = self.fast_variance(self.weighted_n_right, self.sumsq_right, self.sum_right)
 
-    cdef double sum_of_squares(
+    cdef inline double fast_variance(
         self,
-        SIZE_t start,
-        SIZE_t end,
-        double mean,
+        double weighted_n_node_samples,
+        double sumsq_total,
+        double sum_total
     ) noexcept nogil:
-        """Computes variance of feature vector from sample_indices[start:end].
+        return (1. / weighted_n_node_samples) * \
+            ((sumsq_total) - (1. / weighted_n_node_samples) * (sum_total * sum_total))
 
-        See: https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Weighted_sample_variance.  # noqa
-
-        Parameters
-        ----------
-        start : SIZE_t
-            The start pointer
-        end : SIZE_t
-            The end pointer.
-        mean : double
-            The precomputed mean.
-
-        Returns
-        -------
-        ss : double
-            Sum of squares
-        """
-        cdef SIZE_t s_idx, p_idx        # initialize sample and pointer index
-        cdef double ss = 0.0            # sum-of-squares
-        cdef DOUBLE_t w = 1.0           # optional weight
-
-        # calculate variance for the sample_indices chosen start:end
-        for p_idx in range(start, end):
-            s_idx = self.sample_indices[p_idx]
-
-            # include optional weighted sum of squares
-            if self.sample_weight is not None:
-                w = self.sample_weight[s_idx]
-
-            ss += w * (self.Xf[s_idx] - mean) * (self.Xf[s_idx] - mean)
-        return ss
 
 cdef class FastBIC(TwoMeans):
     r"""Fast-BIC split criterion
@@ -432,9 +395,12 @@ cdef class FastBIC(TwoMeans):
     Additionally, Fast-BIC is substantially faster than the traditional BIC method.
 
     Reference: https://arxiv.org/abs/1907.02844
-
     """
-    cdef double bic_cluster(self, SIZE_t n_samples, double variance) noexcept nogil:
+    cdef inline double bic_cluster(
+        self,
+        SIZE_t n_samples,
+        double variance
+    ) noexcept nogil:
         """Help compute the BIC from assigning to a specific cluster.
 
         Parameters
@@ -458,12 +424,10 @@ cdef class FastBIC(TwoMeans):
         variance of the cluster itself, or the estimated combined variance
         from both clusters.
         """
-        cdef SIZE_t n_node_samples = self.n_node_samples
-
         # chances of choosing the cluster based on how many samples are hard-assigned to cluster
         # i.e. the prior
         # cast to double, so we do not round to integers
-        cdef double w_cluster = (n_samples + 0.0) / n_node_samples
+        cdef double w_cluster = (n_samples + 0.0) / self.n_node_samples
 
         # add to prevent taking log of 0 when there is a degenerate cluster (i.e. single sample, or no variance)
         return -2. * (n_samples * log(w_cluster) + 0.5 * n_samples * log(2. * PI * variance + 1.e-7))
@@ -478,32 +442,16 @@ cdef class FastBIC(TwoMeans):
         Namely, this is the maximum likelihood of Xf[sample_indices[start:end]].
         The smaller the impurity the better.
         """
-        cdef double mean
         cdef double variance
         cdef double impurity
-        cdef SIZE_t n_node_samples = self.n_node_samples
-
-        # If calling without setting the
-        if self.Xf is None:
-            with gil:
-                raise MemoryError(
-                    'Xf has not been set yet, so one must call init_feature_vec.'
-                )
-
-        # first compute mean
-        mean = self.sum_total / self.weighted_n_node_samples
 
         # then compute the variance of the cluster
-        variance = self.sum_of_squares(
-            self.start,
-            self.end,
-            mean
-        ) / self.weighted_n_node_samples
+        variance = self.fast_variance(self.weighted_n_node_samples, self.sumsq_total, self.sum_total)
 
         # Compute the BIC of the current set of samples
         # Note: we do not compute the BIC_diff_var and BIC_same_var because
         # they are equivalent in the single cluster setting
-        impurity = self.bic_cluster(n_node_samples, variance)
+        impurity = self.bic_cluster(self.n_node_samples, variance)
         return impurity
 
     cdef void children_impurity(
@@ -528,8 +476,7 @@ cdef class FastBIC(TwoMeans):
         cdef SIZE_t end = self.end
         cdef SIZE_t n_samples_left, n_samples_right
 
-        cdef double mean_left, mean_right
-        cdef double ss_left, ss_right, variance_left, variance_right, variance_comb
+        cdef double variance_left, variance_right, variance_comb
         cdef double BIC_diff_var_left, BIC_diff_var_right
         cdef double BIC_same_var_left, BIC_same_var_right
         cdef double BIC_same_var, BIC_diff_var
@@ -538,26 +485,12 @@ cdef class FastBIC(TwoMeans):
         n_samples_left = pos - start
         n_samples_right = end - pos
 
-        # first compute mean of left and right
-        mean_left = self.sum_left / self.weighted_n_left
-        mean_right = self.sum_right / self.weighted_n_right
-
         # compute the estimated variance of the left and right children
-        ss_left = self.sum_of_squares(
-            start,
-            pos,
-            mean_left
-        )
-        ss_right = self.sum_of_squares(
-            pos,
-            end,
-            mean_right
-        )
-        variance_left = ss_left / self.weighted_n_left
-        variance_right = ss_right / self.weighted_n_right
+        variance_left = self.fast_variance(self.weighted_n_left, self.sumsq_left, self.sum_left)
+        variance_right = self.fast_variance(self.weighted_n_right, self.sumsq_right, self.sum_right)
 
         # compute the estimated combined variance
-        variance_comb = (ss_left + ss_right) / (self.weighted_n_left + self.weighted_n_right)
+        variance_comb = (self.sumsq_left + self.sumsq_right) / (self.weighted_n_left + self.weighted_n_right)
 
         # Compute the BIC using different variances for left and right
         BIC_diff_var_left = self.bic_cluster(n_samples_left, variance_left)

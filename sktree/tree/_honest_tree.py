@@ -4,15 +4,15 @@
 from copy import deepcopy
 
 import numpy as np
-from sklearn.base import MetaEstimatorMixin
-from sklearn.utils.multiclass import check_classification_targets
+from sklearn.base import ClassifierMixin, MetaEstimatorMixin, _fit_context
+from sklearn.utils.multiclass import _check_partial_fit_first_call, check_classification_targets
 from sklearn.utils.validation import check_is_fitted, check_X_y
 
 from sktree._lib.sklearn.tree import DecisionTreeClassifier
 from sktree._lib.sklearn.tree._classes import BaseDecisionTree
 
 
-class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
+class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree):
     """
     A decision tree classifier with honest predictions.
 
@@ -132,6 +132,23 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
         subtree with the largest cost complexity that is smaller than
         ``ccp_alpha`` will be chosen. By default, no pruning is performed. See
         :ref:`minimal_cost_complexity_pruning` for details.
+
+    monotonic_cst : array-like of int of shape (n_features), default=None
+        Indicates the monotonicity constraint to enforce on each feature.
+          - 1: monotonic increase
+          - 0: no constraint
+          - -1: monotonic decrease
+
+        If monotonic_cst is None, no constraints are applied.
+
+        Monotonicity constraints are not supported for:
+          - multiclass classifications (i.e. when `n_classes > 2`),
+          - multioutput classifications (i.e. when `n_outputs_ > 1`),
+          - classifications trained on data with missing values.
+
+        The constraints hold over the probability of the positive class.
+
+        Read more in the :ref:`User Guide <monotonic_cst_gbdt>`.
 
     tree_estimator : object, default=None
         Instatiated tree of type BaseDecisionTree.
@@ -262,6 +279,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
         min_impurity_decrease=0.0,
         class_weight=None,
         ccp_alpha=0.0,
+        monotonic_cst=None,
         tree_estimator=None,
         honest_fraction=0.5,
         honest_prior="empirical",
@@ -281,8 +299,191 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
         self.ccp_alpha = ccp_alpha
         self.honest_fraction = honest_fraction
         self.honest_prior = honest_prior
+        self.monotonic_cst = monotonic_cst
 
-    def fit(self, X, y, sample_weight=None, check_input=True):
+        # XXX: to enable this, we need to also reset the leaf node samples during `_set_leaf_nodes`
+        self.store_leaf_values = False
+
+    @_fit_context(prefer_skip_nested_validation=True)
+    def fit(
+        self,
+        X,
+        y,
+        sample_weight=None,
+        check_input=True,
+        classes=None,
+    ):
+        """Build a decision tree classifier from the training set (X, y).
+
+        Parameters
+        ----------
+        X : {array-like, sparse matrix} of shape (n_samples, n_features)
+            The training input samples. Internally, it will be converted to
+            ``dtype=np.float32`` and if a sparse matrix is provided
+            to a sparse ``csc_matrix``.
+
+        y : array-like of shape (n_samples,) or (n_samples, n_outputs)
+            The target values (class labels) as integers or strings.
+
+        sample_weight : array-like of shape (n_samples,), default=None
+            Sample weights. If None, then samples are equally weighted. Splits
+            that would create child nodes with net zero or negative weight are
+            ignored while searching for a split in each node. Splits are also
+            ignored if they would result in any single class carrying a
+            negative weight in either child node.
+
+        check_input : bool, default=True
+            Allow to bypass several input checking.
+            Don't use this parameter unless you know what you're doing.
+
+        classes : array-like of shape (n_classes,), default=None
+            List of all the classes that can possibly appear in the y vector.
+            Must be provided at the first call to partial_fit, can be omitted
+            in subsequent calls.
+
+        Returns
+        -------
+        self : HonestTreeClassifier
+            Fitted estimator.
+        """
+        self._fit(
+            X,
+            y,
+            sample_weight=sample_weight,
+            check_input=check_input,
+            classes=classes,
+        )
+        return self
+
+    def partial_fit(self, X, y, sample_weight=None, check_input=True, classes=None):
+        """Update a decision tree classifier from the training set (X, y).
+
+        Parameters
+        ----------
+        X : {array-like, sparse matrix} of shape (n_samples, n_features)
+            The training input samples. Internally, it will be converted to
+            ``dtype=np.float32`` and if a sparse matrix is provided
+            to a sparse ``csc_matrix``.
+
+        y : array-like of shape (n_samples,) or (n_samples, n_outputs)
+            The target values (class labels) as integers or strings.
+
+        sample_weight : array-like of shape (n_samples,), default=None
+            Sample weights. If None, then samples are equally weighted. Splits
+            that would create child nodes with net zero or negative weight are
+            ignored while searching for a split in each node. Splits are also
+            ignored if they would result in any single class carrying a
+            negative weight in either child node.
+
+        check_input : bool, default=True
+            Allow to bypass several input checking.
+            Don't use this parameter unless you know what you do.
+
+        classes : array-like of shape (n_classes,), default=None
+            List of all the classes that can possibly appear in the y vector.
+            Must be provided at the first call to partial_fit, can be omitted
+            in subsequent calls.
+
+        Returns
+        -------
+        self : HonestTreeClassifier
+            Fitted estimator.
+        """
+        self._validate_params()
+
+        # validate input parameters
+        first_call = _check_partial_fit_first_call(self, classes=classes)
+
+        # Fit if no tree exists yet
+        if first_call:
+            self._fit(
+                X,
+                y,
+                sample_weight=sample_weight,
+                check_input=check_input,
+                classes=classes,
+            )
+            return self
+
+        rng = np.random.default_rng(self.random_state)
+
+        if sample_weight is None:
+            _sample_weight = np.ones((X.shape[0],), dtype=np.float64)
+        else:
+            _sample_weight = np.array(sample_weight)
+
+        nonzero_indices = np.where(_sample_weight > 0)[0]
+
+        self.structure_indices_ = rng.choice(
+            nonzero_indices,
+            int((1 - self.honest_fraction) * len(nonzero_indices)),
+            replace=False,
+        )
+        self.honest_indices_ = np.setdiff1d(nonzero_indices, self.structure_indices_)
+
+        _sample_weight[self.honest_indices_] = 0
+
+        self.estimator_.partial_fit(
+            X,
+            y,
+            sample_weight=_sample_weight,
+            check_input=check_input,
+            classes=classes,
+        )
+        self._inherit_estimator_attributes()
+
+        # update the number of classes, unsplit
+        if y.ndim == 1:
+            # reshape is necessary to preserve the data contiguity against vs
+            # [:, np.newaxis] that does not.
+            y = np.reshape(y, (-1, 1))
+        check_classification_targets(y)
+        y = np.copy(y)  # .astype(int)
+
+        # Normally called by super
+        X = self.estimator_._validate_X_predict(X, True)
+
+        # Fit leaves using other subsample
+        honest_leaves = self.tree_.apply(X[self.honest_indices_])
+
+        # preserve from underlying tree
+        self._tree_classes_ = self.classes_
+        self._tree_n_classes_ = self.n_classes_
+        self.classes_ = []
+        self.n_classes_ = []
+        self.empirical_prior_ = []
+
+        y_encoded = np.zeros(y.shape, dtype=int)
+        for k in range(self.n_outputs_):
+            classes_k, y_encoded[:, k] = np.unique(y[:, k], return_inverse=True)
+            self.classes_.append(classes_k)
+            self.n_classes_.append(classes_k.shape[0])
+            self.empirical_prior_.append(
+                np.bincount(y_encoded[:, k], minlength=classes_k.shape[0]) / y.shape[0]
+            )
+        y = y_encoded
+
+        # y-encoded ensures that y values match the indices of the classes
+        self._set_leaf_nodes(honest_leaves, y)
+
+        self.n_classes_ = np.array(self.n_classes_, dtype=np.intp)
+        if self.n_outputs_ == 1:
+            self.n_classes_ = self.n_classes_[0]
+            self.classes_ = self.classes_[0]
+            self.empirical_prior_ = self.empirical_prior_[0]
+            y = y[:, 0]
+
+        return self
+
+    def _fit(
+        self,
+        X,
+        y,
+        sample_weight=None,
+        check_input=True,
+        missing_values_in_feature_mask=None,
+        classes=None,
+    ):
         """Build an honest tree classifier from the training set (X, y).
 
         Parameters
@@ -306,6 +507,9 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
             Allow to bypass several input checking.
             Don't use this parameter unless you know what you do.
 
+        classes : array-like of shape (n_classes,), default=None
+            List of all the classes that can possibly appear in the y vector.
+
         Returns
         -------
         self : HonestTreeClassifier
@@ -313,7 +517,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
         """
         rng = np.random.default_rng(self.random_state)
         if check_input:
-            X, y = check_X_y(X, y)
+            X, y = check_X_y(X, y, multi_output=True)
 
         # Account for bootstrapping too
         if sample_weight is None:
@@ -346,17 +550,21 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
                 random_state=self.random_state,
                 min_impurity_decrease=self.min_impurity_decrease,
                 ccp_alpha=self.ccp_alpha,
+                monotonic_cst=self.monotonic_cst,
+                store_leaf_values=self.store_leaf_values,
             )
         else:
             # XXX: maybe error out if the tree_estimator is already fitted
             self.estimator_ = deepcopy(self.tree_estimator)
 
         # Learn structure on subsample
-        self.estimator_.fit(
+        self.estimator_._fit(
             X,
             y,
             sample_weight=_sample_weight,
             check_input=check_input,
+            missing_values_in_feature_mask=missing_values_in_feature_mask,
+            classes=classes,
         )
         self._inherit_estimator_attributes()
 
@@ -366,9 +574,11 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
             # [:, np.newaxis] that does not.
             y = np.reshape(y, (-1, 1))
         check_classification_targets(y)
-        y = np.copy(y).astype(int)
+        y = np.copy(y)  # .astype(int)
+
         # Normally called by super
         X = self.estimator_._validate_X_predict(X, True)
+
         # Fit leaves using other subsample
         honest_leaves = self.tree_.apply(X[self.honest_indices_])
 
@@ -527,5 +737,6 @@ class HonestTreeClassifier(MetaEstimatorMixin, BaseDecisionTree):
         y : array-like of shape (n_samples,) or (n_samples, n_outputs)
             The predicted classes, or the predict values.
         """
+        check_is_fitted(self)
         X = self._validate_X_predict(X, check_input)
         return self.estimator_.predict(X, False)
