@@ -180,7 +180,7 @@ class ExtendedIsolationForest(IsolationForest):
         contamination="auto",
         max_features=1.0,
         bootstrap=False,
-        feature_combinations=2,
+        feature_combinations=None,
         n_jobs=None,
         random_state=None,
         verbose=0,

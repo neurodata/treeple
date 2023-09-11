@@ -61,7 +61,7 @@ plt.show()
 # Training of the model
 # ---------------------
 
-extended_clf = ExtendedIsolationForest(max_samples=100, random_state=0)
+extended_clf = ExtendedIsolationForest(max_samples=100, random_state=0, feature_combinations=2)
 extended_clf.fit(X_train)
 
 clf = IsolationForest(max_samples=100, random_state=0)
@@ -139,7 +139,9 @@ plt.show()
 
 # %%
 
-extended_clf = ExtendedIsolationForest(max_samples=100, random_state=0, n_estimators=200)
+extended_clf = ExtendedIsolationForest(
+    max_samples=100, random_state=0, n_estimators=200, feature_combinations=2
+)
 extended_clf.fit(X)
 
 clf = IsolationForest(max_samples=100, random_state=0, n_estimators=200)
