@@ -90,6 +90,17 @@ The trees that comprise those forests are also available as standalone classes.
    tree.UnsupervisedDecisionTree
    tree.UnsupervisedObliqueDecisionTree
 
+Outlier Detection
+-----------------
+Isolation forests are a model implemented in scikit-learn, which is an ensemble of 
+extremely randomized axis-aligned decision tree models. Extended isolation forests
+replaces the base tree model with an oblique tree, which allows a more flexible model
+for detecting outliers.
+
+.. autosummary::
+   :toctree: generated/
+
+   ExtendedIsolationForest
 
 Distance Metrics
 ----------------

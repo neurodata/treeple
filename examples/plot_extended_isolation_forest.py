@@ -25,8 +25,13 @@ Isolation Forest trained on a toy dataset.
 # whereas the outliers (created with :func:`numpy.random.uniform`) are assigned
 # the label `-1`.
 
+import matplotlib.pyplot as plt
 import numpy as np
+from sklearn.ensemble import IsolationForest
+from sklearn.inspection import DecisionBoundaryDisplay
 from sklearn.model_selection import train_test_split
+
+from sktree.ensemble import ExtendedIsolationForest
 
 n_samples, n_outliers = 120, 40
 rng = np.random.RandomState(0)
@@ -43,8 +48,6 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y, random_sta
 # %%
 # We can visualize the resulting clusters:
 
-import matplotlib.pyplot as plt
-
 scatter = plt.scatter(X[:, 0], X[:, 1], c=y, s=20, edgecolor="k")
 handles, labels = scatter.legend_elements()
 plt.axis("square")
@@ -55,10 +58,6 @@ plt.show()
 # %%
 # Training of the model
 # ---------------------
-
-from sklearn.ensemble import IsolationForest
-
-from sktree.ensemble import ExtendedIsolationForest
 
 extended_clf = ExtendedIsolationForest(max_samples=100, random_state=0)
 extended_clf.fit(X_train)
@@ -75,10 +74,7 @@ clf.fit(X_train)
 # whether a sample in that given area is predicted to be an outlier
 # or not. The scatter plot displays the true labels.
 
-import matplotlib.pyplot as plt
-from sklearn.inspection import DecisionBoundaryDisplay
-
-for model in [clf, extended_clf]:
+for name, model in zip(["IsoForest", "ExtendedIsoForest"], [clf, extended_clf]):
     disp = DecisionBoundaryDisplay.from_estimator(
         model,
         X,
@@ -86,7 +82,7 @@ for model in [clf, extended_clf]:
         alpha=0.5,
     )
     disp.ax_.scatter(X[:, 0], X[:, 1], c=y, s=20, edgecolor="k")
-    disp.ax_.set_title("Binary decision boundary \nof IsolationForest")
+    disp.ax_.set_title(f"Binary decision boundary \nof {name}")
     plt.axis("square")
     plt.legend(handles=handles, labels=["outliers", "inliers"], title="true class")
     plt.show()
@@ -107,7 +103,7 @@ for model in [clf, extended_clf]:
 # the measure of normality is close to `0`. Similarly, large paths correspond to
 # values close to `1` and are more likely to be inliers.
 
-for model in [clf, extended_clf]:
+for name, model in zip(["IsoForest", "ExtendedIsoForest"], [clf, extended_clf]):
     disp = DecisionBoundaryDisplay.from_estimator(
         model,
         X,
@@ -115,7 +111,7 @@ for model in [clf, extended_clf]:
         alpha=0.5,
     )
     disp.ax_.scatter(X[:, 0], X[:, 1], c=y, s=20, edgecolor="k")
-    disp.ax_.set_title("Path length decision boundary \nof IsolationForest")
+    disp.ax_.set_title(f"Path length decision boundary \nof {name}")
     plt.axis("square")
     plt.legend(handles=handles, labels=["outliers", "inliers"], title="true class")
     plt.colorbar(disp.ax_.collections[1])
@@ -140,3 +136,66 @@ plt.ylim([-3.0, 3.0])
 plt.show()
 
 # %%
+
+extended_clf = ExtendedIsolationForest(max_samples=100, random_state=0)
+extended_clf.fit(X)
+
+clf = IsolationForest(max_samples=100, random_state=0)
+clf.fit(X)
+
+# %%
+# Plot discrete decision boundary
+
+for name, model in zip(["IsoForest", "ExtendedIsoForest"], [clf, extended_clf]):
+    disp = DecisionBoundaryDisplay.from_estimator(
+        model,
+        X,
+        response_method="decision_function",
+        alpha=0.5,
+    )
+    disp.ax_.scatter(X[:, 0], X[:, 1], c=y, s=15, edgecolor="k")
+    disp.ax_.set_title(f"Path length decision boundary \nof {name}")
+    plt.colorbar(disp.ax_.collections[1])
+    plt.show()
+
+# %%
+# Visualize the prediction of each tree within the forest
+# -------------------------------------------------------
+#
+# We can visualize the prediction of each tree within the forest by using a
+# circle plot and showing the depth at which each tree isolates a given sample.
+# Here, we will evaluate two samples in the sinusoidal plot: one inlier and one
+# outlier. The inlier is located at the center of the sinusoidal and the outlier
+# is located at the bottom right corner of the plot.
+
+outlier_sample = np.array([10.0, 0.0])
+inlier_sample = np.array([0.0, 0.0])
+
+for name, model in zip(["IsoForest", "ExtendedIsoForest"], [clf, extended_clf]):
+    theta = np.linspace(0, 2 * np.pi, len(model.estimators_))
+    max_tree_depth = max([model.estimators_[i].get_depth() for i in range(len(model.estimators_))])
+
+    fig, ax = plt.subplots()
+
+    # get the depth of each samples
+    for sample in [outlier_sample, inlier_sample]:
+        radii = []
+
+        for i in range(len(model.estimators_)):
+            depth = model.estimators_[i].get_depth()
+            radii.append(depth)
+
+        radii = np.array(radii) / max_tree_depth
+        radii = np.sort(radii)
+
+        for j in range(len(radii)):
+            ax.plot([theta[j], theta[j]], [1, radii[j]], color="r", alpha=0.9, lw=1.3)
+
+    ax.set(
+        title=f"{name}\nNominal: Mean={0:.3f}, Var={1:.3f}\nAnomaly: Mean={2:.3f}, Var={3:.3f}".format(
+            np.mean(radii_in), np.var(radii_in), np.mean(radii_out), np.var(radii_out)
+        ),
+        xlabel="Anomaly",
+        ylim=[0, max_tree_depth],
+    )
+    ax.set_xticklabels([])

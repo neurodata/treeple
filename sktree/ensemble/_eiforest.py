@@ -1,7 +1,7 @@
 from sklearn.ensemble._bagging import BaseBagging
 from sklearn.ensemble._iforest import IsolationForest
 
-from sktree.tree import ExtraObliqueTreeRegressor
+from sktree.tree import ExtraObliqueDecisionTreeRegressor
 
 
 class ExtendedIsolationForest(IsolationForest):
@@ -58,6 +58,10 @@ class ExtendedIsolationForest(IsolationForest):
         If True, individual trees are fit on random subsets of the training
         data sampled with replacement. If False, sampling without replacement
         is performed.
+
+    feature_combinations : int, default=2
+        The number of features to on average combine to consider at each split.
+        For more information, see :class:`~sktree.tree.ExtraObliqueDecisionTreeRegressor`.
 
     n_jobs : int, default=None
         The number of jobs to run in parallel for both :meth:`fit` and
@@ -177,14 +181,18 @@ class ExtendedIsolationForest(IsolationForest):
         contamination="auto",
         max_features=1.0,
         bootstrap=False,
+        feature_combinations=2,
         n_jobs=None,
         random_state=None,
         verbose=0,
         warm_start=False,
     ):
-        super(BaseBagging, self).__init__(
-            estimator=ExtraObliqueTreeRegressor(
-                max_features=1, splitter="random", random_state=random_state
+        super(IsolationForest, self).__init__(
+            estimator=ExtraObliqueDecisionTreeRegressor(
+                feature_combinations=feature_combinations,
+                max_features=1,
+                splitter="random",
+                random_state=random_state,
             ),
             # here above max_features has no links with self.max_features
             bootstrap=bootstrap,
@@ -198,4 +206,5 @@ class ExtendedIsolationForest(IsolationForest):
             verbose=verbose,
         )
 
+        self.feature_combinations = feature_combinations
         self.contamination = contamination
