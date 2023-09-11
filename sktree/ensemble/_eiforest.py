@@ -1,4 +1,3 @@
-from sklearn.ensemble._bagging import BaseBagging
 from sklearn.ensemble._iforest import IsolationForest
 
 from sktree.tree import ExtraObliqueDecisionTreeRegressor

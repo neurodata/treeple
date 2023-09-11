@@ -25,6 +25,8 @@ Isolation Forest trained on a toy dataset.
 # whereas the outliers (created with :func:`numpy.random.uniform`) are assigned
 # the label `-1`.
 
+from copy import copy
+
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.ensemble import IsolationForest
@@ -137,10 +139,10 @@ plt.show()
 
 # %%
 
-extended_clf = ExtendedIsolationForest(max_samples=100, random_state=0)
+extended_clf = ExtendedIsolationForest(max_samples=100, random_state=0, n_estimators=200)
 extended_clf.fit(X)
 
-clf = IsolationForest(max_samples=100, random_state=0)
+clf = IsolationForest(max_samples=100, random_state=0, n_estimators=200)
 clf.fit(X)
 
 # %%
@@ -168,34 +170,50 @@ for name, model in zip(["IsoForest", "ExtendedIsoForest"], [clf, extended_clf]):
 # outlier. The inlier is located at the center of the sinusoidal and the outlier
 # is located at the bottom right corner of the plot.
 
-outlier_sample = np.array([10.0, 0.0])
-inlier_sample = np.array([0.0, 0.0])
+inlier_sample = np.array([10.0, 0.0])
+outlier_sample = np.array([-5.0, -3.0])
 
 for name, model in zip(["IsoForest", "ExtendedIsoForest"], [clf, extended_clf]):
     theta = np.linspace(0, 2 * np.pi, len(model.estimators_))
     max_tree_depth = max([model.estimators_[i].get_depth() for i in range(len(model.estimators_))])
 
-    fig, ax = plt.subplots()
+    fig = plt.figure()
+    ax = plt.subplot(111, projection="polar")
+
+    radii_in = []
+    radii_out = []
 
     # get the depth of each samples
-    for sample in [outlier_sample, inlier_sample]:
-        radii = []
-
+    for radii, sample, color, lw, alpha in zip(
+        [radii_in, radii_out], [inlier_sample, outlier_sample], ["b", "r"], [1, 1.3], [1, 0.9]
+    ):
         for i in range(len(model.estimators_)):
-            depth = model.estimators_[i].get_depth()
+            # get the max depth of this tree
+            max_depth_tree = model.estimators_[i].get_depth()
+
+            leaf_index = model.estimators_[i].apply(sample.reshape(1, -1))
+            # get the depth of each tree's leaf node for this sample
+            depth = model._decision_path_lengths[i][leaf_index].squeeze()
             radii.append(depth)
 
-        radii = np.array(radii) / max_tree_depth
-        radii = np.sort(radii)
-
+        radii = np.array(radii)
+        radii = np.sort(radii) / max_tree_depth
         for j in range(len(radii)):
-            ax.plot([theta[j], theta[j]], [1, radii[j]], color="r", alpha=0.9, lw=1.3)
+            ax.plot([theta[j], theta[j]], [0, radii[j]], color=color, alpha=alpha, lw=lw)
+
+        if color == "b":
+            radii_in = copy(radii)
+        else:
+            radii_out = copy(radii)
 
     ax.set(
-        title=f"{name}\nNominal: Mean={0:.3f}, Var={1:.3f}\nAnomaly: Mean={2:.3f}, Var={3:.3f}".format(
-            np.mean(radii_in), np.var(radii_in), np.mean(radii_out), np.var(radii_out)
-        ),
+        title=f"{name}\nNominal: Mean={np.mean(radii_in).round(3)}, "
+        f"Var={np.var(radii_in).round(3)}\n"
+        f"Anomaly: Mean={np.mean(radii_out).round(3)}, Var={np.var(radii_out).round(3)}",
         xlabel="Anomaly",
-        ylim=[0, max_tree_depth],
     )
     ax.set_xticklabels([])
+    ax.axes.get_xaxis().set_visible(False)
+    ax.axes.get_yaxis().set_visible(False)
+    fig.tight_layout()
+    plt.show()
