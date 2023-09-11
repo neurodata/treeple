@@ -26,7 +26,6 @@ Isolation Forest trained on a toy dataset.
 # the label `-1`.
 
 import numpy as np
-
 from sklearn.model_selection import train_test_split
 
 n_samples, n_outliers = 120, 40
@@ -37,9 +36,7 @@ cluster_2 = 0.3 * rng.randn(n_samples, 2) + np.array([-2, -2])  # spherical
 outliers = rng.uniform(low=-4, high=4, size=(n_outliers, 2))
 
 X = np.concatenate([cluster_1, cluster_2, outliers])
-y = np.concatenate(
-    [np.ones((2 * n_samples), dtype=int), -np.ones((n_outliers), dtype=int)]
-)
+y = np.concatenate([np.ones((2 * n_samples), dtype=int), -np.ones((n_outliers), dtype=int)])
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y, random_state=42)
 
@@ -60,6 +57,7 @@ plt.show()
 # ---------------------
 
 from sklearn.ensemble import IsolationForest
+
 from sktree.ensemble import ExtendedIsolationForest
 
 extended_clf = ExtendedIsolationForest(max_samples=100, random_state=0)
@@ -78,7 +76,6 @@ clf.fit(X_train)
 # or not. The scatter plot displays the true labels.
 
 import matplotlib.pyplot as plt
-
 from sklearn.inspection import DecisionBoundaryDisplay
 
 for model in [clf, extended_clf]:
@@ -129,16 +126,16 @@ for model in [clf, extended_clf]:
 # Produce 2-D dataset with a sinusoidal shape and Gaussian noise added on top.
 
 N = 1000
-x = np.random.rand(N)*8*np.pi
-y = np.sin(x) + np.random.randn(N)/4.
-X=np.array([x,y]).T
+x = np.random.rand(N) * 8 * np.pi
+y = np.sin(x) + np.random.randn(N) / 4.0
+X = np.array([x, y]).T
 
-fig=plt.figure(figsize=(6,6))
+fig = plt.figure(figsize=(6, 6))
 fig.add_subplot(111)
-plt.plot(X[:,0],X[:,1],'o', color=[0.5,0.5,0.5])
+plt.plot(X[:, 0], X[:, 1], "o", color=[0.5, 0.5, 0.5])
 
-plt.xlim([-5,30])
-plt.ylim([-3.,3.])
+plt.xlim([-5, 30])
+plt.ylim([-3.0, 3.0])
 
 plt.show()
 
