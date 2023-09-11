@@ -1,5 +1,6 @@
 import numpy as np
 from joblib import Parallel, delayed
+from scipy.stats import entropy
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import train_test_split
 
@@ -126,6 +127,7 @@ class MIRF_AUC:
         self,
         x,
         y,
+        stat="AUC",
         workers=1,
         test_size=0.2,
         initial=True,
@@ -143,7 +145,16 @@ class MIRF_AUC:
         )
 
         posterior_final = forest_pos(posterior, y)
-        self.stat = roc_auc_score(posterior_final[:, 0], posterior_final[:, 1], max_fpr=self.limit)
+
+        if stat == "AUC":
+            self.stat = roc_auc_score(
+                posterior_final[:, 0], posterior_final[:, 1], max_fpr=self.limit
+            )
+        elif stat == "MI":
+            H_YX = np.mean(entropy(posterior_final[:, 1], base=np.exp(1), axis=1))
+            _, counts = np.unique(posterior_final[:, 0], return_counts=True)
+            H_Y = entropy(counts, base=np.exp(1))
+            self.stat = max(H_Y - H_YX, 0)
 
         if return_pos:
             return self.stat, posterior
@@ -208,6 +219,7 @@ class MIRF_MV:
         self,
         x,
         y,
+        stat="AUC",
         workers=1,
         test_size=0.2,
         initial=True,
@@ -224,14 +236,17 @@ class MIRF_MV:
             for tree in (self.clf.estimators_)
         )
 
-        # Average all posteriors
-        posterior_final = np.nanmean(posterior, axis=0)
+        posterior_final = forest_pos(posterior, y)
 
-        # Ignore all NaN values (samples not tested)
-        true_final = y.ravel()[~np.isnan(posterior_final)]
-        posterior_final = posterior_final[~np.isnan(posterior_final)]
-
-        self.stat = roc_auc_score(true_final, posterior_final, max_fpr=self.limit)
+        if stat == "AUC":
+            self.stat = roc_auc_score(
+                posterior_final[:, 0], posterior_final[:, 1], max_fpr=self.limit
+            )
+        elif stat == "MI":
+            H_YX = np.mean(entropy(posterior_final[:, 1], base=np.exp(1), axis=1))
+            _, counts = np.unique(posterior_final[:, 0], return_counts=True)
+            H_Y = entropy(counts, base=np.exp(1))
+            self.stat = max(H_Y - H_YX, 0)
 
         if return_pos:
             return self.stat, posterior
