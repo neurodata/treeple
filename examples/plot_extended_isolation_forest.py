@@ -4,10 +4,11 @@ ExtendedIsolationForest example
 ===============================
 
 An example using :class:`~sktree.ExtendedIsolationForest` for anomaly
-detection, which compares to the :class:`~sklearn.ensemble.IsolationForest`.
+detection, which compares to the :class:`~sklearn.ensemble.IsolationForest` based
+on the algorithm in :footcite:`hariri2019extended`.
 
 In the present example we demo two ways to visualize the decision boundary of an
-Isolation Forest trained on a toy dataset.
+Extended Isolation Forest trained on a toy dataset.
 
 """
 
@@ -219,3 +220,9 @@ for name, model in zip(["IsoForest", "ExtendedIsoForest"], [clf, extended_clf]):
     ax.axes.get_yaxis().set_visible(False)
     fig.tight_layout()
     plt.show()
+
+# %%
+# References
+# ----------
+#
+# .. footbibliography::
