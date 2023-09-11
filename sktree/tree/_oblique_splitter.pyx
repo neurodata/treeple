@@ -7,12 +7,10 @@
 import numpy as np
 
 from cython.operator cimport dereference as deref
-from libcpp.algorithm cimport sort as stdsort
 from libcpp.vector cimport vector
 from sklearn.tree._utils cimport rand_int, rand_uniform
 
 from .._lib.sklearn.tree._criterion cimport Criterion
-from ._utils cimport vector_hash
 
 
 cdef double INFINITY = np.inf
@@ -528,7 +526,7 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
 
             # increment the mtry
             n_visited_features += 1
-            
+
             # Evaluate all splits
             self.criterion.reset()
             p = start
