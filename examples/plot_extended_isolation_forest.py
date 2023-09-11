@@ -3,7 +3,7 @@
 ExtendedIsolationForest example
 ===============================
 
-An example using :class:`~sktree.ensemble.ExtendedIsolationForest` for anomaly
+An example using :class:`~sktree.ExtendedIsolationForest` for anomaly
 detection, which compares to the :class:`~sklearn.ensemble.IsolationForest`.
 
 In the present example we demo two ways to visualize the decision boundary of an
@@ -33,7 +33,7 @@ from sklearn.ensemble import IsolationForest
 from sklearn.inspection import DecisionBoundaryDisplay
 from sklearn.model_selection import train_test_split
 
-from sktree.ensemble import ExtendedIsolationForest
+from sktree import ExtendedIsolationForest
 
 n_samples, n_outliers = 120, 40
 rng = np.random.RandomState(0)

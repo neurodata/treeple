@@ -60,7 +60,7 @@ class ExtendedIsolationForest(IsolationForest):
 
     feature_combinations : int, default=2
         The number of features to on average combine to consider at each split.
-        For more information, see :class:`~sktree.tree.ExtraObliqueDecisionTreeRegressor`.
+        For more information, see `ExtraObliqueDecisionTreeRegressor`.
 
     n_jobs : int, default=None
         The number of jobs to run in parallel for both :meth:`fit` and
