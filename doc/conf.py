@@ -169,6 +169,7 @@ numpydoc_xref_aliases = {
     "ObliqueDecisionTreeRegressor": "sktree.tree.ObliqueDecisionTreeRegressor",
     "PatchObliqueDecisionTreeRegressor": "sktree.tree.PatchObliqueDecisionTreeRegressor",
     "UnsupervisedObliqueRandomForest": "sktree.ensemble.UnsupervisedObliqueRandomForest",
+    "ExtraObliqueDecisionTreeRegressor": "sktree.tree.ExtraObliqueDecisionTreeRegressor",
     "DecisionTreeClassifier": "sklearn.tree.DecisionTreeClassifier",
     "DecisionTreeRegressor": "sklearn.tree.DecisionTreeRegressor",
     "ExtraTreeRegressor": "sklearn.tree.ExtraTreeRegressor",
@@ -228,6 +229,7 @@ numpydoc_xref_ignore = {
     "one",
     "joblib.parallel_backend",
     "length",
+    "instances",
 }
 
 # validation

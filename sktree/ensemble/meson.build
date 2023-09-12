@@ -3,6 +3,7 @@ python_sources = [
   '_supervised_forest.py',
   '_unsupervised_forest.py',
   '_honest_forest.py',
+  '_eiforest.py'
 ]
 
 py3.install_sources(
