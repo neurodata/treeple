@@ -8,7 +8,7 @@ import numpy as np
 
 from cython.operator cimport dereference as deref
 from libcpp.vector cimport vector
-from sklearn.tree._utils cimport rand_int
+from sklearn.tree._utils cimport rand_int, rand_uniform
 
 from .._lib.sklearn.tree._criterion cimport Criterion
 
@@ -31,59 +31,13 @@ cdef inline void _init_split(ObliqueSplitRecord* self, SIZE_t start_pos) noexcep
     self.threshold = 0.
     self.improvement = -INFINITY
 
+
 cdef class BaseObliqueSplitter(Splitter):
     """Abstract oblique splitter class.
 
     Splitters are called by tree builders to find the best_split splits on
     both sparse and dense data, one split at a time.
     """
-    def __cinit__(
-        self,
-        Criterion criterion,
-        SIZE_t max_features,
-        SIZE_t min_samples_leaf,
-        double min_weight_leaf,
-        object random_state,
-        const cnp.int8_t[:] monotonic_cst,
-        *argv
-    ):
-        """
-        Parameters
-        ----------
-        criterion : Criterion
-            The criterion to measure the quality of a split.
-
-        max_features : SIZE_t
-            The maximal number of randomly selected features which can be
-            considered for a split.
-
-        min_samples_leaf : SIZE_t
-            The minimal number of samples each leaf can have, where splits
-            which would result in having less samples in a leaf are not
-            considered.
-
-        min_weight_leaf : double
-            The minimal weight each leaf can have, where the weight is the sum
-            of the weights of each sample in it.
-
-        random_state : object
-            The user inputted random state to be used for pseudo-randomness
-        """
-        self.criterion = criterion
-
-        self.n_samples = 0
-        self.n_features = 0
-
-        # Max features = output dimensionality of projection vectors
-        self.max_features = max_features
-        self.min_samples_leaf = min_samples_leaf
-        self.min_weight_leaf = min_weight_leaf
-        self.random_state = random_state
-
-        # Sparse max_features x n_features projection matrix
-        self.proj_mat_weights = vector[vector[DTYPE_t]](self.max_features)
-        self.proj_mat_indices = vector[vector[SIZE_t]](self.max_features)
-
     def __getstate__(self):
         return {}
 
@@ -354,6 +308,22 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         random_state : object
             The user inputted random state to be used for pseudo-randomness
         """
+        self.criterion = criterion
+
+        self.n_samples = 0
+        self.n_features = 0
+
+        # Max features = output dimensionality of projection vectors
+        self.max_features = max_features
+        self.min_samples_leaf = min_samples_leaf
+        self.min_weight_leaf = min_weight_leaf
+        self.random_state = random_state
+        self.monotonic_cst = monotonic_cst
+
+        # Sparse max_features x n_features projection matrix
+        self.proj_mat_weights = vector[vector[DTYPE_t]](self.max_features)
+        self.proj_mat_indices = vector[vector[SIZE_t]](self.max_features)
+
         # Oblique tree parameters
         self.feature_combinations = feature_combinations
 
@@ -444,7 +414,6 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
             proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
             proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
 
-
 cdef class BestObliqueSplitter(ObliqueSplitter):
     def __reduce__(self):
         """Enable pickling the splitter."""
@@ -458,3 +427,228 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
                     self.monotonic_cst.base if self.monotonic_cst is not None else None,
                     self.feature_combinations,
                 ), self.__getstate__())
+
+cdef class RandomObliqueSplitter(ObliqueSplitter):
+    def __reduce__(self):
+        """Enable pickling the splitter."""
+        return (type(self),
+                (
+                    self.criterion,
+                    self.max_features,
+                    self.min_samples_leaf,
+                    self.min_weight_leaf,
+                    self.random_state,
+                    self.monotonic_cst.base if self.monotonic_cst is not None else None,
+                    self.feature_combinations,
+                ), self.__getstate__())
+
+    cdef inline void find_min_max(
+        self,
+        DTYPE_t[::1] feature_values,
+        DTYPE_t* min_feature_value_out,
+        DTYPE_t* max_feature_value_out,
+    ) noexcept nogil:
+        """Find the minimum and maximum value for current_feature."""
+        cdef:
+            DTYPE_t current_feature_value
+            DTYPE_t min_feature_value = INFINITY
+            DTYPE_t max_feature_value = -INFINITY
+            SIZE_t start = self.start
+            SIZE_t end = self.end
+            SIZE_t p
+
+        for p in range(start, end):
+            current_feature_value = feature_values[p]
+            if current_feature_value < min_feature_value:
+                min_feature_value = current_feature_value
+            elif current_feature_value > max_feature_value:
+                max_feature_value = current_feature_value
+
+        min_feature_value_out[0] = min_feature_value
+        max_feature_value_out[0] = max_feature_value
+
+    cdef inline SIZE_t partition_samples(self, double current_threshold) noexcept nogil:
+        """Partition samples for feature_values at the current_threshold."""
+        cdef:
+            SIZE_t p = self.start
+            SIZE_t partition_end = self.end
+            SIZE_t[::1] samples = self.samples
+            DTYPE_t[::1] feature_values = self.feature_values
+
+        while p < partition_end:
+            if feature_values[p] <= current_threshold:
+                p += 1
+            else:
+                partition_end -= 1
+
+                feature_values[p], feature_values[partition_end] = (
+                    feature_values[partition_end], feature_values[p]
+                )
+                samples[p], samples[partition_end] = samples[partition_end], samples[p]
+
+        return partition_end
+
+    # overwrite the node_split method with random threshold selection
+    cdef int node_split(
+        self,
+        double impurity,
+        SplitRecord* split,
+        SIZE_t* n_constant_features,
+        double lower_bound,
+        double upper_bound,
+    ) except -1 nogil:
+        """Find the best_split split on node samples[start:end]
+
+        Returns -1 in case of failure to allocate memory (and raise MemoryError)
+        or 0 otherwise.
+        """
+        # typecast the pointer to an ObliqueSplitRecord
+        cdef ObliqueSplitRecord* oblique_split = <ObliqueSplitRecord*>(split)
+
+        # Draw random splits and pick the best_split
+        cdef SIZE_t[::1] samples = self.samples
+        cdef SIZE_t start = self.start
+        cdef SIZE_t end = self.end
+        cdef UINT32_t* random_state = &self.rand_r_state
+
+        # pointer array to store feature values to split on
+        cdef DTYPE_t[::1] feature_values = self.feature_values
+        cdef SIZE_t max_features = self.max_features
+        cdef SIZE_t min_samples_leaf = self.min_samples_leaf
+        cdef double min_weight_leaf = self.min_weight_leaf
+
+        # keep track of split record for current_split node and the best_split split
+        # found among the sampled projection vectors
+        cdef ObliqueSplitRecord best_split, current_split
+        cdef double current_proxy_improvement = -INFINITY
+        cdef double best_proxy_improvement = -INFINITY
+
+        cdef SIZE_t p
+        cdef SIZE_t feat_i
+        cdef SIZE_t partition_end
+        cdef DTYPE_t temp_d         # to compute a projection feature value
+        cdef DTYPE_t min_feature_value
+        cdef DTYPE_t max_feature_value
+
+        # Number of features discovered to be constant during the split search
+        # cdef SIZE_t n_found_constants = 0
+        # cdef SIZE_t n_known_constants = n_constant_features[0]
+        # n_total_constants = n_known_constants + n_found_constants
+        # cdef SIZE_t n_total_constants = n_known_constants
+        cdef SIZE_t n_visited_features = 0
+
+        # instantiate the split records
+        _init_split(&best_split, end)
+
+        # Sample the projection matrix
+        self.sample_proj_mat(self.proj_mat_weights, self.proj_mat_indices)
+
+        # For every vector in the projection matrix
+        for feat_i in range(max_features):
+            # Break if already reached max_features
+            if n_visited_features >= max_features:
+                break
+            # Skip features known to be constant
+            # if feat_i < n_total_constants:
+            #     continue
+            # Projection vector has no nonzeros
+            if self.proj_mat_weights[feat_i].empty():
+                continue
+
+            # XXX: 'feature' is not actually used in oblique split records
+            # Just indicates which split was sampled
+            current_split.feature = feat_i
+            current_split.proj_vec_weights = &self.proj_mat_weights[feat_i]
+            current_split.proj_vec_indices = &self.proj_mat_indices[feat_i]
+
+            # Compute linear combination of features
+            self.compute_features_over_samples(
+                start,
+                end,
+                samples,
+                feature_values,
+                &self.proj_mat_weights[feat_i],
+                &self.proj_mat_indices[feat_i]
+            )
+
+            # find min, max of the feature_values
+            self.find_min_max(feature_values, &min_feature_value, &max_feature_value)
+
+            # XXX: Add logic to keep track of constant features if they exist
+            # if max_feature_value <= min_feature_value + FEATURE_THRESHOLD:
+            #     n_found_constants += 1
+            #     n_total_constants += 1
+            #     continue
+
+            # Draw a random threshold
+            current_split.threshold = rand_uniform(
+                min_feature_value,
+                max_feature_value,
+                random_state,
+            )
+
+            if current_split.threshold == max_feature_value:
+                current_split.threshold = min_feature_value
+
+            # Partition
+            current_split.pos = self.partition_samples(current_split.threshold)
+
+            # Reject if min_samples_leaf is not guaranteed
+            if (((current_split.pos - start) < min_samples_leaf) or
+                    ((end - current_split.pos) < min_samples_leaf)):
+                continue
+
+            # evaluate split
+            self.criterion.reset()
+            self.criterion.update(current_split.pos)
+
+            # Reject if min_weight_leaf is not satisfied
+            if ((self.criterion.weighted_n_left < min_weight_leaf) or
+                    (self.criterion.weighted_n_right < min_weight_leaf)):
+                continue
+
+            current_proxy_improvement = self.criterion.proxy_impurity_improvement()
+
+            if current_proxy_improvement > best_proxy_improvement:
+                best_proxy_improvement = current_proxy_improvement
+                best_split = current_split  # copy
+
+            n_visited_features += 1
+
+        # Reorganize into samples[start:best_split.pos] + samples[best_split.pos:end]
+        if best_split.pos < end:
+            partition_end = end
+            p = start
+
+            while p < partition_end:
+                # Account for projection vector
+                temp_d = 0.0
+                for j in range(best_split.proj_vec_indices.size()):
+                    temp_d += self.X[samples[p], deref(best_split.proj_vec_indices)[j]] *\
+                                deref(best_split.proj_vec_weights)[j]
+
+                if temp_d <= best_split.threshold:
+                    p += 1
+
+                else:
+                    partition_end -= 1
+                    samples[p], samples[partition_end] = \
+                        samples[partition_end], samples[p]
+
+            self.criterion.reset()
+            self.criterion.update(best_split.pos)
+            self.criterion.children_impurity(&best_split.impurity_left,
+                                             &best_split.impurity_right)
+            best_split.improvement = self.criterion.impurity_improvement(
+                impurity, best_split.impurity_left, best_split.impurity_right)
+
+        # Return values
+        deref(oblique_split).proj_vec_indices = best_split.proj_vec_indices
+        deref(oblique_split).proj_vec_weights = best_split.proj_vec_weights
+        deref(oblique_split).feature = best_split.feature
+        deref(oblique_split).pos = best_split.pos
+        deref(oblique_split).threshold = best_split.threshold
+        deref(oblique_split).improvement = best_split.improvement
+        deref(oblique_split).impurity_left = best_split.impurity_left
+        deref(oblique_split).impurity_right = best_split.impurity_right
+        return 0

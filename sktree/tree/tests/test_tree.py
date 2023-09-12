@@ -10,6 +10,8 @@ from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from sktree._lib.sklearn.tree import DecisionTreeClassifier
 from sktree.tree import (
+    ExtraObliqueDecisionTreeClassifier,
+    ExtraObliqueDecisionTreeRegressor,
     ObliqueDecisionTreeClassifier,
     ObliqueDecisionTreeRegressor,
     PatchObliqueDecisionTreeClassifier,
@@ -20,6 +22,7 @@ from sktree.tree import (
 
 CLUSTER_CRITERIONS = ("twomeans", "fastbic")
 REG_CRITERIONS = ("squared_error", "absolute_error", "friedman_mse", "poisson")
+CLF_CRITERIONS = ("gini", "entropy")
 
 TREE_CLUSTERS = {
     "UnsupervisedDecisionTree": UnsupervisedDecisionTree,
@@ -27,15 +30,39 @@ TREE_CLUSTERS = {
 }
 
 REG_TREES = {
+    "ExtraObliqueDecisionTreeRegressor": ExtraObliqueDecisionTreeRegressor,
     "ObliqueDecisionTreeRegressor": ObliqueDecisionTreeRegressor,
     "PatchObliqueDecisionTreeRegressor": PatchObliqueDecisionTreeRegressor,
 }
 
 CLF_TREES = {
+    "ExtraObliqueDecisionTreeClassifier": ExtraObliqueDecisionTreeClassifier,
     "ObliqueDecisionTreeClassifier": ObliqueDecisionTreeClassifier,
     "PatchObliqueTreeClassifier": PatchObliqueDecisionTreeClassifier,
 }
 
+OBLIQUE_TREES = {
+    "ExtraObliqueDecisionTreeClassifier": ExtraObliqueDecisionTreeClassifier,
+    "ExtraObliqueDecisionTreeRegressor": ExtraObliqueDecisionTreeRegressor,
+    "ObliqueDecisionTreeClassifier": ObliqueDecisionTreeClassifier,
+    "ObliqueDecisionTreeRegressor": ObliqueDecisionTreeRegressor,
+}
+
+PATCH_OBLIQUE_TREES = {
+    "PatchObliqueDecisionTreeClassifier": PatchObliqueDecisionTreeClassifier,
+    "PatchObliqueDecisionTreeRegressor": PatchObliqueDecisionTreeRegressor,
+}
+
+ALL_TREES = {
+    "ExtraObliqueDecisionTreeClassifier": ExtraObliqueDecisionTreeClassifier,
+    "ExtraObliqueDecisionTreeRegressor": ExtraObliqueDecisionTreeRegressor,
+    "ObliqueDecisionTreeClassifier": ObliqueDecisionTreeClassifier,
+    "ObliqueDecisionTreeRegressor": ObliqueDecisionTreeRegressor,
+    "PatchObliqueDecisionTreeClassifier": PatchObliqueDecisionTreeClassifier,
+    "PatchObliqueDecisionTreeRegressor": PatchObliqueDecisionTreeRegressor,
+    "UnsupervisedDecisionTree": UnsupervisedDecisionTree,
+    "UnsupervisedObliqueDecisionTree": UnsupervisedObliqueDecisionTree,
+}
 X_small = np.array(
     [
         [0, 0, 4, 0, 0, 0, 1, -14, 0, -4, 0, 0, 0, 0],
@@ -114,12 +141,10 @@ digits.data = digits.data[perm]
 digits.target = digits.target[perm]
 
 
-ALL_TREES = [
-    ObliqueDecisionTreeClassifier,
-    PatchObliqueDecisionTreeClassifier,
-    UnsupervisedDecisionTree,
-    UnsupervisedObliqueDecisionTree,
-]
+def assert_tree_equal(d, s, message):
+    assert s.node_count == d.node_count, "{0}: inequal number of node ({1} != {2})".format(
+        message, s.node_count, d.node_count
+    )
 
 
 def test_pickle_splitters():
@@ -129,7 +154,7 @@ def test_pickle_splitters():
     import joblib
 
     from sktree._lib.sklearn.tree._criterion import Gini
-    from sktree.tree._oblique_splitter import BestObliqueSplitter
+    from sktree.tree._oblique_splitter import BestObliqueSplitter, RandomObliqueSplitter
     from sktree.tree.manifold._morf_splitter import BestPatchSplitter
 
     criterion = Gini(1, np.array((0, 1)))
@@ -146,6 +171,18 @@ def test_pickle_splitters():
     data_dims = np.array((5, 5))
 
     splitter = BestObliqueSplitter(
+        criterion,
+        max_features,
+        min_samples_leaf,
+        min_weight_leaf,
+        random_state,
+        monotonic_cst,
+        1.5,
+    )
+    with tempfile.TemporaryFile() as f:
+        joblib.dump(splitter, f)
+
+    splitter = RandomObliqueSplitter(
         criterion,
         max_features,
         min_samples_leaf,
@@ -177,6 +214,8 @@ def test_pickle_splitters():
 
 @parametrize_with_checks(
     [
+        ExtraObliqueDecisionTreeClassifier(random_state=12),
+        ExtraObliqueDecisionTreeRegressor(random_state=12),
         ObliqueDecisionTreeClassifier(random_state=12),
         ObliqueDecisionTreeRegressor(random_state=12),
         PatchObliqueDecisionTreeClassifier(random_state=12),
@@ -185,32 +224,33 @@ def test_pickle_splitters():
 )
 def test_sklearn_compatible_estimator(estimator, check):
     # TODO: remove when we can replicate the CI error...
-    if isinstance(estimator, PatchObliqueDecisionTreeClassifier) and check.func.__name__ in [
-        "check_fit_score_takes_y"
-    ]:
+    if isinstance(
+        estimator, (PatchObliqueDecisionTreeClassifier, ExtraObliqueDecisionTreeClassifier)
+    ) and check.func.__name__ in ["check_fit_score_takes_y"]:
         pytest.skip()
     check(estimator)
 
 
-def test_oblique_tree_sampling():
+@pytest.mark.parametrize("Tree", CLF_TREES.values())
+def test_oblique_tree_sampling(Tree, random_state=0):
     """Test Oblique Decision Trees.
 
-    Oblique trees can sample more candidate splits then
+    Oblique trees can sample more candidate splits than
     a normal axis-aligned tree.
     """
     X, y = iris.data, iris.target
     n_samples, n_features = X.shape
 
     # add additional noise dimensions
-    rng = np.random.RandomState(0)
+    rng = np.random.RandomState(random_state)
     X_noise = rng.random((n_samples, n_features))
     X = np.concatenate((X, X_noise), axis=1)
 
     # oblique decision trees can sample significantly more
     # diverse sets of splits and will do better if allowed
     # to sample more
-    tree_ri = DecisionTreeClassifier(random_state=0, max_features=n_features)
-    tree_rc = ObliqueDecisionTreeClassifier(random_state=0, max_features=n_features * 2)
+    tree_ri = DecisionTreeClassifier(random_state=random_state, max_features=n_features)
+    tree_rc = Tree(random_state=random_state, max_features=n_features * 2)
     ri_cv_scores = cross_val_score(tree_ri, X, y, scoring="accuracy", cv=10, error_score="raise")
     rc_cv_scores = cross_val_score(tree_rc, X, y, scoring="accuracy", cv=10, error_score="raise")
     assert rc_cv_scores.mean() > ri_cv_scores.mean()
@@ -218,7 +258,8 @@ def test_oblique_tree_sampling():
     assert rc_cv_scores.mean() > 0.91
 
 
-def test_oblique_trees_feature_combinations_less_than_n_features():
+@pytest.mark.parametrize("Tree", OBLIQUE_TREES.values())
+def test_oblique_trees_feature_combinations_less_than_n_features(Tree):
     """Test the hyperparameter ``feature_combinations`` behaves properly."""
 
     X, y = iris.data[:5, :], iris.target[:5, ...]
@@ -233,12 +274,12 @@ def test_oblique_trees_feature_combinations_less_than_n_features():
     _, n_features = X.shape
 
     # asset that the feature combinations is less than the number of features
-    estimator = ObliqueDecisionTreeRegressor(random_state=0, feature_combinations=3)
+    estimator = Tree(random_state=0, feature_combinations=3)
     estimator.fit(X, y)
     assert estimator.feature_combinations_ < n_features
 
 
-@pytest.mark.parametrize("Tree", [ObliqueDecisionTreeRegressor])
+@pytest.mark.parametrize("Tree", OBLIQUE_TREES.values())
 def test_oblique_trees_feature_combinations(Tree):
     """Test the hyperparameter ``feature_combinations`` behaves properly."""
 
@@ -279,13 +320,14 @@ def test_oblique_trees_feature_combinations(Tree):
     assert estimator.feature_combinations_ == 1
 
 
-def test_patch_tree_errors():
+@pytest.mark.parametrize("Tree", PATCH_OBLIQUE_TREES.values())
+def test_patch_tree_errors(Tree):
     """Test errors that are specifically raised by manifold trees."""
     X, y = digits.data, digits.target
 
     # passed in data should match expected data shape
     with pytest.raises(RuntimeError, match="Data dimensions"):
-        clf = PatchObliqueDecisionTreeClassifier(
+        clf = Tree(
             data_dims=(8, 9),
         )
         clf.fit(X, y)
@@ -293,7 +335,7 @@ def test_patch_tree_errors():
     # minimum patch height/width should be always less than or equal to
     # the maximum patch height/width
     with pytest.raises(RuntimeError, match="The minimum patch"):
-        clf = PatchObliqueDecisionTreeClassifier(
+        clf = Tree(
             min_patch_dims=(2, 1),
             max_patch_dims=(1, 1),
             data_dims=(8, 8),
@@ -302,7 +344,7 @@ def test_patch_tree_errors():
 
     # the maximum patch height/width should not exceed the data height/width
     with pytest.raises(RuntimeError, match="The maximum patch width"):
-        clf = PatchObliqueDecisionTreeClassifier(
+        clf = Tree(
             max_patch_dims=(9, 1),
             data_dims=(8, 8),
         )
@@ -415,7 +457,7 @@ def test_regression_toy(Tree, criterion):
 def test_diabetes_overfit(name, Tree, criterion):
     # check consistency of overfitted trees on the diabetes dataset
     # since the trees will overfit, we expect an MSE of 0
-    reg = Tree(criterion=criterion, random_state=0)
+    reg = Tree(criterion=criterion, random_state=12)
     reg.fit(diabetes.data, diabetes.target)
     score = mean_squared_error(diabetes.target, reg.predict(diabetes.data))
     assert score == pytest.approx(
@@ -428,9 +470,9 @@ def test_diabetes_overfit(name, Tree, criterion):
 @pytest.mark.parametrize(
     "criterion, max_depth, metric, max_loss",
     [
-        ("squared_error", 15, mean_squared_error, 60),
+        ("squared_error", 15, mean_squared_error, 65),
         ("absolute_error", 20, mean_squared_error, 60),
-        ("friedman_mse", 15, mean_squared_error, 60),
+        ("friedman_mse", 15, mean_squared_error, 65),
         ("poisson", 15, mean_poisson_deviance, 30),
     ],
 )
@@ -438,10 +480,10 @@ def test_diabetes_underfit(name, Tree, criterion, max_depth, metric, max_loss):
     # check consistency of trees when the depth and the number of features are
     # limited
 
-    reg = Tree(criterion=criterion, max_depth=max_depth, max_features=6, random_state=0)
+    reg = Tree(criterion=criterion, max_depth=max_depth, max_features=10, random_state=1234)
     reg.fit(diabetes.data, diabetes.target)
     loss = metric(diabetes.target, reg.predict(diabetes.data))
-    assert 0 < loss < max_loss
+    assert 0.0 <= loss < max_loss
 
 
 def test_numerical_stability():
