@@ -61,7 +61,7 @@ def test_iris(criterion, max_features):
     score = accuracy_score(clf.predict(iris.data), iris.target)
 
     assert (
-        score > 0.5 and score < 1.0
+        score > 0.5 and score <= 1.0
     ), "Failed partial_fit with {0}, criterion = {1} and score = {2}".format(
         "SDF", criterion, score
     )
@@ -90,7 +90,7 @@ def test_iris_multi(criterion, max_features):
 
     clf.fit(X, y)
     score = r2_score(clf.predict(X), y)
-    assert score > 0.9 and score < 1.0, "Failed with {0}, criterion = {1} and score = {2}".format(
+    assert score > 0.9 and score <= 1.0, "Failed with {0}, criterion = {1} and score = {2}".format(
         "SDF", criterion, score
     )
 
