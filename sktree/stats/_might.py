@@ -47,7 +47,7 @@ def perm_half(clf, z, y, x_pos):
     return null_stat
 
 
-def pos_diff(observe_pos, perm_pos, limit):
+def pos_diff(observe_pos, perm_pos, y, limit):
     total_pos = np.random.shuffle(np.concatenate((observe_pos, perm_pos)))
 
     half_ind = len(total_pos) * 0.5
@@ -307,7 +307,7 @@ class MIGHT_MV:
         # Boostrap sample the posterior from the two forests
         null_stats = np.array(
             Parallel(n_jobs=workers)(
-                [delayed(pos_diff)(observe_pos, perm_pos, limit=self.limit) for _ in range(reps)]
+                [delayed(pos_diff)(observe_pos, perm_pos, y, limit=self.limit) for _ in range(reps)]
             )
         )
 
