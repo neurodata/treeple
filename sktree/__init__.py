@@ -36,7 +36,7 @@ if __sktree_SETUP__:
     # process, as it may not be compiled yet
 else:
     try:
-        from . import _lib, tree, ensemble, experimental
+        from . import _lib, tree, ensemble, experimental, stats
         from ._lib.sklearn.ensemble._forest import (
             RandomForestClassifier,
             RandomForestRegressor,
@@ -44,6 +44,7 @@ else:
             ExtraTreesRegressor,
         )
         from .neighbors import NearestNeighborsMetaEstimator
+        from .ensemble import ExtendedIsolationForest
         from .ensemble._unsupervised_forest import (
             UnsupervisedRandomForest,
             UnsupervisedObliqueRandomForest,
@@ -68,6 +69,7 @@ else:
         "tree",
         "experimental",
         "ensemble",
+        "stats",
         "ExtraObliqueRandomForestClassifier",
         "ExtraObliqueRandomForestRegressor",
         "NearestNeighborsMetaEstimator",
@@ -82,4 +84,5 @@ else:
         "RandomForestRegressor",
         "ExtraTreesClassifier",
         "ExtraTreesRegressor",
+        "ExtendedIsolationForest",
     ]

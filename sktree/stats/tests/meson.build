@@ -1,14 +1,11 @@
 python_sources = [
   '__init__.py',
-  '_might.py',
-  'forestht.py',
-  'utils.py',
+  'test_might.py',
+  'test_forestht.py'
 ]
 
 py3.install_sources(
   python_sources,
   pure: false,
-  subdir: 'sktree/stats'
+  subdir: 'sktree/stats/tests'
 )
-
-subdir('tests')
