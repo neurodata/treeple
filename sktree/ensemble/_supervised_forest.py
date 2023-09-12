@@ -1,7 +1,7 @@
 from sklearn.utils._param_validation import StrOptions
 
-from sktree._lib.sklearn.ensemble._forest import ForestClassifier, ForestRegressor
-from sktree.tree import (
+from .._lib.sklearn.ensemble._forest import ForestClassifier, ForestRegressor
+from ..tree import (
     ExtraObliqueDecisionTreeClassifier,
     ExtraObliqueDecisionTreeRegressor,
     ObliqueDecisionTreeClassifier,
@@ -9,7 +9,6 @@ from sktree.tree import (
     PatchObliqueDecisionTreeClassifier,
     PatchObliqueDecisionTreeRegressor,
 )
-
 from ..tree._neighbors import SimMatrixMixin
 
 

@@ -31,6 +31,7 @@ Changelog
 - |Efficiency| Around 1.5-2x speed improvement for unsupervised forests, by `Adam Li`_  (:pr:`114`)
 - |API| Allow ``sqrt`` and ``log2`` keywords to be used for ``min_samples_split`` parameter in unsupervised forests, by `Adam Li`_  (:pr:`114`)
 - |Feature| Implement extended isolation forest, by `Adam Li`_ (:pr:`101`)
+- |Feature| Implementation of StreamDecisionForest, by `Haoyin Xu`_ and `Adam Li`_ (:pr:`116`)
 
 Code and Documentation Contributors
 -----------------------------------
@@ -40,3 +41,4 @@ the project since version inception, including:
 
 * `Adam Li`_
 * `SUKI-O`_
+* `Haoyin Xu`_
