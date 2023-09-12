@@ -1,7 +1,6 @@
 import numpy as np
 import pytest
 from sklearn import datasets
-from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from sktree._lib.sklearn.tree import DecisionTreeClassifier
 from sktree.stats import MIGHT
@@ -50,4 +49,4 @@ def test_iris(criterion, max_features, honest_prior, estimator, limit):
             clf.statistic(iris_X, iris_y)
     else:
         score = clf.statistic(iris_X, iris_y, stat="AUC")
-        assert score == 1.0, "Failed with pAUC: {0} for max fpr: {1}".format(pAUC, limit)
+        assert score == 1.0, "Failed with pAUC: {0} for max fpr: {1}".format(score, limit)
