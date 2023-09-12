@@ -371,6 +371,9 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="generated/sktree.tree.UnsupervisedObliqueDecisionTree.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.UnsupervisedObliqueDecisionTree</a></li>
 </ul>
 <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.ExtendedIsolationForest.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ExtendedIsolationForest</a></li>
+</ul>
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="generated/sktree.tree.compute_forest_similarity_matrix.html">sktree.tree.compute_forest_similarity_matrix</a></li>
 </ul>
 <ul class="nav bd-sidenav">
@@ -551,6 +554,20 @@ on unsupervised criterion such as variance and BIC.</p>
 </tbody>
 </table>
 </section>
+<section id="outlier-detection">
+<h2>Outlier Detection<a class="headerlink" href="#outlier-detection" title="Link to this heading">#</a></h2>
+<p>Isolation forests are a model implemented in scikit-learn, which is an ensemble of
+extremely randomized axis-aligned decision tree models. Extended isolation forests
+replaces the base tree model with an oblique tree, which allows a more flexible model
+for detecting outliers.</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.ExtendedIsolationForest.html#sktree.ExtendedIsolationForest" title="sktree.ExtendedIsolationForest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExtendedIsolationForest</span></code></a>(*[, n_estimators, ...])</p></td>
+<td><p>Extended Isolation Forest Algorithm.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="distance-metrics">
 <h2>Distance Metrics<a class="headerlink" href="#distance-metrics" title="Link to this heading">#</a></h2>
 <p>Trees inherently produce a “distance-like” metric. We provide an API for
@@ -672,6 +689,7 @@ for the entropy, MI and CMI of the Gaussian distributions.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#unsupervised">Unsupervised</a><ul class="nav section-nav flex-column">
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlier-detection">Outlier Detection</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#distance-metrics">Distance Metrics</a><ul class="nav section-nav flex-column">
 </ul>
 </li>
@@ -705,7 +723,7 @@ for the entropy, MI and CMI of the Gaussian distributions.</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-09-10.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-09-12.
       <br/>
     
   </p>
