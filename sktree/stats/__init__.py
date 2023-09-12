@@ -1,1 +1,1 @@
-from ._might import MIRF_AUC, MIRF_MV
+from ._might import MIGHT, MIGHT_MV

@@ -28,8 +28,12 @@ def auc_calibrator(tree, X, y, test_size=0.2, permute_y=False):
 
 
 def perm_stat(clf, x, z, y, random_state=None):
-    permuted_Z = np.random.permutation(z)
-    X_permutedZ = np.hstack((x, permuted_Z))
+    if z is not None:
+        permuted_Z = np.random.permutation(z)
+        X_permutedZ = np.hstack((x, permuted_Z))
+    else:
+        X_permutedZ = np.random.permutation(x)
+
     perm_stat = clf.statistic(X_permutedZ, y)
     return perm_stat
 
@@ -43,7 +47,7 @@ def perm_half(clf, z, y, x_pos):
     return null_stat
 
 
-def pos_diff(observe_pos, perm_pos, limit):
+def pos_diff(observe_pos, perm_pos, y, limit):
     total_pos = np.random.shuffle(np.concatenate((observe_pos, perm_pos)))
 
     half_ind = len(total_pos) * 0.5
@@ -70,7 +74,7 @@ def forest_pos(posterior, y):
     return np.hstack((true_final, posterior_final))
 
 
-class MIRF_AUC:
+class MIGHT:
     def __init__(
         self,
         n_estimators=500,
@@ -151,7 +155,7 @@ class MIRF_AUC:
                 posterior_final[:, 0], posterior_final[:, 1], max_fpr=self.limit
             )
         elif stat == "MI":
-            H_YX = np.mean(entropy(posterior_final[:, 1], base=np.exp(1), axis=1))
+            H_YX = np.mean(entropy(posterior_final[:, 1], base=np.exp(1)))
             _, counts = np.unique(posterior_final[:, 0], return_counts=True)
             H_Y = entropy(counts, base=np.exp(1))
             self.stat = max(H_Y - H_YX, 0)
@@ -161,8 +165,18 @@ class MIRF_AUC:
 
         return self.stat
 
+    def test(self, x, y, reps=1000, workers=1, random_state=None):
+        observe_stat = self.statistic(x, y)
 
-class MIRF_MV:
+        null_dist = np.array(
+            Parallel(n_jobs=workers)([delayed(perm_stat)(self, x, None, y) for _ in range(reps)])
+        )
+        pval = (1 + (null_dist >= observe_stat).sum()) / (1 + reps)
+
+        return observe_stat, null_dist, pval
+
+
+class MIGHT_MV:
     def __init__(
         self,
         n_estimators=500,
@@ -243,7 +257,7 @@ class MIRF_MV:
                 posterior_final[:, 0], posterior_final[:, 1], max_fpr=self.limit
             )
         elif stat == "MI":
-            H_YX = np.mean(entropy(posterior_final[:, 1], base=np.exp(1), axis=1))
+            H_YX = np.mean(entropy(posterior_final[:, 1], base=np.exp(1)))
             _, counts = np.unique(posterior_final[:, 0], return_counts=True)
             H_Y = entropy(counts, base=np.exp(1))
             self.stat = max(H_Y - H_YX, 0)
@@ -293,7 +307,7 @@ class MIRF_MV:
         # Boostrap sample the posterior from the two forests
         null_stats = np.array(
             Parallel(n_jobs=workers)(
-                [delayed(pos_diff)(observe_pos, perm_pos, limit=self.limit) for _ in range(reps)]
+                [delayed(pos_diff)(observe_pos, perm_pos, y, limit=self.limit) for _ in range(reps)]
             )
         )
 
