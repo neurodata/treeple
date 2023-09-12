@@ -8,3 +8,5 @@ py3.install_sources(
   pure: false,
   subdir: 'sktree/stats'
 )
+
+subdir('tests')
