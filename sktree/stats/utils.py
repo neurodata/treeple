@@ -4,7 +4,7 @@ import numpy as np
 from numpy.typing import ArrayLike
 from scipy.stats import entropy
 from sklearn.metrics import mean_squared_error, roc_auc_score
-from sklearn.utils.validation import check_is_fitted, check_X_y
+from sklearn.utils.validation import check_X_y
 
 from sktree._lib.sklearn.ensemble._forest import ForestClassifier
 
@@ -107,8 +107,10 @@ def compute_null_distribution_perm(
 def _compute_null_distribution_coleman(
     X_test: ArrayLike,
     y_test: ArrayLike,
-    forest: ForestClassifier,
-    perm_forest: ForestClassifier,
+    y_pred_proba_normal: ArrayLike,
+    y_pred_proba_perm: ArrayLike,
+    normal_samples: ArrayLike,
+    perm_samples: ArrayLike,
     metric: str = "mse",
     n_repeats: int = 1000,
     seed: int = None,
@@ -123,10 +125,14 @@ def _compute_null_distribution_coleman(
         The data matrix.
     y_test : ArrayLike of shape (n_samples, n_outputs)
         The output matrix.
-    forest : ForestClassifier
-        A trained forest on the original data.
-    perm_forest : ForestClassifier
-        A trained forest on the permuted data.
+    y_pred_proba_normal : ArrayLike of shape (n_samples_normal, n_outputs)
+        The predicted posteriors from the normal forest.
+    y_pred_proba_perm : ArrayLike of shape (n_samples_perm, n_outputs)
+        The predicted posteriors from the permuted forest.
+    normal_samples : ArrayLike of shape (n_samples_normal,)
+        The indices of the normal samples that we have a posterior for.
+    perm_samples : ArrayLike of shape (n_samples_perm,)
+        The indices of the permuted samples that we have a posterior for.
     metric : str, optional
         The metric, which to compute the null distribution of statistics, by default 'mse'.
     n_repeats : int, optional
@@ -142,33 +148,37 @@ def _compute_null_distribution_coleman(
         An array of the metrics computed on the other half of the trees.
     """
     rng = np.random.default_rng(seed)
-    check_is_fitted(forest)
-    check_is_fitted(perm_forest)
-    X_test, y_test = check_X_y(X_test, y_test, ensure_2d=True)
+    # X_test, y_test = check_X_y(X_test, y_test, copy=True, ensure_2d=True, multi_output=True)
 
     metric_func = METRIC_FUNCTIONS[metric]
 
     # sample two sets of equal number of trees from the combined forest
-    y_pred_proba_normal = forest.predict_proba(X_test)
-    y_pred_proba_perm = perm_forest.predict_proba(X_test)
     all_y_pred = np.concatenate((y_pred_proba_normal, y_pred_proba_perm), axis=0)
 
-    n_samples = len(y_test)
+    # get the indices of the samples that we have a posterior for, so each element
+    # is an index into `y_test`
+    all_samples_pred = np.concatenate((normal_samples, perm_samples), axis=0)
+
+    n_samples_final = len(all_samples_pred)
 
     # pre-allocate memory for the index array
-    index_arr = np.arange(n_samples * 2, dtype=int)
+    index_arr = np.arange(n_samples_final, dtype=int)
 
     metric_star = np.zeros((n_repeats,))
     metric_star_pi = np.zeros((n_repeats,))
     for idx in range(n_repeats):
         # two sets of random indices from 1 : 2N are sampled using Fisher-Yates
         rng.shuffle(index_arr)
-        first_half_index = index_arr[:n_samples]
-        second_half_index = index_arr[n_samples:]
+        first_half_index = index_arr[: n_samples_final // 2]
+        second_half_index = index_arr[n_samples_final // 2 :]
+
+        # now get the pointers to the actual samples used for the metric
+        y_test_first_half = y_test[all_samples_pred[first_half_index]]
+        y_test_second_half = y_test[all_samples_pred[second_half_index]]
 
         # compute two instances of the metric from the sampled trees
-        first_half_metric = metric_func(y_true=y_test, y_pred=all_y_pred[first_half_index])
-        second_half_metric = metric_func(y_true=y_test, y_pred=all_y_pred[second_half_index])
+        first_half_metric = metric_func(y_test_first_half, all_y_pred[first_half_index])
+        second_half_metric = metric_func(y_test_second_half, all_y_pred[second_half_index])
 
         metric_star[idx] = first_half_metric
         metric_star_pi[idx] = second_half_metric

@@ -5,6 +5,7 @@ import threading
 
 import numpy as np
 from joblib import Parallel, delayed
+from sklearn.base import _fit_context
 from sklearn.ensemble._base import _partition_estimators
 from sklearn.utils.validation import check_is_fitted, check_X_y
 
@@ -374,6 +375,7 @@ class HonestForestClassifier(ForestClassifier):
         self.honest_prior = honest_prior
         self.tree_estimator = tree_estimator
 
+    @_fit_context(prefer_skip_nested_validation=True)
     def fit(self, X, y, sample_weight=None, classes=None):
         """
         Build a forest of trees from the training set (X, y).
