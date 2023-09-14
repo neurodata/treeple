@@ -1,11 +1,11 @@
 import numpy as np
-from scipy.special import expit
 import pytest
-from sktree.stats.forestht import ForestHT
+from scipy.special import expit
 from sklearn import datasets
 
 from sktree._lib.sklearn.tree import DecisionTreeClassifier
 from sktree.stats import MIGHT
+from sktree.stats.forestht import ForestHT, HyppoForestRegressor
 from sktree.tree import ObliqueDecisionTreeClassifier, PatchObliqueDecisionTreeClassifier
 
 # load the iris dataset
@@ -25,6 +25,14 @@ iris_y = iris_y[p]
 seed = 12345
 
 
+def test_forestht_proper_attributes():
+    """Forest HTs should have n_classes_ and n_outputs_ properly set.
+
+    This requires the first dummy fit to always get all classes.
+    """
+    pass
+
+
 def test_iris():
     pass
 
@@ -36,14 +44,13 @@ def test_linear_model():
 
     Y = Beta * X_1 + Beta * I(X_6 = 2) + \epsilon
     """
-    # TODO: this requires us to implement the test using forestregressors
-    pass
-    j = np.linspace(0.005, 2.25, 9)[0]
-    beta = 10
-    sigma = 10 / j
-    n_samples = 20
+    # j = np.linspace(0.005, 2.25, 9)[]
+    beta = 10.0
+    sigma = 0.05  # / j
+    n_samples = 2500
     n_estimators = 125
-    # subsample_size = np.power(n_samples, 0.6)
+    test_size = 0.1
+    # subsample_size = 0.8
 
     rng = np.random.default_rng(seed)
 
@@ -54,29 +61,41 @@ def test_linear_model():
         X_610[:, idx] = np.argwhere(
             rng.multinomial(1, [1.0 / 3, 1.0 / 3, 1.0 / 3], size=(n_samples,))
         )[:, 1]
-    X = np.concatenate((X_15, X_610), axis=1)
+    X = np.concatenate((X_15, X_610), axis=1, dtype=np.float32)
+    assert X.shape == (n_samples, 10)
 
     # sample noise
-    epsilon = rng.normal(size=n_samples, scale=sigma)
+    epsilon = rng.normal(size=n_samples, loc=0.0, scale=sigma)
 
     # compute final y of (n_samples,)
-    y = beta * X[:, 0] + beta * (X[:, 5] == 2) + epsilon
-
-    est = ForestHT(random_state=seed, n_estimators=n_estimators)
+    y = beta * X[:, 0] + (beta * (X[:, 5] == 2.0)) + epsilon
+    est = HyppoForestRegressor(
+        max_features=1.0,
+        random_state=seed,
+        n_estimators=n_estimators,
+        n_jobs=-1,
+        permute_per_tree=False,
+        # bootstrap=True, max_samples=subsample_size
+    )
 
     # test for X_1
-    stat, pvalue = est.test(X, y, [0])
-    assert pvalue < 0.05
+    stat, pvalue = est.test(X, y, [0], test_size=test_size)
+    print(pvalue)
+    # assert pvalue < 0.05, f"pvalue: {pvalue}"
 
     # test for X_6
-    stat, pvalue = est.test(X, y, [5])
-    assert pvalue < 0.05
+    stat, pvalue = est.test(X, y, [5], test_size=test_size)
+    print(pvalue)
+    # assert pvalue < 0.05, f"pvalue: {pvalue}"
 
     # test for a few unimportant other X
-    for covariate_index in [1, 2, 3]:
+    for covariate_index in [1, 6]:
         # test for X_2, X_3, X_4
-        stat, pvalue = est.test(X, y, [covariate_index])
-        assert pvalue > 0.05
+        stat, pvalue = est.test(X, y, [covariate_index], test_size=test_size)
+        print(pvalue)
+        # assert pvalue > 0.05, f"pvalue: {pvalue}"
+
+    assert False
 
 
 def test_correlated_logit_model():
@@ -135,7 +154,7 @@ def test_correlated_logit_model():
 
 
 @pytest.mark.parametrize("criterion", ["gini", "entropy"])
-@pytest.mark.parametrize("max_features", [None, 'sqrt'])
+@pytest.mark.parametrize("max_features", [None, "sqrt"])
 @pytest.mark.parametrize("honest_prior", ["empirical", "uniform", "ignore"])
 @pytest.mark.parametrize(
     "estimator",

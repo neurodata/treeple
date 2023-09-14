@@ -3,7 +3,7 @@ from typing import Tuple
 import numpy as np
 from numpy.typing import ArrayLike
 from scipy.stats import entropy
-from sklearn.metrics import mean_squared_error, roc_auc_score
+from sklearn.metrics import mean_absolute_error, mean_squared_error, roc_auc_score
 from sklearn.utils.validation import check_X_y
 
 from sktree._lib.sklearn.ensemble._forest import ForestClassifier
@@ -16,7 +16,13 @@ def _mutual_information(y_true, y_pred):
     return max(H_Y - H_YX, 0)
 
 
-METRIC_FUNCTIONS = {"mse": mean_squared_error, "auc": roc_auc_score, "mi": _mutual_information}
+METRIC_FUNCTIONS = {
+    "mse": mean_squared_error,
+    "mae": mean_absolute_error,
+    "auc": roc_auc_score,
+    "mi": _mutual_information,
+}
+REGRESSOR_METRICS = ("mse", "mae")
 
 
 def _pvalue(observe_stat: float, permuted_stat: ArrayLike, correction: bool = True) -> float:
