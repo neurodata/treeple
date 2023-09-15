@@ -575,7 +575,7 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
 
 
 class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
-    """A decision tree classifier.
+    """An oblique decision tree classifier.
 
     Read more in the :ref:`User Guide <sklearn:tree>`. The implementation follows
     that of :footcite:`breiman2001random` and :footcite:`TomitaSPORF2020`.

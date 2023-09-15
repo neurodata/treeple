@@ -3,10 +3,16 @@ from typing import Tuple
 import numpy as np
 from numpy.typing import ArrayLike
 from scipy.stats import entropy
-from sklearn.metrics import mean_absolute_error, mean_squared_error, roc_auc_score
+from sklearn.metrics import (
+    balanced_accuracy_score,
+    mean_absolute_error,
+    mean_squared_error,
+    roc_auc_score,
+)
 from sklearn.utils.validation import check_X_y
 
 from sktree._lib.sklearn.ensemble._forest import ForestClassifier
+from sktree._lib.sklearn.tree import DecisionTreeClassifier
 
 
 def _mutual_information(y_true, y_pred):
@@ -21,15 +27,50 @@ METRIC_FUNCTIONS = {
     "mae": mean_absolute_error,
     "auc": roc_auc_score,
     "mi": _mutual_information,
+    "balanced_accuracy": balanced_accuracy_score,
 }
 REGRESSOR_METRICS = ("mse", "mae")
 
 
-def _pvalue(observe_stat: float, permuted_stat: ArrayLike, correction: bool = True) -> float:
-    """Compute pvalue with Coleman method.
+def train_tree(
+    tree: DecisionTreeClassifier,
+    X: ArrayLike,
+    y: ArrayLike,
+    covariate_index: ArrayLike = None,
+) -> ArrayLike:
+    """Compute the posterior from each tree on the "OOB" samples.
 
-    Implements the pvalue calculation from Algorithm 1. See
-    :footcite:`coleman2022scalable` for full details.
+    Parameters
+    ----------
+    tree : DecisionTreeClassifier
+        The tree to compute the posterior from.
+    X : ArrayLike of shape (n_samples, n_features)
+        The data matrix.
+    y : ArrayLike of shape (n_samples, n_outputs)
+        The output matrix.
+    covariate_index : ArrayLike of shape (n_covariates,), optional
+        The indices of the covariates to permute, by default None, which
+        does not permute any columns.
+    """
+    # seed the random number generator using each tree's random seed(?)
+    rng = np.random.default_rng(tree.random_state)
+
+    indices = np.arange(X.shape[0])
+
+    if covariate_index is not None:
+        # perform permutation of covariates
+        index_arr = rng.choice(indices, size=(X.shape[0], 1), replace=False, shuffle=False)
+        perm_X_cov = X[index_arr, covariate_index]
+        X[:, covariate_index] = perm_X_cov
+
+    # individual tree permutation of y labels
+    tree.fit(X, y, check_input=False)
+
+
+def _pvalue(observe_stat: float, permuted_stat: ArrayLike, correction: bool = True) -> float:
+    """Compute pvalue.
+
+    Implements the pvalue calculation from optionally with a correction factor.
 
     Parameters
     ----------
@@ -47,13 +88,15 @@ def _pvalue(observe_stat: float, permuted_stat: ArrayLike, correction: bool = Tr
     """
     n_repeats = len(permuted_stat)
     if correction:
-        pval = (1 + (permuted_stat >= observe_stat).sum()) / (1 + n_repeats)
+        pval = (1 + (permuted_stat < observe_stat).sum()) / (1 + n_repeats)
     else:
-        pval = (permuted_stat >= observe_stat).sum() / n_repeats
+        pval = (permuted_stat < observe_stat).sum() / n_repeats
     return pval
 
 
 def compute_null_distribution_perm(
+    X_train: ArrayLike,
+    y_train: ArrayLike,
     X_test: ArrayLike,
     y_test: ArrayLike,
     covariate_index: ArrayLike,
@@ -82,29 +125,37 @@ def compute_null_distribution_perm(
         Random seed, by default None.
     """
     rng = np.random.default_rng(seed)
-    X_test, y_test = check_X_y(X_test, y_test, ensure_2d=True)
-    n_samples = len(y_test)
-
+    X_test, y_test = check_X_y(X_test, y_test, ensure_2d=True, multi_output=True)
+    n_samples_test = len(y_test)
+    n_samples_train = len(y_train)
     metric_func = METRIC_FUNCTIONS[metric]
 
     # pre-allocate memory for the index array
-    index_arr = np.arange(n_samples * 2, dtype=int)
+    train_index_arr = np.arange(n_samples_train, dtype=int).reshape(-1, 1)
+    test_index_arr = np.arange(n_samples_test, dtype=int).reshape(-1, 1)
+
+    X = np.concatenate((X_train, X_test), axis=0)
+    index_arr = np.arange(X.shape[0], dtype=int)  # .reshape(-1, 1)
 
     null_metrics = np.zeros((n_repeats,))
 
     for idx in range(n_repeats):
         # permute the covariates inplace
-        rng.shuffle(index_arr)
-        perm_X_cov = X_test[index_arr, covariate_index]
+        rng.shuffle(test_index_arr)
+        perm_X_cov = X_test[test_index_arr, covariate_index]
         X_test[:, covariate_index] = perm_X_cov
+
+        rng.shuffle(train_index_arr)
+        perm_X_cov = X_train[train_index_arr, covariate_index]
+        X_train[:, covariate_index] = perm_X_cov
 
         # train a new forest on the permuted data
         # XXX: should there be a train/test split here? even w/ honest forests?
-        est.fit(X_test, y_test)
-        y_pred_proba = est.predict_proba(X_test)
+        est.fit(X_train, y_train.ravel())
+        y_pred = est.predict(X_test)
 
         # compute two instances of the metric from the sampled trees
-        metric_val = metric_func(y_true=y_test, y_pred=y_pred_proba)
+        metric_val = metric_func(y_test, y_pred)
 
         null_metrics[idx] = metric_val
     return null_metrics

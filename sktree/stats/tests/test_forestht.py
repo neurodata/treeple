@@ -4,8 +4,8 @@ from scipy.special import expit
 from sklearn import datasets
 
 from sktree._lib.sklearn.tree import DecisionTreeClassifier
-from sktree.stats import MIGHT
-from sktree.stats.forestht import ForestHT, HyppoForestRegressor
+from sktree.stats import MIGHT, PermutationForestClassifier, PermutationForestRegressor
+from sktree.stats.forestht import ForestHT
 from sktree.tree import ObliqueDecisionTreeClassifier, PatchObliqueDecisionTreeClassifier
 
 # load the iris dataset
@@ -33,24 +33,22 @@ def test_forestht_proper_attributes():
     pass
 
 
-def test_iris():
-    pass
-
-
-def test_linear_model():
-    r"""Test MIGHT using MSE from linear model simulation.
+@pytest.mark.slowtest
+@pytest.mark.parametrize("hypotester", [PermutationForestRegressor])
+def test_linear_model(hypotester):
+    r"""Test hypothesis testing forests using MSE from linear model simulation.
 
     See https://arxiv.org/pdf/1904.07830.pdf Figure 1.
 
     Y = Beta * X_1 + Beta * I(X_6 = 2) + \epsilon
     """
-    # j = np.linspace(0.005, 2.25, 9)[]
     beta = 10.0
-    sigma = 0.05  # / j
-    n_samples = 2500
-    n_estimators = 125
+    sigma = 0.5
+    n_samples = 550
+    n_estimators = 50
     test_size = 0.1
-    # subsample_size = 0.8
+    n_repeats = 50
+    metric = "mse"
 
     rng = np.random.default_rng(seed)
 
@@ -61,7 +59,7 @@ def test_linear_model():
         X_610[:, idx] = np.argwhere(
             rng.multinomial(1, [1.0 / 3, 1.0 / 3, 1.0 / 3], size=(n_samples,))
         )[:, 1]
-    X = np.concatenate((X_15, X_610), axis=1, dtype=np.float32)
+    X = np.concatenate((X_15, X_610), axis=1)
     assert X.shape == (n_samples, 10)
 
     # sample noise
@@ -69,51 +67,55 @@ def test_linear_model():
 
     # compute final y of (n_samples,)
     y = beta * X[:, 0] + (beta * (X[:, 5] == 2.0)) + epsilon
-    est = HyppoForestRegressor(
+    est = hypotester(
         max_features=1.0,
         random_state=seed,
         n_estimators=n_estimators,
         n_jobs=-1,
-        permute_per_tree=False,
-        # bootstrap=True, max_samples=subsample_size
     )
 
     # test for X_1
-    stat, pvalue = est.test(X, y, [0], test_size=test_size)
-    print(pvalue)
-    # assert pvalue < 0.05, f"pvalue: {pvalue}"
+    stat, pvalue = est.test(X, y, [0], metric=metric, test_size=test_size, n_repeats=n_repeats)
+    print("X1: ", pvalue)
+    assert pvalue < 0.05, f"pvalue: {pvalue}"
 
     # test for X_6
-    stat, pvalue = est.test(X, y, [5], test_size=test_size)
-    print(pvalue)
-    # assert pvalue < 0.05, f"pvalue: {pvalue}"
+    stat, pvalue = est.test(X, y, [5], metric=metric, test_size=test_size, n_repeats=n_repeats)
+    print("X6: ", pvalue)
+    assert pvalue < 0.05, f"pvalue: {pvalue}"
 
     # test for a few unimportant other X
     for covariate_index in [1, 6]:
-        # test for X_2, X_3, X_4
-        stat, pvalue = est.test(X, y, [covariate_index], test_size=test_size)
-        print(pvalue)
-        # assert pvalue > 0.05, f"pvalue: {pvalue}"
+        # test for X_2, X_7
+        stat, pvalue = est.test(
+            X, y, [covariate_index], metric=metric, test_size=test_size, n_repeats=n_repeats
+        )
+        print("X2/7: ", pvalue)
+        assert pvalue > 0.05, f"pvalue: {pvalue}"
 
-    assert False
 
-
-def test_correlated_logit_model():
+@pytest.mark.slowtest
+@pytest.mark.parametrize("hypotester", [PermutationForestClassifier])
+def test_correlated_logit_model(hypotester):
     r"""Test MIGHT using MSE from linear model simulation.
 
     See https://arxiv.org/pdf/1904.07830.pdf Figure 1.
 
     P(Y = 1 | X) = expit(beta * \\sum_{j=2}^5 X_j)
     """
-    beta = 15.0
+    beta = 5.0
     n_samples = 600
-    n_estimators = 125
+    n_estimators = 50
     n_jobs = -1
+    max_features = "sqrt"
+    test_size = 1.0 / 6
+    metric = "mse"
+    n_repeats = 50
 
-    n = 100  # Number of time steps
-    ar_coefficient = 0.015
+    n = 200  # Number of time steps
+    ar_coefficient = 0.0015
+
     rng = np.random.default_rng(seed)
-    test_size = 0.5
 
     X = np.zeros((n_samples, n))
     for idx in range(n_samples):
@@ -135,22 +137,30 @@ def test_correlated_logit_model():
     assert y_proba.shape == (n_samples,)
     y = rng.binomial(1, y_proba, size=n_samples)  # .reshape(-1, 1)
 
-    est = ForestHT(max_features=n, random_state=seed, n_estimators=n_estimators, n_jobs=n_jobs)
+    est = hypotester(
+        max_features=max_features, random_state=seed, n_estimators=n_estimators, n_jobs=n_jobs
+    )
 
     # test for X_2 important
-    stat, pvalue = est.test(X, y, [1], test_size=test_size, metric="mse")
-    print(pvalue)
-    assert pvalue < 0.6, f"pvalue: {pvalue}"
+    stat, pvalue = est.test(
+        X.copy(), y.copy(), [1], test_size=test_size, n_repeats=n_repeats, metric=metric
+    )
+    print("X2: ", pvalue)
+    assert pvalue < 0.05, f"pvalue: {pvalue}"
 
-    # test for X_1
-    stat, pvalue = est.test(X, y, [0], metric="mse")
-    print(pvalue)
-    assert pvalue > 0.9, f"pvalue: {pvalue}"
+    # test for X_1 unimportant
+    stat, pvalue = est.test(
+        X.copy(), y.copy(), [0], test_size=test_size, n_repeats=n_repeats, metric=metric
+    )
+    print("X1: ", pvalue)
+    assert pvalue > 0.05, f"pvalue: {pvalue}"
 
-    # test for X_500
-    stat, pvalue = est.test(X, y, [n - 1], metric="mse")
-    print(pvalue)
-    assert pvalue > 0.9, f"pvalue: {pvalue}"
+    # test for X_500 unimportant
+    stat, pvalue = est.test(
+        X.copy(), y.copy(), [n - 1], test_size=test_size, n_repeats=n_repeats, metric=metric
+    )
+    print("X500: ", pvalue)
+    assert pvalue > 0.05, f"pvalue: {pvalue}"
 
 
 @pytest.mark.parametrize("criterion", ["gini", "entropy"])

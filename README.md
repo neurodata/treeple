@@ -13,11 +13,6 @@ scikit-tree is a scikit-learn compatible API for building state-of-the-art decis
 
 Tree-models have withstood the test of time, and are consistently used for modern-day data science and machine learning applications. They especially perform well when there are limited samples for a problem and are flexible learners that can be applied to a wide variety of different settings, such as tabular, images, time-series, genomics, EEG data and more.
 
-We welcome contributions for modern tree-based algorithms. We use Cython to achieve fast C/C++ speeds, while abiding by a scikit-learn compatible (tested) API. Moreover, our Cython internals are easily extensible because they follow the internal Cython API of scikit-learn as well.
-
-Due to the current state of scikit-learn's internal Cython code for trees, we have to instead leverage a fork of scikit-learn at https://github.com/neurodata/scikit-learn when
-extending the decision tree model API of scikit-learn. Specifically, we extend the Python and Cython API of the tree submodule in scikit-learn in our submodule, so we can introduce the tree models housed in this package. Thus these extend the functionality of decision-tree based models in a way that is not possible yet in scikit-learn itself. As one example, we introduce an abstract API to allow users to implement their own oblique splits. Our plan in the future is to benchmark these functionalities and introduce them upstream to scikit-learn where applicable and inclusion criterion are met.
-
 Documentation
 =============
 
@@ -104,6 +99,13 @@ You can also do the same thing using Meson/Ninja itself. Run the following to bu
 Alternatively, you can use editable installs
 
     pip install --no-build-isolation --editable .
+
+Development
+===========
+We welcome contributions for modern tree-based algorithms. We use Cython to achieve fast C/C++ speeds, while abiding by a scikit-learn compatible (tested) API. Moreover, our Cython internals are easily extensible because they follow the internal Cython API of scikit-learn as well.
+
+Due to the current state of scikit-learn's internal Cython code for trees, we have to instead leverage a fork of scikit-learn at https://github.com/neurodata/scikit-learn when
+extending the decision tree model API of scikit-learn. Specifically, we extend the Python and Cython API of the tree submodule in scikit-learn in our submodule, so we can introduce the tree models housed in this package. Thus these extend the functionality of decision-tree based models in a way that is not possible yet in scikit-learn itself. As one example, we introduce an abstract API to allow users to implement their own oblique splits. Our plan in the future is to benchmark these functionalities and introduce them upstream to scikit-learn where applicable and inclusion criterion are met.
 
 References
 ==========

@@ -3,6 +3,7 @@ python_sources = [
   '_might.py',
   'forestht.py',
   'utils.py',
+  'permutationforest.py',
 ]
 
 py3.install_sources(

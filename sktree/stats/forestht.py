@@ -8,46 +8,18 @@ from sktree._lib.sklearn.ensemble._forest import (
     ForestClassifier,
     ForestRegressor,
     RandomForestRegressor,
+    BaseForest
 )
 from sktree._lib.sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 
 from ..ensemble import HonestForestClassifier
-from .utils import METRIC_FUNCTIONS, REGRESSOR_METRICS, _compute_null_distribution_coleman, _pvalue
-
-
-def train_tree(
-    tree: DecisionTreeClassifier,
-    X: ArrayLike,
-    y: ArrayLike,
-    covariate_index: ArrayLike = None,
-) -> ArrayLike:
-    """Compute the posterior from each tree on the "OOB" samples.
-
-    Parameters
-    ----------
-    tree : DecisionTreeClassifier
-        The tree to compute the posterior from.
-    X : ArrayLike of shape (n_samples, n_features)
-        The data matrix.
-    y : ArrayLike of shape (n_samples, n_outputs)
-        The output matrix.
-    covariate_index : ArrayLike of shape (n_covariates,), optional
-        The indices of the covariates to permute, by default None, which
-        does not permute any columns.
-    """
-    # seed the random number generator using each tree's random seed(?)
-    rng = np.random.default_rng(tree.random_state)
-
-    indices = np.arange(X.shape[0])
-
-    if covariate_index is not None:
-        # perform permutation of covariates
-        index_arr = rng.choice(indices, size=(X.shape[0], 1), replace=False, shuffle=False)
-        perm_X_cov = X[index_arr, covariate_index]
-        X[:, covariate_index] = perm_X_cov
-
-    # individual tree permutation of y labels
-    tree.fit(X, y, check_input=False)
+from .utils import (
+    METRIC_FUNCTIONS,
+    REGRESSOR_METRICS,
+    _compute_null_distribution_coleman,
+    _pvalue,
+    train_tree,
+)
 
 
 def tree_posterior(
@@ -633,11 +605,15 @@ class ForestHT(MetaEstimatorMixin):
         return observe_stat, pval
 
 
-class HyppoForestRegressor(MetaEstimatorMixin):
+class FeatureImportanceForestRegressor(MetaEstimatorMixin):
     """Forest hypothesis testing with continuous `y` variable.
 
     Parameters
     ----------
+    estimator : object, default=None
+        Type of forest estimator to use. By default `None`, which defaults to
+        :class:`sklearn.ensemble.RandomForestRegressor`.
+
     n_estimators : int, default=100
         The number of trees in the forest.
 
@@ -848,7 +824,7 @@ class HyppoForestRegressor(MetaEstimatorMixin):
 
     def _statistic(
         self,
-        estimator: ForestClassifier,
+        estimator: BaseForest,
         X: ArrayLike,
         y: ArrayLike,
         covariate_index: ArrayLike = None,
