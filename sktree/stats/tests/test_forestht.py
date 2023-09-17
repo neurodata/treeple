@@ -4,9 +4,13 @@ from scipy.special import expit
 from sklearn import datasets
 
 from sktree._lib.sklearn.tree import DecisionTreeClassifier
-from sktree.stats import MIGHT, PermutationForestClassifier, PermutationForestRegressor
+from sktree.stats import (
+    FeatureImportanceForestRegressor,
+    PermutationForestClassifier,
+    PermutationForestRegressor,
+)
 from sktree.stats.forestht import ForestHT
-from sktree.tree import ObliqueDecisionTreeClassifier, PatchObliqueDecisionTreeClassifier
+from sktree.tree import ObliqueDecisionTreeClassifier
 
 # load the iris dataset
 # and randomly permute it
@@ -34,7 +38,13 @@ def test_forestht_proper_attributes():
 
 
 @pytest.mark.slowtest
-@pytest.mark.parametrize("hypotester", [PermutationForestRegressor])
+@pytest.mark.parametrize(
+    "hypotester",
+    [
+        # PermutationForestRegressor,
+        FeatureImportanceForestRegressor
+    ],
+)
 def test_linear_model(hypotester):
     r"""Test hypothesis testing forests using MSE from linear model simulation.
 
@@ -71,6 +81,75 @@ def test_linear_model(hypotester):
         max_features=1.0,
         random_state=seed,
         n_estimators=n_estimators,
+        n_jobs=-1,
+    )
+
+    # test for X_1
+    stat, pvalue = est.test(X, y, [0], metric=metric, test_size=test_size, n_repeats=n_repeats)
+    print("X1: ", pvalue)
+    assert pvalue < 0.05, f"pvalue: {pvalue}"
+
+    # test for X_6
+    stat, pvalue = est.test(X, y, [5], metric=metric, test_size=test_size, n_repeats=n_repeats)
+    print("X6: ", pvalue)
+    assert pvalue < 0.05, f"pvalue: {pvalue}"
+
+    # test for a few unimportant other X
+    for covariate_index in [1, 6]:
+        # test for X_2, X_7
+        stat, pvalue = est.test(
+            X, y, [covariate_index], metric=metric, test_size=test_size, n_repeats=n_repeats
+        )
+        print("X2/7: ", pvalue)
+        assert pvalue > 0.05, f"pvalue: {pvalue}"
+
+
+@pytest.mark.slowtest
+@pytest.mark.parametrize(
+    "hypotester",
+    [
+        # PermutationForestRegressor,
+        FeatureImportanceForestRegressor
+    ],
+)
+def test_linear_model_withcoleman(hypotester):
+    r"""Test hypothesis testing forests using MSE from linear model simulation.
+
+    See https://arxiv.org/pdf/1904.07830.pdf Figure 1.
+
+    Y = Beta * X_1 + Beta * I(X_6 = 2) + \epsilon
+    """
+    beta = 10.0
+    sigma = 0.5
+    n_samples = 600
+    n_estimators = 125
+    test_size = 0.1
+    n_repeats = 200
+    permute_per_tree = True
+    metric = "mse"
+
+    rng = np.random.default_rng(seed)
+
+    # sample covariates
+    X_15 = rng.uniform(0, 1, size=(n_samples, 5))
+    X_610 = np.zeros((n_samples, 5))
+    for idx in range(5):
+        X_610[:, idx] = np.argwhere(
+            rng.multinomial(1, [1.0 / 3, 1.0 / 3, 1.0 / 3], size=(n_samples,))
+        )[:, 1]
+    X = np.concatenate((X_15, X_610), axis=1)
+    assert X.shape == (n_samples, 10)
+
+    # sample noise
+    epsilon = rng.normal(size=n_samples, loc=0.0, scale=sigma)
+
+    # compute final y of (n_samples,)
+    y = beta * X[:, 0] + (beta * (X[:, 5] == 2.0)) + epsilon
+    est = hypotester(
+        max_features=1.0,
+        random_state=seed,
+        n_estimators=n_estimators,
+        permute_per_tree=permute_per_tree,
         n_jobs=-1,
     )
 

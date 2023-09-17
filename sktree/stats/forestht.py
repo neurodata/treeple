@@ -5,81 +5,20 @@ from sklearn.model_selection import train_test_split
 from sklearn.utils.validation import _is_fitted, check_X_y
 
 from sktree._lib.sklearn.ensemble._forest import (
+    BaseForest,
     ForestClassifier,
     ForestRegressor,
     RandomForestRegressor,
-    BaseForest
 )
-from sktree._lib.sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+from sktree._lib.sklearn.tree import DecisionTreeRegressor
 
 from ..ensemble import HonestForestClassifier
 from .utils import (
     METRIC_FUNCTIONS,
     REGRESSOR_METRICS,
     _compute_null_distribution_coleman,
-    _pvalue,
     train_tree,
 )
-
-
-def tree_posterior(
-    tree: DecisionTreeClassifier,
-    X: ArrayLike,
-    y: ArrayLike,
-    covariate_index: ArrayLike = None,
-    test_size: float = 0.2,
-    seed=None,
-) -> ArrayLike:
-    """Compute the posterior from each tree on the "OOB" samples.
-
-    Parameters
-    ----------
-    tree : DecisionTreeClassifier
-        The tree to compute the posterior from.
-    X : ArrayLike of shape (n_samples, n_features)
-        The data matrix.
-    y : ArrayLike of shape (n_samples, n_outputs)
-        The output matrix.
-    covariate_index : ArrayLike of shape (n_covariates,), optional
-        The indices of the covariates to permute, by default None, which
-        does not permute any columns.
-    test_size : float, optional
-        The size of the OOB set of samples, by default 0.2.
-    seed : int, optional
-        Random seed, by default None.
-
-    Returns
-    -------
-    posterior : ArrayLike of shape (n_samples, n_outputs)
-        The predicted posterior probabilities for each OOB sample from the tree.
-        For any in-bag samples, the posterior is NaN.
-    """
-    # seed the random number generator using each tree's random seed(?)
-    rng = np.random.default_rng(tree.random_state)
-
-    indices = np.arange(X.shape[0])
-
-    if covariate_index is not None:
-        # perform permutation of covariates
-        index_arr = rng.choice(indices, size=(X.shape[0], 1), replace=False, shuffle=False)
-        perm_X_cov = X[index_arr, covariate_index]
-        X[:, covariate_index] = perm_X_cov
-
-    # XXX: we can replace this using Forest's generator for the in-bag/oob sample indices when
-    # https://github.com/scikit-learn/scikit-learn/pull/26736 is merged
-    # X_train, X_test, y_train, _, _, indices_test = train_test_split(
-    #     X, y, indices, test_size=test_size
-    # )
-
-    # individual tree permutation of y labels
-    tree.fit(X, y, check_input=False)
-    # y_pred = tree.predict_proba(X_test)[:, 1]
-
-    # Fill test set posteriors & set rest NaN
-    # posterior = np.full((y.shape[0], tree.n_outputs_), np.nan)
-    # posterior[indices_test] = y_pred.reshape(-1, tree.n_outputs_)
-
-    # return posterior
 
 
 class ForestHT(MetaEstimatorMixin):
@@ -605,8 +544,72 @@ class ForestHT(MetaEstimatorMixin):
         return observe_stat, pval
 
 
-class FeatureImportanceForestRegressor(MetaEstimatorMixin):
+class BaseForestHT(MetaEstimatorMixin):
+    def __init__(
+        self,
+        estimator=None,
+        n_estimators=100,
+        criterion="squared_error",
+        max_depth=None,
+        min_samples_split=2,
+        min_samples_leaf=1,
+        min_weight_fraction_leaf=0.0,
+        max_features="sqrt",
+        max_leaf_nodes=None,
+        min_impurity_decrease=0.0,
+        bootstrap=False,
+        oob_score=False,
+        n_jobs=None,
+        random_state=None,
+        verbose=0,
+        warm_start=False,
+        ccp_alpha=0.0,
+        max_samples=None,
+        permute_per_tree=True,
+        **estimator_kwargs,
+    ):
+        self.estimator = estimator
+        self.n_jobs = n_jobs
+        self.n_estimators = n_estimators
+        self.criterion = criterion
+        self.max_depth = max_depth
+        self.min_samples_split = min_samples_split
+        self.min_samples_leaf = min_samples_leaf
+        self.min_weight_fraction_leaf = min_weight_fraction_leaf
+        self.max_features = max_features
+        self.max_leaf_nodes = max_leaf_nodes
+        self.min_impurity_decrease = min_impurity_decrease
+        self.bootstrap = bootstrap
+        self.oob_score = oob_score
+        self.random_state = random_state
+        self.verbose = verbose
+        self.warm_start = warm_start
+        self.ccp_alpha = ccp_alpha
+        self.max_samples = max_samples
+        self.estimator_kwargs = estimator_kwargs
+        self.permute_per_tree = permute_per_tree
+
+    def reset(self):
+        class_attributes = dir(type(self))
+        instance_attributes = dir(self)
+
+        for attr_name in instance_attributes:
+            if attr_name.endswith("_") and attr_name not in class_attributes:
+                delattr(self, attr_name)
+
+
+class FeatureImportanceForestRegressor(BaseForestHT):
     """Forest hypothesis testing with continuous `y` variable.
+
+    The dataset is split into a training and testing dataset initially. Then there
+    are two forests that are trained: one on the original dataset, and one on the
+    permuted dataset. The dataset is either permuted once, or independently for
+    each tree in the permuted forest. The original test statistic is computed by
+    comparing the metric on both forests ``(metric_forest - metric_perm_forest)``.
+    
+    Then the output predictions are randomly sampled to recompute the test statistic
+    ``n_repeats`` times. The p-value is computed as the proportion of times the
+    null test statistic is greater than the original test statistic.
 
     Parameters
     ----------
@@ -801,26 +804,60 @@ class FeatureImportanceForestRegressor(MetaEstimatorMixin):
         ccp_alpha=0.0,
         max_samples=None,
         permute_per_tree=True,
+        sample_dataset_per_tree=False,
+        **estimator_kwargs,
     ):
-        self.estimator = estimator
-        self.n_jobs = n_jobs
-        self.n_estimators = n_estimators
-        self.criterion = criterion
-        self.max_depth = max_depth
-        self.min_samples_split = min_samples_split
-        self.min_samples_leaf = min_samples_leaf
-        self.min_weight_fraction_leaf = min_weight_fraction_leaf
-        self.max_features = max_features
-        self.max_leaf_nodes = max_leaf_nodes
-        self.min_impurity_decrease = min_impurity_decrease
-        self.bootstrap = bootstrap
-        self.oob_score = oob_score
-        self.random_state = random_state
-        self.verbose = verbose
-        self.warm_start = warm_start
-        self.ccp_alpha = ccp_alpha
-        self.max_samples = max_samples
+        super().__init__(
+            estimator=estimator,
+            n_estimators=n_estimators,
+            criterion=criterion,
+            max_depth=max_depth,
+            min_samples_split=min_samples_split,
+            min_samples_leaf=min_samples_leaf,
+            min_weight_fraction_leaf=min_weight_fraction_leaf,
+            max_features=max_features,
+            max_leaf_nodes=max_leaf_nodes,
+            min_impurity_decrease=min_impurity_decrease,
+            bootstrap=bootstrap,
+            oob_score=oob_score,
+            n_jobs=n_jobs,
+            random_state=random_state,
+            verbose=verbose,
+            warm_start=warm_start,
+            ccp_alpha=ccp_alpha,
+            max_samples=max_samples,
+            **estimator_kwargs,
+        )
         self.permute_per_tree = permute_per_tree
+        self.sample_dataset_per_tree = sample_dataset_per_tree
+
+    def _get_estimator(self):
+        if self.estimator is None:
+            estimator_ = RandomForestRegressor(
+                n_estimators=self.n_estimators,
+                criterion=self.criterion,
+                max_depth=self.max_depth,
+                min_samples_split=self.min_samples_split,
+                min_samples_leaf=self.min_samples_leaf,
+                min_weight_fraction_leaf=self.min_weight_fraction_leaf,
+                max_features=self.max_features,
+                max_leaf_nodes=self.max_leaf_nodes,
+                min_impurity_decrease=self.min_impurity_decrease,
+                bootstrap=self.bootstrap,
+                oob_score=self.oob_score,
+                n_jobs=self.n_jobs,
+                random_state=self.random_state,
+                verbose=self.verbose,
+                warm_start=self.warm_start,
+                ccp_alpha=self.ccp_alpha,
+                max_samples=self.max_samples,
+                **self.estimator_kwargs,
+            )
+        elif isinstance(self.estimator, ForestRegressor):
+            raise RuntimeError(f"Estimator must be a ForestRegressor, got {type(self.estimator)}")
+        else:
+            estimator_ = self.estimator
+        return estimator_
 
     def _statistic(
         self,
@@ -829,7 +866,6 @@ class FeatureImportanceForestRegressor(MetaEstimatorMixin):
         y: ArrayLike,
         covariate_index: ArrayLike = None,
         metric="mse",
-        test_size=0.2,
         return_posteriors: bool = False,
         **metric_kwargs,
     ):
@@ -837,9 +873,8 @@ class FeatureImportanceForestRegressor(MetaEstimatorMixin):
         metric_func = METRIC_FUNCTIONS[metric]
         rng = np.random.default_rng(self.random_state)
         n_samples = X.shape[0]
-        indices = np.arange(n_samples, dtype=int)
 
-        if self.permute_per_tree:
+        if self.permute_per_tree and not self.sample_dataset_per_tree:
             # first run a dummy fit on the samples to initialize the
             # internal data structure of the forest
             if not _is_fitted(estimator):
@@ -848,36 +883,75 @@ class FeatureImportanceForestRegressor(MetaEstimatorMixin):
                 estimator.fit(X_dummy, unique_y)
 
             # Fit each tree and compute posteriors with train test splits
-            posterior_arr = np.zeros((self.n_estimators, n_samples, estimator.n_outputs_))
+            n_samples_test = len(self.indices_test_)
+
+            # now initialize posterior array as (n_trees, n_samples_test, n_outputs)
+            posterior_arr = np.zeros((self.n_estimators, n_samples_test, estimator.n_outputs_))
             for idx in range(self.n_estimators):
-                seed = rng.integers(0, np.iinfo(np.uint32).max, dtype=np.uint32)
+                tree: DecisionTreeRegressor = estimator.estimators_[idx]
+                train_tree(
+                    tree, X[self.indices_train_, :], y[self.indices_train_, :], covariate_index
+                )
+
+                y_pred = tree.predict(X[self.indices_test_, :]).reshape(-1, tree.n_outputs_)
+
+                # Fill test set posteriors & set rest NaN
+                posterior_arr[idx, ...] = y_pred  # posterior
+
+            y_true_final = y[self.indices_test_, :]
+            # Average all posteriors
+            posterior_final = np.nanmean(posterior_arr, axis=0)
+            samples = np.argwhere(~np.isnan(posterior_final).any(axis=1)).squeeze()
+        elif self.permute_per_tree and self.sample_dataset_per_tree:
+            # first run a dummy fit on the samples to initialize the
+            # internal data structure of the forest
+            if not _is_fitted(estimator):
+                unique_y = np.unique(y)
+                X_dummy = np.zeros((unique_y.shape[0], X.shape[1]))
+                estimator.fit(X_dummy, unique_y)
+
+            # now initialize posterior array as (n_trees, n_samples, n_outputs)
+            posterior_arr = np.full((self.n_estimators, n_samples, estimator.n_outputs_), np.nan)
+            # Fit each tree and compute posteriors with train test splits
+            for idx in range(self.n_estimators):
+                # sample train/test dataset for each tree
                 indices_train, indices_test = train_test_split(
-                    indices, test_size=test_size, stratify=y, shuffle=True, random_state=seed
+                    np.arange(n_samples, dtype=int),
+                    test_size=self.test_size_,
+                    shuffle=True,
+                    random_state=rng.integers(0, np.iinfo(np.uint32).max, dtype=np.uint32),
                 )
                 tree: DecisionTreeRegressor = estimator.estimators_[idx]
                 train_tree(tree, X[indices_train, :], y[indices_train, :], covariate_index)
 
-                y_pred = tree.predict(X[indices_test, :])
+                y_pred = tree.predict(X[indices_test, :]).reshape(-1, tree.n_outputs_)
 
-                # Fill test set posteriors & set rest NaN
-                posterior = np.full((y.shape[0], tree.n_outputs_), np.nan)
-                posterior[indices_test, :] = y_pred
-                posterior_arr[idx, ...] = posterior
+                posterior_arr[idx, indices_test, :] = y_pred  # posterior
 
             # Average all posteriors
             posterior_final = np.nanmean(posterior_arr, axis=0)
-            samples = np.argwhere(~np.isnan(posterior_final).any(axis=1)).squeeze()
-            y_true_final = y[samples, :]
-            posterior_final = posterior_final[samples, :]
-        else:
-            if covariate_index is not None:
-                print("Permuting the covariate...")
-                # perform permutation of covariates
-                index_arr = rng.choice(indices, size=(X.shape[0], 1), replace=False, shuffle=False)
-                X[:, covariate_index] = X[index_arr, covariate_index]
 
+            # Find the row indices with NaN values in any column
+            nonnan_indices = np.where(~np.isnan(posterior_final).any(axis=1))[0]
+
+            # Ignore all NaN values (samples not tested)
+            y_true_final = y[nonnan_indices, :]
+            posterior_final = posterior_final[nonnan_indices, :]
+            samples = nonnan_indices
+        else:
             X_train, X_test = X[self.indices_train_, :], X[self.indices_test_, :]
             y_train, y_test = y[self.indices_train_, :], y[self.indices_test_, :]
+
+            if covariate_index is not None:
+                # perform permutation of covariates
+                n_samples_train = X_train.shape[0]
+                index_arr = rng.choice(
+                    np.arange(n_samples_train, dtype=int),
+                    size=(n_samples_train, 1),
+                    replace=False,
+                    shuffle=True,
+                )
+                X_train[:, covariate_index] = X_train[index_arr, covariate_index]
 
             estimator.fit(X_train, y_train)
             y_pred = estimator.predict(X_test)
@@ -887,10 +961,7 @@ class FeatureImportanceForestRegressor(MetaEstimatorMixin):
             y_true_final = y_test
             posterior_final = y_pred
 
-        # print('Y true: ', y_true_final)
-        # print('posterior: ', posterior_final)
         stat = metric_func(y_true_final, posterior_final, **metric_kwargs)
-
         if covariate_index is None:
             # Ignore all NaN values (samples not tested) -> (n_samples_final, n_outputs)
             # arrays of y and predicted posterior
@@ -904,21 +975,12 @@ class FeatureImportanceForestRegressor(MetaEstimatorMixin):
 
         return stat
 
-    def reset(self):
-        class_attributes = dir(type(self))
-        instance_attributes = dir(self)
-
-        for attr_name in instance_attributes:
-            if attr_name.endswith("_") and attr_name not in class_attributes:
-                delattr(self, attr_name)
-
     def statistic(
         self,
         X: ArrayLike,
         y: ArrayLike,
         covariate_index: ArrayLike = None,
         metric="mse",
-        test_size=0.2,
         return_posteriors: bool = False,
         check_input: bool = True,
         **metric_kwargs,
@@ -962,30 +1024,8 @@ class FeatureImportanceForestRegressor(MetaEstimatorMixin):
         if metric not in REGRESSOR_METRICS:
             raise RuntimeError(f'Metric must be either "mse" or "mae", got {metric}')
 
-        if not hasattr(self, "estimator_") and self.estimator is None:
-            self.estimator_ = RandomForestRegressor(
-                n_estimators=self.n_estimators,
-                criterion=self.criterion,
-                max_depth=self.max_depth,
-                min_samples_split=self.min_samples_split,
-                min_samples_leaf=self.min_samples_leaf,
-                min_weight_fraction_leaf=self.min_weight_fraction_leaf,
-                max_features=self.max_features,
-                max_leaf_nodes=self.max_leaf_nodes,
-                min_impurity_decrease=self.min_impurity_decrease,
-                bootstrap=self.bootstrap,
-                oob_score=self.oob_score,
-                n_jobs=self.n_jobs,
-                random_state=self.random_state,
-                verbose=self.verbose,
-                warm_start=self.warm_start,
-                ccp_alpha=self.ccp_alpha,
-                max_samples=self.max_samples,
-            )
-        elif not isinstance(self.estimator_, ForestRegressor):
-            raise RuntimeError(f"Estimator must be a ForestRegressor, got {type(self.estimator_)}")
-
         if covariate_index is None:
+            self.estimator_ = self._get_estimator()
             estimator = self.estimator_
         else:
             self.permuted_estimator_ = clone(self.estimator_)
@@ -997,7 +1037,6 @@ class FeatureImportanceForestRegressor(MetaEstimatorMixin):
             y,
             covariate_index=covariate_index,
             metric=metric,
-            test_size=test_size,
             return_posteriors=return_posteriors,
             **metric_kwargs,
         )
@@ -1054,14 +1093,18 @@ class FeatureImportanceForestRegressor(MetaEstimatorMixin):
             y = y.reshape(-1, 1)
 
         indices = np.arange(X.shape[0])
-        if not self.permute_per_tree:
-            # train/test split
-            # XXX: could add stratifying by y when y is classification
-            indices_train, indices_test = train_test_split(
-                indices, test_size=test_size, shuffle=True
-            )
-            self.indices_train_ = indices_train
-            self.indices_test_ = indices_test
+        self.test_size_ = int(test_size * X.shape[0])
+        # if not self.permute_per_tree:
+        #     # train/test split
+        #     # XXX: could add stratifying by y when y is classification
+        #     indices_train, indices_test = train_test_split(
+        #         indices, test_size=test_size, shuffle=True
+        #     )
+        #     self.indices_train_ = indices_train
+        #     self.indices_test_ = indices_test
+        indices_train, indices_test = train_test_split(indices, test_size=test_size, shuffle=True)
+        self.indices_train_ = indices_train
+        self.indices_test_ = indices_test
 
         if not hasattr(self, "samples_"):
             # first compute the test statistic on the un-permuted data
@@ -1070,7 +1113,6 @@ class FeatureImportanceForestRegressor(MetaEstimatorMixin):
                 y,
                 covariate_index=None,
                 metric=metric,
-                test_size=test_size,
                 return_posteriors=True,
                 check_input=False,
                 **metric_kwargs,
@@ -1086,7 +1128,6 @@ class FeatureImportanceForestRegressor(MetaEstimatorMixin):
             y,
             covariate_index=covariate_index,
             metric=metric,
-            test_size=test_size,
             return_posteriors=True,
             check_input=False,
             **metric_kwargs,
@@ -1095,26 +1136,32 @@ class FeatureImportanceForestRegressor(MetaEstimatorMixin):
         # Note: at this point, both `estimator` and `permuted_estimator_` should
         # have been fitted already, so we can now compute on the null by resampling
         # the posteriors and computing the test statistic on the resampled posteriors
-        metric_star, metric_star_pi = _compute_null_distribution_coleman(
-            X_test=X,
-            y_test=y,
-            y_pred_proba_normal=observe_posteriors,
-            y_pred_proba_perm=permute_posteriors,
-            normal_samples=observe_samples,
-            perm_samples=permute_samples,
-            metric=metric,
-            n_repeats=n_repeats,
-            seed=self.random_state,
-        )
-        # print(observe_posteriors)
-        # print(permute_posteriors)
-        # metric^\pi - metric
+        if self.sample_dataset_per_tree:
+            metric_star, metric_star_pi = _compute_null_distribution_coleman(
+                y_test=y[observe_samples, :],
+                y_pred_proba_normal=observe_posteriors,
+                y_pred_proba_perm=permute_posteriors,
+                metric=metric,
+                n_repeats=n_repeats,
+                seed=self.random_state,
+            )
+        else:
+            metric_star, metric_star_pi = _compute_null_distribution_coleman(
+                y_test=y[self.indices_test_, :],
+                y_pred_proba_normal=observe_posteriors,
+                y_pred_proba_perm=permute_posteriors,
+                metric=metric,
+                n_repeats=n_repeats,
+                seed=self.random_state,
+            )
+        # metric^\pi - metric = observed test statistic, which under the null is normally distributed around 0
         observe_stat = permute_stat - observe_stat
 
-        # metric^\pi_j - metric_j
+        # metric^\pi_j - metric_j, which is centered at 0
         null_dist = metric_star_pi - metric_star
 
-        pval = _pvalue(observe_stat=observe_stat, permuted_stat=null_dist, correction=True)
+        # compute pvalue
+        pvalue = (1 + (null_dist >= observe_stat).sum()) / (1 + n_repeats)
 
         if return_posteriors:
             self.observe_posteriors_ = observe_posteriors
@@ -1123,4 +1170,4 @@ class FeatureImportanceForestRegressor(MetaEstimatorMixin):
             self.permute_samples_ = permute_samples
 
         self.null_dist_ = null_dist
-        return observe_stat, pval
+        return observe_stat, pvalue

@@ -54,7 +54,7 @@ cython_c_args += numpy_nodepr_api
 python_sources = [
   '__init__.py',
   'neighbors.py',
-  'conftest.py',
+  # 'conftest.py',
 ]
 
 py3.install_sources(

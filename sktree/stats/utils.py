@@ -15,8 +15,8 @@ from sktree._lib.sklearn.ensemble._forest import ForestClassifier
 from sktree._lib.sklearn.tree import DecisionTreeClassifier
 
 
-def _mutual_information(y_true, y_pred):
-    H_YX = np.mean(entropy(y_pred, base=np.exp(1)))
+def _mutual_information(y_true, y_pred_proba):
+    H_YX = np.mean(entropy(y_pred_proba, base=np.exp(1), axis=1))
     _, counts = np.unique(y_true, return_counts=True)
     H_Y = entropy(counts, base=np.exp(1))
     return max(H_Y - H_YX, 0)
@@ -55,11 +55,11 @@ def train_tree(
     # seed the random number generator using each tree's random seed(?)
     rng = np.random.default_rng(tree.random_state)
 
-    indices = np.arange(X.shape[0])
+    indices = np.arange(X.shape[0], dtype=int)
 
     if covariate_index is not None:
         # perform permutation of covariates
-        index_arr = rng.choice(indices, size=(X.shape[0], 1), replace=False, shuffle=False)
+        index_arr = rng.choice(indices, size=(X.shape[0], 1), replace=False, shuffle=True)
         perm_X_cov = X[index_arr, covariate_index]
         X[:, covariate_index] = perm_X_cov
 
@@ -67,34 +67,7 @@ def train_tree(
     tree.fit(X, y, check_input=False)
 
 
-def _pvalue(observe_stat: float, permuted_stat: ArrayLike, correction: bool = True) -> float:
-    """Compute pvalue.
-
-    Implements the pvalue calculation from optionally with a correction factor.
-
-    Parameters
-    ----------
-    observe_stat : float
-        The observed test statistic.
-    permuted_stat : ArrayLike of shape (n_repeats,)
-        The array of test statistics computed on permutations.
-    correction : bool
-        Whether to use correction and add 1 to the numerator and denominator, by default True.
-
-    Returns
-    -------
-    pval : float
-        The pvalue.
-    """
-    n_repeats = len(permuted_stat)
-    if correction:
-        pval = (1 + (permuted_stat < observe_stat).sum()) / (1 + n_repeats)
-    else:
-        pval = (permuted_stat < observe_stat).sum() / n_repeats
-    return pval
-
-
-def compute_null_distribution_perm(
+def _compute_null_distribution_perm(
     X_train: ArrayLike,
     y_train: ArrayLike,
     X_test: ArrayLike,
@@ -135,8 +108,6 @@ def compute_null_distribution_perm(
     test_index_arr = np.arange(n_samples_test, dtype=int).reshape(-1, 1)
 
     X = np.concatenate((X_train, X_test), axis=0)
-    index_arr = np.arange(X.shape[0], dtype=int)  # .reshape(-1, 1)
-
     null_metrics = np.zeros((n_repeats,))
 
     for idx in range(n_repeats):
@@ -162,12 +133,9 @@ def compute_null_distribution_perm(
 
 
 def _compute_null_distribution_coleman(
-    X_test: ArrayLike,
     y_test: ArrayLike,
     y_pred_proba_normal: ArrayLike,
     y_pred_proba_perm: ArrayLike,
-    normal_samples: ArrayLike,
-    perm_samples: ArrayLike,
     metric: str = "mse",
     n_repeats: int = 1000,
     seed: int = None,
@@ -209,33 +177,49 @@ def _compute_null_distribution_coleman(
 
     metric_func = METRIC_FUNCTIONS[metric]
 
-    # sample two sets of equal number of trees from the combined forest
+    # sample two sets of equal number of trees from the combined forest these are the posteriors
     all_y_pred = np.concatenate((y_pred_proba_normal, y_pred_proba_perm), axis=0)
 
-    # get the indices of the samples that we have a posterior for, so each element
-    # is an index into `y_test`
-    all_samples_pred = np.concatenate((normal_samples, perm_samples), axis=0)
+    n_samples_test = len(y_test)
+    assert len(all_y_pred) == 2 * n_samples_test
 
-    n_samples_final = len(all_samples_pred)
+    # create two stacked index arrays of y_test resulting in [1, ..., N, 1, ..., N]
+    y_test_ind_arr = np.hstack(
+        (np.arange(n_samples_test, dtype=int), np.arange(n_samples_test, dtype=int))
+    )
+
+    # create index array of [1, ..., 2N] to slice into `all_y_pred`
+    y_pred_ind_arr = np.arange((2 * n_samples_test), dtype=int)
+
+    # # get the indices of the samples that we have a posterior for, so each element
+    # # is an index into `y_test`
+    # all_samples_pred = np.concatenate((normal_samples, perm_samples), axis=0)
+
+    # n_samples_final = len(all_samples_pred)
 
     # pre-allocate memory for the index array
-    index_arr = np.arange(n_samples_final, dtype=int)
+    # index_arr = np.arange(n_samples_final, dtype=int)
 
     metric_star = np.zeros((n_repeats,))
     metric_star_pi = np.zeros((n_repeats,))
     for idx in range(n_repeats):
         # two sets of random indices from 1 : 2N are sampled using Fisher-Yates
-        rng.shuffle(index_arr)
-        first_half_index = index_arr[: n_samples_final // 2]
-        second_half_index = index_arr[n_samples_final // 2 :]
+        rng.shuffle(y_pred_ind_arr)
+
+        first_forest_inds = y_pred_ind_arr[:n_samples_test]
+        second_forest_inds = y_pred_ind_arr[:n_samples_test]
+
+        # index into y_test for first half and second half
+        first_half_index_test = y_test_ind_arr[first_forest_inds]
+        second_half_index_test = y_test_ind_arr[second_forest_inds]
 
         # now get the pointers to the actual samples used for the metric
-        y_test_first_half = y_test[all_samples_pred[first_half_index]]
-        y_test_second_half = y_test[all_samples_pred[second_half_index]]
+        y_test_first_half = y_test[first_half_index_test]
+        y_test_second_half = y_test[second_half_index_test]
 
         # compute two instances of the metric from the sampled trees
-        first_half_metric = metric_func(y_test_first_half, all_y_pred[first_half_index])
-        second_half_metric = metric_func(y_test_second_half, all_y_pred[second_half_index])
+        first_half_metric = metric_func(y_test_first_half, all_y_pred[first_forest_inds])
+        second_half_metric = metric_func(y_test_second_half, all_y_pred[second_forest_inds])
 
         metric_star[idx] = first_half_metric
         metric_star_pi[idx] = second_half_metric

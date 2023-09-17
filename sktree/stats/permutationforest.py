@@ -7,7 +7,7 @@ from sklearn.utils.validation import check_X_y
 
 from sktree._lib.sklearn.ensemble._forest import BaseForest, ForestClassifier, ForestRegressor
 
-from .utils import METRIC_FUNCTIONS, REGRESSOR_METRICS, compute_null_distribution_perm
+from .utils import METRIC_FUNCTIONS, REGRESSOR_METRICS, _compute_null_distribution_perm
 
 
 class BasePermutationForest(MetaEstimatorMixin):
@@ -259,7 +259,7 @@ class BasePermutationForest(MetaEstimatorMixin):
 
         # compute null distribution of the test statistic
         # WARNING: this could take a long time, since it fits a new forest
-        null_dist = compute_null_distribution_perm(
+        null_dist = _compute_null_distribution_perm(
             X_train=X[self.indices_train_, :],
             y_train=y[self.indices_train_, :],
             X_test=X[self.indices_test_, :],

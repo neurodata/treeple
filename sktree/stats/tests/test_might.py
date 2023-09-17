@@ -4,7 +4,7 @@ from sklearn import datasets
 
 from sktree._lib.sklearn.tree import DecisionTreeClassifier
 from sktree.stats import MIGHT
-from sktree.tree import ObliqueDecisionTreeClassifier, PatchObliqueDecisionTreeClassifier
+from sktree.tree import ObliqueDecisionTreeClassifier
 
 # load the iris dataset
 # and randomly permute it
