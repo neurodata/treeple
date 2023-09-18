@@ -155,7 +155,9 @@ class MIGHT:
                 posterior_final[:, 0], posterior_final[:, 1], max_fpr=self.limit
             )
         elif stat == "MI":
-            H_YX = np.mean(entropy(posterior_final[:, 1], base=np.exp(1)))
+            class_zero = (1 - posterior_final[:, 1]).reshape(-1, 1)
+            full_class = np.hstack((class_zero, posterior_final[:, 1].reshape(-1, 1)))
+            H_YX = np.mean(entropy(full_class, base=np.exp(1), axis=1))
             _, counts = np.unique(posterior_final[:, 0], return_counts=True)
             H_Y = entropy(counts, base=np.exp(1))
             self.stat = max(H_Y - H_YX, 0)
