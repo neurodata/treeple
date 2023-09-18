@@ -125,6 +125,20 @@ an API-like interface similar to :class:`~sklearn.neighbors.NearestNeighbors`.
 
    NearestNeighborsMetaEstimator
 
+Statistical Hypothesis Testing
+------------------------------
+We provide an API for performing statistical hypothesis testing using Decision
+tree models.
+
+.. currentmodule:: sktree.stats
+.. autosummary::
+   :toctree: generated/
+
+   FeatureImportanceForestRegressor
+   FeatureImportanceForestClassifier
+   PermutationImportanceForestRegressor
+   PermutationImportanceForestClassifier
+
 
 Experimental Functionality
 --------------------------
