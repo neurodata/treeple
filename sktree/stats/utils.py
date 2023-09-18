@@ -107,7 +107,6 @@ def _compute_null_distribution_perm(
     train_index_arr = np.arange(n_samples_train, dtype=int).reshape(-1, 1)
     test_index_arr = np.arange(n_samples_test, dtype=int).reshape(-1, 1)
 
-    X = np.concatenate((X_train, X_test), axis=0)
     null_metrics = np.zeros((n_repeats,))
 
     for idx in range(n_repeats):
@@ -181,7 +180,10 @@ def _compute_null_distribution_coleman(
     all_y_pred = np.concatenate((y_pred_proba_normal, y_pred_proba_perm), axis=0)
 
     n_samples_test = len(y_test)
-    assert len(all_y_pred) == 2 * n_samples_test
+    if len(all_y_pred) != 2 * n_samples_test:
+        raise RuntimeError(
+            "The number of samples in `all_y_pred` is not equal to 2 * n_samples_test"
+        )
 
     # create two stacked index arrays of y_test resulting in [1, ..., N, 1, ..., N]
     y_test_ind_arr = np.hstack(

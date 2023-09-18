@@ -87,10 +87,6 @@ def linear_model_ancova(sigma_factor=2.0, seed=None):
     return pvalue_dict
 
 
-def linear_model_mars():
-    pass
-
-
 def correlated_logit_model(beta=5.0, seed=None):
     n_samples = 600
     n_estimators = 125
@@ -149,14 +145,43 @@ def random_forest_model():
     pass
 
 
-if __name__ == "__main__":
+def evaluate_correlated_logit_model():
+    pvalue_dict = defaultdict(list)
+    rng = np.random.default_rng(seed)
+
+    beta_space = np.hstack((np.linspace(0.01, 2.5, 8), np.linspace(5, 20, 7)))
+    for beta in beta_space:
+        for idx in range(5):
+            new_seed = rng.integers(0, np.iinfo(np.uint32).max, dtype=np.uint32)
+
+            elements_dict = correlated_logit_model(beta, new_seed)
+            for key, value in elements_dict.items():
+                pvalue_dict[key].append(value)
+            pvalue_dict["sigma_factor"].append(beta)
+
+    df = pd.DataFrame(pvalue_dict)
+
+    fig, axs = plt.subplots(3, 1, figsize=(8, 6), sharey=True, sharex=True)
+    axs = axs.flatten()
+
+    for ax, name in zip(axs, ["X1", "X2", "X500"]):
+        sns.lineplot(data=df, x="sigma_factor", y=name, ax=ax, marker="o")
+
+        ax.axhline([0.05], ls="--", color="red", label="alpha")
+        ax.set(title=name, ylabel="pvalue", xlabel="SNR (beta)")
+        ax.legend()
+    fig.suptitle("Correlated Logit model")
+    fig.tight_layout()
+
+
+def evaluate_linear_ancova_model():
     pvalue_dict = defaultdict(list)
     rng = np.random.default_rng(seed)
 
     j_space = np.linspace(0.005, 2.25, 9)
 
     for sigma_factor in j_space:
-        for idx in range(10):
+        for idx in range(5):
             new_seed = rng.integers(0, np.iinfo(np.uint32).max, dtype=np.uint32)
 
             elements_dict = linear_model_ancova(sigma_factor, new_seed)
@@ -165,3 +190,19 @@ if __name__ == "__main__":
             pvalue_dict["sigma_factor"].append(sigma_factor)
 
     df = pd.DataFrame(pvalue_dict)
+
+    fig, axs = plt.subplots(2, 2, figsize=(8, 6), sharey=True, sharex=True)
+    axs = axs.flatten()
+
+    for ax, name in zip(axs, ["X1", "X2", "X6", "X7"]):
+        sns.lineplot(data=df, x="sigma_factor", y=name, ax=ax, marker="o")
+
+        ax.axhline([0.05], ls="--", color="red", label="alpha")
+        ax.set(title=name, ylabel="pvalue", xlabel="SNR (10 / x)")
+        ax.legend()
+    fig.suptitle("Linear ANCOVA model")
+    fig.tight_layout()
+
+
+if __name__ == "__main__":
+    evaluate_linear_ancova_model()

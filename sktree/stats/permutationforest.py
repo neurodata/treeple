@@ -243,7 +243,7 @@ class BasePermutationForest(MetaEstimatorMixin):
 
         if not hasattr(self, "samples_"):
             # first compute the test statistic on the un-permuted data
-            observe_stat, observe_posteriors, observe_samples = self.statistic(
+            observe_stat, _, _ = self.statistic(
                 X,
                 y,
                 covariate_index=None,
@@ -253,8 +253,8 @@ class BasePermutationForest(MetaEstimatorMixin):
                 **metric_kwargs,
             )
         else:
-            observe_samples = self.samples_
-            observe_posteriors = self.posterior_final_
+            # observe_samples = self.samples_
+            # observe_posteriors = self.posterior_final_
             observe_stat = self.stat_
 
         # compute null distribution of the test statistic
@@ -572,7 +572,7 @@ class PermutationForestClassifier(BasePermutationForest):
     non-permuted data.
 
     .. note:: This does not allow testing on the posteriors.
-    
+
     Parameters
     ----------
     estimator : object, default=None
@@ -830,6 +830,6 @@ class PermutationForestClassifier(BasePermutationForest):
                 max_samples=self.max_samples,
                 **self.estimator_kwargs,
             )
-        elif not isinstance(self.estimator_, ForestRegressor):
-            raise RuntimeError(f"Estimator must be a ForestRegressor, got {type(self.estimator_)}")
+        elif not isinstance(self.estimator_, ForestClassifier):
+            raise RuntimeError(f"Estimator must be a ForestClassifier, got {type(self.estimator_)}")
         return estimator_

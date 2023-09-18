@@ -306,7 +306,7 @@ class MIGHT_MV:
         X_permutedZ = np.hstack((x, permuted_Z))
         perm_stat, perm_pos = self.statistic(X_permutedZ, y, return_pos=True)
 
-        # Bootsrap sample the posterior from the two forests
+        # Bootstrap sample the posterior from the two forests
         null_stats = np.array(
             Parallel(n_jobs=workers)(
                 [delayed(pos_diff)(observe_pos, perm_pos, y, limit=self.limit) for _ in range(reps)]

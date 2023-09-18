@@ -58,7 +58,6 @@ else:
             PatchObliqueRandomForestRegressor,
         )
         from .ensemble._honest_forest import HonestForestClassifier
-        from .stats import ForestHT
     except ImportError as e:
         msg = """Error importing scikit-tree: you cannot import scikit-tree while
         being in scikit-tree source directory; please exit the scikit-tree source
@@ -86,5 +85,4 @@ else:
         "ExtraTreesClassifier",
         "ExtraTreesRegressor",
         "ExtendedIsolationForest",
-        "ForestHT",
     ]
