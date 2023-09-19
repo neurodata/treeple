@@ -100,11 +100,13 @@ class BaseForestHT(MetaEstimatorMixin):
         covariate_index : ArrayLike, optional of shape (n_covariates,)
             The index array of covariates to shuffle, by default None.
         metric : str, optional
-            The metric to compute, by default "auc".
-        test_size : float, optional
-            Proportion of samples per tree to use for the test set, by default 0.2.
+            The metric to compute, by default "mse".
         return_posteriors : bool, optional
             Whether or not to return the posteriors, by default False.
+        check_input : bool, optional
+            Whether or not to check the input, by default True.
+        **metric_kwargs : dict, optional
+            Additional keyword arguments to pass to the metric function.
 
         Returns
         -------
@@ -184,6 +186,8 @@ class BaseForestHT(MetaEstimatorMixin):
             Number of times to sample the null distribution, by default 1000.
         return_posteriors : bool, optional
             Whether or not to return the posteriors, by default False.
+        **metric_kwargs : dict, optional
+            Additional keyword arguments to pass to the metric function.
 
         Returns
         -------
@@ -307,11 +311,6 @@ class FeatureImportanceForestRegressor(BaseForestHT):
         "gini" for the Gini impurity and "entropy" for the information gain.
         Note: this parameter is tree-specific.
 
-    splitter : {"best", "random"}, default="best"
-        The strategy used to choose the split at each node. Supported
-        strategies are "best" to choose the best split and "random" to choose
-        the best random split.
-
     max_depth : int, default=None
         The maximum depth of the tree. If None, then nodes are expanded until
         all leaves are pure or until all leaves contain less than
@@ -388,11 +387,7 @@ class FeatureImportanceForestRegressor(BaseForestHT):
         Only available if bootstrap=True.
 
     n_jobs : int, default=None
-        The number of jobs to run in parallel. :meth:`fit`, :meth:`predict`,
-        :meth:`decision_path` and :meth:`apply` are all parallelized over the
-        trees. ``None`` means 1 unless in a `joblib.parallel_backend`
-        context. ``-1`` means using all processors. See :term:`Glossary
-        <n_jobs>` for more details.
+        The number of jobs to run in parallel.
 
     random_state : int, RandomState instance or None, default=None
         Controls both the randomness of the bootstrapping of the samples used
@@ -408,32 +403,6 @@ class FeatureImportanceForestRegressor(BaseForestHT):
         When set to ``True``, reuse the solution of the previous call to fit
         and add more estimators to the ensemble, otherwise, just fit a whole
         new forest. See :term:`the Glossary <warm_start>`.
-
-    class_weight : {"balanced", "balanced_subsample"}, dict or list of dicts, \
-            default=None
-        Weights associated with classes in the form ``{class_label: weight}``.
-        If not given, all classes are supposed to have weight one. For
-        multi-output problems, a list of dicts can be provided in the same
-        order as the columns of y.
-
-        Note that for multioutput (including multilabel) weights should be
-        defined for each class of every column in its own dict. For example,
-        for four-class multilabel classification weights should be
-        [{0: 1, 1: 1}, {0: 1, 1: 5}, {0: 1, 1: 1}, {0: 1, 1: 1}] instead of
-        [{1:1}, {2:5}, {3:1}, {4:1}].
-
-        The "balanced" mode uses the values of y to automatically adjust
-        weights inversely proportional to class frequencies in the input data
-        as ``n_samples / (n_classes * np.bincount(y))``
-
-        The "balanced_subsample" mode is the same as "balanced" except that
-        weights are computed based on the bootstrap sample for every tree
-        grown.
-
-        For multi-output, the weights of each column of y will be multiplied.
-
-        Note that these weights will be multiplied with sample_weight (passed
-        through the fit method) if sample_weight is specified.
 
     ccp_alpha : non-negative float, default=0.0
         Complexity parameter used for Minimal Cost-Complexity Pruning. The
@@ -698,11 +667,6 @@ class FeatureImportanceForestClassifier(BaseForestHT):
         "gini" for the Gini impurity and "entropy" for the information gain.
         Note: this parameter is tree-specific.
 
-    splitter : {"best", "random"}, default="best"
-        The strategy used to choose the split at each node. Supported
-        strategies are "best" to choose the best split and "random" to choose
-        the best random split.
-
     max_depth : int, default=None
         The maximum depth of the tree. If None, then nodes are expanded until
         all leaves are pure or until all leaves contain less than
@@ -779,11 +743,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
         Only available if bootstrap=True.
 
     n_jobs : int, default=None
-        The number of jobs to run in parallel. :meth:`fit`, :meth:`predict`,
-        :meth:`decision_path` and :meth:`apply` are all parallelized over the
-        trees. ``None`` means 1 unless in a `joblib.parallel_backend`
-        context. ``-1`` means using all processors. See :term:`Glossary
-        <n_jobs>` for more details.
+        The number of jobs to run in parallel.
 
     random_state : int, RandomState instance or None, default=None
         Controls both the randomness of the bootstrapping of the samples used
@@ -799,32 +759,6 @@ class FeatureImportanceForestClassifier(BaseForestHT):
         When set to ``True``, reuse the solution of the previous call to fit
         and add more estimators to the ensemble, otherwise, just fit a whole
         new forest. See :term:`the Glossary <warm_start>`.
-
-    class_weight : {"balanced", "balanced_subsample"}, dict or list of dicts, \
-            default=None
-        Weights associated with classes in the form ``{class_label: weight}``.
-        If not given, all classes are supposed to have weight one. For
-        multi-output problems, a list of dicts can be provided in the same
-        order as the columns of y.
-
-        Note that for multioutput (including multilabel) weights should be
-        defined for each class of every column in its own dict. For example,
-        for four-class multilabel classification weights should be
-        [{0: 1, 1: 1}, {0: 1, 1: 5}, {0: 1, 1: 1}, {0: 1, 1: 1}] instead of
-        [{1:1}, {2:5}, {3:1}, {4:1}].
-
-        The "balanced" mode uses the values of y to automatically adjust
-        weights inversely proportional to class frequencies in the input data
-        as ``n_samples / (n_classes * np.bincount(y))``
-
-        The "balanced_subsample" mode is the same as "balanced" except that
-        weights are computed based on the bootstrap sample for every tree
-        grown.
-
-        For multi-output, the weights of each column of y will be multiplied.
-
-        Note that these weights will be multiplied with sample_weight (passed
-        through the fit method) if sample_weight is specified.
 
     ccp_alpha : non-negative float, default=0.0
         Complexity parameter used for Minimal Cost-Complexity Pruning. The

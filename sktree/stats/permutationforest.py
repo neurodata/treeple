@@ -31,7 +31,6 @@ class BasePermutationForest(MetaEstimatorMixin):
         warm_start=False,
         ccp_alpha=0.0,
         max_samples=None,
-        **estimators_kwargs,
     ):
         self.estimator = estimator
         self.n_jobs = n_jobs
@@ -51,7 +50,6 @@ class BasePermutationForest(MetaEstimatorMixin):
         self.warm_start = warm_start
         self.ccp_alpha = ccp_alpha
         self.max_samples = max_samples
-        self.estimator_kwargs = estimators_kwargs
 
     def reset(self):
         class_attributes = dir(type(self))
@@ -141,10 +139,14 @@ class BasePermutationForest(MetaEstimatorMixin):
             The index array of covariates to shuffle, by default None.
         metric : str, optional
             The metric to compute, by default "mse".
-        test_size : float, optional
-            Proportion of samples per tree to use for the test set, by default 0.2.
         return_posteriors : bool, optional
             Whether or not to return the posteriors, by default False.
+        check_input : bool, optional
+            Whether or not to check the input, by default True.
+        seed : int, optional
+            The random seed to use, by default None.
+        **metric_kwargs : dict, optional
+            Keyword arguments to pass to the metric function.
 
         Returns
         -------
@@ -221,13 +223,17 @@ class BasePermutationForest(MetaEstimatorMixin):
             by default 0.2.
         n_repeats : int, optional
             Number of times to sample the null distribution, by default 1000.
+        return_posteriors : bool, optional
+            Whether or not to return the posteriors, by default False.
+        **metric_kwargs : dict, optional
+            Keyword arguments to pass to the metric function.
 
         Returns
         -------
         observe_stat : float
             Observed test statistic.
         pvalue : float
-            p-value of the test.
+            Pvalue of the test.
         """
         X, y = check_X_y(X, y, ensure_2d=True, copy=True, multi_output=True)
         if y.ndim != 2:
@@ -292,10 +298,10 @@ class PermutationForestRegressor(BasePermutationForest):
     non-permuted data.
 
     .. warning:: Permutation testing with forests is computationally expensive.
-    As a result, if you are testing for the importance of feature sets, consider
-    using :class:`sktree.stats.FeatureImportanceForestRegressor` or
-    :class:`sktree.stats.FeatureImportanceForestClassifier` instead, which is
-    much more computationally efficient.
+        As a result, if you are testing for the importance of feature sets, consider
+        using `sktree.FeatureImportanceForestRegressor` or
+        `sktree.FeatureImportanceForestClassifier` instead, which is
+        much more computationally efficient.
 
     .. note:: This does not allow testing on the posteriors.
 
@@ -318,11 +324,6 @@ class PermutationForestRegressor(BasePermutationForest):
         splits, "absolute_error" for the mean absolute error, which minimizes
         the L1 loss using the median of each terminal node, and "poisson" which
         uses reduction in Poisson deviance to find splits.
-
-    splitter : {"best", "random"}, default="best"
-        The strategy used to choose the split at each node. Supported
-        strategies are "best" to choose the best split and "random" to choose
-        the best random split.
 
     max_depth : int, default=None
         The maximum depth of the tree. If None, then nodes are expanded until
@@ -400,11 +401,7 @@ class PermutationForestRegressor(BasePermutationForest):
         Only available if bootstrap=True.
 
     n_jobs : int, default=None
-        The number of jobs to run in parallel. :meth:`fit`, :meth:`predict`,
-        :meth:`decision_path` and :meth:`apply` are all parallelized over the
-        trees. ``None`` means 1 unless in a `joblib.parallel_backend`
-        context. ``-1`` means using all processors. See :term:`Glossary
-        <n_jobs>` for more details.
+        The number of jobs to run in parallel.
 
     random_state : int, RandomState instance or None, default=None
         Controls both the randomness of the bootstrapping of the samples used
@@ -421,32 +418,6 @@ class PermutationForestRegressor(BasePermutationForest):
         and add more estimators to the ensemble, otherwise, just fit a whole
         new forest. See :term:`the Glossary <warm_start>`.
 
-    class_weight : {"balanced", "balanced_subsample"}, dict or list of dicts, \
-            default=None
-        Weights associated with classes in the form ``{class_label: weight}``.
-        If not given, all classes are supposed to have weight one. For
-        multi-output problems, a list of dicts can be provided in the same
-        order as the columns of y.
-
-        Note that for multioutput (including multilabel) weights should be
-        defined for each class of every column in its own dict. For example,
-        for four-class multilabel classification weights should be
-        [{0: 1, 1: 1}, {0: 1, 1: 5}, {0: 1, 1: 1}, {0: 1, 1: 1}] instead of
-        [{1:1}, {2:5}, {3:1}, {4:1}].
-
-        The "balanced" mode uses the values of y to automatically adjust
-        weights inversely proportional to class frequencies in the input data
-        as ``n_samples / (n_classes * np.bincount(y))``
-
-        The "balanced_subsample" mode is the same as "balanced" except that
-        weights are computed based on the bootstrap sample for every tree
-        grown.
-
-        For multi-output, the weights of each column of y will be multiplied.
-
-        Note that these weights will be multiplied with sample_weight (passed
-        through the fit method) if sample_weight is specified.
-
     ccp_alpha : non-negative float, default=0.0
         Complexity parameter used for Minimal Cost-Complexity Pruning. The
         subtree with the largest cost complexity that is smaller than
@@ -461,22 +432,6 @@ class PermutationForestRegressor(BasePermutationForest):
         - If int, then draw `max_samples` samples.
         - If float, then draw `max_samples * X.shape[0]` samples. Thus,
           `max_samples` should be in the interval `(0.0, 1.0]`.
-
-    honest_prior : {"ignore", "uniform", "empirical"}, default="empirical"
-        Method for dealing with empty leaves during evaluation of a test
-        sample. If "ignore", the tree is ignored. If "uniform", the prior tree
-        posterior is 1/(number of classes). If "empirical", the prior tree
-        posterior is the relative class frequency in the voting subsample.
-        If all trees are ignored, the empirical estimate is returned.
-
-    honest_fraction : float, default=0.5
-        Fraction of training samples used for estimates in the trees. The
-        remaining samples will be used to learn the tree structure. A larger
-        fraction creates shallower trees with lower variance estimates.
-
-    tree_estimator : object, default=None
-        Type of decision tree classifier to use. By default `None`, which
-        defaults to :class:`sklearn.tree.DecisionTreeClassifier`.
 
     Attributes
     ----------
@@ -517,7 +472,6 @@ class PermutationForestRegressor(BasePermutationForest):
         warm_start=False,
         ccp_alpha=0.0,
         max_samples=None,
-        **estimators_kwargs,
     ):
         super().__init__(
             estimator=estimator,
@@ -538,7 +492,6 @@ class PermutationForestRegressor(BasePermutationForest):
             warm_start=warm_start,
             ccp_alpha=ccp_alpha,
             max_samples=max_samples,
-            **estimators_kwargs,
         )
 
     def _get_estimator(self):
@@ -561,7 +514,6 @@ class PermutationForestRegressor(BasePermutationForest):
                 warm_start=self.warm_start,
                 ccp_alpha=self.ccp_alpha,
                 max_samples=self.max_samples,
-                **self.estimator_kwargs,
             )
         elif not isinstance(self.estimator_, ForestRegressor):
             raise RuntimeError(f"Estimator must be a ForestRegressor, got {type(self.estimator_)}")
@@ -578,10 +530,10 @@ class PermutationForestClassifier(BasePermutationForest):
     non-permuted data.
 
     .. warning:: Permutation testing with forests is computationally expensive.
-    As a result, if you are testing for the importance of feature sets, consider
-    using :class:`sktree.stats.FeatureImportanceForestRegressor` or
-    :class:`sktree.stats.FeatureImportanceForestClassifier` instead, which is
-    much more computationally efficient.
+        As a result, if you are testing for the importance of feature sets, consider
+        using `sktree.FeatureImportanceForestRegressor` or
+        `sktree.FeatureImportanceForestClassifier` instead, which is
+        much more computationally efficient.
 
     .. note:: This does not allow testing on the posteriors.
 
@@ -597,11 +549,6 @@ class PermutationForestClassifier(BasePermutationForest):
     criterion : {"gini", "entropy"}, default="gini"
         The function to measure the quality of a split. Supported criteria are
         "gini" for the Gini impurity and "entropy" for the information gain.
-
-    splitter : {"best", "random"}, default="best"
-        The strategy used to choose the split at each node. Supported
-        strategies are "best" to choose the best split and "random" to choose
-        the best random split.
 
     max_depth : int, default=None
         The maximum depth of the tree. If None, then nodes are expanded until
@@ -679,11 +626,7 @@ class PermutationForestClassifier(BasePermutationForest):
         Only available if bootstrap=True.
 
     n_jobs : int, default=None
-        The number of jobs to run in parallel. :meth:`fit`, :meth:`predict`,
-        :meth:`decision_path` and :meth:`apply` are all parallelized over the
-        trees. ``None`` means 1 unless in a `joblib.parallel_backend`
-        context. ``-1`` means using all processors. See :term:`Glossary
-        <n_jobs>` for more details.
+        The number of jobs to run in parallel.
 
     random_state : int, RandomState instance or None, default=None
         Controls both the randomness of the bootstrapping of the samples used
@@ -700,32 +643,6 @@ class PermutationForestClassifier(BasePermutationForest):
         and add more estimators to the ensemble, otherwise, just fit a whole
         new forest. See :term:`the Glossary <warm_start>`.
 
-    class_weight : {"balanced", "balanced_subsample"}, dict or list of dicts, \
-            default=None
-        Weights associated with classes in the form ``{class_label: weight}``.
-        If not given, all classes are supposed to have weight one. For
-        multi-output problems, a list of dicts can be provided in the same
-        order as the columns of y.
-
-        Note that for multioutput (including multilabel) weights should be
-        defined for each class of every column in its own dict. For example,
-        for four-class multilabel classification weights should be
-        [{0: 1, 1: 1}, {0: 1, 1: 5}, {0: 1, 1: 1}, {0: 1, 1: 1}] instead of
-        [{1:1}, {2:5}, {3:1}, {4:1}].
-
-        The "balanced" mode uses the values of y to automatically adjust
-        weights inversely proportional to class frequencies in the input data
-        as ``n_samples / (n_classes * np.bincount(y))``
-
-        The "balanced_subsample" mode is the same as "balanced" except that
-        weights are computed based on the bootstrap sample for every tree
-        grown.
-
-        For multi-output, the weights of each column of y will be multiplied.
-
-        Note that these weights will be multiplied with sample_weight (passed
-        through the fit method) if sample_weight is specified.
-
     ccp_alpha : non-negative float, default=0.0
         Complexity parameter used for Minimal Cost-Complexity Pruning. The
         subtree with the largest cost complexity that is smaller than
@@ -740,22 +657,6 @@ class PermutationForestClassifier(BasePermutationForest):
         - If int, then draw `max_samples` samples.
         - If float, then draw `max_samples * X.shape[0]` samples. Thus,
           `max_samples` should be in the interval `(0.0, 1.0]`.
-
-    honest_prior : {"ignore", "uniform", "empirical"}, default="empirical"
-        Method for dealing with empty leaves during evaluation of a test
-        sample. If "ignore", the tree is ignored. If "uniform", the prior tree
-        posterior is 1/(number of classes). If "empirical", the prior tree
-        posterior is the relative class frequency in the voting subsample.
-        If all trees are ignored, the empirical estimate is returned.
-
-    honest_fraction : float, default=0.5
-        Fraction of training samples used for estimates in the trees. The
-        remaining samples will be used to learn the tree structure. A larger
-        fraction creates shallower trees with lower variance estimates.
-
-    tree_estimator : object, default=None
-        Type of decision tree classifier to use. By default `None`, which
-        defaults to :class:`sklearn.tree.DecisionTreeClassifier`.
 
     Attributes
     ----------
@@ -796,7 +697,6 @@ class PermutationForestClassifier(BasePermutationForest):
         warm_start=False,
         ccp_alpha=0.0,
         max_samples=None,
-        **estimators_kwargs,
     ):
         super().__init__(
             estimator=estimator,
@@ -817,7 +717,6 @@ class PermutationForestClassifier(BasePermutationForest):
             warm_start=warm_start,
             ccp_alpha=ccp_alpha,
             max_samples=max_samples,
-            **estimators_kwargs,
         )
 
     def _get_estimator(self):
@@ -840,7 +739,6 @@ class PermutationForestClassifier(BasePermutationForest):
                 warm_start=self.warm_start,
                 ccp_alpha=self.ccp_alpha,
                 max_samples=self.max_samples,
-                **self.estimator_kwargs,
             )
         elif not isinstance(self.estimator_, ForestClassifier):
             raise RuntimeError(f"Estimator must be a ForestClassifier, got {type(self.estimator_)}")

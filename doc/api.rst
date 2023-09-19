@@ -136,8 +136,8 @@ tree models.
 
    FeatureImportanceForestRegressor
    FeatureImportanceForestClassifier
-   PermutationImportanceForestRegressor
-   PermutationImportanceForestClassifier
+   PermutationForestClassifier
+   PermutationForestRegressor
 
 
 Experimental Functionality
