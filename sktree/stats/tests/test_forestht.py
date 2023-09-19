@@ -214,7 +214,7 @@ def test_correlated_logit_model(hypotester, model_kwargs, n_samples, n_repeats, 
 def test_iris_pauc_statistic(criterion, honest_prior, estimator, limit):
     max_features = "sqrt"
     n_repeats = 200
-    n_estimators = 50
+    n_estimators = 100
 
     # Check consistency on dataset iris.
     clf = FeatureImportanceForestClassifier(
