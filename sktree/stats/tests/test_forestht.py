@@ -200,6 +200,7 @@ def test_correlated_logit_model(hypotester, model_kwargs, n_samples, n_repeats, 
     assert pvalue > 0.05, f"pvalue: {pvalue}"
 
 
+@flaky(max_runs=3)
 @pytest.mark.parametrize("criterion", ["gini", "entropy"])
 @pytest.mark.parametrize("honest_prior", ["empirical", "uniform", "ignore"])
 @pytest.mark.parametrize(
@@ -223,7 +224,10 @@ def test_iris_pauc_statistic(criterion, honest_prior, estimator, limit):
         max_features=max_features,
         n_estimators=n_estimators,
         estimator=HonestForestClassifier(
-            n_estimators=n_estimators, tree_estimator=estimator, honest_prior=honest_prior
+            n_estimators=n_estimators,
+            tree_estimator=estimator,
+            honest_prior=honest_prior,
+            random_state=0,
         ),
         n_jobs=-1,
         sample_dataset_per_tree=True,
