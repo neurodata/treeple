@@ -224,7 +224,6 @@ class BaseForestHT(MetaEstimatorMixin):
         y,
         covariate_index: ArrayLike,
         metric: str = "mse",
-        test_size: float = 0.2,
         n_repeats: int = 1000,
         return_posteriors: bool = False,
         **metric_kwargs,
@@ -270,12 +269,6 @@ class BaseForestHT(MetaEstimatorMixin):
         X, y = check_X_y(X, y, ensure_2d=True, copy=True, multi_output=True)
         if y.ndim != 2:
             y = y.reshape(-1, 1)
-
-        # indices = np.arange(X.shape[0])
-        # self.test_size_ = int(test_size * X.shape[0])
-        # indices_train, indices_test = train_test_split(indices, test_size=test_size, shuffle=True)
-        # self.indices_train_ = indices_train
-        # self.indices_test_ = indices_test
 
         if not hasattr(self, "samples_"):
             # first compute the test statistic on the un-permuted data
