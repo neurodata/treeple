@@ -140,7 +140,7 @@ def test_linear_model(hypotester, model_kwargs, n_samples, n_repeats, test_size)
                 "estimator": RandomForestClassifier(
                     max_features="sqrt",
                     random_state=seed,
-                    n_estimators=125,
+                    n_estimators=150,
                     n_jobs=-1,
                 ),
                 "random_state": seed,
