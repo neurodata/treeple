@@ -1,6 +1,5 @@
 python_sources = [
   '__init__.py',
-  'test_might.py',
   'test_forestht.py'
 ]
 
