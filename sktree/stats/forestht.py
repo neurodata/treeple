@@ -1,7 +1,10 @@
 import numpy as np
 from numpy.typing import ArrayLike
-from sklearn.base import MetaEstimatorMixin, clone
+from sklearn.base import MetaEstimatorMixin, clone, is_classifier
+from sklearn.ensemble._forest import ForestClassifier as sklearnForestClassifier
+from sklearn.ensemble._forest import ForestRegressor as sklearnForestRegressor
 from sklearn.model_selection import train_test_split
+from sklearn.utils.multiclass import type_of_target
 from sklearn.utils.validation import _is_fitted, check_X_y
 
 from sktree._lib.sklearn.ensemble._forest import (
@@ -15,6 +18,8 @@ from sktree._lib.sklearn.tree import DecisionTreeClassifier, DecisionTreeRegress
 
 from .utils import (
     METRIC_FUNCTIONS,
+    POSITIVE_METRICS,
+    POSTERIOR_FUNCTIONS,
     REGRESSOR_METRICS,
     _compute_null_distribution_coleman,
     train_tree,
@@ -43,7 +48,7 @@ class BaseForestHT(MetaEstimatorMixin):
         ccp_alpha=0.0,
         max_samples=None,
         permute_per_tree=True,
-        **estimator_kwargs,
+        sample_dataset_per_tree=True,
     ):
         self.estimator = estimator
         self.n_jobs = n_jobs
@@ -63,8 +68,8 @@ class BaseForestHT(MetaEstimatorMixin):
         self.warm_start = warm_start
         self.ccp_alpha = ccp_alpha
         self.max_samples = max_samples
-        self.estimator_kwargs = estimator_kwargs
         self.permute_per_tree = permute_per_tree
+        self.sample_dataset_per_tree = sample_dataset_per_tree
 
     def reset(self):
         class_attributes = dir(type(self))
@@ -120,15 +125,15 @@ class BaseForestHT(MetaEstimatorMixin):
             if y.ndim != 2:
                 y = y.reshape(-1, 1)
 
-        if metric not in REGRESSOR_METRICS:
-            raise RuntimeError(f'Metric must be either "mse" or "mae", got {metric}')
-
         if covariate_index is None:
             self.estimator_ = self._get_estimator()
             estimator = self.estimator_
         else:
             self.permuted_estimator_ = clone(self.estimator_)
             estimator = self.permuted_estimator_
+
+        if not is_classifier(self.estimator_) and metric not in REGRESSOR_METRICS:
+            raise RuntimeError(f'Metric must be either "mse" or "mae", got {metric}')
 
         return self._statistic(
             estimator,
@@ -193,14 +198,6 @@ class BaseForestHT(MetaEstimatorMixin):
 
         indices = np.arange(X.shape[0])
         self.test_size_ = int(test_size * X.shape[0])
-        # if not self.permute_per_tree:
-        #     # train/test split
-        #     # XXX: could add stratifying by y when y is classification
-        #     indices_train, indices_test = train_test_split(
-        #         indices, test_size=test_size, shuffle=True
-        #     )
-        #     self.indices_train_ = indices_train
-        #     self.indices_test_ = indices_test
         indices_train, indices_test = train_test_split(indices, test_size=test_size, shuffle=True)
         self.indices_train_ = indices_train
         self.indices_test_ = indices_test
@@ -245,8 +242,13 @@ class BaseForestHT(MetaEstimatorMixin):
                 seed=self.random_state,
             )
         else:
+            if self.permute_per_tree:
+                y_test = y
+            else:
+                y_test = y[self.indices_test_, :]
+            print(y.shape, observe_posteriors.shape, permute_posteriors.shape)
             metric_star, metric_star_pi = _compute_null_distribution_coleman(
-                y_test=y[self.indices_test_, :],
+                y_test=y_test,
                 y_pred_proba_normal=observe_posteriors,
                 y_pred_proba_perm=permute_posteriors,
                 metric=metric,
@@ -261,7 +263,10 @@ class BaseForestHT(MetaEstimatorMixin):
         null_dist = metric_star_pi - metric_star
 
         # compute pvalue
-        pvalue = (1 + (null_dist >= observe_stat).sum()) / (1 + n_repeats)
+        if metric in POSITIVE_METRICS:
+            pvalue = (1 + (null_dist <= observe_stat).sum()) / (1 + n_repeats)
+        else:
+            pvalue = (1 + (null_dist >= observe_stat).sum()) / (1 + n_repeats)
 
         if return_posteriors:
             self.observe_posteriors_ = observe_posteriors
@@ -275,6 +280,8 @@ class BaseForestHT(MetaEstimatorMixin):
 
 class FeatureImportanceForestRegressor(BaseForestHT):
     """Forest hypothesis testing with continuous `y` variable.
+
+    Implements the algorithm described in :footcite:`coleman2022scalable`.
 
     The dataset is split into a training and testing dataset initially. Then there
     are two forests that are trained: one on the original dataset, and one on the
@@ -443,6 +450,12 @@ class FeatureImportanceForestRegressor(BaseForestHT):
         - If float, then draw `max_samples * X.shape[0]` samples. Thus,
           `max_samples` should be in the interval `(0.0, 1.0]`.
 
+    permute_per_tree : bool, default=True
+        Whether to permute the covariate index per tree or per forest.
+
+    sample_dataset_per_tree : bool, default=False
+        Whether to sample the dataset per tree or per forest.
+
     Attributes
     ----------
     samples_ : ArrayLike of shape (n_samples,)
@@ -456,6 +469,10 @@ class FeatureImportanceForestRegressor(BaseForestHT):
 
     null_dist_ : ArrayLike of shape (n_repeats,)
         The null distribution of the test statistic.
+
+    References
+    ----------
+    .. footbibliography::
     """
 
     def __init__(
@@ -479,8 +496,7 @@ class FeatureImportanceForestRegressor(BaseForestHT):
         ccp_alpha=0.0,
         max_samples=None,
         permute_per_tree=True,
-        sample_dataset_per_tree=False,
-        **estimator_kwargs,
+        sample_dataset_per_tree=True,
     ):
         super().__init__(
             estimator=estimator,
@@ -501,7 +517,6 @@ class FeatureImportanceForestRegressor(BaseForestHT):
             warm_start=warm_start,
             ccp_alpha=ccp_alpha,
             max_samples=max_samples,
-            **estimator_kwargs,
         )
         self.permute_per_tree = permute_per_tree
         self.sample_dataset_per_tree = sample_dataset_per_tree
@@ -526,9 +541,8 @@ class FeatureImportanceForestRegressor(BaseForestHT):
                 warm_start=self.warm_start,
                 ccp_alpha=self.ccp_alpha,
                 max_samples=self.max_samples,
-                **self.estimator_kwargs,
             )
-        elif isinstance(self.estimator, ForestRegressor):
+        elif not isinstance(self.estimator, (ForestRegressor, sklearnForestRegressor)):
             raise RuntimeError(f"Estimator must be a ForestRegressor, got {type(self.estimator)}")
         else:
             estimator_ = self.estimator
@@ -585,6 +599,11 @@ class FeatureImportanceForestRegressor(BaseForestHT):
                 X_dummy = np.zeros((unique_y.shape[0], X.shape[1]))
                 estimator.fit(X_dummy, unique_y)
 
+            if hasattr(self, "test_size_"):
+                test_size = self.test_size_
+            else:
+                test_size = 0.2  # type: ignore
+
             # now initialize posterior array as (n_trees, n_samples, n_outputs)
             posterior_arr = np.full((self.n_estimators, n_samples, estimator.n_outputs_), np.nan)
             # Fit each tree and compute posteriors with train test splits
@@ -592,7 +611,7 @@ class FeatureImportanceForestRegressor(BaseForestHT):
                 # sample train/test dataset for each tree
                 indices_train, indices_test = train_test_split(
                     np.arange(n_samples, dtype=int),
-                    test_size=self.test_size_,
+                    test_size=test_size,
                     shuffle=True,
                     random_state=rng.integers(0, np.iinfo(np.uint32).max, dtype=np.uint32),
                 )
@@ -653,6 +672,8 @@ class FeatureImportanceForestRegressor(BaseForestHT):
 class FeatureImportanceForestClassifier(BaseForestHT):
     """Forest hypothesis testing with categorical `y` variable.
 
+    Implements the algorithm described in :footcite:`coleman2022scalable`.
+
     The dataset is split into a training and testing dataset initially. Then there
     are two forests that are trained: one on the original dataset, and one on the
     permuted dataset. The dataset is either permuted once, or independently for
@@ -820,6 +841,12 @@ class FeatureImportanceForestClassifier(BaseForestHT):
         - If float, then draw `max_samples * X.shape[0]` samples. Thus,
           `max_samples` should be in the interval `(0.0, 1.0]`.
 
+    permute_per_tree : bool, default=True
+        Whether to permute the covariate index per tree or per forest.
+
+    sample_dataset_per_tree : bool, default=False
+        Whether to sample the dataset per tree or per forest.
+
     Attributes
     ----------
     samples_ : ArrayLike of shape (n_samples,)
@@ -833,6 +860,10 @@ class FeatureImportanceForestClassifier(BaseForestHT):
 
     null_dist_ : ArrayLike of shape (n_repeats,)
         The null distribution of the test statistic.
+
+    References
+    ----------
+    .. footbibliography::
     """
 
     def __init__(
@@ -856,8 +887,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
         ccp_alpha=0.0,
         max_samples=None,
         permute_per_tree=True,
-        sample_dataset_per_tree=False,
-        **estimator_kwargs,
+        sample_dataset_per_tree=True,
     ):
         super().__init__(
             estimator=estimator,
@@ -878,7 +908,6 @@ class FeatureImportanceForestClassifier(BaseForestHT):
             warm_start=warm_start,
             ccp_alpha=ccp_alpha,
             max_samples=max_samples,
-            **estimator_kwargs,
         )
         self.permute_per_tree = permute_per_tree
         self.sample_dataset_per_tree = sample_dataset_per_tree
@@ -903,11 +932,14 @@ class FeatureImportanceForestClassifier(BaseForestHT):
                 warm_start=self.warm_start,
                 ccp_alpha=self.ccp_alpha,
                 max_samples=self.max_samples,
-                **self.estimator_kwargs,
             )
-        elif isinstance(self.estimator, ForestClassifier):
+        elif not isinstance(self.estimator, (ForestClassifier, sklearnForestClassifier)):
             raise RuntimeError(f"Estimator must be a ForestClassifier, got {type(self.estimator)}")
         else:
+            # self.estimator is an instance of a ForestEstimator, so we should verify that all
+            # the parameters are set correctly
+            # XXX: implement checks
+
             estimator_ = self.estimator
         return estimator_
 
@@ -926,70 +958,89 @@ class FeatureImportanceForestClassifier(BaseForestHT):
         rng = np.random.default_rng(self.random_state)
         n_samples = X.shape[0]
 
-        if self.permute_per_tree and not self.sample_dataset_per_tree:
+        if metric in POSTERIOR_FUNCTIONS:
+            predict_posteriors = True
+        else:
+            predict_posteriors = False
+
+        if hasattr(self, "test_size_"):
+            test_size = self.test_size_
+        else:
+            test_size = 0.2  # type: ignore
+
+        if not _is_fitted(estimator):
+            unique_y = np.unique(y)
+            X_dummy = np.zeros((unique_y.shape[0], X.shape[1]))
+            estimator.fit(X_dummy, unique_y)
+        if estimator.n_outputs_ > 1 and metric == "auc":
+            raise ValueError("AUC metric is not supported for multi-output classification")
+
+        if self.permute_per_tree:
             # first run a dummy fit on the samples to initialize the
             # internal data structure of the forest
-            if not _is_fitted(estimator):
-                unique_y = np.unique(y)
-                X_dummy = np.zeros((unique_y.shape[0], X.shape[1]))
-                estimator.fit(X_dummy, unique_y)
+            if self.sample_dataset_per_tree:
+                # Fit each tree and compute posteriors with train test splits
+                n_samples_test = len(self.indices_test_)
+            else:
+                n_samples_test = n_samples
 
-            # Fit each tree and compute posteriors with train test splits
-            n_samples_test = len(self.indices_test_)
+            if predict_posteriors:
+                posterior_arr = np.zeros((self.n_estimators, n_samples_test, estimator.n_classes_))
+            else:
+                # now initialize posterior array as (n_trees, n_samples_test, n_outputs)
+                posterior_arr = np.zeros((self.n_estimators, n_samples_test, estimator.n_outputs_))
 
-            # now initialize posterior array as (n_trees, n_samples_test, n_outputs)
-            posterior_arr = np.zeros((self.n_estimators, n_samples_test, estimator.n_outputs_))
-            for idx in range(self.n_estimators):
-                tree: DecisionTreeClassifier = estimator.estimators_[idx]
-                train_tree(
-                    tree, X[self.indices_train_, :], y[self.indices_train_, :], covariate_index
-                )
+            if self.sample_dataset_per_tree:
+                for idx in range(self.n_estimators):
+                    tree: DecisionTreeClassifier = estimator.estimators_[idx]
+                    train_tree(
+                        tree, X[self.indices_train_, :], y[self.indices_train_, :], covariate_index
+                    )
 
-                y_pred = tree.predict(X[self.indices_test_, :]).reshape(-1, tree.n_outputs_)
+                    if predict_posteriors:
+                        # XXX: currently assumes n_outputs_ == 1
+                        y_pred = tree.predict_proba(X[self.indices_test_, :])
+                    else:
+                        y_pred = tree.predict(X[self.indices_test_, :]).reshape(-1, tree.n_outputs_)
 
-                # Fill test set posteriors & set rest NaN
-                posterior_arr[idx, ...] = y_pred  # posterior
+                    # Fill test set posteriors & set rest NaN
+                    posterior_arr[idx, ...] = y_pred  # posterior
 
-            y_true_final = y[self.indices_test_, :]
-            # Average all posteriors
-            posterior_final = np.nanmean(posterior_arr, axis=0)
-            samples = np.argwhere(~np.isnan(posterior_final).any(axis=1)).squeeze()
-        elif self.permute_per_tree and self.sample_dataset_per_tree:
-            # first run a dummy fit on the samples to initialize the
-            # internal data structure of the forest
-            if not _is_fitted(estimator):
-                unique_y = np.unique(y)
-                X_dummy = np.zeros((unique_y.shape[0], X.shape[1]))
-                estimator.fit(X_dummy, unique_y)
+                y_true_final = y[self.indices_test_, :]
+                # Average all posteriors
+                posterior_final = np.nanmean(posterior_arr, axis=0)
+                samples = np.argwhere(~np.isnan(posterior_final).any(axis=1)).squeeze()
+            else:
+                # Fit each tree and compute posteriors with train test splits
+                for idx in range(self.n_estimators):
+                    # sample train/test dataset for each tree
+                    indices_train, indices_test = train_test_split(
+                        np.arange(n_samples, dtype=int),
+                        test_size=test_size,
+                        shuffle=True,
+                        random_state=rng.integers(0, np.iinfo(np.uint32).max, dtype=np.uint32),
+                    )
+                    tree = estimator.estimators_[idx]
+                    train_tree(tree, X[indices_train, :], y[indices_train, :], covariate_index)
 
-            # now initialize posterior array as (n_trees, n_samples, n_outputs)
-            posterior_arr = np.full((self.n_estimators, n_samples, estimator.n_outputs_), np.nan)
-            # Fit each tree and compute posteriors with train test splits
-            for idx in range(self.n_estimators):
-                # sample train/test dataset for each tree
-                indices_train, indices_test = train_test_split(
-                    np.arange(n_samples, dtype=int),
-                    test_size=self.test_size_,
-                    shuffle=True,
-                    random_state=rng.integers(0, np.iinfo(np.uint32).max, dtype=np.uint32),
-                )
-                tree = estimator.estimators_[idx]
-                train_tree(tree, X[indices_train, :], y[indices_train, :], covariate_index)
+                    if predict_posteriors:
+                        # XXX: currently assumes n_outputs_ == 1
+                        y_pred = tree.predict_proba(X[indices_test, :])
+                    else:
+                        y_pred = tree.predict(X[indices_test, :]).reshape(-1, tree.n_outputs_)
 
-                y_pred = tree.predict(X[indices_test, :]).reshape(-1, tree.n_outputs_)
+                    posterior_arr[idx, indices_test, :] = y_pred  # posterior
 
-                posterior_arr[idx, indices_test, :] = y_pred  # posterior
+                # Average all posteriors (n_samples, n_outputs)
+                posterior_final = np.nanmean(posterior_arr, axis=0)
 
-            # Average all posteriors
-            posterior_final = np.nanmean(posterior_arr, axis=0)
+                # Find the row indices with NaN values in any column
+                nonnan_indices = np.where(~np.isnan(posterior_final).any(axis=1))[0]
 
-            # Find the row indices with NaN values in any column
-            nonnan_indices = np.where(~np.isnan(posterior_final).any(axis=1))[0]
-
-            # Ignore all NaN values (samples not tested)
-            y_true_final = y[nonnan_indices, :]
-            posterior_final = posterior_final[nonnan_indices, :]
-            samples = nonnan_indices
+                # Ignore all NaN values (samples not tested)
+                y_true_final = y[nonnan_indices, :]
+                posterior_final = posterior_final[nonnan_indices, :]
+                samples = nonnan_indices
         else:
             X_train, X_test = X[self.indices_train_, :], X[self.indices_test_, :]
             y_train, y_test = y[self.indices_train_, :], y[self.indices_test_, :]
@@ -1006,12 +1057,27 @@ class FeatureImportanceForestClassifier(BaseForestHT):
                 X_train[:, covariate_index] = X_train[index_arr, covariate_index]
 
             estimator.fit(X_train, y_train)
-            y_pred = estimator.predict(X_test)
+
+            if predict_posteriors:
+                # XXX: currently assumes n_outputs_ == 1
+                y_pred = estimator.predict_proba(X_test)
+            else:
+                y_pred = estimator.predict(X_test)
 
             # set variables to compute metric
             samples = self.indices_test_
             y_true_final = y_test
             posterior_final = y_pred
+
+        if metric == "auc":
+            # at this point, posterior_final is the predicted posterior for only the positive class
+            # as more than one output is not supported.
+            if type_of_target(y_true_final) == "binary":
+                posterior_final = posterior_final[:, 1]
+            else:
+                raise RuntimeError(
+                    f"AUC metric is not supported for {type_of_target(y_true_final)} targets."
+                )
 
         stat = metric_func(y_true_final, posterior_final, **metric_kwargs)
         if covariate_index is None:

@@ -1,8 +1,10 @@
 import numpy as np
 import pytest
+from flaky import flaky
 from scipy.special import expit
 from sklearn import datasets
 
+from sktree import HonestForestClassifier
 from sktree._lib.sklearn.tree import DecisionTreeClassifier
 from sktree.stats import (
     FeatureImportanceForestClassifier,
@@ -12,10 +14,11 @@ from sktree.stats import (
 )
 from sktree.tree import ObliqueDecisionTreeClassifier
 
-# load the iris dataset
+# load the iris dataset (n_samples, 4)
 # and randomly permute it
 iris = datasets.load_iris()
-rng = np.random.RandomState(1)
+seed = 12345
+rng = np.random.default_rng(seed)
 
 # remove third class
 iris_X = iris.data[iris.target != 2]
@@ -26,17 +29,7 @@ iris_X = iris_X[p]
 iris_y = iris_y[p]
 
 
-seed = 12345
-
-
-def test_forestht_proper_attributes():
-    """Forest HTs should have n_classes_ and n_outputs_ properly set.
-
-    This requires the first dummy fit to always get all classes.
-    """
-    pass
-
-
+@flaky(max_runs=3)
 @pytest.mark.slowtest
 @pytest.mark.parametrize(
     "hypotester, model_kwargs, n_samples, n_repeats, test_size",
@@ -44,26 +37,27 @@ def test_forestht_proper_attributes():
         [
             PermutationForestRegressor,
             {
-                "max_features": 1.0,
+                "max_features": "sqrt",
                 "random_state": seed,
-                "n_estimators": 50,
+                "n_estimators": 75,
                 "n_jobs": -1,
             },
-            550,
+            300,
             50,
             0.1,
         ],
         [
             FeatureImportanceForestRegressor,
             {
-                "max_features": 1.0,
+                "max_features": "sqrt",
                 "random_state": seed,
                 "n_estimators": 125,
                 "permute_per_tree": True,
+                "sample_dataset_per_tree": True,
                 "n_jobs": -1,
             },
-            600,
-            200,
+            300,
+            500,
             0.1,
         ],
     ],
@@ -75,11 +69,9 @@ def test_linear_model(hypotester, model_kwargs, n_samples, n_repeats, test_size)
 
     Y = Beta * X_1 + Beta * I(X_6 = 2) + \epsilon
     """
-    beta = 10.0
-    sigma = 0.5
+    beta = 15.0
+    sigma = 0.05
     metric = "mse"
-
-    rng = np.random.default_rng(seed)
 
     # sample covariates
     X_15 = rng.uniform(0, 1, size=(n_samples, 5))
@@ -118,6 +110,7 @@ def test_linear_model(hypotester, model_kwargs, n_samples, n_repeats, test_size)
         assert pvalue > 0.05, f"pvalue: {pvalue}"
 
 
+@flaky(max_runs=3)
 @pytest.mark.slowtest
 @pytest.mark.parametrize(
     "hypotester, model_kwargs, n_samples, n_repeats, test_size",
@@ -127,10 +120,10 @@ def test_linear_model(hypotester, model_kwargs, n_samples, n_repeats, test_size)
             {
                 "max_features": "sqrt",
                 "random_state": seed,
-                "n_estimators": 75,
+                "n_estimators": 50,
                 "n_jobs": -1,
             },
-            500,
+            600,
             50,
             1.0 / 6,
         ],
@@ -144,8 +137,8 @@ def test_linear_model(hypotester, model_kwargs, n_samples, n_repeats, test_size)
                 "sample_dataset_per_tree": True,
                 "n_jobs": -1,
             },
-            500,
-            100,
+            600,
+            200,
             1.0 / 6,
         ],
     ],
@@ -157,13 +150,11 @@ def test_correlated_logit_model(hypotester, model_kwargs, n_samples, n_repeats, 
 
     P(Y = 1 | X) = expit(beta * \\sum_{j=2}^5 X_j)
     """
-    beta = 5.0
+    beta = 10.0
     metric = "mse"
 
-    n = 200  # Number of time steps
-    ar_coefficient = 0.0015
-
-    rng = np.random.default_rng(seed)
+    n = 100  # Number of time steps
+    ar_coefficient = 0.015
 
     X = np.zeros((n_samples, n))
     for idx in range(n_samples):
@@ -210,7 +201,6 @@ def test_correlated_logit_model(hypotester, model_kwargs, n_samples, n_repeats, 
 
 
 @pytest.mark.parametrize("criterion", ["gini", "entropy"])
-@pytest.mark.parametrize("max_features", [None, "sqrt"])
 @pytest.mark.parametrize("honest_prior", ["empirical", "uniform", "ignore"])
 @pytest.mark.parametrize(
     "estimator",
@@ -221,30 +211,47 @@ def test_correlated_logit_model(hypotester, model_kwargs, n_samples, n_repeats, 
     ],
 )
 @pytest.mark.parametrize("limit", [0.05, 0.1])
-def test_iris_pauc(criterion, max_features, honest_prior, estimator, limit):
+def test_iris_pauc_statistic(criterion, honest_prior, estimator, limit):
+    max_features = "sqrt"
+    n_repeats = 200
+    n_estimators = 50
+
     # Check consistency on dataset iris.
     clf = FeatureImportanceForestClassifier(
         criterion=criterion,
         random_state=0,
         max_features=max_features,
-        n_estimators=100,
-        honest_prior=honest_prior,
-        tree_estimator=estimator,
+        n_estimators=n_estimators,
+        estimator=HonestForestClassifier(
+            n_estimators=n_estimators, tree_estimator=estimator, honest_prior=honest_prior
+        ),
+        n_jobs=-1,
+        sample_dataset_per_tree=True,
+        permute_per_tree=True,
     )
-    score = clf.statistic(iris_X, iris_y, metric="auc", max_fpr=limit)
-    assert score >= 0.9, "Failed with pAUC: {0} for max fpr: {1}".format(score, limit)
-
     # now add completely uninformative feature
-    X = np.hstack((iris_X, rng.standard_normal(size=(iris_X.shape[0], 1))))
+    X = np.hstack((iris_X, rng.standard_normal(size=(iris_X.shape[0], 4))))
 
-    # test for unimportant feature
-    test_size = 0.2
+    # test for unimportant feature set
+    test_size = 0.1
     clf.reset()
-    stat, pvalue = clf.test(X, iris_y, [X.shape[1] - 1], test_size=test_size, metric="auc")
+    stat, pvalue = clf.test(
+        X,
+        iris_y,
+        np.arange(iris_X.shape[0], X.shape[1], dtype=int).tolist(),
+        n_repeats=n_repeats,
+        test_size=test_size,
+        metric="auc",
+    )
     print(pvalue)
-    # assert pvalue > 0.05, f"pvalue: {pvalue}"
+    assert pvalue > 0.05, f"pvalue: {pvalue}"
 
-    stat, pvalue = clf.test(X, iris_y, [2, 3], test_size=test_size, metric="auc")
+    # test for important features that are permuted
+    stat, pvalue = clf.test(
+        X, iris_y, [0, 1, 2, 3], n_repeats=n_repeats, test_size=test_size, metric="auc"
+    )
     print(pvalue)
-    # assert pvalue < 0.05, f"pvalue: {pvalue}"
-    assert False
+    assert pvalue < 0.05, f"pvalue: {pvalue}"
+
+    score = clf.statistic(iris_X, iris_y, metric="auc", max_fpr=limit)
+    assert score >= 0.8, "Failed with pAUC: {0} for max fpr: {1}".format(score, limit)

@@ -291,6 +291,12 @@ class PermutationForestRegressor(BasePermutationForest):
     is compared to the original random forest that was computed on the regular
     non-permuted data.
 
+    .. warning:: Permutation testing with forests is computationally expensive.
+    As a result, if you are testing for the importance of feature sets, consider
+    using :class:`sktree.stats.FeatureImportanceForestRegressor` or
+    :class:`sktree.stats.FeatureImportanceForestClassifier` instead, which is
+    much more computationally efficient.
+
     .. note:: This does not allow testing on the posteriors.
 
     Parameters
@@ -570,6 +576,12 @@ class PermutationForestClassifier(BasePermutationForest):
     indices and then a random forest is trained for each permuted instance. This
     is compared to the original random forest that was computed on the regular
     non-permuted data.
+
+    .. warning:: Permutation testing with forests is computationally expensive.
+    As a result, if you are testing for the importance of feature sets, consider
+    using :class:`sktree.stats.FeatureImportanceForestRegressor` or
+    :class:`sktree.stats.FeatureImportanceForestClassifier` instead, which is
+    much more computationally efficient.
 
     .. note:: This does not allow testing on the posteriors.
 

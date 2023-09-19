@@ -25,10 +25,15 @@ def _mutual_information(y_true, y_pred_proba):
 METRIC_FUNCTIONS = {
     "mse": mean_squared_error,
     "mae": mean_absolute_error,
+    "balanced_accuracy": balanced_accuracy_score,
     "auc": roc_auc_score,
     "mi": _mutual_information,
-    "balanced_accuracy": balanced_accuracy_score,
 }
+
+POSTERIOR_FUNCTIONS = ("mi", "auc")
+
+POSITIVE_METRICS = ("mi", "auc", "balanced_accuracy")
+
 REGRESSOR_METRICS = ("mse", "mae")
 
 
@@ -172,8 +177,6 @@ def _compute_null_distribution_coleman(
         An array of the metrics computed on the other half of the trees.
     """
     rng = np.random.default_rng(seed)
-    # X_test, y_test = check_X_y(X_test, y_test, copy=True, ensure_2d=True, multi_output=True)
-
     metric_func = METRIC_FUNCTIONS[metric]
 
     # sample two sets of equal number of trees from the combined forest these are the posteriors
@@ -181,8 +184,12 @@ def _compute_null_distribution_coleman(
 
     n_samples_test = len(y_test)
     if len(all_y_pred) != 2 * n_samples_test:
+        print("y_pred_proba_perm: ", y_pred_proba_perm.shape)
+        print("y_pred_proba: ", y_pred_proba_normal.shape)
+
         raise RuntimeError(
-            "The number of samples in `all_y_pred` is not equal to 2 * n_samples_test"
+            f"The number of samples in `all_y_pred` {len(all_y_pred)} "
+            f"is not equal to 2 * n_samples_test {2 * n_samples_test}"
         )
 
     # create two stacked index arrays of y_test resulting in [1, ..., N, 1, ..., N]
@@ -192,15 +199,6 @@ def _compute_null_distribution_coleman(
 
     # create index array of [1, ..., 2N] to slice into `all_y_pred`
     y_pred_ind_arr = np.arange((2 * n_samples_test), dtype=int)
-
-    # # get the indices of the samples that we have a posterior for, so each element
-    # # is an index into `y_test`
-    # all_samples_pred = np.concatenate((normal_samples, perm_samples), axis=0)
-
-    # n_samples_final = len(all_samples_pred)
-
-    # pre-allocate memory for the index array
-    # index_arr = np.arange(n_samples_final, dtype=int)
 
     metric_star = np.zeros((n_repeats,))
     metric_star_pi = np.zeros((n_repeats,))
