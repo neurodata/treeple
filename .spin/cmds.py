@@ -33,15 +33,10 @@ def docs(ctx, build_dir, clean=False, noplot=False):
     util.run(["pip", "install", "-q", "-r", "doc_requirements.txt"])
 
     ctx.invoke(meson.docs)
-    # os.environ["SPHINXOPTS"] = "-W"
-    # os.environ["PYTHONPATH"] = f'{site_path}{os.sep}:{os.environ.get("PYTHONPATH", "")}'
-    # if noplot:
-    #     util.run(["make", "-C", "docs", "clean", "html-noplot"], replace=True)
-    # else:
-    #     util.run(["make", "-C", "docs", "clean", "html"], replace=True)
 
 
 @click.command()
+@click.option("--runslow", help="Run slow tests.")
 @click.pass_context
 def coverage(ctx):
     """📊 Generate coverage report"""

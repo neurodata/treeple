@@ -20,7 +20,7 @@ See here for the documentation for our dev version: https://docs.neurodata.io/sc
 
 Why oblique trees and why trees beyond those in scikit-learn?
 =============================================================
-In 2001, Leo Breiman proposed two types of Random Forests. One was known as ``Forest-RI``, which is the axis-aligned traditional random forest. One was known as ``Forest-RC``, which is the random oblique linear combinations random forest. This leveraged random combinations of features to perform splits. [MORF](1) builds upon ``Forest-RC`` by proposing additional functions to combine features. Other modern tree variants such as Canonical Correlation Forests (CCF), or unsupervised random forests are also important at solving real-world problems using robust decision tree models.
+In 2001, Leo Breiman proposed two types of Random Forests. One was known as ``Forest-RI``, which is the axis-aligned traditional random forest. One was known as ``Forest-RC``, which is the random oblique linear combinations random forest. This leveraged random combinations of features to perform splits. [MORF](1) builds upon ``Forest-RC`` by proposing additional functions to combine features. Other modern tree variants such as Canonical Correlation Forests (CCF), Extended Isolation Forests, Quantile Forests, or unsupervised random forests are also important at solving real-world problems using robust decision tree models.
 
 Installation
 ============

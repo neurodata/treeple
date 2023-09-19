@@ -62,9 +62,9 @@ iris_y = iris_y[p]
                 "permute_per_tree": True,
                 "sample_dataset_per_tree": True,
             },
-            300,
-            500,
-            0.1,
+            300,  # n_samples
+            500,  # n_repeats
+            0.1,  # test_size
         ],
     ],
 )
@@ -94,24 +94,22 @@ def test_linear_model(hypotester, model_kwargs, n_samples, n_repeats, test_size)
 
     # compute final y of (n_samples,)
     y = beta * X[:, 0] + (beta * (X[:, 5] == 2.0)) + epsilon
-    est = hypotester(**model_kwargs)
+    est = hypotester(test_size=test_size, **model_kwargs)
 
     # test for X_1
-    stat, pvalue = est.test(X, y, [0], metric=metric, test_size=test_size, n_repeats=n_repeats)
+    stat, pvalue = est.test(X, y, [0], metric=metric, n_repeats=n_repeats)
     print("X1: ", pvalue)
     assert pvalue < 0.05, f"pvalue: {pvalue}"
 
     # test for X_6
-    stat, pvalue = est.test(X, y, [5], metric=metric, test_size=test_size, n_repeats=n_repeats)
+    stat, pvalue = est.test(X, y, [5], metric=metric, n_repeats=n_repeats)
     print("X6: ", pvalue)
     assert pvalue < 0.05, f"pvalue: {pvalue}"
 
     # test for a few unimportant other X
     for covariate_index in [1, 6]:
         # test for X_2, X_7
-        stat, pvalue = est.test(
-            X, y, [covariate_index], metric=metric, test_size=test_size, n_repeats=n_repeats
-        )
+        stat, pvalue = est.test(X, y, [covariate_index], metric=metric, n_repeats=n_repeats)
         print("X2/7: ", pvalue)
         assert pvalue > 0.05, f"pvalue: {pvalue}"
 
@@ -188,26 +186,20 @@ def test_correlated_logit_model(hypotester, model_kwargs, n_samples, n_repeats, 
     assert y_proba.shape == (n_samples,)
     y = rng.binomial(1, y_proba, size=n_samples)  # .reshape(-1, 1)
 
-    est = hypotester(**model_kwargs)
+    est = hypotester(test_size=test_size, **model_kwargs)
 
     # test for X_2 important
-    stat, pvalue = est.test(
-        X.copy(), y.copy(), [1], test_size=test_size, n_repeats=n_repeats, metric=metric
-    )
+    stat, pvalue = est.test(X.copy(), y.copy(), [1], n_repeats=n_repeats, metric=metric)
     print("X2: ", pvalue)
     assert pvalue < 0.05, f"pvalue: {pvalue}"
 
     # test for X_1 unimportant
-    stat, pvalue = est.test(
-        X.copy(), y.copy(), [0], test_size=test_size, n_repeats=n_repeats, metric=metric
-    )
+    stat, pvalue = est.test(X.copy(), y.copy(), [0], n_repeats=n_repeats, metric=metric)
     print("X1: ", pvalue)
     assert pvalue > 0.05, f"pvalue: {pvalue}"
 
     # test for X_500 unimportant
-    stat, pvalue = est.test(
-        X.copy(), y.copy(), [n - 1], test_size=test_size, n_repeats=n_repeats, metric=metric
-    )
+    stat, pvalue = est.test(X.copy(), y.copy(), [n - 1], n_repeats=n_repeats, metric=metric)
     print("X500: ", pvalue)
     assert pvalue > 0.05, f"pvalue: {pvalue}"
 
@@ -228,6 +220,7 @@ def test_iris_pauc_statistic(criterion, honest_prior, estimator, limit):
     max_features = "sqrt"
     n_repeats = 200
     n_estimators = 100
+    test_size = 0.1
 
     # Check consistency on dataset iris.
     clf = FeatureImportanceForestClassifier(
@@ -240,6 +233,7 @@ def test_iris_pauc_statistic(criterion, honest_prior, estimator, limit):
             random_state=0,
             n_jobs=-1,
         ),
+        test_size=test_size,
         sample_dataset_per_tree=True,
         permute_per_tree=True,
     )
@@ -247,23 +241,19 @@ def test_iris_pauc_statistic(criterion, honest_prior, estimator, limit):
     X = np.hstack((iris_X, rng.standard_normal(size=(iris_X.shape[0], 4))))
 
     # test for unimportant feature set
-    test_size = 0.1
     clf.reset()
     stat, pvalue = clf.test(
         X,
         iris_y,
         np.arange(iris_X.shape[0], X.shape[1], dtype=int).tolist(),
         n_repeats=n_repeats,
-        test_size=test_size,
         metric="auc",
     )
     print(pvalue)
     assert pvalue > 0.05, f"pvalue: {pvalue}"
 
     # test for important features that are permuted
-    stat, pvalue = clf.test(
-        X, iris_y, [0, 1, 2, 3], n_repeats=n_repeats, test_size=test_size, metric="auc"
-    )
+    stat, pvalue = clf.test(X, iris_y, [0, 1, 2, 3], n_repeats=n_repeats, metric="auc")
     print(pvalue)
     assert pvalue < 0.05, f"pvalue: {pvalue}"
 

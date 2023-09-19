@@ -16,10 +16,12 @@ class BasePermutationForest(MetaEstimatorMixin):
     def __init__(
         self,
         estimator=None,
+        test_size=0.2,
         random_state=None,
         verbose=0,
     ):
         self.estimator = estimator
+        self.test_size = test_size
         self.random_state = random_state
         self.verbose = verbose
 
@@ -33,6 +35,27 @@ class BasePermutationForest(MetaEstimatorMixin):
 
     def _get_estimator(self):
         pass
+
+    @property
+    def train_test_samples_(self):
+        """
+        The subset of drawn samples for each base estimator.
+
+        Returns a dynamically generated list of indices identifying
+        the samples used for fitting each member of the ensemble, i.e.,
+        the in-bag samples.
+
+        Note: the list is re-created at each call to the property in order
+        to reduce the object memory footprint by not storing the sampling
+        data. Thus fetching the property may be slower than expected.
+        """
+        indices = np.arange(self._n_samples_, dtype=int)
+
+        # Get drawn indices along both sample and feature axes
+        indices_train, indices_test = train_test_split(
+            indices, test_size=self.test_size, shuffle=True, random_state=self.random_state
+        )
+        return indices_train, indices_test
 
     def _statistic(
         self,
@@ -51,25 +74,27 @@ class BasePermutationForest(MetaEstimatorMixin):
             rng = np.random.default_rng(self.random_state)
         else:
             rng = np.random.default_rng(seed)
-        n_samples = X.shape[0]
-        indices = np.arange(n_samples, dtype=int)
-
+        indices_train, indices_test = self.train_test_samples_
         if covariate_index is not None:
+            n_samples = X.shape[0]
+            indices = np.arange(n_samples, dtype=int)
             # perform permutation of covariates
-            index_arr = rng.choice(indices, size=(X.shape[0], 1), replace=False, shuffle=False)
+            index_arr = rng.choice(indices, size=(n_samples, 1), replace=False, shuffle=False)
             X = X.copy()
             X[:, covariate_index] = X[index_arr, covariate_index]
 
-        X_train, X_test = X[self.indices_train_, :], X[self.indices_test_, :]
-        y_train, y_test = y[self.indices_train_, :], y[self.indices_test_, :]
-
-        estimator.fit(X_train, y_train.ravel())
+        X_train, X_test = X[indices_train, :], X[indices_test, :]
+        y_train, y_test = y[indices_train, :], y[indices_test, :]
+        if y_train.shape[1] == 1:
+            y_train = y_train.ravel()
+            y_test = y_test.ravel()
+        estimator.fit(X_train, y_train)
 
         # Either get the predicted value, or the posterior probabilities
         y_pred = estimator.predict(X_test)
 
         # set variables to compute metric
-        samples = self.indices_test_
+        samples = indices_test
         y_true_final = y_test
         posterior_final = y_pred
 
@@ -79,7 +104,7 @@ class BasePermutationForest(MetaEstimatorMixin):
             # Ignore all NaN values (samples not tested) -> (n_samples_final, n_outputs)
             # arrays of y and predicted posterior
             self.samples_ = samples
-            self.y_true_final_ = y_true_final
+            self.y_true_ = y_true_final
             self.posterior_final_ = posterior_final
             self.stat_ = stat
 
@@ -139,6 +164,7 @@ class BasePermutationForest(MetaEstimatorMixin):
             if y.ndim != 2:
                 y = y.reshape(-1, 1)
 
+        self._n_samples_ = X.shape[0]
         self.estimator_ = self._get_estimator()
 
         if is_classifier(self.estimator_):
@@ -173,7 +199,6 @@ class BasePermutationForest(MetaEstimatorMixin):
         y: ArrayLike,
         covariate_index: ArrayLike,
         metric: str = "mse",
-        test_size: float = 0.2,
         n_repeats: int = 1000,
         return_posteriors: bool = False,
         **metric_kwargs,
@@ -210,14 +235,11 @@ class BasePermutationForest(MetaEstimatorMixin):
         X, y = check_X_y(X, y, ensure_2d=True, copy=True, multi_output=True)
         if y.ndim != 2:
             y = y.reshape(-1, 1)
-
-        indices = np.arange(X.shape[0])
+        self._n_samples_ = X.shape[0]
 
         # train/test split
         # XXX: could add stratifying by y when y is classification
-        indices_train, indices_test = train_test_split(indices, test_size=test_size, shuffle=True)
-        self.indices_train_ = indices_train
-        self.indices_test_ = indices_test
+        indices_train, indices_test = self.train_test_samples_
 
         if not hasattr(self, "samples_"):
             # first compute the test statistic on the un-permuted data
@@ -238,10 +260,10 @@ class BasePermutationForest(MetaEstimatorMixin):
         # compute null distribution of the test statistic
         # WARNING: this could take a long time, since it fits a new forest
         null_dist = _compute_null_distribution_perm(
-            X_train=X[self.indices_train_, :],
-            y_train=y[self.indices_train_, :],
-            X_test=X[self.indices_test_, :],
-            y_test=y[self.indices_test_, :],
+            X_train=X[indices_train, :],
+            y_train=y[indices_train, :],
+            X_test=X[indices_test, :],
+            y_test=y[indices_test, :],
             covariate_index=covariate_index,
             est=self.estimator_,
             metric=metric,
@@ -283,6 +305,9 @@ class PermutationForestRegressor(BasePermutationForest):
         Type of forest estimator to use. By default `None`, which defaults to
         :class:`sklearn.ensemble.RandomForestRegressor` with default parameters.
 
+    test_size : float, default=0.2
+        The proportion of samples to leave out for each tree to compute metric on.
+
     random_state : int, RandomState instance or None, default=None
         Controls both the randomness of the bootstrapping of the samples used
         when building trees (if ``bootstrap=True``) and the sampling of the
@@ -315,11 +340,13 @@ class PermutationForestRegressor(BasePermutationForest):
     def __init__(
         self,
         estimator=None,
+        test_size=0.2,
         random_state=None,
         verbose=0,
     ):
         super().__init__(
             estimator=estimator,
+            test_size=test_size,
             random_state=random_state,
             verbose=verbose,
         )
@@ -357,6 +384,9 @@ class PermutationForestClassifier(BasePermutationForest):
         Type of forest estimator to use. By default `None`, which defaults to
         :class:`sklearn.ensemble.RandomForestClassifier`.
 
+    test_size : float, default=0.2
+        The proportion of samples to leave out for each tree to compute metric on.
+
     n_jobs : int, default=None
         The number of jobs to run in parallel.
 
@@ -392,11 +422,13 @@ class PermutationForestClassifier(BasePermutationForest):
     def __init__(
         self,
         estimator=None,
+        test_size=0.2,
         random_state=None,
         verbose=0,
     ):
         super().__init__(
             estimator=estimator,
+            test_size=test_size,
             random_state=random_state,
             verbose=verbose,
         )

@@ -206,6 +206,7 @@ numpydoc_xref_ignore = {
     "Ignored",
     "UnsupervisedSplitter",
     "n_repeats",
+    "n_samples_test_used",
     # from sklearn
     "such",
     "arrays",
