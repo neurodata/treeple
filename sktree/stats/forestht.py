@@ -377,6 +377,9 @@ class FeatureImportanceForestRegressor(BaseForestHT):
     verbose : int, default=0
         Controls the verbosity when fitting and predicting.
 
+    test_size : float, default=0.2
+        Proportion of samples per tree to use for the test set.
+
     permute_per_tree : bool, default=True
         Whether to permute the covariate index per tree or per forest.
 
@@ -553,6 +556,9 @@ class FeatureImportanceForestClassifier(BaseForestHT):
 
     verbose : int, default=0
         Controls the verbosity when fitting and predicting.
+
+    test_size : float, default=0.2
+        Proportion of samples per tree to use for the test set.
 
     permute_per_tree : bool, default=True
         Whether to permute the covariate index per tree or per forest.

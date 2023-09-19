@@ -387,9 +387,6 @@ class PermutationForestClassifier(BasePermutationForest):
     test_size : float, default=0.2
         The proportion of samples to leave out for each tree to compute metric on.
 
-    n_jobs : int, default=None
-        The number of jobs to run in parallel.
-
     random_state : int, RandomState instance or None, default=None
         Controls both the randomness of the bootstrapping of the samples used
         when building trees (if ``bootstrap=True``) and the sampling of the

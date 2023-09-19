@@ -15,11 +15,30 @@ from sktree._lib.sklearn.ensemble._forest import ForestClassifier
 from sktree._lib.sklearn.tree import DecisionTreeClassifier
 
 
-def _mutual_information(y_true, y_pred_proba):
+def _mutual_information(y_true: ArrayLike, y_pred_proba: ArrayLike) -> float:
+    """Compute estimate of mutual information.
+
+    Parameters
+    ----------
+    y_true : ArrayLike of shape (n_samples,)
+        _description_
+    y_pred_proba : ArrayLike of shape (n_samples, n_outputs)
+        Posterior probabilities.
+
+    Returns
+    -------
+    float :
+        The estimated MI.
+    """
+    if y_true.squeeze().ndim != 1:
+        raise ValueError(f"y_true must be 1d, not {y_true.shape}")
+
+    # entropy averaged over n_samples
     H_YX = np.mean(entropy(y_pred_proba, base=np.exp(1), axis=1))
+    # empirical count of each class (n_classes)
     _, counts = np.unique(y_true, return_counts=True)
     H_Y = entropy(counts, base=np.exp(1))
-    return max(H_Y - H_YX, 0)
+    return H_Y - H_YX
 
 
 METRIC_FUNCTIONS = {

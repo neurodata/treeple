@@ -29,6 +29,50 @@ iris_X = iris_X[p]
 iris_y = iris_y[p]
 
 
+def test_featureimportance_forest_permute_pertree():
+    est = FeatureImportanceForestClassifier(
+        estimator=RandomForestClassifier(
+            n_estimators=10,
+        ),
+        permute_per_tree=True,
+        sample_dataset_per_tree=True,
+    )
+    est.statistic(iris_X[:10], iris_y[:10])
+
+    assert (
+        len(est.train_test_samples_[0][1]) == 10 * est.test_size
+    ), f"{len(est.train_test_samples_[0][1])} {10 * est.test_size}"
+    assert len(est.train_test_samples_[0][0]) == est._n_samples_ - 10 * est.test_size
+
+    est.test(iris_X[:10], iris_y[:10], [0, 1], n_repeats=10, metric="mse")
+    assert (
+        len(est.train_test_samples_[0][1]) == 10 * est.test_size
+    ), f"{len(est.train_test_samples_[0][1])} {10 * est.test_size}"
+    assert len(est.train_test_samples_[0][0]) == est._n_samples_ - 10 * est.test_size
+
+
+def test_featureimportance_forest_errors():
+    permute_per_tree = False
+    sample_dataset_per_tree = True
+    est = FeatureImportanceForestClassifier(
+        estimator=RandomForestClassifier(
+            n_estimators=10,
+        ),
+        permute_per_tree=permute_per_tree,
+        sample_dataset_per_tree=sample_dataset_per_tree,
+    )
+    with pytest.raises(ValueError, match="sample_dataset_per_tree"):
+        est.statistic(iris_X[:10], iris_y[:10])
+
+    est = FeatureImportanceForestClassifier(estimator=RandomForestRegressor)
+    with pytest.raises(RuntimeError, match="Estimator must be"):
+        est.statistic(iris_X[:10], iris_y[:10])
+
+    est = FeatureImportanceForestRegressor(estimator=RandomForestClassifier)
+    with pytest.raises(RuntimeError, match="Estimator must be"):
+        est.statistic(iris_X[:10], iris_y[:10])
+
+
 @flaky(max_runs=3)
 @pytest.mark.slowtest
 @pytest.mark.parametrize(
@@ -215,8 +259,12 @@ def test_correlated_logit_model(hypotester, model_kwargs, n_samples, n_repeats, 
         ObliqueDecisionTreeClassifier(),
     ],
 )
-@pytest.mark.parametrize("limit", [0.05, 0.1])
-def test_iris_pauc_statistic(criterion, honest_prior, estimator, limit):
+@pytest.mark.parametrize("permute_per_tree", [True, False])
+@pytest.mark.parametrize("sample_dataset_per_tree", [True, False])
+def test_iris_pauc_statistic(
+    criterion, honest_prior, estimator, permute_per_tree, sample_dataset_per_tree
+):
+    limit = 0.1
     max_features = "sqrt"
     n_repeats = 200
     n_estimators = 100
@@ -234,14 +282,17 @@ def test_iris_pauc_statistic(criterion, honest_prior, estimator, limit):
             n_jobs=-1,
         ),
         test_size=test_size,
-        sample_dataset_per_tree=True,
-        permute_per_tree=True,
+        sample_dataset_per_tree=sample_dataset_per_tree,
+        permute_per_tree=permute_per_tree,
     )
     # now add completely uninformative feature
     X = np.hstack((iris_X, rng.standard_normal(size=(iris_X.shape[0], 4))))
 
     # test for unimportant feature set
     clf.reset()
+    if sample_dataset_per_tree and not permute_per_tree:
+        # test in another test
+        pytest.skip()
     stat, pvalue = clf.test(
         X,
         iris_y,
