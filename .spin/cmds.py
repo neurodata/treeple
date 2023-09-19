@@ -36,7 +36,6 @@ def docs(ctx, build_dir, clean=False, noplot=False):
 
 
 @click.command()
-@click.option("--runslow", help="Run slow tests.")
 @click.pass_context
 def coverage(ctx):
     """📊 Generate coverage report"""

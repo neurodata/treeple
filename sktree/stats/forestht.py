@@ -178,12 +178,12 @@ class BaseForestHT(MetaEstimatorMixin):
             for axis in range(y.shape[1]):
                 _unique_y.append(np.unique(y[:, axis]))
             unique_y = np.hstack(_unique_y)
-            if unique_y.shape[1] == 1:
+            if unique_y.ndim > 1 and unique_y.shape[1] == 1:
                 unique_y = unique_y.ravel()
             X_dummy = np.zeros((unique_y.shape[0], X.shape[1]))
             estimator.fit(X_dummy, unique_y)
         elif not _is_fitted(estimator):
-            if y.shape[1] == 1:
+            if y.ndim > 1 and y.shape[1] == 1:
                 estimator.fit(X[:2], y[:2].ravel())
             else:
                 estimator.fit(X[:2], y[:2])
@@ -475,7 +475,6 @@ class FeatureImportanceForestRegressor(BaseForestHT):
                 y_pred = tree.predict(X[indices_test, :]).reshape(-1, tree.n_outputs_)
 
                 # Fill test set posteriors & set rest NaN
-                print(posterior_arr.shape, y_pred.shape)
                 posterior_arr[idx, indices_test, :] = y_pred  # posterior
 
             y_true_final = y[indices_test, :]
@@ -669,7 +668,6 @@ class FeatureImportanceForestClassifier(BaseForestHT):
                     y_pred = tree.predict(X[indices_test, :]).reshape(-1, tree.n_outputs_)
 
                 # Fill test set posteriors & set rest NaN
-                print(posterior_arr.shape, y_pred.shape)
                 posterior_arr[idx, indices_test, :] = y_pred  # posterior
 
             # Average all posteriors (n_samples_test, n_outputs)
