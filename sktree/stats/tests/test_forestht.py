@@ -4,7 +4,7 @@ from flaky import flaky
 from scipy.special import expit
 from sklearn import datasets
 
-from sktree import HonestForestClassifier
+from sktree import HonestForestClassifier, RandomForestClassifier, RandomForestRegressor
 from sktree._lib.sklearn.tree import DecisionTreeClassifier
 from sktree.stats import (
     FeatureImportanceForestClassifier,
@@ -37,10 +37,13 @@ iris_y = iris_y[p]
         [
             PermutationForestRegressor,
             {
-                "max_features": "sqrt",
+                "estimator": RandomForestRegressor(
+                    max_features="sqrt",
+                    random_state=seed,
+                    n_estimators=75,
+                    n_jobs=-1,
+                ),
                 "random_state": seed,
-                "n_estimators": 75,
-                "n_jobs": -1,
             },
             300,
             50,
@@ -49,12 +52,15 @@ iris_y = iris_y[p]
         [
             FeatureImportanceForestRegressor,
             {
-                "max_features": "sqrt",
+                "estimator": RandomForestRegressor(
+                    max_features="sqrt",
+                    random_state=seed,
+                    n_estimators=125,
+                    n_jobs=-1,
+                ),
                 "random_state": seed,
-                "n_estimators": 125,
                 "permute_per_tree": True,
                 "sample_dataset_per_tree": True,
-                "n_jobs": -1,
             },
             300,
             500,
@@ -118,10 +124,13 @@ def test_linear_model(hypotester, model_kwargs, n_samples, n_repeats, test_size)
         [
             PermutationForestClassifier,
             {
-                "max_features": "sqrt",
+                "estimator": RandomForestClassifier(
+                    max_features="sqrt",
+                    random_state=seed,
+                    n_estimators=50,
+                    n_jobs=-1,
+                ),
                 "random_state": seed,
-                "n_estimators": 50,
-                "n_jobs": -1,
             },
             600,
             50,
@@ -130,12 +139,15 @@ def test_linear_model(hypotester, model_kwargs, n_samples, n_repeats, test_size)
         [
             FeatureImportanceForestClassifier,
             {
-                "max_features": "sqrt",
+                "estimator": RandomForestClassifier(
+                    max_features="sqrt",
+                    random_state=seed,
+                    n_estimators=125,
+                    n_jobs=-1,
+                ),
                 "random_state": seed,
-                "n_estimators": 125,
                 "permute_per_tree": True,
                 "sample_dataset_per_tree": True,
-                "n_jobs": -1,
             },
             600,
             200,
@@ -219,17 +231,15 @@ def test_iris_pauc_statistic(criterion, honest_prior, estimator, limit):
 
     # Check consistency on dataset iris.
     clf = FeatureImportanceForestClassifier(
-        criterion=criterion,
-        random_state=0,
-        max_features=max_features,
-        n_estimators=n_estimators,
         estimator=HonestForestClassifier(
+            criterion=criterion,
             n_estimators=n_estimators,
+            max_features=max_features,
             tree_estimator=estimator,
             honest_prior=honest_prior,
             random_state=0,
+            n_jobs=-1,
         ),
-        n_jobs=-1,
         sample_dataset_per_tree=True,
         permute_per_tree=True,
     )
