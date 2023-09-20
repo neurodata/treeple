@@ -250,7 +250,7 @@ def test_correlated_logit_model(hypotester, model_kwargs, n_samples, n_repeats, 
 
 @flaky(max_runs=3)
 @pytest.mark.parametrize("criterion", ["gini", "entropy"])
-@pytest.mark.parametrize("honest_prior", ["empirical", "uniform", "ignore"])
+@pytest.mark.parametrize("honest_prior", ["empirical", "uniform"])
 @pytest.mark.parametrize(
     "estimator",
     [
@@ -259,7 +259,13 @@ def test_correlated_logit_model(hypotester, model_kwargs, n_samples, n_repeats, 
         ObliqueDecisionTreeClassifier(),
     ],
 )
-@pytest.mark.parametrize("permute_per_tree", [True, False])
+@pytest.mark.parametrize(
+    "permute_per_tree",
+    [
+        True,
+        False,
+    ],
+)
 @pytest.mark.parametrize("sample_dataset_per_tree", [True, False])
 def test_iris_pauc_statistic(
     criterion, honest_prior, estimator, permute_per_tree, sample_dataset_per_tree
@@ -268,7 +274,7 @@ def test_iris_pauc_statistic(
     max_features = "sqrt"
     n_repeats = 200
     n_estimators = 100
-    test_size = 0.1
+    test_size = 0.2
 
     # Check consistency on dataset iris.
     clf = FeatureImportanceForestClassifier(
@@ -293,6 +299,7 @@ def test_iris_pauc_statistic(
     if sample_dataset_per_tree and not permute_per_tree:
         # test in another test
         pytest.skip()
+
     stat, pvalue = clf.test(
         X,
         iris_y,

@@ -215,9 +215,6 @@ class BasePermutationForest(MetaEstimatorMixin):
             The covariate indices of ``X`` to shuffle.
         metric : str, optional
             Metric to compute, by default "mse".
-        test_size : float, optional
-            Size of the samples to leave out for each tree to compute posteriors on,
-            by default 0.2.
         n_repeats : int, optional
             Number of times to sample the null distribution, by default 1000.
         return_posteriors : bool, optional

@@ -1,6 +1,8 @@
 # Authors: Ronan Perry, Sambit Panda, Haoyin Xu
 # Adopted from: https://github.com/neurodata/honest-forests
 
+import inspect
+
 import numpy as np
 from sklearn.base import ClassifierMixin, MetaEstimatorMixin, _fit_context, clone
 from sklearn.ensemble._base import _set_random_states
@@ -568,11 +570,21 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
                     class_weight=self.class_weight,
                     random_state=self.random_state,
                     min_impurity_decrease=self.min_impurity_decrease,
-                    ccp_alpha=self.ccp_alpha,
-                    monotonic_cst=self.monotonic_cst,
-                    store_leaf_values=self.store_leaf_values,
                 )
             )
+
+            # TODO: refactor oblique trees to have these parameters by default, but not used
+            init_signature = inspect.signature(self.estimator_.__init__)
+            if "ccp_alpha" in init_signature.parameters:
+                self.estimator_.set_params(**dict(ccp_alpha=self.ccp_alpha))
+            if "store_leaf_values" in init_signature.parameters:
+                self.estimator_.set_params(
+                    **dict(
+                        store_leaf_values=self.store_leaf_values,
+                    )
+                )
+            if "monotonic_cst" in init_signature.parameters:
+                self.self.estimator_.set_params(**dict(monotonic_cst=self.monotonic_cst))
 
             if self.random_state is not None:
                 _set_random_states(self.estimator_, self.random_state)

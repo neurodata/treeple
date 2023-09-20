@@ -250,8 +250,6 @@ class BaseForestHT(MetaEstimatorMixin):
             The index array of covariates to shuffle, by default None.
         metric : str, optional
             The metric to compute, by default "mse".
-        test_size : float, optional
-            Proportion of samples per tree to use for the test set, by default 0.2.
         n_repeats : int, optional
             Number of times to sample the null distribution, by default 1000.
         return_posteriors : bool, optional
@@ -315,6 +313,8 @@ class BaseForestHT(MetaEstimatorMixin):
                 y_test = y[indices_test, :]
             else:
                 y_test = y
+            print("y_test: ", y_test.shape)
+            print(observe_posteriors.shape, permute_posteriors.shape)
             metric_star, metric_star_pi = _compute_null_distribution_coleman(
                 y_test=y_test,
                 y_pred_proba_normal=observe_posteriors,
@@ -647,13 +647,13 @@ class FeatureImportanceForestClassifier(BaseForestHT):
 
         if self.permute_per_tree:
             if predict_posteriors:
-                posterior_arr = np.zeros(
-                    (self.n_estimators, self.n_samples_test_, estimator.n_classes_)
+                posterior_arr = np.full(
+                    (self.n_estimators, self._n_samples_, estimator.n_classes_), np.nan
                 )
             else:
                 # now initialize posterior array as (n_trees, n_samples_test, n_outputs)
-                posterior_arr = np.zeros(
-                    (self.n_estimators, self.n_samples_test_, estimator.n_outputs_)
+                posterior_arr = np.full(
+                    (self.n_estimators, self._n_samples_, estimator.n_outputs_), np.nan
                 )
 
             for idx, (indices_train, indices_test) in enumerate(self._get_estimators_indices()):
@@ -667,6 +667,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
                     y_pred = tree.predict(X[indices_test, :]).reshape(-1, tree.n_outputs_)
 
                 # Fill test set posteriors & set rest NaN
+                # TODO: refactor so posterior_arr is just a large NaN array
                 posterior_arr[idx, indices_test, :] = y_pred  # posterior
 
             # Average all posteriors (n_samples_test, n_outputs)
@@ -679,6 +680,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
             # Ignore all NaN values (samples not tested)
             y_true_final = y[nonnan_indices, :]
             posterior_final = posterior_final[nonnan_indices, :]
+            print("Inside _statistic: ", y_true_final.shape, posterior_final.shape)
         else:
             # fitting a forest will only get one unique train/test split
             indices_train, indices_test = self.train_test_samples_[0]
@@ -710,6 +712,9 @@ class FeatureImportanceForestClassifier(BaseForestHT):
             y_true_final = y_test
             posterior_final = y_pred
 
+            print("False false: ", posterior_final.shape, y_true_final.shape)
+            print(y_true_final)
+            print(posterior_final)
         if metric == "auc":
             # at this point, posterior_final is the predicted posterior for only the positive class
             # as more than one output is not supported.
@@ -719,6 +724,9 @@ class FeatureImportanceForestClassifier(BaseForestHT):
                 raise RuntimeError(
                     f"AUC metric is not supported for {self._type_of_target} targets."
                 )
+
+        if np.isnan(posterior_final).any():
+            raise RuntimeError("NaN values encountered in posterior_final.")
 
         stat = metric_func(y_true_final, posterior_final, **metric_kwargs)
         if covariate_index is None:

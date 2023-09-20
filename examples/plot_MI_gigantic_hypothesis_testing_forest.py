@@ -3,10 +3,11 @@
 Mutual Information for Gigantic Hypothesis Testing (MIGHT)
 ===========================================================
 
-An example using :class:`~sktree.FeatureImportanceForestClassifier` for nonparametric
+An example using :class:`~sktree.stats.FeatureImportanceForestClassifier` for nonparametric
 multivariate hypothesis test, on simulated datasets. Here, we present a simulation
 of how MIGHT is used to test the hypothesis that a "feature set is important for
-predicting the target".
+predicting the target". This is a generalization of the framework presented in
+:footcite:`coleman2022scalable`.
 
 We simulate a dataset with 1000 features, 500 samples, and a binary class target
 variable. Within each feature set, there is 500 features associated with one feature
@@ -19,18 +20,16 @@ null hypothesis:
 ``H0: I(X; y) - I(X, W; y) = 0``
 ``HA: I(X; y) - I(X, W; y) > 0``
 
-where ``I`` is mutual information.
-
-We present causal settings where this would be true:
+where ``I`` is mutual information. For example, this could be true in the following settings,
+where X is our informative feature set and W is our uninformative feature set.
 
 - ``W    X -> y``: here ``W`` is completely disconnected from X and y.
 - ``W -> X -> y``: here ``W`` is d-separated from y given X.
-- ``W -> y <- X``: here ``W`` is a weak predictor of y, and X is a strong predictor of y.
-- ``X <- W -> y; X -> y``: here ``W`` is a weak confounder of the relationship between X and y.
+- ``W <- X -> y``: here ``W`` is d-separated from y given X.
 
 We then use MIGHT to test the hypothesis that the first feature set is important for
 predicting the target, and the second feature set is not important for predicting the
-target. We use :class:`~sktree.FeatureImportanceForestClassifier`.
+target. We use :class:`~sktree.stats.FeatureImportanceForestClassifier`.
 """
 
 import numpy as np
@@ -80,13 +79,22 @@ y = rng.binomial(n=1, p=expit(beta * X_important[:, :10].sum(axis=1)), size=n_sa
 # %%
 # Perform hypothesis testing using Mutual Information
 # ---------------------------------------------------
+# Here, we use :class:`~sktree.stats.FeatureImportanceForestClassifier` to perform the hypothesis
+# test. The test statistic is computed by comparing the metric (i.e. mutual information) estimated
+# between two forests. One forest is trained on the original dataset, and one forest is trained
+# on a permuted dataset, where the rows of the ``covariate_index`` columns are shuffled randomly.
+#
+# The null distribution is then estimated in an efficient manner using the framework of
+# :footcite:`coleman2022scalable`. The sample evaluations of each forest (i.e. the posteriors)
+# are sampled randomly ``n_repeats`` times to generate a null distribution. The pvalue is then
+# computed as the proportion of samples in the null distribution that are less than the
+# observed test statistic.
+
 n_estimators = 100
 max_features = 1.0
 test_size = 0.2
 n_repeats = 500
 
-# TODO: This can be improved since HonestForestClassifier should be able to extract
-# the relevant hyperparameters
 est = FeatureImportanceForestClassifier(
     estimator=HonestForestClassifier(
         n_estimators=n_estimators,
@@ -116,3 +124,8 @@ stat, pvalue = est.test(
     n_repeats=n_repeats,
 )
 print(f"Estimated MI difference: {stat} with Pvalue: {pvalue}")
+
+# %%
+# References
+# ----------
+# .. footbibliography::
