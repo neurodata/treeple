@@ -248,7 +248,7 @@ def test_correlated_logit_model(hypotester, model_kwargs, n_samples, n_repeats, 
     assert pvalue > 0.05, f"pvalue: {pvalue}"
 
 
-@flaky(max_runs=3)
+@flaky(max_runs=2)
 @pytest.mark.parametrize("criterion", ["gini", "entropy"])
 @pytest.mark.parametrize("honest_prior", ["empirical", "uniform"])
 @pytest.mark.parametrize(
