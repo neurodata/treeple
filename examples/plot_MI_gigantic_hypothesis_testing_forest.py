@@ -117,7 +117,7 @@ stat, pvalue = est.test(
 )
 print(f"Estimated MI difference: {stat} with Pvalue: {pvalue}")
 
-# we test for the second feature set, which is important and thus should return a pvalue > 0.05
+# we test for the second feature set, which is unimportant and thus should return a pvalue > 0.05
 stat, pvalue = est.test(
     X,
     y,
