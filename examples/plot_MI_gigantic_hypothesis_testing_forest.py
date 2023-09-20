@@ -90,10 +90,11 @@ y = rng.binomial(n=1, p=expit(beta * X_important[:, :10].sum(axis=1)), size=n_sa
 # computed as the proportion of samples in the null distribution that are less than the
 # observed test statistic.
 
-n_estimators = 100
-max_features = 1.0
+n_estimators = 125
+max_features = "sqrt"
 test_size = 0.2
 n_repeats = 500
+n_jobs = -1
 
 est = FeatureImportanceForestClassifier(
     estimator=HonestForestClassifier(
@@ -102,6 +103,7 @@ est = FeatureImportanceForestClassifier(
         tree_estimator=DecisionTreeClassifier(),
         random_state=seed,
         honest_fraction=0.7,
+        n_jobs=n_jobs,
     ),
     random_state=seed,
     test_size=test_size,

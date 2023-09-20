@@ -313,8 +313,6 @@ class BaseForestHT(MetaEstimatorMixin):
                 y_test = y[indices_test, :]
             else:
                 y_test = y
-            print("y_test: ", y_test.shape)
-            print(observe_posteriors.shape, permute_posteriors.shape)
             metric_star, metric_star_pi = _compute_null_distribution_coleman(
                 y_test=y_test,
                 y_pred_proba_normal=observe_posteriors,
@@ -680,7 +678,6 @@ class FeatureImportanceForestClassifier(BaseForestHT):
             # Ignore all NaN values (samples not tested)
             y_true_final = y[nonnan_indices, :]
             posterior_final = posterior_final[nonnan_indices, :]
-            print("Inside _statistic: ", y_true_final.shape, posterior_final.shape)
         else:
             # fitting a forest will only get one unique train/test split
             indices_train, indices_test = self.train_test_samples_[0]
@@ -711,10 +708,6 @@ class FeatureImportanceForestClassifier(BaseForestHT):
             samples = indices_test
             y_true_final = y_test
             posterior_final = y_pred
-
-            print("False false: ", posterior_final.shape, y_true_final.shape)
-            print(y_true_final)
-            print(posterior_final)
         if metric == "auc":
             # at this point, posterior_final is the predicted posterior for only the positive class
             # as more than one output is not supported.

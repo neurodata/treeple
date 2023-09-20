@@ -166,7 +166,7 @@ _cythonlint = 'cython-lint sktree/ --exclude "sktree/_lib/*"'
 _black_check = 'black --check sktree examples'
 _isort_check = 'isort --check .'
 _pydocstyle = 'pydocstyle ./sktree'
-_codespell = 'codespell sktree/ doc/ examples/ --ignore-words=.codespellignore --skip "**/_build/*,**/_lib/*,doc/_build/*,doc/auto_examples/*,doc/tutorials/*"'
+_codespell = 'codespell sktree/ doc/ examples/ --ignore-words=.codespellignore --skip "**/_build/*,**/_lib/*,doc/_build/*,doc/auto_examples/*,doc/tutorials/*,doc/generated/*"'
 _changelog = 'semversioner changelog > CHANGELOG.md'
 _apply_version = 'semversioner release'
 
