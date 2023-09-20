@@ -584,7 +584,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
                     )
                 )
             if "monotonic_cst" in init_signature.parameters:
-                self.self.estimator_.set_params(**dict(monotonic_cst=self.monotonic_cst))
+                self.estimator_.set_params(**dict(monotonic_cst=self.monotonic_cst))
 
             if self.random_state is not None:
                 _set_random_states(self.estimator_, self.random_state)
