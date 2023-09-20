@@ -5,6 +5,7 @@ python_sources = [
   'ksg.py',
   'forest.py',
   'monte_carlo.py',
+  'sdf.py',
 ]
 
 py3.install_sources(

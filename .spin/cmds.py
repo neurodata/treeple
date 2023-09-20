@@ -166,3 +166,26 @@ def build(ctx, meson_args, jobs=None, clean=False, forcesubmodule=False, verbose
 
     # run build as normal
     ctx.invoke(meson.build, meson_args=meson_args, jobs=jobs, clean=clean, verbose=verbose)
+
+
+@click.command()
+@click.argument("asv_args", nargs=-1)
+def asv(asv_args):
+    """🏃 Run `asv` to collect benchmarks
+
+    ASV_ARGS are passed through directly to asv, e.g.:
+
+    spin asv -- dev -b TransformSuite
+
+    ./spin asv -- continuous --verbose --split --bench ObliqueRandomForest origin/main constantsv2
+
+    Please see CONTRIBUTING.txt
+    """
+    site_path = meson._get_site_packages()
+    if site_path is None:
+        print("No built scikit-tree found; run `spin build` first.")
+        sys.exit(1)
+
+    os.environ["ASV_ENV_DIR"] = "/Users/adam2392/miniforge3"
+    os.environ["PYTHONPATH"] = f'{site_path}{os.sep}:{os.environ.get("PYTHONPATH", "")}'
+    util.run(["asv"] + list(asv_args))

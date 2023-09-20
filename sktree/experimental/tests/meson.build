@@ -4,6 +4,7 @@ python_sources = [
   'test_simulate.py',
   'test_ksg.py',
   'test_monte_carlo.py'
+  'test_sdf.py',
 ]
 
 py3.install_sources(
