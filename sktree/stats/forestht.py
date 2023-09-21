@@ -43,6 +43,12 @@ class BaseForestHT(MetaEstimatorMixin):
         self.permute_per_tree = permute_per_tree
         self.sample_dataset_per_tree = sample_dataset_per_tree
 
+        self.n_samples_test_ = None
+        self._n_samples_ = None
+        self._covariate_index_cache_ = None
+        self._type_of_target_ = None
+        self.n_features_in_ = None
+
     @property
     def n_estimators(self):
         return self.estimator_.n_estimators
@@ -107,6 +113,29 @@ class BaseForestHT(MetaEstimatorMixin):
     ):
         raise NotImplementedError("Subclasses should implement this!")
 
+    def _check_input(self, X: ArrayLike, y: ArrayLike, covariate_index: ArrayLike = None):
+        X, y = check_X_y(X, y, ensure_2d=True, copy=True, multi_output=True)
+        if y.ndim != 2:
+            y = y.reshape(-1, 1)
+
+        if self._n_samples_ is not None and X.shape[0] != self._n_samples_:
+            raise RuntimeError(
+                f"X must have {self._n_samples_} samples, got {X.shape[0]}. "
+                f"If running on a new dataset, call the 'reset' method."
+            )
+        if self.n_features_in_ is not None and X.shape[1] != self.n_features_in_:
+            raise RuntimeError(
+                f"X must have {self.n_features_in_} features, got {X.shape[1]}. "
+                f"If running on a new dataset, call the 'reset' method."
+            )
+        if self._type_of_target_ is not None and type_of_target(y) != self._type_of_target_:
+            raise RuntimeError(
+                f"y must have type {self._type_of_target_}, got {type_of_target(y)}. "
+                f"If running on a new dataset, call the 'reset' method."
+            )
+
+        return X, y, covariate_index
+
     def statistic(
         self,
         X: ArrayLike,
@@ -151,9 +180,12 @@ class BaseForestHT(MetaEstimatorMixin):
             least one tree in the posterior computation.
         """
         if check_input:
-            X, y = check_X_y(X, y, ensure_2d=True, multi_output=True)
-            if y.ndim != 2:
-                y = y.reshape(-1, 1)
+            X, y, covariate_index = self._check_input(X, y, covariate_index)
+
+        if self._n_samples_ is None:
+            self._n_samples_, self.n_features_in_ = X.shape
+        if self._type_of_target_ is None:
+            self._type_of_target_ = type_of_target(y)
 
         if self.sample_dataset_per_tree and not self.permute_per_tree:
             raise ValueError("sample_dataset_per_tree is only valid when permute_per_tree=True")
@@ -167,7 +199,7 @@ class BaseForestHT(MetaEstimatorMixin):
 
         # Infer type of target y
         if not hasattr(self, "_type_of_target"):
-            self._type_of_target = type_of_target(y)
+            self._type_of_target_ = type_of_target(y)
 
         # XXX: this can be improved as an extra fit can be avoided, by just doing error-checking
         # and then setting the internal meta data structures
@@ -264,9 +296,7 @@ class BaseForestHT(MetaEstimatorMixin):
         pval : float
             The p-value of the test statistic.
         """
-        X, y = check_X_y(X, y, ensure_2d=True, copy=True, multi_output=True)
-        if y.ndim != 2:
-            y = y.reshape(-1, 1)
+        X, y, covariate_index = self._check_input(X, y, covariate_index)
 
         if not hasattr(self, "samples_"):
             # first compute the test statistic on the un-permuted data
@@ -410,6 +440,17 @@ class FeatureImportanceForestRegressor(BaseForestHT):
 
     null_dist_ : ArrayLike of shape (n_repeats,)
         The null distribution of the test statistic.
+
+    Notes
+    -----
+    This class trains two forests: one on the original dataset, and one on the
+    permuted dataset. The forest from the original dataset is cached and re-used to
+    compute the test-statistic each time the :meth:`test` method is called. However,
+    the forest from the permuted dataset is re-trained each time the :meth:`test` is called
+    if the ``covariate_index`` differs from the previous run.
+
+    To fully start from a new dataset, call the :meth:`reset` method, which will then
+    re-train both forests upon calling the :meth:`test` and :meth:`statistic` methods.
 
     References
     ----------
@@ -591,6 +632,17 @@ class FeatureImportanceForestClassifier(BaseForestHT):
     null_dist_ : ArrayLike of shape (n_repeats,)
         The null distribution of the test statistic.
 
+    Notes
+    -----
+    This class trains two forests: one on the original dataset, and one on the
+    permuted dataset. The forest from the original dataset is cached and re-used to
+    compute the test-statistic each time the :meth:`test` method is called. However,
+    the forest from the permuted dataset is re-trained each time the :meth:`test` is called
+    if the ``covariate_index`` differs from the previous run.
+
+    To fully start from a new dataset, call the :meth:`reset` method, which will then
+    re-train both forests upon calling the :meth:`test` and :meth:`statistic` methods.
+
     References
     ----------
     .. footbibliography::
@@ -630,7 +682,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
         X: ArrayLike,
         y: ArrayLike,
         covariate_index: ArrayLike = None,
-        metric="mse",
+        metric="mi",
         return_posteriors: bool = False,
         **metric_kwargs,
     ):
@@ -696,6 +748,8 @@ class FeatureImportanceForestClassifier(BaseForestHT):
                 )
                 X_train[:, covariate_index] = X_train[index_arr, covariate_index]
 
+            if self._type_of_target_ == "binary":
+                y_train = y_train.ravel()
             estimator.fit(X_train, y_train)
 
             if predict_posteriors:
@@ -711,11 +765,11 @@ class FeatureImportanceForestClassifier(BaseForestHT):
         if metric == "auc":
             # at this point, posterior_final is the predicted posterior for only the positive class
             # as more than one output is not supported.
-            if self._type_of_target == "binary":
+            if self._type_of_target_ == "binary":
                 posterior_final = posterior_final[:, 1]
             else:
                 raise RuntimeError(
-                    f"AUC metric is not supported for {self._type_of_target} targets."
+                    f"AUC metric is not supported for {self._type_of_target_} targets."
                 )
 
         if np.isnan(posterior_final).any():

@@ -317,3 +317,48 @@ def test_iris_pauc_statistic(
 
     score = clf.statistic(iris_X, iris_y, metric="auc", max_fpr=limit)
     assert score >= 0.8, "Failed with pAUC: {0} for max fpr: {1}".format(score, limit)
+
+
+@pytest.mark.parametrize(
+    "forest_hyppo",
+    [
+        FeatureImportanceForestRegressor(
+            estimator=RandomForestRegressor(
+                n_estimators=10,
+            ),
+            random_state=seed,
+        ),
+        FeatureImportanceForestClassifier(
+            estimator=RandomForestClassifier(
+                n_estimators=10,
+            ),
+            random_state=seed,
+            permute_per_tree=False,
+            sample_dataset_per_tree=False,
+        ),
+    ],
+)
+def test_forestht_check_inputs(forest_hyppo):
+    n_samples = 100
+    n_features = 5
+    X = rng.uniform(size=(n_samples, n_features))
+    y = rng.integers(0, 2, size=n_samples)  # Binary classification
+
+    # Test case 1: Valid input
+    forest_hyppo.statistic(X, y)
+
+    # Test case 2: Invalid input with different number of samples
+    X_invalid = np.random.rand(n_samples + 1, X.shape[1])
+    y_invalid = rng.integers(0, 2, size=n_samples + 1)
+    with pytest.raises(RuntimeError, match="X must have"):
+        forest_hyppo.statistic(X_invalid, y_invalid)
+
+    # Test case 3: Invalid input with different number of features
+    X_invalid = np.random.rand(X.shape[0], n_features + 1)
+    with pytest.raises(RuntimeError, match="X must have"):
+        forest_hyppo.statistic(X_invalid, y)
+
+    # Test case 4: Invalid input with incorrect y type target
+    y_invalid = np.random.rand(X.shape[0])
+    with pytest.raises(RuntimeError, match="y must have type"):
+        forest_hyppo.statistic(X, y_invalid)
