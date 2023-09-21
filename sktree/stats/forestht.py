@@ -61,6 +61,12 @@ class BaseForestHT(MetaEstimatorMixin):
             if attr_name.endswith("_") and attr_name not in class_attributes:
                 delattr(self, attr_name)
 
+        self.n_samples_test_ = None
+        self._n_samples_ = None
+        self._covariate_index_cache_ = None
+        self._type_of_target_ = None
+        self.n_features_in_ = None
+
     def _get_estimators_indices(self):
         indices = np.arange(self._n_samples_, dtype=int)
 
@@ -221,13 +227,11 @@ class BaseForestHT(MetaEstimatorMixin):
                 estimator.fit(X[:2], y[:2])
 
         # permute per tree
-        n_samples = X.shape[0]
-        self._n_samples_ = n_samples
         if self.sample_dataset_per_tree:
-            self.n_samples_test_ = n_samples
+            self.n_samples_test_ = self._n_samples_
         else:
             # not permute per tree
-            test_size_ = int(self.test_size * n_samples)
+            test_size_ = int(self.test_size * self._n_samples_)
 
             # Fit each tree and compute posteriors with train test splits
             self.n_samples_test_ = test_size_
@@ -298,7 +302,7 @@ class BaseForestHT(MetaEstimatorMixin):
         """
         X, y, covariate_index = self._check_input(X, y, covariate_index)
 
-        if not hasattr(self, "samples_"):
+        if self._n_samples_ is None:
             # first compute the test statistic on the un-permuted data
             observe_stat, observe_posteriors, observe_samples = self.statistic(
                 X,

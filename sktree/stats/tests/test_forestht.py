@@ -315,6 +315,11 @@ def test_iris_pauc_statistic(
     print(pvalue)
     assert pvalue < 0.05, f"pvalue: {pvalue}"
 
+    # one must call `reset()` to make sure the test is run on a "new" feature set properly
+    with pytest.raises(RuntimeError, match="X must have 8 features"):
+        clf.statistic(iris_X, iris_y, metric="auc", max_fpr=limit)
+
+    clf.reset()
     score = clf.statistic(iris_X, iris_y, metric="auc", max_fpr=limit)
     assert score >= 0.8, "Failed with pAUC: {0} for max fpr: {1}".format(score, limit)
 
