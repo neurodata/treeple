@@ -216,6 +216,7 @@ numpydoc_xref_ignore = {
     "Tree",
     "_type_",
     "MetadataRequest",
+    "sklearn.utils.metadata_routing.MetadataRequest",
     "~utils.metadata_routing.MetadataRequest",
     "quantiles",
     "n_quantiles",

@@ -453,7 +453,7 @@ class FeatureImportanceForestRegressor(BaseForestHT):
     the forest from the permuted dataset is re-trained each time the :meth:`test` is called
     if the ``covariate_index`` differs from the previous run.
 
-    To fully start from a new dataset, call the :meth:`reset` method, which will then
+    To fully start from a new dataset, call the ``reset`` method, which will then
     re-train both forests upon calling the :meth:`test` and :meth:`statistic` methods.
 
     References
@@ -644,7 +644,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
     the forest from the permuted dataset is re-trained each time the :meth:`test` is called
     if the ``covariate_index`` differs from the previous run.
 
-    To fully start from a new dataset, call the :meth:`reset` method, which will then
+    To fully start from a new dataset, call the ``reset`` method, which will then
     re-train both forests upon calling the :meth:`test` and :meth:`statistic` methods.
 
     References
