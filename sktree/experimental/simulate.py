@@ -238,7 +238,7 @@ def embed_high_dims(data, n_dims=50, random_state=None):
     return new_data
 
 
-def simulate_separate_gaussians(n_dims=2, n_samples=1000, n_classes=2, pi=None, seed=None):
+def simulate_separate_gaussians(n_dims=2, n_samples=1000, n_classes=2, mean1: float=None, var1: float=None, pi=None, seed=None):
     """Simulate data from separate multivariate Gaussians.
 
     Parameters
@@ -249,6 +249,12 @@ def simulate_separate_gaussians(n_dims=2, n_samples=1000, n_classes=2, pi=None, 
         The number of samples to generate. The default is 1000.
     n_classes : int
         The number of classes to generate. The default is 2.
+    mean1 : float
+        The mean of the first dimension of the first class. If None (default), then a random
+        standard normal vector is drawn.
+    var1 : float
+        The covariance matrix of the first class. If None (default), then a random standard
+        normal 2D array is drawn. It is then converted to a PD matrix.
     pi : array-like of shape (n_classes,)
         The class probabilities. If None (default), then uniform class probabilities are used.
     seed : int
@@ -289,6 +295,13 @@ def simulate_separate_gaussians(n_dims=2, n_samples=1000, n_classes=2, pi=None, 
     # now sample the multivariate Gaussian for each class
     means = [np.zeros((n_dims,))]
     sigmas = [np.eye(n_dims)]
+
+    if mean1 is not None:
+        means[0][0] = mean1
+    if var1 is not None:
+        sigmas[0][0, 0] = var1
+
+    # sample additional classes if not binary
     for _ in range(1, n_classes):
         mean = rng.standard_normal(size=(n_dims,))
         sigma = np.eye(n_dims)
