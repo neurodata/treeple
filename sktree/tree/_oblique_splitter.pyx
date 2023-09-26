@@ -380,7 +380,6 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         it is assumed ``feature_combinations`` is forced to be smaller than
         ``n_features`` before instantiating an oblique splitter.
         """
-
         cdef SIZE_t n_features = self.n_features
         cdef SIZE_t n_non_zeros = self.n_non_zeros
         cdef UINT32_t* random_state = &self.rand_r_state
@@ -652,3 +651,145 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
         deref(oblique_split).impurity_left = best_split.impurity_left
         deref(oblique_split).impurity_right = best_split.impurity_right
         return 0
+
+
+cdef class MultiViewSplitter(ObliqueSplitter):
+    def __cinit__(
+        self,
+        Criterion criterion,
+        SIZE_t max_features,
+        SIZE_t min_samples_leaf,
+        double min_weight_leaf,
+        object random_state,
+        const cnp.int8_t[:] monotonic_cst,
+        double feature_combinations,
+        const cnp.int8_t[:] feature_set_ends,
+        *argv
+    ):
+        self.feature_set_ends = feature_set_ends
+
+        # infer the number of feature sets
+        self.n_feature_sets = len(self.feature_set_ends) + 1
+
+    def __reduce__(self):
+        """Enable pickling the splitter."""
+        return (type(self),
+                (
+                    self.criterion,
+                    self.max_features,
+                    self.min_samples_leaf,
+                    self.min_weight_leaf,
+                    self.random_state,
+                    self.monotonic_cst.base if self.monotonic_cst is not None else None,
+                    self.feature_combinations,
+                    self.feature_set_ends,
+                ), self.__getstate__())
+
+    cdef void sample_proj_mat(
+        self,
+        vector[vector[DTYPE_t]]& proj_mat_weights,
+        vector[vector[SIZE_t]]& proj_mat_indices
+    ) noexcept nogil:
+        """Sample projection matrix accounting for multi-views.
+        
+        This proceeds as a normal sampling projection matrix,
+        but now also uniformly samples features from each feature set.
+        """
+        cdef SIZE_t n_features = self.n_features
+        cdef SIZE_t n_non_zeros = self.n_non_zeros
+        cdef UINT32_t* random_state = &self.rand_r_state
+
+        cdef int i, feat_i, proj_i, rand_vec_index
+        cdef DTYPE_t weight
+
+        # construct an array to sample from mTry x n_features set of indices
+        cdef SIZE_t[::1] indices_to_sample = self.indices_to_sample
+        cdef SIZE_t grid_size
+
+        cdef SIZE_t n_features_in_set
+        cdef int feature_set_begin, feature_set_end
+        feature_set_begin = 0
+
+        # 01: This algorithm samples features from each feature set uniformly and combines them
+        # into one sparse projection vector.
+        for feature_set_end in self.feature_set_ends:
+            n_features_in_set = feature_set_end - feature_set_begin
+            
+            grid_size = self.max_features * n_features_in_set
+
+            # shuffle indices over the 2D grid for this feature set to sample using Fisher-Yates
+            for i in range(0, grid_size):
+                j = rand_int(0, grid_size - i, random_state) + feature_set_begin
+                indices_to_sample[j], indices_to_sample[i] = \
+                    indices_to_sample[i], indices_to_sample[j]
+
+            # sample 'n_non_zeros' in a mtry X n_features projection matrix
+            # which consists of +/- 1's chosen at a 1/2s rate
+            for i in range(0, n_non_zeros):
+                # get the next index from the shuffled index array
+                rand_vec_index = indices_to_sample[i]
+
+                # get the projection index and feature index
+                proj_i = rand_vec_index // n_features
+                feat_i = rand_vec_index % n_features
+
+                # sample a random weight
+                weight = 1 if (rand_int(0, 2, random_state) == 1) else -1
+
+                proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
+                proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
+
+            # the new beginning is the previous end
+            feature_set_begin = feature_set_end
+        
+        # 02: Algorithm samples feature combinations from each feature set uniformly and evaluates
+        # them independently.
+
+
+cdef class MultiViewSplitterTester(MultiViewSplitter):
+    """A class to expose a Python interface for testing."""
+    
+    cpdef sample_projection_matrix_py(self):
+        """Sample projection matrix using a patch.
+
+        Used for testing purposes.
+
+        Randomly sample patches with weight of 1.
+        """
+        cdef vector[vector[DTYPE_t]] proj_mat_weights = vector[vector[DTYPE_t]](self.max_features)
+        cdef vector[vector[SIZE_t]] proj_mat_indices = vector[vector[SIZE_t]](self.max_features)
+        cdef SIZE_t i, j
+
+        # sample projection matrix in C/C++
+        self.sample_proj_mat(proj_mat_weights, proj_mat_indices)
+
+        # convert the projection matrix to something that can be used in Python
+        proj_vecs = np.zeros((self.max_features, self.n_features), dtype=np.float64)
+        for i in range(0, self.max_features):
+            for j in range(0, proj_mat_weights[i].size()):
+                weight = proj_mat_weights[i][j]
+                feat = proj_mat_indices[i][j]
+
+                proj_vecs[i, feat] = weight
+
+        return proj_vecs
+
+
+    cpdef init_test(self, X, y, sample_weight, missing_values_in_feature_mask=None):
+        """Initializes the state of the splitter.
+
+        Used for testing purposes.
+
+        Parameters
+        ----------
+        X : array-like, shape (n_samples, n_features)
+            The input samples.
+        y : array-like, shape (n_samples,)
+            The target values (class labels in classification, real numbers in
+            regression).
+        sample_weight : array-like, shape (n_samples,)
+            Sample weights.
+        missing_values_in_feature_mask : array-like, shape (n_features,)
+            Whether or not a feature has missing values.
+        """
+        self.init(X, y, sample_weight, missing_values_in_feature_mask)

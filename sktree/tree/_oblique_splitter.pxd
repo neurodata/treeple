@@ -106,3 +106,15 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         vector[vector[DTYPE_t]]& proj_mat_weights,
         vector[vector[SIZE_t]]& proj_mat_indices
     ) noexcept nogil
+
+
+# XXX: This splitter is experimental. Expect changes frequently.
+cdef class MultiViewSplitter(ObliqueSplitter):
+    cdef SIZE_t[::1] feature_set_ends           # an array indicating the column indices of the end of each feature set
+    cdef SIZE_t n_feature_sets                  # the number of feature sets is the length of feature_set_ends + 1
+
+    cdef void sample_proj_mat(
+        self,
+        vector[vector[DTYPE_t]]& proj_mat_weights,
+        vector[vector[SIZE_t]]& proj_mat_indices
+    ) noexcept nogil
