@@ -171,18 +171,14 @@ def _compute_null_distribution_coleman(
     ----------
     y_test : ArrayLike of shape (n_samples, n_outputs)
         The output matrix.
-    y_pred_proba_normal : ArrayLike of shape (n_estimators, n_samples_normal, n_outputs)
+    y_pred_proba_normal : ArrayLike of shape (n_estimators_normal, n_samples, n_outputs)
         The predicted posteriors from the normal forest. Some of the trees
         may have nans predicted in them, which means the tree used these samples
         for training and not for prediction.
-    y_pred_proba_perm : ArrayLike of shape (n_estimators, n_samples_perm, n_outputs)
+    y_pred_proba_perm : ArrayLike of shape (n_estimators_perm, n_samples, n_outputs)
         The predicted posteriors from the permuted forest. Some of the trees
         may have nans predicted in them, which means the tree used these samples
         for training and not for prediction.
-    normal_samples : ArrayLike of shape (n_samples_normal,)
-        The indices of the normal samples that we have a posterior for.
-    perm_samples : ArrayLike of shape (n_samples_perm,)
-        The indices of the permuted samples that we have a posterior for.
     metric : str, optional
         The metric, which to compute the null distribution of statistics, by default 'mse'.
     n_repeats : int, optional
@@ -204,28 +200,15 @@ def _compute_null_distribution_coleman(
     # (n_estimators * 2, n_samples, n_outputs)
     all_y_pred = np.concatenate((y_pred_proba_normal, y_pred_proba_perm), axis=0)
 
-    print(y_pred_proba_normal.shape)
     n_estimators, _, _ = y_pred_proba_normal.shape
     n_samples_test = len(y_test)
     if all_y_pred.shape[1] != n_samples_test:
-        print(all_y_pred.shape)
-        print(n_samples_test)
-        print(y_test.shape)
-        print("y_pred_proba_perm: ", y_pred_proba_perm.shape)
-        print("y_pred_proba: ", y_pred_proba_normal.shape)
-
         raise RuntimeError(
             f"The number of samples in `all_y_pred` {len(all_y_pred)} "
             f"is not equal to 2 * n_samples_test {2 * n_samples_test}"
         )
 
-    # create two stacked index arrays of y_test resulting in [1, ..., N, 1, ..., N]
-    # where N is `n_estimators`
-    # y_test_ind_arr = np.hstack(
-    #     (np.arange(n_estimators, dtype=int), np.arange(n_estimators, dtype=int))
-    # )
-
-    # create index array of [1, ..., 2N] to slice into `all_y_pred`
+    # create index array of [1, ..., 2N] to slice into `all_y_pred` the stacks of trees
     y_pred_ind_arr = np.arange((2 * n_estimators), dtype=int)
 
     metric_star = np.zeros((n_repeats,))
@@ -234,6 +217,7 @@ def _compute_null_distribution_coleman(
         # two sets of random indices from 1 : 2N are sampled using Fisher-Yates
         rng.shuffle(y_pred_ind_arr)
 
+        # get random half of the posteriors from two sets of trees
         first_forest_inds = y_pred_ind_arr[:n_samples_test]
         second_forest_inds = y_pred_ind_arr[:n_samples_test]
 

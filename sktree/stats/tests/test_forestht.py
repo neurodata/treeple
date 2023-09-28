@@ -29,26 +29,34 @@ iris_X = iris_X[p]
 iris_y = iris_y[p]
 
 
-def test_featureimportance_forest_permute_pertree():
+@pytest.mark.parametrize("sample_dataset_per_tree", [True, False])
+def test_featureimportance_forest_permute_pertree(sample_dataset_per_tree):
     est = FeatureImportanceForestClassifier(
         estimator=RandomForestClassifier(
             n_estimators=10,
+            random_state=seed,
         ),
         permute_per_tree=True,
-        sample_dataset_per_tree=False,
+        test_size=0.7,
+        random_state=seed,
+        sample_dataset_per_tree=sample_dataset_per_tree,
     )
-    est.statistic(iris_X[:10], iris_y[:10])
+    n_samples = 50
+    est.statistic(iris_X[:n_samples], iris_y[:n_samples], metric="mse")
 
     assert (
-        len(est.train_test_samples_[0][1]) == 10 * est.test_size
-    ), f"{len(est.train_test_samples_[0][1])} {10 * est.test_size}"
-    assert len(est.train_test_samples_[0][0]) == est._n_samples_ - 10 * est.test_size
+        len(est.train_test_samples_[0][1]) == n_samples * est.test_size
+    ), f"{len(est.train_test_samples_[0][1])} {n_samples * est.test_size}"
+    assert len(est.train_test_samples_[0][0]) == est._n_samples_ - n_samples * est.test_size
 
-    est.test(iris_X[:10], iris_y[:10], [0, 1], n_repeats=10, metric="mse")
+    est.test(iris_X[:n_samples], iris_y[:n_samples], [0, 1], n_repeats=10, metric="mse")
     assert (
-        len(est.train_test_samples_[0][1]) == 10 * est.test_size
-    ), f"{len(est.train_test_samples_[0][1])} {10 * est.test_size}"
-    assert len(est.train_test_samples_[0][0]) == est._n_samples_ - 10 * est.test_size
+        len(est.train_test_samples_[0][1]) == n_samples * est.test_size
+    ), f"{len(est.train_test_samples_[0][1])} {n_samples * est.test_size}"
+    assert len(est.train_test_samples_[0][0]) == est._n_samples_ - n_samples * est.test_size
+
+    with pytest.raises(RuntimeError, match="Metric must be"):
+        est.statistic(iris_X[:n_samples], iris_y[:n_samples], metric="mi")
 
 
 def test_featureimportance_forest_errors():

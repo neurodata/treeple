@@ -1,4 +1,4 @@
-from typing import Callable, Dict
+from typing import Callable
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -46,6 +46,7 @@ class BaseForestHT(MetaEstimatorMixin):
 
         self.n_samples_test_ = None
         self._n_samples_ = None
+        self._metric = None
         self._covariate_index_cache_ = None
         self._type_of_target_ = None
         self.n_features_in_ = None
@@ -66,6 +67,7 @@ class BaseForestHT(MetaEstimatorMixin):
         self._n_samples_ = None
         self._covariate_index_cache_ = None
         self._type_of_target_ = None
+        self._metric = None
         self.n_features_in_ = None
 
     def _get_estimators_indices(self):
@@ -238,6 +240,13 @@ class BaseForestHT(MetaEstimatorMixin):
             # Fit each tree and compute posteriors with train test splits
             self.n_samples_test_ = test_size_
 
+        if self._metric is not None and self._metric != metric:
+            raise RuntimeError(
+                f"Metric must be {self._metric}, got {metric}. "
+                f"If running on a new dataset, call the 'reset' method."
+            )
+        self._metric = metric
+
         if not is_classifier(self.estimator_) and metric not in REGRESSOR_METRICS:
             raise RuntimeError(
                 f'Metric must be either "mse" or "mae" if using Regression, got {metric}'
@@ -334,7 +343,6 @@ class BaseForestHT(MetaEstimatorMixin):
         # Note: at this point, both `estimator` and `permuted_estimator_` should
         # have been fitted already, so we can now compute on the null by resampling
         # the posteriors and computing the test statistic on the resampled posteriors
-        print(observe_posteriors.shape, permute_posteriors.shape)
         if self.sample_dataset_per_tree:
             metric_star, metric_star_pi = _compute_null_distribution_coleman(
                 y_test=y[observe_samples, :],
@@ -502,14 +510,14 @@ class FeatureImportanceForestRegressor(BaseForestHT):
         **metric_kwargs,
     ):
         """Helper function to compute the test statistic."""
-        metric_func: Callable[[ArrayLike, ArrayLike, Dict], float] = METRIC_FUNCTIONS[metric]
+        metric_func: Callable[[ArrayLike, ArrayLike], float] = METRIC_FUNCTIONS[metric]
         rng = np.random.default_rng(self.random_state)
 
+        posterior_arr = np.full(
+            (self.n_estimators, self.n_samples_test_, estimator.n_outputs_), np.nan
+        )
         if self.permute_per_tree:
             # now initialize posterior array as (n_trees, n_samples_test, n_outputs)
-            posterior_arr = np.zeros(
-                (self.n_estimators, self.n_samples_test_, estimator.n_outputs_)
-            )
             for idx, (indices_train, indices_test) in enumerate(self._get_estimators_indices()):
                 tree: DecisionTreeRegressor = estimator.estimators_[idx]
                 train_tree(tree, X[indices_train, :], y[indices_train, :], covariate_index)
@@ -551,9 +559,6 @@ class FeatureImportanceForestRegressor(BaseForestHT):
             estimator.fit(X_train, y_train)
 
             # construct posterior array for all trees (n_trees, n_samples_test, n_outputs)
-            posterior_arr = np.full(
-                (len(estimator.estimators_), self.n_samples_test_, estimator.n_outputs_), np.nan
-            )
             for itree, tree in enumerate(estimator.estimators_):
                 posterior_arr[itree, ...] = tree.predict(X_test)
 
@@ -669,7 +674,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
         verbose=0,
         test_size=0.2,
         permute_per_tree=True,
-        sample_dataset_per_tree=False,
+        sample_dataset_per_tree=True,
     ):
         super().__init__(
             estimator=estimator,
@@ -701,7 +706,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
         **metric_kwargs,
     ):
         """Helper function to compute the test statistic."""
-        metric_func: Callable[[ArrayLike, ArrayLike, Dict], float] = METRIC_FUNCTIONS[metric]
+        metric_func: Callable[[ArrayLike, ArrayLike], float] = METRIC_FUNCTIONS[metric]
         rng = np.random.default_rng(self.random_state)
 
         if metric in POSTERIOR_FUNCTIONS:
@@ -731,7 +736,6 @@ class FeatureImportanceForestClassifier(BaseForestHT):
                     y_pred = tree.predict(X[indices_test, :]).reshape(-1, tree.n_outputs_)
 
                 # Fill test set posteriors & set rest NaN
-                # TODO: refactor so posterior_arr is just a large NaN array
                 posterior_arr[idx, indices_test, :] = y_pred  # posterior
         else:
             # fitting a forest will only get one unique train/test split
@@ -782,11 +786,13 @@ class FeatureImportanceForestClassifier(BaseForestHT):
 
         # determine if there are any nans in the final posterior array
         # Average all posteriors (n_samples_test, n_outputs)
-        posterior_forest = np.nanmean(posterior_arr, axis=0)
+        # posterior_forest = np.nanmean(posterior_arr, axis=0)
 
         # # Find the row indices with NaN values in any column
-        nonnan_indices = np.where(~np.isnan(posterior_forest).any(axis=1))[0]
+        # nonnan_indices = np.where(~np.isnan(posterior_forest).any(axis=1))[0]
+        nonnan_indices = np.all(~np.isnan(posterior_arr), axis=(0, 2))
         samples = nonnan_indices
+        print(nonnan_indices)
 
         # Ignore all NaN values (samples not tested)
         y_true_final = y[(nonnan_indices), :]
