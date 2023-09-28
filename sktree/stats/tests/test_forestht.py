@@ -35,7 +35,7 @@ def test_featureimportance_forest_permute_pertree():
             n_estimators=10,
         ),
         permute_per_tree=True,
-        sample_dataset_per_tree=True,
+        sample_dataset_per_tree=False,
     )
     est.statistic(iris_X[:10], iris_y[:10])
 
@@ -322,6 +322,8 @@ def test_iris_pauc_statistic(
     clf.reset()
     score = clf.statistic(iris_X, iris_y, metric="auc", max_fpr=limit)
     assert score >= 0.8, "Failed with pAUC: {0} for max fpr: {1}".format(score, limit)
+
+    assert isinstance(clf.estimator_, HonestForestClassifier)
 
 
 @pytest.mark.parametrize(

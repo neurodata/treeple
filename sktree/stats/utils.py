@@ -169,14 +169,16 @@ def _compute_null_distribution_coleman(
 
     Parameters
     ----------
-    X_test : ArrayLike of shape (n_samples, n_features)
-        The data matrix.
     y_test : ArrayLike of shape (n_samples, n_outputs)
         The output matrix.
-    y_pred_proba_normal : ArrayLike of shape (n_samples_normal, n_outputs)
-        The predicted posteriors from the normal forest.
-    y_pred_proba_perm : ArrayLike of shape (n_samples_perm, n_outputs)
-        The predicted posteriors from the permuted forest.
+    y_pred_proba_normal : ArrayLike of shape (n_estimators, n_samples_normal, n_outputs)
+        The predicted posteriors from the normal forest. Some of the trees
+        may have nans predicted in them, which means the tree used these samples
+        for training and not for prediction.
+    y_pred_proba_perm : ArrayLike of shape (n_estimators, n_samples_perm, n_outputs)
+        The predicted posteriors from the permuted forest. Some of the trees
+        may have nans predicted in them, which means the tree used these samples
+        for training and not for prediction.
     normal_samples : ArrayLike of shape (n_samples_normal,)
         The indices of the normal samples that we have a posterior for.
     perm_samples : ArrayLike of shape (n_samples_perm,)
@@ -199,10 +201,16 @@ def _compute_null_distribution_coleman(
     metric_func = METRIC_FUNCTIONS[metric]
 
     # sample two sets of equal number of trees from the combined forest these are the posteriors
+    # (n_estimators * 2, n_samples, n_outputs)
     all_y_pred = np.concatenate((y_pred_proba_normal, y_pred_proba_perm), axis=0)
 
+    print(y_pred_proba_normal.shape)
+    n_estimators, _, _ = y_pred_proba_normal.shape
     n_samples_test = len(y_test)
-    if len(all_y_pred) != 2 * n_samples_test:
+    if all_y_pred.shape[1] != n_samples_test:
+        print(all_y_pred.shape)
+        print(n_samples_test)
+        print(y_test.shape)
         print("y_pred_proba_perm: ", y_pred_proba_perm.shape)
         print("y_pred_proba: ", y_pred_proba_normal.shape)
 
@@ -212,12 +220,13 @@ def _compute_null_distribution_coleman(
         )
 
     # create two stacked index arrays of y_test resulting in [1, ..., N, 1, ..., N]
-    y_test_ind_arr = np.hstack(
-        (np.arange(n_samples_test, dtype=int), np.arange(n_samples_test, dtype=int))
-    )
+    # where N is `n_estimators`
+    # y_test_ind_arr = np.hstack(
+    #     (np.arange(n_estimators, dtype=int), np.arange(n_estimators, dtype=int))
+    # )
 
     # create index array of [1, ..., 2N] to slice into `all_y_pred`
-    y_pred_ind_arr = np.arange((2 * n_samples_test), dtype=int)
+    y_pred_ind_arr = np.arange((2 * n_estimators), dtype=int)
 
     metric_star = np.zeros((n_repeats,))
     metric_star_pi = np.zeros((n_repeats,))
@@ -228,17 +237,13 @@ def _compute_null_distribution_coleman(
         first_forest_inds = y_pred_ind_arr[:n_samples_test]
         second_forest_inds = y_pred_ind_arr[:n_samples_test]
 
-        # index into y_test for first half and second half
-        first_half_index_test = y_test_ind_arr[first_forest_inds]
-        second_half_index_test = y_test_ind_arr[second_forest_inds]
-
-        # now get the pointers to the actual samples used for the metric
-        y_test_first_half = y_test[first_half_index_test]
-        y_test_second_half = y_test[second_half_index_test]
+        # get random half of the posteriors
+        y_pred_first_half = np.nanmean(all_y_pred[first_forest_inds], axis=0)
+        y_pred_second_half = np.nanmean(all_y_pred[second_forest_inds], axis=0)
 
         # compute two instances of the metric from the sampled trees
-        first_half_metric = metric_func(y_test_first_half, all_y_pred[first_forest_inds])
-        second_half_metric = metric_func(y_test_second_half, all_y_pred[second_forest_inds])
+        first_half_metric = metric_func(y_test, y_pred_first_half)
+        second_half_metric = metric_func(y_test, y_pred_second_half)
 
         metric_star[idx] = first_half_metric
         metric_star_pi[idx] = second_half_metric
