@@ -179,7 +179,7 @@ class BaseForestHT(MetaEstimatorMixin):
         stat : float
             The test statistic.
         posterior_final : ArrayLike of shape (n_estimators, n_samples_final, n_outputs) or
-                (n_estimators, n_samples_final), optional
+            (n_estimators, n_samples_final), optional
             If ``return_posteriors`` is True, then the posterior probabilities of the
             samples used in the final test. ``n_samples_final`` is equal to ``n_samples``
             if all samples are encountered in the test set of at least one tree in the
@@ -645,7 +645,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
         The true labels of the samples used in the final test.
 
     posterior_final_ : ArrayLike of shape (n_estimators, n_samples_final, n_outputs) or
-            (n_estimators, n_samples_final)
+        (n_estimators, n_samples_final)
         The predicted posterior probabilities of the samples used in the final test.
 
     null_dist_ : ArrayLike of shape (n_repeats,)
@@ -844,7 +844,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
         stat : float
             The test statistic.
         posterior_final : ArrayLike of shape (n_estimators, n_samples_final, n_outputs) or
-                (n_estimators, n_samples_final), optional
+            (n_estimators, n_samples_final), optional
             If ``return_posteriors`` is True, then the posterior probabilities of the
             samples used in the final test. ``n_samples_final`` is equal to ``n_samples``
             if all samples are encountered in the test set of at least one tree in the
