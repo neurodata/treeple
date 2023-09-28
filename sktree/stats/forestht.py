@@ -785,8 +785,10 @@ class FeatureImportanceForestClassifier(BaseForestHT):
                 )
 
         # determine if there are any nans in the final posterior array
+        temp_posterior_forest = np.nanmean(posterior_arr, axis=0)
+        nonnan_indices = np.where(~np.isnan(temp_posterior_forest).any(axis=1))[0]
+
         # Find the row indices with NaN values in any column
-        nonnan_indices = np.all(~np.isnan(posterior_arr), axis=(0, 2))
         samples = nonnan_indices
 
         # Ignore all NaN values (samples not tested)
