@@ -513,9 +513,7 @@ class FeatureImportanceForestRegressor(BaseForestHT):
         metric_func: Callable[[ArrayLike, ArrayLike], float] = METRIC_FUNCTIONS[metric]
         rng = np.random.default_rng(self.random_state)
 
-        posterior_arr = np.full(
-            (self.n_estimators, self.n_samples_test_, estimator.n_outputs_), np.nan
-        )
+        posterior_arr = np.full((self.n_estimators, self._n_samples_, estimator.n_outputs_), np.nan)
         if self.permute_per_tree:
             # now initialize posterior array as (n_trees, n_samples_test, n_outputs)
             for idx, (indices_train, indices_test) in enumerate(self._get_estimators_indices()):
@@ -526,18 +524,6 @@ class FeatureImportanceForestRegressor(BaseForestHT):
 
                 # Fill test set posteriors & set rest NaN
                 posterior_arr[idx, indices_test, :] = y_pred  # posterior
-
-            # determine if there are any nans in the final posterior array
-            # Average all posteriors (n_samples_test, n_outputs)
-            posterior_forest = np.nanmean(posterior_arr, axis=0)
-
-            # # Find the row indices with NaN values in any column
-            nonnan_indices = np.where(~np.isnan(posterior_forest).any(axis=1))[0]
-            samples = nonnan_indices
-
-            # # Ignore all NaN values (samples not tested)
-            y_true_final = y[nonnan_indices, :]
-            posterior_arr = posterior_arr[:, (nonnan_indices), :]
         else:
             # fitting a forest will only get one unique train/test split
             indices_train, indices_test = self.train_test_samples_[0]
@@ -556,15 +542,30 @@ class FeatureImportanceForestRegressor(BaseForestHT):
                 )
                 X_train[:, covariate_index] = X_train[index_arr, covariate_index]
 
+            if self._type_of_target_ == "binary":
+                y_train = y_train.ravel()
             estimator.fit(X_train, y_train)
 
             # construct posterior array for all trees (n_trees, n_samples_test, n_outputs)
             for itree, tree in enumerate(estimator.estimators_):
-                posterior_arr[itree, ...] = tree.predict(X_test)
+                posterior_arr[itree, indices_test, ...] = tree.predict(X_test).reshape(
+                    -1, tree.n_outputs_
+                )
 
             # set variables to compute metric
             samples = indices_test
             y_true_final = y_test
+
+        # determine if there are any nans in the final posterior array
+        temp_posterior_forest = np.nanmean(posterior_arr, axis=0)
+        nonnan_indices = np.where(~np.isnan(temp_posterior_forest).any(axis=1))[0]
+
+        # Find the row indices with NaN values in any column
+        samples = nonnan_indices
+
+        # Ignore all NaN values (samples not tested)
+        y_true_final = y[(nonnan_indices), :]
+        posterior_arr = posterior_arr[:, (nonnan_indices), :]
 
         # Average all posteriors (n_samples_test, n_outputs) to compute the statistic
         posterior_forest = np.nanmean(posterior_arr, axis=0)
