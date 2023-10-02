@@ -15,6 +15,9 @@ from ..tree import HonestTreeClassifier
 
 DTYPE = _sklearn_tree.DTYPE
 
+# TODO: throw error and check if sklearn.tree.BaseDecisionTree,
+# or sktree.tree.BaseDecisionTree (i.e. fork of sklearn.tree.BaseDecisionTree)
+
 
 class HonestForestClassifier(ForestClassifier):
     """
@@ -449,12 +452,12 @@ class HonestForestClassifier(ForestClassifier):
         posteriors = [
             np.zeros((X.shape[0], j), dtype=np.float64) for j in np.atleast_1d(self.n_classes_)
         ]
-        lock = threading.Lock()
-
         if indices is None:
             indices = [None] * self.n_estimators
+
+        lock = threading.Lock()
         Parallel(n_jobs=n_jobs, verbose=self.verbose, require="sharedmem")(
-            delayed(_accumulate_prediction)(tree, X, posteriors, lock, idx)
+            delayed(_accumulate_prediction)(tree.predict_proba, X, posteriors, lock, idx)
             for tree, idx in zip(self.estimators_, indices)
         )
 
@@ -579,7 +582,7 @@ class HonestForestClassifier(ForestClassifier):
         return self.estimator_.get_leaf_node_samples(X)
 
 
-def _accumulate_prediction(tree, X, out, lock, indices=None):
+def _accumulate_prediction(predict, X, out, lock, indices=None):
     """
     See https://github.com/scikit-learn/scikit-learn/blob/
     95119c13af77c76e150b753485c662b7c52a41a2/sklearn/ensemble/_forest.py#L460
@@ -590,7 +593,7 @@ def _accumulate_prediction(tree, X, out, lock, indices=None):
 
     if indices is None:
         indices = np.arange(X.shape[0])
-    proba = tree.predict_proba(X[indices], check_input=False)
+    proba = predict(X[indices], check_input=False)
 
     with lock:
         if len(out) == 1:

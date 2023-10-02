@@ -43,6 +43,12 @@ else:
             ExtraTreesClassifier,
             ExtraTreesRegressor,
         )
+        from ._lib.sklearn.tree import (
+            DecisionTreeClassifier,
+            DecisionTreeRegressor,
+            ExtraTreeClassifier,
+            ExtraTreeRegressor,
+        )
         from .neighbors import NearestNeighborsMetaEstimator
         from .ensemble import ExtendedIsolationForest
         from .ensemble._unsupervised_forest import (
@@ -85,4 +91,8 @@ else:
         "ExtraTreesClassifier",
         "ExtraTreesRegressor",
         "ExtendedIsolationForest",
+        "DecisionTreeClassifier",
+        "DecisionTreeRegressor",
+        "ExtraTreeClassifier",
+        "ExtraTreeRegressor",
     ]

@@ -55,6 +55,12 @@ class BaseForestHT(MetaEstimatorMixin):
     def n_estimators(self):
         return self.estimator_.n_estimators
 
+    @property
+    def n_classes_(self):
+        return self.estimator_.n_classes_
+
+        # tODO: replace all instances of  estimator.n_classes_ with self.n_classes_
+
     def reset(self):
         class_attributes = dir(type(self))
         instance_attributes = dir(self)
@@ -204,7 +210,7 @@ class BaseForestHT(MetaEstimatorMixin):
             self.estimator_ = self._get_estimator()
             estimator = self.estimator_
         else:
-            self.permuted_estimator_ = clone(self.estimator_)
+            self.permuted_estimator_ = self._get_estimator()
             estimator = self.permuted_estimator_
 
         # Infer type of target y
@@ -313,6 +319,8 @@ class BaseForestHT(MetaEstimatorMixin):
         """
         X, y, covariate_index = self._check_input(X, y, covariate_index)
 
+        # TODO: need to add a more robust check to ensure that the estimator is correct when
+        # refitting
         if self._n_samples_ is None:
             # first compute the test statistic on the un-permuted data
             observe_stat, observe_posteriors, observe_samples = self.statistic(
@@ -497,7 +505,7 @@ class FeatureImportanceForestRegressor(BaseForestHT):
             raise RuntimeError(f"Estimator must be a ForestRegressor, got {type(self.estimator)}")
         else:
             estimator_ = self.estimator
-        return estimator_
+        return clone(estimator_)
 
     def _statistic(
         self,
