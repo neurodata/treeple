@@ -819,6 +819,9 @@ class FeatureImportanceForestClassifier(BaseForestHT):
                 )
 
         # determine if there are any nans in the final posterior array
+        print(posterior_arr.shape)
+        print(posterior_arr)
+        print(np.nanmean(posterior_arr, axis=0).shape)
         temp_posterior_forest = np.nanmean(posterior_arr, axis=0)
         nonnan_indices = np.where(~np.isnan(temp_posterior_forest).any(axis=1))[0]
 

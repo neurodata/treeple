@@ -389,7 +389,9 @@ def test_forestht_check_inputs(forest_hyppo):
         forest_hyppo.statistic(X, y_invalid)
 
 
-def test_parallelization():
+@pytest.mark.parametrize("backend", ["loky", "threading"])
+@pytest.mark.parametrize("n_jobs", [1, -1])
+def test_parallelization(backend, n_jobs):
     """Test parallelization of training forests."""
     n_samples = 100
     n_features = 5
@@ -399,16 +401,14 @@ def test_parallelization():
     def run_forest(covariate_index=None):
         clf = FeatureImportanceForestClassifier(
             estimator=HonestForestClassifier(
-                n_estimators=10,
-                random_state=seed,
-                n_jobs=1,
+                n_estimators=10, random_state=seed, n_jobs=n_jobs, honest_fraction=0.2
             ),
+            test_size=0.5,
         )
-        obs_stat = clf.statistic(X, y, metric="mi")
-        perm_stat = clf.statistic(X, y, covariate_index=[covariate_index], metric="mi")
-        return obs_stat, perm_stat
+        pvalue = clf.test(X, y, covariate_index=[covariate_index], metric="mi")
+        return pvalue
 
-    out = Parallel(n_jobs=1)(
+    out = Parallel(n_jobs=1, backend=backend)(
         delayed(run_forest)(covariate_index) for covariate_index in range(n_features)
     )
     assert len(out) == n_features
