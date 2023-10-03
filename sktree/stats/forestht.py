@@ -152,7 +152,7 @@ class BaseForestHT(MetaEstimatorMixin):
         X: ArrayLike,
         y: ArrayLike,
         covariate_index: ArrayLike = None,
-        metric="mse",
+        metric="mi",
         return_posteriors: bool = False,
         check_input: bool = True,
         **metric_kwargs,
@@ -272,9 +272,9 @@ class BaseForestHT(MetaEstimatorMixin):
         X,
         y,
         covariate_index: ArrayLike = None,
-        metric: str = "mse",
+        metric: str = "mi",
         n_repeats: int = 1000,
-        return_posteriors: bool = False,
+        return_posteriors: bool = True,
         **metric_kwargs,
     ):
         """Perform hypothesis test using Coleman method.
@@ -302,7 +302,7 @@ class BaseForestHT(MetaEstimatorMixin):
         n_repeats : int, optional
             Number of times to sample the null distribution, by default 1000.
         return_posteriors : bool, optional
-            Whether or not to return the posteriors, by default False.
+            Whether or not to return the posteriors, by default True.
         **metric_kwargs : dict, optional
             Additional keyword arguments to pass to the metric function.
 
@@ -322,7 +322,7 @@ class BaseForestHT(MetaEstimatorMixin):
                 y,
                 covariate_index=None,
                 metric=metric,
-                return_posteriors=True,
+                return_posteriors=return_posteriors,
                 check_input=False,
                 **metric_kwargs,
             )
@@ -337,7 +337,7 @@ class BaseForestHT(MetaEstimatorMixin):
             y,
             covariate_index=covariate_index,
             metric=metric,
-            return_posteriors=True,
+            return_posteriors=return_posteriors,
             check_input=False,
             **metric_kwargs,
         )
