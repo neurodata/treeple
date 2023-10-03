@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, Tuple
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -28,6 +28,13 @@ from .utils import (
 
 
 class BaseForestHT(MetaEstimatorMixin):
+    observe_samples_: ArrayLike
+    observe_posteriors_: ArrayLike
+    observe_stat_: float
+    permute_samples_: ArrayLike
+    permute_posteriors_: ArrayLike
+    permute_stat_: float
+
     def __init__(
         self,
         estimator=None,
@@ -129,6 +136,13 @@ class BaseForestHT(MetaEstimatorMixin):
         if y.ndim != 2:
             y = y.reshape(-1, 1)
 
+        if covariate_index is not None:
+            if not isinstance(covariate_index, (list, tuple, np.ndarray)):
+                raise RuntimeError("covariate_index must be an iterable of integer indices")
+            else:
+                if not all(isinstance(idx, int) for idx in covariate_index):
+                    raise RuntimeError("Not all covariate_index are integer indices")
+
         if self._n_samples_ is not None and X.shape[0] != self._n_samples_:
             raise RuntimeError(
                 f"X must have {self._n_samples_} samples, got {X.shape[0]}. "
@@ -156,7 +170,7 @@ class BaseForestHT(MetaEstimatorMixin):
         return_posteriors: bool = False,
         check_input: bool = True,
         **metric_kwargs,
-    ):
+    ) -> Tuple[float, ArrayLike, ArrayLike]:
         """Compute the test statistic.
 
         Parameters
@@ -502,6 +516,20 @@ class FeatureImportanceForestRegressor(BaseForestHT):
         else:
             estimator_ = self.estimator
         return clone(estimator_)
+
+    def statistic(
+        self,
+        X: ArrayLike,
+        y: ArrayLike,
+        covariate_index: ArrayLike = None,
+        metric="mse",
+        return_posteriors: bool = False,
+        check_input: bool = True,
+        **metric_kwargs,
+    ):
+        return super().statistic(
+            X, y, covariate_index, metric, return_posteriors, check_input, **metric_kwargs
+        )
 
     def _statistic(
         self,

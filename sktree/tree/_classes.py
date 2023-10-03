@@ -839,7 +839,7 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         min_impurity_decrease=0.0,
         class_weight=None,
         feature_combinations=None,
-        ccp_alpha=None,
+        ccp_alpha=0.0,
         store_leaf_values=False,
         monotonic_cst=None,
     ):
@@ -1220,7 +1220,7 @@ class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         max_leaf_nodes=None,
         min_impurity_decrease=0.0,
         feature_combinations=None,
-        ccp_alpha=None,
+        ccp_alpha=0.0,
         store_leaf_values=False,
         monotonic_cst=None,
     ):
@@ -1628,7 +1628,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
         data_dims=None,
         boundary=None,
         feature_weight=None,
-        ccp_alpha=None,
+        ccp_alpha=0.0,
         store_leaf_values=False,
         monotonic_cst=None,
     ):
@@ -2092,7 +2092,7 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         data_dims=None,
         boundary=None,
         feature_weight=None,
-        ccp_alpha=None,
+        ccp_alpha=0.0,
         store_leaf_values=False,
         monotonic_cst=None,
     ):
@@ -2582,7 +2582,7 @@ class ExtraObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
         min_impurity_decrease=0.0,
         class_weight=None,
         feature_combinations=None,
-        ccp_alpha=None,
+        ccp_alpha=0.0,
         store_leaf_values=False,
         monotonic_cst=None,
     ):
@@ -2973,7 +2973,7 @@ class ExtraObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         max_leaf_nodes=None,
         min_impurity_decrease=0.0,
         feature_combinations=None,
-        ccp_alpha=None,
+        ccp_alpha=0.0,
         store_leaf_values=False,
         monotonic_cst=None,
     ):

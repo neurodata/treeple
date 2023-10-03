@@ -235,7 +235,7 @@ exclude = [
 
 [tool.pytest.ini_options]
 minversion = '6.0'
-addopts = '--durations 20 --junit-xml=junit-results.xml --verbose --ignore=sktree/_lib/'
+addopts = '--durations 20 --junit-xml=junit-results.xml --verbose --ignore=sktree/_lib/ -k "not slowtest"'
 filterwarnings = []
 
 [tool.coverage.run]
@@ -267,7 +267,9 @@ Environments = [
     'spin.cmds.meson.ipython',
     'spin.cmds.meson.python',
 ]
-Documentation = ['.spin/cmds.py:docs']
+Documentation = [
+    'spin.cmds.meson.docs'
+    ]
 Metrics = [
     '.spin/cmds.py:coverage',
     '.spin/cmds.py:asv',

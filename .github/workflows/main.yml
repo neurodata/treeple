@@ -116,7 +116,116 @@ jobs:
           ./spin --help
           ./spin coverage --help
           ./spin test --help
-          ./spin coverage
+          ./spin test
+          cp $PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages/coverage.xml ./coverage.xml
+
+      - name: debug
+        run: |
+          ls $PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages/
+          echo "Okay..."
+          ls $PWD/build
+          ls ./
+
+      - name: Save build
+        uses: actions/upload-artifact@v3
+        with:
+          name: sktree-build
+          path: $PWD/build
+
+  build_and_test_slow:
+    name: Meson build ${{ matrix.os }} - py${{ matrix.python-version }}
+    timeout-minutes: 20
+    needs: [build_and_test]
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04]
+        python-version: ["3.11"]
+        poetry-version: [1.5.0]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    env:
+      # to make sure coverage/test command builds cleanly
+      FORCE_SUBMODULE: True
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4.6.1
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: "x64"
+          cache: "pip"
+          cache-dependency-path: "requirements.txt"
+
+      - name: show-gcc
+        run: |
+          gcc --version
+
+      - name: Install Ccache for MacOSX
+        if: ${{ matrix.os == 'macos-latest'}}
+        run: |
+          brew install ccache
+
+      - name: Install packages for Ubuntu
+        if: ${{ matrix.os == 'ubuntu-22.04'}}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libopenblas-dev libatlas-base-dev liblapack-dev gfortran libgmp-dev libmpfr-dev libsuitesparse-dev ccache libmpc-dev
+
+      - name: Install Python packages
+        run: |
+          python -m pip install -r build_requirements.txt
+          python -m pip install spin
+          python -m pip install -r test_requirements.txt
+
+      - name: Prepare compiler cache
+        id: prep-ccache
+        shell: bash
+        run: |
+          mkdir -p "${CCACHE_DIR}"
+          echo "dir=$CCACHE_DIR" >> $GITHUB_OUTPUT
+          NOW=$(date -u +"%F-%T")
+          echo "timestamp=${NOW}" >> $GITHUB_OUTPUT
+
+      - name: Setup compiler cache
+        uses: actions/cache@v3
+        id: cache-ccachev1
+        # Reference: https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows#matching-a-cache-key
+        # NOTE: The caching strategy is modeled in a way that it will always have a unique cache key for each workflow run
+        # (even if the same workflow is run multiple times). The restore keys are not unique and for a partial match, they will
+        # return the most recently created cache entry, according to the GitHub Action Docs.
+        with:
+          path: ${{ steps.prep-ccache.outputs.dir }}
+          # Restores ccache from either a previous build on this branch or on main
+          key: ${{ github.workflow }}-${{ matrix.python-version }}-ccache-linux-${{ steps.prep-ccache.outputs.timestamp }}
+          # This evaluates to `Linux Tests-3.9-ccache-linux-` which is not unique. As the CI matrix is expanded, this will
+          # need to be updated to be unique so that the cache is not restored from a different job altogether.
+          restore-keys: |
+            ${{ github.workflow }}-${{ matrix.python-version }}-ccache-linux-
+
+      - name: Setup build and install scikit-tree
+        run: |
+          ./spin build -j 2 --forcesubmodule
+
+      - name: Ccache performance
+        shell: bash -l {0}
+        run: ccache -s
+
+      - name: build-path
+        run: |
+          echo "$PWD/build-install/"
+          export INSTALLED_PATH=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages
+
+      - name: Run unit tests and coverage
+        run: |
+          ./spin --help
+          ./spin coverage --help
+          ./spin test --help
+          ./spin coverage -k "slowtest"
           cp $PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages/coverage.xml ./coverage.xml
 
       - name: debug
@@ -127,7 +236,6 @@ jobs:
           ls ./
 
       - name: Upload coverage stats to codecov
-        if: ${{ matrix.os == 'ubuntu-22.04' && matrix.python-version == '3.10'}}
         uses: codecov/codecov-action@v3
         with:
           # python spin goes into the INSTALLED path in order to run pytest
@@ -146,7 +254,7 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    needs: [build_and_test]
+    needs: [build_and_test_slow]
     if: startsWith(github.ref, 'refs/tags/')
     steps:
       - name: Checkout repository

@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 from flaky import flaky
+from joblib import Parallel, delayed
 from scipy.special import expit
 from sklearn import datasets
 
@@ -57,6 +58,14 @@ def test_featureimportance_forest_permute_pertree(sample_dataset_per_tree):
 
     with pytest.raises(RuntimeError, match="Metric must be"):
         est.statistic(iris_X[:n_samples], iris_y[:n_samples], metric="mi")
+
+    # covariate index must be an iterable
+    with pytest.raises(RuntimeError, match="covariate_index must be an iterable"):
+        est.statistic(iris_X[:n_samples], iris_y[:n_samples], 0, metric="mi")
+
+    # covariate index must be an iterable of ints
+    with pytest.raises(RuntimeError, match="Not all covariate_index"):
+        est.statistic(iris_X[:n_samples], iris_y[:n_samples], [0, 1.0], metric="mi")
 
 
 def test_featureimportance_forest_errors():
@@ -257,6 +266,7 @@ def test_correlated_logit_model(hypotester, model_kwargs, n_samples, n_repeats, 
 
 
 @flaky(max_runs=2)
+@pytest.mark.slowtest
 @pytest.mark.parametrize("criterion", ["gini", "entropy"])
 @pytest.mark.parametrize("honest_prior", ["empirical", "uniform"])
 @pytest.mark.parametrize(
@@ -377,3 +387,28 @@ def test_forestht_check_inputs(forest_hyppo):
     y_invalid = np.random.rand(X.shape[0])
     with pytest.raises(RuntimeError, match="y must have type"):
         forest_hyppo.statistic(X, y_invalid)
+
+
+def test_parallelization():
+    """Test parallelization of training forests."""
+    n_samples = 100
+    n_features = 5
+    X = rng.uniform(size=(n_samples, n_features))
+    y = rng.integers(0, 2, size=n_samples)  # Binary classification
+
+    def run_forest(covariate_index=None):
+        clf = FeatureImportanceForestClassifier(
+            estimator=HonestForestClassifier(
+                n_estimators=10,
+                random_state=seed,
+                n_jobs=1,
+            ),
+        )
+        obs_stat = clf.statistic(X, y, metric="mi")
+        perm_stat = clf.statistic(X, y, covariate_index=[covariate_index], metric="mi")
+        return obs_stat, perm_stat
+
+    out = Parallel(n_jobs=1)(
+        delayed(run_forest)(covariate_index) for covariate_index in range(n_features)
+    )
+    assert len(out) == n_features

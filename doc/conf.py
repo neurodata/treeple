@@ -240,6 +240,7 @@ numpydoc_xref_ignore = {
     "predict",
     "fit",
     "apply",
+    "TreeBuilder",
 }
 
 # validation
