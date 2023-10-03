@@ -697,7 +697,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
         else:
             # self.estimator is an instance of a ForestEstimator
             estimator_ = self.estimator
-        return estimator_
+        return clone(estimator_)
 
     def _statistic(
         self,
