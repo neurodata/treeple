@@ -34,6 +34,15 @@ to the scikit-learn estimators.
    ExtraTreesClassifier
    ExtraTreesRegressor
 
+.. currentmodule:: sktree.tree
+.. autosummary::
+   :toctree: generated/
+
+   DecisionTreeClassifier
+   DecisionTreeRegressor
+   ExtraTreeClassifier
+   ExtraTreeRegressor
+
 Supervised
 ----------
 Decision-tree models are traditionally implemented with axis-aligned splits and

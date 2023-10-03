@@ -50,16 +50,11 @@ class BaseForestHT(MetaEstimatorMixin):
         self._covariate_index_cache_ = None
         self._type_of_target_ = None
         self.n_features_in_ = None
+        self._is_fitted = False
 
     @property
     def n_estimators(self):
         return self.estimator_.n_estimators
-
-    @property
-    def n_classes_(self):
-        return self.estimator_.n_classes_
-
-        # tODO: replace all instances of  estimator.n_classes_ with self.n_classes_
 
     def reset(self):
         class_attributes = dir(type(self))
@@ -75,6 +70,7 @@ class BaseForestHT(MetaEstimatorMixin):
         self._type_of_target_ = None
         self._metric = None
         self.n_features_in_ = None
+        self._is_fitted = False
 
     def _get_estimators_indices(self):
         indices = np.arange(self._n_samples_, dtype=int)
@@ -319,9 +315,7 @@ class BaseForestHT(MetaEstimatorMixin):
         """
         X, y, covariate_index = self._check_input(X, y, covariate_index)
 
-        # TODO: need to add a more robust check to ensure that the estimator is correct when
-        # refitting
-        if self._n_samples_ is None:
+        if self._is_fitted:
             # first compute the test statistic on the un-permuted data
             observe_stat, observe_posteriors, observe_samples = self.statistic(
                 X,
@@ -585,6 +579,7 @@ class FeatureImportanceForestRegressor(BaseForestHT):
             self.y_true_final_ = y_true_final
             self.posterior_final_ = posterior_arr
             self.stat_ = stat
+            self._is_fitted = True
 
         if return_posteriors:
             return stat, posterior_arr, samples
@@ -815,6 +810,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
             self.y_true_final_ = y_true_final
             self.posterior_final_ = posterior_arr
             self.stat_ = stat
+            self._is_fitted = True
 
         if return_posteriors:
             return stat, posterior_arr, samples

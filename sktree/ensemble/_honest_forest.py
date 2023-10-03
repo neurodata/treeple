@@ -15,9 +15,6 @@ from ..tree import HonestTreeClassifier
 
 DTYPE = _sklearn_tree.DTYPE
 
-# TODO: throw error and check if sklearn.tree.BaseDecisionTree,
-# or sktree.tree.BaseDecisionTree (i.e. fork of sklearn.tree.BaseDecisionTree)
-
 
 class HonestForestClassifier(ForestClassifier):
     """
@@ -190,7 +187,9 @@ class HonestForestClassifier(ForestClassifier):
 
     tree_estimator : object, default=None
         Type of decision tree classifier to use. By default `None`, which
-        defaults to :class:`sklearn.tree.DecisionTreeClassifier`.
+        defaults to `sktree.tree.DecisionTreeClassifier`. Note
+        that one MUST use trees imported from the `sktree.tree`
+        API namespace rather than from `sklearn.tree`.
 
     Attributes
     ----------
