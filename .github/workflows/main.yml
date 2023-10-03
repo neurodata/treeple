@@ -117,7 +117,6 @@ jobs:
           ./spin coverage --help
           ./spin test --help
           ./spin test
-          cp $PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages/coverage.xml ./coverage.xml
 
       - name: debug
         run: |
@@ -133,7 +132,7 @@ jobs:
           path: $PWD/build
 
   build_and_test_slow:
-    name: Meson build ${{ matrix.os }} - py${{ matrix.python-version }}
+    name: Slow Meson build ${{ matrix.os }} - py${{ matrix.python-version }}
     timeout-minutes: 20
     needs: [build_and_test]
     strategy:
