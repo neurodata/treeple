@@ -315,7 +315,7 @@ class BaseForestHT(MetaEstimatorMixin):
         """
         X, y, covariate_index = self._check_input(X, y, covariate_index)
 
-        if self._is_fitted:
+        if not self._is_fitted:
             # first compute the test statistic on the un-permuted data
             observe_stat, observe_posteriors, observe_samples = self.statistic(
                 X,
@@ -720,7 +720,9 @@ class FeatureImportanceForestClassifier(BaseForestHT):
 
         if predict_posteriors:
             # now initialize posterior array as (n_trees, n_samples_test, n_classes)
-            posterior_arr = np.full((self.n_estimators, self._n_samples_, self.n_classes_), np.nan)
+            posterior_arr = np.full(
+                (self.n_estimators, self._n_samples_, estimator.n_classes_), np.nan
+            )
         else:
             # now initialize posterior array as (n_trees, n_samples_test, n_outputs)
             posterior_arr = np.full(
