@@ -275,7 +275,7 @@ class BaseForestHT(MetaEstimatorMixin):
         self,
         X,
         y,
-        covariate_index: ArrayLike,
+        covariate_index: ArrayLike = None,
         metric: str = "mse",
         n_repeats: int = 1000,
         return_posteriors: bool = False,
@@ -725,9 +725,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
 
         if predict_posteriors:
             # now initialize posterior array as (n_trees, n_samples_test, n_classes)
-            posterior_arr = np.full(
-                (self.n_estimators, self._n_samples_, estimator.n_classes_), np.nan
-            )
+            posterior_arr = np.full((self.n_estimators, self._n_samples_, self.n_classes_), np.nan)
         else:
             # now initialize posterior array as (n_trees, n_samples_test, n_outputs)
             posterior_arr = np.full(
