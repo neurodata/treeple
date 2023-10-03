@@ -327,9 +327,9 @@ class BaseForestHT(MetaEstimatorMixin):
                 **metric_kwargs,
             )
         else:
-            observe_samples = self.samples_
-            observe_posteriors = self.posterior_final_
-            observe_stat = self.stat_
+            observe_samples = self.observe_samples_
+            observe_posteriors = self.observe_posteriors_
+            observe_stat = self.observe_stat_
 
         # next permute the data
         permute_stat, permute_posteriors, permute_samples = self.statistic(
@@ -341,6 +341,7 @@ class BaseForestHT(MetaEstimatorMixin):
             check_input=False,
             **metric_kwargs,
         )
+        self.permute_stat_ = permute_stat
 
         # Note: at this point, both `estimator` and `permuted_estimator_` should
         # have been fitted already, so we can now compute on the null by resampling
@@ -452,7 +453,8 @@ class FeatureImportanceForestRegressor(BaseForestHT):
     y_true_final_ : ArrayLike of shape (n_samples_final,)
         The true labels of the samples used in the final test.
 
-    posterior_final_ : ArrayLike of shape (n_estimators, n_samples_final)
+    observe_posteriors_ : ArrayLike of shape (n_estimators, n_samples_final, n_outputs) or
+        (n_estimators, n_samples_final, n_classes)
         The predicted posterior probabilities of the samples used in the final test.
 
     null_dist_ : ArrayLike of shape (n_repeats,)
@@ -575,10 +577,10 @@ class FeatureImportanceForestRegressor(BaseForestHT):
         if covariate_index is None:
             # Ignore all NaN values (samples not tested) -> (n_samples_final, n_outputs)
             # arrays of y and predicted posterior
-            self.samples_ = samples
+            self.observe_samples_ = samples
             self.y_true_final_ = y_true_final
-            self.posterior_final_ = posterior_arr
-            self.stat_ = stat
+            self.observe_posteriors_ = posterior_arr
+            self.observe_stat_ = stat
             self._is_fitted = True
 
         if return_posteriors:
@@ -648,8 +650,8 @@ class FeatureImportanceForestClassifier(BaseForestHT):
     y_true_final_ : ArrayLike of shape (n_samples_final,)
         The true labels of the samples used in the final test.
 
-    posterior_final_ : ArrayLike of shape (n_estimators, n_samples_final, n_outputs) or
-        (n_estimators, n_samples_final)
+    observe_posteriors_ : ArrayLike of shape (n_estimators, n_samples_final, n_outputs) or
+        (n_estimators, n_samples_final, n_classes)
         The predicted posterior probabilities of the samples used in the final test.
 
     null_dist_ : ArrayLike of shape (n_repeats,)
@@ -806,10 +808,10 @@ class FeatureImportanceForestClassifier(BaseForestHT):
         if covariate_index is None:
             # Ignore all NaN values (samples not tested) -> (n_samples_final, n_outputs)
             # arrays of y and predicted posterior
-            self.samples_ = samples
+            self.observe_samples_ = samples
             self.y_true_final_ = y_true_final
-            self.posterior_final_ = posterior_arr
-            self.stat_ = stat
+            self.observe_posteriors_ = posterior_arr
+            self.observe_stat_ = stat
             self._is_fitted = True
 
         if return_posteriors:
