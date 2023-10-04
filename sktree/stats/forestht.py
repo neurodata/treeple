@@ -141,7 +141,7 @@ class BaseForestHT(MetaEstimatorMixin):
             if not isinstance(covariate_index, (list, tuple, np.ndarray)):
                 raise RuntimeError("covariate_index must be an iterable of integer indices")
             else:
-                if not all(isinstance(idx, int) for idx in covariate_index):
+                if not all(isinstance(idx, (np.integer, int)) for idx in covariate_index):
                     raise RuntimeError("Not all covariate_index are integer indices")
 
         if self._n_samples_ is not None and X.shape[0] != self._n_samples_:

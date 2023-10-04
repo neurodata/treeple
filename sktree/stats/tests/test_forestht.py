@@ -98,21 +98,21 @@ def test_featureimportance_forest_errors():
 @pytest.mark.parametrize(
     "hypotester, model_kwargs, n_samples, n_repeats, test_size",
     [
-        # [
-        #     PermutationForestRegressor,
-        #     {
-        #         "estimator": RandomForestRegressor(
-        #             max_features="sqrt",
-        #             random_state=seed,
-        #             n_estimators=75,
-        #             n_jobs=-1,
-        #         ),
-        #         "random_state": seed,
-        #     },
-        #     300,
-        #     50,
-        #     0.1,
-        # ],
+        [
+            PermutationForestRegressor,
+            {
+                "estimator": RandomForestRegressor(
+                    max_features="sqrt",
+                    random_state=seed,
+                    n_estimators=75,
+                    n_jobs=-1,
+                ),
+                "random_state": seed,
+            },
+            300,
+            50,
+            0.1,
+        ],
         [
             FeatureImportanceForestRegressor,
             {
@@ -127,8 +127,8 @@ def test_featureimportance_forest_errors():
                 "sample_dataset_per_tree": True,
             },
             300,  # n_samples
-            500,  # n_repeats
-            0.1,  # test_size
+            1000,  # n_repeats
+            0.2,  # test_size
         ],
     ],
 )
@@ -211,9 +211,9 @@ def test_linear_model(hypotester, model_kwargs, n_samples, n_repeats, test_size)
                 "permute_per_tree": False,
                 "sample_dataset_per_tree": False,
             },
-            600,
-            200,
-            1.0 / 6,
+            600,        # n_samples
+            1000,       # n_repeats
+            1.0 / 6,    # test_size
         ],
     ],
 )

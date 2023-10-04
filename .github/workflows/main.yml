@@ -224,7 +224,7 @@ jobs:
           ./spin --help
           ./spin coverage --help
           ./spin test --help
-          ./spin coverage -k "slowtest"
+          ./spin coverage
           cp $PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages/coverage.xml ./coverage.xml
 
       - name: debug
