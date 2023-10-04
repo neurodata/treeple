@@ -23,6 +23,7 @@ from .utils import (
     POSTERIOR_FUNCTIONS,
     REGRESSOR_METRICS,
     _compute_null_distribution_coleman,
+    _non_nan_samples,
     train_tree,
 )
 
@@ -140,7 +141,7 @@ class BaseForestHT(MetaEstimatorMixin):
             if not isinstance(covariate_index, (list, tuple, np.ndarray)):
                 raise RuntimeError("covariate_index must be an iterable of integer indices")
             else:
-                if not all(isinstance(idx, int) for idx in covariate_index):
+                if not all(isinstance(idx, (np.integer, int)) for idx in covariate_index):
                     raise RuntimeError("Not all covariate_index are integer indices")
 
         if self._n_samples_ is not None and X.shape[0] != self._n_samples_:
@@ -362,7 +363,7 @@ class BaseForestHT(MetaEstimatorMixin):
         # the posteriors and computing the test statistic on the resampled posteriors
         if self.sample_dataset_per_tree:
             metric_star, metric_star_pi = _compute_null_distribution_coleman(
-                y_test=y[observe_samples, :],
+                y_test=y,
                 y_pred_proba_normal=observe_posteriors,
                 y_pred_proba_perm=permute_posteriors,
                 metric=metric,
@@ -375,10 +376,13 @@ class BaseForestHT(MetaEstimatorMixin):
             # there is only one train and test split, so we can just use that
             _, indices_test = self.train_test_samples_[0]
             y_test = y[indices_test, :]
+            y_pred_proba_normal = observe_posteriors[:, indices_test, :]
+            y_pred_proba_perm = permute_posteriors[:, indices_test, :]
+
             metric_star, metric_star_pi = _compute_null_distribution_coleman(
                 y_test=y_test,
-                y_pred_proba_normal=observe_posteriors,
-                y_pred_proba_perm=permute_posteriors,
+                y_pred_proba_normal=y_pred_proba_normal,
+                y_pred_proba_perm=y_pred_proba_perm,
                 metric=metric,
                 n_repeats=n_repeats,
                 seed=self.random_state,
@@ -588,19 +592,15 @@ class FeatureImportanceForestRegressor(BaseForestHT):
             samples = indices_test
             y_true_final = y_test
 
-        # determine if there are any nans in the final posterior array
-        temp_posterior_forest = np.nanmean(posterior_arr, axis=0)
-        nonnan_indices = np.where(~np.isnan(temp_posterior_forest).any(axis=1))[0]
-
-        # Find the row indices with NaN values in any column
-        samples = nonnan_indices
+        # determine if there are any nans in the final posterior array, when
+        # averaged over the trees
+        samples = _non_nan_samples(posterior_arr)
 
         # Ignore all NaN values (samples not tested)
-        y_true_final = y[(nonnan_indices), :]
-        posterior_arr = posterior_arr[:, (nonnan_indices), :]
+        y_true_final = y[(samples), :]
 
         # Average all posteriors (n_samples_test, n_outputs) to compute the statistic
-        posterior_forest = np.nanmean(posterior_arr, axis=0)
+        posterior_forest = np.nanmean(posterior_arr[:, (samples), :], axis=0)
         stat = metric_func(y_true_final, posterior_forest, **metric_kwargs)
         if covariate_index is None:
             # Ignore all NaN values (samples not tested) -> (n_samples_final, n_outputs)
@@ -750,6 +750,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
 
         if predict_posteriors:
             # now initialize posterior array as (n_trees, n_samples_test, n_classes)
+            # XXX: currently assumes n_outputs_ == 1
             posterior_arr = np.full(
                 (self.n_estimators, self._n_samples_, estimator.n_classes_), np.nan
             )
@@ -818,19 +819,15 @@ class FeatureImportanceForestClassifier(BaseForestHT):
                     f"AUC metric is not supported for {self._type_of_target_} targets."
                 )
 
-        # determine if there are any nans in the final posterior array
-        temp_posterior_forest = np.nanmean(posterior_arr, axis=0)
-        nonnan_indices = np.where(~np.isnan(temp_posterior_forest).any(axis=1))[0]
-
-        # Find the row indices with NaN values in any column
-        samples = nonnan_indices
+        # determine if there are any nans in the final posterior array, when
+        # averaged over the trees
+        samples = _non_nan_samples(posterior_arr)
 
         # Ignore all NaN values (samples not tested)
-        y_true_final = y[(nonnan_indices), :]
-        posterior_arr = posterior_arr[:, (nonnan_indices), :]
+        y_true_final = y[(samples), :]
 
         # Average all posteriors (n_samples_test, n_outputs) to compute the statistic
-        posterior_forest = np.nanmean(posterior_arr, axis=0)
+        posterior_forest = np.nanmean(posterior_arr[:, (samples), :], axis=0)
         stat = metric_func(y_true_final, posterior_forest, **metric_kwargs)
 
         if covariate_index is None:
@@ -846,51 +843,3 @@ class FeatureImportanceForestClassifier(BaseForestHT):
             return stat, posterior_arr, samples
 
         return stat
-
-    def statistic(
-        self,
-        X: ArrayLike,
-        y: ArrayLike,
-        covariate_index: ArrayLike = None,
-        metric="mi",
-        return_posteriors: bool = False,
-        check_input: bool = True,
-        **metric_kwargs,
-    ):
-        """Compute the test statistic.
-
-        Parameters
-        ----------
-        X : ArrayLike of shape (n_samples, n_features)
-            The data matrix.
-        y : ArrayLike of shape (n_samples, n_outputs)
-            The target matrix.
-        covariate_index : ArrayLike, optional of shape (n_covariates,)
-            The index array of covariates to shuffle, by default None.
-        metric : str, optional
-            The metric to compute, by default "mi", which computes Mutual Information.
-        return_posteriors : bool, optional
-            Whether or not to return the posteriors, by default False.
-        check_input : bool, optional
-            Whether or not to check the input, by default True.
-        **metric_kwargs : dict, optional
-            Additional keyword arguments to pass to the metric function.
-
-        Returns
-        -------
-        stat : float
-            The test statistic.
-        posterior_final : ArrayLike of shape (n_estimators, n_samples_final, n_outputs) or
-            (n_estimators, n_samples_final), optional
-            If ``return_posteriors`` is True, then the posterior probabilities of the
-            samples used in the final test. ``n_samples_final`` is equal to ``n_samples``
-            if all samples are encountered in the test set of at least one tree in the
-            posterior computation.
-        samples : ArrayLike of shape (n_samples_final,), optional
-            The indices of the samples used in the final test. ``n_samples_final`` is
-            equal to ``n_samples`` if all samples are encountered in the test set of at
-            least one tree in the posterior computation.
-        """
-        return super().statistic(
-            X, y, covariate_index, metric, return_posteriors, check_input, **metric_kwargs
-        )

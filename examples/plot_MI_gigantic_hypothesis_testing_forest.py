@@ -90,10 +90,10 @@ y = rng.binomial(n=1, p=expit(beta * X_important[:, :10].sum(axis=1)), size=n_sa
 # computed as the proportion of samples in the null distribution that are less than the
 # observed test statistic.
 
-n_estimators = 125
+n_estimators = 200
 max_features = "sqrt"
 test_size = 0.2
-n_repeats = 500
+n_repeats = 1000
 n_jobs = -1
 
 est = FeatureImportanceForestClassifier(
@@ -107,8 +107,8 @@ est = FeatureImportanceForestClassifier(
     ),
     random_state=seed,
     test_size=test_size,
-    permute_per_tree=True,
-    sample_dataset_per_tree=True,
+    permute_per_tree=False,
+    sample_dataset_per_tree=False,
 )
 
 # we test for the first feature set, which is important and thus should return a pvalue < 0.05

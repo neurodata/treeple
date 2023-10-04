@@ -16,12 +16,12 @@ from sktree._lib.sklearn.tree import DecisionTreeClassifier
 
 
 def _mutual_information(y_true: ArrayLike, y_pred_proba: ArrayLike) -> float:
-    """Compute estimate of mutual information.
+    """Compute estimate of mutual information for supervised classification setting.
 
     Parameters
     ----------
     y_true : ArrayLike of shape (n_samples,)
-        _description_
+        The true labels.
     y_pred_proba : ArrayLike of shape (n_samples, n_outputs)
         Posterior probabilities.
 
@@ -41,19 +41,67 @@ def _mutual_information(y_true: ArrayLike, y_pred_proba: ArrayLike) -> float:
     return H_Y - H_YX
 
 
+def _cond_entropy(y_true: ArrayLike, y_pred_proba: ArrayLike) -> float:
+    """Compute estimate of entropy for supervised classification setting.
+
+    H(Y | X)
+
+    Parameters
+    ----------
+    y_true : ArrayLike of shape (n_samples,)
+        The true labels. Not used in computation of the entropy.
+    y_pred_proba : ArrayLike of shape (n_samples, n_outputs)
+        Posterior probabilities.
+
+    Returns
+    -------
+    float :
+        The estimated MI.
+    """
+    if y_true.squeeze().ndim != 1:
+        raise ValueError(f"y_true must be 1d, not {y_true.shape}")
+
+    # entropy averaged over n_samples
+    H_YX = np.mean(entropy(y_pred_proba, base=np.exp(1), axis=1))
+    return H_YX
+
+
 METRIC_FUNCTIONS = {
     "mse": mean_squared_error,
     "mae": mean_absolute_error,
     "balanced_accuracy": balanced_accuracy_score,
     "auc": roc_auc_score,
     "mi": _mutual_information,
+    "cond_entropy": _cond_entropy,
 }
 
-POSTERIOR_FUNCTIONS = ("mi", "auc")
+POSTERIOR_FUNCTIONS = ("mi", "auc", "cond_entropy")
 
 POSITIVE_METRICS = ("mi", "auc", "balanced_accuracy")
 
 REGRESSOR_METRICS = ("mse", "mae")
+
+
+def _non_nan_samples(posterior_arr: ArrayLike) -> ArrayLike:
+    """Determine which samples are not nan in the posterior tree array.
+
+    Parameters
+    ----------
+    posterior_arr : ArrayLike of shape (n_trees, n_samples, n_outputs)
+        The 3D posterior array from the forest.
+
+    Returns
+    -------
+    nonnan_indices : ArrayLike of shape (n_nonnan_samples,)
+        The indices of the samples that are not nan in the posterior array
+        along axis=1.
+    """
+    # Find the row indices with NaN values along the specified axis
+    nan_indices = np.isnan(posterior_arr).any(axis=2).all(axis=0)
+
+    # Invert the boolean mask to get indices without NaN values
+    nonnan_indices = np.where(~nan_indices)[0]
+    return nonnan_indices
 
 
 def train_tree(
@@ -218,16 +266,30 @@ def _compute_null_distribution_coleman(
         rng.shuffle(y_pred_ind_arr)
 
         # get random half of the posteriors from two sets of trees
-        first_forest_inds = y_pred_ind_arr[:n_samples_test]
-        second_forest_inds = y_pred_ind_arr[:n_samples_test]
+        first_forest_inds = y_pred_ind_arr[: n_estimators // 2]
+        second_forest_inds = y_pred_ind_arr[n_estimators // 2 :]
 
-        # get random half of the posteriors
-        y_pred_first_half = np.nanmean(all_y_pred[first_forest_inds], axis=0)
-        y_pred_second_half = np.nanmean(all_y_pred[second_forest_inds], axis=0)
+        # get random half of the posteriors as one forest
+        first_forest_pred = all_y_pred[first_forest_inds, ...]
+        second_forest_pred = all_y_pred[second_forest_inds, ...]
+
+        # determine if there are any nans in the final posterior array, when
+        # averaged over the trees
+        first_forest_samples = _non_nan_samples(first_forest_pred)
+        second_forest_samples = _non_nan_samples(second_forest_pred)
+
+        # todo: is this step necessary?
+        non_nan_samples = np.intersect1d(
+            first_forest_samples, second_forest_samples, assume_unique=True
+        )
+
+        # now average the posteriors over the trees for the non-nan samples
+        y_pred_first_half = np.nanmean(first_forest_pred[:, non_nan_samples, :], axis=0)
+        y_pred_second_half = np.nanmean(second_forest_pred[:, non_nan_samples, :], axis=0)
 
         # compute two instances of the metric from the sampled trees
-        first_half_metric = metric_func(y_test, y_pred_first_half)
-        second_half_metric = metric_func(y_test, y_pred_second_half)
+        first_half_metric = metric_func(y_test[non_nan_samples, :], y_pred_first_half)
+        second_half_metric = metric_func(y_test[non_nan_samples, :], y_pred_second_half)
 
         metric_star[idx] = first_half_metric
         metric_star_pi[idx] = second_half_metric
