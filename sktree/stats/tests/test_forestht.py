@@ -1,12 +1,13 @@
+import pickle
+from pathlib import Path
+
 import numpy as np
 import pytest
-from pathlib import Path
 from flaky import flaky
 from joblib import Parallel, delayed
+from numpy.testing import assert_array_equal
 from scipy.special import expit
 from sklearn import datasets
-import pickle
-from numpy.testing import assert_array_equal
 
 from sktree import HonestForestClassifier, RandomForestClassifier, RandomForestRegressor
 from sktree._lib.sklearn.tree import DecisionTreeClassifier
@@ -211,9 +212,9 @@ def test_linear_model(hypotester, model_kwargs, n_samples, n_repeats, test_size)
                 "permute_per_tree": False,
                 "sample_dataset_per_tree": False,
             },
-            600,        # n_samples
-            1000,       # n_repeats
-            1.0 / 6,    # test_size
+            600,  # n_samples
+            1000,  # n_repeats
+            1.0 / 6,  # test_size
         ],
     ],
 )
@@ -417,7 +418,7 @@ def test_parallelization(backend, n_jobs):
 
 
 def test_pickle(tmpdir):
-    """Test that pickling works and perserves fitted attributes."""
+    """Test that pickling works and preserves fitted attributes."""
     n_samples = 100
     n_features = 5
     X = rng.uniform(size=(n_samples, n_features))
@@ -432,30 +433,32 @@ def test_pickle(tmpdir):
     )
     stat, pvalue = clf.test(X, y, covariate_index=[1], metric="mi", n_repeats=n_repeats)
 
-    with open(Path(tmpdir) / 'clf.pkl', 'wb') as fpath:
+    with open(Path(tmpdir) / "clf.pkl", "wb") as fpath:
         pickle.dump(clf, fpath)
 
-    with open(Path(tmpdir) / 'clf.pkl', 'rb') as fpath:
+    with open(Path(tmpdir) / "clf.pkl", "rb") as fpath:
         clf_pickle = pickle.load(fpath)
 
     # recompute pvalue manually and compare
-    pickle_pvalue = (1. + (clf_pickle.null_dist_ <= (clf_pickle.permute_stat_ - clf_pickle.observe_stat_)).sum()) / (1. + n_repeats)
+    pickle_pvalue = (
+        1.0 + (clf_pickle.null_dist_ <= (clf_pickle.permute_stat_ - clf_pickle.observe_stat_)).sum()
+    ) / (1.0 + n_repeats)
     assert pvalue == pickle_pvalue
     assert clf_pickle.permute_stat_ - clf_pickle.observe_stat_ == stat
 
     attr_list = [
-        'test_size',
-        'observe_samples_',
-        'y_true_final_',
-        'observe_posteriors_',
-        'observe_stat_',
-        '_is_fitted',
-        'permute_samples_',
-        'permute_posteriors_',
-        'permute_stat_',
-        'n_samples_test_',
-        '_n_samples_',
-        '_metric',
+        "test_size",
+        "observe_samples_",
+        "y_true_final_",
+        "observe_posteriors_",
+        "observe_stat_",
+        "_is_fitted",
+        "permute_samples_",
+        "permute_posteriors_",
+        "permute_stat_",
+        "n_samples_test_",
+        "_n_samples_",
+        "_metric",
     ]
     for attr in attr_list:
         assert_array_equal(getattr(clf, attr), getattr(clf_pickle, attr))

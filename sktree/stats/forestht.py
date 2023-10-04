@@ -23,8 +23,8 @@ from .utils import (
     POSTERIOR_FUNCTIONS,
     REGRESSOR_METRICS,
     _compute_null_distribution_coleman,
-    train_tree,
     _non_nan_samples,
+    train_tree,
 )
 
 

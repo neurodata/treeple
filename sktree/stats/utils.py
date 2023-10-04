@@ -266,8 +266,8 @@ def _compute_null_distribution_coleman(
         rng.shuffle(y_pred_ind_arr)
 
         # get random half of the posteriors from two sets of trees
-        first_forest_inds = y_pred_ind_arr[:n_estimators // 2]
-        second_forest_inds = y_pred_ind_arr[n_estimators // 2:]
+        first_forest_inds = y_pred_ind_arr[: n_estimators // 2]
+        second_forest_inds = y_pred_ind_arr[n_estimators // 2 :]
 
         # get random half of the posteriors as one forest
         first_forest_pred = all_y_pred[first_forest_inds, ...]
@@ -279,7 +279,9 @@ def _compute_null_distribution_coleman(
         second_forest_samples = _non_nan_samples(second_forest_pred)
 
         # todo: is this step necessary?
-        non_nan_samples = np.intersect1d(first_forest_samples, second_forest_samples, assume_unique=True)
+        non_nan_samples = np.intersect1d(
+            first_forest_samples, second_forest_samples, assume_unique=True
+        )
 
         # now average the posteriors over the trees for the non-nan samples
         y_pred_first_half = np.nanmean(first_forest_pred[:, non_nan_samples, :], axis=0)
