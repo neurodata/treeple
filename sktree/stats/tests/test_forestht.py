@@ -17,6 +17,7 @@ from sktree.stats import (
     PermutationForestClassifier,
     PermutationForestRegressor,
 )
+from sktree.stats.utils import _non_nan_samples
 from sktree.tree import ObliqueDecisionTreeClassifier
 
 # load the iris dataset (n_samples, 4)
@@ -82,8 +83,11 @@ def test_featureimportance_forest_errors():
         permute_per_tree=permute_per_tree,
         sample_dataset_per_tree=sample_dataset_per_tree,
     )
-    with pytest.raises(ValueError, match="sample_dataset_per_tree"):
-        est.statistic(iris_X[:10], iris_y[:10])
+    with pytest.raises(RuntimeError, match="The estimator must be fitted"):
+        est.train_test_samples_
+
+    with pytest.raises(RuntimeError, match="There are less than 2 testing samples"):
+        est.statistic(iris_X[:5], iris_y[:5])
 
     est = FeatureImportanceForestClassifier(estimator=RandomForestRegressor)
     with pytest.raises(RuntimeError, match="Estimator must be"):
@@ -200,6 +204,7 @@ def test_linear_model(hypotester, model_kwargs, n_samples, n_repeats, test_size)
             1.0 / 6,
         ],
         [
+            # XXX: Currently does not work with permute and sample dataset per tree
             FeatureImportanceForestClassifier,
             {
                 "estimator": RandomForestClassifier(
@@ -306,7 +311,7 @@ def test_iris_pauc_statistic(
             tree_estimator=estimator,
             honest_prior=honest_prior,
             random_state=0,
-            n_jobs=-1,
+            n_jobs=1,
         ),
         test_size=test_size,
         sample_dataset_per_tree=sample_dataset_per_tree,
@@ -462,3 +467,65 @@ def test_pickle(tmpdir):
     ]
     for attr in attr_list:
         assert_array_equal(getattr(clf, attr), getattr(clf_pickle, attr))
+
+
+@pytest.mark.parametrize("permute_per_tree", [True, False])
+@pytest.mark.parametrize("sample_dataset_per_tree", [True, False])
+def test_sample_size_consistency_of_estimator_indices_(permute_per_tree, sample_dataset_per_tree):
+    """Test that the test-sample indices are what is expected."""
+    clf = FeatureImportanceForestClassifier(
+        estimator=HonestForestClassifier(
+            n_estimators=10, random_state=seed, n_jobs=1, honest_fraction=0.2
+        ),
+        test_size=0.5,
+        permute_per_tree=permute_per_tree,
+        sample_dataset_per_tree=sample_dataset_per_tree,
+    )
+
+    n_samples = 100
+    n_features = 5
+    X = rng.uniform(size=(n_samples, n_features))
+    y = rng.integers(0, 2, size=n_samples)  # Binary classification
+
+    _, posteriors, samples = clf.statistic(
+        X, y, covariate_index=None, return_posteriors=True, metric="mi"
+    )
+    if sample_dataset_per_tree:
+        assert_array_equal(
+            samples,
+            sorted(np.unique(np.concatenate([x[1] for x in clf.train_test_samples_]).flatten())),
+        )
+    else:
+        assert_array_equal(samples, sorted(clf.train_test_samples_[0][1]))
+    assert len(_non_nan_samples(posteriors)) == len(samples)
+
+
+def test_permute_per_tree_samples_consistency_with_sklearnforest():
+    n_samples = 100
+    n_features = 5
+    X = rng.uniform(size=(n_samples, n_features))
+    y = rng.integers(0, 2, size=n_samples)  # Binary classification
+
+    clf = FeatureImportanceForestClassifier(
+        estimator=HonestForestClassifier(
+            n_estimators=10, random_state=seed, n_jobs=1, honest_fraction=0.2
+        ),
+        test_size=0.5,
+        permute_per_tree=True,
+        sample_dataset_per_tree=False,
+    )
+
+    other_clf = FeatureImportanceForestClassifier(
+        estimator=HonestForestClassifier(
+            n_estimators=10, random_state=seed, n_jobs=1, honest_fraction=0.2
+        ),
+        test_size=0.5,
+        permute_per_tree=False,
+        sample_dataset_per_tree=False,
+    )
+
+    clf.statistic(X, y, covariate_index=None, metric="mi")
+    other_clf.statistic(X, y, covariate_index=None, metric="mi")
+
+    assert_array_equal(clf.train_test_samples_[0][0], other_clf.train_test_samples_[0][0])
+    assert_array_equal(clf.train_test_samples_[0][1], other_clf.train_test_samples_[0][1])

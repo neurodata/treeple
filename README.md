@@ -26,8 +26,6 @@ Installation
 ============
 Our installation will try to follow scikit-learn installation as close as possible, as we contain Cython code subclassed, or inspired by the scikit-learn tree submodule.
 
-AS OF NOW, scikit-tree is in development stage and the installation is still finicky due to the upstream scikit-learn's stalled refactoring PRs of the tree submodule. Once those are merged, the installation will be simpler. The current recommended installation is done locally with meson.
-
 Dependencies
 ------------
 
@@ -40,11 +38,12 @@ We minimally require:
 
 Installation with Pip (https://pypi.org/project/scikit-tree/)
 -------------------------------------------------------------
+Installing with pip on a conda environment is the recommended route.
 
     pip install scikit-tree
 
-Building locally with Meson (RECOMMENDED)
------------------------------------------
+Building locally with Meson (For developers)
+--------------------------------------------
 Make sure you have the necessary packages installed
 
     # install build dependencies
@@ -96,7 +95,7 @@ You can also do the same thing using Meson/Ninja itself. Run the following to bu
     python -c "from sktree import tree"
     python -c "import sklearn; print(sklearn.__version__);"
 
-Alternatively, you can use editable installs
+After building locally, you can use editable installs (warning: this only registers Python changes locally)
 
     pip install --no-build-isolation --editable .
 

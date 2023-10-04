@@ -11,10 +11,13 @@ from sklearn.utils.multiclass import type_of_target
 from sklearn.utils.validation import _is_fitted, check_X_y
 
 from sktree._lib.sklearn.ensemble._forest import (
+    BaseForest,
     ForestClassifier,
     ForestRegressor,
     RandomForestClassifier,
     RandomForestRegressor,
+    _get_n_samples_bootstrap,
+    _parallel_build_trees,
 )
 from sktree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 
@@ -25,12 +28,11 @@ from .utils import (
     REGRESSOR_METRICS,
     _compute_null_distribution_coleman,
     _non_nan_samples,
-    train_tree,
 )
 
 
 def _parallel_build_trees_and_compute_posteriors(
-    trees,
+    forest: BaseForest,
     idx: int,
     indices_train: ArrayLike,
     indices_test: ArrayLike,
@@ -39,14 +41,56 @@ def _parallel_build_trees_and_compute_posteriors(
     covariate_index,
     posterior_arr: ArrayLike,
     predict_posteriors: bool,
+    permute_per_tree: bool,
+    sample_weight: ArrayLike = None,
+    class_weight=None,
+    missing_values_in_feature_mask=None,
+    classes=None,
 ):
     """Parallel function to build trees and compute posteriors.
 
     This inherently assumes that the caller function defines the indices
     for the training and testing data for each tree.
     """
-    tree: Union[DecisionTreeClassifier, DecisionTreeRegressor] = trees[idx]
-    train_tree(tree, X[indices_train, :], y[indices_train, :], covariate_index)
+    tree: Union[DecisionTreeClassifier, DecisionTreeRegressor] = forest.estimators_[idx]
+    if permute_per_tree and covariate_index is not None:
+        random_state = tree.random_state
+    else:
+        random_state = forest.random_state
+
+    X_train = X[indices_train, :]
+    y_train = y[indices_train, ...]
+    rng = np.random.default_rng(random_state)
+
+    if forest.bootstrap:
+        n_samples_bootstrap = _get_n_samples_bootstrap(
+            n_samples=X_train.shape[0], max_samples=forest.max_samples
+        )
+    else:
+        n_samples_bootstrap = None
+
+    # individual tree permutation of y labels
+    if covariate_index is not None:
+        indices = np.arange(X_train.shape[0], dtype=int)
+        # perform permutation of covariates
+        index_arr = rng.choice(indices, size=(X_train.shape[0], 1), replace=False, shuffle=True)
+        perm_X_cov = X_train[index_arr, covariate_index]
+        X_train[:, covariate_index] = perm_X_cov
+
+    tree = _parallel_build_trees(
+        tree,
+        forest.bootstrap,
+        X_train,
+        y_train,
+        sample_weight,
+        idx,
+        len(forest.estimators_),
+        verbose=0,
+        class_weight=class_weight,
+        n_samples_bootstrap=n_samples_bootstrap,
+        missing_values_in_feature_mask=missing_values_in_feature_mask,
+        classes=classes,
+    )
 
     if predict_posteriors:
         # XXX: currently assumes n_outputs_ == 1
@@ -114,7 +158,7 @@ class BaseForestHT(MetaEstimatorMixin):
         indices = np.arange(self._n_samples_, dtype=int)
 
         # Get drawn indices along both sample and feature axes
-        if self.permute_per_tree and self.sample_dataset_per_tree:
+        if self.sample_dataset_per_tree:
             for tree in self.estimator_.estimators_:
                 seed = tree.random_state
 
@@ -127,7 +171,10 @@ class BaseForestHT(MetaEstimatorMixin):
                 yield indices_train, indices_test
         else:
             indices_train, indices_test = train_test_split(
-                indices, test_size=self.test_size, shuffle=True, random_state=self.random_state
+                indices,
+                test_size=self.test_size,
+                shuffle=True,
+                random_state=self.estimator_.random_state,
             )
             for tree in self.estimator_.estimators_:
                 yield indices_train, indices_test
@@ -145,6 +192,9 @@ class BaseForestHT(MetaEstimatorMixin):
         to reduce the object memory footprint by not storing the sampling
         data. Thus fetching the property may be slower than expected.
         """
+        if self._n_samples_ is None:
+            raise RuntimeError("The estimator must be fitted before accessing this attribute.")
+
         return [
             (indices_train, indices_test)
             for indices_train, indices_test in self._get_estimators_indices()
@@ -173,6 +223,12 @@ class BaseForestHT(MetaEstimatorMixin):
             else:
                 if not all(isinstance(idx, (np.integer, int)) for idx in covariate_index):
                     raise RuntimeError("Not all covariate_index are integer indices")
+
+        if self.test_size * X.shape[0] < 2:
+            raise RuntimeError(
+                f"There are less than 2 testing samples used with "
+                f"test_size={self.test_size} for X ({X.shape})."
+            )
 
         if self._n_samples_ is not None and X.shape[0] != self._n_samples_:
             raise RuntimeError(
@@ -244,8 +300,8 @@ class BaseForestHT(MetaEstimatorMixin):
         if self._type_of_target_ is None:
             self._type_of_target_ = type_of_target(y)
 
-        if self.sample_dataset_per_tree and not self.permute_per_tree:
-            raise ValueError("sample_dataset_per_tree is only valid when permute_per_tree=True")
+        # if self.sample_dataset_per_tree and not self.permute_per_tree:
+        #     raise ValueError("sample_dataset_per_tree is only valid when permute_per_tree=True")
 
         if covariate_index is None:
             self.estimator_ = self._get_estimator()
@@ -277,11 +333,11 @@ class BaseForestHT(MetaEstimatorMixin):
             else:
                 estimator.fit(X[:2], y[:2])
 
-        # permute per tree
+        # sampling a separate train/test per tree
         if self.sample_dataset_per_tree:
             self.n_samples_test_ = self._n_samples_
         else:
-            # not permute per tree
+            # here we fix a training/testing dataset
             test_size_ = int(self.test_size * self._n_samples_)
 
             # Fit each tree and compute posteriors with train test splits
@@ -316,7 +372,7 @@ class BaseForestHT(MetaEstimatorMixin):
         self,
         X,
         y,
-        covariate_index: ArrayLike = None,
+        covariate_index: ArrayLike,
         metric: str = "mi",
         n_repeats: int = 1000,
         return_posteriors: bool = True,
@@ -582,10 +638,13 @@ class FeatureImportanceForestRegressor(BaseForestHT):
         rng = np.random.default_rng(self.random_state)
 
         posterior_arr = np.full((self.n_estimators, self._n_samples_, estimator.n_outputs_), np.nan)
-        if self.permute_per_tree:
+
+        # both sampling dataset per tree or permuting per tree requires us to bypass the
+        # sklearn API to fit each tree individually
+        if self.sample_dataset_per_tree or self.permute_per_tree:
             Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose, prefer="threads")(
                 delayed(_parallel_build_trees_and_compute_posteriors)(
-                    estimator.estimators_,
+                    estimator,
                     idx,
                     indices_train,
                     indices_test,
@@ -594,6 +653,7 @@ class FeatureImportanceForestRegressor(BaseForestHT):
                     covariate_index,
                     posterior_arr,
                     False,
+                    self.permute_per_tree,
                 )
                 for idx, (indices_train, indices_test) in enumerate(self._get_estimators_indices())
             )
@@ -778,7 +838,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
     ):
         """Helper function to compute the test statistic."""
         metric_func: Callable[[ArrayLike, ArrayLike], float] = METRIC_FUNCTIONS[metric]
-        rng = np.random.default_rng(self.random_state)
+        rng = np.random.default_rng(estimator.random_state)
 
         if metric in POSTERIOR_FUNCTIONS:
             predict_posteriors = True
@@ -796,10 +856,13 @@ class FeatureImportanceForestClassifier(BaseForestHT):
             posterior_arr = np.full(
                 (self.n_estimators, self._n_samples_, estimator.n_outputs_), np.nan
             )
-        if self.permute_per_tree:
+
+        # both sampling dataset per tree or permuting per tree requires us to bypass the
+        # sklearn API to fit each tree individually
+        if self.sample_dataset_per_tree or self.permute_per_tree:
             Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose, prefer="threads")(
                 delayed(_parallel_build_trees_and_compute_posteriors)(
-                    estimator.estimators_,
+                    estimator,
                     idx,
                     indices_train,
                     indices_test,
@@ -808,6 +871,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
                     covariate_index,
                     posterior_arr,
                     predict_posteriors,
+                    self.permute_per_tree,
                 )
                 for idx, (indices_train, indices_test) in enumerate(self._get_estimators_indices())
             )

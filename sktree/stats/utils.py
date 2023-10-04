@@ -12,7 +12,6 @@ from sklearn.metrics import (
 from sklearn.utils.validation import check_X_y
 
 from sktree._lib.sklearn.ensemble._forest import ForestClassifier
-from sktree._lib.sklearn.tree import DecisionTreeClassifier
 
 
 def _mutual_information(y_true: ArrayLike, y_pred_proba: ArrayLike) -> float:
@@ -102,41 +101,6 @@ def _non_nan_samples(posterior_arr: ArrayLike) -> ArrayLike:
     # Invert the boolean mask to get indices without NaN values
     nonnan_indices = np.where(~nan_indices)[0]
     return nonnan_indices
-
-
-def train_tree(
-    tree: DecisionTreeClassifier,
-    X: ArrayLike,
-    y: ArrayLike,
-    covariate_index: ArrayLike = None,
-) -> ArrayLike:
-    """Compute the posterior from each tree on the "OOB" samples.
-
-    Parameters
-    ----------
-    tree : DecisionTreeClassifier
-        The tree to compute the posterior from.
-    X : ArrayLike of shape (n_samples, n_features)
-        The data matrix.
-    y : ArrayLike of shape (n_samples, n_outputs)
-        The output matrix.
-    covariate_index : ArrayLike of shape (n_covariates,), optional
-        The indices of the covariates to permute, by default None, which
-        does not permute any columns.
-    """
-    # seed the random number generator using each tree's random seed(?)
-    rng = np.random.default_rng(tree.random_state)
-
-    indices = np.arange(X.shape[0], dtype=int)
-
-    if covariate_index is not None:
-        # perform permutation of covariates
-        index_arr = rng.choice(indices, size=(X.shape[0], 1), replace=False, shuffle=True)
-        perm_X_cov = X[index_arr, covariate_index]
-        X[:, covariate_index] = perm_X_cov
-
-    # individual tree permutation of y labels
-    tree.fit(X, y, check_input=False)
 
 
 def _compute_null_distribution_perm(
@@ -279,17 +243,24 @@ def _compute_null_distribution_coleman(
         second_forest_samples = _non_nan_samples(second_forest_pred)
 
         # todo: is this step necessary?
-        non_nan_samples = np.intersect1d(
-            first_forest_samples, second_forest_samples, assume_unique=True
-        )
+        # non_nan_samples = np.intersect1d(
+        #     first_forest_samples, second_forest_samples, assume_unique=True
+        # )
 
         # now average the posteriors over the trees for the non-nan samples
-        y_pred_first_half = np.nanmean(first_forest_pred[:, non_nan_samples, :], axis=0)
-        y_pred_second_half = np.nanmean(second_forest_pred[:, non_nan_samples, :], axis=0)
+        # y_pred_first_half = np.nanmean(first_forest_pred[:, non_nan_samples, :], axis=0)
+        # y_pred_second_half = np.nanmean(second_forest_pred[:, non_nan_samples, :], axis=0)
+
+        # # compute two instances of the metric from the sampled trees
+        # first_half_metric = metric_func(y_test[non_nan_samples, :], y_pred_first_half)
+        # second_half_metric = metric_func(y_test[non_nan_samples, :], y_pred_second_half)
+
+        y_pred_first_half = np.nanmean(first_forest_pred[:, first_forest_samples, :], axis=0)
+        y_pred_second_half = np.nanmean(second_forest_pred[:, second_forest_samples, :], axis=0)
 
         # compute two instances of the metric from the sampled trees
-        first_half_metric = metric_func(y_test[non_nan_samples, :], y_pred_first_half)
-        second_half_metric = metric_func(y_test[non_nan_samples, :], y_pred_second_half)
+        first_half_metric = metric_func(y_test[first_forest_samples, :], y_pred_first_half)
+        second_half_metric = metric_func(y_test[second_forest_samples, :], y_pred_second_half)
 
         metric_star[idx] = first_half_metric
         metric_star_pi[idx] = second_half_metric
