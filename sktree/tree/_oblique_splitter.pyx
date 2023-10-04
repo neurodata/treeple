@@ -369,9 +369,9 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
 
         Parameters
         ----------
-        proj_mat_weights : vector of vectors reference
+        proj_mat_weights : vector of vectors reference of shape (mtry, n_features)
             The memory address of projection matrix non-zero weights.
-        proj_mat_indices : vector of vectors reference
+        proj_mat_indices : vector of vectors reference of shape (mtry, n_features)
             The memory address of projection matrix non-zero indices.
 
         Notes
@@ -403,7 +403,8 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
             # get the next index from the shuffled index array
             rand_vec_index = indices_to_sample[i]
 
-            # get the projection index and feature index
+            # get the projection index (i.e. row of the projection matrix) and
+            # feature index (i.e. column of the projection matrix)
             proj_i = rand_vec_index // n_features
             feat_i = rand_vec_index % n_features
 
@@ -669,7 +670,7 @@ cdef class MultiViewSplitter(ObliqueSplitter):
         self.feature_set_ends = feature_set_ends
 
         # infer the number of feature sets
-        self.n_feature_sets = len(self.feature_set_ends) + 1
+        self.n_feature_sets = len(self.feature_set_ends)
 
     def __reduce__(self):
         """Enable pickling the splitter."""
@@ -706,12 +707,16 @@ cdef class MultiViewSplitter(ObliqueSplitter):
         cdef SIZE_t[::1] indices_to_sample = self.indices_to_sample
         cdef SIZE_t grid_size
 
+        # compute the number of features in each feature set
         cdef SIZE_t n_features_in_set
+
+        # keep track of the beginning and ending indices of each feature set
         cdef int feature_set_begin, feature_set_end
         feature_set_begin = 0
 
         # 01: This algorithm samples features from each feature set uniformly and combines them
         # into one sparse projection vector.
+        cdef int n_non_zeros_per_set = n_non_zeros // self.n_feature_sets
         for feature_set_end in self.feature_set_ends:
             n_features_in_set = feature_set_end - feature_set_begin
             
@@ -723,13 +728,15 @@ cdef class MultiViewSplitter(ObliqueSplitter):
                 indices_to_sample[j], indices_to_sample[i] = \
                     indices_to_sample[i], indices_to_sample[j]
 
-            # sample 'n_non_zeros' in a mtry X n_features projection matrix
-            # which consists of +/- 1's chosen at a 1/2s rate
-            for i in range(0, n_non_zeros):
+            # sample a n_non_zeros matrix for each feature set, which proceeds by:
+            # - sample 'n_non_zeros' in a mtry X n_features projection matrix
+            # - which consists of +/- 1's chosen at a 1/2s rate
+            for i in range(0, n_non_zeros_per_set):
                 # get the next index from the shuffled index array
                 rand_vec_index = indices_to_sample[i]
 
-                # get the projection index and feature index
+                # get the projection index (i.e. row of the projection matrix) and
+                # feature index (i.e. column of the projection matrix)
                 proj_i = rand_vec_index // n_features
                 feat_i = rand_vec_index % n_features
 
@@ -744,7 +751,31 @@ cdef class MultiViewSplitter(ObliqueSplitter):
         
         # 02: Algorithm samples feature combinations from each feature set uniformly and evaluates
         # them independently.
+        cdef int ifeature = 0
 
+        while ifeature < self.max_features:
+            feature_set_begin = 0
+
+            # sample from a feature set
+            for feature_set_end in self.feature_set_ends:
+                n_features_in_set = feature_set_end - feature_set_begin
+
+                for i in range(0, n_non_zeros):
+                    # get the next index from the shuffled index array
+                    rand_vec_index = indices_to_sample[i]
+
+                    # get the projection index (i.e. row of the projection matrix) and
+                    # feature index (i.e. column of the projection matrix)
+                    proj_i = rand_vec_index // n_features
+                    feat_i = rand_vec_index % n_features
+
+                    # sample a random weight
+                    weight = 1 if (rand_int(0, 2, random_state) == 1) else -1
+
+                    proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
+                    proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
+                    
+                ifeature += 1
 
 cdef class MultiViewSplitterTester(MultiViewSplitter):
     """A class to expose a Python interface for testing."""
