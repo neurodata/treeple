@@ -17,8 +17,9 @@ The first feature set (X) is strongly correlated with the target, and the second
 feature set (W) is weakly correlated with the target (y). Here, we are testing the
 null hypothesis:
 
-``H0: I(X; y) - I(X, W; y) = 0``
-``HA: I(X; y) - I(X, W; y) > 0``
+- ``H0: I(X; y) - I(X, W; y) = 0``
+- ``HA: I(X; y) - I(X, W; y) < 0`` indicating that there is more mutual information with
+    respect to ``y``
 
 where ``I`` is mutual information. For example, this could be true in the following settings,
 where X is our informative feature set and W is our uninformative feature set.

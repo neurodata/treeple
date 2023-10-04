@@ -1,6 +1,7 @@
-from typing import Callable, Tuple
+from typing import Callable, Tuple, Union
 
 import numpy as np
+from joblib import Parallel, delayed
 from numpy.typing import ArrayLike
 from sklearn.base import MetaEstimatorMixin, clone, is_classifier
 from sklearn.ensemble._forest import ForestClassifier as sklearnForestClassifier
@@ -15,7 +16,7 @@ from sktree._lib.sklearn.ensemble._forest import (
     RandomForestClassifier,
     RandomForestRegressor,
 )
-from sktree._lib.sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+from sktree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 
 from .utils import (
     METRIC_FUNCTIONS,
@@ -26,6 +27,35 @@ from .utils import (
     _non_nan_samples,
     train_tree,
 )
+
+
+def _parallel_build_trees_and_compute_posteriors(
+    trees,
+    idx: int,
+    indices_train: ArrayLike,
+    indices_test: ArrayLike,
+    X: ArrayLike,
+    y: ArrayLike,
+    covariate_index,
+    posterior_arr: ArrayLike,
+    predict_posteriors: bool,
+):
+    """Parallel function to build trees and compute posteriors.
+
+    This inherently assumes that the caller function defines the indices
+    for the training and testing data for each tree.
+    """
+    tree: Union[DecisionTreeClassifier, DecisionTreeRegressor] = trees[idx]
+    train_tree(tree, X[indices_train, :], y[indices_train, :], covariate_index)
+
+    if predict_posteriors:
+        # XXX: currently assumes n_outputs_ == 1
+        y_pred = tree.predict_proba(X[indices_test, :]).reshape(-1, tree.n_classes_)
+    else:
+        y_pred = tree.predict(X[indices_test, :]).reshape(-1, tree.n_outputs_)
+
+    # Fill test set posteriors & set rest NaN
+    posterior_arr[idx, indices_test, :] = y_pred  # posterior
 
 
 class BaseForestHT(MetaEstimatorMixin):
@@ -471,9 +501,11 @@ class FeatureImportanceForestRegressor(BaseForestHT):
     y_true_final_ : ArrayLike of shape (n_samples_final,)
         The true labels of the samples used in the final test.
 
-    observe_posteriors_ : ArrayLike of shape (n_estimators, n_samples_final, n_outputs) or
-        (n_estimators, n_samples_final, n_classes)
+    observe_posteriors_ : ArrayLike of shape (n_estimators, n_samples, n_outputs) or
+        (n_estimators, n_samples, n_classes)
         The predicted posterior probabilities of the samples used in the final test.
+        For samples that are NaNs for all estimators, means the sample was not used
+        in the test set at all across all trees.
 
     null_dist_ : ArrayLike of shape (n_repeats,)
         The null distribution of the test statistic.
@@ -551,15 +583,20 @@ class FeatureImportanceForestRegressor(BaseForestHT):
 
         posterior_arr = np.full((self.n_estimators, self._n_samples_, estimator.n_outputs_), np.nan)
         if self.permute_per_tree:
-            # now initialize posterior array as (n_trees, n_samples_test, n_outputs)
-            for idx, (indices_train, indices_test) in enumerate(self._get_estimators_indices()):
-                tree: DecisionTreeRegressor = estimator.estimators_[idx]
-                train_tree(tree, X[indices_train, :], y[indices_train, :], covariate_index)
-
-                y_pred = tree.predict(X[indices_test, :]).reshape(-1, tree.n_outputs_)
-
-                # Fill test set posteriors & set rest NaN
-                posterior_arr[idx, indices_test, :] = y_pred  # posterior
+            Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose, prefer="threads")(
+                delayed(_parallel_build_trees_and_compute_posteriors)(
+                    estimator.estimators_,
+                    idx,
+                    indices_train,
+                    indices_test,
+                    X,
+                    y,
+                    covariate_index,
+                    posterior_arr,
+                    False,
+                )
+                for idx, (indices_train, indices_test) in enumerate(self._get_estimators_indices())
+            )
         else:
             # fitting a forest will only get one unique train/test split
             indices_train, indices_test = self.train_test_samples_[0]
@@ -760,18 +797,20 @@ class FeatureImportanceForestClassifier(BaseForestHT):
                 (self.n_estimators, self._n_samples_, estimator.n_outputs_), np.nan
             )
         if self.permute_per_tree:
-            for idx, (indices_train, indices_test) in enumerate(self._get_estimators_indices()):
-                tree: DecisionTreeClassifier = estimator.estimators_[idx]
-                train_tree(tree, X[indices_train, :], y[indices_train, :], covariate_index)
-
-                if predict_posteriors:
-                    # XXX: currently assumes n_outputs_ == 1
-                    y_pred = tree.predict_proba(X[indices_test, :]).reshape(-1, tree.n_classes_)
-                else:
-                    y_pred = tree.predict(X[indices_test, :]).reshape(-1, tree.n_outputs_)
-
-                # Fill test set posteriors & set rest NaN
-                posterior_arr[idx, indices_test, :] = y_pred  # posterior
+            Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose, prefer="threads")(
+                delayed(_parallel_build_trees_and_compute_posteriors)(
+                    estimator.estimators_,
+                    idx,
+                    indices_train,
+                    indices_test,
+                    X,
+                    y,
+                    covariate_index,
+                    posterior_arr,
+                    predict_posteriors,
+                )
+                for idx, (indices_train, indices_test) in enumerate(self._get_estimators_indices())
+            )
         else:
             # fitting a forest will only get one unique train/test split
             indices_train, indices_test = self.train_test_samples_[0]

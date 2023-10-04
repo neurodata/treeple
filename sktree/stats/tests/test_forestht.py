@@ -319,7 +319,7 @@ def test_iris_pauc_statistic(
     clf.reset()
     if sample_dataset_per_tree and not permute_per_tree:
         # test in another test
-        pytest.skip()
+        return
 
     stat, pvalue = clf.test(
         X,
