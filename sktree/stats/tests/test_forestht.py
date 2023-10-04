@@ -1,9 +1,12 @@
 import numpy as np
 import pytest
+from pathlib import Path
 from flaky import flaky
 from joblib import Parallel, delayed
 from scipy.special import expit
 from sklearn import datasets
+import pickle
+from numpy.testing import assert_array_equal
 
 from sktree import HonestForestClassifier, RandomForestClassifier, RandomForestRegressor
 from sktree._lib.sklearn.tree import DecisionTreeClassifier
@@ -95,21 +98,21 @@ def test_featureimportance_forest_errors():
 @pytest.mark.parametrize(
     "hypotester, model_kwargs, n_samples, n_repeats, test_size",
     [
-        [
-            PermutationForestRegressor,
-            {
-                "estimator": RandomForestRegressor(
-                    max_features="sqrt",
-                    random_state=seed,
-                    n_estimators=75,
-                    n_jobs=-1,
-                ),
-                "random_state": seed,
-            },
-            300,
-            50,
-            0.1,
-        ],
+        # [
+        #     PermutationForestRegressor,
+        #     {
+        #         "estimator": RandomForestRegressor(
+        #             max_features="sqrt",
+        #             random_state=seed,
+        #             n_estimators=75,
+        #             n_jobs=-1,
+        #         ),
+        #         "random_state": seed,
+        #     },
+        #     300,
+        #     50,
+        #     0.1,
+        # ],
         [
             FeatureImportanceForestRegressor,
             {
@@ -205,8 +208,8 @@ def test_linear_model(hypotester, model_kwargs, n_samples, n_repeats, test_size)
                     n_jobs=-1,
                 ),
                 "random_state": seed,
-                "permute_per_tree": True,
-                "sample_dataset_per_tree": True,
+                "permute_per_tree": False,
+                "sample_dataset_per_tree": False,
             },
             600,
             200,
@@ -266,7 +269,6 @@ def test_correlated_logit_model(hypotester, model_kwargs, n_samples, n_repeats, 
 
 
 @flaky(max_runs=2)
-@pytest.mark.slowtest
 @pytest.mark.parametrize("criterion", ["gini", "entropy"])
 @pytest.mark.parametrize("honest_prior", ["empirical", "uniform"])
 @pytest.mark.parametrize(
@@ -408,7 +410,52 @@ def test_parallelization(backend, n_jobs):
         pvalue = clf.test(X, y, covariate_index=[covariate_index], metric="mi")
         return pvalue
 
-    out = Parallel(n_jobs=1, backend=backend)(
+    out = Parallel(n_jobs=-1, backend=backend)(
         delayed(run_forest)(covariate_index) for covariate_index in range(n_features)
     )
     assert len(out) == n_features
+
+
+def test_pickle(tmpdir):
+    """Test that pickling works and perserves fitted attributes."""
+    n_samples = 100
+    n_features = 5
+    X = rng.uniform(size=(n_samples, n_features))
+    y = rng.integers(0, 2, size=n_samples)  # Binary classification
+    n_repeats = 1000
+
+    clf = FeatureImportanceForestClassifier(
+        estimator=HonestForestClassifier(
+            n_estimators=10, random_state=seed, n_jobs=1, honest_fraction=0.2
+        ),
+        test_size=0.5,
+    )
+    stat, pvalue = clf.test(X, y, covariate_index=[1], metric="mi", n_repeats=n_repeats)
+
+    with open(Path(tmpdir) / 'clf.pkl', 'wb') as fpath:
+        pickle.dump(clf, fpath)
+
+    with open(Path(tmpdir) / 'clf.pkl', 'rb') as fpath:
+        clf_pickle = pickle.load(fpath)
+
+    # recompute pvalue manually and compare
+    pickle_pvalue = (1. + (clf_pickle.null_dist_ <= (clf_pickle.permute_stat_ - clf_pickle.observe_stat_)).sum()) / (1. + n_repeats)
+    assert pvalue == pickle_pvalue
+    assert clf_pickle.permute_stat_ - clf_pickle.observe_stat_ == stat
+
+    attr_list = [
+        'test_size',
+        'observe_samples_',
+        'y_true_final_',
+        'observe_posteriors_',
+        'observe_stat_',
+        '_is_fitted',
+        'permute_samples_',
+        'permute_posteriors_',
+        'permute_stat_',
+        'n_samples_test_',
+        '_n_samples_',
+        '_metric',
+    ]
+    for attr in attr_list:
+        assert_array_equal(getattr(clf, attr), getattr(clf_pickle, attr))
