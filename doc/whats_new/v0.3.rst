@@ -1,18 +1,6 @@
 :orphan:
 
 .. include:: _contributors.rst
-
-.. _changes_0_3:
-
-What's new?
-===========
-
-Here we list a changelog of scikit-tree.
-
-.. contents:: Contents
-   :local:
-   :depth: 3
-
 .. currentmodule:: sktree
 
 .. _current:

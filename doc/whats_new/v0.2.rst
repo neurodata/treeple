@@ -1,21 +1,9 @@
 :orphan:
 
 .. include:: _contributors.rst
-
-.. _changes_0_2:
-
-What's new?
-===========
-
-Here we list a changelog of scikit-tree.
-
-.. contents:: Contents
-   :local:
-   :depth: 3
-
 .. currentmodule:: sktree
 
-.. _current:
+.. _v0_2:
 
 Version 0.2
 ===========
@@ -36,7 +24,7 @@ Changelog
 - |API| Allow ``sqrt`` and ``log2`` keywords to be used for ``min_samples_split`` parameter in unsupervised forests, by `Adam Li`_  (:pr:`114`)
 - |Feature| Implement extended isolation forest, by `Adam Li`_ (:pr:`101`)
 - |Feature| Implementation of StreamDecisionForest, by `Haoyin Xu`_ and `Adam Li`_ (:pr:`116`)
-- |Feature| Implementation of Permutation forests and a feature importance testing forest, by `Haoyin Xu`_, `Adam Li`_, `Sambit Panda` (:pr:`125`)
+- |Feature| Implementation of Permutation forests and a feature importance testing forest, by `Haoyin Xu`_, `Adam Li`_, `Sambit Panda`_ (:pr:`125`)
 
 Code and Documentation Contributors
 -----------------------------------
