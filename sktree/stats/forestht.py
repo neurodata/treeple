@@ -372,7 +372,7 @@ class BaseForestHT(MetaEstimatorMixin):
         self,
         X,
         y,
-        covariate_index: ArrayLike,
+        covariate_index: ArrayLike = None,
         metric: str = "mi",
         n_repeats: int = 1000,
         return_posteriors: bool = True,
