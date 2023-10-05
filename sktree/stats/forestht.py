@@ -224,9 +224,9 @@ class BaseForestHT(MetaEstimatorMixin):
                 if not all(isinstance(idx, (np.integer, int)) for idx in covariate_index):
                     raise RuntimeError("Not all covariate_index are integer indices")
 
-        if self.test_size * X.shape[0] < 2:
+        if self.test_size * X.shape[0] < 5:
             raise RuntimeError(
-                f"There are less than 2 testing samples used with "
+                f"There are less than 5 testing samples used with "
                 f"test_size={self.test_size} for X ({X.shape})."
             )
 
@@ -619,6 +619,40 @@ class FeatureImportanceForestRegressor(BaseForestHT):
         check_input: bool = True,
         **metric_kwargs,
     ):
+        """Compute the test statistic.
+
+        Parameters
+        ----------
+        X : ArrayLike of shape (n_samples, n_features)
+            The data matrix.
+        y : ArrayLike of shape (n_samples, n_outputs)
+            The target matrix.
+        covariate_index : ArrayLike, optional of shape (n_covariates,)
+            The index array of covariates to shuffle, by default None.
+        metric : str, optional
+            The metric to compute, by default "mse".
+        return_posteriors : bool, optional
+            Whether or not to return the posteriors, by default False.
+        check_input : bool, optional
+            Whether or not to check the input, by default True.
+        **metric_kwargs : dict, optional
+            Additional keyword arguments to pass to the metric function.
+
+        Returns
+        -------
+        stat : float
+            The test statistic.
+        posterior_final : ArrayLike of shape (n_estimators, n_samples_final, n_outputs) or
+            (n_estimators, n_samples_final), optional
+            If ``return_posteriors`` is True, then the posterior probabilities of the
+            samples used in the final test. ``n_samples_final`` is equal to ``n_samples``
+            if all samples are encountered in the test set of at least one tree in the
+            posterior computation.
+        samples : ArrayLike of shape (n_samples_final,), optional
+            The indices of the samples used in the final test. ``n_samples_final`` is
+            equal to ``n_samples`` if all samples are encountered in the test set of at
+            least one tree in the posterior computation.
+        """
         return super().statistic(
             X, y, covariate_index, metric, return_posteriors, check_input, **metric_kwargs
         )
