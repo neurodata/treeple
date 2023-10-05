@@ -1,0 +1,1454 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sktree.stats.forestht &#8212; scikit-tree 0.2.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=ac02cc09edc035673794" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=ac02cc09edc035673794" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=ac02cc09edc035673794" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=ac02cc09edc035673794" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/style.css?v=a6733705" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=ac02cc09edc035673794" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=ac02cc09edc035673794" />
+  <script src="../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=ac02cc09edc035673794"></script>
+
+    <script src="../../../_static/documentation_options.js?v=1be0d999"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=fd10adb8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sktree/stats/forestht';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
+    <script type="text/javascript" src="../../../_static/copybutton.js"></script>
+    <script type="text/javascript" src="../../../_static/scrollfix.js"></script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">scikit-tree 0.2.0 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api.html">
+                        API Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user_guide.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../whats_new.html">
+                        Release History
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../install.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../use.html">
+                        Examples using scikit-tree
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><div class="dropdown">
+    <button type="button" class="btn btn-primary btn-sm navbar-btn dropdown-toggle" id="dLabelMore" data-toggle="dropdown">
+        v0.2.0
+        <span class="caret"></span>
+    </button>
+    <div class="dropdown-menu list-group-flush py-0" aria-labelledby="dLabelMore">
+        <a class="list-group-item list-group-item-action py-1" href="https:///docs.neurodata.io/scikit-tree/dev/index.html">v0.2 (devel)</a>
+        <a class="list-group-item list-group-item-action py-1" href="https:///docs.neurodata.io/scikit-tree/stable/index.html">v0.1</a>
+    </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api.html">
+                        API Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user_guide.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../whats_new.html">
+                        Release History
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../install.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../use.html">
+                        Examples using scikit-tree
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><div class="dropdown">
+    <button type="button" class="btn btn-primary btn-sm navbar-btn dropdown-toggle" id="dLabelMore" data-toggle="dropdown">
+        v0.2.0
+        <span class="caret"></span>
+    </button>
+    <div class="dropdown-menu list-group-flush py-0" aria-labelledby="dLabelMore">
+        <a class="list-group-item list-group-item-action py-1" href="https:///docs.neurodata.io/scikit-tree/dev/index.html">v0.2 (devel)</a>
+        <a class="list-group-item list-group-item-action py-1" href="https:///docs.neurodata.io/scikit-tree/stable/index.html">v0.1</a>
+    </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">sktree.stats...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for sktree.stats.forestht</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">joblib</span> <span class="kn">import</span> <span class="n">Parallel</span><span class="p">,</span> <span class="n">delayed</span>
+<span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">ArrayLike</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">MetaEstimatorMixin</span><span class="p">,</span> <span class="n">clone</span><span class="p">,</span> <span class="n">is_classifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble._forest</span> <span class="kn">import</span> <span class="n">ForestClassifier</span> <span class="k">as</span> <span class="n">sklearnForestClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble._forest</span> <span class="kn">import</span> <span class="n">ForestRegressor</span> <span class="k">as</span> <span class="n">sklearnForestRegressor</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.multiclass</span> <span class="kn">import</span> <span class="n">type_of_target</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">_is_fitted</span><span class="p">,</span> <span class="n">check_X_y</span>
+
+<span class="kn">from</span> <span class="nn">sktree._lib.sklearn.ensemble._forest</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BaseForest</span><span class="p">,</span>
+    <span class="n">ForestClassifier</span><span class="p">,</span>
+    <span class="n">ForestRegressor</span><span class="p">,</span>
+    <span class="n">RandomForestClassifier</span><span class="p">,</span>
+    <span class="n">RandomForestRegressor</span><span class="p">,</span>
+    <span class="n">_get_n_samples_bootstrap</span><span class="p">,</span>
+    <span class="n">_parallel_build_trees</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">sktree.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span><span class="p">,</span> <span class="n">DecisionTreeRegressor</span>
+
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">METRIC_FUNCTIONS</span><span class="p">,</span>
+    <span class="n">POSITIVE_METRICS</span><span class="p">,</span>
+    <span class="n">POSTERIOR_FUNCTIONS</span><span class="p">,</span>
+    <span class="n">REGRESSOR_METRICS</span><span class="p">,</span>
+    <span class="n">_compute_null_distribution_coleman</span><span class="p">,</span>
+    <span class="n">_non_nan_samples</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_parallel_build_trees_and_compute_posteriors</span><span class="p">(</span>
+    <span class="n">forest</span><span class="p">:</span> <span class="n">BaseForest</span><span class="p">,</span>
+    <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">indices_train</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+    <span class="n">indices_test</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+    <span class="n">X</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+    <span class="n">covariate_index</span><span class="p">,</span>
+    <span class="n">posterior_arr</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+    <span class="n">predict_posteriors</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">permute_per_tree</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">sample_weight</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">class_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">missing_values_in_feature_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">classes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parallel function to build trees and compute posteriors.</span>
+
+<span class="sd">    This inherently assumes that the caller function defines the indices</span>
+<span class="sd">    for the training and testing data for each tree.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tree</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DecisionTreeClassifier</span><span class="p">,</span> <span class="n">DecisionTreeRegressor</span><span class="p">]</span> <span class="o">=</span> <span class="n">forest</span><span class="o">.</span><span class="n">estimators_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">permute_per_tree</span> <span class="ow">and</span> <span class="n">covariate_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">random_state</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">random_state</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">random_state</span> <span class="o">=</span> <span class="n">forest</span><span class="o">.</span><span class="n">random_state</span>
+
+    <span class="n">X_train</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">indices_train</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">y_train</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">indices_train</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">forest</span><span class="o">.</span><span class="n">bootstrap</span><span class="p">:</span>
+        <span class="n">n_samples_bootstrap</span> <span class="o">=</span> <span class="n">_get_n_samples_bootstrap</span><span class="p">(</span>
+            <span class="n">n_samples</span><span class="o">=</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">max_samples</span><span class="o">=</span><span class="n">forest</span><span class="o">.</span><span class="n">max_samples</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">n_samples_bootstrap</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># individual tree permutation of y labels</span>
+    <span class="k">if</span> <span class="n">covariate_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="c1"># perform permutation of covariates</span>
+        <span class="n">index_arr</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">perm_X_cov</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[</span><span class="n">index_arr</span><span class="p">,</span> <span class="n">covariate_index</span><span class="p">]</span>
+        <span class="n">X_train</span><span class="p">[:,</span> <span class="n">covariate_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">perm_X_cov</span>
+
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">_parallel_build_trees</span><span class="p">(</span>
+        <span class="n">tree</span><span class="p">,</span>
+        <span class="n">forest</span><span class="o">.</span><span class="n">bootstrap</span><span class="p">,</span>
+        <span class="n">X_train</span><span class="p">,</span>
+        <span class="n">y_train</span><span class="p">,</span>
+        <span class="n">sample_weight</span><span class="p">,</span>
+        <span class="n">idx</span><span class="p">,</span>
+        <span class="nb">len</span><span class="p">(</span><span class="n">forest</span><span class="o">.</span><span class="n">estimators_</span><span class="p">),</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">class_weight</span><span class="o">=</span><span class="n">class_weight</span><span class="p">,</span>
+        <span class="n">n_samples_bootstrap</span><span class="o">=</span><span class="n">n_samples_bootstrap</span><span class="p">,</span>
+        <span class="n">missing_values_in_feature_mask</span><span class="o">=</span><span class="n">missing_values_in_feature_mask</span><span class="p">,</span>
+        <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">predict_posteriors</span><span class="p">:</span>
+        <span class="c1"># XXX: currently assumes n_outputs_ == 1</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">indices_test</span><span class="p">,</span> <span class="p">:])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">tree</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">indices_test</span><span class="p">,</span> <span class="p">:])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">tree</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">)</span>
+
+    <span class="c1"># Fill test set posteriors &amp; set rest NaN</span>
+    <span class="n">posterior_arr</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">y_pred</span>  <span class="c1"># posterior</span>
+
+
+<span class="k">class</span> <span class="nc">BaseForestHT</span><span class="p">(</span><span class="n">MetaEstimatorMixin</span><span class="p">):</span>
+    <span class="n">observe_samples_</span><span class="p">:</span> <span class="n">ArrayLike</span>
+    <span class="n">observe_posteriors_</span><span class="p">:</span> <span class="n">ArrayLike</span>
+    <span class="n">observe_stat_</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">permute_samples_</span><span class="p">:</span> <span class="n">ArrayLike</span>
+    <span class="n">permute_posteriors_</span><span class="p">:</span> <span class="n">ArrayLike</span>
+    <span class="n">permute_stat_</span><span class="p">:</span> <span class="nb">float</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">estimator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+        <span class="n">permute_per_tree</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">sample_dataset_per_tree</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="o">=</span> <span class="n">estimator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_size</span> <span class="o">=</span> <span class="n">test_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">permute_per_tree</span> <span class="o">=</span> <span class="n">permute_per_tree</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_dataset_per_tree</span> <span class="o">=</span> <span class="n">sample_dataset_per_tree</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_samples_test_</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_metric</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_covariate_index_cache_</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_type_of_target_</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_fitted</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_estimators</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">n_estimators</span>
+
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">class_attributes</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="n">instance_attributes</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">attr_name</span> <span class="ow">in</span> <span class="n">instance_attributes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">attr_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">attr_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">class_attributes</span><span class="p">:</span>
+                <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_samples_test_</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_covariate_index_cache_</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_type_of_target_</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_metric</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_fitted</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">_get_estimators_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+        <span class="c1"># Get drawn indices along both sample and feature axes</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_dataset_per_tree</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">tree</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">estimators_</span><span class="p">:</span>
+                <span class="n">seed</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">random_state</span>
+
+                <span class="c1"># Operations accessing random_state must be performed identically</span>
+                <span class="c1"># to those in `_parallel_build_trees()`</span>
+                <span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+                    <span class="n">indices</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">seed</span>
+                <span class="p">)</span>
+
+                <span class="k">yield</span> <span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+                <span class="n">indices</span><span class="p">,</span>
+                <span class="n">test_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_size</span><span class="p">,</span>
+                <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">random_state</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">tree</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">estimators_</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">train_test_samples_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The subset of drawn samples for each base estimator.</span>
+
+<span class="sd">        Returns a dynamically generated list of indices identifying</span>
+<span class="sd">        the samples used for fitting each member of the ensemble, i.e.,</span>
+<span class="sd">        the in-bag samples.</span>
+
+<span class="sd">        Note: the list is re-created at each call to the property in order</span>
+<span class="sd">        to reduce the object memory footprint by not storing the sampling</span>
+<span class="sd">        data. Thus fetching the property may be slower than expected.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;The estimator must be fitted before accessing this attribute.&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_estimators_indices</span><span class="p">()</span>
+        <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_statistic</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">estimator</span><span class="p">:</span> <span class="n">ForestClassifier</span><span class="p">,</span>
+        <span class="n">X</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+        <span class="n">covariate_index</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+        <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">return_posteriors</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Subclasses should implement this!&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">covariate_index</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">check_X_y</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">ensure_2d</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">covariate_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">covariate_index</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;covariate_index must be an iterable of integer indices&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">,</span> <span class="nb">int</span><span class="p">))</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">covariate_index</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Not all covariate_index are integer indices&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_size</span> <span class="o">*</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;There are less than 5 testing samples used with &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;test_size=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">test_size</span><span class="si">}</span><span class="s2"> for X (</span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">).&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;X must have </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_</span><span class="si">}</span><span class="s2"> samples, got </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;If running on a new dataset, call the &#39;reset&#39; method.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;X must have </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span><span class="si">}</span><span class="s2"> features, got </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;If running on a new dataset, call the &#39;reset&#39; method.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type_of_target_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">type_of_target</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type_of_target_</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;y must have type </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_type_of_target_</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">type_of_target</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="si">}</span><span class="s2">. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;If running on a new dataset, call the &#39;reset&#39; method.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">covariate_index</span>
+
+    <span class="k">def</span> <span class="nf">statistic</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">X</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+        <span class="n">covariate_index</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;mi&quot;</span><span class="p">,</span>
+        <span class="n">return_posteriors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">check_input</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">ArrayLike</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the test statistic.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : ArrayLike of shape (n_samples, n_features)</span>
+<span class="sd">            The data matrix.</span>
+<span class="sd">        y : ArrayLike of shape (n_samples, n_outputs)</span>
+<span class="sd">            The target matrix.</span>
+<span class="sd">        covariate_index : ArrayLike, optional of shape (n_covariates,)</span>
+<span class="sd">            The index array of covariates to shuffle, by default None.</span>
+<span class="sd">        metric : str, optional</span>
+<span class="sd">            The metric to compute, by default &quot;mse&quot;.</span>
+<span class="sd">        return_posteriors : bool, optional</span>
+<span class="sd">            Whether or not to return the posteriors, by default False.</span>
+<span class="sd">        check_input : bool, optional</span>
+<span class="sd">            Whether or not to check the input, by default True.</span>
+<span class="sd">        **metric_kwargs : dict, optional</span>
+<span class="sd">            Additional keyword arguments to pass to the metric function.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        stat : float</span>
+<span class="sd">            The test statistic.</span>
+<span class="sd">        posterior_final : ArrayLike of shape (n_estimators, n_samples_final, n_outputs) or</span>
+<span class="sd">            (n_estimators, n_samples_final), optional</span>
+<span class="sd">            If ``return_posteriors`` is True, then the posterior probabilities of the</span>
+<span class="sd">            samples used in the final test. ``n_samples_final`` is equal to ``n_samples``</span>
+<span class="sd">            if all samples are encountered in the test set of at least one tree in the</span>
+<span class="sd">            posterior computation.</span>
+<span class="sd">        samples : ArrayLike of shape (n_samples_final,), optional</span>
+<span class="sd">            The indices of the samples used in the final test. ``n_samples_final`` is</span>
+<span class="sd">            equal to ``n_samples`` if all samples are encountered in the test set of at</span>
+<span class="sd">            least one tree in the posterior computation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">check_input</span><span class="p">:</span>
+            <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">covariate_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_input</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">covariate_index</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type_of_target_</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_type_of_target_</span> <span class="o">=</span> <span class="n">type_of_target</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+        <span class="c1"># if self.sample_dataset_per_tree and not self.permute_per_tree:</span>
+        <span class="c1">#     raise ValueError(&quot;sample_dataset_per_tree is only valid when permute_per_tree=True&quot;)</span>
+
+        <span class="k">if</span> <span class="n">covariate_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_estimator</span><span class="p">()</span>
+            <span class="n">estimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">permuted_estimator_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_estimator</span><span class="p">()</span>
+            <span class="n">estimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">permuted_estimator_</span>
+
+        <span class="c1"># Infer type of target y</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_type_of_target&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_type_of_target_</span> <span class="o">=</span> <span class="n">type_of_target</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+        <span class="c1"># XXX: this can be improved as an extra fit can be avoided, by just doing error-checking</span>
+        <span class="c1"># and then setting the internal meta data structures</span>
+        <span class="c1"># first run a dummy fit on the samples to initialize the</span>
+        <span class="c1"># internal data structure of the forest</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_fitted</span><span class="p">(</span><span class="n">estimator</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_classifier</span><span class="p">(</span><span class="n">estimator</span><span class="p">):</span>
+            <span class="n">_unique_y</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="n">_unique_y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y</span><span class="p">[:,</span> <span class="n">axis</span><span class="p">]))</span>
+            <span class="n">unique_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">_unique_y</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">unique_y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">unique_y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">unique_y</span> <span class="o">=</span> <span class="n">unique_y</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="n">X_dummy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">unique_y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="n">estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_dummy</span><span class="p">,</span> <span class="n">unique_y</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">_is_fitted</span><span class="p">(</span><span class="n">estimator</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="n">y</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="n">y</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+
+        <span class="c1"># sampling a separate train/test per tree</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_dataset_per_tree</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_samples_test_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># here we fix a training/testing dataset</span>
+            <span class="n">test_size_</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_size</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_</span><span class="p">)</span>
+
+            <span class="c1"># Fit each tree and compute posteriors with train test splits</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_samples_test_</span> <span class="o">=</span> <span class="n">test_size_</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metric</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metric</span> <span class="o">!=</span> <span class="n">metric</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Metric must be </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_metric</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s2">. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;If running on a new dataset, call the &#39;reset&#39; method.&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_metric</span> <span class="o">=</span> <span class="n">metric</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_classifier</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="p">)</span> <span class="ow">and</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">REGRESSOR_METRICS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Metric must be either &quot;mse&quot; or &quot;mae&quot; if using Regression, got </span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">estimator</span><span class="o">.</span><span class="n">n_outputs_</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">metric</span> <span class="o">==</span> <span class="s2">&quot;auc&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;AUC metric is not supported for multi-output&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_statistic</span><span class="p">(</span>
+            <span class="n">estimator</span><span class="p">,</span>
+            <span class="n">X</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">,</span>
+            <span class="n">covariate_index</span><span class="o">=</span><span class="n">covariate_index</span><span class="p">,</span>
+            <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+            <span class="n">return_posteriors</span><span class="o">=</span><span class="n">return_posteriors</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">X</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">,</span>
+        <span class="n">covariate_index</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mi&quot;</span><span class="p">,</span>
+        <span class="n">n_repeats</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+        <span class="n">return_posteriors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform hypothesis test using Coleman method.</span>
+
+<span class="sd">        X is split into a training/testing split. Optionally, the covariate index</span>
+<span class="sd">        columns are shuffled.</span>
+
+<span class="sd">        On the training dataset, two honest forests are trained and then the posterior</span>
+<span class="sd">        is estimated on the testing dataset. One honest forest is trained on the</span>
+<span class="sd">        permuted dataset and the other is trained on the original dataset.</span>
+
+<span class="sd">        Finally, resample the posteriors of the two forests to compute the null</span>
+<span class="sd">        distribution of the statistics.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : ArrayLike of shape (n_samples, n_features)</span>
+<span class="sd">            The data matrix.</span>
+<span class="sd">        y : ArrayLike of shape (n_samples, n_outputs)</span>
+<span class="sd">            The target matrix.</span>
+<span class="sd">        covariate_index : ArrayLike, optional of shape (n_covariates,)</span>
+<span class="sd">            The index array of covariates to shuffle, by default None.</span>
+<span class="sd">        metric : str, optional</span>
+<span class="sd">            The metric to compute, by default &quot;mse&quot;.</span>
+<span class="sd">        n_repeats : int, optional</span>
+<span class="sd">            Number of times to sample the null distribution, by default 1000.</span>
+<span class="sd">        return_posteriors : bool, optional</span>
+<span class="sd">            Whether or not to return the posteriors, by default True.</span>
+<span class="sd">        **metric_kwargs : dict, optional</span>
+<span class="sd">            Additional keyword arguments to pass to the metric function.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        stat : float</span>
+<span class="sd">            The test statistic.</span>
+<span class="sd">        pval : float</span>
+<span class="sd">            The p-value of the test statistic.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">covariate_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_input</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">covariate_index</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_fitted</span><span class="p">:</span>
+            <span class="c1"># first compute the test statistic on the un-permuted data</span>
+            <span class="n">observe_stat</span><span class="p">,</span> <span class="n">observe_posteriors</span><span class="p">,</span> <span class="n">observe_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">statistic</span><span class="p">(</span>
+                <span class="n">X</span><span class="p">,</span>
+                <span class="n">y</span><span class="p">,</span>
+                <span class="n">covariate_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+                <span class="n">return_posteriors</span><span class="o">=</span><span class="n">return_posteriors</span><span class="p">,</span>
+                <span class="n">check_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">observe_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">observe_samples_</span>
+            <span class="n">observe_posteriors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">observe_posteriors_</span>
+            <span class="n">observe_stat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">observe_stat_</span>
+
+        <span class="c1"># next permute the data</span>
+        <span class="n">permute_stat</span><span class="p">,</span> <span class="n">permute_posteriors</span><span class="p">,</span> <span class="n">permute_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">statistic</span><span class="p">(</span>
+            <span class="n">X</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">,</span>
+            <span class="n">covariate_index</span><span class="o">=</span><span class="n">covariate_index</span><span class="p">,</span>
+            <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+            <span class="n">return_posteriors</span><span class="o">=</span><span class="n">return_posteriors</span><span class="p">,</span>
+            <span class="n">check_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">permute_stat_</span> <span class="o">=</span> <span class="n">permute_stat</span>
+
+        <span class="c1"># Note: at this point, both `estimator` and `permuted_estimator_` should</span>
+        <span class="c1"># have been fitted already, so we can now compute on the null by resampling</span>
+        <span class="c1"># the posteriors and computing the test statistic on the resampled posteriors</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_dataset_per_tree</span><span class="p">:</span>
+            <span class="n">metric_star</span><span class="p">,</span> <span class="n">metric_star_pi</span> <span class="o">=</span> <span class="n">_compute_null_distribution_coleman</span><span class="p">(</span>
+                <span class="n">y_test</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
+                <span class="n">y_pred_proba_normal</span><span class="o">=</span><span class="n">observe_posteriors</span><span class="p">,</span>
+                <span class="n">y_pred_proba_perm</span><span class="o">=</span><span class="n">permute_posteriors</span><span class="p">,</span>
+                <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+                <span class="n">n_repeats</span><span class="o">=</span><span class="n">n_repeats</span><span class="p">,</span>
+                <span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># If not sampling a new dataset per tree, then we may either be</span>
+            <span class="c1"># permuting the covariate index per tree or per forest. If not permuting</span>
+            <span class="c1"># there is only one train and test split, so we can just use that</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">indices_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_test_samples_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">y_test</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">indices_test</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="n">y_pred_proba_normal</span> <span class="o">=</span> <span class="n">observe_posteriors</span><span class="p">[:,</span> <span class="n">indices_test</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="n">y_pred_proba_perm</span> <span class="o">=</span> <span class="n">permute_posteriors</span><span class="p">[:,</span> <span class="n">indices_test</span><span class="p">,</span> <span class="p">:]</span>
+
+            <span class="n">metric_star</span><span class="p">,</span> <span class="n">metric_star_pi</span> <span class="o">=</span> <span class="n">_compute_null_distribution_coleman</span><span class="p">(</span>
+                <span class="n">y_test</span><span class="o">=</span><span class="n">y_test</span><span class="p">,</span>
+                <span class="n">y_pred_proba_normal</span><span class="o">=</span><span class="n">y_pred_proba_normal</span><span class="p">,</span>
+                <span class="n">y_pred_proba_perm</span><span class="o">=</span><span class="n">y_pred_proba_perm</span><span class="p">,</span>
+                <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+                <span class="n">n_repeats</span><span class="o">=</span><span class="n">n_repeats</span><span class="p">,</span>
+                <span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="c1"># metric^\pi - metric = observed test statistic, which under the</span>
+        <span class="c1"># null is normally distributed around 0</span>
+        <span class="n">observe_stat</span> <span class="o">=</span> <span class="n">permute_stat</span> <span class="o">-</span> <span class="n">observe_stat</span>
+
+        <span class="c1"># metric^\pi_j - metric_j, which is centered at 0</span>
+        <span class="n">null_dist</span> <span class="o">=</span> <span class="n">metric_star_pi</span> <span class="o">-</span> <span class="n">metric_star</span>
+
+        <span class="c1"># compute pvalue</span>
+        <span class="k">if</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">POSITIVE_METRICS</span><span class="p">:</span>
+            <span class="n">pvalue</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">null_dist</span> <span class="o">&lt;=</span> <span class="n">observe_stat</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">n_repeats</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pvalue</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">null_dist</span> <span class="o">&gt;=</span> <span class="n">observe_stat</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">n_repeats</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">return_posteriors</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">observe_posteriors_</span> <span class="o">=</span> <span class="n">observe_posteriors</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">permute_posteriors_</span> <span class="o">=</span> <span class="n">permute_posteriors</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">observe_samples_</span> <span class="o">=</span> <span class="n">observe_samples</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">permute_samples_</span> <span class="o">=</span> <span class="n">permute_samples</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">null_dist_</span> <span class="o">=</span> <span class="n">null_dist</span>
+        <span class="k">return</span> <span class="n">observe_stat</span><span class="p">,</span> <span class="n">pvalue</span>
+
+
+<div class="viewcode-block" id="FeatureImportanceForestRegressor">
+<a class="viewcode-back" href="../../../generated/sktree.stats.FeatureImportanceForestRegressor.html#sktree.stats.FeatureImportanceForestRegressor">[docs]</a>
+<span class="k">class</span> <span class="nc">FeatureImportanceForestRegressor</span><span class="p">(</span><span class="n">BaseForestHT</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Forest hypothesis testing with continuous `y` variable.</span>
+
+<span class="sd">    Implements the algorithm described in :footcite:`coleman2022scalable`.</span>
+
+<span class="sd">    The dataset is split into a training and testing dataset initially. Then there</span>
+<span class="sd">    are two forests that are trained: one on the original dataset, and one on the</span>
+<span class="sd">    permuted dataset. The dataset is either permuted once, or independently for</span>
+<span class="sd">    each tree in the permuted forest. The original test statistic is computed by</span>
+<span class="sd">    comparing the metric on both forests ``(metric_forest - metric_perm_forest)``.</span>
+
+<span class="sd">    Then the output predictions are randomly sampled to recompute the test statistic</span>
+<span class="sd">    ``n_repeats`` times. The p-value is computed as the proportion of times the</span>
+<span class="sd">    null test statistic is greater than the original test statistic.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    estimator : object, default=None</span>
+<span class="sd">        Type of forest estimator to use. By default `None`, which defaults to</span>
+<span class="sd">        :class:`sklearn.ensemble.RandomForestRegressor`.</span>
+
+<span class="sd">    random_state : int, RandomState instance or None, default=None</span>
+<span class="sd">        Controls both the randomness of the bootstrapping of the samples used</span>
+<span class="sd">        when building trees (if ``bootstrap=True``) and the sampling of the</span>
+<span class="sd">        features to consider when looking for the best split at each node</span>
+<span class="sd">        (if ``max_features &lt; n_features``).</span>
+<span class="sd">        See :term:`Glossary &lt;random_state&gt;` for details.</span>
+
+<span class="sd">    verbose : int, default=0</span>
+<span class="sd">        Controls the verbosity when fitting and predicting.</span>
+
+<span class="sd">    test_size : float, default=0.2</span>
+<span class="sd">        Proportion of samples per tree to use for the test set.</span>
+
+<span class="sd">    permute_per_tree : bool, default=True</span>
+<span class="sd">        Whether to permute the covariate index per tree or per forest.</span>
+
+<span class="sd">    sample_dataset_per_tree : bool, default=False</span>
+<span class="sd">        Whether to sample the dataset per tree or per forest.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    estimator_ : BaseForest</span>
+<span class="sd">        The estimator used to compute the test statistic.</span>
+
+<span class="sd">    n_samples_test_ : int</span>
+<span class="sd">        The number of samples used in the final test set.</span>
+
+<span class="sd">    indices_train_ : ArrayLike of shape (n_samples_train,)</span>
+<span class="sd">        The indices of the samples used in the training set.</span>
+
+<span class="sd">    indices_test_ : ArrayLike of shape (n_samples_test,)</span>
+<span class="sd">        The indices of the samples used in the testing set.</span>
+
+<span class="sd">    samples_ : ArrayLike of shape (n_samples_final,)</span>
+<span class="sd">        The indices of the samples used in the final test set that would slice</span>
+<span class="sd">        the original ``(X, y)`` input.</span>
+
+<span class="sd">    y_true_final_ : ArrayLike of shape (n_samples_final,)</span>
+<span class="sd">        The true labels of the samples used in the final test.</span>
+
+<span class="sd">    observe_posteriors_ : ArrayLike of shape (n_estimators, n_samples, n_outputs) or</span>
+<span class="sd">        (n_estimators, n_samples, n_classes)</span>
+<span class="sd">        The predicted posterior probabilities of the samples used in the final test.</span>
+<span class="sd">        For samples that are NaNs for all estimators, means the sample was not used</span>
+<span class="sd">        in the test set at all across all trees.</span>
+
+<span class="sd">    null_dist_ : ArrayLike of shape (n_repeats,)</span>
+<span class="sd">        The null distribution of the test statistic.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This class trains two forests: one on the original dataset, and one on the</span>
+<span class="sd">    permuted dataset. The forest from the original dataset is cached and re-used to</span>
+<span class="sd">    compute the test-statistic each time the :meth:`test` method is called. However,</span>
+<span class="sd">    the forest from the permuted dataset is re-trained each time the :meth:`test` is called</span>
+<span class="sd">    if the ``covariate_index`` differs from the previous run.</span>
+
+<span class="sd">    To fully start from a new dataset, call the ``reset`` method, which will then</span>
+<span class="sd">    re-train both forests upon calling the :meth:`test` and :meth:`statistic` methods.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. footbibliography::</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">estimator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+        <span class="n">permute_per_tree</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">sample_dataset_per_tree</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">estimator</span><span class="o">=</span><span class="n">estimator</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">test_size</span><span class="o">=</span><span class="n">test_size</span><span class="p">,</span>
+            <span class="n">permute_per_tree</span><span class="o">=</span><span class="n">permute_per_tree</span><span class="p">,</span>
+            <span class="n">sample_dataset_per_tree</span><span class="o">=</span><span class="n">sample_dataset_per_tree</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">estimator_</span> <span class="o">=</span> <span class="n">RandomForestRegressor</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="p">,</span> <span class="p">(</span><span class="n">ForestRegressor</span><span class="p">,</span> <span class="n">sklearnForestRegressor</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Estimator must be a ForestRegressor, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">estimator_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span>
+        <span class="k">return</span> <span class="n">clone</span><span class="p">(</span><span class="n">estimator_</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FeatureImportanceForestRegressor.statistic">
+<a class="viewcode-back" href="../../../generated/sktree.stats.FeatureImportanceForestRegressor.html#sktree.stats.FeatureImportanceForestRegressor.statistic">[docs]</a>
+    <span class="k">def</span> <span class="nf">statistic</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">X</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+        <span class="n">covariate_index</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;mse&quot;</span><span class="p">,</span>
+        <span class="n">return_posteriors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">check_input</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the test statistic.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : ArrayLike of shape (n_samples, n_features)</span>
+<span class="sd">            The data matrix.</span>
+<span class="sd">        y : ArrayLike of shape (n_samples, n_outputs)</span>
+<span class="sd">            The target matrix.</span>
+<span class="sd">        covariate_index : ArrayLike, optional of shape (n_covariates,)</span>
+<span class="sd">            The index array of covariates to shuffle, by default None.</span>
+<span class="sd">        metric : str, optional</span>
+<span class="sd">            The metric to compute, by default &quot;mse&quot;.</span>
+<span class="sd">        return_posteriors : bool, optional</span>
+<span class="sd">            Whether or not to return the posteriors, by default False.</span>
+<span class="sd">        check_input : bool, optional</span>
+<span class="sd">            Whether or not to check the input, by default True.</span>
+<span class="sd">        **metric_kwargs : dict, optional</span>
+<span class="sd">            Additional keyword arguments to pass to the metric function.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        stat : float</span>
+<span class="sd">            The test statistic.</span>
+<span class="sd">        posterior_final : ArrayLike of shape (n_estimators, n_samples_final, n_outputs) or</span>
+<span class="sd">            (n_estimators, n_samples_final), optional</span>
+<span class="sd">            If ``return_posteriors`` is True, then the posterior probabilities of the</span>
+<span class="sd">            samples used in the final test. ``n_samples_final`` is equal to ``n_samples``</span>
+<span class="sd">            if all samples are encountered in the test set of at least one tree in the</span>
+<span class="sd">            posterior computation.</span>
+<span class="sd">        samples : ArrayLike of shape (n_samples_final,), optional</span>
+<span class="sd">            The indices of the samples used in the final test. ``n_samples_final`` is</span>
+<span class="sd">            equal to ``n_samples`` if all samples are encountered in the test set of at</span>
+<span class="sd">            least one tree in the posterior computation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">statistic</span><span class="p">(</span>
+            <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">covariate_index</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">return_posteriors</span><span class="p">,</span> <span class="n">check_input</span><span class="p">,</span> <span class="o">**</span><span class="n">metric_kwargs</span>
+        <span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_statistic</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">estimator</span><span class="p">:</span> <span class="n">ForestClassifier</span><span class="p">,</span>
+        <span class="n">X</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+        <span class="n">covariate_index</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+        <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">return_posteriors</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper function to compute the test statistic.&quot;&quot;&quot;</span>
+        <span class="n">metric_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">ArrayLike</span><span class="p">,</span> <span class="n">ArrayLike</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">METRIC_FUNCTIONS</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span>
+        <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+
+        <span class="n">posterior_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n_estimators</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_</span><span class="p">,</span> <span class="n">estimator</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+
+        <span class="c1"># both sampling dataset per tree or permuting per tree requires us to bypass the</span>
+        <span class="c1"># sklearn API to fit each tree individually</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_dataset_per_tree</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">permute_per_tree</span><span class="p">:</span>
+            <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">estimator</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span> <span class="n">prefer</span><span class="o">=</span><span class="s2">&quot;threads&quot;</span><span class="p">)(</span>
+                <span class="n">delayed</span><span class="p">(</span><span class="n">_parallel_build_trees_and_compute_posteriors</span><span class="p">)(</span>
+                    <span class="n">estimator</span><span class="p">,</span>
+                    <span class="n">idx</span><span class="p">,</span>
+                    <span class="n">indices_train</span><span class="p">,</span>
+                    <span class="n">indices_test</span><span class="p">,</span>
+                    <span class="n">X</span><span class="p">,</span>
+                    <span class="n">y</span><span class="p">,</span>
+                    <span class="n">covariate_index</span><span class="p">,</span>
+                    <span class="n">posterior_arr</span><span class="p">,</span>
+                    <span class="kc">False</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">permute_per_tree</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_estimators_indices</span><span class="p">())</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># fitting a forest will only get one unique train/test split</span>
+            <span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_test_samples_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">indices_train</span><span class="p">,</span> <span class="p">:],</span> <span class="n">X</span><span class="p">[</span><span class="n">indices_test</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">indices_train</span><span class="p">,</span> <span class="p">:],</span> <span class="n">y</span><span class="p">[</span><span class="n">indices_test</span><span class="p">,</span> <span class="p">:]</span>
+
+            <span class="k">if</span> <span class="n">covariate_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># perform permutation of covariates</span>
+                <span class="n">n_samples_train</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">index_arr</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_samples_train</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+                    <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n_samples_train</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                    <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">X_train</span><span class="p">[:,</span> <span class="n">covariate_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[</span><span class="n">index_arr</span><span class="p">,</span> <span class="n">covariate_index</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type_of_target_</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span><span class="p">:</span>
+                <span class="n">y_train</span> <span class="o">=</span> <span class="n">y_train</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="n">estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+            <span class="c1"># construct posterior array for all trees (n_trees, n_samples_test, n_outputs)</span>
+            <span class="k">for</span> <span class="n">itree</span><span class="p">,</span> <span class="n">tree</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">estimator</span><span class="o">.</span><span class="n">estimators_</span><span class="p">):</span>
+                <span class="n">posterior_arr</span><span class="p">[</span><span class="n">itree</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                    <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">tree</span><span class="o">.</span><span class="n">n_outputs_</span>
+                <span class="p">)</span>
+
+            <span class="c1"># set variables to compute metric</span>
+            <span class="n">samples</span> <span class="o">=</span> <span class="n">indices_test</span>
+            <span class="n">y_true_final</span> <span class="o">=</span> <span class="n">y_test</span>
+
+        <span class="c1"># determine if there are any nans in the final posterior array, when</span>
+        <span class="c1"># averaged over the trees</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="n">_non_nan_samples</span><span class="p">(</span><span class="n">posterior_arr</span><span class="p">)</span>
+
+        <span class="c1"># Ignore all NaN values (samples not tested)</span>
+        <span class="n">y_true_final</span> <span class="o">=</span> <span class="n">y</span><span class="p">[(</span><span class="n">samples</span><span class="p">),</span> <span class="p">:]</span>
+
+        <span class="c1"># Average all posteriors (n_samples_test, n_outputs) to compute the statistic</span>
+        <span class="n">posterior_forest</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">posterior_arr</span><span class="p">[:,</span> <span class="p">(</span><span class="n">samples</span><span class="p">),</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">stat</span> <span class="o">=</span> <span class="n">metric_func</span><span class="p">(</span><span class="n">y_true_final</span><span class="p">,</span> <span class="n">posterior_forest</span><span class="p">,</span> <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">covariate_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Ignore all NaN values (samples not tested) -&gt; (n_samples_final, n_outputs)</span>
+            <span class="c1"># arrays of y and predicted posterior</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">observe_samples_</span> <span class="o">=</span> <span class="n">samples</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">y_true_final_</span> <span class="o">=</span> <span class="n">y_true_final</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">observe_posteriors_</span> <span class="o">=</span> <span class="n">posterior_arr</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">observe_stat_</span> <span class="o">=</span> <span class="n">stat</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_is_fitted</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">return_posteriors</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">stat</span><span class="p">,</span> <span class="n">posterior_arr</span><span class="p">,</span> <span class="n">samples</span>
+
+        <span class="k">return</span> <span class="n">stat</span></div>
+
+
+
+<div class="viewcode-block" id="FeatureImportanceForestClassifier">
+<a class="viewcode-back" href="../../../generated/sktree.stats.FeatureImportanceForestClassifier.html#sktree.stats.FeatureImportanceForestClassifier">[docs]</a>
+<span class="k">class</span> <span class="nc">FeatureImportanceForestClassifier</span><span class="p">(</span><span class="n">BaseForestHT</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Forest hypothesis testing with categorical `y` variable.</span>
+
+<span class="sd">    Implements the algorithm described in :footcite:`coleman2022scalable`.</span>
+
+<span class="sd">    The dataset is split into a training and testing dataset initially. Then there</span>
+<span class="sd">    are two forests that are trained: one on the original dataset, and one on the</span>
+<span class="sd">    permuted dataset. The dataset is either permuted once, or independently for</span>
+<span class="sd">    each tree in the permuted forest. The original test statistic is computed by</span>
+<span class="sd">    comparing the metric on both forests ``(metric_forest - metric_perm_forest)``.</span>
+
+<span class="sd">    Then the output predictions are randomly sampled to recompute the test statistic</span>
+<span class="sd">    ``n_repeats`` times. The p-value is computed as the proportion of times the</span>
+<span class="sd">    null test statistic is greater than the original test statistic.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    estimator : object, default=None</span>
+<span class="sd">        Type of forest estimator to use. By default `None`, which defaults to</span>
+<span class="sd">        :class:`sklearn.ensemble.RandomForestRegressor`.</span>
+
+<span class="sd">    random_state : int, RandomState instance or None, default=None</span>
+<span class="sd">        Controls both the randomness of the bootstrapping of the samples used</span>
+<span class="sd">        when building trees (if ``bootstrap=True``) and the sampling of the</span>
+<span class="sd">        features to consider when looking for the best split at each node</span>
+<span class="sd">        (if ``max_features &lt; n_features``).</span>
+<span class="sd">        See :term:`Glossary &lt;random_state&gt;` for details.</span>
+
+<span class="sd">    verbose : int, default=0</span>
+<span class="sd">        Controls the verbosity when fitting and predicting.</span>
+
+<span class="sd">    test_size : float, default=0.2</span>
+<span class="sd">        Proportion of samples per tree to use for the test set.</span>
+
+<span class="sd">    permute_per_tree : bool, default=True</span>
+<span class="sd">        Whether to permute the covariate index per tree or per forest.</span>
+
+<span class="sd">    sample_dataset_per_tree : bool, default=False</span>
+<span class="sd">        Whether to sample the dataset per tree or per forest.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    estimator_ : BaseForest</span>
+<span class="sd">        The estimator used to compute the test statistic.</span>
+
+<span class="sd">    n_samples_test_ : int</span>
+<span class="sd">        The number of samples used in the final test set.</span>
+
+<span class="sd">    indices_train_ : ArrayLike of shape (n_samples_train,)</span>
+<span class="sd">        The indices of the samples used in the training set.</span>
+
+<span class="sd">    indices_test_ : ArrayLike of shape (n_samples_test,)</span>
+<span class="sd">        The indices of the samples used in the testing set.</span>
+
+<span class="sd">    samples_ : ArrayLike of shape (n_samples_final,)</span>
+<span class="sd">        The indices of the samples used in the final test set that would slice</span>
+<span class="sd">        the original ``(X, y)`` input along the rows.</span>
+
+<span class="sd">    y_true_final_ : ArrayLike of shape (n_samples_final,)</span>
+<span class="sd">        The true labels of the samples used in the final test.</span>
+
+<span class="sd">    observe_posteriors_ : ArrayLike of shape (n_estimators, n_samples_final, n_outputs) or</span>
+<span class="sd">        (n_estimators, n_samples_final, n_classes)</span>
+<span class="sd">        The predicted posterior probabilities of the samples used in the final test.</span>
+
+<span class="sd">    null_dist_ : ArrayLike of shape (n_repeats,)</span>
+<span class="sd">        The null distribution of the test statistic.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This class trains two forests: one on the original dataset, and one on the</span>
+<span class="sd">    permuted dataset. The forest from the original dataset is cached and re-used to</span>
+<span class="sd">    compute the test-statistic each time the :meth:`test` method is called. However,</span>
+<span class="sd">    the forest from the permuted dataset is re-trained each time the :meth:`test` is called</span>
+<span class="sd">    if the ``covariate_index`` differs from the previous run.</span>
+
+<span class="sd">    To fully start from a new dataset, call the ``reset`` method, which will then</span>
+<span class="sd">    re-train both forests upon calling the :meth:`test` and :meth:`statistic` methods.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. footbibliography::</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">estimator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+        <span class="n">permute_per_tree</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">sample_dataset_per_tree</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">estimator</span><span class="o">=</span><span class="n">estimator</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">test_size</span><span class="o">=</span><span class="n">test_size</span><span class="p">,</span>
+            <span class="n">permute_per_tree</span><span class="o">=</span><span class="n">permute_per_tree</span><span class="p">,</span>
+            <span class="n">sample_dataset_per_tree</span><span class="o">=</span><span class="n">sample_dataset_per_tree</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">estimator_</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="p">,</span> <span class="p">(</span><span class="n">ForestClassifier</span><span class="p">,</span> <span class="n">sklearnForestClassifier</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Estimator must be a ForestClassifier, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># self.estimator is an instance of a ForestEstimator</span>
+            <span class="n">estimator_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span>
+        <span class="k">return</span> <span class="n">clone</span><span class="p">(</span><span class="n">estimator_</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_statistic</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">estimator</span><span class="p">:</span> <span class="n">ForestClassifier</span><span class="p">,</span>
+        <span class="n">X</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+        <span class="n">covariate_index</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+        <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">return_posteriors</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper function to compute the test statistic.&quot;&quot;&quot;</span>
+        <span class="n">metric_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">ArrayLike</span><span class="p">,</span> <span class="n">ArrayLike</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">METRIC_FUNCTIONS</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span>
+        <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">estimator</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">POSTERIOR_FUNCTIONS</span><span class="p">:</span>
+            <span class="n">predict_posteriors</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">predict_posteriors</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">predict_posteriors</span><span class="p">:</span>
+            <span class="c1"># now initialize posterior array as (n_trees, n_samples_test, n_classes)</span>
+            <span class="c1"># XXX: currently assumes n_outputs_ == 1</span>
+            <span class="n">posterior_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_estimators</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_</span><span class="p">,</span> <span class="n">estimator</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># now initialize posterior array as (n_trees, n_samples_test, n_outputs)</span>
+            <span class="n">posterior_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_estimators</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_</span><span class="p">,</span> <span class="n">estimator</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="p">)</span>
+
+        <span class="c1"># both sampling dataset per tree or permuting per tree requires us to bypass the</span>
+        <span class="c1"># sklearn API to fit each tree individually</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_dataset_per_tree</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">permute_per_tree</span><span class="p">:</span>
+            <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">estimator</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span> <span class="n">prefer</span><span class="o">=</span><span class="s2">&quot;threads&quot;</span><span class="p">)(</span>
+                <span class="n">delayed</span><span class="p">(</span><span class="n">_parallel_build_trees_and_compute_posteriors</span><span class="p">)(</span>
+                    <span class="n">estimator</span><span class="p">,</span>
+                    <span class="n">idx</span><span class="p">,</span>
+                    <span class="n">indices_train</span><span class="p">,</span>
+                    <span class="n">indices_test</span><span class="p">,</span>
+                    <span class="n">X</span><span class="p">,</span>
+                    <span class="n">y</span><span class="p">,</span>
+                    <span class="n">covariate_index</span><span class="p">,</span>
+                    <span class="n">posterior_arr</span><span class="p">,</span>
+                    <span class="n">predict_posteriors</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">permute_per_tree</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_estimators_indices</span><span class="p">())</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># fitting a forest will only get one unique train/test split</span>
+            <span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_test_samples_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">indices_train</span><span class="p">,</span> <span class="p">:],</span> <span class="n">X</span><span class="p">[</span><span class="n">indices_test</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">indices_train</span><span class="p">,</span> <span class="p">:],</span> <span class="n">y</span><span class="p">[</span><span class="n">indices_test</span><span class="p">,</span> <span class="p">:]</span>
+
+            <span class="k">if</span> <span class="n">covariate_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># perform permutation of covariates</span>
+                <span class="n">n_samples_train</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">index_arr</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_samples_train</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+                    <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n_samples_train</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                    <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">X_train</span><span class="p">[:,</span> <span class="n">covariate_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[</span><span class="n">index_arr</span><span class="p">,</span> <span class="n">covariate_index</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type_of_target_</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span><span class="p">:</span>
+                <span class="n">y_train</span> <span class="o">=</span> <span class="n">y_train</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="n">estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+            <span class="c1"># construct posterior array for all trees (n_trees, n_samples_test, n_outputs)</span>
+            <span class="k">for</span> <span class="n">itree</span><span class="p">,</span> <span class="n">tree</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">estimator</span><span class="o">.</span><span class="n">estimators_</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">predict_posteriors</span><span class="p">:</span>
+                    <span class="c1"># XXX: currently assumes n_outputs_ == 1</span>
+                    <span class="n">posterior_arr</span><span class="p">[</span><span class="n">itree</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                        <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">tree</span><span class="o">.</span><span class="n">n_classes_</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">posterior_arr</span><span class="p">[</span><span class="n">itree</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                        <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">tree</span><span class="o">.</span><span class="n">n_outputs_</span>
+                    <span class="p">)</span>
+
+            <span class="c1"># set variables to compute metric</span>
+            <span class="n">samples</span> <span class="o">=</span> <span class="n">indices_test</span>
+            <span class="n">y_true_final</span> <span class="o">=</span> <span class="n">y_test</span>
+        <span class="k">if</span> <span class="n">metric</span> <span class="o">==</span> <span class="s2">&quot;auc&quot;</span><span class="p">:</span>
+            <span class="c1"># at this point, posterior_final is the predicted posterior for only the positive class</span>
+            <span class="c1"># as more than one output is not supported.</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type_of_target_</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span><span class="p">:</span>
+                <span class="n">posterior_arr</span> <span class="o">=</span> <span class="n">posterior_arr</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;AUC metric is not supported for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_type_of_target_</span><span class="si">}</span><span class="s2"> targets.&quot;</span>
+                <span class="p">)</span>
+
+        <span class="c1"># determine if there are any nans in the final posterior array, when</span>
+        <span class="c1"># averaged over the trees</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="n">_non_nan_samples</span><span class="p">(</span><span class="n">posterior_arr</span><span class="p">)</span>
+
+        <span class="c1"># Ignore all NaN values (samples not tested)</span>
+        <span class="n">y_true_final</span> <span class="o">=</span> <span class="n">y</span><span class="p">[(</span><span class="n">samples</span><span class="p">),</span> <span class="p">:]</span>
+
+        <span class="c1"># Average all posteriors (n_samples_test, n_outputs) to compute the statistic</span>
+        <span class="n">posterior_forest</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">posterior_arr</span><span class="p">[:,</span> <span class="p">(</span><span class="n">samples</span><span class="p">),</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">stat</span> <span class="o">=</span> <span class="n">metric_func</span><span class="p">(</span><span class="n">y_true_final</span><span class="p">,</span> <span class="n">posterior_forest</span><span class="p">,</span> <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">covariate_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Ignore all NaN values (samples not tested) -&gt; (n_samples_final, n_outputs)</span>
+            <span class="c1"># arrays of y and predicted posterior</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">observe_samples_</span> <span class="o">=</span> <span class="n">samples</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">y_true_final_</span> <span class="o">=</span> <span class="n">y_true_final</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">observe_posteriors_</span> <span class="o">=</span> <span class="n">posterior_arr</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">observe_stat_</span> <span class="o">=</span> <span class="n">stat</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_is_fitted</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">return_posteriors</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">stat</span><span class="p">,</span> <span class="n">posterior_arr</span><span class="p">,</span> <span class="n">samples</span>
+
+        <span class="k">return</span> <span class="n">stat</span></div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=ac02cc09edc035673794"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=ac02cc09edc035673794"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-10-05.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
