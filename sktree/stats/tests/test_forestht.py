@@ -372,3 +372,22 @@ def test_small_dataset():
     stat, pvalue = clf.test(X, y, metric="mi")
     assert stat == 0.0
     assert pvalue > 0.05
+
+
+# @pytest.mark.monitor_test
+# def test_memory_usage():
+#     n_samples = 1000
+#     n_features = 5000
+#     X = rng.uniform(size=(n_samples, n_features))
+#     y = rng.integers(0, 2, size=n_samples)  # Binary classification
+
+#     clf = FeatureImportanceForestClassifier(
+#         estimator=HonestForestClassifier(
+#             n_estimators=10, random_state=seed, n_jobs=-1, honest_fraction=0.5
+#         ),
+#         test_size=0.2,
+#         permute_per_tree=False,
+#         sample_dataset_per_tree=False,
+#     )
+
+#     stat, pvalue = clf.test(X, y, covariate_index=[1, 2], metric="mi")
