@@ -87,6 +87,8 @@ nitpicky = False
 # TODO: figure out why these are raising an error?
 nitpick_ignore = [
     ("py:mod", "sktree.tree"),
+    ("py:mod", "sktree.stats"),
+    ("py:class", "sklearn.utils.metadata_routing.MetadataRequest"),
 ]
 
 # The name of a reST role (builtin or Sphinx extension) to use as the default
@@ -204,6 +206,8 @@ numpydoc_xref_ignore = {
     "matrix",
     "Ignored",
     "UnsupervisedSplitter",
+    "n_repeats",
+    "n_samples_test_used",
     # from sklearn
     "such",
     "arrays",
@@ -213,6 +217,7 @@ numpydoc_xref_ignore = {
     "Tree",
     "_type_",
     "MetadataRequest",
+    "sklearn.utils.metadata_routing.MetadataRequest",
     "~utils.metadata_routing.MetadataRequest",
     "quantiles",
     "n_quantiles",
@@ -230,6 +235,12 @@ numpydoc_xref_ignore = {
     "joblib.parallel_backend",
     "length",
     "instances",
+    "decision_path",
+    "n_samples_final",
+    "predict",
+    "fit",
+    "apply",
+    "TreeBuilder",
 }
 
 # validation

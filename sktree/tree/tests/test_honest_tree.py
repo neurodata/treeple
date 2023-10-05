@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 from sklearn import datasets
 from sklearn.metrics import accuracy_score
+from sklearn.tree import DecisionTreeClassifier as skDecisionTreeClassifier
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from sktree._lib.sklearn.tree import DecisionTreeClassifier
@@ -117,3 +118,13 @@ def test_sklearn_compatible_estimator(estimator, check):
     if check.func.__name__ in ["check_class_weight_classifiers", "check_classifier_multioutput"]:
         pytest.skip()
     check(estimator)
+
+
+def test_error_with_sklearn_trees():
+    X = np.ones((20, 4))
+    X[10:] *= -1
+    y = [0] * 10 + [1] * 10
+
+    with pytest.raises(RuntimeError, match="Instead of using sklearn.tree"):
+        clf = HonestTreeClassifier(tree_estimator=skDecisionTreeClassifier())
+        clf.fit(X, y)
