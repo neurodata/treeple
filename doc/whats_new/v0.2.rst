@@ -32,6 +32,7 @@ Changelog
 - |API| Allow ``sqrt`` and ``log2`` keywords to be used for ``min_samples_split`` parameter in unsupervised forests, by `Adam Li`_  (:pr:`114`)
 - |Feature| Implement extended isolation forest, by `Adam Li`_ (:pr:`101`)
 - |Feature| Implementation of StreamDecisionForest, by `Haoyin Xu`_ and `Adam Li`_ (:pr:`116`)
+- |Feature| Implementation of Permutation forests and a feature importance testing forest, by `Haoyin Xu`_, `Adam Li`_, `Sambit Panda` (:pr:`125`)
 
 Code and Documentation Contributors
 -----------------------------------
@@ -42,3 +43,4 @@ the project since version inception, including:
 * `Adam Li`_
 * `SUKI-O`_
 * `Haoyin Xu`_
+* `Sambit Panda`_

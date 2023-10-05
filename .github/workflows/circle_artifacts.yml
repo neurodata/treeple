@@ -4,20 +4,21 @@ on: [status]
 # Restrict the permissions granted to the use of secrets.GITHUB_TOKEN in this
 # github actions workflow:
 # https://docs.github.com/en/actions/security-guides/automatic-token-authentication
-permissions:
-  statuses: write
+permissions: read-all
   
 jobs:
   circleci_artifacts_redirector_job:
     runs-on: ubuntu-20.04
     if: "github.repository == 'neurodata/scikit-tree' && github.event.context == 'ci/circleci: build_docs'"
+    permissions:
+      statuses: write
     name: Run CircleCI artifacts redirector
     steps:
       - name: GitHub Action step
         uses: larsoner/circleci-artifacts-redirector-action@master
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          api-token: ${{ secrets.CIRCLE_TOKEN }}
+          api-token: ${{ secrets.CIRCLECI_TOKEN }}
           artifact-path: 0/dev/index.html
           circleci-jobs: build_docs
           job-title: Check the rendered docs here!

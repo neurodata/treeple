@@ -40,10 +40,6 @@ class ExtendedIsolationForest(IsolationForest):
               original paper.
             - If float, the contamination should be in the range (0, 0.5].
 
-        .. versionchanged:: 0.22
-           The default value of ``contamination`` changed from 0.1
-           to ``'auto'``.
-
     max_features : int or float, default=1.0
         The number of features to draw from X to train each base estimator.
 

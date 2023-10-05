@@ -4,7 +4,7 @@ name = "scikit-tree"
 # 0.0.0 is standard placeholder for poetry-dynamic-versioning
 # any changes to this should not be checked in
 #
-version = "0.2.0dev0"
+version = "0.2.0"
 description = "Modern decision trees in Python"
 maintainers = [
     {name="Neurodata", email="adam.li@columbia.edu"}
@@ -166,7 +166,7 @@ _cythonlint = 'cython-lint sktree/ --exclude "sktree/_lib/*"'
 _black_check = 'black --check sktree examples'
 _isort_check = 'isort --check .'
 _pydocstyle = 'pydocstyle ./sktree'
-_codespell = 'codespell sktree/ doc/ examples/ --ignore-words=.codespellignore --skip "**/_build/*,**/_lib/*,doc/_build/*,doc/auto_examples/*,doc/tutorials/*"'
+_codespell = 'codespell sktree/ doc/ examples/ --ignore-words=.codespellignore --skip "**/_build/*,**/_lib/*,doc/_build/*,doc/auto_examples/*,doc/tutorials/*,doc/generated/*"'
 _changelog = 'semversioner changelog > CHANGELOG.md'
 _apply_version = 'semversioner release'
 
@@ -235,7 +235,7 @@ exclude = [
 
 [tool.pytest.ini_options]
 minversion = '6.0'
-addopts = '--durations 20 --junit-xml=junit-results.xml --verbose --ignore=sktree/_lib/'
+addopts = '--durations 20 --junit-xml=junit-results.xml --verbose --ignore=sktree/_lib/ -k "not slowtest"'
 filterwarnings = []
 
 [tool.coverage.run]
@@ -267,7 +267,9 @@ Environments = [
     'spin.cmds.meson.ipython',
     'spin.cmds.meson.python',
 ]
-Documentation = ['.spin/cmds.py:docs']
+Documentation = [
+    'spin.cmds.meson.docs'
+    ]
 Metrics = [
     '.spin/cmds.py:coverage',
     '.spin/cmds.py:asv',
