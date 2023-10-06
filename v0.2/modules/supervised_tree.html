@@ -1,0 +1,678 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>1. Supervised Decision Trees &#8212; scikit-tree 0.2.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'modules/supervised_tree';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="2. Unsupervised Decision Trees" href="unsupervised_tree.html" />
+    <link rel="prev" title="User Guide" href="../user_guide.html" />
+    <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <script type="text/javascript" src="../_static/scrollfix.js"></script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  <div class="navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">scikit-tree 0.2.0 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api.html">
+                        API Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../user_guide.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../whats_new.html">
+                        Release History
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../install.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../use.html">
+                        Examples using scikit-tree
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+        </div>
+      
+      
+        <div class="navbar-item"><div class="dropdown">
+    <button type="button" class="btn btn-primary btn-sm navbar-btn dropdown-toggle" id="dLabelMore" data-toggle="dropdown">
+        v0.2.0
+        <span class="caret"></span>
+    </button>
+    <div class="dropdown-menu list-group-flush py-0" aria-labelledby="dLabelMore">
+        <a class="list-group-item list-group-item-action py-1" href="https:///docs.neurodata.io/scikit-tree/v0.3/index.html">v0.3 (development)</a>
+        <a class="list-group-item list-group-item-action py-1" href="https:///docs.neurodata.io/scikit-tree/v0.2/index.html">v0.2</a>
+        <a class="list-group-item list-group-item-action py-1" href="https:///docs.neurodata.io/scikit-tree/v0.1/index.html">v0.1</a>
+    </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api.html">
+                        API Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../user_guide.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../whats_new.html">
+                        Release History
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../install.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../use.html">
+                        Examples using scikit-tree
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><div class="dropdown">
+    <button type="button" class="btn btn-primary btn-sm navbar-btn dropdown-toggle" id="dLabelMore" data-toggle="dropdown">
+        v0.2.0
+        <span class="caret"></span>
+    </button>
+    <div class="dropdown-menu list-group-flush py-0" aria-labelledby="dLabelMore">
+        <a class="list-group-item list-group-item-action py-1" href="https:///docs.neurodata.io/scikit-tree/v0.3/index.html">v0.3 (development)</a>
+        <a class="list-group-item list-group-item-action py-1" href="https:///docs.neurodata.io/scikit-tree/v0.2/index.html">v0.2</a>
+        <a class="list-group-item list-group-item-action py-1" href="https:///docs.neurodata.io/scikit-tree/v0.1/index.html">v0.1</a>
+    </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">1. Supervised Decision Trees</a></li>
+<li class="toctree-l1"><a class="reference internal" href="unsupervised_tree.html">2. Unsupervised Decision Trees</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ensemble.html">3. Oblique Random Forests</a></li>
+
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumbs">
+  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../user_guide.html" class="nav-link">User Guide</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="section-number">1. </span>Supervised Decision Trees</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="supervised-decision-trees">
+<span id="supervised-tree"></span><h1><span class="section-number">1. </span>Supervised Decision Trees<a class="headerlink" href="#supervised-decision-trees" title="Permalink to this heading">#</a></h1>
+<p>Supervised decision tree models are models where there is a ground-truth label, typically
+denoted <code class="docutils literal notranslate"><span class="pre">y</span></code> that is associated with each sample of data. In scikit-learn, the axis-aligned
+decision tree model is implemented and described. We extend those models beyond the axis-aligned
+tree model and describe their use-cases here.</p>
+<section id="oblique-trees">
+<span id="id1"></span><h2><span class="section-number">1.1. </span>Oblique Trees<a class="headerlink" href="#oblique-trees" title="Permalink to this heading">#</a></h2>
+<p>Similar to DTs, <strong>Oblique Trees (OTs)</strong> are a non-parametric supervised learning
+method used for <a class="reference external" href="https://scikit-learn.org/dev/modules/tree.html#tree-classification" title="(in scikit-learn v1.4)"><span class="xref std std-ref">:ref: classification</span></a> and <a class="reference external" href="https://scikit-learn.org/dev/modules/tree.html#tree-regression" title="(in scikit-learn v1.4)"><span class="xref std std-ref">:ref: regression</span></a>. It was originally described as <code class="docutils literal notranslate"><span class="pre">Forest-RC</span></code> in Breiman’s
+landmark paper on Random Forests <a class="reference internal" href="#rf" id="id2"><span>[RF]</span></a>. Breiman found that combining data features
+empirically outperforms DTs on a variety of data sets.</p>
+<p>The algorithm implemented in scikit-learn differs from <code class="docutils literal notranslate"><span class="pre">Forest-RC</span></code> in that
+it allows the user to specify the number of variables to combine to consider
+as a split, <span class="math notranslate nohighlight">\(\lambda\)</span>. If <span class="math notranslate nohighlight">\(\lambda\)</span> is set to <code class="docutils literal notranslate"><span class="pre">n_features</span></code>, then
+it is equivalent to <code class="docutils literal notranslate"><span class="pre">Forest-RC</span></code>. <span class="math notranslate nohighlight">\(\lambda\)</span> presents a tradeoff between
+considering dense combinations of features vs sparse combinations of features.</p>
+<section id="differences-compared-to-decision-trees">
+<h3><span class="section-number">1.1.1. </span>Differences compared to decision trees<a class="headerlink" href="#differences-compared-to-decision-trees" title="Permalink to this heading">#</a></h3>
+<p>Compared to DTs, OTs differ in how they compute a candidate split. DTs split
+along the passed in data columns in an axis-aligned fashion, whereas OTs split
+along oblique curves. Using the Iris dataset, we can similarly construct an OT
+as follows:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sktree</span> <span class="kn">import</span> <span class="n">tree</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">iris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">iris</span><span class="o">.</span><span class="n">target</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clf</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">ObliqueDecisionTreeClassifier</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clf</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<figure class="align-center">
+<a class="reference external image-reference" href="../auto_examples/plot_iris_dtc.html"><img alt="../_images/sphx_glr_plot_iris_dtc_002.png" src="../_images/sphx_glr_plot_iris_dtc_002.png" /></a>
+</figure>
+<p>Another major difference to DTs is that OTs can by definition sample more candidate
+splits. The parameter <code class="docutils literal notranslate"><span class="pre">max_features</span></code> controls how many splits to sample at each
+node. For DTs “max_features” is constrained to be at most “n_features” by default,
+whereas OTs can sample possibly up to <span class="math notranslate nohighlight">\(2^{n_{features}}\)</span> candidate splits
+because they are combining features.</p>
+</section>
+<section id="mathematical-formulation">
+<h3><span class="section-number">1.1.2. </span>Mathematical formulation<a class="headerlink" href="#mathematical-formulation" title="Permalink to this heading">#</a></h3>
+<p>Given training vectors <span class="math notranslate nohighlight">\(x_i \in R^n\)</span>, i=1,…, l and a label vector
+<span class="math notranslate nohighlight">\(y \in R^l\)</span>, an oblique decision tree recursively partitions the
+feature space such that the samples with the same labels or similar target
+values are grouped together. Normal decision trees partition the feature space
+in an axis-aligned manner splitting along orthogonal axes based on the dimensions
+(columns) of <span class="math notranslate nohighlight">\(x_i\)</span>. In oblique trees, nodes sample a random projection vector,
+<span class="math notranslate nohighlight">\(a_i \in R^n\)</span>, where the inner-product of <span class="math notranslate nohighlight">\(\langle a_i, x_i \rangle\)</span>
+is a candidate split value. The entries of <span class="math notranslate nohighlight">\(a_i\)</span> have values
++/- 1 with probability <span class="math notranslate nohighlight">\(\lambda / n\)</span> with the rest being 0s.</p>
+<p>Let the data at node <span class="math notranslate nohighlight">\(m\)</span> be represented by <span class="math notranslate nohighlight">\(Q_m\)</span> with <span class="math notranslate nohighlight">\(n_m\)</span>
+samples. For each candidate split <span class="math notranslate nohighlight">\(\theta = (a_i, t_m)\)</span> consisting of a
+(possibly sparse) vector <span class="math notranslate nohighlight">\(a_i\)</span> and threshold <span class="math notranslate nohighlight">\(t_m\)</span>, partition the
+data into <span class="math notranslate nohighlight">\(Q_m^{left}(\theta)\)</span> and <span class="math notranslate nohighlight">\(Q_m^{right}(\theta)\)</span> subsets</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}Q_m^{left}(\theta) = \{(x, y) | a_i^T x_j \leq t_m\}\\Q_m^{right}(\theta) = Q_m \setminus Q_m^{left}(\theta)\end{aligned}\end{align} \]</div>
+<p>Note that this formulation is a generalization of decision trees, where
+<span class="math notranslate nohighlight">\(a_i = e_i\)</span>, a standard basis vector with a “1” at index “i” and “0”
+elsewhere.</p>
+<p>The quality of a candidate split of node <span class="math notranslate nohighlight">\(m\)</span> is then computed using an
+impurity function or loss function <span class="math notranslate nohighlight">\(H()\)</span>, in the same exact manner as
+decision trees.</p>
+</section>
+<section id="classification-regression-and-multi-output-problems">
+<h3><span class="section-number">1.1.3. </span>Classification, regression and multi-output problems<a class="headerlink" href="#classification-regression-and-multi-output-problems" title="Permalink to this heading">#</a></h3>
+<p>OTs can be used for both classification and regression, and can handle multi-output
+problems in the same manner as DTs.</p>
+</section>
+<section id="complexity">
+<h3><span class="section-number">1.1.4. </span>Complexity<a class="headerlink" href="#complexity" title="Permalink to this heading">#</a></h3>
+<p>The run time cost to construct an OT will be similar to that of a DT, with the
+added complexity of a (possibly sparse) matrix multiplication to combine random
+data columns into candidate split values. The cost at each node is
+<span class="math notranslate nohighlight">\(O(n_{features}n_{samples}\log(n_{samples}) + n_{features}n_{samples}max\_features \lambda)\)</span>
+where the additional <span class="math notranslate nohighlight">\(n_{features}n_{samples}max\_features \lambda\)</span> term
+comes from the (possibly sparse) matrix multiplication controlled by both the
+number of candidate splits to generate (“max_features”) and the sparsity of
+the projection matrix that combines the data features (”<span class="math notranslate nohighlight">\(\lambda\)</span>”).</p>
+<p>Another consideration is space-complexity.</p>
+<p>Space-complexity and storing the OT pickled on disc is also a consideration. OTs
+at every node need to store an additional vector of feature indices and vector of
+feature weights that are used together to form the candidate splits.</p>
+</section>
+<section id="tips-on-practical-use">
+<h3><span class="section-number">1.1.5. </span>Tips on practical use<a class="headerlink" href="#tips-on-practical-use" title="Permalink to this heading">#</a></h3>
+<p>Similar to DTs, the intuition for most parameters are the same. Therefore refer
+to <a class="reference external" href="https://scikit-learn.org/stable/modules/tree.html#tips-on-practical-use">tips for using decision trees</a>
+for information on standard
+tree parameters. Specific parameters, such as <code class="docutils literal notranslate"><span class="pre">max_features</span></code> and
+<code class="docutils literal notranslate"><span class="pre">feature_combinations</span></code> are different or special to OTs.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>As specified earlier, <code class="docutils literal notranslate"><span class="pre">max_features</span></code> is not constrained to <code class="docutils literal notranslate"><span class="pre">n_features</span></code>
+as it is in DTs. Setting <code class="docutils literal notranslate"><span class="pre">max_features</span></code> higher requires more computation time because
+the algorithm needs to sample more candidate splits at every node. However, it also possibly
+lets the user to sample more informative splits, thereby improving the model fit. This
+presents a tradeoff between runtime resources and improvements to the model. In practice,
+we found that sampling more splits, say up to <code class="docutils literal notranslate"><span class="pre">max_features=n_features**2</span></code>, is desirable
+if one is willing to spend the computational resources.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">feature_combinations</span></code> is the <span class="math notranslate nohighlight">\(\lambda\)</span> term presented in the complexity
+analysis, which specifies how sparse our combination of features is. If
+<code class="docutils literal notranslate"><span class="pre">feature_combinations=n_features</span></code>, then OT is the <code class="docutils literal notranslate"><span class="pre">Forest-RC</span></code> version. However,
+in practice, <code class="docutils literal notranslate"><span class="pre">feature_combinations</span></code> can be set much lower, therefore improving runtime
+and storage complexity.</p></li>
+</ul>
+</div></blockquote>
+<p>Finally, when asking the question of when to use OTs vs DTs, scikit-learn recommends
+always trying both model using some type of cross-validation procedure and hyperparameter
+optimization (e.g. <code class="docutils literal notranslate"><span class="pre">GridSearchCV</span></code>). If one has prior knowledge about how the data is
+distributed along its features, such as data being axis-aligned, then one might use a DT.
+Other considerations are runtime and space complexity.</p>
+</section>
+<section id="limitations-compared-to-decision-trees">
+<h3><span class="section-number">1.1.6. </span>Limitations compared to decision trees<a class="headerlink" href="#limitations-compared-to-decision-trees" title="Permalink to this heading">#</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li><p>There currently does not exist support for pruning OTs, such as with the minimal
+cost-complexity pruning algorithm.</p></li>
+<li><p>Moreover, OTs do not have built-in support for missing data, so the recommendation
+by scikit-learn is for users to first impute, or drop their missing data if they
+would like to use OTs.</p></li>
+<li><p>Currently, OTs also does not support sparse inputs for data matrices and labels.</p></li>
+</ul>
+</div></blockquote>
+<aside class="topic">
+<p class="topic-title">References:</p>
+<div role="list" class="citation-list">
+<div class="citation" id="rf" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">RF</a><span class="fn-bracket">]</span></span>
+<p>L. Breiman. Random Forests. Machine Learning 45, 5–32 (2001).
+<a class="reference external" href="https://doi.org/10.1023/A:1010933404324">https://doi.org/10.1023/A:1010933404324</a>.</p>
+</div>
+</div>
+<ul class="simple">
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Decision_tree_learning">https://en.wikipedia.org/wiki/Decision_tree_learning</a></p></li>
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Predictive_analytics">https://en.wikipedia.org/wiki/Predictive_analytics</a></p></li>
+<li><p>J.R. Quinlan. C4. 5: programs for machine learning. Morgan
+Kaufmann, 1993.</p></li>
+<li><p>T. Hastie, R. Tibshirani and J. Friedman. Elements of Statistical
+Learning, Springer, 2009.</p></li>
+</ul>
+</aside>
+</section>
+</section>
+<section id="honest-trees">
+<span id="id3"></span><h2><span class="section-number">1.2. </span>Honest Trees<a class="headerlink" href="#honest-trees" title="Permalink to this heading">#</a></h2>
+<p>Honesty is a property of decision trees where the data used to determine splitting is independent
+of the data used to estimate the prediction at each leaf. This is in contrast to standard decision
+where the data used to determine splitting is also used to estimate the prediction at each leaf.</p>
+<p>Honesty is a desirable property because it prevents overfitting. In particular, it prevents
+the tree from overfitting to the training data. This is because the data used to determine
+splitting is independent of the data used to estimate the prediction at each leaf.</p>
+<p>There are two methods for constructing an honest tree: 1. subsampling and 2. propensity trees.
+The first method, subsampling, is the most common method for constructing honest trees and only
+requires (X, y) pairs of data. The second method, propensity trees, requires (X, y, T) triplets
+where the tree is split first using (X, T), where T is the treatment variable, and then the
+prediction at each leaf is estimated using (X, y).</p>
+<p>Honesty results in calibrated confidence intervals, but sacrifices sample size to do so. Thus
+subsampled honest trees have higher MSE, but are better calibrated. See :</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../user_guide.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">User Guide</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="unsupervised_tree.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">2. </span>Unsupervised Decision Trees</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#oblique-trees">1.1. Oblique Trees</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#differences-compared-to-decision-trees">1.1.1. Differences compared to decision trees</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mathematical-formulation">1.1.2. Mathematical formulation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#classification-regression-and-multi-output-problems">1.1.3. Classification, regression and multi-output problems</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#complexity">1.1.4. Complexity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tips-on-practical-use">1.1.5. Tips on practical use</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#limitations-compared-to-decision-trees">1.1.6. Limitations compared to decision trees</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#honest-trees">1.2. Honest Trees</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-10-05.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
