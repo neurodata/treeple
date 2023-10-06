@@ -22,6 +22,8 @@ from .._lib.sklearn.tree._tree cimport SIZE_t  # Type for indices and counters
 from .._lib.sklearn.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
 from ._sklearn_splitter cimport sort
 
+from .._lib.sklearn.utils._typedefs cimport intp_t
+
 
 cdef struct ObliqueSplitRecord:
     # Data to track sample split
@@ -108,10 +110,45 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
     ) noexcept nogil
 
 
+cdef class BestObliqueSplitter(ObliqueSplitter):
+    cdef int node_split(
+        self,
+        double impurity,   # Impurity of the node
+        SplitRecord* split,
+        SIZE_t* n_constant_features,
+        double lower_bound,
+        double upper_bound,
+    ) except -1 nogil
+
+
+cdef class RandomObliqueSplitter(ObliqueSplitter):
+    cdef void find_min_max(
+        self,
+        DTYPE_t[::1] feature_values,
+        DTYPE_t* min_feature_value_out,
+        DTYPE_t* max_feature_value_out,
+    ) noexcept nogil
+
+    cdef SIZE_t partition_samples(
+        self,
+        double current_threshold
+    ) noexcept nogil
+
+    cdef int node_split(
+        self,
+        double impurity,   # Impurity of the node
+        SplitRecord* split,
+        SIZE_t* n_constant_features,
+        double lower_bound,
+        double upper_bound,
+    ) except -1 nogil
+
+
 # XXX: This splitter is experimental. Expect changes frequently.
-cdef class MultiViewSplitter(ObliqueSplitter):
-    cdef SIZE_t[::1] feature_set_ends           # an array indicating the column indices of the end of each feature set
-    cdef SIZE_t n_feature_sets                  # the number of feature sets is the length of feature_set_ends + 1
+cdef class MultiViewSplitter(BestObliqueSplitter):
+    cdef const cnp.int8_t[:] feature_set_ends   # an array indicating the column indices of the end of each feature set
+    cdef intp_t n_feature_sets                  # the number of feature sets is the length of feature_set_ends + 1
+    cdef bint uniform_sampling                  # whether or not to uniformly sample feature-sets
 
     cdef void sample_proj_mat(
         self,

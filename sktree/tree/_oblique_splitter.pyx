@@ -7,6 +7,7 @@
 import numpy as np
 
 from cython.operator cimport dereference as deref
+from libcpp.unordered_map cimport unordered_map
 from libcpp.vector cimport vector
 from sklearn.tree._utils cimport rand_int, rand_uniform
 
@@ -123,6 +124,159 @@ cdef class BaseObliqueSplitter(Splitter):
                 if jdx == 0:
                     feature_values[idx] = 0.0
                 feature_values[idx] += self.X[samples[idx], col_idx] * col_weight
+
+cdef class ObliqueSplitter(BaseObliqueSplitter):
+    def __cinit__(
+        self,
+        Criterion criterion,
+        SIZE_t max_features,
+        SIZE_t min_samples_leaf,
+        double min_weight_leaf,
+        object random_state,
+        const cnp.int8_t[:] monotonic_cst,
+        double feature_combinations,
+        *argv
+    ):
+        """
+        Parameters
+        ----------
+        criterion : Criterion
+            The criterion to measure the quality of a split.
+
+        max_features : SIZE_t
+            The maximal number of randomly selected features which can be
+            considered for a split.
+
+        min_samples_leaf : SIZE_t
+            The minimal number of samples each leaf can have, where splits
+            which would result in having less samples in a leaf are not
+            considered.
+
+        min_weight_leaf : double
+            The minimal weight each leaf can have, where the weight is the sum
+            of the weights of each sample in it.
+
+        feature_combinations : double
+            The average number of features to combine in an oblique split.
+            Each feature is independently included with probability
+            ``feature_combination`` / ``n_features``.
+
+        random_state : object
+            The user inputted random state to be used for pseudo-randomness
+        """
+        self.criterion = criterion
+
+        self.n_samples = 0
+        self.n_features = 0
+
+        # Max features = output dimensionality of projection vectors
+        self.max_features = max_features
+        self.min_samples_leaf = min_samples_leaf
+        self.min_weight_leaf = min_weight_leaf
+        self.random_state = random_state
+        self.monotonic_cst = monotonic_cst
+
+        # Sparse max_features x n_features projection matrix
+        self.proj_mat_weights = vector[vector[DTYPE_t]](self.max_features)
+        self.proj_mat_indices = vector[vector[SIZE_t]](self.max_features)
+
+        # Oblique tree parameters
+        self.feature_combinations = feature_combinations
+
+        # or max w/ 1...
+        self.n_non_zeros = max(int(self.max_features * self.feature_combinations), 1)
+
+    cdef int init(
+        self,
+        object X,
+        const DOUBLE_t[:, ::1] y,
+        const DOUBLE_t[:] sample_weight,
+        const unsigned char[::1] missing_values_in_feature_mask,
+    ) except -1:
+        Splitter.init(self, X, y, sample_weight, missing_values_in_feature_mask)
+
+        self.X = X
+
+        # create a helper array for allowing efficient Fisher-Yates
+        self.indices_to_sample = np.arange(self.max_features * self.n_features,
+                                           dtype=np.intp)
+
+        # XXX: Just to initialize stuff
+        # self.feature_weights = np.ones((self.n_features,), dtype=DTYPE_t) / self.n_features
+        return 0
+
+    cdef void sample_proj_mat(
+        self,
+        vector[vector[DTYPE_t]]& proj_mat_weights,
+        vector[vector[SIZE_t]]& proj_mat_indices
+    ) noexcept nogil:
+        """Sample oblique projection matrix.
+
+        Randomly sample features to put in randomly sampled projection vectors
+        weight = 1 or -1 with probability 0.5.
+
+        Note: vectors are passed by value, so & is needed to pass by reference.
+
+        Parameters
+        ----------
+        proj_mat_weights : vector of vectors reference of shape (mtry, n_features)
+            The memory address of projection matrix non-zero weights.
+        proj_mat_indices : vector of vectors reference of shape (mtry, n_features)
+            The memory address of projection matrix non-zero indices.
+
+        Notes
+        -----
+        Note that grid_size must be larger than or equal to n_non_zeros because
+        it is assumed ``feature_combinations`` is forced to be smaller than
+        ``n_features`` before instantiating an oblique splitter.
+        """
+        cdef SIZE_t n_features = self.n_features
+        cdef SIZE_t n_non_zeros = self.n_non_zeros
+        cdef UINT32_t* random_state = &self.rand_r_state
+
+        cdef int i, feat_i, proj_i, rand_vec_index
+        cdef DTYPE_t weight
+
+        # construct an array to sample from mTry x n_features set of indices
+        cdef SIZE_t[::1] indices_to_sample = self.indices_to_sample
+        cdef SIZE_t grid_size = self.max_features * self.n_features
+
+        # shuffle indices over the 2D grid to sample using Fisher-Yates
+        for i in range(0, grid_size):
+            j = rand_int(0, grid_size - i, random_state)
+            indices_to_sample[j], indices_to_sample[i] = \
+                indices_to_sample[i], indices_to_sample[j]
+
+        # sample 'n_non_zeros' in a mtry X n_features projection matrix
+        # which consists of +/- 1's chosen at a 1/2s rate
+        for i in range(0, n_non_zeros):
+            # get the next index from the shuffled index array
+            rand_vec_index = indices_to_sample[i]
+
+            # get the projection index (i.e. row of the projection matrix) and
+            # feature index (i.e. column of the projection matrix)
+            proj_i = rand_vec_index // n_features
+            feat_i = rand_vec_index % n_features
+
+            # sample a random weight
+            weight = 1 if (rand_int(0, 2, random_state) == 1) else -1
+
+            proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
+            proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
+
+cdef class BestObliqueSplitter(ObliqueSplitter):
+    def __reduce__(self):
+        """Enable pickling the splitter."""
+        return (type(self),
+                (
+                    self.criterion,
+                    self.max_features,
+                    self.min_samples_leaf,
+                    self.min_weight_leaf,
+                    self.random_state,
+                    self.monotonic_cst.base if self.monotonic_cst is not None else None,
+                    self.feature_combinations,
+                ), self.__getstate__())
 
     cdef int node_split(
         self,
@@ -268,165 +422,6 @@ cdef class BaseObliqueSplitter(Splitter):
         deref(oblique_split).impurity_left = best_split.impurity_left
         deref(oblique_split).impurity_right = best_split.impurity_right
         return 0
-
-cdef class ObliqueSplitter(BaseObliqueSplitter):
-    def __cinit__(
-        self,
-        Criterion criterion,
-        SIZE_t max_features,
-        SIZE_t min_samples_leaf,
-        double min_weight_leaf,
-        object random_state,
-        const cnp.int8_t[:] monotonic_cst,
-        double feature_combinations,
-        *argv
-    ):
-        """
-        Parameters
-        ----------
-        criterion : Criterion
-            The criterion to measure the quality of a split.
-
-        max_features : SIZE_t
-            The maximal number of randomly selected features which can be
-            considered for a split.
-
-        min_samples_leaf : SIZE_t
-            The minimal number of samples each leaf can have, where splits
-            which would result in having less samples in a leaf are not
-            considered.
-
-        min_weight_leaf : double
-            The minimal weight each leaf can have, where the weight is the sum
-            of the weights of each sample in it.
-
-        feature_combinations : double
-            The average number of features to combine in an oblique split.
-            Each feature is independently included with probability
-            ``feature_combination`` / ``n_features``.
-
-        random_state : object
-            The user inputted random state to be used for pseudo-randomness
-        """
-        self.criterion = criterion
-
-        self.n_samples = 0
-        self.n_features = 0
-
-        # Max features = output dimensionality of projection vectors
-        self.max_features = max_features
-        self.min_samples_leaf = min_samples_leaf
-        self.min_weight_leaf = min_weight_leaf
-        self.random_state = random_state
-        self.monotonic_cst = monotonic_cst
-
-        # Sparse max_features x n_features projection matrix
-        self.proj_mat_weights = vector[vector[DTYPE_t]](self.max_features)
-        self.proj_mat_indices = vector[vector[SIZE_t]](self.max_features)
-
-        # Oblique tree parameters
-        self.feature_combinations = feature_combinations
-
-        # or max w/ 1...
-        self.n_non_zeros = max(int(self.max_features * self.feature_combinations), 1)
-
-    def __getstate__(self):
-        return {}
-
-    def __setstate__(self, d):
-        pass
-
-    cdef int init(
-        self,
-        object X,
-        const DOUBLE_t[:, ::1] y,
-        const DOUBLE_t[:] sample_weight,
-        const unsigned char[::1] missing_values_in_feature_mask,
-    ) except -1:
-        Splitter.init(self, X, y, sample_weight, missing_values_in_feature_mask)
-
-        self.X = X
-
-        # create a helper array for allowing efficient Fisher-Yates
-        self.indices_to_sample = np.arange(self.max_features * self.n_features,
-                                           dtype=np.intp)
-
-        # XXX: Just to initialize stuff
-        # self.feature_weights = np.ones((self.n_features,), dtype=DTYPE_t) / self.n_features
-        return 0
-
-    cdef void sample_proj_mat(
-        self,
-        vector[vector[DTYPE_t]]& proj_mat_weights,
-        vector[vector[SIZE_t]]& proj_mat_indices
-    ) noexcept nogil:
-        """Sample oblique projection matrix.
-
-        Randomly sample features to put in randomly sampled projection vectors
-        weight = 1 or -1 with probability 0.5.
-
-        Note: vectors are passed by value, so & is needed to pass by reference.
-
-        Parameters
-        ----------
-        proj_mat_weights : vector of vectors reference of shape (mtry, n_features)
-            The memory address of projection matrix non-zero weights.
-        proj_mat_indices : vector of vectors reference of shape (mtry, n_features)
-            The memory address of projection matrix non-zero indices.
-
-        Notes
-        -----
-        Note that grid_size must be larger than or equal to n_non_zeros because
-        it is assumed ``feature_combinations`` is forced to be smaller than
-        ``n_features`` before instantiating an oblique splitter.
-        """
-        cdef SIZE_t n_features = self.n_features
-        cdef SIZE_t n_non_zeros = self.n_non_zeros
-        cdef UINT32_t* random_state = &self.rand_r_state
-
-        cdef int i, feat_i, proj_i, rand_vec_index
-        cdef DTYPE_t weight
-
-        # construct an array to sample from mTry x n_features set of indices
-        cdef SIZE_t[::1] indices_to_sample = self.indices_to_sample
-        cdef SIZE_t grid_size = self.max_features * self.n_features
-
-        # shuffle indices over the 2D grid to sample using Fisher-Yates
-        for i in range(0, grid_size):
-            j = rand_int(0, grid_size - i, random_state)
-            indices_to_sample[j], indices_to_sample[i] = \
-                indices_to_sample[i], indices_to_sample[j]
-
-        # sample 'n_non_zeros' in a mtry X n_features projection matrix
-        # which consists of +/- 1's chosen at a 1/2s rate
-        for i in range(0, n_non_zeros):
-            # get the next index from the shuffled index array
-            rand_vec_index = indices_to_sample[i]
-
-            # get the projection index (i.e. row of the projection matrix) and
-            # feature index (i.e. column of the projection matrix)
-            proj_i = rand_vec_index // n_features
-            feat_i = rand_vec_index % n_features
-
-            # sample a random weight
-            weight = 1 if (rand_int(0, 2, random_state) == 1) else -1
-
-            proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
-            proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
-
-cdef class BestObliqueSplitter(ObliqueSplitter):
-    def __reduce__(self):
-        """Enable pickling the splitter."""
-        return (type(self),
-                (
-                    self.criterion,
-                    self.max_features,
-                    self.min_samples_leaf,
-                    self.min_weight_leaf,
-                    self.random_state,
-                    self.monotonic_cst.base if self.monotonic_cst is not None else None,
-                    self.feature_combinations,
-                ), self.__getstate__())
 
 cdef class RandomObliqueSplitter(ObliqueSplitter):
     def __reduce__(self):
@@ -654,7 +649,7 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
         return 0
 
 
-cdef class MultiViewSplitter(ObliqueSplitter):
+cdef class MultiViewSplitter(BestObliqueSplitter):
     def __cinit__(
         self,
         Criterion criterion,
@@ -665,12 +660,15 @@ cdef class MultiViewSplitter(ObliqueSplitter):
         const cnp.int8_t[:] monotonic_cst,
         double feature_combinations,
         const cnp.int8_t[:] feature_set_ends,
+        intp_t n_feature_sets,
+        bint uniform_sampling,
         *argv
     ):
         self.feature_set_ends = feature_set_ends
+        self.uniform_sampling = uniform_sampling
 
         # infer the number of feature sets
-        self.n_feature_sets = len(self.feature_set_ends)
+        self.n_feature_sets = n_feature_sets
 
     def __reduce__(self):
         """Enable pickling the splitter."""
@@ -684,6 +682,8 @@ cdef class MultiViewSplitter(ObliqueSplitter):
                     self.monotonic_cst.base if self.monotonic_cst is not None else None,
                     self.feature_combinations,
                     self.feature_set_ends,
+                    self.n_feature_sets,
+                    self.uniform_sampling,
                 ), self.__getstate__())
 
     cdef void sample_proj_mat(
@@ -699,7 +699,7 @@ cdef class MultiViewSplitter(ObliqueSplitter):
         cdef SIZE_t n_features = self.n_features
         cdef SIZE_t n_non_zeros = self.n_non_zeros
         cdef UINT32_t* random_state = &self.rand_r_state
-
+        # cdef  n_feature_sets = self.n_feature_sets
         cdef int i, feat_i, proj_i, rand_vec_index
         cdef DTYPE_t weight
 
@@ -711,13 +711,16 @@ cdef class MultiViewSplitter(ObliqueSplitter):
         cdef SIZE_t n_features_in_set
 
         # keep track of the beginning and ending indices of each feature set
-        cdef int feature_set_begin, feature_set_end
+        cdef int feature_set_begin, feature_set_end, idx
         feature_set_begin = 0
 
         # 01: This algorithm samples features from each feature set uniformly and combines them
         # into one sparse projection vector.
-        cdef int n_non_zeros_per_set = n_non_zeros // self.n_feature_sets
-        for feature_set_end in self.feature_set_ends:
+        cdef intp_t n_non_zeros_per_set
+        n_non_zeros_per_set = n_non_zeros // self.n_feature_sets
+        
+        for idx in range(self.n_feature_sets):
+            feature_set_end = self.feature_set_ends[idx]
             n_features_in_set = feature_set_end - feature_set_begin
             
             grid_size = self.max_features * n_features_in_set
@@ -737,8 +740,8 @@ cdef class MultiViewSplitter(ObliqueSplitter):
 
                 # get the projection index (i.e. row of the projection matrix) and
                 # feature index (i.e. column of the projection matrix)
-                proj_i = rand_vec_index // n_features
-                feat_i = rand_vec_index % n_features
+                proj_i = rand_vec_index // n_features_in_set
+                feat_i = rand_vec_index % n_features_in_set
 
                 # sample a random weight
                 weight = 1 if (rand_int(0, 2, random_state) == 1) else -1
@@ -753,12 +756,22 @@ cdef class MultiViewSplitter(ObliqueSplitter):
         # them independently.
         cdef int ifeature = 0
 
+        # keep track of the unique number of features
+        cdef unordered_map[int, bint] projection_indices
+
         while ifeature < self.max_features:
             feature_set_begin = 0
 
             # sample from a feature set
-            for feature_set_end in self.feature_set_ends:
+            for idx in range(self.n_feature_sets):
+                feature_set_end = self.feature_set_ends[idx]
                 n_features_in_set = feature_set_end - feature_set_begin
+
+                # shuffle indices over the 2D grid for this feature set to sample using Fisher-Yates
+                for i in range(0, grid_size):
+                    j = rand_int(0, grid_size - i, random_state) + feature_set_begin
+                    indices_to_sample[j], indices_to_sample[i] = \
+                        indices_to_sample[i], indices_to_sample[j]
 
                 for i in range(0, n_non_zeros):
                     # get the next index from the shuffled index array
@@ -774,8 +787,18 @@ cdef class MultiViewSplitter(ObliqueSplitter):
 
                     proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
                     proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
-                    
-                ifeature += 1
+
+                    # keep track of the number of projection vectors we have sampled
+                    if projection_indices.find(proj_i) == projection_indices.end():
+                        ifeature += 1
+                    projection_indices[proj_i] = True
+
+                    if ifeature >= self.max_features:
+                        break
+
+                # the new beginning is the previous end
+                feature_set_begin = feature_set_end
+
 
 cdef class MultiViewSplitterTester(MultiViewSplitter):
     """A class to expose a Python interface for testing."""
@@ -824,3 +847,6 @@ cdef class MultiViewSplitterTester(MultiViewSplitter):
             Whether or not a feature has missing values.
         """
         self.init(X, y, sample_weight, missing_values_in_feature_mask)
+
+
+# I want to write an example that visualizes the projection matrix that is sampled for `MultiViewSplitter`

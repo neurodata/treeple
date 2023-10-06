@@ -19,7 +19,7 @@ from ..._lib.sklearn.tree._criterion cimport Criterion
 from .._utils cimport ravel_multi_index_cython, unravel_index_cython
 
 
-cdef class PatchSplitter(BaseObliqueSplitter):
+cdef class PatchSplitter(BestObliqueSplitter):
     """Patch splitter.
 
     A convolutional 2D patch splitter.
@@ -37,7 +37,7 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         const DOUBLE_t[:] sample_weight,
         const unsigned char[::1] missing_values_in_feature_mask,
     ) except -1:
-        BaseObliqueSplitter.init(self, X, y, sample_weight, missing_values_in_feature_mask)
+        BestObliqueSplitter.init(self, X, y, sample_weight, missing_values_in_feature_mask)
 
         return 0
 
