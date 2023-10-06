@@ -927,7 +927,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
             indices_train, indices_test = self.train_test_samples_[0]
 
             X_train, X_test = X[indices_train, :], X[indices_test, :]
-            y_train, y_test = y[indices_train, :], y[indices_test, :]
+            y_train = y[indices_train, :]
 
             if covariate_index is not None:
                 # perform permutation of covariates
