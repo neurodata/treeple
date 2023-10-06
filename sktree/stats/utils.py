@@ -246,11 +246,9 @@ def _compute_null_distribution_coleman(
         # non_nan_samples = np.intersect1d(
         #     first_forest_samples, second_forest_samples, assume_unique=True
         # )
-
         # now average the posteriors over the trees for the non-nan samples
         # y_pred_first_half = np.nanmean(first_forest_pred[:, non_nan_samples, :], axis=0)
         # y_pred_second_half = np.nanmean(second_forest_pred[:, non_nan_samples, :], axis=0)
-
         # # compute two instances of the metric from the sampled trees
         # first_half_metric = metric_func(y_test[non_nan_samples, :], y_pred_first_half)
         # second_half_metric = metric_func(y_test[non_nan_samples, :], y_pred_second_half)

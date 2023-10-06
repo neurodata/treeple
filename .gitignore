@@ -7,6 +7,7 @@ build-install/
 coverage
 *.xml
 .venv
+.pymon
 
 commit.txt
 sktree/_lib/sklearn/

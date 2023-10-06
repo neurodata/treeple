@@ -133,6 +133,7 @@ class BaseForestHT(MetaEstimatorMixin):
         self._type_of_target_ = None
         self.n_features_in_ = None
         self._is_fitted = False
+        self._seeds = None
 
     @property
     def n_estimators(self):
@@ -153,14 +154,22 @@ class BaseForestHT(MetaEstimatorMixin):
         self._metric = None
         self.n_features_in_ = None
         self._is_fitted = False
+        self._seeds = None
 
     def _get_estimators_indices(self):
         indices = np.arange(self._n_samples_, dtype=int)
 
         # Get drawn indices along both sample and feature axes
+        rng = np.random.default_rng(self.estimator_.random_state)
+
         if self.sample_dataset_per_tree:
-            for tree in self.estimator_.estimators_:
-                seed = tree.random_state
+            if self._seeds is None:
+                self._seeds = rng.integers(
+                    low=0, high=np.iinfo(np.int32).max, size=(len(self.estimator_.estimators_))
+                )
+
+            for idx, tree in enumerate(self.estimator_.estimators_):
+                seed = self._seeds[idx]
 
                 # Operations accessing random_state must be performed identically
                 # to those in `_parallel_build_trees()`
@@ -170,13 +179,16 @@ class BaseForestHT(MetaEstimatorMixin):
 
                 yield indices_train, indices_test
         else:
+            if self._seeds is None:
+                self._seeds = rng.integers(low=0, high=np.iinfo(np.int32).max)
+
+            # TODO: make random_state consistent
             indices_train, indices_test = train_test_split(
                 indices,
                 test_size=self.test_size,
-                shuffle=True,
-                random_state=self.estimator_.random_state,
+                random_state=self._seeds,
             )
-            for tree in self.estimator_.estimators_:
+            for _ in self.estimator_.estimators_:
                 yield indices_train, indices_test
 
     @property
@@ -461,6 +473,7 @@ class BaseForestHT(MetaEstimatorMixin):
             # permuting the covariate index per tree or per forest. If not permuting
             # there is only one train and test split, so we can just use that
             _, indices_test = self.train_test_samples_[0]
+            indices_test = observe_samples
             y_test = y[indices_test, :]
             y_pred_proba_normal = observe_posteriors[:, indices_test, :]
             y_pred_proba_perm = permute_posteriors[:, indices_test, :]
@@ -945,7 +958,6 @@ class FeatureImportanceForestClassifier(BaseForestHT):
 
             # set variables to compute metric
             samples = indices_test
-            y_true_final = y_test
         if metric == "auc":
             # at this point, posterior_final is the predicted posterior for only the positive class
             # as more than one output is not supported.
