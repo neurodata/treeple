@@ -23,7 +23,7 @@ def coverage(ctx, slowtest):
             "sktree",
             "--cov=sktree",
             "--cov-report=xml",
-            "-k slowtest",
+            "-k .",
         )
     else:
         pytest_args = (
