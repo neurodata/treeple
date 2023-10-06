@@ -128,7 +128,7 @@ html_theme_options = {
     "show_toc_level": 1,
     "navbar_end": ["theme-switcher", "version-switcher", "navbar-icon-links"],
     "switcher": {
-        "json_url": "https://raw.githubusercontent.com/neurodata/scikit-tree/v0.3dev0/doc/_static/versions.json",  # noqa: E501
+        "json_url": "https://raw.githubusercontent.com/neurodata/scikit-tree/main/doc/_static/versions.json",  # noqa: E501
         "version_match": switcher_version_match,
     },
 }
