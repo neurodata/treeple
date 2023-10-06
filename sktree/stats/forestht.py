@@ -946,7 +946,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
                 )
                 X_train[:, covariate_index] = X_train[index_arr, covariate_index]
 
-            if self._type_of_target_ == "binary":
+            if self._type_of_target_ == "binary" or (y.ndim > 1 and y.shape[1] == 1):
                 y_train = y_train.ravel()
             estimator.fit(X_train, y_train)
 
