@@ -1,27 +1,19 @@
 :orphan:
 
 .. include:: _contributors.rst
-
-.. _changes_0_2:
-
-What's new?
-===========
-
-Here we list a changelog of scikit-tree.
-
-.. contents:: Contents
-   :local:
-   :depth: 3
-
 .. currentmodule:: sktree
 
-.. _current:
+.. _v0_2:
 
 Version 0.2
 ===========
 
-**In Development**
-
+This release is a major release, with many new features and improvements.
+For instance, we have added a new implementation of the extended isolation forest,
+enabled all decision trees to take advantage of ``partial_fit`` meaning trees have streaming
+capabilities. Moreover, we have added an analogous implementation of extra-trees for oblique-trees.
+Finally, this release includes a highly experimental feature for multivariate high-dimensional
+hypothesis testing using permutation forests and a feature importance testing forest.
 
 Changelog
 ---------
@@ -32,6 +24,7 @@ Changelog
 - |API| Allow ``sqrt`` and ``log2`` keywords to be used for ``min_samples_split`` parameter in unsupervised forests, by `Adam Li`_  (:pr:`114`)
 - |Feature| Implement extended isolation forest, by `Adam Li`_ (:pr:`101`)
 - |Feature| Implementation of StreamDecisionForest, by `Haoyin Xu`_ and `Adam Li`_ (:pr:`116`)
+- |Feature| Implementation of Permutation forests and a feature importance testing forest, by `Haoyin Xu`_, `Adam Li`_, `Sambit Panda`_ (:pr:`125`)
 
 Code and Documentation Contributors
 -----------------------------------
@@ -42,3 +35,4 @@ the project since version inception, including:
 * `Adam Li`_
 * `SUKI-O`_
 * `Haoyin Xu`_
+* `Sambit Panda`_

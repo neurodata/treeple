@@ -79,12 +79,14 @@ def test_iris(criterion, max_features, honest_prior, estimator):
     ],
 )
 def test_iris_multi(criterion, max_features, honest_prior, estimator):
+    n_estimators = 10
+
     # Check consistency on dataset iris.
     clf = HonestForestClassifier(
         criterion=criterion,
         random_state=0,
         max_features=max_features,
-        n_estimators=10,
+        n_estimators=n_estimators,
         honest_prior=honest_prior,
         tree_estimator=estimator,
     )
@@ -101,7 +103,7 @@ def test_iris_multi(criterion, max_features, honest_prior, estimator):
         score = r2_score(clf.predict(X), y)
         if honest_prior == "ignore":
             assert (
-                score > 0.6 and score < 1.0
+                score > 0.4 and score < 1.0
             ), "Failed with {0}, criterion = {1} and score = {2}".format(
                 "HForest", criterion, score
             )

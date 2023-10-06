@@ -3,7 +3,7 @@ import logging
 import os
 import sys
 
-__version__ = "0.2.0dev0"
+__version__ = "0.3.0dev0"
 logger = logging.getLogger(__name__)
 
 
@@ -36,7 +36,7 @@ if __sktree_SETUP__:
     # process, as it may not be compiled yet
 else:
     try:
-        from . import _lib, tree, ensemble, experimental
+        from . import _lib, tree, ensemble, experimental, stats
         from ._lib.sklearn.ensemble._forest import (
             RandomForestClassifier,
             RandomForestRegressor,
@@ -69,6 +69,7 @@ else:
         "tree",
         "experimental",
         "ensemble",
+        "stats",
         "ExtraObliqueRandomForestClassifier",
         "ExtraObliqueRandomForestRegressor",
         "NearestNeighborsMetaEstimator",
