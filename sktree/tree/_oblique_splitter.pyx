@@ -847,6 +847,3 @@ cdef class MultiViewSplitterTester(MultiViewSplitter):
             Whether or not a feature has missing values.
         """
         self.init(X, y, sample_weight, missing_values_in_feature_mask)
-
-
-# I want to write an example that visualizes the projection matrix that is sampled for `MultiViewSplitter`
