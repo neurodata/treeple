@@ -42,6 +42,7 @@ def _parallel_build_trees_and_compute_posteriors(
     posterior_arr: ArrayLike,
     predict_posteriors: bool,
     permute_per_tree: bool,
+    type_of_target,
     sample_weight: ArrayLike = None,
     class_weight=None,
     missing_values_in_feature_mask=None,
@@ -76,6 +77,9 @@ def _parallel_build_trees_and_compute_posteriors(
         index_arr = rng.choice(indices, size=(X_train.shape[0], 1), replace=False, shuffle=True)
         perm_X_cov = X_train[index_arr, covariate_index]
         X_train[:, covariate_index] = perm_X_cov
+
+    if type_of_target == "binary":
+        y_train = y_train.ravel()
 
     tree = _parallel_build_trees(
         tree,
@@ -701,6 +705,7 @@ class FeatureImportanceForestRegressor(BaseForestHT):
                     posterior_arr,
                     False,
                     self.permute_per_tree,
+                    self._type_of_target_,
                 )
                 for idx, (indices_train, indices_test) in enumerate(self._get_estimators_indices())
             )
@@ -919,6 +924,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
                     posterior_arr,
                     predict_posteriors,
                     self.permute_per_tree,
+                    self._type_of_target_,
                 )
                 for idx, (indices_train, indices_test) in enumerate(self._get_estimators_indices())
             )
