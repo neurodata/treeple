@@ -14,17 +14,17 @@ cnp.import_array()
 from sktree._lib.sklearn.tree._utils cimport rand_uniform
 
 
-cdef inline int rand_weighted_binary(double p0, UINT32_t* random_state) noexcept nogil:
+cdef inline int rand_weighted_binary(float64_t p0, uint32_t* random_state) noexcept nogil:
     """Sample from integers 0 and 1 with different probabilities.
 
     Parameters
     ----------
-    p0 : double
+    p0 : float64_t
         The probability of sampling 0.
-    random_state : UINT32_t*
+    random_state : uint32_t*
         The random state.
     """
-    cdef double random_value = rand_uniform(0.0, 1.0, random_state)
+    cdef float64_t random_value = rand_uniform(0.0, 1.0, random_state)
 
     if random_value < p0:
         return 0
@@ -32,8 +32,8 @@ cdef inline int rand_weighted_binary(double p0, UINT32_t* random_state) noexcept
         return 1
 
 cpdef unravel_index(
-    SIZE_t index,
-    cnp.ndarray[SIZE_t, ndim=1] shape
+    intp_t index,
+    cnp.ndarray[intp_t, ndim=1] shape
 ):
     """Converts a flat index or array of flat indices into a tuple of coordinate arrays.
 
@@ -41,14 +41,14 @@ cpdef unravel_index(
 
     Parameters
     ----------
-    index : SIZE_t
+    index : intp_t
         A flat index.
-    shape : numpy.ndarray[SIZE_t, ndim=1]
+    shape : numpy.ndarray[intp_t, ndim=1]
         The shape of the array into which the flat indices should be converted.
 
     Returns
     -------
-    numpy.ndarray[SIZE_t, ndim=1]
+    numpy.ndarray[intp_t, ndim=1]
         A coordinate array having the same shape as the input `shape`.
     """
     index = np.intp(index)
@@ -58,21 +58,21 @@ cpdef unravel_index(
     return coords
 
 
-cpdef ravel_multi_index(SIZE_t[:] coords, const SIZE_t[:] shape):
+cpdef ravel_multi_index(intp_t[:] coords, const intp_t[:] shape):
     """Converts a tuple of coordinate arrays into a flat index.
 
     Purely used for testing purposes.
 
     Parameters
     ----------
-    coords : numpy.ndarray[SIZE_t, ndim=1]
+    coords : numpy.ndarray[intp_t, ndim=1]
         An array of coordinate arrays to be converted.
-    shape : numpy.ndarray[SIZE_t, ndim=1]
+    shape : numpy.ndarray[intp_t, ndim=1]
         The shape of the array into which the coordinates should be converted.
 
     Returns
     -------
-    SIZE_t
+    intp_t
         The resulting flat index.
 
     Raises
@@ -83,25 +83,25 @@ cpdef ravel_multi_index(SIZE_t[:] coords, const SIZE_t[:] shape):
     return ravel_multi_index_cython(coords, shape)
 
 
-cdef void unravel_index_cython(SIZE_t index, const SIZE_t[:] shape, SIZE_t[:] coords) noexcept nogil:
+cdef void unravel_index_cython(intp_t index, const intp_t[:] shape, intp_t[:] coords) noexcept nogil:
     """Converts a flat index into a tuple of coordinate arrays.
 
     Parameters
     ----------
-    index : SIZE_t
+    index : intp_t
         The flat index to be converted.
-    shape : numpy.ndarray[SIZE_t, ndim=1]
+    shape : numpy.ndarray[intp_t, ndim=1]
         The shape of the array into which the flat index should be converted.
-    coords : numpy.ndarray[SIZE_t, ndim=1]
+    coords : numpy.ndarray[intp_t, ndim=1]
         A preinitialized memoryview array of coordinate arrays to be converted.
 
     Returns
     -------
-    numpy.ndarray[SIZE_t, ndim=1]
+    numpy.ndarray[intp_t, ndim=1]
         An array of coordinate arrays, with each coordinate array having the same shape as the input `shape`.
     """
-    cdef SIZE_t ndim = shape.shape[0]
-    cdef SIZE_t j, size
+    cdef intp_t ndim = shape.shape[0]
+    cdef intp_t j, size
 
     for j in range(ndim - 1, -1, -1):
         size = shape[j]
@@ -109,19 +109,19 @@ cdef void unravel_index_cython(SIZE_t index, const SIZE_t[:] shape, SIZE_t[:] co
         index //= size
 
 
-cdef SIZE_t ravel_multi_index_cython(SIZE_t[:] coords, const SIZE_t[:] shape) noexcept nogil:
+cdef intp_t ravel_multi_index_cython(intp_t[:] coords, const intp_t[:] shape) noexcept nogil:
     """Converts a tuple of coordinate arrays into a flat index.
 
     Parameters
     ----------
-    coords : numpy.ndarray[SIZE_t, ndim=1]
+    coords : numpy.ndarray[intp_t, ndim=1]
         An array of coordinate arrays to be converted.
-    shape : numpy.ndarray[SIZE_t, ndim=1]
+    shape : numpy.ndarray[intp_t, ndim=1]
         The shape of the array into which the coordinates should be converted.
 
     Returns
     -------
-    SIZE_t
+    intp_t
         The resulting flat index.
 
     Raises
@@ -129,8 +129,8 @@ cdef SIZE_t ravel_multi_index_cython(SIZE_t[:] coords, const SIZE_t[:] shape) no
     ValueError
         If the input `coords` have invalid indices.
     """
-    cdef SIZE_t i, ndim
-    cdef SIZE_t flat_index, index
+    cdef intp_t i, ndim
+    cdef intp_t flat_index, index
 
     ndim = len(shape)
 
