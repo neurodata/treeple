@@ -1,5 +1,6 @@
 import pickle
 from copy import deepcopy
+from itertools import combinations
 from pathlib import Path
 
 import numpy as np
@@ -354,6 +355,16 @@ def test_permute_per_tree_samples_consistency_with_sklearnforest(seed, sample_da
     for idx in range(clf.n_estimators):
         assert_array_equal(clf.train_test_samples_[idx][0], estimator_train_test_indices[idx][0])
         assert_array_equal(clf.train_test_samples_[idx][1], estimator_train_test_indices[idx][1])
+
+    # if the sample_dataset_per_tree, then the indices should be different across all
+    if sample_dataset_per_tree:
+        for (indices, other_indices) in combinations(clf.train_test_samples_, 2):
+            assert not np.array_equal(indices[0], other_indices[0])
+            assert not np.array_equal(indices[1], other_indices[1])
+    else:
+        for (indices, other_indices) in combinations(clf.train_test_samples_, 2):
+            assert_array_equal(indices[0], other_indices[0])
+            assert_array_equal(indices[1], other_indices[1])
 
     # estimator indices should be preserved over multiple calls
     estimator_train_test_indices = deepcopy(other_clf.train_test_samples_)
