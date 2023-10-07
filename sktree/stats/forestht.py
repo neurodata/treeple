@@ -138,6 +138,7 @@ class BaseForestHT(MetaEstimatorMixin):
         self.n_features_in_ = None
         self._is_fitted = False
         self._seeds = None
+        self._perm_seeds = None
 
     @property
     def n_estimators(self):
@@ -160,7 +161,7 @@ class BaseForestHT(MetaEstimatorMixin):
         self._is_fitted = False
         self._seeds = None
 
-    def _get_estimators_indices(self):
+    def _get_estimators_indices(self, sample_separate=False):
         indices = np.arange(self._n_samples_, dtype=int)
 
         # Get drawn indices along both sample and feature axes
@@ -168,12 +169,24 @@ class BaseForestHT(MetaEstimatorMixin):
 
         if self.sample_dataset_per_tree:
             if self._seeds is None:
-                self._seeds = rng.integers(
-                    low=0, high=np.iinfo(np.int32).max, size=(len(self.estimator_.estimators_))
-                )
+                self._seeds = []
 
+                for tree in self.estimator_.estimators_:
+                    if tree.random_state is None:
+                        self._seeds.append(rng.integers(low=0, high=np.iinfo(np.int32).max))
+                    else:
+                        self._seeds.append(tree.random_state)
+            seeds = self._seeds
+
+            if sample_separate:
+                if self._perm_seeds is None:
+                    new_rng = np.random.default_rng(np.random.randint(0, 1e6))
+                    self._perm_seeds = new_rng.integers(
+                        low=0, high=np.iinfo(np.int32).max, size=len(self.estimator_.estimators_)
+                    )
+                seeds = self._perm_seeds
             for idx, tree in enumerate(self.estimator_.estimators_):
-                seed = self._seeds[idx]
+                seed = seeds[idx]
 
                 # Operations accessing random_state must be performed identically
                 # to those in `_parallel_build_trees()`
@@ -184,7 +197,10 @@ class BaseForestHT(MetaEstimatorMixin):
                 yield indices_train, indices_test
         else:
             if self._seeds is None:
-                self._seeds = rng.integers(low=0, high=np.iinfo(np.int32).max)
+                if self.estimator_.random_state is None:
+                    self._seeds = rng.integers(low=0, high=np.iinfo(np.int32).max)
+                else:
+                    self._seeds = self.estimator_.random_state
 
             # TODO: make random_state consistent
             indices_train, indices_test = train_test_split(
@@ -707,7 +723,9 @@ class FeatureImportanceForestRegressor(BaseForestHT):
                     self.permute_per_tree,
                     self._type_of_target_,
                 )
-                for idx, (indices_train, indices_test) in enumerate(self._get_estimators_indices())
+                for idx, (indices_train, indices_test) in enumerate(
+                    self._get_estimators_indices(sample_separate=True)
+                )
             )
         else:
             # fitting a forest will only get one unique train/test split
@@ -926,7 +944,9 @@ class FeatureImportanceForestClassifier(BaseForestHT):
                     self.permute_per_tree,
                     self._type_of_target_,
                 )
-                for idx, (indices_train, indices_test) in enumerate(self._get_estimators_indices())
+                for idx, (indices_train, indices_test) in enumerate(
+                    self._get_estimators_indices(sample_separate=True)
+                )
             )
         else:
             # fitting a forest will only get one unique train/test split
