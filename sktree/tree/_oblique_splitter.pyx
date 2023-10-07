@@ -714,58 +714,22 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
         cdef int feature_set_begin, feature_set_end, idx
         feature_set_begin = 0
 
-        # 01: This algorithm samples features from each feature set uniformly and combines them
-        # into one sparse projection vector.
         cdef intp_t n_non_zeros_per_set
-        n_non_zeros_per_set = n_non_zeros // self.n_feature_sets
-        
-        for idx in range(self.n_feature_sets):
-            feature_set_end = self.feature_set_ends[idx]
-            n_features_in_set = feature_set_end - feature_set_begin
-            
-            grid_size = self.max_features * n_features_in_set
-
-            # shuffle indices over the 2D grid for this feature set to sample using Fisher-Yates
-            for i in range(0, grid_size):
-                j = rand_int(0, grid_size - i, random_state) + feature_set_begin
-                indices_to_sample[j], indices_to_sample[i] = \
-                    indices_to_sample[i], indices_to_sample[j]
-
-            # sample a n_non_zeros matrix for each feature set, which proceeds by:
-            # - sample 'n_non_zeros' in a mtry X n_features projection matrix
-            # - which consists of +/- 1's chosen at a 1/2s rate
-            for i in range(0, n_non_zeros_per_set):
-                # get the next index from the shuffled index array
-                rand_vec_index = indices_to_sample[i]
-
-                # get the projection index (i.e. row of the projection matrix) and
-                # feature index (i.e. column of the projection matrix)
-                proj_i = rand_vec_index // n_features_in_set
-                feat_i = rand_vec_index % n_features_in_set
-
-                # sample a random weight
-                weight = 1 if (rand_int(0, 2, random_state) == 1) else -1
-
-                proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
-                proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
-
-            # the new beginning is the previous end
-            feature_set_begin = feature_set_end
-        
-        # 02: Algorithm samples feature combinations from each feature set uniformly and evaluates
-        # them independently.
         cdef int ifeature = 0
 
         # keep track of the unique number of features
         cdef unordered_map[int, bint] projection_indices
 
-        while ifeature < self.max_features:
-            feature_set_begin = 0
-
-            # sample from a feature set
+        if self.uniform_sampling:
+            # 01: This algorithm samples features from each feature set uniformly and combines them
+            # into one sparse projection vector.
+            n_non_zeros_per_set = n_non_zeros // self.n_feature_sets
+            
             for idx in range(self.n_feature_sets):
                 feature_set_end = self.feature_set_ends[idx]
                 n_features_in_set = feature_set_end - feature_set_begin
+                
+                grid_size = self.max_features * n_features_in_set
 
                 # shuffle indices over the 2D grid for this feature set to sample using Fisher-Yates
                 for i in range(0, grid_size):
@@ -773,14 +737,17 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
                     indices_to_sample[j], indices_to_sample[i] = \
                         indices_to_sample[i], indices_to_sample[j]
 
-                for i in range(0, n_non_zeros):
+                # sample a n_non_zeros matrix for each feature set, which proceeds by:
+                # - sample 'n_non_zeros' in a mtry X n_features projection matrix
+                # - which consists of +/- 1's chosen at a 1/2s rate
+                for i in range(0, n_non_zeros_per_set):
                     # get the next index from the shuffled index array
                     rand_vec_index = indices_to_sample[i]
 
                     # get the projection index (i.e. row of the projection matrix) and
                     # feature index (i.e. column of the projection matrix)
-                    proj_i = rand_vec_index // n_features
-                    feat_i = rand_vec_index % n_features
+                    proj_i = rand_vec_index // n_features_in_set
+                    feat_i = rand_vec_index % n_features_in_set
 
                     # sample a random weight
                     weight = 1 if (rand_int(0, 2, random_state) == 1) else -1
@@ -788,16 +755,52 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
                     proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
                     proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
 
-                    # keep track of the number of projection vectors we have sampled
-                    if projection_indices.find(proj_i) == projection_indices.end():
-                        ifeature += 1
-                    projection_indices[proj_i] = True
-
-                    if ifeature >= self.max_features:
-                        break
-
                 # the new beginning is the previous end
                 feature_set_begin = feature_set_end
+        else:
+            # TODO: this is an infinite loop for some reason
+            # 02: Algorithm samples feature combinations from each feature set uniformly and evaluates
+            # them independently.
+            while ifeature < self.max_features:
+                feature_set_begin = 0
+
+                # sample from a feature set
+                for idx in range(self.n_feature_sets):
+                    feature_set_end = self.feature_set_ends[idx]
+                    n_features_in_set = feature_set_end - feature_set_begin
+                    grid_size = self.max_features * n_features_in_set
+
+                    # shuffle indices over the 2D grid for this feature set to sample using Fisher-Yates
+                    for i in range(0, grid_size):
+                        j = rand_int(0, grid_size - i, random_state) + feature_set_begin
+                        indices_to_sample[j], indices_to_sample[i] = \
+                            indices_to_sample[i], indices_to_sample[j]
+
+                    for i in range(0, n_non_zeros):
+                        # get the next index from the shuffled index array
+                        rand_vec_index = indices_to_sample[i]
+
+                        # get the projection index (i.e. row of the projection matrix) and
+                        # feature index (i.e. column of the projection matrix)
+                        proj_i = rand_vec_index // n_features
+                        feat_i = rand_vec_index % n_features
+
+                        # sample a random weight
+                        weight = 1 if (rand_int(0, 2, random_state) == 1) else -1
+
+                        proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
+                        proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
+
+                        # keep track of the number of projection vectors we have sampled
+                        # if projection_indices.find(proj_i) == projection_indices.end():
+                        projection_indices[proj_i] = True
+                        ifeature += 1
+
+                        if ifeature >= self.max_features:
+                            break
+
+                    # the new beginning is the previous end
+                    feature_set_begin = feature_set_end
 
 
 cdef class MultiViewSplitterTester(MultiViewSplitter):
@@ -808,7 +811,7 @@ cdef class MultiViewSplitterTester(MultiViewSplitter):
 
         Used for testing purposes.
 
-        Randomly sample patches with weight of 1.
+        Returns projection matrix of shape (max_features, n_features).
         """
         cdef vector[vector[DTYPE_t]] proj_mat_weights = vector[vector[DTYPE_t]](self.max_features)
         cdef vector[vector[SIZE_t]] proj_mat_indices = vector[vector[SIZE_t]](self.max_features)
