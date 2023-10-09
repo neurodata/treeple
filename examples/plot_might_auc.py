@@ -96,9 +96,9 @@ stat, posterior_arr, samples = est.statistic(
     return_posteriors=True,
 )
 
-print(f"ASH-90 / Partial AUC:", stat)
-print(f"Shape of Observed Samples:", samples.shape)
-print(f"Shape of Tree Posteriors for the positive class:", posterior_arr.shape)
+print(f"ASH-90 / Partial AUC: {stat}")
+print(f"Shape of Observed Samples: {samples.shape}")
+print(f"Shape of Tree Posteriors for the positive class: {posterior_arr.shape}")
 
 # %%
 # Repeat for the second feature set
@@ -112,9 +112,9 @@ stat, posterior_arr, samples = est.statistic(
     return_posteriors=True,
 )
 
-print(f"ASH-90 / Partial AUC:", stat)
-print(f"Shape of Observed Samples:", samples.shape)
-print(f"Shape of Tree Posteriors for the positive class:", posterior_arr.shape)
+print(f"ASH-90 / Partial AUC: {stat}")
+print(f"Shape of Observed Samples: {samples.shape}")
+print(f"Shape of Tree Posteriors for the positive class: {posterior_arr.shape}")
 
 # %%
 # All posteriors are saved within the model
