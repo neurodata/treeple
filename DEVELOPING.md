@@ -76,4 +76,8 @@ Verify that installations work as expected on your machine.
 
     twine upload dist/*
 
+or if you have two-factor authentication enabled: https://pypi.org/help/#apitoken
+
+    twine upload dist/* --repository scikit-tree
+
 4. Update version number on ``meson.build`` and ``_version.py`` to the relevant version.

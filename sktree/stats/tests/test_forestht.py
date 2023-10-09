@@ -1,11 +1,13 @@
 import pickle
+from copy import deepcopy
+from itertools import combinations
 from pathlib import Path
 
 import numpy as np
 import pytest
 from flaky import flaky
 from joblib import Parallel, delayed
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_almost_equal, assert_array_equal
 from sklearn import datasets
 
 from sktree import HonestForestClassifier, RandomForestClassifier, RandomForestRegressor
@@ -283,6 +285,7 @@ def test_pickle(tmpdir):
         "n_samples_test_",
         "_n_samples_",
         "_metric",
+        "train_test_samples_",
     ]
     for attr in attr_list:
         assert_array_equal(getattr(clf, attr), getattr(clf_pickle, attr))
@@ -311,7 +314,7 @@ def test_sample_size_consistency_of_estimator_indices_(permute_per_tree, sample_
     )
     if sample_dataset_per_tree:
         assert_array_equal(
-            samples,
+            sorted(np.unique(samples)),
             sorted(np.unique(np.concatenate([x[1] for x in clf.train_test_samples_]).flatten())),
         )
     else:
@@ -319,7 +322,9 @@ def test_sample_size_consistency_of_estimator_indices_(permute_per_tree, sample_
     assert len(_non_nan_samples(posteriors)) == len(samples)
 
 
-def test_permute_per_tree_samples_consistency_with_sklearnforest():
+@pytest.mark.parametrize("sample_dataset_per_tree", [True, False])
+@pytest.mark.parametrize("seed", [None, 0])
+def test_permute_per_tree_samples_consistency_with_sklearnforest(seed, sample_dataset_per_tree):
     n_samples = 100
     n_features = 5
     X = rng.uniform(size=(n_samples, n_features))
@@ -331,28 +336,61 @@ def test_permute_per_tree_samples_consistency_with_sklearnforest():
         ),
         test_size=0.5,
         permute_per_tree=True,
-        sample_dataset_per_tree=False,
+        sample_dataset_per_tree=sample_dataset_per_tree,
     )
-
     other_clf = FeatureImportanceForestClassifier(
         estimator=HonestForestClassifier(
             n_estimators=10, random_state=seed, n_jobs=1, honest_fraction=0.2
         ),
         test_size=0.5,
         permute_per_tree=False,
-        sample_dataset_per_tree=False,
+        sample_dataset_per_tree=sample_dataset_per_tree,
     )
 
     clf.statistic(X, y, covariate_index=None, metric="mi")
     other_clf.statistic(X, y, covariate_index=None, metric="mi")
 
-    assert_array_equal(clf.train_test_samples_[0][0], other_clf.train_test_samples_[0][0])
-    assert_array_equal(clf.train_test_samples_[0][1], other_clf.train_test_samples_[0][1])
+    # estimator indices should be preserved over multiple calls
+    estimator_train_test_indices = deepcopy(clf.train_test_samples_)
+    for idx in range(clf.n_estimators):
+        assert_array_equal(clf.train_test_samples_[idx][0], estimator_train_test_indices[idx][0])
+        assert_array_equal(clf.train_test_samples_[idx][1], estimator_train_test_indices[idx][1])
+
+    # if the sample_dataset_per_tree, then the indices should be different across all
+    if sample_dataset_per_tree:
+        for (indices, other_indices) in combinations(clf.train_test_samples_, 2):
+            assert not np.array_equal(indices[0], other_indices[0])
+            assert not np.array_equal(indices[1], other_indices[1])
+    else:
+        for (indices, other_indices) in combinations(clf.train_test_samples_, 2):
+            assert_array_equal(indices[0], other_indices[0])
+            assert_array_equal(indices[1], other_indices[1])
+
+    # estimator indices should be preserved over multiple calls
+    estimator_train_test_indices = deepcopy(other_clf.train_test_samples_)
+    for idx in range(clf.n_estimators):
+        assert_array_equal(
+            other_clf.train_test_samples_[idx][0], estimator_train_test_indices[idx][0]
+        )
+        assert_array_equal(
+            other_clf.train_test_samples_[idx][1], estimator_train_test_indices[idx][1]
+        )
+
+        # when seed is passed, the indices should be deterministic
+        if seed is not None:
+            assert_array_equal(
+                clf.train_test_samples_[idx][0], other_clf.train_test_samples_[idx][0]
+            )
+            assert_array_equal(
+                clf.train_test_samples_[idx][1], other_clf.train_test_samples_[idx][1]
+            )
 
 
-def test_small_dataset():
+@pytest.mark.parametrize("seed", [None, 0])
+def test_small_dataset(seed):
     n_samples = 32
     n_features = 5
+
     X = rng.uniform(size=(n_samples, n_features))
     y = rng.integers(0, 2, size=n_samples)  # Binary classification
 
@@ -370,7 +408,10 @@ def test_small_dataset():
     assert pvalue > 0.05
 
     stat, pvalue = clf.test(X, y, metric="mi")
-    assert stat == 0.0
+    if seed is not None:
+        assert stat == 0.0
+    else:
+        assert_almost_equal(stat, 0.0, decimal=1)
     assert pvalue > 0.05
 
 
