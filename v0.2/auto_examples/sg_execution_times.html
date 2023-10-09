@@ -2,18 +2,18 @@
 <!DOCTYPE html>
 
 
-<html lang="en" >
+<html lang="en" data-theme="auto">
 
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Computation times &#8212; scikit-tree 0.2.0 documentation</title>
+    <title>Computation times &#8212; scikit-tree 0.2.1 documentation</title>
   
   
   
   <script data-cfasync="false">
-    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "auto";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
   </script>
   
@@ -47,6 +47,10 @@
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'auto_examples/sg_execution_times';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/scikit-tree/main/doc/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.2.1';
+        </script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
@@ -59,7 +63,7 @@
   </head>
   
   
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="auto">
 
   
   
@@ -115,7 +119,7 @@
   
   
   
-    <p class="title logo__title">scikit-tree 0.2.0 documentation</p>
+    <p class="title logo__title">scikit-tree 0.2.1 documentation</p>
   
 </a></div>
     
@@ -189,17 +193,31 @@ document.write(`
         </div>
       
       
-        <div class="navbar-item"><div class="dropdown">
-    <button type="button" class="btn btn-primary btn-sm navbar-btn dropdown-toggle" id="dLabelMore" data-toggle="dropdown">
-        v0.2.0
-        <span class="caret"></span>
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
+      0.2.1  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
     </button>
-    <div class="dropdown-menu list-group-flush py-0" aria-labelledby="dLabelMore">
-        <a class="list-group-item list-group-item-action py-1" href="https:///docs.neurodata.io/scikit-tree/v0.3/index.html">v0.3 (development)</a>
-        <a class="list-group-item list-group-item-action py-1" href="https:///docs.neurodata.io/scikit-tree/v0.2/index.html">v0.2</a>
-        <a class="list-group-item list-group-item-action py-1" href="https:///docs.neurodata.io/scikit-tree/v0.1/index.html">v0.1</a>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
     </div>
-</div></div>
+  </div>
+`);
+</script></div>
       
         <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
     aria-label="Icon Links">
@@ -302,17 +320,31 @@ document.write(`
     
       <div class="sidebar-header-items__end">
         
-          <div class="navbar-item"><div class="dropdown">
-    <button type="button" class="btn btn-primary btn-sm navbar-btn dropdown-toggle" id="dLabelMore" data-toggle="dropdown">
-        v0.2.0
-        <span class="caret"></span>
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
+      0.2.1  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
     </button>
-    <div class="dropdown-menu list-group-flush py-0" aria-labelledby="dLabelMore">
-        <a class="list-group-item list-group-item-action py-1" href="https:///docs.neurodata.io/scikit-tree/v0.3/index.html">v0.3 (development)</a>
-        <a class="list-group-item list-group-item-action py-1" href="https:///docs.neurodata.io/scikit-tree/v0.2/index.html">v0.2</a>
-        <a class="list-group-item list-group-item-action py-1" href="https:///docs.neurodata.io/scikit-tree/v0.1/index.html">v0.1</a>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
     </div>
-</div></div>
+  </div>
+`);
+</script></div>
         
           <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
     aria-label="Icon Links">
@@ -385,47 +417,51 @@ document.write(`
                   
   <section id="computation-times">
 <span id="sphx-glr-auto-examples-sg-execution-times"></span><h1>Computation times<a class="headerlink" href="#computation-times" title="Permalink to this heading">#</a></h1>
-<p><strong>02:52.959</strong> total execution time for <strong>auto_examples</strong> files:</p>
+<p><strong>02:18.747</strong> total execution time for <strong>auto_examples</strong> files:</p>
 <table class="table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="plot_extra_orf_sample_size.html#sphx-glr-auto-examples-plot-extra-orf-sample-size-py"><span class="std std-ref">Speed of Extra Oblique Random Forest vs Oblique Random Forest on different dataset sizes</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_extra_orf_sample_size.py</span></code>)</p></td>
-<td><p>01:29.651</p></td>
+<td><p>01:14.956</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_MI_gigantic_hypothesis_testing_forest.html#sphx-glr-auto-examples-plot-mi-gigantic-hypothesis-testing-forest-py"><span class="std std-ref">Mutual Information for Gigantic Hypothesis Testing (MIGHT)</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_MI_gigantic_hypothesis_testing_forest.py</span></code>)</p></td>
-<td><p>00:18.727</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_oblique_forests_iris.html#sphx-glr-auto-examples-plot-oblique-forests-iris-py"><span class="std std-ref">Compare the decision surfaces of oblique extra-trees with standard oblique trees</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_oblique_forests_iris.py</span></code>)</p></td>
+<td><p>00:12.448</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_oblique_forests_iris.html#sphx-glr-auto-examples-plot-oblique-forests-iris-py"><span class="std std-ref">Compare the decision surfaces of oblique extra-trees with standard oblique trees</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_oblique_forests_iris.py</span></code>)</p></td>
-<td><p>00:15.532</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_MI_gigantic_hypothesis_testing_forest.html#sphx-glr-auto-examples-plot-mi-gigantic-hypothesis-testing-forest-py"><span class="std std-ref">Mutual Information for Gigantic Hypothesis Testing (MIGHT)</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_MI_gigantic_hypothesis_testing_forest.py</span></code>)</p></td>
+<td><p>00:12.014</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="plot_extra_oblique_random_forest.html#sphx-glr-auto-examples-plot-extra-oblique-random-forest-py"><span class="std std-ref">Compare extra oblique forest and oblique random forest predictions on cc18 datasets</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_extra_oblique_random_forest.py</span></code>)</p></td>
-<td><p>00:10.556</p></td>
+<td><p>00:08.341</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="plot_oblique_random_forest.html#sphx-glr-auto-examples-plot-oblique-random-forest-py"><span class="std std-ref">Plot oblique forest and axis-aligned random forest predictions on cc18 datasets</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_oblique_random_forest.py</span></code>)</p></td>
-<td><p>00:10.450</p></td>
+<td><p>00:07.445</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="plot_overlapping_gaussians.html#sphx-glr-auto-examples-plot-overlapping-gaussians-py"><span class="std std-ref">Plot honest forest calibrations on overlapping gaussian simulations</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_overlapping_gaussians.py</span></code>)</p></td>
-<td><p>00:10.021</p></td>
+<td><p>00:06.489</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="plot_extended_isolation_forest.html#sphx-glr-auto-examples-plot-extended-isolation-forest-py"><span class="std std-ref">ExtendedIsolationForest example</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_extended_isolation_forest.py</span></code>)</p></td>
-<td><p>00:05.895</p></td>
+<td><p>00:04.637</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="plot_oblique_axis_aligned_forests_sparse_parity.html#sphx-glr-auto-examples-plot-oblique-axis-aligned-forests-sparse-parity-py"><span class="std std-ref">Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_oblique_axis_aligned_forests_sparse_parity.py</span></code>)</p></td>
-<td><p>00:04.934</p></td>
+<td><p>00:04.414</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_projection_matrices.html#sphx-glr-auto-examples-plot-projection-matrices-py"><span class="std std-ref">Plot the projection matrices of an oblique tree</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_projection_matrices.py</span></code>)</p></td>
-<td><p>00:04.162</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_might_auc.html#sphx-glr-auto-examples-plot-might-auc-py"><span class="std std-ref">Compute partial AUC using Mutual Information for Genuine Hypothesis Testing (MIGHT)</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_might_auc.py</span></code>)</p></td>
+<td><p>00:03.008</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_iris_dtc.html#sphx-glr-auto-examples-plot-iris-dtc-py"><span class="std std-ref">Plot the decision surface of decision trees trained on the iris dataset</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_iris_dtc.py</span></code>)</p></td>
-<td><p>00:03.031</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_projection_matrices.html#sphx-glr-auto-examples-plot-projection-matrices-py"><span class="std std-ref">Plot the projection matrices of an oblique tree</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_projection_matrices.py</span></code>)</p></td>
+<td><p>00:02.827</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_iris_dtc.html#sphx-glr-auto-examples-plot-iris-dtc-py"><span class="std std-ref">Plot the decision surface of decision trees trained on the iris dataset</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_iris_dtc.py</span></code>)</p></td>
+<td><p>00:02.167</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
 </tbody>
@@ -475,7 +511,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-10-05.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-10-09.
       <br/>
     
   </p>

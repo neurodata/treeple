@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Mutual Information for Gigantic Hypothesis Testing (MIGHT) &#8212; scikit-tree 0.2.1 documentation</title>
+    <title>Compute partial AUC using Mutual Information for Genuine Hypothesis Testing (MIGHT) &#8212; scikit-tree 0.2.1 documentation</title>
   
   
   
@@ -46,15 +46,15 @@
     <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'auto_examples/plot_MI_gigantic_hypothesis_testing_forest';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'auto_examples/plot_might_auc';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/scikit-tree/main/doc/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.2.1';
         </script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Plot honest forest calibrations on overlapping gaussian simulations" href="plot_overlapping_gaussians.html" />
-    <link rel="prev" title="ExtendedIsolationForest example" href="plot_extended_isolation_forest.html" />
+    <link rel="next" title="ExtendedIsolationForest example" href="plot_extended_isolation_forest.html" />
+    <link rel="prev" title="Compare the decision surfaces of oblique extra-trees with standard oblique trees" href="plot_oblique_forests_iris.html" />
     <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
     <script type="text/javascript" src="../_static/copybutton.js"></script>
     <script type="text/javascript" src="../_static/scrollfix.js"></script>
@@ -379,9 +379,9 @@ document.write(`
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="plot_extra_oblique_random_forest.html">Compare extra oblique forest and oblique random forest predictions on cc18 datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plot_oblique_forests_iris.html">Compare the decision surfaces of oblique extra-trees with standard oblique trees</a></li>
-<li class="toctree-l1"><a class="reference internal" href="plot_might_auc.html">Compute partial AUC using Mutual Information for Genuine Hypothesis Testing (MIGHT)</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Compute partial AUC using Mutual Information for Genuine Hypothesis Testing (MIGHT)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plot_extended_isolation_forest.html">ExtendedIsolationForest example</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Mutual Information for Gigantic Hypothesis Testing (MIGHT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot_MI_gigantic_hypothesis_testing_forest.html">Mutual Information for Gigantic Hypothesis Testing (MIGHT)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plot_overlapping_gaussians.html">Plot honest forest calibrations on overlapping gaussian simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plot_oblique_random_forest.html">Plot oblique forest and axis-aligned random forest predictions on cc18 datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plot_oblique_axis_aligned_forests_sparse_parity.html">Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation</a></li>
@@ -428,7 +428,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="../use.html" class="nav-link">Examples using scikit-tree</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">Mutual Information for Gigantic Hypothesis Testing (MIGHT)</li>
+    <li class="breadcrumb-item active" aria-current="page">Compute partial AUC using Mutual Information for Genuine Hypothesis Testing (MIGHT)</li>
   </ul>
 </nav>
 </div>
@@ -447,41 +447,21 @@ document.write(`
                   
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p><a class="reference internal" href="#sphx-glr-download-auto-examples-plot-mi-gigantic-hypothesis-testing-forest-py"><span class="std std-ref">Go to the end</span></a>
+<p><a class="reference internal" href="#sphx-glr-download-auto-examples-plot-might-auc-py"><span class="std std-ref">Go to the end</span></a>
 to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="mutual-information-for-gigantic-hypothesis-testing-might">
-<span id="sphx-glr-auto-examples-plot-mi-gigantic-hypothesis-testing-forest-py"></span><h1>Mutual Information for Gigantic Hypothesis Testing (MIGHT)<a class="headerlink" href="#mutual-information-for-gigantic-hypothesis-testing-might" title="Permalink to this heading">#</a></h1>
+<section class="sphx-glr-example-title" id="compute-partial-auc-using-mutual-information-for-genuine-hypothesis-testing-might">
+<span id="sphx-glr-auto-examples-plot-might-auc-py"></span><h1>Compute partial AUC using Mutual Information for Genuine Hypothesis Testing (MIGHT)<a class="headerlink" href="#compute-partial-auc-using-mutual-information-for-genuine-hypothesis-testing-might" title="Permalink to this heading">#</a></h1>
 <p>An example using <a class="reference internal" href="../generated/sktree.stats.FeatureImportanceForestClassifier.html#sktree.stats.FeatureImportanceForestClassifier" title="sktree.stats.FeatureImportanceForestClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">FeatureImportanceForestClassifier</span></code></a> for nonparametric
 multivariate hypothesis test, on simulated datasets. Here, we present a simulation
-of how MIGHT is used to test the hypothesis that a “feature set is important for
-predicting the target”. This is a generalization of the framework presented in
-<a class="footnote-reference brackets" href="#footcite-coleman2022scalable" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
+of how MIGHT is used to evaluate how a “feature set is important for predicting the target”.</p>
 <p>We simulate a dataset with 1000 features, 500 samples, and a binary class target
 variable. Within each feature set, there is 500 features associated with one feature
 set, and another 500 features associated with another feature set. One could think of
 these for example as different datasets collected on the same patient in a biomedical setting.
 The first feature set (X) is strongly correlated with the target, and the second
-feature set (W) is weakly correlated with the target (y). Here, we are testing the
-null hypothesis:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">H0:</span> <span class="pre">I(X;</span> <span class="pre">y)</span> <span class="pre">-</span> <span class="pre">I(X,</span> <span class="pre">W;</span> <span class="pre">y)</span> <span class="pre">=</span> <span class="pre">0</span></code></p></li>
-<li><dl class="simple">
-<dt><code class="docutils literal notranslate"><span class="pre">HA:</span> <span class="pre">I(X;</span> <span class="pre">y)</span> <span class="pre">-</span> <span class="pre">I(X,</span> <span class="pre">W;</span> <span class="pre">y)</span> <span class="pre">&lt;</span> <span class="pre">0</span></code> indicating that there is more mutual information with</dt><dd><p>respect to <code class="docutils literal notranslate"><span class="pre">y</span></code></p>
-</dd>
-</dl>
-</li>
-</ul>
-<p>where <code class="docutils literal notranslate"><span class="pre">I</span></code> is mutual information. For example, this could be true in the following settings,
-where X is our informative feature set and W is our uninformative feature set.</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">W</span>&#160;&#160;&#160; <span class="pre">X</span> <span class="pre">-&gt;</span> <span class="pre">y</span></code>: here <code class="docutils literal notranslate"><span class="pre">W</span></code> is completely disconnected from X and y.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">W</span> <span class="pre">-&gt;</span> <span class="pre">X</span> <span class="pre">-&gt;</span> <span class="pre">y</span></code>: here <code class="docutils literal notranslate"><span class="pre">W</span></code> is d-separated from y given X.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">W</span> <span class="pre">&lt;-</span> <span class="pre">X</span> <span class="pre">-&gt;</span> <span class="pre">y</span></code>: here <code class="docutils literal notranslate"><span class="pre">W</span></code> is d-separated from y given X.</p></li>
-</ul>
-<p>We then use MIGHT to test the hypothesis that the first feature set is important for
-predicting the target, and the second feature set is not important for predicting the
-target. We use <a class="reference internal" href="../generated/sktree.stats.FeatureImportanceForestClassifier.html#sktree.stats.FeatureImportanceForestClassifier" title="sktree.stats.FeatureImportanceForestClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">FeatureImportanceForestClassifier</span></code></a>.</p>
+feature set (W) is weakly correlated with the target (y).</p>
+<p>We then use MIGHT to calculate the partial AUC of these sets.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">scipy.special</span> <span class="kn">import</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ufunc.html#numpy.ufunc" title="numpy.ufunc" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">expit</span></a>
 
@@ -520,29 +500,22 @@ into a single dataset to perform hypothesis testing.</p>
 <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_unimportant</span></a> <span class="o">=</span> <a href="https://numpy.org/devdocs/reference/random/generator.html#numpy.random.Generator" title="numpy.random.Generator" class="sphx-glr-backref-module-numpy-random sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">rng</span></a><span class="o">.</span><span class="n">normal</span><span class="p">(</span>
     <span class="n">loc</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">unimportant_mean</span></a><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">unimportant_sigma</span></a><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_samples</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_features_set</span></a><span class="p">)</span>
 <span class="p">)</span>
-<a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a> <span class="o">=</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.hstack.html#numpy.hstack" title="numpy.hstack" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">hstack</span></a><span class="p">([</span><a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_important</span></a><span class="p">,</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_unimportant</span></a><span class="p">])</span>
 
 <span class="c1"># simulate the binary target variable</span>
 <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a> <span class="o">=</span> <a href="https://numpy.org/devdocs/reference/random/generator.html#numpy.random.Generator" title="numpy.random.Generator" class="sphx-glr-backref-module-numpy-random sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">rng</span></a><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><a href="https://numpy.org/devdocs/reference/generated/numpy.ufunc.html#numpy.ufunc" title="numpy.ufunc" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">expit</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">beta</span></a> <span class="o">*</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_important</span></a><span class="p">[:,</span> <span class="p">:</span><span class="mi">10</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span> <span class="n">size</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_samples</span></a><span class="p">)</span>
 </pre></div>
 </div>
 </section>
-<section id="perform-hypothesis-testing-using-mutual-information">
-<h2>Perform hypothesis testing using Mutual Information<a class="headerlink" href="#perform-hypothesis-testing-using-mutual-information" title="Permalink to this heading">#</a></h2>
-<p>Here, we use <a class="reference internal" href="../generated/sktree.stats.FeatureImportanceForestClassifier.html#sktree.stats.FeatureImportanceForestClassifier" title="sktree.stats.FeatureImportanceForestClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">FeatureImportanceForestClassifier</span></code></a> to perform the hypothesis
-test. The test statistic is computed by comparing the metric (i.e. mutual information) estimated
-between two forests. One forest is trained on the original dataset, and one forest is trained
-on a permuted dataset, where the rows of the <code class="docutils literal notranslate"><span class="pre">covariate_index</span></code> columns are shuffled randomly.</p>
-<p>The null distribution is then estimated in an efficient manner using the framework of
-<a class="footnote-reference brackets" href="#footcite-coleman2022scalable" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. The sample evaluations of each forest (i.e. the posteriors)
-are sampled randomly <code class="docutils literal notranslate"><span class="pre">n_repeats</span></code> times to generate a null distribution. The pvalue is then
-computed as the proportion of samples in the null distribution that are less than the
-observed test statistic.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_estimators</span></a> <span class="o">=</span> <span class="mi">200</span>
+<section id="use-partial-auc-as-test-statistic">
+<h2>Use partial AUC as test statistic<a class="headerlink" href="#use-partial-auc-as-test-statistic" title="Permalink to this heading">#</a></h2>
+<p>You can specify the maximum specificity by modifying <code class="docutils literal notranslate"><span class="pre">max_fpr</span></code> in <code class="docutils literal notranslate"><span class="pre">statistic</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_estimators</span></a> <span class="o">=</span> <span class="mi">125</span>
 <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">max_features</span></a> <span class="o">=</span> <span class="s2">&quot;sqrt&quot;</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">metric</span></a> <span class="o">=</span> <span class="s2">&quot;auc&quot;</span>
 <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">test_size</span></a> <span class="o">=</span> <span class="mf">0.2</span>
-<a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_repeats</span></a> <span class="o">=</span> <span class="mi">1000</span>
 <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_jobs</span></a> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+<a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">honest_fraction</span></a> <span class="o">=</span> <span class="mf">0.7</span>
+<a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">max_fpr</span></a> <span class="o">=</span> <span class="mf">0.1</span>
 
 <a href="../generated/sktree.stats.FeatureImportanceForestClassifier.html#sktree.stats.FeatureImportanceForestClassifier" title="sktree.stats.FeatureImportanceForestClassifier" class="sphx-glr-backref-module-sktree-stats sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">est</span></a> <span class="o">=</span> <a href="../generated/sktree.stats.FeatureImportanceForestClassifier.html#sktree.stats.FeatureImportanceForestClassifier" title="sktree.stats.FeatureImportanceForestClassifier" class="sphx-glr-backref-module-sktree-stats sphx-glr-backref-type-py-class"><span class="n">FeatureImportanceForestClassifier</span></a><span class="p">(</span>
     <span class="n">estimator</span><span class="o">=</span><a href="../generated/sktree.HonestForestClassifier.html#sktree.HonestForestClassifier" title="sktree.HonestForestClassifier" class="sphx-glr-backref-module-sktree sphx-glr-backref-type-py-class"><span class="n">HonestForestClassifier</span></a><span class="p">(</span>
@@ -550,59 +523,69 @@ observed test statistic.</p>
         <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">max_features</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">max_features</span></a><span class="p">,</span>
         <span class="n">tree_estimator</span><span class="o">=</span><a href="https://scikit-learn.org/dev/modules/generated/sklearn.base.ClassifierMixin.html#sklearn.base.ClassifierMixin" title="sklearn.base.ClassifierMixin" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">DecisionTreeClassifier</span></a><span class="p">(),</span>
         <span class="n">random_state</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seed</span></a><span class="p">,</span>
-        <span class="n">honest_fraction</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+        <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">honest_fraction</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">honest_fraction</span></a><span class="p">,</span>
         <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_jobs</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_jobs</span></a><span class="p">,</span>
     <span class="p">),</span>
     <span class="n">random_state</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seed</span></a><span class="p">,</span>
     <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">test_size</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">test_size</span></a><span class="p">,</span>
     <span class="n">permute_per_tree</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">sample_dataset_per_tree</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">sample_dataset_per_tree</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span>
-    <span class="sa">f</span><span class="s2">&quot;Permutation per tree: </span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#bool" title="builtins.bool" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">est</span><span class="o">.</span><span class="n">permute_per_tree</span></a><span class="si">}</span><span class="s2"> and sampling dataset per tree: &quot;</span>
-    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#bool" title="builtins.bool" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">est</span><span class="o">.</span><span class="n">sample_dataset_per_tree</span></a><span class="si">}</span><span class="s2">&quot;</span>
-<span class="p">)</span>
-<span class="c1"># we test for the first feature set, which is important and thus should return a pvalue &lt; 0.05</span>
-<a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">stat</span></a><span class="p">,</span> <a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">pvalue</span></a> <span class="o">=</span> <a href="../generated/sktree.stats.FeatureImportanceForestClassifier.html#sktree.stats.FeatureImportanceForestClassifier.test" title="sktree.stats.FeatureImportanceForestClassifier.test" class="sphx-glr-backref-module-sktree-stats sphx-glr-backref-type-py-method"><span class="n">est</span><span class="o">.</span><span class="n">test</span></a><span class="p">(</span>
-    <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a><span class="p">,</span> <span class="n">covariate_index</span><span class="o">=</span><a href="https://numpy.org/devdocs/reference/generated/numpy.arange.html#numpy.arange" title="numpy.arange" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">arange</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_features_set</span></a><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;mi&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_repeats</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_repeats</span></a>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Estimated MI difference: </span><span class="si">{</span><a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">stat</span></a><span class="si">}</span><span class="s2"> with Pvalue: </span><span class="si">{</span><a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">pvalue</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-<span class="c1"># we test for the second feature set, which is unimportant and thus should return a pvalue &gt; 0.05</span>
-<a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">stat</span></a><span class="p">,</span> <a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">pvalue</span></a> <span class="o">=</span> <a href="../generated/sktree.stats.FeatureImportanceForestClassifier.html#sktree.stats.FeatureImportanceForestClassifier.test" title="sktree.stats.FeatureImportanceForestClassifier.test" class="sphx-glr-backref-module-sktree-stats sphx-glr-backref-type-py-method"><span class="n">est</span><span class="o">.</span><span class="n">test</span></a><span class="p">(</span>
-    <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span>
+<span class="c1"># we test for the first feature set, which is important and thus should return a higher AUC</span>
+<a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">stat</span></a><span class="p">,</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">posterior_arr</span></a><span class="p">,</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">samples</span></a> <span class="o">=</span> <a href="../generated/sktree.stats.FeatureImportanceForestClassifier.html#sktree.stats.FeatureImportanceForestClassifier.statistic" title="sktree.stats.FeatureImportanceForestClassifier.statistic" class="sphx-glr-backref-module-sktree-stats sphx-glr-backref-type-py-method"><span class="n">est</span><span class="o">.</span><span class="n">statistic</span></a><span class="p">(</span>
+    <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_important</span></a><span class="p">,</span>
     <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a><span class="p">,</span>
-    <span class="n">covariate_index</span><span class="o">=</span><a href="https://numpy.org/devdocs/reference/generated/numpy.arange.html#numpy.arange" title="numpy.arange" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">arange</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_features_set</span></a><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span> <span class="o">+</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_features_set</span></a><span class="p">,</span>
-    <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;mi&quot;</span><span class="p">,</span>
-    <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_repeats</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_repeats</span></a><span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">metric</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">metric</span></a><span class="p">,</span>
+    <span class="n">return_posteriors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Estimated MI difference: </span><span class="si">{</span><a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">stat</span></a><span class="si">}</span><span class="s2"> with Pvalue: </span><span class="si">{</span><a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">pvalue</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ASH-90 / Partial AUC: </span><span class="si">{</span><a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">stat</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Shape of Observed Samples: </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">samples</span><span class="o">.</span><span class="n">shape</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Shape of Tree Posteriors for the positive class: </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">posterior_arr</span><span class="o">.</span><span class="n">shape</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Permutation per tree: True and sampling dataset per tree: False
-Estimated MI difference: -0.0020971800159385046 with Pvalue: 0.14785214785214784
-Estimated MI difference: -0.0015810248636906332 with Pvalue: 0.2217782217782218
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ASH-90 / Partial AUC: 0.5899498864615144
+Shape of Observed Samples: (1000,)
+Shape of Tree Posteriors for the positive class: (125, 1000, 1)
 </pre></div>
 </div>
 </section>
-<section id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this heading">#</a></h2>
-<div class="docutils container" id="id3">
-<aside class="footnote brackets" id="footcite-coleman2022scalable" role="note">
-<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
-<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id2">2</a>)</span>
-<p>Tim Coleman, Wei Peng, and Lucas Mentch. Scalable and efficient hypothesis testing with random forests. <em>The Journal of Machine Learning Research</em>, 23(1):7679–7713, 2022.</p>
-</aside>
-</aside>
+<section id="repeat-for-the-second-feature-set">
+<h2>Repeat for the second feature set<a class="headerlink" href="#repeat-for-the-second-feature-set" title="Permalink to this heading">#</a></h2>
+<p>This feature set has a smaller statistic, which is expected due to its weak correlation.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">stat</span></a><span class="p">,</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">posterior_arr</span></a><span class="p">,</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">samples</span></a> <span class="o">=</span> <a href="../generated/sktree.stats.FeatureImportanceForestClassifier.html#sktree.stats.FeatureImportanceForestClassifier.statistic" title="sktree.stats.FeatureImportanceForestClassifier.statistic" class="sphx-glr-backref-module-sktree-stats sphx-glr-backref-type-py-method"><span class="n">est</span><span class="o">.</span><span class="n">statistic</span></a><span class="p">(</span>
+    <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_unimportant</span></a><span class="p">,</span>
+    <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a><span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">metric</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">metric</span></a><span class="p">,</span>
+    <span class="n">return_posteriors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ASH-90 / Partial AUC: </span><span class="si">{</span><a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">stat</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Shape of Observed Samples: </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">samples</span><span class="o">.</span><span class="n">shape</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Shape of Tree Posteriors for the positive class: </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">posterior_arr</span><span class="o">.</span><span class="n">shape</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  12.014 seconds)</p>
-<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-mi-gigantic-hypothesis-testing-forest-py">
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ASH-90 / Partial AUC: 0.4453449220891081
+Shape of Observed Samples: (1000,)
+Shape of Tree Posteriors for the positive class: (125, 1000, 1)
+</pre></div>
+</div>
+</section>
+<section id="all-posteriors-are-saved-within-the-model">
+<h2>All posteriors are saved within the model<a class="headerlink" href="#all-posteriors-are-saved-within-the-model" title="Permalink to this heading">#</a></h2>
+<p>Extract the results from the model variables anytime. You can save the model with <code class="docutils literal notranslate"><span class="pre">pickle</span></code>.</p>
+<p>ASH-90 / Partial AUC: <code class="docutils literal notranslate"><span class="pre">est.observe_stat_</span></code>
+Observed Samples: <code class="docutils literal notranslate"><span class="pre">est.observe_samples_</span></code>
+Tree Posteriors for the positive class: <code class="docutils literal notranslate"><span class="pre">est.observe_posteriors_</span></code> (n_trees, n_samples_test, 1)
+True Labels: <code class="docutils literal notranslate"><span class="pre">est.y_true_final_</span></code></p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  3.008 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-might-auc-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../_downloads/00cfceae2563f06768ed2afc5560087c/plot_MI_gigantic_hypothesis_testing_forest.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_MI_gigantic_hypothesis_testing_forest.py</span></code></a></p>
+<p><a class="reference download internal" download="" href="../_downloads/71f52ddc897be17d747e41dffb3b0762/plot_might_auc.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_might_auc.py</span></code></a></p>
 </div>
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
-<p><a class="reference download internal" download="" href="../_downloads/453552a6c236a8acedd7543ec68eb290/plot_MI_gigantic_hypothesis_testing_forest.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_MI_gigantic_hypothesis_testing_forest.ipynb</span></code></a></p>
+<p><a class="reference download internal" download="" href="../_downloads/b3e7bddab5998eaeaa7413978232d146/plot_might_auc.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_might_auc.ipynb</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
@@ -621,20 +604,20 @@ Estimated MI difference: -0.0015810248636906332 with Pvalue: 0.2217782217782218
     <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="plot_extended_isolation_forest.html"
+       href="plot_oblique_forests_iris.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">ExtendedIsolationForest example</p>
+        <p class="prev-next-title">Compare the decision surfaces of oblique extra-trees with standard oblique trees</p>
       </div>
     </a>
     <a class="right-next"
-       href="plot_overlapping_gaussians.html"
+       href="plot_extended_isolation_forest.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Plot honest forest calibrations on overlapping gaussian simulations</p>
+        <p class="prev-next-title">ExtendedIsolationForest example</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -657,8 +640,9 @@ Estimated MI difference: -0.0015810248636906332 with Pvalue: 0.2217782217782218
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simulate-data">Simulate data</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#perform-hypothesis-testing-using-mutual-information">Perform hypothesis testing using Mutual Information</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#use-partial-auc-as-test-statistic">Use partial AUC as test statistic</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#repeat-for-the-second-feature-set">Repeat for the second feature set</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#all-posteriors-are-saved-within-the-model">All posteriors are saved within the model</a></li>
 </ul>
   </nav></div>
 

@@ -2,17 +2,17 @@
 <!DOCTYPE html>
 
 
-<html lang="en" >
+<html lang="en" data-theme="auto">
 
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>sktree.stats.forestht &#8212; scikit-tree 0.2.0 documentation</title>
+    <title>sktree.stats.forestht &#8212; scikit-tree 0.2.1 documentation</title>
   
   
   
   <script data-cfasync="false">
-    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "auto";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
   </script>
   
@@ -46,6 +46,10 @@
     <script src="../../../_static/clipboard.min.js"></script>
     <script src="../../../_static/copybutton.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sktree/stats/forestht';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/scikit-tree/main/doc/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.2.1';
+        </script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
@@ -58,7 +62,7 @@
   </head>
   
   
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="auto">
 
   
   
@@ -114,7 +118,7 @@
   
   
   
-    <p class="title logo__title">scikit-tree 0.2.0 documentation</p>
+    <p class="title logo__title">scikit-tree 0.2.1 documentation</p>
   
 </a></div>
     
@@ -188,17 +192,31 @@ document.write(`
         </div>
       
       
-        <div class="navbar-item"><div class="dropdown">
-    <button type="button" class="btn btn-primary btn-sm navbar-btn dropdown-toggle" id="dLabelMore" data-toggle="dropdown">
-        v0.2.0
-        <span class="caret"></span>
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
+      0.2.1  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
     </button>
-    <div class="dropdown-menu list-group-flush py-0" aria-labelledby="dLabelMore">
-        <a class="list-group-item list-group-item-action py-1" href="https:///docs.neurodata.io/scikit-tree/v0.3/index.html">v0.3 (development)</a>
-        <a class="list-group-item list-group-item-action py-1" href="https:///docs.neurodata.io/scikit-tree/v0.2/index.html">v0.2</a>
-        <a class="list-group-item list-group-item-action py-1" href="https:///docs.neurodata.io/scikit-tree/v0.1/index.html">v0.1</a>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
     </div>
-</div></div>
+  </div>
+`);
+</script></div>
       
         <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
     aria-label="Icon Links">
@@ -301,17 +319,31 @@ document.write(`
     
       <div class="sidebar-header-items__end">
         
-          <div class="navbar-item"><div class="dropdown">
-    <button type="button" class="btn btn-primary btn-sm navbar-btn dropdown-toggle" id="dLabelMore" data-toggle="dropdown">
-        v0.2.0
-        <span class="caret"></span>
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
+      0.2.1  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
     </button>
-    <div class="dropdown-menu list-group-flush py-0" aria-labelledby="dLabelMore">
-        <a class="list-group-item list-group-item-action py-1" href="https:///docs.neurodata.io/scikit-tree/v0.3/index.html">v0.3 (development)</a>
-        <a class="list-group-item list-group-item-action py-1" href="https:///docs.neurodata.io/scikit-tree/v0.2/index.html">v0.2</a>
-        <a class="list-group-item list-group-item-action py-1" href="https:///docs.neurodata.io/scikit-tree/v0.1/index.html">v0.1</a>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
     </div>
-</div></div>
+  </div>
+`);
+</script></div>
         
           <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
     aria-label="Icon Links">
@@ -430,6 +462,7 @@ document.write(`
     <span class="n">posterior_arr</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
     <span class="n">predict_posteriors</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="n">permute_per_tree</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">type_of_target</span><span class="p">,</span>
     <span class="n">sample_weight</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">class_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">missing_values_in_feature_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -464,6 +497,9 @@ document.write(`
         <span class="n">index_arr</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">perm_X_cov</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[</span><span class="n">index_arr</span><span class="p">,</span> <span class="n">covariate_index</span><span class="p">]</span>
         <span class="n">X_train</span><span class="p">[:,</span> <span class="n">covariate_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">perm_X_cov</span>
+
+    <span class="k">if</span> <span class="n">type_of_target</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span><span class="p">:</span>
+        <span class="n">y_train</span> <span class="o">=</span> <span class="n">y_train</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
 
     <span class="n">tree</span> <span class="o">=</span> <span class="n">_parallel_build_trees</span><span class="p">(</span>
         <span class="n">tree</span><span class="p">,</span>
@@ -521,6 +557,8 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_type_of_target_</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_is_fitted</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_seeds</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_perm_seeds</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_estimators</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -541,14 +579,34 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_metric</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_is_fitted</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_seeds</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">_get_estimators_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_estimators_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_separate</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
 
         <span class="c1"># Get drawn indices along both sample and feature axes</span>
+        <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_dataset_per_tree</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">tree</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">estimators_</span><span class="p">:</span>
-                <span class="n">seed</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">random_state</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seeds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_seeds</span> <span class="o">=</span> <span class="p">[]</span>
+
+                <span class="k">for</span> <span class="n">tree</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">estimators_</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">tree</span><span class="o">.</span><span class="n">random_state</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_seeds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_seeds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+            <span class="n">seeds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seeds</span>
+
+            <span class="k">if</span> <span class="n">sample_separate</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_perm_seeds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">new_rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1e6</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_perm_seeds</span> <span class="o">=</span> <span class="n">new_rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span>
+                        <span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">estimators_</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="n">seeds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_perm_seeds</span>
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">tree</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">estimators_</span><span class="p">):</span>
+                <span class="n">seed</span> <span class="o">=</span> <span class="n">seeds</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
 
                 <span class="c1"># Operations accessing random_state must be performed identically</span>
                 <span class="c1"># to those in `_parallel_build_trees()`</span>
@@ -558,13 +616,19 @@ document.write(`
 
                 <span class="k">yield</span> <span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seeds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">random_state</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_seeds</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_seeds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">random_state</span>
+
+            <span class="c1"># TODO: make random_state consistent</span>
             <span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
                 <span class="n">indices</span><span class="p">,</span>
                 <span class="n">test_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_size</span><span class="p">,</span>
-                <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">random_state</span><span class="p">,</span>
+                <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_seeds</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="k">for</span> <span class="n">tree</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">estimators_</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">estimators_</span><span class="p">:</span>
                 <span class="k">yield</span> <span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span>
 
     <span class="nd">@property</span>
@@ -849,6 +913,7 @@ document.write(`
             <span class="c1"># permuting the covariate index per tree or per forest. If not permuting</span>
             <span class="c1"># there is only one train and test split, so we can just use that</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">indices_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_test_samples_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">indices_test</span> <span class="o">=</span> <span class="n">observe_samples</span>
             <span class="n">y_test</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">indices_test</span><span class="p">,</span> <span class="p">:]</span>
             <span class="n">y_pred_proba_normal</span> <span class="o">=</span> <span class="n">observe_posteriors</span><span class="p">[:,</span> <span class="n">indices_test</span><span class="p">,</span> <span class="p">:]</span>
             <span class="n">y_pred_proba_perm</span> <span class="o">=</span> <span class="n">permute_posteriors</span><span class="p">[:,</span> <span class="n">indices_test</span><span class="p">,</span> <span class="p">:]</span>
@@ -1076,8 +1141,11 @@ document.write(`
                     <span class="n">posterior_arr</span><span class="p">,</span>
                     <span class="kc">False</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">permute_per_tree</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_type_of_target_</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_estimators_indices</span><span class="p">())</span>
+                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_get_estimators_indices</span><span class="p">(</span><span class="n">sample_separate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="p">)</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># fitting a forest will only get one unique train/test split</span>
@@ -1294,15 +1362,18 @@ document.write(`
                     <span class="n">posterior_arr</span><span class="p">,</span>
                     <span class="n">predict_posteriors</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">permute_per_tree</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_type_of_target_</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_estimators_indices</span><span class="p">())</span>
+                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_get_estimators_indices</span><span class="p">(</span><span class="n">sample_separate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="p">)</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># fitting a forest will only get one unique train/test split</span>
             <span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_test_samples_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
             <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">indices_train</span><span class="p">,</span> <span class="p">:],</span> <span class="n">X</span><span class="p">[</span><span class="n">indices_test</span><span class="p">,</span> <span class="p">:]</span>
-            <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">indices_train</span><span class="p">,</span> <span class="p">:],</span> <span class="n">y</span><span class="p">[</span><span class="n">indices_test</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="n">y_train</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">indices_train</span><span class="p">,</span> <span class="p">:]</span>
 
             <span class="k">if</span> <span class="n">covariate_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="c1"># perform permutation of covariates</span>
@@ -1315,7 +1386,7 @@ document.write(`
                 <span class="p">)</span>
                 <span class="n">X_train</span><span class="p">[:,</span> <span class="n">covariate_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[</span><span class="n">index_arr</span><span class="p">,</span> <span class="n">covariate_index</span><span class="p">]</span>
 
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type_of_target_</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type_of_target_</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span> <span class="ow">or</span> <span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
                 <span class="n">y_train</span> <span class="o">=</span> <span class="n">y_train</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
             <span class="n">estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 
@@ -1333,7 +1404,6 @@ document.write(`
 
             <span class="c1"># set variables to compute metric</span>
             <span class="n">samples</span> <span class="o">=</span> <span class="n">indices_test</span>
-            <span class="n">y_true_final</span> <span class="o">=</span> <span class="n">y_test</span>
         <span class="k">if</span> <span class="n">metric</span> <span class="o">==</span> <span class="s2">&quot;auc&quot;</span><span class="p">:</span>
             <span class="c1"># at this point, posterior_final is the predicted posterior for only the positive class</span>
             <span class="c1"># as more than one output is not supported.</span>
@@ -1412,7 +1482,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-10-05.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-10-09.
       <br/>
     
   </p>
