@@ -314,7 +314,7 @@ def test_sample_size_consistency_of_estimator_indices_(permute_per_tree, sample_
     )
     if sample_dataset_per_tree:
         assert_array_equal(
-            samples,
+            sorted(np.unique(samples)),
             sorted(np.unique(np.concatenate([x[1] for x in clf.train_test_samples_]).flatten())),
         )
     else:
