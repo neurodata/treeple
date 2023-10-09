@@ -30,10 +30,10 @@ min_weight_leaf = 0.0
 random_state = np.random.RandomState(100)
 
 feature_set_ends = np.array([3, 5, 9], dtype=np.int8)
-n_feature_sets = 3
-uniform_sampling = False
+n_feature_sets = len(feature_set_ends)
+uniform_sampling = True
 
-feature_combinations = 1.5
+feature_combinations = 1
 monotonic_cst = None
 missing_value_feature_mask = None
 
@@ -79,7 +79,7 @@ projection_matrix = splitter.sample_projection_matrix_py()
 cmap = ListedColormap(['#1f77b4', '#ff7f0e', '#2ca02c'][:n_feature_sets])
 
 # Create a heatmap to visualize the indices
-fig, ax = plt.subplots(figsize=(10, 10))
+fig, ax = plt.subplots(figsize=(6, 6))
 
 ax.imshow(projection_matrix, cmap=cmap, aspect='auto')
 ax.set(
@@ -87,13 +87,17 @@ ax.set(
     xlabel="Feature Index",
     ylabel="Projection Vector Index"
 )
+ax.set_xticks(np.arange(feature_set_ends[-1]))
+ax.set_yticks(np.arange(max_features))
+ax.set_yticklabels(np.arange(max_features, dtype=int) + 1)
+ax.set_xticklabels(np.arange(feature_set_ends[-1], dtype=int) + 1)
 
 # Create a mappable object
 sm = ScalarMappable(cmap=cmap)
 sm.set_array([])  # You can set an empty array or values here
 
 # Create a color bar with labels for each feature set
-colorbar = plt.colorbar(sm, ticks=np.arange(n_feature_sets) + 0.5, format="%d")
+colorbar = fig.colorbar(sm, ax=ax, ticks=np.arange(n_feature_sets) + 0.5, format="%d")
 colorbar.set_label("Feature Set")
 
 plt.show()
