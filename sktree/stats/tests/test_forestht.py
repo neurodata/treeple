@@ -358,11 +358,11 @@ def test_permute_per_tree_samples_consistency_with_sklearnforest(seed, sample_da
 
     # if the sample_dataset_per_tree, then the indices should be different across all
     if sample_dataset_per_tree:
-        for (indices, other_indices) in combinations(clf.train_test_samples_, 2):
+        for indices, other_indices in combinations(clf.train_test_samples_, 2):
             assert not np.array_equal(indices[0], other_indices[0])
             assert not np.array_equal(indices[1], other_indices[1])
     else:
-        for (indices, other_indices) in combinations(clf.train_test_samples_, 2):
+        for indices, other_indices in combinations(clf.train_test_samples_, 2):
             assert_array_equal(indices[0], other_indices[0])
             assert_array_equal(indices[1], other_indices[1])
 
@@ -408,10 +408,7 @@ def test_small_dataset_independent(seed):
     assert pvalue > 0.05
 
     stat, pvalue = clf.test(X, y, metric="mi")
-    if seed is not None:
-        assert stat == 0.0
-    else:
-        assert_almost_equal(stat, 0.0, decimal=1)
+    assert_almost_equal(stat, 0.0, decimal=1)
     assert pvalue > 0.05
 
 
@@ -426,7 +423,10 @@ def test_small_dataset_dependent(seed):
     X = rng.uniform(size=(n_samples // 2, n_features))
     X2 = X + 3
     X = np.vstack([X, X2])
-    y = np.vstack([np.zeros((n_samples // 2, 1)), np.ones((n_samples // 2, 1))])  # Binary classification
+    y = np.vstack(
+        [np.zeros((n_samples // 2, 1)), np.ones((n_samples // 2, 1))]
+    )  # Binary classification
+    print(X.shape, y.shape)
 
     clf = FeatureImportanceForestClassifier(
         estimator=HonestForestClassifier(

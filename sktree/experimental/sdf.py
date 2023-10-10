@@ -108,7 +108,6 @@ class StreamDecisionForest(RandomForestClassifier):
         monotonic_cst=None,
         n_swaps=1,
     ):
-
         super().__init__(
             n_estimators=n_estimators,
             criterion=criterion,
