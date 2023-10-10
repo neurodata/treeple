@@ -429,7 +429,7 @@ class BaseForestHT(MetaEstimatorMixin):
         y : ArrayLike of shape (n_samples, n_outputs)
             The target matrix.
         covariate_index : ArrayLike, optional of shape (n_covariates,)
-            The index array of covariates to shuffle, will shuffle all columns by default.
+            The index array of covariates to shuffle, will shuffle all columns by default (corresponding to None).
         metric : str, optional
             The metric to compute, by default "mse".
         n_repeats : int, optional
