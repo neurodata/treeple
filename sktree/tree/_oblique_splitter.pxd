@@ -148,6 +148,20 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
     cdef const cnp.int8_t[:] feature_set_ends   # an array indicating the column indices of the end of each feature set
     cdef intp_t n_feature_sets                  # the number of feature sets is the length of feature_set_ends + 1
 
+    cdef vector[vector[SIZE_t]] multi_indices_to_sample
+
+    cdef void sample_proj_mat(
+        self,
+        vector[vector[DTYPE_t]]& proj_mat_weights,
+        vector[vector[SIZE_t]]& proj_mat_indices
+    ) noexcept nogil
+
+
+# XXX: This splitter is experimental. Expect changes frequently.
+cdef class MultiViewObliqueSplitter(BestObliqueSplitter):
+    cdef const cnp.int8_t[:] feature_set_ends   # an array indicating the column indices of the end of each feature set
+    cdef intp_t n_feature_sets                  # the number of feature sets is the length of feature_set_ends + 1
+
     # whether or not to uniformly sample feature-sets into each projection vector
     # if True, then sample from each feature set for each projection vector
     cdef bint uniform_sampling

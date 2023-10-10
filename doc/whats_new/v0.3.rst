@@ -13,7 +13,7 @@ Version 0.3
 Changelog
 ---------
 - |Fix| Fixes a bug in consistency of train/test samples when ``random_state`` is not set in FeatureImportanceForestClassifier and FeatureImportanceForestRegressor, by `Adam Li`_ (:pr:`135`)
-- |Enhancement| Add multi-view splitter for oblique decision trees, by `Adam Li`_ (:pr:`129`)
+- |Enhancement| Add multi-view splitter for axis-aligned decision trees, by `Adam Li`_ (:pr:`129`)
 
 Code and Documentation Contributors
 -----------------------------------

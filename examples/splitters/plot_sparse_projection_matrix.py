@@ -15,8 +15,7 @@ from the input ``X`` and linearly combined to form candidate split dimensions.
 For details on how to use the hyperparameters related to the patches, see
 :class:`sktree.tree.ObliqueDecisionTreeClassifier`.
 """
-
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 # import modules
 # .. note:: We use a private Cython module here to demonstrate what the patches
@@ -26,6 +25,8 @@ For details on how to use the hyperparameters related to the patches, see
 #           To use the actual splitter, one should use the public API for the
 #           relevant tree/forests class.
 import numpy as np
+from matplotlib.cm import ScalarMappable
+from matplotlib.colors import ListedColormap
 
 from sktree._lib.sklearn.tree._criterion import Gini
 from sktree.tree._oblique_splitter import BestObliqueSplitterTester
@@ -47,17 +48,24 @@ feature_combinations = 1
 monotonic_cst = None
 missing_value_feature_mask = None
 
+n_features = 10
+n_samples = 5
+
 # initialize some dummy data
-X = np.repeat(np.arange(25).astype(np.float32), 5).reshape(5, -1)
+X = np.ones((n_samples, n_features), dtype=np.float32)
 y = np.array([0, 0, 0, 1, 1]).reshape(-1, 1).astype(np.float64)
 sample_weight = np.ones(5)
 
 print("The shape of our dataset is: ", X.shape, y.shape, sample_weight.shape)
 
 # %%
-# Generate 1D patches
-# -------------------
-
+# Initialize the splitter
+# -----------------------
+# The splitter is initialized in the decision-tree classes, but we expose
+# a testing interface here to demonstrate how the projection matrices are
+# sampled internally.
+#
+# .. warning:: Do not use this interface directly in practice.
 
 splitter = BestObliqueSplitterTester(
     criterion,
@@ -70,20 +78,37 @@ splitter = BestObliqueSplitterTester(
 )
 splitter.init_test(X, y, sample_weight, missing_value_feature_mask)
 
-# sample the projection matrix that consists of 1D patches
-proj_mat = splitter.sample_projection_matrix()
-print(proj_mat.shape)
+# %%
+# Generate projection matrix
+# --------------------------
+# Sample the projection matrix that consists of randomly sampled features
+# with an average of ``feature_combinations * max_features`` non-zeros
+# in the ``(max_features, n_features)`` matrix.
 
-# Visualize 1D patches
-# fig, axs = plt.subplots(nrows=2, ncols=3, figsize=(12, 8), sharex=True, sharey=True, squeeze=True)
-# axs = axs.flatten()
-# for idx, ax in enumerate(axs):
-#     ax.imshow(proj_mat[idx, :].reshape(data_dims), cmap="viridis")
-#     ax.set(
-#         xlim=(-1, data_dims[1]),
-#         ylim=(-1, data_dims[0]),
-#         title=f"Patch {idx}",
-#     )
+projection_matrix = splitter.sample_projection_matrix_py()
+print(projection_matrix.shape)
 
-# fig.suptitle("1D Patch Visualization")
-# plt.show()
+# Visualize the projection matrix
+cmap = ListedColormap(["orange", "white", "green"])
+
+# Create a heatmap to visualize the indices
+fig, ax = plt.subplots(figsize=(6, 6))
+
+ax.imshow(projection_matrix, cmap=cmap, aspect=n_features / max_features, interpolation="none")
+
+ax.set(title="Sampled Projection Matrix", xlabel="Feature Index", ylabel="Projection Vector Index")
+ax.set_xticks(np.arange(n_features))
+ax.set_yticks(np.arange(max_features))
+ax.set_yticklabels(np.arange(max_features, dtype=int) + 1)
+ax.set_xticklabels(np.arange(n_features, dtype=int) + 1)
+
+# Create a mappable object
+sm = ScalarMappable(cmap=cmap)
+sm.set_array([])  # You can set an empty array or values here
+
+# Create a color bar with labels for each feature set
+colorbar = fig.colorbar(sm, ax=ax, ticks=[0, 0.5, 1], format="%d")
+colorbar.set_label("Projection Weight")
+colorbar.ax.set_yticklabels(["-1", "0", "1"])
+
+plt.show()

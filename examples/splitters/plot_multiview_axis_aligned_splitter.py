@@ -1,7 +1,7 @@
 """
-===========================================================================
-Demonstrate and visualize a multi-view projection matrix of an oblique tree
-===========================================================================
+=================================================================================
+Demonstrate and visualize a multi-view projection matrix for an axis-aligned tree
+=================================================================================
 
 This example shows how multi-view projection matrices are generated for an oblique tree,
 specifically the :class:`sktree.tree.ObliqueDecisionTreeClassifier`.
@@ -13,6 +13,14 @@ consists of multiple feature-sets that are groups of features important for pred
 For details on how to use the hyperparameters related to the multi-view, see
 :class:`sktree.tree.ObliqueDecisionTreeClassifier`.
 """
+
+# import modules
+# .. note:: We use a private Cython module here to demonstrate what the patches
+#           look like. This is not part of the public API. The Cython module used
+#           is just a Python wrapper for the underlying Cython code and is not the
+#           same as the Cython splitter used in the actual implementation.
+#           To use the actual splitter, one should use the public API for the
+#           relevant tree/forests class.
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -31,7 +39,6 @@ random_state = np.random.RandomState(10)
 # we "simulate" three feature sets, with 3, 2 and 4 features respectively
 feature_set_ends = np.array([3, 5, 9], dtype=np.int8)
 n_feature_sets = len(feature_set_ends)
-uniform_sampling = True
 
 feature_combinations = 1
 monotonic_cst = None
@@ -50,6 +57,8 @@ print("The shape of our dataset is: ", X.shape, y.shape, sample_weight.shape)
 # The multi-view splitter is a Cython class that is initialized internally
 # in scikit-tree. However, we expose a Python tester object to demonstrate
 # how the splitter works in practice.
+#
+# .. warning:: Do not use this interface directly in practice.
 
 splitter = MultiViewSplitterTester(
     criterion,
@@ -61,7 +70,6 @@ splitter = MultiViewSplitterTester(
     feature_combinations,
     feature_set_ends,
     n_feature_sets,
-    uniform_sampling,
 )
 splitter.init_test(X, y, sample_weight, missing_value_feature_mask)
 
@@ -69,14 +77,14 @@ splitter.init_test(X, y, sample_weight, missing_value_feature_mask)
 # Sample the projection matrix
 # ----------------------------
 # The projection matrix is sampled by the splitter. The projection
-# matrix is a (max_features, n_features) matrix that linearly combines random
-# features from ``X`` to define candidate split dimensions. The multi-view
+# matrix is a (max_features, n_features) matrix that selects which features of ``X``
+# to define candidate split dimensions. The multi-view
 # splitter's projection matrix though samples from multiple feature sets,
 # which are aligned contiguously over the columns of ``X``.
 
 projection_matrix = splitter.sample_projection_matrix_py()
 
-cmap = ListedColormap(["orange", "white", "green"][:n_feature_sets])
+cmap = ListedColormap(["white", "green"][:n_feature_sets])
 
 # Create a heatmap to visualize the indices
 fig, ax = plt.subplots(figsize=(6, 6))
@@ -87,9 +95,6 @@ ax.imshow(
 ax.axvline(feature_set_ends[0] - 0.5, color="black", linewidth=1, label="Feature Sets")
 for iend in feature_set_ends[1:]:
     ax.axvline(iend - 0.5, color="black", linewidth=1)
-
-# Gridlines based on minor ticks
-# ax.grid(which='both', color='black', linestyle='-', linewidth=2)
 
 ax.set(title="Sampled Projection Matrix", xlabel="Feature Index", ylabel="Projection Vector Index")
 ax.set_xticks(np.arange(feature_set_ends[-1]))
@@ -103,8 +108,19 @@ sm = ScalarMappable(cmap=cmap)
 sm.set_array([])  # You can set an empty array or values here
 
 # Create a color bar with labels for each feature set
-colorbar = fig.colorbar(sm, ax=ax, ticks=[0, 0.5, 1], format="%d")
-colorbar.set_label("Projection Weight")
-colorbar.ax.set_yticklabels(["-1", "0", "1"])
+colorbar = fig.colorbar(sm, ax=ax, ticks=[0.25, 0.75], format="%d")
+colorbar.set_label("Projection Weight (I.e. Sampled Feature From a Feature Set)")
+colorbar.ax.set_yticklabels(["0", "1"])
 
 plt.show()
+
+# %%
+# Discussion
+# ----------
+# As we can see, the multi-view splitter samples split candidates uniformly across the feature sets.
+# In contrast, the normal splitter in :class:`sklearn.tree.DecisionTreeClassifier` samples
+# randomly across all ``n_features`` features because it is not aware of the multi-view structure.
+# This is the key difference between the two splitters.
+#
+# For an example of using the multi-view splitter in practice on simulated data, see
+# :ref:`sphx_glr_auto_examples_plot_multiview_dtc.py`.
