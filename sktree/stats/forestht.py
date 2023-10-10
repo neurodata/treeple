@@ -465,6 +465,9 @@ class BaseForestHT(MetaEstimatorMixin):
             observe_stat = self.observe_stat_
 
         # next permute the data
+        if covariate_index is None:
+            covariate_index = np.arange(X.shape[1], dtype=int)
+
         permute_stat, permute_posteriors, permute_samples = self.statistic(
             X,
             y,

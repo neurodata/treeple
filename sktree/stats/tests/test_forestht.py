@@ -387,7 +387,7 @@ def test_permute_per_tree_samples_consistency_with_sklearnforest(seed, sample_da
 
 
 @pytest.mark.parametrize("seed", [None, 0])
-def test_small_dataset(seed):
+def test_small_dataset_independent(seed):
     n_samples = 32
     n_features = 5
 
@@ -413,6 +413,37 @@ def test_small_dataset(seed):
     else:
         assert_almost_equal(stat, 0.0, decimal=1)
     assert pvalue > 0.05
+
+
+@flaky(max_runs=3)
+@pytest.mark.parametrize("seed", [None, 0])
+def test_small_dataset_dependent(seed):
+    n_samples = 100
+    n_features = 5
+    rng = np.random.default_rng(seed)
+
+    X = rng.uniform(size=(n_samples, n_features))
+    X = rng.uniform(size=(n_samples // 2, n_features))
+    X2 = X + 3
+    X = np.vstack([X, X2])
+    y = np.vstack([np.zeros((n_samples // 2, 1)), np.ones((n_samples // 2, 1))])  # Binary classification
+    print(X.shape, y.shape)
+
+    clf = FeatureImportanceForestClassifier(
+        estimator=HonestForestClassifier(
+            n_estimators=10, random_state=seed, n_jobs=1, honest_fraction=0.5
+        ),
+        test_size=0.2,
+        permute_per_tree=False,
+        sample_dataset_per_tree=False,
+    )
+    stat, pvalue = clf.test(X, y, covariate_index=[1, 2], metric="mi")
+    assert ~np.isnan(pvalue)
+    assert ~np.isnan(stat)
+    assert pvalue <= 0.05
+
+    stat, pvalue = clf.test(X, y, metric="mi")
+    assert pvalue <= 0.05
 
 
 # @pytest.mark.monitor_test
