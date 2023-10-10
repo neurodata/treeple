@@ -331,7 +331,7 @@ class BaseForestHT(MetaEstimatorMixin):
             self._n_samples_, self.n_features_in_ = X.shape
         if self._type_of_target_ is None:
             self._type_of_target_ = type_of_target(y)
-            
+
         if covariate_index is None:
             self.estimator_ = self._get_estimator()
             estimator = self.estimator_

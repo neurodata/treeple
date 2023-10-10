@@ -8,27 +8,27 @@ specifically the :class:`sktree.tree.ObliqueDecisionTreeClassifier`.
 
 Multi-view projection matrices operate under the assumption that the input ``X`` array
 consists of multiple feature-sets that are groups of features important for predicting
-``y``. 
+``y``.
 
 For details on how to use the hyperparameters related to the multi-view, see
 :class:`sktree.tree.ObliqueDecisionTreeClassifier`.
 """
 
-import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.colors import ListedColormap
+import numpy as np
 from matplotlib.cm import ScalarMappable
+from matplotlib.colors import ListedColormap
 
 from sktree._lib.sklearn.tree._criterion import Gini
 from sktree.tree._oblique_splitter import MultiViewSplitterTester
 
-
 criterion = Gini(1, np.array((0, 1)))
-max_features = 6
+max_features = 5
 min_samples_leaf = 1
 min_weight_leaf = 0.0
-random_state = np.random.RandomState(100)
+random_state = np.random.RandomState(10)
 
+# we "simulate" three feature sets, with 3, 2 and 4 features respectively
 feature_set_ends = np.array([3, 5, 9], dtype=np.int8)
 n_feature_sets = len(feature_set_ends)
 uniform_sampling = True
@@ -61,7 +61,7 @@ splitter = MultiViewSplitterTester(
     feature_combinations,
     feature_set_ends,
     n_feature_sets,
-    uniform_sampling
+    uniform_sampling,
 )
 splitter.init_test(X, y, sample_weight, missing_value_feature_mask)
 
@@ -76,28 +76,35 @@ splitter.init_test(X, y, sample_weight, missing_value_feature_mask)
 
 projection_matrix = splitter.sample_projection_matrix_py()
 
-cmap = ListedColormap(['#1f77b4', '#ff7f0e', '#2ca02c'][:n_feature_sets])
+cmap = ListedColormap(["orange", "white", "green"][:n_feature_sets])
 
 # Create a heatmap to visualize the indices
 fig, ax = plt.subplots(figsize=(6, 6))
 
-ax.imshow(projection_matrix, cmap=cmap, aspect='auto')
-ax.set(
-    title="Sampled Projection Matrix",
-    xlabel="Feature Index",
-    ylabel="Projection Vector Index"
+ax.imshow(
+    projection_matrix, cmap=cmap, aspect=feature_set_ends[-1] / max_features, interpolation="none"
 )
+ax.axvline(feature_set_ends[0] - 0.5, color="black", linewidth=1, label="Feature Sets")
+for iend in feature_set_ends[1:]:
+    ax.axvline(iend - 0.5, color="black", linewidth=1)
+
+# Gridlines based on minor ticks
+# ax.grid(which='both', color='black', linestyle='-', linewidth=2)
+
+ax.set(title="Sampled Projection Matrix", xlabel="Feature Index", ylabel="Projection Vector Index")
 ax.set_xticks(np.arange(feature_set_ends[-1]))
 ax.set_yticks(np.arange(max_features))
 ax.set_yticklabels(np.arange(max_features, dtype=int) + 1)
 ax.set_xticklabels(np.arange(feature_set_ends[-1], dtype=int) + 1)
+ax.legend()
 
 # Create a mappable object
 sm = ScalarMappable(cmap=cmap)
 sm.set_array([])  # You can set an empty array or values here
 
 # Create a color bar with labels for each feature set
-colorbar = fig.colorbar(sm, ax=ax, ticks=np.arange(n_feature_sets) + 0.5, format="%d")
-colorbar.set_label("Feature Set")
+colorbar = fig.colorbar(sm, ax=ax, ticks=[0, 0.5, 1], format="%d")
+colorbar.set_label("Projection Weight")
+colorbar.ax.set_yticklabels(["-1", "0", "1"])
 
 plt.show()

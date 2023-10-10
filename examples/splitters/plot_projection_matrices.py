@@ -1,7 +1,7 @@
 """
-===============================================
-Plot the projection matrices of an oblique tree
-===============================================
+===================================================================================
+Plot the projection matrices of an oblique tree for sampling images, or time-series
+===================================================================================
 
 This example shows how projection matrices are generated for an oblique tree,
 specifically the :class:`sktree.tree.PatchObliqueDecisionTreeClassifier`.
@@ -61,6 +61,7 @@ random_state = np.random.RandomState(100)
 
 boundary = None
 feature_weight = None
+monotonic_cst = None
 missing_value_feature_mask = None
 
 # initialize some dummy data
@@ -87,7 +88,7 @@ splitter = BestPatchSplitterTester(
     min_samples_leaf,
     min_weight_leaf,
     random_state,
-    missing_value_feature_mask,
+    monotonic_cst,
     min_patch_dims,
     max_patch_dims,
     dim_contiguous,
@@ -95,7 +96,7 @@ splitter = BestPatchSplitterTester(
     boundary,
     feature_weight,
 )
-splitter.init_test(X, y, sample_weight, None)
+splitter.init_test(X, y, sample_weight, missing_value_feature_mask)
 
 # sample the projection matrix that consists of 1D patches
 proj_mat = splitter.sample_projection_matrix()

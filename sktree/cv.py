@@ -26,7 +26,8 @@ def cross_fit_forest(
     y : ArrayLike of shape (n_samples, [n_outputs])
         Target data.
     cv : BaseCrossValidator, optional
-        Cross validation object, by default None, which defaults to :class:`sklearn.model_selection.StratifiedKFold`.
+        Cross validation object, by default None, which defaults to
+        :class:`sklearn.model_selection.StratifiedKFold`.
     n_splits : int, optional
         Number of folds to generate, by default 5.
     random_state : int, optional

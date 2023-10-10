@@ -20,9 +20,8 @@ from .._lib.sklearn.tree._tree cimport DTYPE_t  # Type of X
 from .._lib.sklearn.tree._tree cimport INT32_t  # Signed 32 bit integer
 from .._lib.sklearn.tree._tree cimport SIZE_t  # Type for indices and counters
 from .._lib.sklearn.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
-from ._sklearn_splitter cimport sort
-
 from .._lib.sklearn.utils._typedefs cimport intp_t
+from ._sklearn_splitter cimport sort
 
 
 cdef struct ObliqueSplitRecord:
@@ -148,10 +147,12 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
 cdef class MultiViewSplitter(BestObliqueSplitter):
     cdef const cnp.int8_t[:] feature_set_ends   # an array indicating the column indices of the end of each feature set
     cdef intp_t n_feature_sets                  # the number of feature sets is the length of feature_set_ends + 1
-    
+
     # whether or not to uniformly sample feature-sets into each projection vector
     # if True, then sample from each feature set for each projection vector
     cdef bint uniform_sampling
+
+    cdef vector[vector[SIZE_t]] multi_indices_to_sample
 
     cdef void sample_proj_mat(
         self,

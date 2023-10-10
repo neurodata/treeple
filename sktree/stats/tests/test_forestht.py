@@ -292,7 +292,9 @@ def test_pickle(tmpdir):
 
 
 @pytest.mark.parametrize("permute_per_tree", [True, False], ids=["permute_per_tree", "no_permute"])
-@pytest.mark.parametrize("sample_dataset_per_tree", [True, False], ids=["sample_dataset_per_tree", "no_sample_dataset"])
+@pytest.mark.parametrize(
+    "sample_dataset_per_tree", [True, False], ids=["sample_dataset_per_tree", "no_sample_dataset"]
+)
 def test_sample_size_consistency_of_estimator_indices_(permute_per_tree, sample_dataset_per_tree):
     """Test that the test-sample indices are what is expected."""
     clf = FeatureImportanceForestClassifier(
@@ -318,17 +320,20 @@ def test_sample_size_consistency_of_estimator_indices_(permute_per_tree, sample_
         assert clf.n_samples_test_ == n_samples, f"{clf.n_samples_test_} != {n_samples}"
 
         sorted_sample_idx = sorted(np.unique(samples))
-        sorted_est_samples_idx = sorted(np.unique(np.concatenate([x[1] for x in clf.train_test_samples_]).flatten()))
+        sorted_est_samples_idx = sorted(
+            np.unique(np.concatenate([x[1] for x in clf.train_test_samples_]).flatten())
+        )
         assert_array_equal(sorted_sample_idx, non_nan_idx)
 
-        # the sample indices are equal to the output of the train/test indices_ only if there are no nans
-        # in the posteriors over all the samples
+        # the sample indices are equal to the output of the train/test indices_
+        # only if there are no nans in the posteriors over all the samples
         if np.sum(non_nan_idx) == n_samples:
             assert_array_equal(
-            sorted_sample_idx,
-            sorted_est_samples_idx,
-            f"{set(sorted_sample_idx) - set(sorted_est_samples_idx)} and {set(sorted_est_samples_idx) - set(sorted_sample_idx)}"
-        )
+                sorted_sample_idx,
+                sorted_est_samples_idx,
+                f"{set(sorted_sample_idx) - set(sorted_est_samples_idx)} and "
+                f"{set(sorted_est_samples_idx) - set(sorted_sample_idx)}",
+            )
     else:
         assert_array_equal(samples, sorted(clf.train_test_samples_[0][1]))
     assert len(_non_nan_samples(posteriors)) == len(samples)
