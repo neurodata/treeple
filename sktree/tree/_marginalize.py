@@ -105,11 +105,7 @@ def _apply_marginal_forest(
     if est.max_bins is not None:
         X = est._bin_data(X, is_training_data=False).astype(DTYPE)
 
-    results = Parallel(
-        n_jobs=est.n_jobs,
-        verbose=est.verbose,
-        prefer="threads",
-    )(
+    results = Parallel(n_jobs=est.n_jobs, verbose=est.verbose, prefer="threads",)(
         delayed(_apply_marginal_tree)(
             tree,
             X,
