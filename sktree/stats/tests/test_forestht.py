@@ -427,7 +427,6 @@ def test_small_dataset_dependent(seed):
     X2 = X + 3
     X = np.vstack([X, X2])
     y = np.vstack([np.zeros((n_samples // 2, 1)), np.ones((n_samples // 2, 1))])  # Binary classification
-    print(X.shape, y.shape)
 
     clf = FeatureImportanceForestClassifier(
         estimator=HonestForestClassifier(
