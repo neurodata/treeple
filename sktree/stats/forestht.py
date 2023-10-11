@@ -426,7 +426,8 @@ class BaseForestHT(MetaEstimatorMixin):
         y : ArrayLike of shape (n_samples, n_outputs)
             The target matrix.
         covariate_index : ArrayLike, optional of shape (n_covariates,)
-            The index array of covariates to shuffle, by default None.
+            The index array of covariates to shuffle, will shuffle all columns by
+            default (corresponding to None).
         metric : str, optional
             The metric to compute, by default "mse".
         n_repeats : int, optional
@@ -462,6 +463,9 @@ class BaseForestHT(MetaEstimatorMixin):
             observe_stat = self.observe_stat_
 
         # next permute the data
+        if covariate_index is None:
+            covariate_index = np.arange(X.shape[1], dtype=int)
+
         permute_stat, permute_posteriors, permute_samples = self.statistic(
             X,
             y,
