@@ -89,6 +89,12 @@ cdef class BaseObliqueSplitter(Splitter):
         double upper_bound,
     ) except -1 nogil
 
+    cdef inline void fisher_yates_shuffle_memview(
+        self,
+        SIZE_t[::1] indices_to_sample,
+        SIZE_t grid_size,
+        UINT32_t* random_state
+    ) noexcept nogil
 
 cdef class ObliqueSplitter(BaseObliqueSplitter):
     # The splitter searches in the input space for a linear combination of features and a threshold

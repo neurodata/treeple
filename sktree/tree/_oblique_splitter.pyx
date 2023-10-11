@@ -12,7 +12,6 @@ from sklearn.tree._utils cimport rand_int, rand_uniform
 
 from .._lib.sklearn.tree._criterion cimport Criterion
 
-
 cdef double INFINITY = np.inf
 
 # Mitigate precision differences between 32 bit and 64 bit
@@ -123,6 +122,18 @@ cdef class BaseObliqueSplitter(Splitter):
                 if jdx == 0:
                     feature_values[idx] = 0.0
                 feature_values[idx] += self.X[samples[idx], col_idx] * col_weight
+    
+    cdef inline void fisher_yates_shuffle_memview(
+        self,
+        SIZE_t[::1] indices_to_sample,
+        SIZE_t grid_size,
+        UINT32_t* random_state,
+    ) noexcept nogil:
+        cdef int i, j
+        for i in range(0, grid_size - 1):
+            j = rand_int(i + 1, grid_size, random_state)
+            indices_to_sample[j], indices_to_sample[i] = \
+                indices_to_sample[i], indices_to_sample[j]
 
 cdef class ObliqueSplitter(BaseObliqueSplitter):
     def __cinit__(
@@ -241,10 +252,7 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         cdef SIZE_t grid_size = self.max_features * self.n_features
 
         # shuffle indices over the 2D grid to sample using Fisher-Yates
-        for i in range(0, grid_size):
-            j = rand_int(0, grid_size, random_state)
-            indices_to_sample[j], indices_to_sample[i] = \
-                indices_to_sample[i], indices_to_sample[j]
+        self.fisher_yates_shuffle_memview(indices_to_sample, grid_size, random_state)
 
         # sample 'n_non_zeros' in a mtry X n_features projection matrix
         # which consists of +/- 1's chosen at a 1/2s rate
@@ -702,6 +710,7 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
         # create a helper array for allowing efficient Fisher-Yates
         self.multi_indices_to_sample = vector[vector[SIZE_t]](self.n_feature_sets)
 
+        cdef SIZE_t[::1] indices_to_sample
         cdef SIZE_t i_feature = 0
         cdef SIZE_t feature_set_begin = 0
         cdef SIZE_t size_of_feature_set
@@ -710,8 +719,28 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
             size_of_feature_set = self.feature_set_ends[i_feature] - feature_set_begin
             for ifeat in range(size_of_feature_set):
                 self.multi_indices_to_sample[i_feature].push_back(ifeat + feature_set_begin)
+
             feature_set_begin = self.feature_set_ends[i_feature]
         return 0
+
+    # cdef inline void fisher_yates_shuffle_vector(
+    #     self,
+    #     vector[SIZE_t]& indices_to_sample,
+    #     SIZE_t grid_size,
+    #     UINT32_t* random_state,
+    # ) noexcept nogil:
+    #     cdef int i, j
+    #     cdef int temp_i, temp_j
+    #     for i in range(0, grid_size - 1):
+    #         j = rand_int(i + 1, grid_size, random_state)
+    #         temp_i = indices_to_sample[i]
+    #         temp_j = indices_to_sample[j]
+    #         indices_to_sample[i] = temp_j
+    #         indices_to_sample[j] = temp_i
+    #         with gil:
+    #             print('After shuffled', i, temp_i, temp_j, indices_to_sample[i], indices_to_sample[j])
+            # indices_to_sample[j], indices_to_sample[i] = \
+            #     indices_to_sample[i], indices_to_sample[j]
 
     cdef void sample_proj_mat(
         self,
@@ -724,41 +753,77 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
         but now also uniformly samples features from each feature set.
         """
         cdef UINT32_t* random_state = &self.rand_r_state
-
         cdef int feat_i, proj_i
         cdef DTYPE_t weight
 
         cdef vector[SIZE_t] indices_to_sample
 
         # keep track of the beginning and ending indices of each feature set
-        cdef int feature_set_begin, feature_set_end, idx
+        cdef int idx
         cdef int ifeature = 0
+        cdef int grid_size
 
         # 03: Algorithm samples features from each set with equal probability
         proj_i = 0
         cdef bint finished_feature_set = False
 
-        while proj_i < self.max_features and not finished_feature_set:
-            feature_set_begin = 0
+        cdef int i, j
+        cdef int temp_i, temp_j
+        # for idx in range(self.n_feature_sets):
+        #     indices_to_sample = self.multi_indices_to_sample[idx]
+        #     grid_size = indices_to_sample.size()
+        #     # with gil:
+        #     #     print('Shuffling...', indices_to_sample.size())
+        #     # shuffle indices over the 2D grid for this feature set to sample using Fisher-Yates
+        #     # only during the first loop, so we sample without replacement
+        #     # customFisherYatesShuffle(indices_to_sample, random_state, rand_int)
+        #     # for i in range(0, grid_size):
+        #     #     j = rand_int(0, grid_size, random_state)
+        #     #     indices_to_sample[j], indices_to_sample[i] = \
+        #     #         indices_to_sample[i], indices_to_sample[j]
+        #     # Get the first and last iterators of the vector
+        #     # first = indices_to_sample.begin()
+        #     # last = indices_to_sample.end()
+        #     # random_shuffle(first, last, rng)
+        #     # self.fisher_yates_shuffle_vector(indices_to_sample, grid_size, random_state)
+        #     for i in range(0, grid_size - 1):
+        #         j = rand_int(i + 1, grid_size, random_state)
+        #         temp_i = indices_to_sample[i]
+        #         temp_j = indices_to_sample[j]
+        #         indices_to_sample[i] = temp_j
+        #         indices_to_sample[j] = temp_i
+        #         with gil:
+        #             print('After shuffled', i, temp_i, temp_j, indices_to_sample[i], indices_to_sample[j])
 
+        #     with gil:
+        #         print('Shold be shuffled ', idx)
+        #     for i in range(grid_size):
+        #         with gil:
+        #             print(self.multi_indices_to_sample[idx][i])
+        #             print(indices_to_sample[i])
+
+        while proj_i < self.max_features and not finished_feature_set:
             # sample from a feature set
             for idx in range(self.n_feature_sets):
-                indices_to_sample = self.multi_indices_to_sample[idx]
+                # indices_to_sample = self.multi_indices_to_sample[idx]
+                grid_size = self.multi_indices_to_sample[idx].size()
 
+                # Note: a temporary variable must occur
                 if proj_i == 0:
-                    # shuffle indices over the 2D grid for this feature set to sample using Fisher-Yates
-                    # only during the first loop, so we sample without replacement
-                    for i in range(0, indices_to_sample.size()):
-                        j = rand_int(0, indices_to_sample.size(), random_state)
-                        indices_to_sample[j], indices_to_sample[i] = \
-                            indices_to_sample[i], indices_to_sample[j]
+                    for i in range(0, self.multi_indices_to_sample[idx].size() - 1):
+                        j = rand_int(i + 1, grid_size, random_state)
+                        # temp_i = indices_to_sample[i]
+                        # temp_j = indices_to_sample[j]
+                        # indices_to_sample[i] = temp_j
+                        # indices_to_sample[j] = temp_i
+                        self.multi_indices_to_sample[idx][i], self.multi_indices_to_sample[idx][j] = self.multi_indices_to_sample[idx][j], self.multi_indices_to_sample[idx][i]
 
-                if ifeature >= indices_to_sample.size():
+                if ifeature >= grid_size:
                     finished_feature_set = True
                     continue
 
                 # sample random feature in this set
-                feat_i = indices_to_sample[ifeature]
+                feat_i = self.multi_indices_to_sample[idx][ifeature]
 
                 # here, axis-aligned splits are entirely weights of 1
                 weight = 1  # if (rand_int(0, 2, random_state) == 1) else -1
@@ -770,11 +835,15 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
                 if proj_i >= self.max_features:
                     break
 
-                # the new beginning is the previous end
-                feature_set_begin = feature_set_end
                 finished_feature_set = False
 
             ifeature += 1
+
+        with gil:
+            print('Finished sampling projection matrix...')
+            for idx in range(proj_mat_indices.size()):
+                for jdx in range(proj_mat_indices[idx].size()):
+                    print(idx, jdx, proj_mat_indices[idx][jdx])
 # XXX: not used right now
 cdef class MultiViewObliqueSplitter(BestObliqueSplitter):
     def __cinit__(

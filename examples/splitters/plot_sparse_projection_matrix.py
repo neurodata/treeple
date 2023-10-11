@@ -42,9 +42,9 @@ criterion = Gini(1, np.array((0, 1)))
 max_features = 6
 min_samples_leaf = 1
 min_weight_leaf = 0.0
-random_state = np.random.RandomState(100)
+random_state = np.random.RandomState(1)
 
-feature_combinations = 1
+feature_combinations = 1.5
 monotonic_cst = None
 missing_value_feature_mask = None
 
