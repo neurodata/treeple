@@ -1,13 +1,11 @@
 import numpy as np
 import pytest
-
-from numpy.testing import assert_allclose
-from sklearn.datasets import make_classification, make_blobs
-from sklearn.utils.estimator_checks import parametrize_with_checks
+from sklearn.datasets import make_blobs
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import cross_val_score
+from sklearn.utils.estimator_checks import parametrize_with_checks
 
-from sktree.tree import MultiViewDecisionTreeClassifier, DecisionTreeClassifier
+from sktree.tree import DecisionTreeClassifier, MultiViewDecisionTreeClassifier
 
 seed = 12345
 
@@ -21,8 +19,14 @@ def test_sklearn_compatible_estimator(estimator, check):
     check(estimator)
 
 
-def test_multiview_classification():
-    """Test that explicit knowledge of multi-view structure improves classification accuracy."""
+@pytest.mark.parametrize("baseline_est", [MultiViewDecisionTreeClassifier, DecisionTreeClassifier])
+def test_multiview_classification(baseline_est):
+    """Test that explicit knowledge of multi-view structure improves classification accuracy.
+
+    In very high-dimensional noise setting across two views, when the max_depth and max_features
+    are constrained, the multi-view decision tree will still obtain perfect accuracy, while
+    the single-view decision tree will not.
+    """
     rng = np.random.default_rng(seed=seed)
 
     n_samples = 20
@@ -57,23 +61,26 @@ def test_multiview_classification():
     clf = MultiViewDecisionTreeClassifier(
         random_state=seed,
         feature_set_ends=[n_features_1, X.shape[1]],
+        max_features="sqrt",
+        max_depth=5,
     )
     clf.fit(X, y)
     assert (
-        accuracy_score(y, clf.predict(X)) > 0.99
+        accuracy_score(y, clf.predict(X)) == 1.0
     ), f"Accuracy score: {accuracy_score(y, clf.predict(X))}"
     assert (
-        cross_val_score(clf, X, y, cv=5).mean() > 0.82
+        cross_val_score(clf, X, y, cv=5).mean() == 1.0
     ), f"CV score: {cross_val_score(clf, X, y, cv=5).mean()}"
 
-    clf = DecisionTreeClassifier(
+    clf = baseline_est(
         random_state=seed,
+        max_depth=5,
+        max_features="sqrt",
     )
     clf.fit(X, y)
     assert (
-        accuracy_score(y, clf.predict(X)) >= 0.5 and accuracy_score(y, clf.predict(X)) < 0.99
+        accuracy_score(y, clf.predict(X)) == 1.0
     ), f"Accuracy score: {accuracy_score(y, clf.predict(X))}"
     assert (
-        cross_val_score(clf, X, y, cv=5).mean() >= 0.5 and cross_val_score(clf, X, y, cv=5).mean() < 0.82
+        cross_val_score(clf, X, y, cv=5).mean() <= 0.6
     ), f"CV score: {cross_val_score(clf, X, y, cv=5).mean()}"
-    assert False

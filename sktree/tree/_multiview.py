@@ -180,7 +180,7 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
           - -1: monotonic decrease
 
         Not used.
-        
+
     feature_set_ends : array-like of int of shape (n_feature_sets,), default=None
         The indices of the end of each feature set. For example, if the first
         feature set is the first 10 features, and the second feature set is the
@@ -232,7 +232,7 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
 
     feature_set_ends_ : array-like of int of shape (n_feature_sets,)
         The indices of the end of each feature set.
-    
+
     n_feature_sets_ : int
         The number of feature sets.
 
@@ -358,9 +358,9 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
             criterion = copy.deepcopy(criterion)
 
         if self.feature_set_ends is None:
-            self.feature_set_ends_ = np.asarray([n_features], dtype=np.int8)
+            self.feature_set_ends_ = np.asarray([n_features], dtype=np.intp)
         else:
-            self.feature_set_ends_ = np.asarray(self.feature_set_ends, dtype=np.int8)
+            self.feature_set_ends_ = np.atleast_1d(self.feature_set_ends).astype(np.intp)
         self.n_feature_sets_ = len(self.feature_set_ends_)
 
         splitter = self.splitter
