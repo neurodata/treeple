@@ -320,3 +320,17 @@ for idx, ax in enumerate(axs):
 
 fig.suptitle("2D Discontiguous In All Dims Patch Visualization")
 plt.show()
+
+# %%
+# Discussion
+# ----------
+# As we can see, the patch-oblique splitter samples structured patches from the data,
+# which may be useful for images (where features are correlated across the image), or
+# time-series (where features are correlated across time).
+#
+# In contrast, the normal splitter in :class:`sklearn.tree.DecisionTreeClassifier` samples
+# randomly across all ``n_features`` features because it is not aware of the such structure.
+# This is the key difference between the two splitters.
+#
+# Please see :ref:`sphx_glr_auto_examples_morf_plot_morf_eeg.py` for an example of how to
+# use the patch-oblique splitter in practice on real data.
