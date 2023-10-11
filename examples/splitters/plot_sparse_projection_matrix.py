@@ -112,3 +112,18 @@ colorbar.set_label("Projection Weight")
 colorbar.ax.set_yticklabels(["-1", "0", "1"])
 
 plt.show()
+
+# %%
+# Discussion
+# ----------
+# As we can see, the (sparse) oblique splitter samples random features to
+# linearly combine to form candidate split dimensions.
+#
+# In contrast, the normal splitter in :class:`sklearn.tree.DecisionTreeClassifier` samples
+# randomly across all ``n_features`` features.
+#
+# For an example of using oblique trees/forests in practice on data, see the following
+# examples:
+#
+# - :ref:`sphx_glr_auto_examples_plot_oblique_forests_iris.py`
+# - :ref:`sphx_glr_auto_examples_plot_oblique_random_forest.py`
