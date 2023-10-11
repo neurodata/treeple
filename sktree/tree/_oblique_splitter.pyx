@@ -131,8 +131,10 @@ cdef class BaseObliqueSplitter(Splitter):
         UINT32_t* random_state,
     ) noexcept nogil:
         cdef int i, j
+
+        # XXX: should this be `i` or `i+1`? for valid Fisher-Yates?
         for i in range(0, grid_size - 1):
-            j = rand_int(i + 1, grid_size, random_state)
+            j = rand_int(i, grid_size, random_state)
             indices_to_sample[j], indices_to_sample[i] = \
                 indices_to_sample[i], indices_to_sample[j]
 

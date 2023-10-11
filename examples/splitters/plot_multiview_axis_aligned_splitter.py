@@ -37,7 +37,7 @@ min_weight_leaf = 0.0
 random_state = np.random.RandomState(10)
 
 # we "simulate" three feature sets, with 3, 2 and 4 features respectively
-feature_set_ends = np.array([3, 5, 9], dtype=np.int8)
+feature_set_ends = np.array([3, 5, 9], dtype=np.intp)
 n_feature_sets = len(feature_set_ends)
 
 feature_combinations = 1
