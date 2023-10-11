@@ -122,6 +122,9 @@ print(f"Shape of Tree Posteriors for the positive class: {posterior_arr.shape}")
 # Extract the results from the model variables anytime. You can save the model with ``pickle``.
 #
 # ASH-90 / Partial AUC: ``est.observe_stat_``
+#
 # Observed Samples: ``est.observe_samples_``
+#
 # Tree Posteriors for the positive class: ``est.observe_posteriors_`` (n_trees, n_samples_test, 1)
+#
 # True Labels: ``est.y_true_final_``
