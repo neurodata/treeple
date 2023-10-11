@@ -667,7 +667,8 @@ distribution of the statistics.</p>
 </dd>
 <dt><strong>y</strong><span class="classifier">ArrayLike of shape (n_samples, n_outputs)</span></dt><dd><p>The target matrix.</p>
 </dd>
-<dt><strong>covariate_index</strong><span class="classifier">ArrayLike, optional of shape (n_covariates,)</span></dt><dd><p>The index array of covariates to shuffle, by default None.</p>
+<dt><strong>covariate_index</strong><span class="classifier">ArrayLike, optional of shape (n_covariates,)</span></dt><dd><p>The index array of covariates to shuffle, will shuffle all columns by
+default (corresponding to None).</p>
 </dd>
 <dt><strong>metric</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>The metric to compute, by default “mse”.</p>
 </dd>
@@ -792,7 +793,7 @@ data. Thus fetching the property may be slower than expected.</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-10-09.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-10-11.
       <br/>
     
   </p>

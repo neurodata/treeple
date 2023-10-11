@@ -865,7 +865,8 @@ document.write(`
 <span class="sd">        y : ArrayLike of shape (n_samples, n_outputs)</span>
 <span class="sd">            The target matrix.</span>
 <span class="sd">        covariate_index : ArrayLike, optional of shape (n_covariates,)</span>
-<span class="sd">            The index array of covariates to shuffle, by default None.</span>
+<span class="sd">            The index array of covariates to shuffle, will shuffle all columns by</span>
+<span class="sd">            default (corresponding to None).</span>
 <span class="sd">        metric : str, optional</span>
 <span class="sd">            The metric to compute, by default &quot;mse&quot;.</span>
 <span class="sd">        n_repeats : int, optional</span>
@@ -901,6 +902,9 @@ document.write(`
             <span class="n">observe_stat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">observe_stat_</span>
 
         <span class="c1"># next permute the data</span>
+        <span class="k">if</span> <span class="n">covariate_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">covariate_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
         <span class="n">permute_stat</span><span class="p">,</span> <span class="n">permute_posteriors</span><span class="p">,</span> <span class="n">permute_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">statistic</span><span class="p">(</span>
             <span class="n">X</span><span class="p">,</span>
             <span class="n">y</span><span class="p">,</span>
@@ -1503,7 +1507,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-10-09.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-10-11.
       <br/>
     
   </p>
