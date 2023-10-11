@@ -447,7 +447,7 @@ def test_small_dataset_dependent(seed):
 
     clf = FeatureImportanceForestClassifier(
         estimator=HonestForestClassifier(
-            n_estimators=10, random_state=seed, n_jobs=1, honest_fraction=0.5
+            n_estimators=50, random_state=seed, n_jobs=1, honest_fraction=0.5
         ),
         test_size=0.2,
         permute_per_tree=False,

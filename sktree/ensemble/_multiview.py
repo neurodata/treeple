@@ -166,6 +166,12 @@ class MultiViewRandomForestClassifier(SimMatrixMixin, ForestClassifier):
         ``(max_features, n_features)``. Thus this value must always be less than
         ``n_features`` in order to be valid.
 
+    feature_set_ends : array-like of int of shape (n_feature_sets,), default=None
+        The indices of the end of each feature set. For example, if the first
+        feature set is the first 10 features, and the second feature set is the
+        next 20 features, then ``feature_set_ends = [10, 30]``. If ``None``,
+        then this will assume that there is only one feature set.
+
     Attributes
     ----------
     base_estimator_ : sktree.tree.ObliqueDecisionTreeClassifier
@@ -225,38 +231,6 @@ class MultiViewRandomForestClassifier(SimMatrixMixin, ForestClassifier):
         tree classifier.
     sklearn.ensemble.RandomForestClassifier : An axis-aligned decision
         forest classifier.
-
-    Notes
-    -----
-    The default values for the parameters controlling the size of the trees
-    (e.g. ``max_depth``, ``min_samples_leaf``, etc.) lead to fully grown and
-    unpruned trees which can potentially be very large on some data sets. To
-    reduce memory consumption, the complexity and size of the trees should be
-    controlled by setting those parameter values.
-
-    The features are always randomly permuted at each split. Therefore,
-    the best found split may vary, even with the same training data,
-    ``max_features=n_features`` and ``bootstrap=False``, if the improvement
-    of the criterion is identical for several splits enumerated during the
-    search of the best split. To obtain a deterministic behaviour during
-    fitting, ``random_state`` has to be fixed.
-
-    References
-    ----------
-    .. [1] L. Breiman, "Random Forests", Machine Learning, 45(1), 5-32, 2001.
-
-    Examples
-    --------
-    >>> from sktree.ensemble import ObliqueRandomForestClassifier
-    >>> from sklearn.datasets import make_classification
-    >>> X, y = make_classification(n_samples=1000, n_features=4,
-    ...                            n_informative=2, n_redundant=0,
-    ...                            random_state=0, shuffle=False)
-    >>> clf = ObliqueRandomForestClassifier(max_depth=2, random_state=0)
-    >>> clf.fit(X, y)
-    ObliqueRandomForestClassifier(...)
-    >>> print(clf.predict([[0, 0, 0, 0]]))
-    [1]
     """
 
     tree_type = "oblique"

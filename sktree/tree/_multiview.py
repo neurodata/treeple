@@ -155,18 +155,6 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
     feature_combinations : float, default=None
         Not used.
 
-    feature_set_ends : array-like of int of shape (n_feature_sets,), default=None
-        The indices of the end of each feature set. For example, if the first
-        feature set is the first 10 features, and the second feature set is the
-        next 20 features, then ``feature_set_ends = [10, 30]``. If ``None``,
-        then this will assume that there is only one feature set.
-
-    uniform_sampling : bool, default=False
-        Whether to sample features uniformly or not. If ``True``, then
-        ``feature_combinations`` average number of features is sampled uniformly
-        across all feature sets. If ``False``, then ``feature_combinations`` average
-        number of features is sampled per feature set.
-
     ccp_alpha : non-negative float, default=0.0
         Not used.
 
