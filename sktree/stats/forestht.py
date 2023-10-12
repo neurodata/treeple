@@ -42,6 +42,7 @@ def _parallel_build_trees_and_compute_posteriors(
     posterior_arr: ArrayLike,
     predict_posteriors: bool,
     permute_per_tree: bool,
+    type_of_target,
     sample_weight: ArrayLike = None,
     class_weight=None,
     missing_values_in_feature_mask=None,
@@ -76,6 +77,9 @@ def _parallel_build_trees_and_compute_posteriors(
         index_arr = rng.choice(indices, size=(X_train.shape[0], 1), replace=False, shuffle=True)
         perm_X_cov = X_train[index_arr, covariate_index]
         X_train[:, covariate_index] = perm_X_cov
+
+    if type_of_target == "binary":
+        y_train = y_train.ravel()
 
     tree = _parallel_build_trees(
         tree,
@@ -133,6 +137,8 @@ class BaseForestHT(MetaEstimatorMixin):
         self._type_of_target_ = None
         self.n_features_in_ = None
         self._is_fitted = False
+        self._seeds = None
+        self._perm_seeds = None
 
     @property
     def n_estimators(self):
@@ -153,14 +159,34 @@ class BaseForestHT(MetaEstimatorMixin):
         self._metric = None
         self.n_features_in_ = None
         self._is_fitted = False
+        self._seeds = None
 
-    def _get_estimators_indices(self):
+    def _get_estimators_indices(self, sample_separate=False):
         indices = np.arange(self._n_samples_, dtype=int)
 
         # Get drawn indices along both sample and feature axes
+        rng = np.random.default_rng(self.estimator_.random_state)
+
         if self.sample_dataset_per_tree:
-            for tree in self.estimator_.estimators_:
-                seed = tree.random_state
+            if self._seeds is None:
+                self._seeds = []
+
+                for tree in self.estimator_.estimators_:
+                    if tree.random_state is None:
+                        self._seeds.append(rng.integers(low=0, high=np.iinfo(np.int32).max))
+                    else:
+                        self._seeds.append(tree.random_state)
+            seeds = self._seeds
+
+            if sample_separate:
+                if self._perm_seeds is None:
+                    new_rng = np.random.default_rng(np.random.randint(0, 1e6))
+                    self._perm_seeds = new_rng.integers(
+                        low=0, high=np.iinfo(np.int32).max, size=len(self.estimator_.estimators_)
+                    )
+                seeds = self._perm_seeds
+            for idx, tree in enumerate(self.estimator_.estimators_):
+                seed = seeds[idx]
 
                 # Operations accessing random_state must be performed identically
                 # to those in `_parallel_build_trees()`
@@ -170,13 +196,19 @@ class BaseForestHT(MetaEstimatorMixin):
 
                 yield indices_train, indices_test
         else:
+            if self._seeds is None:
+                if self.estimator_.random_state is None:
+                    self._seeds = rng.integers(low=0, high=np.iinfo(np.int32).max)
+                else:
+                    self._seeds = self.estimator_.random_state
+
+            # TODO: make random_state consistent
             indices_train, indices_test = train_test_split(
                 indices,
                 test_size=self.test_size,
-                shuffle=True,
-                random_state=self.estimator_.random_state,
+                random_state=self._seeds,
             )
-            for tree in self.estimator_.estimators_:
+            for _ in self.estimator_.estimators_:
                 yield indices_train, indices_test
 
     @property
@@ -300,9 +332,6 @@ class BaseForestHT(MetaEstimatorMixin):
         if self._type_of_target_ is None:
             self._type_of_target_ = type_of_target(y)
 
-        # if self.sample_dataset_per_tree and not self.permute_per_tree:
-        #     raise ValueError("sample_dataset_per_tree is only valid when permute_per_tree=True")
-
         if covariate_index is None:
             self.estimator_ = self._get_estimator()
             estimator = self.estimator_
@@ -397,7 +426,8 @@ class BaseForestHT(MetaEstimatorMixin):
         y : ArrayLike of shape (n_samples, n_outputs)
             The target matrix.
         covariate_index : ArrayLike, optional of shape (n_covariates,)
-            The index array of covariates to shuffle, by default None.
+            The index array of covariates to shuffle, will shuffle all columns by
+            default (corresponding to None).
         metric : str, optional
             The metric to compute, by default "mse".
         n_repeats : int, optional
@@ -433,6 +463,9 @@ class BaseForestHT(MetaEstimatorMixin):
             observe_stat = self.observe_stat_
 
         # next permute the data
+        if covariate_index is None:
+            covariate_index = np.arange(X.shape[1], dtype=int)
+
         permute_stat, permute_posteriors, permute_samples = self.statistic(
             X,
             y,
@@ -461,6 +494,7 @@ class BaseForestHT(MetaEstimatorMixin):
             # permuting the covariate index per tree or per forest. If not permuting
             # there is only one train and test split, so we can just use that
             _, indices_test = self.train_test_samples_[0]
+            indices_test = observe_samples
             y_test = y[indices_test, :]
             y_pred_proba_normal = observe_posteriors[:, indices_test, :]
             y_pred_proba_perm = permute_posteriors[:, indices_test, :]
@@ -688,8 +722,11 @@ class FeatureImportanceForestRegressor(BaseForestHT):
                     posterior_arr,
                     False,
                     self.permute_per_tree,
+                    self._type_of_target_,
                 )
-                for idx, (indices_train, indices_test) in enumerate(self._get_estimators_indices())
+                for idx, (indices_train, indices_test) in enumerate(
+                    self._get_estimators_indices(sample_separate=True)
+                )
             )
         else:
             # fitting a forest will only get one unique train/test split
@@ -906,15 +943,18 @@ class FeatureImportanceForestClassifier(BaseForestHT):
                     posterior_arr,
                     predict_posteriors,
                     self.permute_per_tree,
+                    self._type_of_target_,
                 )
-                for idx, (indices_train, indices_test) in enumerate(self._get_estimators_indices())
+                for idx, (indices_train, indices_test) in enumerate(
+                    self._get_estimators_indices(sample_separate=True)
+                )
             )
         else:
             # fitting a forest will only get one unique train/test split
             indices_train, indices_test = self.train_test_samples_[0]
 
             X_train, X_test = X[indices_train, :], X[indices_test, :]
-            y_train, y_test = y[indices_train, :], y[indices_test, :]
+            y_train = y[indices_train, :]
 
             if covariate_index is not None:
                 # perform permutation of covariates
@@ -927,7 +967,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
                 )
                 X_train[:, covariate_index] = X_train[index_arr, covariate_index]
 
-            if self._type_of_target_ == "binary":
+            if self._type_of_target_ == "binary" or (y.ndim > 1 and y.shape[1] == 1):
                 y_train = y_train.ravel()
             estimator.fit(X_train, y_train)
 
@@ -945,7 +985,6 @@ class FeatureImportanceForestClassifier(BaseForestHT):
 
             # set variables to compute metric
             samples = indices_test
-            y_true_final = y_test
         if metric == "auc":
             # at this point, posterior_final is the predicted posterior for only the positive class
             # as more than one output is not supported.

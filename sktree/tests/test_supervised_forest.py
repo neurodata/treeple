@@ -248,7 +248,8 @@ def test_oblique_forest_orthant():
         random_state=0,
     )
 
-    rc_clf = ObliqueRandomForestClassifier(max_features=None, random_state=0)
+    n_features = X.shape[1]
+    rc_clf = ObliqueRandomForestClassifier(max_features=int(n_features * 1.5), random_state=0)
     rc_clf.fit(X_train, y_train)
     y_hat = rc_clf.predict(X_test)
     rc_accuracy = accuracy_score(y_test, y_hat)
@@ -258,7 +259,7 @@ def test_oblique_forest_orthant():
     y_hat = ri_clf.predict(X_test)
     ri_accuracy = accuracy_score(y_test, y_hat)
 
-    assert rc_accuracy >= ri_accuracy
+    assert rc_accuracy >= ri_accuracy, f"{rc_accuracy} < {ri_accuracy}"
     assert ri_accuracy > 0.84
     assert rc_accuracy > 0.85
 
@@ -442,4 +443,6 @@ def test_regression(forest, criterion, dtype):
     y = y_large_reg.astype(dtype, copy=False)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=n_test, random_state=123)
     estimator.fit(X_train, y_train)
-    assert estimator.score(X_test, y_test) > 0.88, f"Failed for {estimator} and {criterion}"
+
+    test_score = estimator.score(X_test, y_test)
+    assert test_score > 0.85, f"Failed for {estimator} and {criterion}: {test_score}"

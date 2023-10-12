@@ -20,6 +20,7 @@ from .._lib.sklearn.tree._tree cimport DTYPE_t  # Type of X
 from .._lib.sklearn.tree._tree cimport INT32_t  # Signed 32 bit integer
 from .._lib.sklearn.tree._tree cimport SIZE_t  # Type for indices and counters
 from .._lib.sklearn.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
+from .._lib.sklearn.utils._typedefs cimport intp_t
 from ._sklearn_splitter cimport sort
 
 
@@ -88,6 +89,12 @@ cdef class BaseObliqueSplitter(Splitter):
         double upper_bound,
     ) except -1 nogil
 
+    cdef inline void fisher_yates_shuffle_memview(
+        self,
+        SIZE_t[::1] indices_to_sample,
+        SIZE_t grid_size,
+        UINT32_t* random_state
+    ) noexcept nogil
 
 cdef class ObliqueSplitter(BaseObliqueSplitter):
     # The splitter searches in the input space for a linear combination of features and a threshold
@@ -101,6 +108,72 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
     # All oblique splitters (i.e. non-axis aligned splitters) require a
     # function to sample a projection matrix that is applied to the feature matrix
     # to quickly obtain the sampled projections for candidate splits.
+    cdef void sample_proj_mat(
+        self,
+        vector[vector[DTYPE_t]]& proj_mat_weights,
+        vector[vector[SIZE_t]]& proj_mat_indices
+    ) noexcept nogil
+
+
+cdef class BestObliqueSplitter(ObliqueSplitter):
+    cdef int node_split(
+        self,
+        double impurity,   # Impurity of the node
+        SplitRecord* split,
+        SIZE_t* n_constant_features,
+        double lower_bound,
+        double upper_bound,
+    ) except -1 nogil
+
+
+cdef class RandomObliqueSplitter(ObliqueSplitter):
+    cdef void find_min_max(
+        self,
+        DTYPE_t[::1] feature_values,
+        DTYPE_t* min_feature_value_out,
+        DTYPE_t* max_feature_value_out,
+    ) noexcept nogil
+
+    cdef SIZE_t partition_samples(
+        self,
+        double current_threshold
+    ) noexcept nogil
+
+    cdef int node_split(
+        self,
+        double impurity,   # Impurity of the node
+        SplitRecord* split,
+        SIZE_t* n_constant_features,
+        double lower_bound,
+        double upper_bound,
+    ) except -1 nogil
+
+
+# XXX: This splitter is experimental. Expect changes frequently.
+cdef class MultiViewSplitter(BestObliqueSplitter):
+    cdef const intp_t[:] feature_set_ends   # an array indicating the column indices of the end of each feature set
+    cdef intp_t n_feature_sets                  # the number of feature sets is the length of feature_set_ends + 1
+
+    cdef vector[vector[SIZE_t]] multi_indices_to_sample
+
+    cdef void sample_proj_mat(
+        self,
+        vector[vector[DTYPE_t]]& proj_mat_weights,
+        vector[vector[SIZE_t]]& proj_mat_indices
+    ) noexcept nogil
+
+
+# XXX: This splitter is experimental. Expect changes frequently.
+cdef class MultiViewObliqueSplitter(BestObliqueSplitter):
+    cdef const intp_t[:] feature_set_ends   # an array indicating the column indices of the end of each feature set
+    cdef intp_t n_feature_sets                  # the number of feature sets is the length of feature_set_ends + 1
+
+    # whether or not to uniformly sample feature-sets into each projection vector
+    # if True, then sample from each feature set for each projection vector
+    cdef bint uniform_sampling
+
+    cdef vector[vector[SIZE_t]] multi_indices_to_sample
+
     cdef void sample_proj_mat(
         self,
         vector[vector[DTYPE_t]]& proj_mat_weights,

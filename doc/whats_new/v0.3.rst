@@ -12,7 +12,9 @@ Version 0.3
 
 Changelog
 ---------
-- 
+- |Fix| Fixes a bug in consistency of train/test samples when ``random_state`` is not set in FeatureImportanceForestClassifier and FeatureImportanceForestRegressor, by `Adam Li`_ (:pr:`135`)
+- |Fix| Fixes a bug where covariate indices were not shuffled by default when running FeatureImportanceForestClassifier and FeatureImportanceForestRegressor test methods, by `Sambit Panda`_ (:pr:`140`)
+- |Enhancement| Add multi-view splitter for axis-aligned decision trees, by `Adam Li`_ (:pr:`129`)
 
 Code and Documentation Contributors
 -----------------------------------
@@ -21,4 +23,5 @@ Thanks to everyone who has contributed to the maintenance and improvement of
 the project since version inception, including:
 
 * `Adam Li`_
+* `Sambit Panda`_
 

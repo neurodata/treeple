@@ -6,6 +6,7 @@ python_sources = [
   'test_marginal.py',
   'test_all_trees.py',
   'test_unsupervised_tree.py',
+  'test_multiview.py',
 ]
 
 py3.install_sources(
