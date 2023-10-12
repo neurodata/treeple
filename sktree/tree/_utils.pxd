@@ -5,8 +5,8 @@ cimport numpy as cnp
 cnp.import_array()
 
 from .._lib.sklearn.tree._splitter cimport SplitRecord
-from .._lib.sklearn.utils._typedefs cimport float32_t, float64_t, int32_t, intp_t
 from .._lib.sklearn.tree._utils cimport UINT32_t
+from .._lib.sklearn.utils._typedefs cimport float32_t, float64_t, int32_t, intp_t
 
 
 cdef int rand_weighted_binary(float64_t p0, UINT32_t* random_state) noexcept nogil
