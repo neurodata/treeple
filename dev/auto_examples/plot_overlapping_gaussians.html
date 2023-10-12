@@ -57,7 +57,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Plot oblique forest and axis-aligned random forest predictions on cc18 datasets" href="plot_oblique_random_forest.html" />
-    <link rel="prev" title="Mutual Information for Gigantic Hypothesis Testing (MIGHT)" href="plot_MI_gigantic_hypothesis_testing_forest.html" />
+    <link rel="prev" title="Compare the decision surfaces of oblique extra-trees with standard oblique trees" href="plot_oblique_forests_iris.html" />
     <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
     <script type="text/javascript" src="../_static/copybutton.js"></script>
     <script type="text/javascript" src="../_static/scrollfix.js"></script>
@@ -395,15 +395,28 @@ document.write(`
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="plot_extra_oblique_random_forest.html">Compare extra oblique forest and oblique random forest predictions on cc18 datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plot_oblique_forests_iris.html">Compare the decision surfaces of oblique extra-trees with standard oblique trees</a></li>
-<li class="toctree-l1"><a class="reference internal" href="plot_might_auc.html">Compute partial AUC using Mutual Information for Genuine Hypothesis Testing (MIGHT)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="plot_extended_isolation_forest.html">ExtendedIsolationForest example</a></li>
-<li class="toctree-l1"><a class="reference internal" href="plot_MI_gigantic_hypothesis_testing_forest.html">Mutual Information for Gigantic Hypothesis Testing (MIGHT)</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Plot honest forest calibrations on overlapping gaussian simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plot_oblique_random_forest.html">Plot oblique forest and axis-aligned random forest predictions on cc18 datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plot_oblique_axis_aligned_forests_sparse_parity.html">Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plot_iris_dtc.html">Plot the decision surface of decision trees trained on the iris dataset</a></li>
-<li class="toctree-l1"><a class="reference internal" href="plot_projection_matrices.html">Plot the projection matrices of an oblique tree</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plot_extra_orf_sample_size.html">Speed of Extra Oblique Random Forest vs Oblique Random Forest on different dataset sizes</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="hypothesis_testing/index.html">Hypothesis testing with decision trees</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="hypothesis_testing/plot_might_auc.html">Compute partial AUC using Mutual Information for Genuine Hypothesis Testing (MIGHT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hypothesis_testing/plot_MI_gigantic_hypothesis_testing_forest.html">Mutual Information for Gigantic Hypothesis Testing (MIGHT)</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="outlier_detection/index.html">Outlier-detection</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="outlier_detection/plot_extended_isolation_forest.html">ExtendedIsolationForest example</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="splitters/index.html">Decision-tree splitters</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="splitters/plot_multiview_axis_aligned_splitter.html">Demonstrate and visualize a multi-view projection matrix for an axis-aligned tree</a></li>
+<li class="toctree-l2"><a class="reference internal" href="splitters/plot_projection_matrices.html">Plot the projection matrices of an oblique tree for sampling images, or time-series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="splitters/plot_sparse_projection_matrix.html">Plot the sparse projection matrices of an oblique tree</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </nav></div>
@@ -655,8 +668,8 @@ is reproduced from <a class="footnote-reference brackets" href="#footcite-perry2
 <span class="c1"># curve, compared to RF which is shown below.</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plot_overlapping_gaussians_001.png" srcset="../_images/sphx_glr_plot_overlapping_gaussians_001.png" alt="plot overlapping gaussians" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 12.461 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  9 MB</p>
+<img src="../_images/sphx_glr_plot_overlapping_gaussians_001.png" srcset="../_images/sphx_glr_plot_overlapping_gaussians_001.png" alt="plot overlapping gaussians" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 10.304 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  48 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-overlapping-gaussians-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/ed8294c8526ffbb9799792531e2f729f/plot_overlapping_gaussians.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_overlapping_gaussians.py</span></code></a></p>
@@ -680,12 +693,12 @@ is reproduced from <a class="footnote-reference brackets" href="#footcite-perry2
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="plot_MI_gigantic_hypothesis_testing_forest.html"
+       href="plot_oblique_forests_iris.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Mutual Information for Gigantic Hypothesis Testing (MIGHT)</p>
+        <p class="prev-next-title">Compare the decision surfaces of oblique extra-trees with standard oblique trees</p>
       </div>
     </a>
     <a class="right-next"
@@ -740,7 +753,7 @@ is reproduced from <a class="footnote-reference brackets" href="#footcite-perry2
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-10-11.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-10-12.
       <br/>
     
   </p>

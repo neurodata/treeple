@@ -489,6 +489,7 @@ document.write(`
 <span class="n">OBLIQUE_DENSE_SPLITTERS</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;best&quot;</span><span class="p">:</span> <span class="n">_oblique_splitter</span><span class="o">.</span><span class="n">BestObliqueSplitter</span><span class="p">,</span>
     <span class="s2">&quot;random&quot;</span><span class="p">:</span> <span class="n">_oblique_splitter</span><span class="o">.</span><span class="n">RandomObliqueSplitter</span><span class="p">,</span>
+    <span class="s2">&quot;best-multiview&quot;</span><span class="p">:</span> <span class="n">_oblique_splitter</span><span class="o">.</span><span class="n">MultiViewSplitter</span><span class="p">,</span>
 <span class="p">}</span>
 
 <span class="n">PATCH_DENSE_SPLITTERS</span> <span class="o">=</span> <span class="p">{</span>
@@ -2164,6 +2165,9 @@ document.write(`
 <span class="sd">        random_state : int, RandomState instance or None, default=None</span>
 <span class="sd">            Controls the randomness of the estimator.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Not used. Here for API compatibility</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_combinations_</span> <span class="o">=</span> <span class="mi">1</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_data</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span><span class="p">,</span> <span class="n">ensure_2d</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span>
@@ -2253,6 +2257,7 @@ document.write(`
                 <span class="n">min_weight_leaf</span><span class="p">,</span>
                 <span class="n">random_state</span><span class="p">,</span>
                 <span class="n">monotonic_cst</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">feature_combinations_</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">dim_contiguous_</span><span class="p">,</span>
@@ -2629,6 +2634,9 @@ document.write(`
 <span class="sd">        random_state : int, RandomState instance or None, default=None</span>
 <span class="sd">            Controls the randomness of the estimator.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Not used. Here for API compatibility</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_combinations_</span> <span class="o">=</span> <span class="mi">1</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_data</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span><span class="p">,</span> <span class="n">ensure_2d</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span>
@@ -2719,6 +2727,7 @@ document.write(`
                 <span class="n">min_weight_leaf</span><span class="p">,</span>
                 <span class="n">random_state</span><span class="p">,</span>
                 <span class="n">monotonic_cst</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">feature_combinations_</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">min_patch_dims_</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">max_patch_dims_</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">dim_contiguous_</span><span class="p">,</span>
@@ -3616,7 +3625,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-10-11.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-10-12.
       <br/>
     
   </p>

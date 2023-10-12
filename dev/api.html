@@ -410,6 +410,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="generated/sktree.PatchObliqueRandomForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.PatchObliqueRandomForestClassifier</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sktree.PatchObliqueRandomForestRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.PatchObliqueRandomForestRegressor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sktree.HonestForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.HonestForestClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.MultiViewRandomForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.MultiViewRandomForestClassifier</a></li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="generated/sktree.tree.ObliqueDecisionTreeClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.ObliqueDecisionTreeClassifier</a></li>
@@ -417,6 +418,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="generated/sktree.tree.PatchObliqueDecisionTreeClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.PatchObliqueDecisionTreeClassifier</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sktree.tree.PatchObliqueDecisionTreeRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.PatchObliqueDecisionTreeRegressor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sktree.tree.HonestTreeClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.HonestTreeClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.tree.MultiViewDecisionTreeClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.MultiViewDecisionTreeClassifier</a></li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="generated/sktree.UnsupervisedRandomForest.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.UnsupervisedRandomForest</a></li>
@@ -581,6 +583,9 @@ how scikit-learn builds trees.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.HonestForestClassifier.html#sktree.HonestForestClassifier" title="sktree.HonestForestClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HonestForestClassifier</span></code></a>([n_estimators, ...])</p></td>
 <td><p>A forest classifier with honest leaf estimates.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.MultiViewRandomForestClassifier.html#sktree.MultiViewRandomForestClassifier" title="sktree.MultiViewRandomForestClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MultiViewRandomForestClassifier</span></code></a>([...])</p></td>
+<td><p>A multi-view axis-aligned random forest classifier.</p></td>
+</tr>
 </tbody>
 </table>
 <table class="autosummary longtable table autosummary">
@@ -599,6 +604,9 @@ how scikit-learn builds trees.</p>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.tree.HonestTreeClassifier.html#sktree.tree.HonestTreeClassifier" title="sktree.tree.HonestTreeClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HonestTreeClassifier</span></code></a>([criterion, splitter, ...])</p></td>
 <td><p>A decision tree classifier with honest predictions.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.tree.MultiViewDecisionTreeClassifier.html#sktree.tree.MultiViewDecisionTreeClassifier" title="sktree.tree.MultiViewDecisionTreeClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MultiViewDecisionTreeClassifier</span></code></a>(*[, ...])</p></td>
+<td><p>A multi-view axis-aligned decision tree classifier.</p></td>
 </tr>
 </tbody>
 </table>
@@ -821,7 +829,7 @@ for the entropy, MI and CMI of the Gaussian distributions.</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-10-11.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-10-12.
       <br/>
     
   </p>
