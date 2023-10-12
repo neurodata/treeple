@@ -1,4 +1,4 @@
-from .._lib.sklearn.utils._typedefs cimport intp_t, int32_t, float32_t
+from .._lib.sklearn.utils._typedefs cimport float32_t, int32_t, intp_t
 
 # This defines c-importable functions for other cython files
 

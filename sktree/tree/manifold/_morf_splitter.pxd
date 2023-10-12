@@ -14,7 +14,7 @@ cimport numpy as cnp
 from libcpp.vector cimport vector
 
 from ..._lib.sklearn.tree._splitter cimport SplitRecord
-from ..._lib.sklearn.utils._typedefs cimport float64_t, float32_t, intp_t, uint32_t
+from ..._lib.sklearn.utils._typedefs cimport float32_t, float64_t, intp_t, uint32_t
 from .._oblique_splitter cimport BestObliqueSplitter, ObliqueSplitRecord
 
 # https://github.com/cython/cython/blob/master/Cython/Includes/libcpp/algorithm.pxd

@@ -11,8 +11,8 @@ import numpy as np
 cimport numpy as cnp
 
 from ..._lib.sklearn.tree._splitter cimport SplitRecord
-from ..._lib.sklearn.utils._typedefs cimport float64_t, float32_t, intp_t
 from ..._lib.sklearn.tree._tree cimport BaseTree, Node
+from ..._lib.sklearn.utils._typedefs cimport float32_t, float64_t, intp_t
 from ._unsup_splitter cimport UnsupervisedSplitter
 
 

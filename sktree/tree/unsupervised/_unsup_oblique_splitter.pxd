@@ -4,7 +4,7 @@ cimport numpy as cnp
 from libcpp.vector cimport vector
 
 from ..._lib.sklearn.tree._splitter cimport SplitRecord
-from ..._lib.sklearn.utils._typedefs cimport float64_t, float32_t, intp_t, uint32_t
+from ..._lib.sklearn.utils._typedefs cimport float32_t, float64_t, intp_t, uint32_t
 from ._unsup_splitter cimport UnsupervisedSplitter
 
 
@@ -49,7 +49,7 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
 
     # Redefined here since the new logic requires calling sample_proj_mat
     cdef intp_t node_reset(self, intp_t start, intp_t end,
-                        double* weighted_n_node_samples) except -1 nogil
+                           double* weighted_n_node_samples) except -1 nogil
 
     cdef intp_t node_split(
         self,

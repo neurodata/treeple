@@ -3,7 +3,7 @@
 # cython: language_level=3
 
 from ..._lib.sklearn.tree._criterion cimport BaseCriterion
-from ..._lib.sklearn.utils._typedefs cimport float64_t, float32_t, int32_t, intp_t
+from ..._lib.sklearn.utils._typedefs cimport float32_t, float64_t, int32_t, intp_t
 
 # Note: This class is an exact copy of scikit-learn's Criterion
 # class, with the exception of the type of the internal structure.

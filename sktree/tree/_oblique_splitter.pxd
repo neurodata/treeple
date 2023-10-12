@@ -15,7 +15,7 @@ from libcpp.vector cimport vector
 
 from .._lib.sklearn.tree._criterion cimport Criterion
 from .._lib.sklearn.tree._splitter cimport SplitRecord, Splitter
-from .._lib.sklearn.utils._typedefs cimport intp_t, float32_t, float64_t, uint32_t
+from .._lib.sklearn.utils._typedefs cimport float32_t, float64_t, intp_t, uint32_t
 from ._sklearn_splitter cimport sort
 
 
