@@ -161,8 +161,25 @@ class BaseForestHT(MetaEstimatorMixin):
         self._is_fitted = False
         self._seeds = None
 
-    def _get_estimators_indices(self, y, sample_separate=False):
+    def _get_estimators_indices(self, stratifier, sample_separate=False):
+        
+        # Check stratifier
+        # if stratifier is None, stratifier is regressor
+        if stratifier is not None:
+            if self._n_samples_ is not None and stratifier.shape[0] != self._n_samples_:
+                raise RuntimeError(
+                    f"stratifier must have {self._n_samples_} samples, got {stratifier.shape[0]}. "
+                    f"If running on a new dataset, call the 'reset' method."
+                )
+            
+            if self._type_of_target_ is not None and type_of_target(stratifier) != self._type_of_target_:
+                raise RuntimeError(
+                    f"stratifier must have type {self._type_of_target_}, got {type_of_target(stratifier)}. "
+                    f"If running on a new dataset, call the 'reset' method."
+                )
+
         indices = np.arange(self._n_samples_, dtype=int)
+
 
         # Get drawn indices along both sample and feature axes
         rng = np.random.default_rng(self.estimator_.random_state)
@@ -191,7 +208,7 @@ class BaseForestHT(MetaEstimatorMixin):
                 # Operations accessing random_state must be performed identically
                 # to those in `_parallel_build_trees()`
                 indices_train, indices_test = train_test_split(
-                    indices, test_size=self.test_size, shuffle=True, stratify = y ,random_state=seed
+                    indices, test_size=self.test_size, shuffle=True, stratify = stratifier ,random_state=seed
                 )
 
                 yield indices_train, indices_test
@@ -206,7 +223,7 @@ class BaseForestHT(MetaEstimatorMixin):
             indices_train, indices_test = train_test_split(
                 indices,
                 test_size=self.test_size,
-                stratify = y,
+                stratify = stratifier,
                 random_state=self._seeds,
 
             )
@@ -215,7 +232,7 @@ class BaseForestHT(MetaEstimatorMixin):
                 yield indices_train, indices_test
 
     
-    def train_test_samples_(self,y):
+    def train_test_samples_(self,stratifier):
         """
         The subset of drawn samples for each base estimator.
 
@@ -232,7 +249,7 @@ class BaseForestHT(MetaEstimatorMixin):
 
         return [
             (indices_train, indices_test)
-            for indices_train, indices_test in self._get_estimators_indices(y)
+            for indices_train, indices_test in self._get_estimators_indices(stratifier = stratifier)
         ]
 
     def _statistic(
@@ -495,7 +512,7 @@ class BaseForestHT(MetaEstimatorMixin):
             # If not sampling a new dataset per tree, then we may either be
             # permuting the covariate index per tree or per forest. If not permuting
             # there is only one train and test split, so we can just use that
-            _, indices_test = self.train_test_samples_(y)[0]
+            _, indices_test = self.train_test_samples_(stratifier=y)[0]
             indices_test = observe_samples
             y_test = y[indices_test, :]
             y_pred_proba_normal = observe_posteriors[:, indices_test, :]
@@ -732,7 +749,7 @@ class FeatureImportanceForestRegressor(BaseForestHT):
             )
         else:
             # fitting a forest will only get one unique train/test split
-            indices_train, indices_test = self.train_test_samples_(y)[0]
+            indices_train, indices_test = self.train_test_samples_(stratifier=None)[0]
 
             X_train, X_test = X[indices_train, :], X[indices_test, :]
             y_train, y_test = y[indices_train, :], y[indices_test, :]
@@ -953,7 +970,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
             )
         else:
             # fitting a forest will only get one unique train/test split
-            indices_train, indices_test = self.train_test_samples_(y)[0]
+            indices_train, indices_test = self.train_test_samples_(stratifier=y)[0]
             
 
             X_train, X_test = X[indices_train, :], X[indices_test, :]
