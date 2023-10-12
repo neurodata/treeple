@@ -161,7 +161,7 @@ class BaseForestHT(MetaEstimatorMixin):
         self._is_fitted = False
         self._seeds = None
 
-    def _get_estimators_indices(self, sample_separate=False):
+    def _get_estimators_indices(self, y, sample_separate=False):
         indices = np.arange(self._n_samples_, dtype=int)
 
         # Get drawn indices along both sample and feature axes
@@ -191,7 +191,7 @@ class BaseForestHT(MetaEstimatorMixin):
                 # Operations accessing random_state must be performed identically
                 # to those in `_parallel_build_trees()`
                 indices_train, indices_test = train_test_split(
-                    indices, test_size=self.test_size, shuffle=True, random_state=seed
+                    indices, test_size=self.test_size, shuffle=True, stratify = y ,random_state=seed
                 )
 
                 yield indices_train, indices_test
@@ -206,13 +206,16 @@ class BaseForestHT(MetaEstimatorMixin):
             indices_train, indices_test = train_test_split(
                 indices,
                 test_size=self.test_size,
+                stratify = y,
                 random_state=self._seeds,
+
             )
+            
             for _ in self.estimator_.estimators_:
                 yield indices_train, indices_test
 
-    @property
-    def train_test_samples_(self):
+    
+    def train_test_samples_(self,y):
         """
         The subset of drawn samples for each base estimator.
 
@@ -229,7 +232,7 @@ class BaseForestHT(MetaEstimatorMixin):
 
         return [
             (indices_train, indices_test)
-            for indices_train, indices_test in self._get_estimators_indices()
+            for indices_train, indices_test in self._get_estimators_indices(y)
         ]
 
     def _statistic(
@@ -332,6 +335,9 @@ class BaseForestHT(MetaEstimatorMixin):
         if self._type_of_target_ is None:
             self._type_of_target_ = type_of_target(y)
 
+        # if self.sample_dataset_per_tree and not self.permute_per_tree:
+        #     raise ValueError("sample_dataset_per_tree is only valid when permute_per_tree=True")
+
         if covariate_index is None:
             self.estimator_ = self._get_estimator()
             estimator = self.estimator_
@@ -426,8 +432,7 @@ class BaseForestHT(MetaEstimatorMixin):
         y : ArrayLike of shape (n_samples, n_outputs)
             The target matrix.
         covariate_index : ArrayLike, optional of shape (n_covariates,)
-            The index array of covariates to shuffle, will shuffle all columns by
-            default (corresponding to None).
+            The index array of covariates to shuffle, by default None.
         metric : str, optional
             The metric to compute, by default "mse".
         n_repeats : int, optional
@@ -463,9 +468,6 @@ class BaseForestHT(MetaEstimatorMixin):
             observe_stat = self.observe_stat_
 
         # next permute the data
-        if covariate_index is None:
-            covariate_index = np.arange(X.shape[1], dtype=int)
-
         permute_stat, permute_posteriors, permute_samples = self.statistic(
             X,
             y,
@@ -493,7 +495,7 @@ class BaseForestHT(MetaEstimatorMixin):
             # If not sampling a new dataset per tree, then we may either be
             # permuting the covariate index per tree or per forest. If not permuting
             # there is only one train and test split, so we can just use that
-            _, indices_test = self.train_test_samples_[0]
+            _, indices_test = self.train_test_samples_(y)[0]
             indices_test = observe_samples
             y_test = y[indices_test, :]
             y_pred_proba_normal = observe_posteriors[:, indices_test, :]
@@ -725,12 +727,12 @@ class FeatureImportanceForestRegressor(BaseForestHT):
                     self._type_of_target_,
                 )
                 for idx, (indices_train, indices_test) in enumerate(
-                    self._get_estimators_indices(sample_separate=True)
+                    self._get_estimators_indices(y,sample_separate=True)
                 )
             )
         else:
             # fitting a forest will only get one unique train/test split
-            indices_train, indices_test = self.train_test_samples_[0]
+            indices_train, indices_test = self.train_test_samples_(y)[0]
 
             X_train, X_test = X[indices_train, :], X[indices_test, :]
             y_train, y_test = y[indices_train, :], y[indices_test, :]
@@ -946,12 +948,13 @@ class FeatureImportanceForestClassifier(BaseForestHT):
                     self._type_of_target_,
                 )
                 for idx, (indices_train, indices_test) in enumerate(
-                    self._get_estimators_indices(sample_separate=True)
+                    self._get_estimators_indices(y,sample_separate=True)
                 )
             )
         else:
             # fitting a forest will only get one unique train/test split
-            indices_train, indices_test = self.train_test_samples_[0]
+            indices_train, indices_test = self.train_test_samples_(y)[0]
+            
 
             X_train, X_test = X[indices_train, :], X[indices_test, :]
             y_train = y[indices_train, :]
