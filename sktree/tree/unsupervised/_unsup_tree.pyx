@@ -29,10 +29,10 @@ cnp.import_array()
 
 cdef extern from "numpy/arrayobject.h":
     object PyArray_NewFromDescr(PyTypeObject* subtype, cnp.dtype descr,
-                                int nd, cnp.npy_intp* dims,
+                                intp_t nd, cnp.npy_intp* dims,
                                 cnp.npy_intp* strides,
-                                void* data, int flags, object obj)
-    int PyArray_SetBaseObject(cnp.ndarray arr, PyObject* obj)
+                                void* data, intp_t flags, object obj)
+    intp_t PyArray_SetBaseObject(cnp.ndarray arr, PyObject* obj)
 
 cdef extern from "<stack>" namespace "std" nogil:
     cdef cppclass stack[T]:
@@ -55,15 +55,15 @@ cdef double INFINITY = np.inf
 cdef double EPSILON = np.finfo('double').eps
 
 # Some handy constants (BestFirstTreeBuilder)
-cdef int IS_FIRST = 1
-cdef int IS_NOT_FIRST = 0
-cdef int IS_LEFT = 1
-cdef int IS_NOT_LEFT = 0
+cdef intp_t IS_FIRST = 1
+cdef intp_t IS_NOT_FIRST = 0
+cdef intp_t IS_LEFT = 1
+cdef intp_t IS_NOT_LEFT = 0
 
 TREE_LEAF = -1
 TREE_UNDEFINED = -2
-cdef SIZE_t _TREE_LEAF = TREE_LEAF
-cdef SIZE_t _TREE_UNDEFINED = TREE_UNDEFINED
+cdef intp_t _TREE_LEAF = TREE_LEAF
+cdef intp_t _TREE_UNDEFINED = TREE_UNDEFINED
 
 # Build the corresponding numpy dtype for Node.
 # This works by casting `dummy` to an array of Node of length 1, which numpy
@@ -83,7 +83,7 @@ cdef class UnsupervisedTreeBuilder:
         self,
         UnsupervisedTree tree,
         object X,
-        const DOUBLE_t[:] sample_weight=None
+        const float64_t[:] sample_weight=None
     ):
         """Build a decision tree from the training set X."""
         pass
@@ -91,7 +91,7 @@ cdef class UnsupervisedTreeBuilder:
     cdef inline _check_input(
         self,
         object X,
-        const DOUBLE_t[:] sample_weight,
+        const float64_t[:] sample_weight,
     ):
         """Check input dtype, layout and format"""
         if issparse(X):
@@ -121,11 +121,11 @@ cdef struct FrontierRecord:
     # Record of information of a Node, the frontier for a split. Those records are
     # maintained in a heap to access the Node with the best improvement in impurity,
     # allowing growing trees greedily on this improvement.
-    SIZE_t node_id
-    SIZE_t start
-    SIZE_t end
-    SIZE_t pos
-    SIZE_t depth
+    intp_t node_id
+    intp_t start
+    intp_t end
+    intp_t pos
+    intp_t depth
     bint is_leaf
     double impurity
     double impurity_left
@@ -135,13 +135,13 @@ cdef struct FrontierRecord:
 # Depth first builder ---------------------------------------------------------
 # A record on the stack for depth-first tree growing
 cdef struct StackRecord:
-    SIZE_t start
-    SIZE_t end
-    SIZE_t depth
-    SIZE_t parent
+    intp_t start
+    intp_t end
+    intp_t depth
+    intp_t parent
     bint is_left
     double impurity
-    SIZE_t n_constant_features
+    intp_t n_constant_features
 
 cdef inline bool _compare_records(
     const FrontierRecord& left,
@@ -164,16 +164,16 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
     The best node to expand is given by the node at the frontier that has the
     highest impurity improvement.
     """
-    cdef SIZE_t max_leaf_nodes
+    cdef intp_t max_leaf_nodes
 
     def __cinit__(
         self,
         UnsupervisedSplitter splitter,
-        SIZE_t min_samples_split,
-        SIZE_t min_samples_leaf,
+        intp_t min_samples_split,
+        intp_t min_samples_leaf,
         double min_weight_leaf,
-        SIZE_t max_depth,
-        SIZE_t max_leaf_nodes,
+        intp_t max_depth,
+        intp_t max_leaf_nodes,
         double min_impurity_decrease
     ):
         self.splitter = splitter
@@ -188,7 +188,7 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
         self,
         UnsupervisedTree tree,
         object X,
-        const DOUBLE_t[:] sample_weight=None
+        const float64_t[:] sample_weight=None
     ):
         """Build a decision tree from the training set X."""
         # check input
@@ -196,7 +196,7 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
 
         # Parameters
         cdef UnsupervisedSplitter splitter = self.splitter
-        cdef SIZE_t max_leaf_nodes = self.max_leaf_nodes
+        cdef intp_t max_leaf_nodes = self.max_leaf_nodes
 
         # Recursive partition (without actual recursion)
         splitter.init(X, sample_weight)
@@ -206,15 +206,15 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
         cdef FrontierRecord split_node_left
         cdef FrontierRecord split_node_right
 
-        cdef SIZE_t n_node_samples = splitter.n_samples
-        cdef SIZE_t max_split_nodes = max_leaf_nodes - 1
+        cdef intp_t n_node_samples = splitter.n_samples
+        cdef intp_t max_split_nodes = max_leaf_nodes - 1
         cdef bint is_leaf
-        cdef SIZE_t max_depth_seen = -1
-        cdef int rc = 0
+        cdef intp_t max_depth_seen = -1
+        cdef intp_t rc = 0
         cdef Node* node
 
         # Initial capacity
-        cdef SIZE_t init_capacity = max_split_nodes + max_leaf_nodes
+        cdef intp_t init_capacity = max_split_nodes + max_leaf_nodes
         tree._resize(init_capacity)
 
         with nogil:
@@ -285,17 +285,17 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
         if rc == -1:
             raise MemoryError()
 
-    cdef inline int _add_split_node(
+    cdef inline intp_t _add_split_node(
         self,
         UnsupervisedSplitter splitter,
         UnsupervisedTree tree,
-        SIZE_t start,
-        SIZE_t end,
+        intp_t start,
+        intp_t end,
         double impurity,
         bint is_first,
         bint is_left,
         Node* parent,
-        SIZE_t depth,
+        intp_t depth,
         FrontierRecord* res
     ) except -1 nogil:
         """Adds node w/ partition ``[start, end)`` to the frontier. """
@@ -305,9 +305,9 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
         cdef SplitRecord split
         cdef SplitRecord* split_ptr = <SplitRecord *>malloc(splitter.pointer_size())
 
-        cdef SIZE_t node_id
-        cdef SIZE_t n_node_samples
-        cdef SIZE_t n_constant_features = 0
+        cdef intp_t node_id
+        cdef intp_t n_node_samples
+        cdef intp_t n_constant_features = 0
         cdef double min_impurity_decrease = self.min_impurity_decrease
         cdef double weighted_n_node_samples
         cdef bint is_leaf
@@ -382,10 +382,10 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
     def __cinit__(
         self,
         UnsupervisedSplitter splitter,
-        SIZE_t min_samples_split,
-        SIZE_t min_samples_leaf,
+        intp_t min_samples_split,
+        intp_t min_samples_leaf,
         double min_weight_leaf,
-        SIZE_t max_depth,
+        intp_t max_depth,
         double min_impurity_decrease
     ):
         self.splitter = splitter
@@ -399,7 +399,7 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
         self,
         UnsupervisedTree tree,
         object X,
-        const DOUBLE_t[:] sample_weight=None
+        const float64_t[:] sample_weight=None
     ):
         """Build a decision tree from the training set (X, y)."""
 
@@ -407,10 +407,10 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
         X, sample_weight = self._check_input(X, sample_weight)
 
         # Initial capacity
-        cdef int init_capacity
+        cdef intp_t init_capacity
 
         if tree.max_depth <= 10:
-            init_capacity = <int>(2 ** (tree.max_depth + 1)) - 1
+            init_capacity = <intp_t>(2 ** (tree.max_depth + 1)) - 1
         else:
             init_capacity = 2047
 
@@ -418,23 +418,23 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
 
         # Parameters
         cdef UnsupervisedSplitter splitter = self.splitter
-        cdef SIZE_t max_depth = self.max_depth
-        cdef SIZE_t min_samples_leaf = self.min_samples_leaf
+        cdef intp_t max_depth = self.max_depth
+        cdef intp_t min_samples_leaf = self.min_samples_leaf
         cdef double min_weight_leaf = self.min_weight_leaf
-        cdef SIZE_t min_samples_split = self.min_samples_split
+        cdef intp_t min_samples_split = self.min_samples_split
         cdef double min_impurity_decrease = self.min_impurity_decrease
 
         # Recursive partition (without actual recursion)
         splitter.init(X, sample_weight)
 
-        cdef SIZE_t start
-        cdef SIZE_t end
-        cdef SIZE_t depth
-        cdef SIZE_t parent
+        cdef intp_t start
+        cdef intp_t end
+        cdef intp_t depth
+        cdef intp_t parent
         cdef bint is_left
-        cdef SIZE_t n_node_samples = splitter.n_samples
+        cdef intp_t n_node_samples = splitter.n_samples
         cdef double weighted_n_node_samples
-        cdef SIZE_t node_id
+        cdef intp_t node_id
 
         # initialize record to keep track of split node data and a pointer to the
         # memory address containing the split node
@@ -443,11 +443,11 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
         cdef SplitRecord* split_ptr = <SplitRecord *>malloc(splitter.pointer_size())
 
         cdef double impurity = INFINITY
-        cdef SIZE_t n_constant_features
+        cdef intp_t n_constant_features
         cdef bint is_leaf
         cdef bint first = 1
-        cdef SIZE_t max_depth_seen = -1
-        cdef int rc = 0
+        cdef intp_t max_depth_seen = -1
+        cdef intp_t rc = 0
 
         cdef stack[StackRecord] builder_stack
         cdef StackRecord stack_record
@@ -572,29 +572,29 @@ cdef class UnsupervisedTree(BaseTree):
 
     Attributes
     ----------
-    node_count : int
+    node_count : intp_t
         The number of nodes (internal nodes + leaves) in the tree.
 
-    capacity : int
+    capacity : intp_t
         The current capacity (i.e., size) of the arrays, which is at least as
         great as `node_count`.
 
-    max_depth : int
+    max_depth : intp_t
         The depth of the tree, i.e. the maximum depth of its leaves.
 
-    children_left : array of int, shape [node_count]
+    children_left : array of intp_t, shape [node_count]
         children_left[i] holds the node id of the left child of node i.
         For leaves, children_left[i] == TREE_LEAF. Otherwise,
         children_left[i] > i. This child handles the case where
         X[:, feature[i]] <= threshold[i].
 
-    children_right : array of int, shape [node_count]
+    children_right : array of intp_t, shape [node_count]
         children_right[i] holds the node id of the right child of node i.
         For leaves, children_right[i] == TREE_LEAF. Otherwise,
         children_right[i] > i. This child handles the case where
         X[:, feature[i]] > threshold[i].
 
-    feature : array of int, shape [node_count]
+    feature : array of intp_t, shape [node_count]
         feature[i] holds the feature to split on, for the internal node i.
 
     threshold : array of double, shape [node_count]
@@ -607,7 +607,7 @@ cdef class UnsupervisedTree(BaseTree):
         impurity[i] holds the impurity (i.e., the value of the splitting
         criterion) at node i.
 
-    n_node_samples : array of int, shape [node_count]
+    n_node_samples : array of intp_t, shape [node_count]
         n_node_samples[i] holds the number of training samples reaching node i.
 
     weighted_n_node_samples : array of double, shape [node_count]
@@ -655,7 +655,7 @@ cdef class UnsupervisedTree(BaseTree):
     def value(self):
         return self._get_value_ndarray()[:self.node_count]
 
-    def __cinit__(self, int n_features):
+    def __cinit__(self, intp_t n_features):
         """Constructor."""
         # Input/Output layout
         self.n_features = n_features
@@ -784,12 +784,12 @@ def _check_value_ndarray(value_ndarray, expected_dtype, expected_shape):
     )
 
 
-def _dtype_to_dict(dtype):
+def _float32_to_dict(dtype):
     return {name: dt.str for name, (dt, *rest) in dtype.fields.items()}
 
 
 def _dtype_dict_with_modified_bitness(dtype_dict):
-    # field names in Node struct with SIZE_t types (see sklearn/tree/_tree.pxd)
+    # field names in Node struct with intp_t types (see sklearn/tree/_tree.pxd)
     indexing_field_names = ["left_child", "right_child", "feature", "n_node_samples"]
 
     expected_dtype_size = str(struct.calcsize("P"))
@@ -805,7 +805,7 @@ def _dtype_dict_with_modified_bitness(dtype_dict):
 
 
 def _all_compatible_dtype_dicts(dtype):
-    # The Cython code for decision trees uses platform-specific SIZE_t
+    # The Cython code for decision trees uses platform-specific intp_t
     # typed indexing fields that correspond to either i4 or i8 dtypes for
     # the matching fields in the numpy array depending on the bitness of
     # the platform (32 bit or 64 bit respectively).
@@ -821,9 +821,9 @@ def _all_compatible_dtype_dicts(dtype):
     # saved can have a different endianness than the machine where the pickle
     # is loaded
 
-    dtype_dict = _dtype_to_dict(dtype)
+    dtype_dict = _float32_to_dict(dtype)
     dtype_dict_with_modified_bitness = _dtype_dict_with_modified_bitness(dtype_dict)
-    dtype_dict_with_modified_endianness = _dtype_to_dict(dtype.newbyteorder())
+    dtype_dict_with_modified_endianness = _float32_to_dict(dtype.newbyteorder())
     dtype_dict_with_modified_bitness_and_endianness = _dtype_dict_with_modified_bitness(
         dtype_dict_with_modified_endianness
     )
@@ -852,7 +852,7 @@ def _check_node_ndarray(node_ndarray, expected_dtype):
     if node_ndarray_dtype == expected_dtype:
         return node_ndarray
 
-    node_ndarray_dtype_dict = _dtype_to_dict(node_ndarray_dtype)
+    node_ndarray_dtype_dict = _float32_to_dict(node_ndarray_dtype)
     all_compatible_dtype_dicts = _all_compatible_dtype_dicts(expected_dtype)
 
     if node_ndarray_dtype_dict not in all_compatible_dtype_dicts:

@@ -19,13 +19,13 @@ from .._sklearn_splitter cimport sort
 cdef double INFINITY = np.inf
 
 # Mitigate precision differences between 32 bit and 64 bit
-cdef DTYPE_t FEATURE_THRESHOLD = 1e-7
+cdef float32_t FEATURE_THRESHOLD = 1e-7
 
 # Constant to switch between algorithm non zero value extract algorithm
 # in SparseSplitter
-cdef DTYPE_t EXTRACT_NNZ_SWITCH = 0.1
+cdef float32_t EXTRACT_NNZ_SWITCH = 0.1
 
-cdef inline void _init_split(SplitRecord* self, SIZE_t start_pos) noexcept nogil:
+cdef inline void _init_split(SplitRecord* self, intp_t start_pos) noexcept nogil:
     self.impurity_left = INFINITY
     self.impurity_right = INFINITY
     self.pos = start_pos
@@ -37,8 +37,8 @@ cdef inline void _init_split(SplitRecord* self, SIZE_t start_pos) noexcept nogil
 cdef class UnsupervisedSplitter(BaseSplitter):
     """Base class for unsupervised splitters."""
 
-    def __cinit__(self, UnsupervisedCriterion criterion, SIZE_t max_features,
-                  SIZE_t min_samples_leaf, double min_weight_leaf,
+    def __cinit__(self, UnsupervisedCriterion criterion, intp_t max_features,
+                  intp_t min_samples_leaf, double min_weight_leaf,
                   object random_state, *argv):
         """
         Parameters
@@ -46,11 +46,11 @@ cdef class UnsupervisedSplitter(BaseSplitter):
         criterion : Criterion
             The criterion to measure the quality of a split.
 
-        max_features : SIZE_t
+        max_features : intp_t
             The maximal number of randomly selected features which can be
             considered for a split.
 
-        min_samples_leaf : SIZE_t
+        min_samples_leaf : intp_t
             The minimal number of samples each leaf can have, where splits
             which would result in having less samples in a leaf are not
             considered.
@@ -79,20 +79,20 @@ cdef class UnsupervisedSplitter(BaseSplitter):
                              self.min_weight_leaf,
                              self.random_state), self.__getstate__())
 
-    cdef int init(
+    cdef intp_t init(
         self,
-        const DTYPE_t[:, :] X,
-        const DOUBLE_t[:] sample_weight
+        const float32_t[:, :] X,
+        const float64_t[:] sample_weight
     ) except -1:
         self.rand_r_state = self.random_state.randint(0, RAND_R_MAX)
-        cdef SIZE_t n_samples = X.shape[0]
+        cdef intp_t n_samples = X.shape[0]
 
         # Create a new array which will be used to store nonzero
         # samples from the feature of interest
         self.samples = np.empty(n_samples, dtype=np.intp)
-        cdef SIZE_t[::1] samples = self.samples
+        cdef intp_t[::1] samples = self.samples
 
-        cdef SIZE_t i, j
+        cdef intp_t i, j
         cdef double weighted_n_samples = 0.0
         j = 0
 
@@ -111,7 +111,7 @@ cdef class UnsupervisedSplitter(BaseSplitter):
         self.n_samples = j
         self.weighted_n_samples = weighted_n_samples
 
-        cdef SIZE_t n_features = X.shape[1]
+        cdef intp_t n_features = X.shape[1]
         self.features = np.arange(n_features, dtype=np.intp)
         self.n_features = n_features
 
@@ -136,7 +136,7 @@ cdef class UnsupervisedSplitter(BaseSplitter):
         )
         return 0
 
-    cdef int node_reset(self, SIZE_t start, SIZE_t end,
+    cdef intp_t node_reset(self, intp_t start, intp_t end,
                         double* weighted_n_node_samples) except -1 nogil:
         """Reset splitter on node samples[start:end].
 
@@ -145,9 +145,9 @@ cdef class UnsupervisedSplitter(BaseSplitter):
 
         Parameters
         ----------
-        start : SIZE_t
+        start : intp_t
             The index of the first sample to consider
-        end : SIZE_t
+        end : intp_t
             The index of the last sample to consider
         weighted_n_node_samples : ndarray, dtype=double pointer
             The total weight of those samples
@@ -174,11 +174,11 @@ cdef class UnsupervisedSplitter(BaseSplitter):
 cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
     """Split in a best_split-first fashion.
     """
-    cdef int node_split(
+    cdef intp_t node_split(
         self,
         double impurity,
         SplitRecord* split,
-        SIZE_t* n_constant_features,
+        intp_t* n_constant_features,
         double lower_bound,
         double upper_bound
     ) except -1 nogil:
@@ -195,18 +195,18 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
         be cimportable.
         """
         # Find the best_split split
-        cdef SIZE_t[::1] samples = self.samples
-        cdef SIZE_t start = self.start
-        cdef SIZE_t end = self.end
+        cdef intp_t[::1] samples = self.samples
+        cdef intp_t start = self.start
+        cdef intp_t end = self.end
 
-        cdef SIZE_t[::1] features = self.features
-        cdef SIZE_t[::1] constant_features = self.constant_features
-        cdef SIZE_t n_features = self.n_features
+        cdef intp_t[::1] features = self.features
+        cdef intp_t[::1] constant_features = self.constant_features
+        cdef intp_t n_features = self.n_features
 
-        cdef DTYPE_t[::1] feature_values = self.feature_values
-        cdef SIZE_t max_features = self.max_features
-        cdef SIZE_t min_samples_leaf = self.min_samples_leaf
-        cdef UINT32_t* random_state = &self.rand_r_state
+        cdef float32_t[::1] feature_values = self.feature_values
+        cdef intp_t max_features = self.max_features
+        cdef intp_t min_samples_leaf = self.min_samples_leaf
+        cdef uint32_t* random_state = &self.rand_r_state
 
         # XXX: maybe need to rename to something else
         cdef double min_weight_leaf = self.min_weight_leaf
@@ -215,20 +215,20 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
         cdef double current_proxy_improvement = -INFINITY
         cdef double best_proxy_improvement = -INFINITY
 
-        cdef SIZE_t f_i = n_features
-        cdef SIZE_t f_j
-        cdef SIZE_t p
-        cdef SIZE_t i
+        cdef intp_t f_i = n_features
+        cdef intp_t f_j
+        cdef intp_t p
+        cdef intp_t i
 
-        cdef SIZE_t n_visited_features = 0
+        cdef intp_t n_visited_features = 0
         # Number of features discovered to be constant during the split search
-        cdef SIZE_t n_found_constants = 0
+        cdef intp_t n_found_constants = 0
         # Number of features known to be constant and drawn without replacement
-        cdef SIZE_t n_drawn_constants = 0
-        cdef SIZE_t n_known_constants = n_constant_features[0]
+        cdef intp_t n_drawn_constants = 0
+        cdef intp_t n_known_constants = n_constant_features[0]
         # n_total_constants = n_known_constants + n_found_constants
-        cdef SIZE_t n_total_constants = n_known_constants
-        cdef SIZE_t partition_end
+        cdef intp_t n_total_constants = n_known_constants
+        cdef intp_t partition_end
 
         _init_split(&best_split, end)
 
@@ -372,12 +372,12 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
         # Respect invariant for constant features: the original order of
         # element in features[:n_known_constants] must be preserved for sibling
         # and child nodes
-        memcpy(&features[0], &constant_features[0], sizeof(SIZE_t) * n_known_constants)
+        memcpy(&features[0], &constant_features[0], sizeof(intp_t) * n_known_constants)
 
         # Copy newly found constant features
         memcpy(&constant_features[n_known_constants],
                &features[n_known_constants],
-               sizeof(SIZE_t) * n_found_constants)
+               sizeof(intp_t) * n_found_constants)
 
         # Return values
         split[0] = best_split

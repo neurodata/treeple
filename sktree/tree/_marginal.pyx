@@ -18,15 +18,15 @@ from numpy import float32 as DTYPE
 
 TREE_LEAF = -1
 TREE_UNDEFINED = -2
-cdef SIZE_t _TREE_LEAF = TREE_LEAF
-cdef SIZE_t _TREE_UNDEFINED = TREE_UNDEFINED
+cdef intp_t _TREE_LEAF = TREE_LEAF
+cdef intp_t _TREE_UNDEFINED = TREE_UNDEFINED
 
 
 cpdef apply_marginal_tree(
     BaseTree tree,
     object X,
-    const SIZE_t[:] marginal_indices,
-    int traversal_method,
+    const intp_t[:] marginal_indices,
+    intp_t traversal_method,
     unsigned char use_sample_weight,
     object random_state
 ):
@@ -41,7 +41,7 @@ cpdef apply_marginal_tree(
     marginal_indices : ndarray of shape (n_marginals,)
         The indices of the features to marginalize, which
         are columns in ``X``.
-    traversal_method : int
+    traversal_method : intp_t
         The traversal method to use. 0 for 'random', 1 for
         'weighted'.
     use_sample_weight : unsigned char
@@ -62,13 +62,13 @@ cpdef apply_marginal_tree(
     if X.dtype != DTYPE:
         raise ValueError("X.dtype should be np.float32, got %s" % X.dtype)
 
-    cdef SIZE_t n_marginals = marginal_indices.shape[0]
+    cdef intp_t n_marginals = marginal_indices.shape[0]
 
     # sklearn_rand_r random number state
-    cdef UINT32_t rand_r_state = random_state.randint(0, RAND_R_MAX)
+    cdef uint32_t rand_r_state = random_state.randint(0, RAND_R_MAX)
 
     # define a set of all marginal indices
-    cdef unordered_set[SIZE_t] marginal_indices_map
+    cdef unordered_set[intp_t] marginal_indices_map
 
     # check all marginal indices are valid, and also convert to an unordered map
     for i in range(n_marginals):
@@ -94,21 +94,21 @@ cpdef apply_marginal_tree(
 cdef void _resample_split_node(
     BaseTree tree,
     Node* node,
-    unordered_set[SIZE_t] marginal_indices_map,
-    const DTYPE_t[:, :] X,
-    const DOUBLE_t[:, ::1] y,
-    const DOUBLE_t[:] sample_weight,
+    unordered_set[intp_t] marginal_indices_map,
+    const float32_t[:, :] X,
+    const float64_t[:, ::1] y,
+    const float64_t[:] sample_weight,
 ) noexcept nogil:
     pass
 
 
 cdef inline cnp.ndarray _apply_dense_marginal(
     BaseTree tree,
-    const DTYPE_t[:, :] X,
-    unordered_set[SIZE_t] marginal_indices_map,
-    int traversal_method,
+    const float32_t[:, :] X,
+    unordered_set[intp_t] marginal_indices_map,
+    intp_t traversal_method,
     unsigned char use_sample_weight,
-    UINT32_t* rand_r_state
+    uint32_t* rand_r_state
 ):
     """Finds the terminal region (=leaf node) for each sample in X.
 
@@ -122,33 +122,33 @@ cdef inline cnp.ndarray _apply_dense_marginal(
         The tree to apply.
     X : const ndarray of shape (n_samples, n_features)
         The data matrix.
-    marginal_indices_map : unordered_set[SIZE_t]
+    marginal_indices_map : unordered_set[intp_t]
         The indices of the features to marginalize, which
         are columns in ``X``.
-    traversal_method : int
+    traversal_method : intp_t
         The traversal method to use. 0 for 'random', 1 for
         'weighted'.
     use_sample_weight : unsigned char
         Whether or not to use the weighted number of samples
         in each node.
-    rand_r_state : UINT32_t
+    rand_r_state : uint32_t
         The random number state.
     """
     # Extract input
-    cdef const DTYPE_t[:, :] X_ndarray = X
-    cdef SIZE_t n_samples = X.shape[0]
-    cdef DTYPE_t X_i_node_feature
+    cdef const float32_t[:, :] X_ndarray = X
+    cdef intp_t n_samples = X.shape[0]
+    cdef float32_t X_i_node_feature
 
-    cdef DTYPE_t n_node_samples, n_right_samples, n_left_samples
+    cdef float32_t n_node_samples, n_right_samples, n_left_samples
     cdef double p_left
-    cdef int is_left
+    cdef intp_t is_left
 
     # Initialize output
-    cdef SIZE_t[:] out = np.zeros(n_samples, dtype=np.intp)
+    cdef intp_t[:] out = np.zeros(n_samples, dtype=np.intp)
 
     # Initialize auxiliary data-structure
     cdef Node* node = NULL
-    cdef SIZE_t i = 0
+    cdef intp_t i = 0
 
     with nogil:
         for i in prange(n_samples):
@@ -202,14 +202,14 @@ cdef inline cnp.ndarray _apply_dense_marginal(
                     else:
                         node = &tree.nodes[node.right_child]
 
-            out[i] = <SIZE_t>(node - tree.nodes)  # node offset
+            out[i] = <intp_t>(node - tree.nodes)  # node offset
 
     return np.asarray(out)
 
 
-cdef inline int is_element_present(unordered_set[SIZE_t]& my_set, SIZE_t element) noexcept nogil:
+cdef inline intp_t is_element_present(unordered_set[intp_t]& my_set, intp_t element) noexcept nogil:
     """Helper function to check presence of element in set."""
-    cdef unordered_set[SIZE_t].iterator it = my_set.find(element)
+    cdef unordered_set[intp_t].iterator it = my_set.find(element)
 
     if it != my_set.end():
         return 1

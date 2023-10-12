@@ -46,7 +46,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
     # The 'init' method is copied here with the almost the exact same signature
     # as that of supervised learning criterion in scikit-learn to ensure that
     # Unsupervised criterion can be used with splitter and tree methods.
-    cdef int init(
+    cdef intp_t init(
         self,
         const float32_t[:] feature_values,
         const float64_t[:] sample_weight,

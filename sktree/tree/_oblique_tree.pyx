@@ -29,7 +29,7 @@ cdef Node dummy
 NODE_DTYPE = np.asarray(<Node[:1]>(&dummy)).dtype
 
 # Mitigate precision differences between 32 bit and 64 bit
-cdef DTYPE_t FEATURE_THRESHOLD = 1e-7
+cdef float32_t FEATURE_THRESHOLD = 1e-7
 
 # =============================================================================
 # ObliqueTree
@@ -47,29 +47,29 @@ cdef class ObliqueTree(Tree):
 
     Attributes
     ----------
-    node_count : int
+    node_count : intp_t
         The number of nodes (internal nodes + leaves) in the tree.
 
-    capacity : int
+    capacity : intp_t
         The current capacity (i.e., size) of the arrays, which is at least as
         great as `node_count`.
 
-    max_depth : int
+    max_depth : intp_t
         The depth of the tree, i.e. the maximum depth of its leaves.
 
-    children_left : array of int, shape [node_count]
+    children_left : array of intp_t, shape [node_count]
         children_left[i] holds the node id of the left child of node i.
         For leaves, children_left[i] == TREE_LEAF. Otherwise,
         children_left[i] > i. This child handles the case where
         X[:, feature[i]] <= threshold[i].
 
-    children_right : array of int, shape [node_count]
+    children_right : array of intp_t, shape [node_count]
         children_right[i] holds the node id of the right child of node i.
         For leaves, children_right[i] == TREE_LEAF. Otherwise,
         children_right[i] > i. This child handles the case where
         X[:, feature[i]] > threshold[i].
 
-    feature : array of int, shape [node_count]
+    feature : array of intp_t, shape [node_count]
         feature[i] holds the feature to split on, for the internal node i.
 
     threshold : array of double, shape [node_count]
@@ -82,18 +82,18 @@ cdef class ObliqueTree(Tree):
         impurity[i] holds the impurity (i.e., the value of the splitting
         criterion) at node i.
 
-    n_node_samples : array of int, shape [node_count]
+    n_node_samples : array of intp_t, shape [node_count]
         n_node_samples[i] holds the number of training samples reaching node i.
 
-    weighted_n_node_samples : array of int, shape [node_count]
+    weighted_n_node_samples : array of intp_t, shape [node_count]
         weighted_n_node_samples[i] holds the weighted number of training samples
         reaching node i.
     """
     def __cinit__(
         self,
-        int n_features,
-        cnp.ndarray[SIZE_t, ndim=1] n_classes,
-        int n_outputs
+        intp_t n_features,
+        cnp.ndarray[intp_t, ndim=1] n_classes,
+        intp_t n_outputs
     ):
         """Constructor."""
         # Input/Output layout
@@ -105,7 +105,7 @@ cdef class ObliqueTree(Tree):
         self.max_n_classes = np.max(n_classes)
         self.value_stride = n_outputs * self.max_n_classes
 
-        cdef SIZE_t k
+        cdef intp_t k
         for k in range(n_outputs):
             self.n_classes[k] = n_classes[k]
 
@@ -116,8 +116,8 @@ cdef class ObliqueTree(Tree):
         self.value = NULL
         self.nodes = NULL
 
-        self.proj_vec_weights = vector[vector[DTYPE_t]](self.capacity)
-        self.proj_vec_indices = vector[vector[SIZE_t]](self.capacity)
+        self.proj_vec_weights = vector[vector[float32_t]](self.capacity)
+        self.proj_vec_indices = vector[vector[intp_t]](self.capacity)
 
     def __reduce__(self):
         """Reduce re-implementation, for pickling."""
@@ -191,7 +191,7 @@ cdef class ObliqueTree(Tree):
                 proj_vecs[i, feat] = weight
         return proj_vecs
 
-    cdef int _resize_c(self, SIZE_t capacity=INTPTR_MAX) except -1 nogil:
+    cdef intp_t _resize_c(self, intp_t capacity=INTPTR_MAX) except -1 nogil:
         """Guts of _resize.
 
         Additionally resizes the projection indices and weights.
@@ -229,7 +229,7 @@ cdef class ObliqueTree(Tree):
         self.capacity = capacity
         return 0
 
-    cdef int _set_split_node(self, SplitRecord* split_node, Node *node, SIZE_t node_id) except -1 nogil:
+    cdef intp_t _set_split_node(self, SplitRecord* split_node, Node *node, intp_t node_id) except -1 nogil:
         """Set node data.
         """
         # Cython type cast split record into its inherited split record
@@ -250,10 +250,10 @@ cdef class ObliqueTree(Tree):
         )
         return 1
 
-    cdef DTYPE_t _compute_feature(
+    cdef float32_t _compute_feature(
         self,
-        const DTYPE_t[:, :] X_ndarray,
-        SIZE_t sample_index,
+        const float32_t[:, :] X_ndarray,
+        intp_t sample_index,
         Node *node
     ) noexcept nogil:
         """Compute feature from a given data matrix, X.
@@ -261,15 +261,15 @@ cdef class ObliqueTree(Tree):
         In oblique-aligned trees, this is the projection of X.
         In this case, we take a simple linear combination of some columns of X.
         """
-        cdef DTYPE_t proj_feat = 0.0
-        cdef DTYPE_t weight = 0.0
-        cdef int j = 0
-        cdef SIZE_t feature_index
+        cdef float32_t proj_feat = 0.0
+        cdef float32_t weight = 0.0
+        cdef intp_t j = 0
+        cdef intp_t feature_index
 
         # get the index of the node
-        cdef SIZE_t node_id = node - self.nodes
+        cdef intp_t node_id = node - self.nodes
 
-        # cdef SIZE_t n_projections = proj_vec_indices.size()
+        # cdef intp_t n_projections = proj_vec_indices.size()
         # compute projection of the data based on trained tree
         # proj_vec_weights = self.proj_vec_weights[node_id]
         # proj_vec_indices = self.proj_vec_indices[node_id]
@@ -299,13 +299,13 @@ cdef class ObliqueTree(Tree):
         cdef Node* right
 
         # get the index of the node
-        cdef SIZE_t node_id = node - self.nodes
+        cdef intp_t node_id = node - self.nodes
 
         left = &nodes[node.left_child]
         right = &nodes[node.right_child]
 
-        cdef int i, feature_index
-        cdef DTYPE_t weight
+        cdef intp_t i, feature_index
+        cdef float32_t weight
         for i in range(0, self.proj_vec_indices[node_id].size()):
             feature_index = self.proj_vec_indices[node_id][i]
             weight = self.proj_vec_weights[node_id][i]

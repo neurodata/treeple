@@ -14,34 +14,30 @@ cimport numpy as cnp
 from libcpp.vector cimport vector
 
 from .._lib.sklearn.tree._splitter cimport SplitRecord
-from .._lib.sklearn.tree._tree cimport DOUBLE_t  # Type of y, sample_weight
-from .._lib.sklearn.tree._tree cimport DTYPE_t  # Type of X
-from .._lib.sklearn.tree._tree cimport INT32_t  # Signed 32 bit integer
-from .._lib.sklearn.tree._tree cimport SIZE_t  # Type for indices and counters
-from .._lib.sklearn.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
+from .._lib.sklearn.utils._typedefs cimport intp_t, float32_t, float64_t
 from .._lib.sklearn.tree._tree cimport Node, Tree, TreeBuilder
 from ._oblique_splitter cimport ObliqueSplitRecord
 
 
 cdef class ObliqueTree(Tree):
-    cdef vector[vector[DTYPE_t]] proj_vec_weights  # (capacity, n_features) array of projection vectors
-    cdef vector[vector[SIZE_t]] proj_vec_indices   # (capacity, n_features) array of projection vectors
+    cdef vector[vector[float32_t]] proj_vec_weights  # (capacity, n_features) array of projection vectors
+    cdef vector[vector[intp_t]] proj_vec_indices   # (capacity, n_features) array of projection vectors
 
     # overridden methods
-    cdef int _resize_c(
+    cdef intp_t _resize_c(
         self,
-        SIZE_t capacity=*
+        intp_t capacity=*
     ) except -1 nogil
-    cdef int _set_split_node(
+    cdef intp_t _set_split_node(
         self,
         SplitRecord* split_node,
         Node *node,
-        SIZE_t node_id
+        intp_t node_id
     )  nogil except -1
-    cdef DTYPE_t _compute_feature(
+    cdef float32_t _compute_feature(
         self,
-        const DTYPE_t[:, :] X_ndarray,
-        SIZE_t sample_index,
+        const float32_t[:, :] X_ndarray,
+        intp_t sample_index,
         Node *node
     ) noexcept nogil
     cdef void _compute_feature_importances(

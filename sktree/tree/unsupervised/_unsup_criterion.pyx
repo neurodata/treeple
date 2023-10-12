@@ -93,7 +93,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         # Reset to pos=start
         self.reset()
 
-    cdef int init(
+    cdef intp_t init(
         self,
         const float32_t[:] feature_values,
         const float64_t[:] sample_weight,
@@ -123,7 +123,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
 
         return 0
 
-    cdef int reset(self) except -1 nogil:
+    cdef intp_t reset(self) except -1 nogil:
         """Reset the criterion at pos=start.
 
         Returns -1 in case of failure to allocate memory (and raise MemoryError)
@@ -140,7 +140,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         self.sumsq_right = self.sumsq_total
         return 0
 
-    cdef int reverse_reset(self) except -1 nogil:
+    cdef intp_t reverse_reset(self) except -1 nogil:
         """Reset the criterion at pos=end.
 
         Returns -1 in case of failure to allocate memory (and raise MemoryError)
@@ -157,7 +157,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         self.sumsq_left = self.sumsq_total
         return 0
 
-    cdef int update(
+    cdef intp_t update(
         self,
         intp_t new_pos
     ) except -1 nogil:

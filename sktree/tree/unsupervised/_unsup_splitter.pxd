@@ -1,9 +1,5 @@
 from ..._lib.sklearn.tree._splitter cimport BaseSplitter, SplitRecord
-from ..._lib.sklearn.tree._tree cimport DOUBLE_t  # Type of y, sample_weight
-from ..._lib.sklearn.tree._tree cimport DTYPE_t  # Type of X
-from ..._lib.sklearn.tree._tree cimport INT32_t  # Signed 32 bit integer
-from ..._lib.sklearn.tree._tree cimport SIZE_t  # Type for indices and counters
-from ..._lib.sklearn.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
+from ..._lib.sklearn.utils._typedefs cimport float64_t, float32_t, intp_t, uint32_t
 from ._unsup_criterion cimport UnsupervisedCriterion
 
 
@@ -23,28 +19,28 @@ cdef class UnsupervisedSplitter(BaseSplitter):
 
     # XXX: requires BaseSplitter to not define "criterion"
     cdef public UnsupervisedCriterion criterion         # criterion computer
-    cdef const DTYPE_t[:, :] X                          # feature matrix
-    cdef SIZE_t n_total_samples                         # store the total number of samples
+    cdef const float32_t[:, :] X                          # feature matrix
+    cdef intp_t n_total_samples                         # store the total number of samples
 
     # Initialization method for unsupervised splitters
-    cdef int init(
+    cdef intp_t init(
         self,
-        const DTYPE_t[:, :] X,
-        const DOUBLE_t[:] sample_weight
+        const float32_t[:, :] X,
+        const float64_t[:] sample_weight
     ) except -1
 
     # Overridden Methods from base class
-    cdef int node_reset(
+    cdef intp_t node_reset(
         self,
-        SIZE_t start,
-        SIZE_t end,
+        intp_t start,
+        intp_t end,
         double* weighted_n_node_samples
     ) except -1 nogil
-    cdef int node_split(
+    cdef intp_t node_split(
         self,
         double impurity,   # Impurity of the node
         SplitRecord* split,
-        SIZE_t* n_constant_features,
+        intp_t* n_constant_features,
         double lower_bound,
         double upper_bound
     ) except -1 nogil
