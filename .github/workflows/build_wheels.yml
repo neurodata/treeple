@@ -89,8 +89,7 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with: 
-          # path: ./wheelhouse/
-          path: dist
+          path: ./wheelhouse/
           name: ${{ matrix.python[0] }}-${{ matrix.os[1] }}
 
   build-wheels-m1:
@@ -128,8 +127,7 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with: 
-          # path: ./wheelhouse
-          path: dist
+          path: ./wheelhouse
           name: ${{ matrix.python[0] }}-arm
 
   # Build the source distribution under Linux
