@@ -70,13 +70,13 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
     feature : array of intp_t, shape [node_count]
         feature[i] holds the feature to split on, for the internal node i.
 
-    threshold : array of double, shape [node_count]
+    threshold : array of float64_t, shape [node_count]
         threshold[i] holds the threshold for the internal node i.
 
-    value : array of double, shape [node_count, n_outputs, max_n_classes]
+    value : array of float64_t, shape [node_count, n_outputs, max_n_classes]
         Contains the constant prediction value of each node.
 
-    impurity : array of double, shape [node_count]
+    impurity : array of float64_t, shape [node_count]
         impurity[i] holds the impurity (i.e., the value of the splitting
         criterion) at node i.
 
@@ -159,7 +159,7 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
         memcpy(self.nodes, cnp.PyArray_DATA(node_ndarray),
                self.capacity * sizeof(Node))
         memcpy(self.value, cnp.PyArray_DATA(value_ndarray),
-               self.capacity * self.value_stride * sizeof(double))
+               self.capacity * self.value_stride * sizeof(float64_t))
 
     cpdef cnp.ndarray get_projection_matrix(self):
         """Get the projection matrix of shape (node_count, n_features)."""
@@ -200,7 +200,7 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
         # value memory is initialised to 0 to enable classifier argmax
         if capacity > self.capacity:
             memset(<void*>(self.value + self.capacity * self.value_stride), 0,
-                   (capacity - self.capacity) * self.value_stride * sizeof(double))
+                   (capacity - self.capacity) * self.value_stride * sizeof(float64_t))
 
         # if capacity smaller than node_count, adjust the counter
         if capacity < self.node_count:

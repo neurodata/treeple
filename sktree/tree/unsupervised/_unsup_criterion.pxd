@@ -33,13 +33,13 @@ cdef class UnsupervisedCriterion(BaseCriterion):
     # the left and right node. For example, this can then efficiently compute the
     # mean of the node, and left/right child by subtracting relevant Xf elements
     # and then dividing by the total number of samples in the node and left/right child.
-    cdef double sum_total     # The sum of the weighted count of each feature.
-    cdef double sum_left      # Same as above, but for the left side of the split
-    cdef double sum_right     # Same as above, but for the right side of the split
+    cdef float64_t sum_total     # The sum of the weighted count of each feature.
+    cdef float64_t sum_left      # Same as above, but for the left side of the split
+    cdef float64_t sum_right     # Same as above, but for the right side of the split
 
-    cdef double sumsq_total     # The sum of the weighted count of each feature.
-    cdef double sumsq_left      # Same as above, but for the left side of the split
-    cdef double sumsq_right     # Same as above, but for the right side of the split
+    cdef float64_t sumsq_total     # The sum of the weighted count of each feature.
+    cdef float64_t sumsq_left      # Same as above, but for the left side of the split
+    cdef float64_t sumsq_right     # Same as above, but for the right side of the split
 
     # Methods
     # -------
@@ -50,7 +50,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         self,
         const float32_t[:] feature_values,
         const float64_t[:] sample_weight,
-        double weighted_n_samples,
+        float64_t weighted_n_samples,
         const intp_t[:] samples,
     ) except -1 nogil
 

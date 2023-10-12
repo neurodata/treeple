@@ -51,8 +51,8 @@ from numpy import float32 as DTYPE
 from numpy import float64 as DOUBLE
 
 
-cdef double INFINITY = np.inf
-cdef double EPSILON = np.finfo('double').eps
+cdef float64_t INFINITY = np.inf
+cdef float64_t EPSILON = np.finfo('float64_t').eps
 
 # Some handy constants (BestFirstTreeBuilder)
 cdef intp_t IS_FIRST = 1
@@ -127,10 +127,10 @@ cdef struct FrontierRecord:
     intp_t pos
     intp_t depth
     bint is_leaf
-    double impurity
-    double impurity_left
-    double impurity_right
-    double improvement
+    float64_t impurity
+    float64_t impurity_left
+    float64_t impurity_right
+    float64_t improvement
 
 # Depth first builder ---------------------------------------------------------
 # A record on the stack for depth-first tree growing
@@ -140,7 +140,7 @@ cdef struct StackRecord:
     intp_t depth
     intp_t parent
     bint is_left
-    double impurity
+    float64_t impurity
     intp_t n_constant_features
 
 cdef inline bool _compare_records(
@@ -171,10 +171,10 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
         UnsupervisedSplitter splitter,
         intp_t min_samples_split,
         intp_t min_samples_leaf,
-        double min_weight_leaf,
+        float64_t min_weight_leaf,
         intp_t max_depth,
         intp_t max_leaf_nodes,
-        double min_impurity_decrease
+        float64_t min_impurity_decrease
     ):
         self.splitter = splitter
         self.min_samples_split = min_samples_split
@@ -291,7 +291,7 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
         UnsupervisedTree tree,
         intp_t start,
         intp_t end,
-        double impurity,
+        float64_t impurity,
         bint is_first,
         bint is_left,
         Node* parent,
@@ -308,8 +308,8 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
         cdef intp_t node_id
         cdef intp_t n_node_samples
         cdef intp_t n_constant_features = 0
-        cdef double min_impurity_decrease = self.min_impurity_decrease
-        cdef double weighted_n_node_samples
+        cdef float64_t min_impurity_decrease = self.min_impurity_decrease
+        cdef float64_t weighted_n_node_samples
         cdef bint is_leaf
 
         splitter.node_reset(start, end, &weighted_n_node_samples)
@@ -384,9 +384,9 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
         UnsupervisedSplitter splitter,
         intp_t min_samples_split,
         intp_t min_samples_leaf,
-        double min_weight_leaf,
+        float64_t min_weight_leaf,
         intp_t max_depth,
-        double min_impurity_decrease
+        float64_t min_impurity_decrease
     ):
         self.splitter = splitter
         self.min_samples_split = min_samples_split
@@ -420,9 +420,9 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
         cdef UnsupervisedSplitter splitter = self.splitter
         cdef intp_t max_depth = self.max_depth
         cdef intp_t min_samples_leaf = self.min_samples_leaf
-        cdef double min_weight_leaf = self.min_weight_leaf
+        cdef float64_t min_weight_leaf = self.min_weight_leaf
         cdef intp_t min_samples_split = self.min_samples_split
-        cdef double min_impurity_decrease = self.min_impurity_decrease
+        cdef float64_t min_impurity_decrease = self.min_impurity_decrease
 
         # Recursive partition (without actual recursion)
         splitter.init(X, sample_weight)
@@ -433,7 +433,7 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
         cdef intp_t parent
         cdef bint is_left
         cdef intp_t n_node_samples = splitter.n_samples
-        cdef double weighted_n_node_samples
+        cdef float64_t weighted_n_node_samples
         cdef intp_t node_id
 
         # initialize record to keep track of split node data and a pointer to the
@@ -442,7 +442,7 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
         cdef SplitRecord split
         cdef SplitRecord* split_ptr = <SplitRecord *>malloc(splitter.pointer_size())
 
-        cdef double impurity = INFINITY
+        cdef float64_t impurity = INFINITY
         cdef intp_t n_constant_features
         cdef bint is_leaf
         cdef bint first = 1
@@ -597,20 +597,20 @@ cdef class UnsupervisedTree(BaseTree):
     feature : array of intp_t, shape [node_count]
         feature[i] holds the feature to split on, for the internal node i.
 
-    threshold : array of double, shape [node_count]
+    threshold : array of float64_t, shape [node_count]
         threshold[i] holds the threshold for the internal node i.
 
-    value : array of double, shape [node_count]
+    value : array of float64_t, shape [node_count]
         Contains the constant prediction value of each node.
 
-    impurity : array of double, shape [node_count]
+    impurity : array of float64_t, shape [node_count]
         impurity[i] holds the impurity (i.e., the value of the splitting
         criterion) at node i.
 
     n_node_samples : array of intp_t, shape [node_count]
         n_node_samples[i] holds the number of training samples reaching node i.
 
-    weighted_n_node_samples : array of double, shape [node_count]
+    weighted_n_node_samples : array of float64_t, shape [node_count]
         weighted_n_node_samples[i] holds the weighted number of training samples
         reaching node i.
     """
@@ -718,7 +718,7 @@ cdef class UnsupervisedTree(BaseTree):
         memcpy(self.nodes, cnp.PyArray_DATA(node_ndarray),
                self.capacity * sizeof(Node))
         memcpy(self.value, cnp.PyArray_DATA(value_ndarray),
-               self.capacity * self.value_stride * sizeof(double))
+               self.capacity * self.value_stride * sizeof(float64_t))
 
     cdef cnp.ndarray _get_value_ndarray(self):
         """Wraps value as a 3-d NumPy array.

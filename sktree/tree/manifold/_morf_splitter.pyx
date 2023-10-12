@@ -45,7 +45,7 @@ cdef class PatchSplitter(BestObliqueSplitter):
         self,
         intp_t start,
         intp_t end,
-        double* weighted_n_node_samples
+        float64_t* weighted_n_node_samples
     ) except -1 nogil:
         """Reset splitter on node samples[start:end].
 
@@ -58,7 +58,7 @@ cdef class PatchSplitter(BestObliqueSplitter):
             The index of the first sample to consider
         end : intp_t
             The index of the last sample to consider
-        weighted_n_node_samples : ndarray, dtype=double pointer
+        weighted_n_node_samples : ndarray, dtype=float64_t pointer
             The total weight of those samples
         """
 
@@ -122,10 +122,10 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
         Criterion criterion,
         intp_t max_features,
         intp_t min_samples_leaf,
-        double min_weight_leaf,
+        float64_t min_weight_leaf,
         object random_state,
         const cnp.int8_t[:] monotonic_cst,
-        double feature_combinations,
+        float64_t feature_combinations,
         const intp_t[:] min_patch_dims,
         const intp_t[:] max_patch_dims,
         const cnp.uint8_t[:] dim_contiguous,

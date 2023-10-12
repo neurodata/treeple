@@ -25,10 +25,10 @@ cdef struct ObliqueSplitRecord:
     intp_t pos                  # Split samples array at the given position,
     #                           # i.e. count of samples below threshold for feature.
     #                           # pos is >= end if the node is a leaf.
-    double threshold            # Threshold to split at.
-    double improvement          # Impurity improvement given parent node.
-    double impurity_left        # Impurity of the left split.
-    double impurity_right       # Impurity of the right split.
+    float64_t threshold            # Threshold to split at.
+    float64_t improvement          # Impurity improvement given parent node.
+    float64_t impurity_left        # Impurity of the left split.
+    float64_t impurity_right       # Impurity of the right split.
 
     vector[float32_t]* proj_vec_weights   # weights of the vector (max_features,)
     vector[intp_t]* proj_vec_indices    # indices of the features (max_features,)
@@ -62,7 +62,7 @@ cdef class BaseObliqueSplitter(Splitter):
         self,
         intp_t start,
         intp_t end,
-        double* weighted_n_node_samples
+        float64_t* weighted_n_node_samples
     ) except -1 nogil
 
     cdef void compute_features_over_samples(
@@ -77,11 +77,11 @@ cdef class BaseObliqueSplitter(Splitter):
 
     cdef intp_t node_split(
         self,
-        double impurity,   # Impurity of the node
+        float64_t impurity,   # Impurity of the node
         SplitRecord* split,
         intp_t* n_constant_features,
-        double lower_bound,
-        double upper_bound,
+        float64_t lower_bound,
+        float64_t upper_bound,
     ) except -1 nogil
 
     cdef inline void fisher_yates_shuffle_memview(
@@ -96,7 +96,7 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
     # to split the samples samples[start:end].
 
     # Oblique Splitting extra parameters
-    cdef public double feature_combinations             # Number of features to combine
+    cdef public float64_t feature_combinations             # Number of features to combine
     cdef intp_t n_non_zeros                             # Number of non-zero features
     cdef intp_t[::1] indices_to_sample                  # an array of indices to sample of size mtry X n_features
 
@@ -113,11 +113,11 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
 cdef class BestObliqueSplitter(ObliqueSplitter):
     cdef intp_t node_split(
         self,
-        double impurity,   # Impurity of the node
+        float64_t impurity,   # Impurity of the node
         SplitRecord* split,
         intp_t* n_constant_features,
-        double lower_bound,
-        double upper_bound,
+        float64_t lower_bound,
+        float64_t upper_bound,
     ) except -1 nogil
 
 
@@ -131,16 +131,16 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
 
     cdef intp_t partition_samples(
         self,
-        double current_threshold
+        float64_t current_threshold
     ) noexcept nogil
 
     cdef intp_t node_split(
         self,
-        double impurity,   # Impurity of the node
+        float64_t impurity,   # Impurity of the node
         SplitRecord* split,
         intp_t* n_constant_features,
-        double lower_bound,
-        double upper_bound,
+        float64_t lower_bound,
+        float64_t upper_bound,
     ) except -1 nogil
 
 

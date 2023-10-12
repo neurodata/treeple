@@ -97,7 +97,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         self,
         const float32_t[:] feature_values,
         const float64_t[:] sample_weight,
-        double weighted_n_samples,
+        float64_t weighted_n_samples,
         const intp_t[:] sample_indices,
     ) except -1 nogil:
         """Initialize the unsuperivsed criterion.
@@ -111,7 +111,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
             The memoryview 1D feature vector with (n_samples,) shape.
         sample_weight : array-like, dtype=float64_t
             The weight of each sample (i.e. row of X).
-        weighted_n_samples : double
+        weighted_n_samples : float64_t
             The total weight of all sample_indices.
         sample_indices : array-like, dtype=intp_t
             A mask on the sample_indices, showing which ones we want to use
@@ -225,13 +225,13 @@ cdef class UnsupervisedCriterion(BaseCriterion):
 
     cdef void node_value(
         self,
-        double* dest
+        float64_t* dest
     ) noexcept nogil:
         """Set the node value with sum_total and save it into dest.
 
         Parameters
         ----------
-        dest : double pointer
+        dest : float64_t pointer
             The memory address which we will save the node value into.
         """
         # set values at the address pointer is pointing to with the total value
@@ -307,7 +307,7 @@ cdef class TwoMeans(UnsupervisedCriterion):
     pair minimizes the splitting criteria described in the following
     section
     """
-    cdef double node_impurity(
+    cdef float64_t node_impurity(
         self
     ) noexcept nogil:
         """Evaluate the impurity of the current node.
@@ -316,7 +316,7 @@ cdef class TwoMeans(UnsupervisedCriterion):
         i.e. the variance of Xf[sample_indices[start:end]]. The smaller the impurity the
         better.
         """
-        cdef double impurity
+        cdef float64_t impurity
 
         # then compute the impurity as the variance
         impurity = self.fast_variance(self.weighted_n_node_samples, self.sumsq_total, self.sum_total)
@@ -324,8 +324,8 @@ cdef class TwoMeans(UnsupervisedCriterion):
 
     cdef void children_impurity(
         self,
-        double* impurity_left,
-        double* impurity_right
+        float64_t* impurity_left,
+        float64_t* impurity_right
     ) noexcept nogil:
         """Evaluate the impurity in children nodes.
 
@@ -340,9 +340,9 @@ cdef class TwoMeans(UnsupervisedCriterion):
 
         Parameters
         ----------
-        impurity_left : double pointer
+        impurity_left : float64_t pointer
             The memory address to save the impurity of the left node
-        impurity_right : double pointer
+        impurity_right : float64_t pointer
             The memory address to save the impurity of the right node
         """
         # set values at the address pointer is pointing to with the variance
@@ -350,11 +350,11 @@ cdef class TwoMeans(UnsupervisedCriterion):
         impurity_left[0] = self.fast_variance(self.weighted_n_left, self.sumsq_left, self.sum_left)
         impurity_right[0] = self.fast_variance(self.weighted_n_right, self.sumsq_right, self.sum_right)
 
-    cdef inline double fast_variance(
+    cdef inline float64_t fast_variance(
         self,
-        double weighted_n_node_samples,
-        double sumsq_total,
-        double sum_total
+        float64_t weighted_n_node_samples,
+        float64_t sumsq_total,
+        float64_t sum_total
     ) noexcept nogil:
         return (1. / weighted_n_node_samples) * \
             ((sumsq_total) - (1. / weighted_n_node_samples) * (sum_total * sum_total))
@@ -391,10 +391,10 @@ cdef class FastBIC(TwoMeans):
 
     Reference: https://arxiv.org/abs/1907.02844
     """
-    cdef inline double bic_cluster(
+    cdef inline float64_t bic_cluster(
         self,
         intp_t n_samples,
-        double variance
+        float64_t variance
     ) noexcept nogil:
         """Help compute the BIC from assigning to a specific cluster.
 
@@ -402,7 +402,7 @@ cdef class FastBIC(TwoMeans):
         ----------
         n_samples : intp_t
             The number of samples assigned cluster.
-        variance : double
+        variance : float64_t
             The plug-in variance for assigning to specific cluster.
 
         Notes
@@ -421,13 +421,13 @@ cdef class FastBIC(TwoMeans):
         """
         # chances of choosing the cluster based on how many samples are hard-assigned to cluster
         # i.e. the prior
-        # cast to double, so we do not round to integers
-        cdef double w_cluster = (n_samples + 0.0) / self.n_node_samples
+        # cast to float64_t, so we do not round to integers
+        cdef float64_t w_cluster = (n_samples + 0.0) / self.n_node_samples
 
         # add to prevent taking log of 0 when there is a degenerate cluster (i.e. single sample, or no variance)
         return -2. * (n_samples * log(w_cluster) + 0.5 * n_samples * log(2. * PI * variance + 1.e-7))
 
-    cdef double node_impurity(
+    cdef float64_t node_impurity(
         self
     ) noexcept nogil:
         """Evaluate the impurity of the current node.
@@ -437,8 +437,8 @@ cdef class FastBIC(TwoMeans):
         Namely, this is the maximum likelihood of Xf[sample_indices[start:end]].
         The smaller the impurity the better.
         """
-        cdef double variance
-        cdef double impurity
+        cdef float64_t variance
+        cdef float64_t impurity
 
         # then compute the variance of the cluster
         variance = self.fast_variance(self.weighted_n_node_samples, self.sumsq_total, self.sum_total)
@@ -451,8 +451,8 @@ cdef class FastBIC(TwoMeans):
 
     cdef void children_impurity(
         self,
-        double* impurity_left,
-        double* impurity_right
+        float64_t* impurity_left,
+        float64_t* impurity_right
     ) noexcept nogil:
         """Evaluate the impurity in children nodes.
 
@@ -461,9 +461,9 @@ cdef class FastBIC(TwoMeans):
 
         Parameters
         ----------
-        impurity_left : double pointer
+        impurity_left : float64_t pointer
             The memory address to save the impurity of the left node
-        impurity_right : double pointer
+        impurity_right : float64_t pointer
             The memory address to save the impurity of the right node
         """
         cdef intp_t pos = self.pos
@@ -471,10 +471,10 @@ cdef class FastBIC(TwoMeans):
         cdef intp_t end = self.end
         cdef intp_t n_samples_left, n_samples_right
 
-        cdef double variance_left, variance_right, variance_comb
-        cdef double BIC_diff_var_left, BIC_diff_var_right
-        cdef double BIC_same_var_left, BIC_same_var_right
-        cdef double BIC_same_var, BIC_diff_var
+        cdef float64_t variance_left, variance_right, variance_comb
+        cdef float64_t BIC_diff_var_left, BIC_diff_var_right
+        cdef float64_t BIC_same_var_left, BIC_same_var_right
+        cdef float64_t BIC_same_var, BIC_diff_var
 
         # number of samples of left and right
         n_samples_left = pos - start

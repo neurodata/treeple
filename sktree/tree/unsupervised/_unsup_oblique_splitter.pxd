@@ -14,10 +14,10 @@ cdef struct ObliqueSplitRecord:
     intp_t pos                  # Split samples array at the given position,
     #                           # i.e. count of samples below threshold for feature.
     #                           # pos is >= end if the node is a leaf.
-    double threshold            # Threshold to split at.
-    double improvement          # Impurity improvement given parent node.
-    double impurity_left        # Impurity of the left split.
-    double impurity_right       # Impurity of the right split.
+    float64_t threshold            # Threshold to split at.
+    float64_t improvement          # Impurity improvement given parent node.
+    float64_t impurity_left        # Impurity of the left split.
+    float64_t impurity_right       # Impurity of the right split.
 
     vector[float32_t]* proj_vec_weights   # weights of the vector (max_features,)
     vector[intp_t]* proj_vec_indices    # indices of the features (max_features,)
@@ -34,7 +34,7 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
     """
 
     # Oblique Splitting extra parameters
-    cdef public double feature_combinations             # Number of features to combine
+    cdef public float64_t feature_combinations             # Number of features to combine
     cdef intp_t n_non_zeros                             # Number of non-zero features
     cdef vector[vector[float32_t]] proj_mat_weights       # nonzero weights of sparse proj_mat matrix
     cdef vector[vector[intp_t]] proj_mat_indices        # nonzero indices of sparse proj_mat matrix
@@ -49,15 +49,15 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
 
     # Redefined here since the new logic requires calling sample_proj_mat
     cdef intp_t node_reset(self, intp_t start, intp_t end,
-                           double* weighted_n_node_samples) except -1 nogil
+                           float64_t* weighted_n_node_samples) except -1 nogil
 
     cdef intp_t node_split(
         self,
-        double impurity,   # Impurity of the node
+        float64_t impurity,   # Impurity of the node
         SplitRecord* split,
         intp_t* n_constant_features,
-        double lower_bound,
-        double upper_bound
+        float64_t lower_bound,
+        float64_t upper_bound
     ) except -1 nogil
     cdef intp_t init(
         self,

@@ -140,7 +140,7 @@ cdef inline cnp.ndarray _apply_dense_marginal(
     cdef float32_t X_i_node_feature
 
     cdef float32_t n_node_samples, n_right_samples, n_left_samples
-    cdef double p_left
+    cdef float64_t p_left
     cdef intp_t is_left
 
     # Initialize output
@@ -172,7 +172,7 @@ cdef inline cnp.ndarray _apply_dense_marginal(
                             n_right_samples = tree.nodes[node.right_child].n_node_samples
 
                         # compute the probabilies for going left and right
-                        p_left = (<double>n_left_samples / n_node_samples)
+                        p_left = (<float64_t>n_left_samples / n_node_samples)
 
                         # randomly sample a direction
                         is_left = rand_weighted_binary(p_left, rand_r_state)

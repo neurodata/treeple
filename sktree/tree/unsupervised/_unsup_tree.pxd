@@ -24,7 +24,7 @@ cdef class UnsupervisedTree(BaseTree):
     #
     # Inner structures: values are stored separately from node structure,
     # since size is determined at runtime.
-    # cdef double* value                   # (capacity) array of values
+    # cdef float64_t* value                   # (capacity) array of values
     # cdef intp_t value_stride             # = 1
 
     # Input/Output layout
@@ -69,9 +69,9 @@ cdef class UnsupervisedTreeBuilder:
 
     cdef intp_t min_samples_split       # Minimum number of samples in an internal node
     cdef intp_t min_samples_leaf        # Minimum number of samples in a leaf
-    cdef double min_weight_leaf         # Minimum weight in a leaf
+    cdef float64_t min_weight_leaf         # Minimum weight in a leaf
     cdef intp_t max_depth               # Maximal tree depth
-    cdef double min_impurity_decrease   # Impurity threshold for early stopping
+    cdef float64_t min_impurity_decrease   # Impurity threshold for early stopping
 
     cpdef build(
         self,

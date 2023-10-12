@@ -34,20 +34,20 @@ cdef class UnsupervisedSplitter(BaseSplitter):
         self,
         intp_t start,
         intp_t end,
-        double* weighted_n_node_samples
+        float64_t* weighted_n_node_samples
     ) except -1 nogil
     cdef intp_t node_split(
         self,
-        double impurity,   # Impurity of the node
+        float64_t impurity,   # Impurity of the node
         SplitRecord* split,
         intp_t* n_constant_features,
-        double lower_bound,
-        double upper_bound
+        float64_t lower_bound,
+        float64_t upper_bound
     ) except -1 nogil
     cdef void node_value(
         self,
-        double* dest
+        float64_t* dest
     ) noexcept nogil
-    cdef double node_impurity(
+    cdef float64_t node_impurity(
         self
     ) noexcept nogil

@@ -11,7 +11,7 @@ cimport numpy as cnp
 
 cnp.import_array()
 
-from sktree._lib.sklearn.tree._utils cimport rand_uniform
+from .._lib.sklearn.tree._utils cimport rand_uniform
 
 
 cdef inline int rand_weighted_binary(float64_t p0, uint32_t* random_state) noexcept nogil:

@@ -16,7 +16,7 @@ from sklearn.tree._utils cimport RAND_R_MAX, rand_int
 from .._sklearn_splitter cimport sort
 
 
-cdef double INFINITY = np.inf
+cdef float64_t INFINITY = np.inf
 
 # Mitigate precision differences between 32 bit and 64 bit
 cdef float32_t FEATURE_THRESHOLD = 1e-7
@@ -38,7 +38,7 @@ cdef class UnsupervisedSplitter(BaseSplitter):
     """Base class for unsupervised splitters."""
 
     def __cinit__(self, UnsupervisedCriterion criterion, intp_t max_features,
-                  intp_t min_samples_leaf, double min_weight_leaf,
+                  intp_t min_samples_leaf, float64_t min_weight_leaf,
                   object random_state, *argv):
         """
         Parameters
@@ -55,7 +55,7 @@ cdef class UnsupervisedSplitter(BaseSplitter):
             which would result in having less samples in a leaf are not
             considered.
 
-        min_weight_leaf : double
+        min_weight_leaf : float64_t
             The minimal weight each leaf can have, where the weight is the sum
             of the weights of each sample in it.
 
@@ -93,7 +93,7 @@ cdef class UnsupervisedSplitter(BaseSplitter):
         cdef intp_t[::1] samples = self.samples
 
         cdef intp_t i, j
-        cdef double weighted_n_samples = 0.0
+        cdef float64_t weighted_n_samples = 0.0
         j = 0
 
         for i in range(n_samples):
@@ -137,7 +137,7 @@ cdef class UnsupervisedSplitter(BaseSplitter):
         return 0
 
     cdef intp_t node_reset(self, intp_t start, intp_t end,
-                           double* weighted_n_node_samples) except -1 nogil:
+                           float64_t* weighted_n_node_samples) except -1 nogil:
         """Reset splitter on node samples[start:end].
 
         Returns -1 in case of failure to allocate memory (and raise MemoryError)
@@ -149,7 +149,7 @@ cdef class UnsupervisedSplitter(BaseSplitter):
             The index of the first sample to consider
         end : intp_t
             The index of the last sample to consider
-        weighted_n_node_samples : ndarray, dtype=double pointer
+        weighted_n_node_samples : ndarray, dtype=float64_t pointer
             The total weight of those samples
         """
 
@@ -161,12 +161,12 @@ cdef class UnsupervisedSplitter(BaseSplitter):
         weighted_n_node_samples[0] = self.criterion.weighted_n_node_samples
         return 0
 
-    cdef void node_value(self, double* dest) noexcept nogil:
+    cdef void node_value(self, float64_t* dest) noexcept nogil:
         """Copy the value of node samples[start:end] into dest."""
 
         self.criterion.node_value(dest)
 
-    cdef double node_impurity(self) noexcept nogil:
+    cdef float64_t node_impurity(self) noexcept nogil:
         """Return the impurity of the current_split node."""
 
         return self.criterion.node_impurity()
@@ -176,11 +176,11 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
     """
     cdef intp_t node_split(
         self,
-        double impurity,
+        float64_t impurity,
         SplitRecord* split,
         intp_t* n_constant_features,
-        double lower_bound,
-        double upper_bound
+        float64_t lower_bound,
+        float64_t upper_bound
     ) except -1 nogil:
         """Find the best_split split on node samples[start:end].
 
@@ -209,11 +209,11 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
         cdef uint32_t* random_state = &self.rand_r_state
 
         # XXX: maybe need to rename to something else
-        cdef double min_weight_leaf = self.min_weight_leaf
+        cdef float64_t min_weight_leaf = self.min_weight_leaf
 
         cdef SplitRecord best_split, current_split
-        cdef double current_proxy_improvement = -INFINITY
-        cdef double best_proxy_improvement = -INFINITY
+        cdef float64_t current_proxy_improvement = -INFINITY
+        cdef float64_t best_proxy_improvement = -INFINITY
 
         cdef intp_t f_i = n_features
         cdef intp_t f_j
