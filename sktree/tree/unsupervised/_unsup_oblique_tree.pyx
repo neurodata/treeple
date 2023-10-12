@@ -266,7 +266,7 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
 
     cdef void _compute_feature_importances(
         self,
-        cnp.float64_t[:] importances,
+        float64_t[:] importances,
         Node* node
     ) noexcept nogil:
         """Compute feature importances from a Node in the Tree.

@@ -41,7 +41,7 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
     ) noexcept nogil
     cdef void _compute_feature_importances(
         self,
-        cnp.float64_t[:] importances,
+        float64_t[:] importances,
         Node* node
     ) noexcept nogil
 
