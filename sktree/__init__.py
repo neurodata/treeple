@@ -59,6 +59,7 @@ else:
         )
         from .ensemble._honest_forest import HonestForestClassifier
     except ImportError as e:
+        print(e.msg)
         msg = """Error importing scikit-tree: you cannot import scikit-tree while
         being in scikit-tree source directory; please exit the scikit-tree source
         tree first and relaunch your Python interpreter."""
