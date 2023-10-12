@@ -129,7 +129,7 @@ def setup_submodule(forcesubmodule=False):
 @click.option("-j", "--jobs", help="Number of parallel tasks to launch", type=int)
 @click.option("--clean", is_flag=True, help="Clean build directory before build")
 @click.option(
-    "--forcesubmodule", is_flag=False, help="Force submodule pull.", envvar="FORCE_SUBMODULE"
+    "--forcesubmodule", is_flag=True, help="Force submodule pull.", envvar="FORCE_SUBMODULE"
 )
 @click.option("-v", "--verbose", is_flag=True, help="Print all build output, even installation")
 @click.argument("meson_args", nargs=-1)
