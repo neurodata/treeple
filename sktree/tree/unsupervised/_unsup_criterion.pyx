@@ -11,7 +11,7 @@ from libc.math cimport log
 
 cnp.import_array()
 
-cdef DTYPE_t PI = np.pi
+cdef float32_t PI = np.pi
 
 
 cdef class UnsupervisedCriterion(BaseCriterion):
@@ -64,19 +64,19 @@ cdef class UnsupervisedCriterion(BaseCriterion):
 
         Parameters
         ----------
-        Xf : array-like, dtype=DTYPE_t
+        Xf : array-like, dtype=float32_t
             The read-only memoryview 1D feature vector with (n_samples,) shape.
         """
         # also compute the sum total
         self.sum_total = 0.0
         self.sumsq_total = 0.0
         self.weighted_n_node_samples = 0.0
-        cdef SIZE_t s_idx
-        cdef SIZE_t p_idx
+        cdef intp_t s_idx
+        cdef intp_t p_idx
 
         # XXX: this can be further optimized by computing a cumulative sum hash map of the sum_total and sumsq_total
         # and then update will never have to iterate through even
-        cdef DOUBLE_t w = 1.0
+        cdef float64_t w = 1.0
 
         for p_idx in range(self.start, self.end):
             s_idx = self.sample_indices[p_idx]
@@ -95,10 +95,10 @@ cdef class UnsupervisedCriterion(BaseCriterion):
 
     cdef int init(
         self,
-        const DTYPE_t[:] feature_values,
-        const DOUBLE_t[:] sample_weight,
+        const float32_t[:] feature_values,
+        const float64_t[:] sample_weight,
         double weighted_n_samples,
-        const SIZE_t[:] sample_indices,
+        const intp_t[:] sample_indices,
     ) except -1 nogil:
         """Initialize the unsuperivsed criterion.
 
@@ -107,13 +107,13 @@ cdef class UnsupervisedCriterion(BaseCriterion):
 
         Parameters
         ----------
-        feature_values : array-like, dtype=DTYPE_t
+        feature_values : array-like, dtype=float32_t
             The memoryview 1D feature vector with (n_samples,) shape.
-        sample_weight : array-like, dtype=DOUBLE_t
+        sample_weight : array-like, dtype=float64_t
             The weight of each sample (i.e. row of X).
         weighted_n_samples : double
             The total weight of all sample_indices.
-        sample_indices : array-like, dtype=SIZE_t
+        sample_indices : array-like, dtype=intp_t
             A mask on the sample_indices, showing which ones we want to use
         """
         self.feature_values = feature_values
@@ -159,7 +159,7 @@ cdef class UnsupervisedCriterion(BaseCriterion):
 
     cdef int update(
         self,
-        SIZE_t new_pos
+        intp_t new_pos
     ) except -1 nogil:
         """Updated statistics by moving sample_indices[pos:new_pos] to the left child.
 
@@ -168,19 +168,19 @@ cdef class UnsupervisedCriterion(BaseCriterion):
 
         Parameters
         ----------
-        new_pos : SIZE_t
+        new_pos : intp_t
             The new ending position for which to move sample_indices from the right
             child to the left child.
         """
-        cdef SIZE_t pos = self.pos
-        cdef SIZE_t end = self.end
+        cdef intp_t pos = self.pos
+        cdef intp_t end = self.end
 
-        cdef const SIZE_t[:] sample_indices = self.sample_indices
-        cdef const DOUBLE_t[:] sample_weight = self.sample_weight
+        cdef const intp_t[:] sample_indices = self.sample_indices
+        cdef const float64_t[:] sample_weight = self.sample_weight
 
-        cdef SIZE_t i
-        cdef SIZE_t p
-        cdef DOUBLE_t w = 1.0
+        cdef intp_t i
+        cdef intp_t p
+        cdef float64_t w = 1.0
 
         # Update statistics up to new_pos
         #
@@ -239,8 +239,8 @@ cdef class UnsupervisedCriterion(BaseCriterion):
 
     cdef void set_sample_pointers(
         self,
-        SIZE_t start,
-        SIZE_t end
+        intp_t start,
+        intp_t end
     ) noexcept nogil:
         """Set sample pointers in the criterion.
 
@@ -248,9 +248,9 @@ cdef class UnsupervisedCriterion(BaseCriterion):
 
         Parameters
         ----------
-        start : SIZE_t
+        start : intp_t
             The start sample pointer.
-        end : SIZE_t
+        end : intp_t
             The end sample pointer.
         """
         self.n_node_samples = end - start
@@ -393,14 +393,14 @@ cdef class FastBIC(TwoMeans):
     """
     cdef inline double bic_cluster(
         self,
-        SIZE_t n_samples,
+        intp_t n_samples,
         double variance
     ) noexcept nogil:
         """Help compute the BIC from assigning to a specific cluster.
 
         Parameters
         ----------
-        n_samples : SIZE_t
+        n_samples : intp_t
             The number of samples assigned cluster.
         variance : double
             The plug-in variance for assigning to specific cluster.
@@ -466,10 +466,10 @@ cdef class FastBIC(TwoMeans):
         impurity_right : double pointer
             The memory address to save the impurity of the right node
         """
-        cdef SIZE_t pos = self.pos
-        cdef SIZE_t start = self.start
-        cdef SIZE_t end = self.end
-        cdef SIZE_t n_samples_left, n_samples_right
+        cdef intp_t pos = self.pos
+        cdef intp_t start = self.start
+        cdef intp_t end = self.end
+        cdef intp_t n_samples_left, n_samples_right
 
         cdef double variance_left, variance_right, variance_comb
         cdef double BIC_diff_var_left, BIC_diff_var_right
