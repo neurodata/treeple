@@ -332,9 +332,6 @@ class BaseForestHT(MetaEstimatorMixin):
         if self._type_of_target_ is None:
             self._type_of_target_ = type_of_target(y)
 
-        # if self.sample_dataset_per_tree and not self.permute_per_tree:
-        #     raise ValueError("sample_dataset_per_tree is only valid when permute_per_tree=True")
-
         if covariate_index is None:
             self.estimator_ = self._get_estimator()
             estimator = self.estimator_

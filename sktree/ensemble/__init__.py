@@ -1,5 +1,6 @@
 from ._eiforest import ExtendedIsolationForest
 from ._honest_forest import HonestForestClassifier
+from ._multiview import MultiViewRandomForestClassifier
 from ._supervised_forest import (
     ExtraObliqueRandomForestClassifier,
     ExtraObliqueRandomForestRegressor,

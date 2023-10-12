@@ -19,6 +19,17 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  create_artifacts_folder:
+    name: Create Artifacts Folder
+    runs-on: ubuntu-latest
+    outputs:
+      artifacts_folder: ${{ steps.set_folder.outputs.folder_name }}
+
+    steps:
+      - name: Set Artifacts Folder
+        id: set_folder
+        run: echo "folder_name=artifacts/${{ github.run_id }}" >> $GITHUB_ENV
+
   build_wheels:
     name: Build wheels on ${{ matrix.os[1] }} - ${{ matrix.os[2] }} with Python ${{ matrix.python[0] }}
     runs-on: ${{ matrix.os[0] }}

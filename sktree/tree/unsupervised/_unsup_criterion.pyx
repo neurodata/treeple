@@ -78,11 +78,6 @@ cdef class UnsupervisedCriterion(BaseCriterion):
         # and then update will never have to iterate through even
         cdef DOUBLE_t w = 1.0
 
-        # cdef SIZE_t prev_s_idx = -1
-        # self.cumsum_of_squares_map[prev_s_idx] = 0.0
-        # self.cumsum_map[prev_s_idx] = 0.0
-        # self.cumsum_weights_map[prev_s_idx] = 0.0
-
         for p_idx in range(self.start, self.end):
             s_idx = self.sample_indices[p_idx]
 

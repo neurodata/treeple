@@ -19,7 +19,7 @@ from ..._lib.sklearn.tree._criterion cimport Criterion
 from .._utils cimport ravel_multi_index_cython, unravel_index_cython
 
 
-cdef class PatchSplitter(BaseObliqueSplitter):
+cdef class PatchSplitter(BestObliqueSplitter):
     """Patch splitter.
 
     A convolutional 2D patch splitter.
@@ -37,7 +37,7 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         const DOUBLE_t[:] sample_weight,
         const unsigned char[::1] missing_values_in_feature_mask,
     ) except -1:
-        BaseObliqueSplitter.init(self, X, y, sample_weight, missing_values_in_feature_mask)
+        BestObliqueSplitter.init(self, X, y, sample_weight, missing_values_in_feature_mask)
 
         return 0
 
@@ -125,6 +125,7 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
         double min_weight_leaf,
         object random_state,
         const cnp.int8_t[:] monotonic_cst,
+        double feature_combinations,
         const SIZE_t[:] min_patch_dims,
         const SIZE_t[:] max_patch_dims,
         const cnp.uint8_t[:] dim_contiguous,
@@ -186,6 +187,7 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
                 self.min_weight_leaf,
                 self.random_state,
                 self.monotonic_cst.base if self.monotonic_cst is not None else None,
+                self.feature_combinations,
                 self.min_patch_dims.base if self.min_patch_dims is not None else None,
                 self.max_patch_dims.base if self.max_patch_dims is not None else None,
                 self.dim_contiguous.base if self.dim_contiguous is not None else None,
@@ -480,7 +482,7 @@ cdef class BestPatchSplitterTester(BestPatchSplitter):
                 proj_vecs[i, feat] = weight
         return proj_vecs
 
-    cpdef sample_projection_matrix(self):
+    cpdef sample_projection_matrix_py(self):
         """Sample projection matrix using a patch.
 
         Used for testing purposes.
