@@ -206,7 +206,7 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
         cdef float32_t[::1] feature_values = self.feature_values
         cdef intp_t max_features = self.max_features
         cdef intp_t min_samples_leaf = self.min_samples_leaf
-        cdef uint32_t* random_state = &self.rand_r_state
+        cdef UINT32_t* random_state = &self.rand_r_state
 
         # XXX: maybe need to rename to something else
         cdef float64_t min_weight_leaf = self.min_weight_leaf

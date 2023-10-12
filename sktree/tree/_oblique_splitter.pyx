@@ -128,7 +128,7 @@ cdef class BaseObliqueSplitter(Splitter):
         self,
         intp_t[::1] indices_to_sample,
         intp_t grid_size,
-        uint32_t* random_state,
+        UINT32_t* random_state,
     ) noexcept nogil:
         cdef intp_t i, j
 
@@ -245,7 +245,7 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         """
         cdef intp_t n_features = self.n_features
         cdef intp_t n_non_zeros = self.n_non_zeros
-        cdef uint32_t* random_state = &self.rand_r_state
+        cdef UINT32_t* random_state = &self.rand_r_state
 
         cdef intp_t i, feat_i, proj_i, rand_vec_index
         cdef float32_t weight
@@ -514,7 +514,7 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
         cdef intp_t[::1] samples = self.samples
         cdef intp_t start = self.start
         cdef intp_t end = self.end
-        cdef uint32_t* random_state = &self.rand_r_state
+        cdef UINT32_t* random_state = &self.rand_r_state
 
         # pointer array to store feature values to split on
         cdef float32_t[::1] feature_values = self.feature_values
@@ -735,7 +735,7 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
         This proceeds as a normal sampling projection matrix,
         but now also uniformly samples features from each feature set.
         """
-        cdef uint32_t* random_state = &self.rand_r_state
+        cdef UINT32_t* random_state = &self.rand_r_state
         cdef intp_t feat_i, proj_i
         cdef float32_t weight
 
@@ -866,7 +866,7 @@ cdef class MultiViewObliqueSplitter(BestObliqueSplitter):
         """
         cdef intp_t n_features = self.n_features
         cdef intp_t n_non_zeros = self.n_non_zeros
-        cdef uint32_t* random_state = &self.rand_r_state
+        cdef UINT32_t* random_state = &self.rand_r_state
 
         cdef intp_t i, j, feat_i, proj_i, rand_vec_index
         cdef float32_t weight

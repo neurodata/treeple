@@ -211,7 +211,7 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
         """
         cdef intp_t n_features = self.n_features
         cdef intp_t n_non_zeros = self.n_non_zeros
-        cdef uint32_t* random_state = &self.rand_r_state
+        cdef UINT32_t* random_state = &self.rand_r_state
 
         cdef intp_t i, feat_i, proj_i, rand_vec_index
         cdef float32_t weight

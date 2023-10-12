@@ -212,7 +212,7 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
         cdef intp_t top_left_patch_seed
         cdef intp_t patch_size = 1
 
-        cdef uint32_t* random_state = &self.rand_r_state
+        cdef UINT32_t* random_state = &self.rand_r_state
 
         # define parameters for the random patch
         cdef intp_t patch_dim
@@ -315,7 +315,7 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
         intp_t top_left_patch_seed,
         const intp_t[:] patch_dims,
     ) noexcept nogil:
-        cdef uint32_t* random_state = &self.rand_r_state
+        cdef UINT32_t* random_state = &self.rand_r_state
         # iterates over the size of the patch
         cdef intp_t patch_idx
 

@@ -15,7 +15,8 @@ from libcpp.vector cimport vector
 
 from .._lib.sklearn.tree._criterion cimport Criterion
 from .._lib.sklearn.tree._splitter cimport SplitRecord, Splitter
-from .._lib.sklearn.utils._typedefs cimport float32_t, float64_t, intp_t, uint32_t
+from .._lib.sklearn.utils._typedefs cimport float32_t, float64_t, intp_t
+from .._lib.sklearn.tree._utils cimport UINT32_t
 from ._sklearn_splitter cimport sort
 
 
@@ -88,7 +89,7 @@ cdef class BaseObliqueSplitter(Splitter):
         self,
         intp_t[::1] indices_to_sample,
         intp_t grid_size,
-        uint32_t* random_state
+        UINT32_t* random_state
     ) noexcept nogil
 
 cdef class ObliqueSplitter(BaseObliqueSplitter):
