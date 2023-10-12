@@ -122,6 +122,7 @@ params = {
     "random_state": random_state,
     "n_cv": 10,
     "n_repeats": 1,
+    "n_jobs": -1,
 }
 
 for data_id in data_ids:

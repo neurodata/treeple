@@ -1,7 +1,7 @@
 """
-===============================================
-Plot the projection matrices of an oblique tree
-===============================================
+===================================================================================
+Plot the projection matrices of an oblique tree for sampling images, or time-series
+===================================================================================
 
 This example shows how projection matrices are generated for an oblique tree,
 specifically the :class:`sktree.tree.PatchObliqueDecisionTreeClassifier`.
@@ -61,6 +61,7 @@ random_state = np.random.RandomState(100)
 
 boundary = None
 feature_weight = None
+monotonic_cst = None
 missing_value_feature_mask = None
 
 # initialize some dummy data
@@ -76,10 +77,16 @@ print("The shape of our dataset is: ", X.shape, y.shape, sample_weight.shape)
 # Now that we have th patch splitter initialized, we can generate some patches
 # and visualize how they appear on the data. We will make the patch 1D, which
 # samples multiple rows contiguously. This is a 1D patch of size 3.
+#
+# .. warning:: Do not use this interface directly in practice.
+
 min_patch_dims = np.array((1, 1))
 max_patch_dims = np.array((3, 1))
 dim_contiguous = np.array((True, True))
 data_dims = np.array((5, 5))
+
+# Note: not used, but passed for API compatibility
+feature_combinations = 1.5
 
 splitter = BestPatchSplitterTester(
     criterion,
@@ -87,7 +94,8 @@ splitter = BestPatchSplitterTester(
     min_samples_leaf,
     min_weight_leaf,
     random_state,
-    missing_value_feature_mask,
+    monotonic_cst,
+    feature_combinations,
     min_patch_dims,
     max_patch_dims,
     dim_contiguous,
@@ -95,10 +103,10 @@ splitter = BestPatchSplitterTester(
     boundary,
     feature_weight,
 )
-splitter.init_test(X, y, sample_weight, None)
+splitter.init_test(X, y, sample_weight, missing_value_feature_mask)
 
 # sample the projection matrix that consists of 1D patches
-proj_mat = splitter.sample_projection_matrix()
+proj_mat = splitter.sample_projection_matrix_py()
 print(proj_mat.shape)
 
 # Visualize 1D patches
@@ -132,7 +140,8 @@ splitter = BestPatchSplitterTester(
     min_samples_leaf,
     min_weight_leaf,
     random_state,
-    missing_value_feature_mask,
+    monotonic_cst,
+    feature_combinations,
     min_patch_dims,
     max_patch_dims,
     dim_contiguous,
@@ -140,10 +149,10 @@ splitter = BestPatchSplitterTester(
     boundary,
     feature_weight,
 )
-splitter.init_test(X, y, sample_weight)
+splitter.init_test(X, y, sample_weight, missing_value_feature_mask)
 
 # sample the projection matrix that consists of 1D patches
-proj_mat = splitter.sample_projection_matrix()
+proj_mat = splitter.sample_projection_matrix_py()
 
 # Visualize 2D patches
 fig, axs = plt.subplots(nrows=2, ncols=3, figsize=(12, 8), sharex=True, sharey=True, squeeze=True)
@@ -181,7 +190,8 @@ splitter = BestPatchSplitterTester(
     min_samples_leaf,
     min_weight_leaf,
     random_state,
-    missing_value_feature_mask,
+    monotonic_cst,
+    feature_combinations,
     min_patch_dims,
     max_patch_dims,
     dim_contiguous,
@@ -189,10 +199,10 @@ splitter = BestPatchSplitterTester(
     boundary,
     feature_weight,
 )
-splitter.init_test(X, y, sample_weight)
+splitter.init_test(X, y, sample_weight, missing_value_feature_mask)
 
 # sample the projection matrix that consists of 1D patches
-proj_mat = splitter.sample_projection_matrix()
+proj_mat = splitter.sample_projection_matrix_py()
 print(proj_mat.shape)
 
 fig = plt.figure()
@@ -244,7 +254,8 @@ splitter = BestPatchSplitterTester(
     min_samples_leaf,
     min_weight_leaf,
     random_state,
-    missing_value_feature_mask,
+    monotonic_cst,
+    feature_combinations,
     min_patch_dims,
     max_patch_dims,
     dim_contiguous,
@@ -252,10 +263,10 @@ splitter = BestPatchSplitterTester(
     boundary,
     feature_weight,
 )
-splitter.init_test(X, y, sample_weight)
+splitter.init_test(X, y, sample_weight, missing_value_feature_mask)
 
 # sample the projection matrix that consists of 1D patches
-proj_mat = splitter.sample_projection_matrix()
+proj_mat = splitter.sample_projection_matrix_py()
 
 # Visualize 2D patches
 fig, axs = plt.subplots(nrows=3, ncols=3, figsize=(12, 8), sharex=True, sharey=True, squeeze=True)
@@ -282,7 +293,8 @@ splitter = BestPatchSplitterTester(
     min_samples_leaf,
     min_weight_leaf,
     random_state,
-    missing_value_feature_mask,
+    monotonic_cst,
+    feature_combinations,
     min_patch_dims,
     max_patch_dims,
     dim_contiguous,
@@ -290,10 +302,10 @@ splitter = BestPatchSplitterTester(
     boundary,
     feature_weight,
 )
-splitter.init_test(X, y, sample_weight)
+splitter.init_test(X, y, sample_weight, missing_value_feature_mask)
 
 # sample the projection matrix that consists of 1D patches
-proj_mat = splitter.sample_projection_matrix()
+proj_mat = splitter.sample_projection_matrix_py()
 
 # Visualize 2D patches
 fig, axs = plt.subplots(nrows=3, ncols=3, figsize=(12, 8), sharex=True, sharey=True, squeeze=True)

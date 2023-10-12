@@ -3,15 +3,15 @@
 Demonstrate and visualize a multi-view projection matrix for an axis-aligned tree
 =================================================================================
 
-This example shows how multi-view projection matrices are generated for an oblique tree,
-specifically the :class:`sktree.tree.ObliqueDecisionTreeClassifier`.
+This example shows how multi-view projection matrices are generated for a decision tree,
+specifically the :class:`sktree.tree.MultiViewDecisionTreeClassifier`.
 
 Multi-view projection matrices operate under the assumption that the input ``X`` array
 consists of multiple feature-sets that are groups of features important for predicting
 ``y``.
 
 For details on how to use the hyperparameters related to the multi-view, see
-:class:`sktree.tree.ObliqueDecisionTreeClassifier`.
+:class:`sktree.tree.MultiViewDecisionTreeClassifier`.
 """
 
 # import modules

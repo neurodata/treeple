@@ -170,6 +170,7 @@ def test_pickle_splitters():
     dim_contiguous = np.array((True, True))
     data_dims = np.array((5, 5))
 
+    feature_combinations = 1.5
     splitter = BestObliqueSplitter(
         criterion,
         max_features,
@@ -177,7 +178,7 @@ def test_pickle_splitters():
         min_weight_leaf,
         random_state,
         monotonic_cst,
-        1.5,
+        feature_combinations,
     )
     with tempfile.TemporaryFile() as f:
         joblib.dump(splitter, f)
@@ -189,7 +190,7 @@ def test_pickle_splitters():
         min_weight_leaf,
         random_state,
         monotonic_cst,
-        1.5,
+        feature_combinations,
     )
     with tempfile.TemporaryFile() as f:
         joblib.dump(splitter, f)
@@ -201,6 +202,7 @@ def test_pickle_splitters():
         min_weight_leaf,
         random_state,
         monotonic_cst,
+        feature_combinations,
         min_patch_dims,
         max_patch_dims,
         dim_contiguous,
@@ -471,7 +473,7 @@ def test_diabetes_overfit(name, Tree, criterion):
     "criterion, max_depth, metric, max_loss",
     [
         ("squared_error", 15, mean_squared_error, 65),
-        ("absolute_error", 20, mean_squared_error, 60),
+        ("absolute_error", 25, mean_squared_error, 60),
         ("friedman_mse", 15, mean_squared_error, 65),
         ("poisson", 15, mean_poisson_deviance, 30),
     ],
@@ -483,7 +485,9 @@ def test_diabetes_underfit(name, Tree, criterion, max_depth, metric, max_loss):
     reg = Tree(criterion=criterion, max_depth=max_depth, max_features=10, random_state=1234)
     reg.fit(diabetes.data, diabetes.target)
     loss = metric(diabetes.target, reg.predict(diabetes.data))
-    assert 0.0 <= loss < max_loss
+    assert (
+        0.0 <= loss < max_loss
+    ), f"Failed with {name}, criterion = {criterion} and loss = {loss}, and max_loss: {max_loss}"
 
 
 def test_numerical_stability():

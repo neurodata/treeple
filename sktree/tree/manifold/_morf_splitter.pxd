@@ -19,7 +19,7 @@ from ..._lib.sklearn.tree._tree cimport DTYPE_t  # Type of X
 from ..._lib.sklearn.tree._tree cimport INT32_t  # Signed 32 bit integer
 from ..._lib.sklearn.tree._tree cimport SIZE_t  # Type for indices and counters
 from ..._lib.sklearn.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
-from .._oblique_splitter cimport BaseObliqueSplitter, ObliqueSplitRecord
+from .._oblique_splitter cimport BestObliqueSplitter, ObliqueSplitRecord
 
 # https://github.com/cython/cython/blob/master/Cython/Includes/libcpp/algorithm.pxd
 # shows how to include standard library functions in Cython
@@ -38,7 +38,7 @@ cdef extern from "<algorithm>" namespace "std" nogil:
     void swap[T](T& a, T& b) except +  # array overload also works
 
 
-cdef class PatchSplitter(BaseObliqueSplitter):
+cdef class PatchSplitter(BestObliqueSplitter):
     # The PatchSplitter creates candidate feature values by sampling 2D patches from
     # an input data vector. The input data is vectorized, so `data_height` and
     # `data_width` are used to determine the vectorized indices corresponding to

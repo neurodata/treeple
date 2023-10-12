@@ -291,8 +291,10 @@ def test_pickle(tmpdir):
         assert_array_equal(getattr(clf, attr), getattr(clf_pickle, attr))
 
 
-@pytest.mark.parametrize("permute_per_tree", [True, False])
-@pytest.mark.parametrize("sample_dataset_per_tree", [True, False])
+@pytest.mark.parametrize("permute_per_tree", [True, False], ids=["permute_per_tree", "no_permute"])
+@pytest.mark.parametrize(
+    "sample_dataset_per_tree", [True, False], ids=["sample_dataset_per_tree", "no_sample_dataset"]
+)
 def test_sample_size_consistency_of_estimator_indices_(permute_per_tree, sample_dataset_per_tree):
     """Test that the test-sample indices are what is expected."""
     clf = FeatureImportanceForestClassifier(
@@ -313,10 +315,25 @@ def test_sample_size_consistency_of_estimator_indices_(permute_per_tree, sample_
         X, y, covariate_index=None, return_posteriors=True, metric="mi"
     )
     if sample_dataset_per_tree:
-        assert_array_equal(
-            sorted(np.unique(samples)),
-            sorted(np.unique(np.concatenate([x[1] for x in clf.train_test_samples_]).flatten())),
+        # check the non-nans
+        non_nan_idx = _non_nan_samples(posteriors)
+        assert clf.n_samples_test_ == n_samples, f"{clf.n_samples_test_} != {n_samples}"
+
+        sorted_sample_idx = sorted(np.unique(samples))
+        sorted_est_samples_idx = sorted(
+            np.unique(np.concatenate([x[1] for x in clf.train_test_samples_]).flatten())
         )
+        assert_array_equal(sorted_sample_idx, non_nan_idx)
+
+        # the sample indices are equal to the output of the train/test indices_
+        # only if there are no nans in the posteriors over all the samples
+        if np.sum(non_nan_idx) == n_samples:
+            assert_array_equal(
+                sorted_sample_idx,
+                sorted_est_samples_idx,
+                f"{set(sorted_sample_idx) - set(sorted_est_samples_idx)} and "
+                f"{set(sorted_est_samples_idx) - set(sorted_sample_idx)}",
+            )
     else:
         assert_array_equal(samples, sorted(clf.train_test_samples_[0][1]))
     assert len(_non_nan_samples(posteriors)) == len(samples)
@@ -430,7 +447,7 @@ def test_small_dataset_dependent(seed):
 
     clf = FeatureImportanceForestClassifier(
         estimator=HonestForestClassifier(
-            n_estimators=10, random_state=seed, n_jobs=1, honest_fraction=0.5
+            n_estimators=50, random_state=seed, n_jobs=1, honest_fraction=0.5
         ),
         test_size=0.2,
         permute_per_tree=False,

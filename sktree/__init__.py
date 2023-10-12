@@ -44,7 +44,7 @@ else:
             ExtraTreesRegressor,
         )
         from .neighbors import NearestNeighborsMetaEstimator
-        from .ensemble import ExtendedIsolationForest
+        from .ensemble import ExtendedIsolationForest, MultiViewRandomForestClassifier
         from .ensemble._unsupervised_forest import (
             UnsupervisedRandomForest,
             UnsupervisedObliqueRandomForest,
@@ -85,4 +85,5 @@ else:
         "ExtraTreesClassifier",
         "ExtraTreesRegressor",
         "ExtendedIsolationForest",
+        "MultiViewRandomForestClassifier",
     ]

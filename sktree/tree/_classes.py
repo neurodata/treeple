@@ -53,6 +53,7 @@ CRITERIA_REG = {
 OBLIQUE_DENSE_SPLITTERS = {
     "best": _oblique_splitter.BestObliqueSplitter,
     "random": _oblique_splitter.RandomObliqueSplitter,
+    "best-multiview": _oblique_splitter.MultiViewSplitter,
 }
 
 PATCH_DENSE_SPLITTERS = {
@@ -1708,6 +1709,9 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
         random_state : int, RandomState instance or None, default=None
             Controls the randomness of the estimator.
         """
+        # Not used. Here for API compatibility
+        self.feature_combinations_ = 1
+
         if self.feature_weight is not None:
             self.feature_weight = self._validate_data(
                 self.feature_weight, ensure_2d=True, dtype=DTYPE
@@ -1797,6 +1801,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
                 min_weight_leaf,
                 random_state,
                 monotonic_cst,
+                self.feature_combinations_,
                 self.min_patch_dims_,
                 self.max_patch_dims_,
                 self.dim_contiguous_,
@@ -2170,6 +2175,9 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         random_state : int, RandomState instance or None, default=None
             Controls the randomness of the estimator.
         """
+        # Not used. Here for API compatibility
+        self.feature_combinations_ = 1
+
         if self.feature_weight is not None:
             self.feature_weight = self._validate_data(
                 self.feature_weight, ensure_2d=True, dtype=DTYPE
@@ -2260,6 +2268,7 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
                 min_weight_leaf,
                 random_state,
                 monotonic_cst,
+                self.feature_combinations_,
                 self.min_patch_dims_,
                 self.max_patch_dims_,
                 self.dim_contiguous_,

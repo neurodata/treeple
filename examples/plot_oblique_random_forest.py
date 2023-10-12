@@ -16,6 +16,9 @@ numeric dataset that has notably large feature space of 857 features. As you
 will notice, of these three datasets, the oblique forest outperforms axis-aligned
 random forest on cnae-9 utilizing sparse random projection mechanism. All datasets
 are subsampled due to computational constraints.
+
+For an example of using extra-oblique trees/forests in practice on data, see the following
+example :ref:`sphx_glr_auto_examples_plot_extra_oblique_random_forest.py`.
 """
 
 from datetime import datetime
