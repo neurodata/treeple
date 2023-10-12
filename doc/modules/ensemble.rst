@@ -22,8 +22,8 @@ more information and intuition, see
 
 .. topic:: Examples:
 
- * :ref:`sphx_glr_auto_examples_plot_oblique_random_forest.py`
- * :ref:`sphx_glr_auto_examples_plot_oblique_axis_aligned_forests_sparse_parity.py`
+ * :ref:`sphx_glr_auto_examples_sparse_oblique_trees_plot_oblique_random_forest.py`
+ * :ref:`sphx_glr_auto_examples_sparse_oblique_trees_plot_oblique_axis_aligned_forests_sparse_parity.py`
 
 .. topic:: References
 
