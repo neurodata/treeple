@@ -3,42 +3,34 @@
 Mutual Information for Gigantic Hypothesis Testing (MIGHT) with Imbalanced Data
 ===============================================================================
 
-An example using :class:`~sktree.stats.FeatureImportanceForestClassifier` for nonparametric
-multivariate hypothesis test, on simulated datasets. Here, we present a simulation
-of how MIGHT is used to test the hypothesis that a "feature set is important for
-predicting the target". This is a generalization of the framework presented in
-:footcite:`coleman2022scalable`.
+Here, we demonstrate how to do hypothesis testing on highly imbalanced data
+in terms of their feature-set dimensionalities.
+using mutual information as a test statistic. We use the framework of
+:footcite:`coleman2022scalable` to estimate pvalues efficiently.
 
-We simulate a dataset with 1000 features, 500 samples, and a binary class target
-variable. Within each feature set, there is 500 features associated with one feature
-set, and another 500 features associated with another feature set. One could think of
-these for example as different datasets collected on the same patient in a biomedical setting.
-The first feature set (X) is strongly correlated with the target, and the second
-feature set (W) is weakly correlated with the target (y). Here, we are testing the
-null hypothesis:
+Here, we simulate two feature sets, one of which is important for the target,
+but significantly smaller in dimensionality than the other feature set, which
+is unimportant for the target. We then use the MIGHT framework to test for
+the importance of each feature set. Instead of leveraging a normal honest random
+forest to estimate the posteriors, here we leverage a multi-view honest random
+forest, with knowledge of the multi-view structure of the ``X`` data.
 
-- ``H0: I(X; y) - I(X, W; y) = 0``
-- ``HA: I(X; y) - I(X, W; y) < 0`` indicating that there is more mutual information with
-    respect to ``y``
+For other examples of hypothesis testing, see the following:
 
-where ``I`` is mutual information. For example, this could be true in the following settings,
-where X is our informative feature set and W is our uninformative feature set.
+- :ref:`sphx_glr_auto_examples_hypothesis_testing_plot_MI_gigantic_hypothesis_testing_forest.py`
+- :ref:`sphx_glr_auto_examples_hypothesis_testing_plot_might_auc.py`
 
-- ``W    X -> y``: here ``W`` is completely disconnected from X and y.
-- ``W -> X -> y``: here ``W`` is d-separated from y given X.
-- ``W <- X -> y``: here ``W`` is d-separated from y given X.
-
-We then use MIGHT to test the hypothesis that the first feature set is important for
-predicting the target, and the second feature set is not important for predicting the
-target. We use :class:`~sktree.stats.FeatureImportanceForestClassifier`.
+For more information on the multi-view decision-tree, see
+:ref:`sphx_glr_auto_examples_multiview_plot_multiview_dtc.py`.
 """
 
+import matplotlib.pyplot as plt
 import numpy as np
-from scipy.special import expit
+from sklearn.datasets import make_blobs
 
 from sktree import HonestForestClassifier
 from sktree.stats import FeatureImportanceForestClassifier
-from sktree.tree import DecisionTreeClassifier
+from sktree.tree import DecisionTreeClassifier, MultiViewDecisionTreeClassifier
 
 seed = 12345
 rng = np.random.default_rng(seed)
@@ -48,35 +40,67 @@ rng = np.random.default_rng(seed)
 # -------------
 # We simulate the two feature sets, and the target variable. We then combine them
 # into a single dataset to perform hypothesis testing.
+seed = 12345
+rng = np.random.default_rng(seed)
 
-n_samples = 1000
-n_features_set = 500
-mean = 1.0
-sigma = 2.0
-beta = 5.0
 
-unimportant_mean = 0.0
-unimportant_sigma = 4.5
+def make_multiview_classification(
+    n_samples=100, n_features_1=10, n_features_2=1000, cluster_std=2.0, seed=None
+):
+    rng = np.random.default_rng(seed=seed)
 
-# first sample the informative features, and then the uniformative features
-X_important = rng.normal(loc=mean, scale=sigma, size=(n_samples, 10))
-X_important = np.hstack(
-    [
-        X_important,
-        rng.normal(
-            loc=unimportant_mean, scale=unimportant_sigma, size=(n_samples, n_features_set - 10)
-        ),
-    ]
+    # Create a high-dimensional multiview dataset with a low-dimensional informative
+    # subspace in one view of the dataset.
+    X0_first, y0 = make_blobs(
+        n_samples=n_samples,
+        cluster_std=cluster_std,
+        n_features=n_features_1 // 2,
+        random_state=rng.integers(1, 10000),
+        centers=1,
+    )
+
+    X1_first, y1 = make_blobs(
+        n_samples=n_samples,
+        cluster_std=cluster_std,
+        n_features=n_features_1 // 2,
+        random_state=rng.integers(1, 10000),
+        centers=1,
+    )
+
+    # create the first views for y=0 and y=1
+    X0_first = np.concatenate(
+        (X0_first, rng.standard_normal(size=(n_samples, n_features_1 // 2))), axis=1
+    )
+    X1_first = np.concatenate(
+        (X1_first, rng.standard_normal(size=(n_samples, n_features_1 // 2))), axis=1
+    )
+    y1[:] = 1
+
+    # add the second view for y=0 and y=1, which is completely noise
+    X0 = np.concatenate([X0_first, rng.standard_normal(size=(n_samples, n_features_2))], axis=1)
+    X1 = np.concatenate([X1_first, rng.standard_normal(size=(n_samples, n_features_2))], axis=1)
+
+    # combine the views and targets
+    X = np.vstack((X0, X1))
+    y = np.hstack((y0, y1)).T
+
+    # add noise to the data
+    X = X + rng.standard_normal(size=X.shape)
+
+    return X, y
+
+
+n_samples = 100
+n_features = 10000
+n_features_views = [10, n_features]
+
+X, y = make_multiview_classification(
+    n_samples=n_samples,
+    n_features_1=10,
+    n_features_2=n_features,
+    cluster_std=2.0,
+    seed=seed,
 )
-
-X_unimportant = rng.normal(
-    loc=unimportant_mean, scale=unimportant_sigma, size=(n_samples, n_features_set)
-)
-X = np.hstack([X_important, X_unimportant])
-
-# simulate the binary target variable
-y = rng.binomial(n=1, p=expit(beta * X_important[:, :10].sum(axis=1)), size=n_samples)
-
 # %%
 # Perform hypothesis testing using Mutual Information
 # ---------------------------------------------------
@@ -101,16 +125,18 @@ est = FeatureImportanceForestClassifier(
     estimator=HonestForestClassifier(
         n_estimators=n_estimators,
         max_features=max_features,
-        tree_estimator=DecisionTreeClassifier(),
+        tree_estimator=MultiViewDecisionTreeClassifier(feature_set_ends=n_features_views),
         random_state=seed,
-        honest_fraction=0.7,
+        honest_fraction=0.5,
         n_jobs=n_jobs,
     ),
     random_state=seed,
     test_size=test_size,
-    permute_per_tree=True,
+    permute_per_tree=False,
     sample_dataset_per_tree=False,
 )
+
+mv_results = dict()
 
 print(
     f"Permutation per tree: {est.permute_per_tree} and sampling dataset per tree: "
@@ -118,19 +144,92 @@ print(
 )
 # we test for the first feature set, which is important and thus should return a pvalue < 0.05
 stat, pvalue = est.test(
-    X, y, covariate_index=np.arange(n_features_set, dtype=int), metric="mi", n_repeats=n_repeats
+    X, y, covariate_index=np.arange(10, dtype=int), metric="mi", n_repeats=n_repeats
 )
+mv_results["important_feature_stat"] = stat
+mv_results["important_feature_pvalue"] = pvalue
 print(f"Estimated MI difference: {stat} with Pvalue: {pvalue}")
 
 # we test for the second feature set, which is unimportant and thus should return a pvalue > 0.05
 stat, pvalue = est.test(
     X,
     y,
-    covariate_index=np.arange(n_features_set, dtype=int) + n_features_set,
+    covariate_index=np.arange(10, n_features, dtype=int),
     metric="mi",
     n_repeats=n_repeats,
 )
+mv_results["unimportant_feature_stat"] = stat
+mv_results["unimportant_feature_pvalue"] = pvalue
 print(f"Estimated MI difference: {stat} with Pvalue: {pvalue}")
+
+# %%
+# Let's investigate what happens when we do not use a multi-view decision tree.
+# All other parameters are kept the same.
+
+est = FeatureImportanceForestClassifier(
+    estimator=HonestForestClassifier(
+        n_estimators=n_estimators,
+        max_features=max_features,
+        tree_estimator=DecisionTreeClassifier(),
+        random_state=seed,
+        honest_fraction=0.5,
+        n_jobs=n_jobs,
+    ),
+    random_state=seed,
+    test_size=test_size,
+    permute_per_tree=False,
+    sample_dataset_per_tree=False,
+)
+
+rf_results = dict()
+
+# we test for the first feature set, which is important and thus should return a pvalue < 0.05
+stat, pvalue = est.test(
+    X, y, covariate_index=np.arange(10, dtype=int), metric="mi", n_repeats=n_repeats
+)
+rf_results["important_feature_stat"] = stat
+rf_results["important_feature_pvalue"] = pvalue
+print(f"Estimated MI difference using regular decision-trees: {stat} with Pvalue: {pvalue}")
+
+# we test for the second feature set, which is unimportant and thus should return a pvalue > 0.05
+stat, pvalue = est.test(
+    X,
+    y,
+    covariate_index=np.arange(10, n_features, dtype=int),
+    metric="mi",
+    n_repeats=n_repeats,
+)
+rf_results["unimportant_feature_stat"] = stat
+rf_results["unimportant_feature_pvalue"] = pvalue
+print(f"Estimated MI difference using regular decision-trees: {stat} with Pvalue: {pvalue}")
+
+fig, ax = plt.subplots(figsize=(5, 3))
+
+# plot pvalues
+ax.bar(0, rf_results["important_feature_pvalue"], label="Important Feature Set (RF)")
+ax.bar(1, rf_results["unimportant_feature_pvalue"], label="Unimportant Feature Set (RF)")
+ax.bar(2, mv_results["important_feature_pvalue"], label="Important Feature Set (MV)")
+ax.bar(3, mv_results["unimportant_feature_pvalue"], label="Unimportant Feature Set (MV)")
+ax.axhline(0.05, color="k", linestyle="--", label="alpha=0.05")
+ax.set(ylabel="Log10(PValue)", xlim=[-0.5, 3.5], yscale="log")
+ax.legend()
+
+fig.tight_layout()
+plt.show()
+
+# %%
+# Discussion
+# ----------
+# We see that the multi-view decision tree is able to detect the important feature set,
+# while the regular decision tree is not. This is because the regular decision tree
+# is not aware of the multi-view structure of the data, and thus is challenged
+# by the imbalanced dimensionality of the feature sets. I.e. it rarely splits on
+# the first low-dimensional feature set, and thus is unable to detect its importance.
+#
+# Note both approaches still fail to reject the null hypothesis (for alpha of 0.05)
+# when testing the unimportant feature set. The difference in the two approaches
+# show the statistical power of the multi-view decision tree is higher than the
+# regular decision tree in this simulation.
 
 # %%
 # References
