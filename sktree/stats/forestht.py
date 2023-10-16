@@ -99,6 +99,7 @@ def _parallel_build_trees_with_sepdata(
     )
     return tree
 
+
 def _parallel_build_trees_and_compute_posteriors(
     forest: BaseForest,
     idx: int,
@@ -798,6 +799,11 @@ class FeatureImportanceForestRegressor(BaseForestHT):
             #     )
             # )
 
+            if self.permute_per_tree and covariate_index is not None:
+                random_states = [tree.random_state for tree in estimator.estimators_]
+            else:
+                random_states = [estimator.random_state] * len(estimator.estimators_)
+
             trees = Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose, prefer="threads")(
                 delayed(_parallel_build_trees_with_sepdata)(
                     estimator.estimators_[idx],
@@ -818,7 +824,7 @@ class FeatureImportanceForestRegressor(BaseForestHT):
             # fitting a forest will only get one unique train/test split
             indices_train, indices_test = self.train_test_samples_[0]
 
-            X_train, X_test = X[indices_train, :], X[indices_test, :]
+            X_train, _ = X[indices_train, :], X[indices_test, :]
             y_train, y_test = y[indices_train, :], y[indices_test, :]
 
             if covariate_index is not None:
@@ -848,10 +854,12 @@ class FeatureImportanceForestRegressor(BaseForestHT):
 
         # accumulate the predictions across all trees
         all_proba = Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose)(
-                delayed(_parallel_predict_proba)(estimator.estimators_[idx].predict, X, indices_test)
-                for idx, (_, indices_test) in enumerate(self._get_estimators_indices())
-            )
-        for itree, (proba, est_indices) in enumerate(zip(all_proba, self._get_estimators_indices())):
+            delayed(_parallel_predict_proba)(estimator.estimators_[idx].predict, X, indices_test)
+            for idx, (_, indices_test) in enumerate(self._get_estimators_indices())
+        )
+        for itree, (proba, est_indices) in enumerate(
+            zip(all_proba, self._get_estimators_indices())
+        ):
             _, indices_test = est_indices
             posterior_arr[itree, indices_test, ...] = proba.reshape(-1, estimator.n_outputs_)
 
@@ -1044,6 +1052,10 @@ class FeatureImportanceForestClassifier(BaseForestHT):
             #         self._get_estimators_indices(sample_separate=True)
             #     )
             # )
+            if self.permute_per_tree and covariate_index is not None:
+                random_states = [tree.random_state for tree in estimator.estimators_]
+            else:
+                random_states = [estimator.random_state] * len(estimator.estimators_)
 
             trees = Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose, prefer="threads")(
                 delayed(_parallel_build_trees_with_sepdata)(
@@ -1065,7 +1077,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
             # fitting a forest will only get one unique train/test split
             indices_train, indices_test = self.train_test_samples_[0]
 
-            X_train, X_test = X[indices_train, :], X[indices_test, :]
+            X_train, _ = X[indices_train, :], X[indices_test, :]
             y_train = y[indices_train, :]
 
             if covariate_index is not None:
@@ -1101,15 +1113,21 @@ class FeatureImportanceForestClassifier(BaseForestHT):
         # list of tree outputs. Each tree output is (n_samples, n_outputs), or (n_samples,)
         if predict_posteriors:
             all_proba = Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose)(
-                delayed(_parallel_predict_proba)(estimator.estimators_[idx].predict_proba, X, indices_test)
+                delayed(_parallel_predict_proba)(
+                    estimator.estimators_[idx].predict_proba, X, indices_test
+                )
                 for idx, (_, indices_test) in enumerate(self._get_estimators_indices())
             )
         else:
             all_proba = Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose)(
-                delayed(_parallel_predict_proba)(estimator.estimators_[idx].predict, X, indices_test)
+                delayed(_parallel_predict_proba)(
+                    estimator.estimators_[idx].predict, X, indices_test
+                )
                 for idx, (_, indices_test) in enumerate(self._get_estimators_indices())
             )
-        for itree, (proba, est_indices) in enumerate(zip(all_proba, self._get_estimators_indices())):
+        for itree, (proba, est_indices) in enumerate(
+            zip(all_proba, self._get_estimators_indices())
+        ):
             _, indices_test = est_indices
             posterior_arr[itree, indices_test, ...] = proba.reshape(-1, estimator.n_outputs_)
 
