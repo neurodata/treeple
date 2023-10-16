@@ -1,11 +1,10 @@
 """
-===================================================================
-Quantile regression predictions using Random Forest Regressor class
-compared to ground truth function
-===================================================================
+======================================================
+Quantile prediction with Random Forest Regressor class
+======================================================
 
 An example that demonstrates how to use the Random Forest to generate
-quantile predictions i.e. a conditional median and prediction intervals.
+quantile predictions such as conditional median and prediction intervals.
 The example compares the predictions to a ground truth function used
 to generate noisy samples.
 
