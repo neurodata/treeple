@@ -125,5 +125,5 @@ plt.show()
 # For an example of using oblique trees/forests in practice on data, see the following
 # examples:
 #
-# - :ref:`sphx_glr_auto_examples_plot_oblique_forests_iris.py`
-# - :ref:`sphx_glr_auto_examples_plot_oblique_random_forest.py`
+# - :ref:`sphx_glr_auto_examples_sparse_oblique_trees_plot_oblique_forests_iris.py`
+# - :ref:`sphx_glr_auto_examples_sparse_oblique_trees_plot_oblique_random_forest.py`

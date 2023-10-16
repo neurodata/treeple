@@ -56,7 +56,7 @@
         </script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Compare extra oblique forest and oblique random forest predictions on cc18 datasets" href="auto_examples/plot_extra_oblique_random_forest.html" />
+    <link rel="next" title="Calibrated decision trees via honesty" href="auto_examples/calibration/index.html" />
     <link rel="prev" title="Installation" href="install.html" />
     <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
     <script type="text/javascript" src="_static/copybutton.js"></script>
@@ -393,25 +393,37 @@ document.write(`
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="auto_examples/plot_extra_oblique_random_forest.html">Compare extra oblique forest and oblique random forest predictions on cc18 datasets</a></li>
-<li class="toctree-l1"><a class="reference internal" href="auto_examples/plot_oblique_forests_iris.html">Compare the decision surfaces of oblique extra-trees with standard oblique trees</a></li>
-<li class="toctree-l1"><a class="reference internal" href="auto_examples/plot_overlapping_gaussians.html">Plot honest forest calibrations on overlapping gaussian simulations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="auto_examples/plot_oblique_random_forest.html">Plot oblique forest and axis-aligned random forest predictions on cc18 datasets</a></li>
-<li class="toctree-l1"><a class="reference internal" href="auto_examples/plot_oblique_axis_aligned_forests_sparse_parity.html">Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="auto_examples/plot_iris_dtc.html">Plot the decision surface of decision trees trained on the iris dataset</a></li>
-<li class="toctree-l1"><a class="reference internal" href="auto_examples/plot_extra_orf_sample_size.html">Speed of Extra Oblique Random Forest vs Oblique Random Forest on different dataset sizes</a></li>
-</ul>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="auto_examples/hypothesis_testing/index.html">Hypothesis testing with decision trees</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="auto_examples/hypothesis_testing/plot_might_auc.html">Compute partial AUC using Mutual Information for Genuine Hypothesis Testing (MIGHT)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="auto_examples/hypothesis_testing/plot_MI_gigantic_hypothesis_testing_forest.html">Mutual Information for Gigantic Hypothesis Testing (MIGHT)</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="auto_examples/calibration/index.html">Calibrated decision trees via honesty</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/calibration/plot_overlapping_gaussians.html">Plot honest forest calibrations on overlapping gaussian simulations</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="auto_examples/outlier_detection/index.html">Outlier-detection</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="auto_examples/hypothesis_testing/index.html">Hypothesis testing with decision trees</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/hypothesis_testing/plot_might_auc.html">Compute partial AUC using Mutual Information for Genuine Hypothesis Testing (MIGHT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/hypothesis_testing/plot_MI_gigantic_hypothesis_testing_forest.html">Mutual Information for Gigantic Hypothesis Testing (MIGHT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/hypothesis_testing/plot_MI_imbalanced_hyppo_testing.html">Mutual Information for Gigantic Hypothesis Testing (MIGHT) with Imbalanced Data</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="auto_examples/multiview/index.html">Multi-view learning with Decision-trees</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/multiview/plot_multiview_dtc.html">Analyze a multi-view dataset with a multi-view random forest</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="auto_examples/outlier_detection/index.html">Outlier-detection</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="auto_examples/outlier_detection/plot_extended_isolation_forest.html">ExtendedIsolationForest example</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="auto_examples/splitters/index.html">Decision-tree splitters</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="auto_examples/sklearn_vs_sktree/index.html">Comparing sklearn and sktree decision trees</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/sklearn_vs_sktree/plot_iris_dtc.html">Plot the decision surface of decision trees trained on the iris dataset</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="auto_examples/sparse_oblique_trees/index.html">Sparse oblique projections with oblique decision-trees</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/sparse_oblique_trees/plot_extra_oblique_random_forest.html">Compare extra oblique forest and oblique random forest predictions on cc18 datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/sparse_oblique_trees/plot_oblique_forests_iris.html">Compare the decision surfaces of oblique extra-trees with standard oblique trees</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/sparse_oblique_trees/plot_oblique_random_forest.html">Plot oblique forest and axis-aligned random forest predictions on cc18 datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/sparse_oblique_trees/plot_oblique_axis_aligned_forests_sparse_parity.html">Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/sparse_oblique_trees/plot_extra_orf_sample_size.html">Speed of Extra Oblique Random Forest vs Oblique Random Forest on different dataset sizes</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="auto_examples/splitters/index.html">Decision-tree splitters</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="auto_examples/splitters/plot_multiview_axis_aligned_splitter.html">Demonstrate and visualize a multi-view projection matrix for an axis-aligned tree</a></li>
 <li class="toctree-l2"><a class="reference internal" href="auto_examples/splitters/plot_projection_matrices.html">Plot the projection matrices of an oblique tree for sampling images, or time-series</a></li>
 <li class="toctree-l2"><a class="reference internal" href="auto_examples/splitters/plot_sparse_projection_matrix.html">Plot the sparse projection matrices of an oblique tree</a></li>
@@ -479,29 +491,13 @@ to learn everything you need!</p>
 <section id="examples">
 <h1>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h1>
 <p>Examples demonstrating how to use scikit-tree algorithms.</p>
-<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="A performance comparison between extra oblique forest and standard oblique random forest using ..."><img alt="" src="_images/sphx_glr_plot_extra_oblique_random_forest_thumb.png" />
-<p><a class="reference internal" href="auto_examples/plot_extra_oblique_random_forest.html#sphx-glr-auto-examples-plot-extra-oblique-random-forest-py"><span class="std std-ref">Compare extra oblique forest and oblique random forest predictions on cc18 datasets</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Compare extra oblique forest and oblique random forest predictions on cc18 datasets</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Plot the decision surfaces of forests of randomized oblique trees trained on pairs of features ..."><img alt="" src="_images/sphx_glr_plot_oblique_forests_iris_thumb.png" />
-<p><a class="reference internal" href="auto_examples/plot_oblique_forests_iris.html#sphx-glr-auto-examples-plot-oblique-forests-iris-py"><span class="std std-ref">Compare the decision surfaces of oblique extra-trees with standard oblique trees</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Compare the decision surfaces of oblique extra-trees with standard oblique trees</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Compare the prediction results of honest forests and random forests with various methods of cal..."><img alt="" src="_images/sphx_glr_plot_overlapping_gaussians_thumb.png" />
-<p><a class="reference internal" href="auto_examples/plot_overlapping_gaussians.html#sphx-glr-auto-examples-plot-overlapping-gaussians-py"><span class="std std-ref">Plot honest forest calibrations on overlapping gaussian simulations</span></a></p>
+<div class="sphx-glr-thumbnails"></div><section id="calibrated-decision-trees-via-honesty">
+<h2>Calibrated decision trees via honesty<a class="headerlink" href="#calibrated-decision-trees-via-honesty" title="Link to this heading">#</a></h2>
+<p>Examples demonstrating the usage of honest decision trees to obtain calibrated predictions.</p>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Compare the prediction results of honest forests and random forests with various methods of cal..."><img alt="" src="_images/sphx_glr_plot_overlapping_gaussians_thumb.png" />
+<p><a class="reference internal" href="auto_examples/calibration/plot_overlapping_gaussians.html#sphx-glr-auto-examples-calibration-plot-overlapping-gaussians-py"><span class="std std-ref">Plot honest forest calibrations on overlapping gaussian simulations</span></a></p>
   <div class="sphx-glr-thumbnail-title">Plot honest forest calibrations on overlapping gaussian simulations</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="A performance comparison between oblique forest and standard axis- aligned random forest using ..."><img alt="" src="_images/sphx_glr_plot_oblique_random_forest_thumb.png" />
-<p><a class="reference internal" href="auto_examples/plot_oblique_random_forest.html#sphx-glr-auto-examples-plot-oblique-random-forest-py"><span class="std std-ref">Plot oblique forest and axis-aligned random forest predictions on cc18 datasets</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Plot oblique forest and axis-aligned random forest predictions on cc18 datasets</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation"><img alt="" src="_images/sphx_glr_plot_oblique_axis_aligned_forests_sparse_parity_thumb.png" />
-<p><a class="reference internal" href="auto_examples/plot_oblique_axis_aligned_forests_sparse_parity.html#sphx-glr-auto-examples-plot-oblique-axis-aligned-forests-sparse-parity-py"><span class="std std-ref">Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Plot the decision surface of a decision tree and oblique decision tree trained on pairs of feat..."><img alt="" src="_images/sphx_glr_plot_iris_dtc_thumb.png" />
-<p><a class="reference internal" href="auto_examples/plot_iris_dtc.html#sphx-glr-auto-examples-plot-iris-dtc-py"><span class="std std-ref">Plot the decision surface of decision trees trained on the iris dataset</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Plot the decision surface of decision trees trained on the iris dataset</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="A performance comparison between extra oblique forest and standard oblique random forest on dif..."><img alt="" src="_images/sphx_glr_plot_extra_orf_sample_size_thumb.png" />
-<p><a class="reference internal" href="auto_examples/plot_extra_orf_sample_size.html#sphx-glr-auto-examples-plot-extra-orf-sample-size-py"><span class="std std-ref">Speed of Extra Oblique Random Forest vs Oblique Random Forest on different dataset sizes</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Speed of Extra Oblique Random Forest vs Oblique Random Forest on different dataset sizes</div>
-</div></div><div class="toctree-wrapper compound">
-</div>
+</div></div></section>
 <section id="hypothesis-testing-with-decision-trees">
 <h2>Hypothesis testing with decision trees<a class="headerlink" href="#hypothesis-testing-with-decision-trees" title="Link to this heading">#</a></h2>
 <p>Examples demonstrating how to use decision-trees for statistical hypothesis testing.</p>
@@ -511,6 +507,16 @@ to learn everything you need!</p>
 </div><div class="sphx-glr-thumbcontainer" tooltip="An example using FeatureImportanceForestClassifier for nonparametric multivariate hypothesis te..."><img alt="" src="_images/sphx_glr_plot_MI_gigantic_hypothesis_testing_forest_thumb.png" />
 <p><a class="reference internal" href="auto_examples/hypothesis_testing/plot_MI_gigantic_hypothesis_testing_forest.html#sphx-glr-auto-examples-hypothesis-testing-plot-mi-gigantic-hypothesis-testing-forest-py"><span class="std std-ref">Mutual Information for Gigantic Hypothesis Testing (MIGHT)</span></a></p>
   <div class="sphx-glr-thumbnail-title">Mutual Information for Gigantic Hypothesis Testing (MIGHT)</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Here, we demonstrate how to do hypothesis testing on highly imbalanced data in terms of their f..."><img alt="" src="_images/sphx_glr_plot_MI_imbalanced_hyppo_testing_thumb.png" />
+<p><a class="reference internal" href="auto_examples/hypothesis_testing/plot_MI_imbalanced_hyppo_testing.html#sphx-glr-auto-examples-hypothesis-testing-plot-mi-imbalanced-hyppo-testing-py"><span class="std std-ref">Mutual Information for Gigantic Hypothesis Testing (MIGHT) with Imbalanced Data</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Mutual Information for Gigantic Hypothesis Testing (MIGHT) with Imbalanced Data</div>
+</div></div></section>
+<section id="multi-view-learning-with-decision-trees">
+<h2>Multi-view learning with Decision-trees<a class="headerlink" href="#multi-view-learning-with-decision-trees" title="Link to this heading">#</a></h2>
+<p>Examples demonstrating multi-view learning using random forest variants.</p>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="An example using MultiViewRandomForestClassifier for high-dimensional classification when there..."><img alt="" src="_images/sphx_glr_plot_multiview_dtc_thumb.png" />
+<p><a class="reference internal" href="auto_examples/multiview/plot_multiview_dtc.html#sphx-glr-auto-examples-multiview-plot-multiview-dtc-py"><span class="std std-ref">Analyze a multi-view dataset with a multi-view random forest</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Analyze a multi-view dataset with a multi-view random forest</div>
 </div></div></section>
 <section id="outlier-detection">
 <h2>Outlier-detection<a class="headerlink" href="#outlier-detection" title="Link to this heading">#</a></h2>
@@ -518,6 +524,32 @@ to learn everything you need!</p>
 <div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="An example using ExtendedIsolationForest for anomaly detection, which compares to the Isolation..."><img alt="" src="_images/sphx_glr_plot_extended_isolation_forest_thumb.png" />
 <p><a class="reference internal" href="auto_examples/outlier_detection/plot_extended_isolation_forest.html#sphx-glr-auto-examples-outlier-detection-plot-extended-isolation-forest-py"><span class="std std-ref">ExtendedIsolationForest example</span></a></p>
   <div class="sphx-glr-thumbnail-title">ExtendedIsolationForest example</div>
+</div></div></section>
+<section id="comparing-sklearn-and-sktree-decision-trees">
+<h2>Comparing sklearn and sktree decision trees<a class="headerlink" href="#comparing-sklearn-and-sktree-decision-trees" title="Link to this heading">#</a></h2>
+<p>Examples demonstrating the difference between sklearn and sktree decision trees.</p>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Plot the decision surface of a decision tree and oblique decision tree trained on pairs of feat..."><img alt="" src="_images/sphx_glr_plot_iris_dtc_thumb.png" />
+<p><a class="reference internal" href="auto_examples/sklearn_vs_sktree/plot_iris_dtc.html#sphx-glr-auto-examples-sklearn-vs-sktree-plot-iris-dtc-py"><span class="std std-ref">Plot the decision surface of decision trees trained on the iris dataset</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Plot the decision surface of decision trees trained on the iris dataset</div>
+</div></div></section>
+<section id="sparse-oblique-projections-with-oblique-decision-trees">
+<h2>Sparse oblique projections with oblique decision-trees<a class="headerlink" href="#sparse-oblique-projections-with-oblique-decision-trees" title="Link to this heading">#</a></h2>
+<p>Examples demonstrating learning using oblique random forests.</p>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="A performance comparison between extra oblique forest and standard oblique random forest using ..."><img alt="" src="_images/sphx_glr_plot_extra_oblique_random_forest_thumb.png" />
+<p><a class="reference internal" href="auto_examples/sparse_oblique_trees/plot_extra_oblique_random_forest.html#sphx-glr-auto-examples-sparse-oblique-trees-plot-extra-oblique-random-forest-py"><span class="std std-ref">Compare extra oblique forest and oblique random forest predictions on cc18 datasets</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Compare extra oblique forest and oblique random forest predictions on cc18 datasets</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Plot the decision surfaces of forests of randomized oblique trees trained on pairs of features ..."><img alt="" src="_images/sphx_glr_plot_oblique_forests_iris_thumb.png" />
+<p><a class="reference internal" href="auto_examples/sparse_oblique_trees/plot_oblique_forests_iris.html#sphx-glr-auto-examples-sparse-oblique-trees-plot-oblique-forests-iris-py"><span class="std std-ref">Compare the decision surfaces of oblique extra-trees with standard oblique trees</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Compare the decision surfaces of oblique extra-trees with standard oblique trees</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="A performance comparison between oblique forest and standard axis- aligned random forest using ..."><img alt="" src="_images/sphx_glr_plot_oblique_random_forest_thumb.png" />
+<p><a class="reference internal" href="auto_examples/sparse_oblique_trees/plot_oblique_random_forest.html#sphx-glr-auto-examples-sparse-oblique-trees-plot-oblique-random-forest-py"><span class="std std-ref">Plot oblique forest and axis-aligned random forest predictions on cc18 datasets</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Plot oblique forest and axis-aligned random forest predictions on cc18 datasets</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation"><img alt="" src="_images/sphx_glr_plot_oblique_axis_aligned_forests_sparse_parity_thumb.png" />
+<p><a class="reference internal" href="auto_examples/sparse_oblique_trees/plot_oblique_axis_aligned_forests_sparse_parity.html#sphx-glr-auto-examples-sparse-oblique-trees-plot-oblique-axis-aligned-forests-sparse-parity-py"><span class="std std-ref">Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="A performance comparison between extra oblique forest and standard oblique random forest on dif..."><img alt="" src="_images/sphx_glr_plot_extra_orf_sample_size_thumb.png" />
+<p><a class="reference internal" href="auto_examples/sparse_oblique_trees/plot_extra_orf_sample_size.html#sphx-glr-auto-examples-sparse-oblique-trees-plot-extra-orf-sample-size-py"><span class="std std-ref">Speed of Extra Oblique Random Forest vs Oblique Random Forest on different dataset sizes</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Speed of Extra Oblique Random Forest vs Oblique Random Forest on different dataset sizes</div>
 </div></div></section>
 <section id="decision-tree-splitters">
 <h2>Decision-tree splitters<a class="headerlink" href="#decision-tree-splitters" title="Link to this heading">#</a></h2>
@@ -565,11 +597,11 @@ to learn everything you need!</p>
       </div>
     </a>
     <a class="right-next"
-       href="auto_examples/plot_extra_oblique_random_forest.html"
+       href="auto_examples/calibration/index.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Compare extra oblique forest and oblique random forest predictions on cc18 datasets</p>
+        <p class="prev-next-title">Calibrated decision trees via honesty</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -590,8 +622,12 @@ to learn everything you need!</p>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Examples using scikit-tree</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calibrated-decision-trees-via-honesty">Calibrated decision trees via honesty</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hypothesis-testing-with-decision-trees">Hypothesis testing with decision trees</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multi-view-learning-with-decision-trees">Multi-view learning with Decision-trees</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlier-detection">Outlier-detection</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparing-sklearn-and-sktree-decision-trees">Comparing sklearn and sktree decision trees</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sparse-oblique-projections-with-oblique-decision-trees">Sparse oblique projections with oblique decision-trees</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#decision-tree-splitters">Decision-tree splitters</a></li>
 </ul>
 </li>
@@ -623,7 +659,7 @@ to learn everything you need!</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-10-12.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-10-16.
       <br/>
     
   </p>

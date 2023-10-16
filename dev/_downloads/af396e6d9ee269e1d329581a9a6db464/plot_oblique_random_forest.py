@@ -18,7 +18,7 @@ random forest on cnae-9 utilizing sparse random projection mechanism. All datase
 are subsampled due to computational constraints.
 
 For an example of using extra-oblique trees/forests in practice on data, see the following
-example :ref:`sphx_glr_auto_examples_plot_extra_oblique_random_forest.py`.
+example :ref:`sphx_glr_auto_examples_sparse_oblique_trees_plot_extra_oblique_random_forest.py`.
 """
 
 from datetime import datetime
