@@ -43,3 +43,35 @@ foreach py_source: python_sources
     subdir: 'sktree/_lib/sklearn/ensemble'
   )
 endforeach
+
+# TODO: Can remove if included in scikit-learn eventually
+# install tree/ submodule
+extensions = [
+  '_quad_tree',
+]
+
+foreach ext: extensions
+  py3.extension_module(ext,
+    cython_gen_cpp.process('./sklearn/neighbors/' + ext + '.pyx'),
+    c_args: cython_c_args,
+    include_directories: [incdir_numpy,],
+    install: true,
+    subdir: 'sktree/_lib/sklearn/neighbors/',
+  )
+endforeach
+
+# install tree/ submodule
+extensions = [
+  '_typedefs',
+  '_random',
+]
+
+foreach ext: extensions
+  py3.extension_module(ext,
+    cython_gen_cpp.process('./sklearn/utils/' + ext + '.pyx'),
+    c_args: cython_c_args,
+    include_directories: [incdir_numpy,],
+    install: true,
+    subdir: 'sktree/_lib/sklearn/utils/',
+  )
+endforeach

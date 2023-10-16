@@ -14,11 +14,8 @@ cimport numpy as cnp
 from libcpp.vector cimport vector
 
 from ..._lib.sklearn.tree._splitter cimport SplitRecord
-from ..._lib.sklearn.tree._tree cimport DOUBLE_t  # Type of y, sample_weight
-from ..._lib.sklearn.tree._tree cimport DTYPE_t  # Type of X
-from ..._lib.sklearn.tree._tree cimport INT32_t  # Signed 32 bit integer
-from ..._lib.sklearn.tree._tree cimport SIZE_t  # Type for indices and counters
-from ..._lib.sklearn.tree._tree cimport UINT32_t  # Unsigned 32 bit integer
+from ..._lib.sklearn.tree._utils cimport UINT32_t
+from ..._lib.sklearn.utils._typedefs cimport float32_t, float64_t, intp_t
 from .._oblique_splitter cimport BestObliqueSplitter, ObliqueSplitRecord
 
 # https://github.com/cython/cython/blob/master/Cython/Includes/libcpp/algorithm.pxd
@@ -44,49 +41,49 @@ cdef class PatchSplitter(BestObliqueSplitter):
     # `data_width` are used to determine the vectorized indices corresponding to
     # (x,y) coordinates in the original un-vectorized data.
 
-    cdef public SIZE_t max_patch_height                 # Maximum height of the patch to sample
-    cdef public SIZE_t max_patch_width                  # Maximum width of the patch to sample
-    cdef public SIZE_t min_patch_height                 # Minimum height of the patch to sample
-    cdef public SIZE_t min_patch_width                  # Minimum width of the patch to sample
-    cdef public SIZE_t data_height                      # Height of the input data
-    cdef public SIZE_t data_width                       # Width of the input data
+    cdef public intp_t max_patch_height                 # Maximum height of the patch to sample
+    cdef public intp_t max_patch_width                  # Maximum width of the patch to sample
+    cdef public intp_t min_patch_height                 # Minimum height of the patch to sample
+    cdef public intp_t min_patch_width                  # Minimum width of the patch to sample
+    cdef public intp_t data_height                      # Height of the input data
+    cdef public intp_t data_width                       # Width of the input data
 
-    cdef public SIZE_t ndim                       # The number of dimensions of the input data
+    cdef public intp_t ndim                       # The number of dimensions of the input data
 
-    cdef const SIZE_t[:] data_dims                      # The dimensions of the input data
-    cdef const SIZE_t[:] min_patch_dims                 # The minimum size of the patch to sample in each dimension
-    cdef const SIZE_t[:] max_patch_dims                 # The maximum size of the patch to sample in each dimension
+    cdef const intp_t[:] data_dims                      # The dimensions of the input data
+    cdef const intp_t[:] min_patch_dims                 # The minimum size of the patch to sample in each dimension
+    cdef const intp_t[:] max_patch_dims                 # The maximum size of the patch to sample in each dimension
     cdef const cnp.uint8_t[:] dim_contiguous            # A boolean array indicating whether each dimension is contiguous
 
     # TODO: check if this works and is necessary for discontiguous data
-    # cdef SIZE_t[:] stride_offsets                # The stride offsets for each dimension
+    # cdef intp_t[:] stride_offsets                # The stride offsets for each dimension
     cdef bint _discontiguous
 
     cdef bytes boundary                               # how to sample the patch with boundary in mind
-    cdef const DTYPE_t[:, :] feature_weight               # Whether or not to normalize each column of X when adding in a patch
+    cdef const float32_t[:, :] feature_weight               # Whether or not to normalize each column of X when adding in a patch
 
-    cdef SIZE_t[::1] _index_data_buffer
-    cdef SIZE_t[::1] _index_patch_buffer
-    cdef SIZE_t[:] patch_dims_buff                # A buffer to store the dimensions of the sampled patch
-    cdef SIZE_t[:] unraveled_patch_point          # A buffer to store the unraveled patch point
+    cdef intp_t[::1] _index_data_buffer
+    cdef intp_t[::1] _index_patch_buffer
+    cdef intp_t[:] patch_dims_buff                # A buffer to store the dimensions of the sampled patch
+    cdef intp_t[:] unraveled_patch_point          # A buffer to store the unraveled patch point
 
     # All oblique splitters (i.e. non-axis aligned splitters) require a
     # function to sample a projection matrix that is applied to the feature matrix
     # to quickly obtain the sampled projections for candidate splits.
-    cdef (SIZE_t, SIZE_t) sample_top_left_seed(
+    cdef (intp_t, intp_t) sample_top_left_seed(
         self
     ) noexcept nogil
 
     cdef void sample_proj_mat(
         self,
-        vector[vector[DTYPE_t]]& proj_mat_weights,
-        vector[vector[SIZE_t]]& proj_mat_indices
+        vector[vector[float32_t]]& proj_mat_weights,
+        vector[vector[intp_t]]& proj_mat_indices
     ) noexcept nogil
 
 
 # cdef class UserKernelSplitter(PatchSplitter):
 #     """A class to hold user-specified kernels."""
-#     cdef vector[DTYPE_t[:, ::1]] kernel_dictionary  # A list of C-contiguous 2D kernels
+#     cdef vector[float32_t[:, ::1]] kernel_dictionary  # A list of C-contiguous 2D kernels
 
 
 cdef class GaussianKernelSplitter(PatchSplitter):
@@ -99,6 +96,6 @@ cdef class GaussianKernelSplitter(PatchSplitter):
 
     cdef void sample_proj_mat(
         self,
-        vector[vector[DTYPE_t]]& proj_mat_weights,
-        vector[vector[SIZE_t]]& proj_mat_indices
+        vector[vector[float32_t]]& proj_mat_weights,
+        vector[vector[intp_t]]& proj_mat_indices
     ) noexcept nogil
