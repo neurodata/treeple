@@ -13,6 +13,10 @@ authors:
       family-names: Panda
       affiliation: 'Department of Biomedical Engineering, Johns Hopkins University, Baltimore, MD, USA'
       orcid: 'https://orcid.org/0000-0001-8455-4243'
+    - given-names: Haoyin
+      family-names: Xu
+      affiliation: 'Department of Biomedical Engineering, Johns Hopkins University, Baltimore, MD, USA'
+      orcid: 'https://orcid.org/0000-0001-8235-4950'
 type: software
 repository-code: 'https://github.com/neurodata/scikit-tree'
 license: BSD-3
