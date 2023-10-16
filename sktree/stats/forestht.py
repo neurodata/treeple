@@ -31,6 +31,74 @@ from .utils import (
 )
 
 
+def _parallel_predict_proba(predict_proba, X, indices_test):
+    """
+    This is a utility function for joblib's Parallel.
+
+    It can't go locally in ForestClassifier or ForestRegressor, because joblib
+    complains that it cannot pickle it when placed there.
+    """
+    # each tree predicts proba with a list of output (n_samples, n_classes[i])
+    prediction = predict_proba(X[indices_test, :], check_input=False)
+    return prediction
+
+
+def _parallel_build_trees_with_sepdata(
+    tree: Union[DecisionTreeClassifier, DecisionTreeRegressor],
+    n_trees: int,
+    idx: int,
+    indices_train: ArrayLike,
+    X: ArrayLike,
+    y: ArrayLike,
+    covariate_index,
+    bootstrap: bool,
+    max_samples,
+    sample_weight: ArrayLike = None,
+    class_weight=None,
+    missing_values_in_feature_mask=None,
+    classes=None,
+    random_state=None,
+):
+    """Parallel function to build trees and compute posteriors.
+
+    This inherently assumes that the caller function defines the indices
+    for the training and testing data for each tree.
+    """
+    rng = np.random.default_rng(random_state)
+    X_train = X[indices_train, :]
+    y_train = y[indices_train, ...]
+
+    if bootstrap:
+        n_samples_bootstrap = _get_n_samples_bootstrap(
+            n_samples=X_train.shape[0], max_samples=max_samples
+        )
+    else:
+        n_samples_bootstrap = None
+
+    # individual tree permutation of y labels
+    if covariate_index is not None:
+        indices = np.arange(X_train.shape[0], dtype=int)
+        # perform permutation of covariates
+        index_arr = rng.choice(indices, size=(X_train.shape[0], 1), replace=False, shuffle=True)
+        perm_X_cov = X_train[index_arr, covariate_index]
+        X_train[:, covariate_index] = perm_X_cov
+
+    tree = _parallel_build_trees(
+        tree,
+        bootstrap,
+        X_train,
+        y_train,
+        sample_weight,
+        idx,
+        n_trees,
+        verbose=0,
+        class_weight=class_weight,
+        n_samples_bootstrap=n_samples_bootstrap,
+        missing_values_in_feature_mask=missing_values_in_feature_mask,
+        classes=classes,
+    )
+    return tree
+
 def _parallel_build_trees_and_compute_posteriors(
     forest: BaseForest,
     idx: int,
