@@ -28,6 +28,7 @@ doc/coverages
 doc/samples
 cover
 examples/*.jpg
+examples/**/*.jpg
 
 env/
 html/

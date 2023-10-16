@@ -59,7 +59,7 @@ are not sorted and the split is determined by randomly drawing a threshold from 
 range, hence the complexity is `O(n)`. This makes the algorithm more suitable for large datasets.
 
 To see how sample-sizes affect the performance of Extra Oblique Trees vs regular Oblique Trees,
-see :ref:`sphx_glr_auto_examples_plot_extra_orf_sample_size.py`
+see :ref:`sphx_glr_auto_examples_sparse_oblique_trees_plot_extra_orf_sample_size.py`
 
 References
 ----------
