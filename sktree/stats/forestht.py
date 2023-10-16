@@ -106,6 +106,7 @@ def _parallel_build_trees_and_compute_posteriors(
     posterior_arr[idx, indices_test, :] = y_pred  # posterior
 
 
+# TODO: add support permute_per_forest_fraction option
 class BaseForestHT(MetaEstimatorMixin):
     observe_samples_: ArrayLike
     observe_posteriors_: ArrayLike
