@@ -779,24 +779,41 @@ class FeatureImportanceForestRegressor(BaseForestHT):
         # both sampling dataset per tree or permuting per tree requires us to bypass the
         # sklearn API to fit each tree individually
         if self.sample_dataset_per_tree or self.permute_per_tree:
-            Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose, prefer="threads")(
-                delayed(_parallel_build_trees_and_compute_posteriors)(
-                    estimator,
+            # Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose, prefer="threads")(
+            #     delayed(_parallel_build_trees_and_compute_posteriors)(
+            #         estimator,
+            #         idx,
+            #         indices_train,
+            #         indices_test,
+            #         X,
+            #         y,
+            #         covariate_index,
+            #         posterior_arr,
+            #         False,
+            #         self.permute_per_tree,
+            #         self._type_of_target_,
+            #     )
+            #     for idx, (indices_train, indices_test) in enumerate(
+            #         self._get_estimators_indices(sample_separate=True)
+            #     )
+            # )
+
+            trees = Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose, prefer="threads")(
+                delayed(_parallel_build_trees_with_sepdata)(
+                    estimator.estimators_[idx],
+                    len(estimator.estimators_),
                     idx,
                     indices_train,
-                    indices_test,
                     X,
                     y,
                     covariate_index,
-                    posterior_arr,
-                    False,
-                    self.permute_per_tree,
-                    self._type_of_target_,
+                    bootstrap=estimator.bootstrap,
+                    max_samples=estimator.max_samples,
+                    random_state=random_states[idx],
                 )
-                for idx, (indices_train, indices_test) in enumerate(
-                    self._get_estimators_indices(sample_separate=True)
-                )
+                for idx, (indices_train, _) in enumerate(self._get_estimators_indices())
             )
+            estimator.estimators_ = trees
         else:
             # fitting a forest will only get one unique train/test split
             indices_train, indices_test = self.train_test_samples_[0]
@@ -820,14 +837,23 @@ class FeatureImportanceForestRegressor(BaseForestHT):
             estimator.fit(X_train, y_train)
 
             # construct posterior array for all trees (n_trees, n_samples_test, n_outputs)
-            for itree, tree in enumerate(estimator.estimators_):
-                posterior_arr[itree, indices_test, ...] = tree.predict(X_test).reshape(
-                    -1, tree.n_outputs_
-                )
+            # for itree, tree in enumerate(estimator.estimators_):
+            #     posterior_arr[itree, indices_test, ...] = tree.predict(X_test).reshape(
+            #         -1, tree.n_outputs_
+            #     )
 
             # set variables to compute metric
             samples = indices_test
             y_true_final = y_test
+
+        # accumulate the predictions across all trees
+        all_proba = Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose)(
+                delayed(_parallel_predict_proba)(estimator.estimators_[idx].predict, X, indices_test)
+                for idx, (_, indices_test) in enumerate(self._get_estimators_indices())
+            )
+        for itree, (proba, est_indices) in enumerate(zip(all_proba, self._get_estimators_indices())):
+            _, indices_test = est_indices
+            posterior_arr[itree, indices_test, ...] = proba.reshape(-1, estimator.n_outputs_)
 
         # determine if there are any nans in the final posterior array, when
         # averaged over the trees
@@ -1000,24 +1026,41 @@ class FeatureImportanceForestClassifier(BaseForestHT):
         # both sampling dataset per tree or permuting per tree requires us to bypass the
         # sklearn API to fit each tree individually
         if self.sample_dataset_per_tree or self.permute_per_tree:
-            Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose, prefer="threads")(
-                delayed(_parallel_build_trees_and_compute_posteriors)(
-                    estimator,
+            # Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose, prefer="threads")(
+            #     delayed(_parallel_build_trees_and_compute_posteriors)(
+            #         estimator,
+            #         idx,
+            #         indices_train,
+            #         indices_test,
+            #         X,
+            #         y,
+            #         covariate_index,
+            #         posterior_arr,
+            #         predict_posteriors,
+            #         self.permute_per_tree,
+            #         self._type_of_target_,
+            #     )
+            #     for idx, (indices_train, indices_test) in enumerate(
+            #         self._get_estimators_indices(sample_separate=True)
+            #     )
+            # )
+
+            trees = Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose, prefer="threads")(
+                delayed(_parallel_build_trees_with_sepdata)(
+                    estimator.estimators_[idx],
+                    len(estimator.estimators_),
                     idx,
                     indices_train,
-                    indices_test,
                     X,
                     y,
                     covariate_index,
-                    posterior_arr,
-                    predict_posteriors,
-                    self.permute_per_tree,
-                    self._type_of_target_,
+                    bootstrap=estimator.bootstrap,
+                    max_samples=estimator.max_samples,
+                    random_state=random_states[idx],
                 )
-                for idx, (indices_train, indices_test) in enumerate(
-                    self._get_estimators_indices(sample_separate=True)
-                )
+                for idx, (indices_train, _) in enumerate(self._get_estimators_indices())
             )
+            estimator.estimators_ = trees
         else:
             # fitting a forest will only get one unique train/test split
             indices_train, indices_test = self.train_test_samples_[0]
@@ -1041,19 +1084,35 @@ class FeatureImportanceForestClassifier(BaseForestHT):
             estimator.fit(X_train, y_train)
 
             # construct posterior array for all trees (n_trees, n_samples_test, n_outputs)
-            for itree, tree in enumerate(estimator.estimators_):
-                if predict_posteriors:
-                    # XXX: currently assumes n_outputs_ == 1
-                    posterior_arr[itree, indices_test, ...] = tree.predict_proba(X_test).reshape(
-                        -1, tree.n_classes_
-                    )
-                else:
-                    posterior_arr[itree, indices_test, ...] = tree.predict(X_test).reshape(
-                        -1, tree.n_outputs_
-                    )
+            # for itree, tree in enumerate(estimator.estimators_):
+            #     if predict_posteriors:
+            #         # XXX: currently assumes n_outputs_ == 1
+            #         posterior_arr[itree, indices_test, ...] = tree.predict_proba(X_test).reshape(
+            #             -1, tree.n_classes_
+            #         )
+            #     else:
+            #         posterior_arr[itree, indices_test, ...] = tree.predict(X_test).reshape(
+            #             -1, tree.n_outputs_
+            #         )
 
             # set variables to compute metric
             samples = indices_test
+
+        # list of tree outputs. Each tree output is (n_samples, n_outputs), or (n_samples,)
+        if predict_posteriors:
+            all_proba = Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose)(
+                delayed(_parallel_predict_proba)(estimator.estimators_[idx].predict_proba, X, indices_test)
+                for idx, (_, indices_test) in enumerate(self._get_estimators_indices())
+            )
+        else:
+            all_proba = Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose)(
+                delayed(_parallel_predict_proba)(estimator.estimators_[idx].predict, X, indices_test)
+                for idx, (_, indices_test) in enumerate(self._get_estimators_indices())
+            )
+        for itree, (proba, est_indices) in enumerate(zip(all_proba, self._get_estimators_indices())):
+            _, indices_test = est_indices
+            posterior_arr[itree, indices_test, ...] = proba.reshape(-1, estimator.n_outputs_)
+
         if metric == "auc":
             # at this point, posterior_final is the predicted posterior for only the positive class
             # as more than one output is not supported.
