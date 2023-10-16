@@ -9,6 +9,10 @@ authors:
       family-names: Li
       affiliation: 'Department of Computer Science, Columbia University, New York, NY, USA'
       orcid: 'https://orcid.org/0000-0001-8421-365X'
+    - given-names: Sambit
+      family-names: Panda
+      affiliation: 'Department of Biomedical Engineering, Johns Hopkins University, Baltimore, MD, USA'
+      orcid: 'https://orcid.org/0000-0001-8455-4243'
 type: software
 repository-code: 'https://github.com/neurodata/scikit-tree'
 license: BSD-3
