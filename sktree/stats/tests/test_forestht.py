@@ -70,7 +70,7 @@ def test_featureimportance_forest_permute_pertree(sample_dataset_per_tree):
 
 
 @pytest.mark.parametrize("sample_dataset_per_tree", [True, False])
-def test_featureimportance_forest_startified(sample_dataset_per_tree):
+def test_featureimportance_forest_stratified(sample_dataset_per_tree):
     est = FeatureImportanceForestClassifier(
         estimator=RandomForestClassifier(
             n_estimators=10,
