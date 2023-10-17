@@ -1,7 +1,7 @@
 import joblib
 import numpy as np
 import pytest
-from numpy.testing import assert_almost_equal, assert_array_almost_equal, assert_array_equal
+from numpy.testing import assert_almost_equal, assert_array_equal
 from sklearn.base import is_classifier
 from sklearn.datasets import make_blobs
 from sklearn.tree._tree import TREE_LEAF
@@ -53,9 +53,14 @@ def assert_tree_equal(d, s, message):
 
     assert_almost_equal(d.impurity, s.impurity, err_msg=message + ": inequal impurity")
 
-    assert_array_almost_equal(
-        d.value[external], s.value[external], err_msg=message + ": inequal value"
-    )
+    assert_array_equal(d.value[external], s.value[external], err_msg=message + ": inequal value")
+
+    if hasattr(d, "get_projection_matrix"):
+        assert_array_equal(
+            d.get_projection_matrix(),
+            s.get_projection_matrix(),
+            err_msg=message + ": inequal projection matrix",
+        )
 
 
 X_small = np.array(
