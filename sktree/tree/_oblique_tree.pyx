@@ -272,10 +272,7 @@ cdef class ObliqueTree(Tree):
         # get the index of the node
         cdef intp_t node_id = node - self.nodes
 
-        # cdef intp_t n_projections = proj_vec_indices.size()
         # compute projection of the data based on trained tree
-        # proj_vec_weights = self.proj_vec_weights[node_id]
-        # proj_vec_indices = self.proj_vec_indices[node_id]
         for j in range(0, self.proj_vec_indices[node_id].size()):
             feature_index = self.proj_vec_indices[node_id][j]
             weight = self.proj_vec_weights[node_id][j]
