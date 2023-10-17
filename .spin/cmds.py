@@ -54,7 +54,7 @@ def setup_submodule(forcesubmodule=False):
     This will update the submodule, which then must be commited so that
     git knows the submodule needs to be at a certain commit hash.
     """
-    commit_fpath = "./sktree/_lib/sklearn_fork/commit.txt"
+    commit_fpath = "./sktree/_lib/commit.txt"
     submodule = "./sktree/_lib/sklearn_fork"
     commit = ""
     current_hash = ""

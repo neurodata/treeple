@@ -18,17 +18,17 @@ from .._sklearn_splitter cimport sort
 from ._unsup_criterion cimport UnsupervisedCriterion
 
 
-cdef double INFINITY = np.inf
+cdef float64_t INFINITY = np.inf
 
 # Mitigate precision differences between 32 bit and 64 bit
-cdef DTYPE_t FEATURE_THRESHOLD = 1e-7
+cdef float32_t FEATURE_THRESHOLD = 1e-7
 
 # Constant to switch between algorithm non zero value extract algorithm
 # in SparseSplitter
-cdef DTYPE_t EXTRACT_NNZ_SWITCH = 0.1
+cdef float32_t EXTRACT_NNZ_SWITCH = 0.1
 
 
-cdef inline void _init_split(ObliqueSplitRecord* self, SIZE_t start_pos) noexcept nogil:
+cdef inline void _init_split(ObliqueSplitRecord* self, intp_t start_pos) noexcept nogil:
     self.impurity_left = INFINITY
     self.impurity_right = INFINITY
     self.pos = start_pos
@@ -47,11 +47,11 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
     def __cinit__(
         self,
         UnsupervisedCriterion criterion,
-        SIZE_t max_features,
-        SIZE_t min_samples_leaf,
-        double min_weight_leaf,
+        intp_t max_features,
+        intp_t min_samples_leaf,
+        float64_t min_weight_leaf,
         object random_state,
-        double feature_combinations,
+        float64_t feature_combinations,
         *argv
     ):
         """
@@ -60,20 +60,20 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
         criterion : Criterion
             The criterion to measure the quality of a split.
 
-        max_features : SIZE_t
+        max_features : intp_t
             The maximal number of randomly selected features which can be
             considered for a split.
 
-        min_samples_leaf : SIZE_t
+        min_samples_leaf : intp_t
             The minimal number of samples each leaf can have, where splits
             which would result in having less samples in a leaf are not
             considered.
 
-        min_weight_leaf : double
+        min_weight_leaf : float64_t
             The minimal weight each leaf can have, where the weight is the sum
             of the weights of each sample in it.
 
-        feature_combinations : double
+        feature_combinations : float64_t
             The average number of features to combine in an oblique split.
             Each feature is independently included with probability
             ``feature_combination`` / ``n_features``.
@@ -96,11 +96,11 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
         self.feature_combinations = feature_combinations
 
         # Sparse max_features x n_features projection matrix
-        self.proj_mat_weights = vector[vector[DTYPE_t]](self.max_features)
-        self.proj_mat_indices = vector[vector[SIZE_t]](self.max_features)
+        self.proj_mat_weights = vector[vector[float32_t]](self.max_features)
+        self.proj_mat_indices = vector[vector[intp_t]](self.max_features)
 
         # or max w/ 1...
-        self.n_non_zeros = max(int(self.max_features * self.feature_combinations), 1)
+        self.n_non_zeros = max(<intp_t>(self.max_features * self.feature_combinations), 1)
 
     def __getstate__(self):
         return {}
@@ -116,10 +116,10 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
                              self.random_state,
                              self.feature_combinations), self.__getstate__())
 
-    cdef int init(
+    cdef intp_t init(
         self,
-        const DTYPE_t[:, :] X,
-        const DOUBLE_t[:] sample_weight
+        const float32_t[:, :] X,
+        const float64_t[:] sample_weight
     ) except -1:
         UnsupervisedSplitter.init(self, X, sample_weight)
 
@@ -128,8 +128,8 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
                                            dtype=np.intp)
         return 0
 
-    cdef int node_reset(self, SIZE_t start, SIZE_t end,
-                        double* weighted_n_node_samples) except -1 nogil:
+    cdef intp_t node_reset(self, intp_t start, intp_t end,
+                           float64_t* weighted_n_node_samples) except -1 nogil:
         """Reset splitter on node samples[start:end].
 
         Returns -1 in case of failure to allocate memory (and raise MemoryError)
@@ -137,11 +137,11 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
 
         Parameters
         ----------
-        start : SIZE_t
+        start : intp_t
             The index of the first sample to consider
-        end : SIZE_t
+        end : intp_t
             The index of the last sample to consider
-        weighted_n_node_samples : ndarray, dtype=double pointer
+        weighted_n_node_samples : ndarray, dtype=float64_t pointer
             The total weight of those samples
         """
         # call parent reset
@@ -154,35 +154,35 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
         return 0
 
     cdef void sample_proj_mat(self,
-                              vector[vector[DTYPE_t]]& proj_mat_weights,
-                              vector[vector[SIZE_t]]& proj_mat_indices) noexcept nogil:
+                              vector[vector[float32_t]]& proj_mat_weights,
+                              vector[vector[intp_t]]& proj_mat_indices) noexcept nogil:
         """ Sample the projection vector.
 
         This is a placeholder method.
         """
         pass
 
-    cdef int pointer_size(self) noexcept nogil:
+    cdef intp_t pointer_size(self) noexcept nogil:
         """Get size of a pointer to record for ObliqueSplitter."""
         return sizeof(ObliqueSplitRecord)
 
     cdef inline void compute_features_over_samples(
         self,
-        SIZE_t start,
-        SIZE_t end,
-        const SIZE_t[:] samples,
-        DTYPE_t[:] feature_values,
-        vector[DTYPE_t]* proj_vec_weights,  # weights of the vector (max_features,)
-        vector[SIZE_t]* proj_vec_indices    # indices of the features (max_features,)
+        intp_t start,
+        intp_t end,
+        const intp_t[:] samples,
+        float32_t[:] feature_values,
+        vector[float32_t]* proj_vec_weights,  # weights of the vector (max_features,)
+        vector[intp_t]* proj_vec_indices    # indices of the features (max_features,)
     ) noexcept nogil:
         """Compute the feature values for the samples[start:end] range.
 
         Returns -1 in case of failure to allocate memory (and raise MemoryError)
         or 0 otherwise.
         """
-        cdef SIZE_t idx, jdx
-        cdef SIZE_t col_idx
-        cdef DTYPE_t col_weight
+        cdef intp_t idx, jdx
+        cdef intp_t col_idx
+        cdef float32_t col_weight
 
         # Compute linear combination of features and then
         # sort samples according to the feature values.
@@ -201,24 +201,24 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
     # NOTE: vectors are passed by value, so & is needed to pass by reference
     cdef void sample_proj_mat(
         self,
-        vector[vector[DTYPE_t]]& proj_mat_weights,
-        vector[vector[SIZE_t]]& proj_mat_indices
+        vector[vector[float32_t]]& proj_mat_weights,
+        vector[vector[intp_t]]& proj_mat_indices
     ) noexcept nogil:
         """
         Sparse Oblique Projection matrix.
         Randomly sample features to put in randomly sampled projection vectors
         weight = 1 or -1 with probability 0.5
         """
-        cdef SIZE_t n_features = self.n_features
-        cdef SIZE_t n_non_zeros = self.n_non_zeros
+        cdef intp_t n_features = self.n_features
+        cdef intp_t n_non_zeros = self.n_non_zeros
         cdef UINT32_t* random_state = &self.rand_r_state
 
-        cdef int i, feat_i, proj_i, rand_vec_index
-        cdef DTYPE_t weight
+        cdef intp_t i, feat_i, proj_i, rand_vec_index
+        cdef float32_t weight
 
         # construct an array to sample from mTry x n_features set of indices
-        cdef SIZE_t[::1] indices_to_sample = self.indices_to_sample
-        cdef SIZE_t grid_size = self.max_features * self.n_features
+        cdef intp_t[::1] indices_to_sample = self.indices_to_sample
+        cdef intp_t grid_size = self.max_features * self.n_features
 
         # shuffle indices over the 2D grid to sample using Fisher-Yates
         for i in range(0, grid_size):
@@ -242,13 +242,13 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
             proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
             proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
 
-    cdef int node_split(
+    cdef intp_t node_split(
         self,
-        double impurity,
+        float64_t impurity,
         SplitRecord* split,
-        SIZE_t* n_constant_features,
-        double lower_bound,
-        double upper_bound,
+        intp_t* n_constant_features,
+        float64_t lower_bound,
+        float64_t upper_bound,
     ) except -1 nogil:
         """Find the best_split split on node samples[start:end]
 
@@ -259,25 +259,25 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
         cdef ObliqueSplitRecord* oblique_split = <ObliqueSplitRecord*>(split)
 
         # Draw random splits and pick the best_split
-        cdef SIZE_t[::1] samples = self.samples
-        cdef SIZE_t start = self.start
-        cdef SIZE_t end = self.end
+        cdef intp_t[::1] samples = self.samples
+        cdef intp_t start = self.start
+        cdef intp_t end = self.end
 
         # pointer array to store feature values to split on
-        cdef DTYPE_t[::1]  feature_values = self.feature_values
-        cdef SIZE_t max_features = self.max_features
-        cdef SIZE_t min_samples_leaf = self.min_samples_leaf
-        cdef double min_weight_leaf = self.min_weight_leaf
+        cdef float32_t[::1]  feature_values = self.feature_values
+        cdef intp_t max_features = self.max_features
+        cdef intp_t min_samples_leaf = self.min_samples_leaf
+        cdef float64_t min_weight_leaf = self.min_weight_leaf
 
         # keep track of split record for current_split node and the best_split split
         # found among the sampled projection vectors
         cdef ObliqueSplitRecord best_split, current_split
-        cdef double current_proxy_improvement = -INFINITY
-        cdef double best_proxy_improvement = -INFINITY
+        cdef float64_t current_proxy_improvement = -INFINITY
+        cdef float64_t best_proxy_improvement = -INFINITY
 
-        cdef SIZE_t feat_i, p       # index over computed features and start/end
-        cdef SIZE_t partition_end
-        cdef DTYPE_t temp_d         # to compute a projection feature value
+        cdef intp_t feat_i, p       # index over computed features and start/end
+        cdef intp_t partition_end
+        cdef float32_t temp_d         # to compute a projection feature value
 
         # instantiate the split records
         _init_split(&best_split, end)

@@ -122,3 +122,6 @@ plt.show()
 # In contrast, the normal splitter in :class:`sklearn.tree.DecisionTreeClassifier` samples
 # randomly across all ``n_features`` features because it is not aware of the multi-view structure.
 # This is the key difference between the two splitters.
+#
+# For an example of using the multi-view splitter in practice on simulated data, see
+# :ref:`sphx_glr_auto_examples_multiview_plot_multiview_dtc.py`.

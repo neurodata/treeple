@@ -44,7 +44,7 @@ jobs:
           # - [macos-12, macosx_*, arm64]
           - [windows-2019, win, AMD64]
 
-        python: [["cp39", "3.9"], ["cp310", "3.10"], ["cp311", "3.11.0-alpha - 3.11.0"]]
+        python: [["cp39", "3.9"], ["cp310", "3.10"], ["cp311", "3.11"]]
         # python[0] is used to specify the python versions made by cibuildwheel
     
     env:
