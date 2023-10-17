@@ -69,6 +69,50 @@ def test_featureimportance_forest_permute_pertree(sample_dataset_per_tree):
         est.statistic(iris_X[:n_samples], iris_y[:n_samples], [0, 1.0], metric="mi")
 
 
+@pytest.mark.parametrize("sample_dataset_per_tree", [True, False])
+def test_featureimportance_forest_startified(sample_dataset_per_tree):
+    est = FeatureImportanceForestClassifier(
+        estimator=RandomForestClassifier(
+            n_estimators=10,
+            random_state=seed,
+        ),
+        permute_per_tree=True,
+        test_size=0.7,
+        random_state=seed,
+        sample_dataset_per_tree=sample_dataset_per_tree,
+    )
+    n_samples = 100
+    est.statistic(iris_X[:n_samples], iris_y[:n_samples], metric="mse")
+
+
+    iris_X_class0 = iris_X[iris_y==0]
+    iris_X_class1 = iris_X[iris_y==1]
+    iris_y_class0 = iris_y[iris_y==0]
+    iris_y_class1 = iris_y[iris_y==1]
+
+    assert (
+        len(est.train_test_samples_(iris_y[:n_samples])[0][1]) == len(iris_y_class1) * est.test_size + len(iris_y_class0) * est.test_size
+    ), f"{len(est.train_test_samples_(iris_y[:n_samples])[0][1])} {len(iris_y_class1) * est.test_size + len(iris_y_class0) * est.test_size}"
+    assert len(est.train_test_samples_(iris_y[:n_samples])[0][0]) == est._n_samples_ - (len(iris_y_class1) * est.test_size + len(iris_y_class0) * est.test_size)
+
+    est.test(iris_X[:n_samples], iris_y[:n_samples], [0, 1], n_repeats=10, metric="mse")
+    assert (
+        len(est.train_test_samples_(iris_y[:n_samples])[0][1]) == len(iris_y_class1) * est.test_size + len(iris_y_class0) * est.test_size
+    ), f"{len(est.train_test_samples_(iris_y[:n_samples])[0][1])} {len(iris_y_class1) * est.test_size + len(iris_y_class0) * est.test_size}"
+    assert len(est.train_test_samples_(iris_y[:n_samples])[0][0]) == est._n_samples_ - (len(iris_y_class1) * est.test_size + len(iris_y_class0) * est.test_size)
+
+    with pytest.raises(RuntimeError, match="Metric must be"):
+        est.statistic(iris_X[:n_samples], iris_y[:n_samples], metric="mi")
+
+    # covariate index must be an iterable
+    with pytest.raises(RuntimeError, match="covariate_index must be an iterable"):
+        est.statistic(iris_X[:n_samples], iris_y[:n_samples], 0, metric="mi")
+
+    # covariate index must be an iterable of ints
+    with pytest.raises(RuntimeError, match="Not all covariate_index"):
+        est.statistic(iris_X[:n_samples], iris_y[:n_samples], [0, 1.0], metric="mi")
+
+
 def test_featureimportance_forest_errors():
     permute_per_tree = False
     sample_dataset_per_tree = True
