@@ -168,7 +168,8 @@ class BaseForestHT(MetaEstimatorMixin):
         if stratifier is not None:
             if self._n_samples_ is not None and stratifier.shape[0] != self._n_samples_:
                 raise RuntimeError(
-                    f"stratifier must have {self._n_samples_} samples, got {stratifier.shape[0]}. "
+                    f"Stratifier must have {self._n_samples_} samples, "
+                    "got {stratifier.shape[0]}. "
                     f"If running on a new dataset, call the 'reset' method."
                 )
 
@@ -177,7 +178,8 @@ class BaseForestHT(MetaEstimatorMixin):
                 and type_of_target(stratifier) != self._type_of_target_
             ):
                 raise RuntimeError(
-                    f"stratifier must have type {self._type_of_target_}, got {type_of_target(stratifier)}. "
+                    f"Stratifier must have type {self._type_of_target_}, "
+                    f"got {type_of_target(stratifier)}. "
                     f"If running on a new dataset, call the 'reset' method."
                 )
 
