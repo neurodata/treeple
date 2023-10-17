@@ -11,7 +11,6 @@ from sklearn.utils.multiclass import type_of_target
 from sklearn.utils.validation import _is_fitted, check_X_y
 
 from sktree._lib.sklearn.ensemble._forest import (
-    BaseForest,
     ForestClassifier,
     ForestRegressor,
     RandomForestClassifier,
