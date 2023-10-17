@@ -26,3 +26,6 @@ keywords:
   - honest forests
   - statisical learning
   - machine learning
+message: >-
+  Please cite this software using the metadata from
+  'preferred-citation' in the CITATION.cff file.
