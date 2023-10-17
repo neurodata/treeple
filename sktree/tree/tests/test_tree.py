@@ -1,3 +1,5 @@
+import pickle
+
 import numpy as np
 import pytest
 from numpy.testing import assert_allclose
@@ -526,3 +528,19 @@ def test_balance_property(criterion, Tree):
     reg = Tree(criterion=criterion)
     reg.fit(X, y)
     assert np.sum(reg.predict(X)) == pytest.approx(np.sum(y))
+
+
+# TODO: this does not work properly it seems
+@pytest.mark.skip(reason="Regression in non-deterministic pickle.")
+@pytest.mark.parametrize("Tree", ALL_TREES.values())
+def test_deterministic_pickle(Tree):
+    # Non-regression test for:
+    # https://github.com/scikit-learn/scikit-learn/issues/27268
+    # Uninitialised memory would lead to the two pickle strings being different.
+    tree1 = Tree(random_state=0).fit(iris.data, iris.target)
+    tree2 = Tree(random_state=0).fit(iris.data, iris.target)
+
+    pickle1 = pickle.dumps(tree1)
+    pickle2 = pickle.dumps(tree2)
+
+    assert pickle1 == pickle2, f"Failed with {Tree}"

@@ -217,10 +217,13 @@ cdef class ObliqueTree(Tree):
         self.proj_vec_weights.resize(capacity)
         self.proj_vec_indices.resize(capacity)
 
-        # value memory is initialised to 0 to enable classifier argmax
         if capacity > self.capacity:
+            # value memory is initialised to 0 to enable classifier argmax
             memset(<void*>(self.value + self.capacity * self.value_stride), 0,
                    (capacity - self.capacity) * self.value_stride * sizeof(float64_t))
+
+            # node memory is initialised to 0 to ensure deterministic pickle (padding in Node struct)
+            memset(<void*>(self.nodes + self.capacity), 0, (capacity - self.capacity) * sizeof(Node))
 
         # if capacity smaller than node_count, adjust the counter
         if capacity < self.node_count:
@@ -286,7 +289,7 @@ cdef class ObliqueTree(Tree):
 
     cdef void _compute_feature_importances(
         self,
-        cnp.float64_t[:] importances,
+        float64_t[:] importances,
         Node* node
     ) noexcept nogil:
         """Compute feature importances from a Node in the Tree.

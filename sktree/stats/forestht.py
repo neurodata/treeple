@@ -20,6 +20,7 @@ from sktree._lib.sklearn.ensemble._forest import (
     _parallel_build_trees,
 )
 from sktree.tree import DecisionTreeClassifier, DecisionTreeRegressor
+from sktree.tree._classes import DTYPE
 
 from .utils import (
     METRIC_FUNCTIONS,
@@ -315,7 +316,7 @@ class BaseForestHT(MetaEstimatorMixin):
         raise NotImplementedError("Subclasses should implement this!")
 
     def _check_input(self, X: ArrayLike, y: ArrayLike, covariate_index: ArrayLike = None):
-        X, y = check_X_y(X, y, ensure_2d=True, copy=True, multi_output=True)
+        X, y = check_X_y(X, y, ensure_2d=True, copy=True, multi_output=True, dtype=DTYPE)
         if y.ndim != 2:
             y = y.reshape(-1, 1)
 
@@ -1129,7 +1130,11 @@ class FeatureImportanceForestClassifier(BaseForestHT):
             zip(all_proba, self._get_estimators_indices())
         ):
             _, indices_test = est_indices
-            posterior_arr[itree, indices_test, ...] = proba.reshape(-1, estimator.n_outputs_)
+
+            if predict_posteriors:
+                posterior_arr[itree, indices_test, ...] = proba.reshape(-1, estimator.n_classes_)
+            else:
+                posterior_arr[itree, indices_test, ...] = proba.reshape(-1, estimator.n_outputs_)
 
         if metric == "auc":
             # at this point, posterior_final is the predicted posterior for only the positive class
