@@ -19,7 +19,7 @@ authors:
     orcid: "https://orcid.org/0000-0001-8235-4950"
 type: software
 repository-code: "https://github.com/neurodata/scikit-tree"
-license: BSD-3
+license: 'BSD-3-Clause'
 keywords:
   - random forest
   - oblique trees
