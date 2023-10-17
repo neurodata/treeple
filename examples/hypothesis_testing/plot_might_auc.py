@@ -94,6 +94,7 @@ stat, posterior_arr, samples = est.statistic(
     y,
     metric=metric,
     return_posteriors=True,
+    max_fpr=max_fpr,
 )
 
 print(f"ASH-90 / Partial AUC: {stat}")
@@ -110,6 +111,7 @@ stat, posterior_arr, samples = est.statistic(
     y,
     metric=metric,
     return_posteriors=True,
+    max_fpr=max_fpr,
 )
 
 print(f"ASH-90 / Partial AUC: {stat}")
