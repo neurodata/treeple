@@ -108,7 +108,7 @@ est = FeatureImportanceForestClassifier(
     ),
     random_state=seed,
     test_size=test_size,
-    permute_per_tree=True,
+    permute_per_tree=False,
     sample_dataset_per_tree=False,
 )
 
@@ -120,7 +120,7 @@ print(
 stat, pvalue = est.test(
     X, y, covariate_index=np.arange(n_features_set, dtype=int), metric="mi", n_repeats=n_repeats
 )
-print(f"Estimated MI difference: {stat} with Pvalue: {pvalue}")
+print(f"Estimated MI difference for the important feature set: {stat} with Pvalue: {pvalue}")
 
 # we test for the second feature set, which is unimportant and thus should return a pvalue > 0.05
 stat, pvalue = est.test(
@@ -130,7 +130,7 @@ stat, pvalue = est.test(
     metric="mi",
     n_repeats=n_repeats,
 )
-print(f"Estimated MI difference: {stat} with Pvalue: {pvalue}")
+print(f"Estimated MI difference for the unimportant feature set: {stat} with Pvalue: {pvalue}")
 
 # %%
 # References

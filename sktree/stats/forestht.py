@@ -115,8 +115,8 @@ class BaseForestHT(MetaEstimatorMixin):
         random_state=None,
         verbose=0,
         test_size=0.2,
-        permute_per_tree=True,
-        sample_dataset_per_tree=True,
+        permute_per_tree=False,
+        sample_dataset_per_tree=False,
     ):
         self.estimator = estimator
         self.random_state = random_state
@@ -617,8 +617,8 @@ class FeatureImportanceForestRegressor(BaseForestHT):
         random_state=None,
         verbose=0,
         test_size=0.2,
-        permute_per_tree=True,
-        sample_dataset_per_tree=True,
+        permute_per_tree=False,
+        sample_dataset_per_tree=False,
     ):
         super().__init__(
             estimator=estimator,
@@ -903,8 +903,8 @@ class FeatureImportanceForestClassifier(BaseForestHT):
         random_state=None,
         verbose=0,
         test_size=0.2,
-        permute_per_tree=True,
-        sample_dataset_per_tree=True,
+        permute_per_tree=False,
+        sample_dataset_per_tree=False,
     ):
         super().__init__(
             estimator=estimator,
