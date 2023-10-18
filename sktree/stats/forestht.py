@@ -122,6 +122,7 @@ class BaseForestHT(MetaEstimatorMixin):
         test_size=0.2,
         permute_per_tree=True,
         sample_dataset_per_tree=True,
+        stratify=True,
     ):
         self.estimator = estimator
         self.random_state = random_state
@@ -129,6 +130,7 @@ class BaseForestHT(MetaEstimatorMixin):
         self.test_size = test_size
         self.permute_per_tree = permute_per_tree
         self.sample_dataset_per_tree = sample_dataset_per_tree
+        self.stratify = stratify
 
         self.n_samples_test_ = None
         self._n_samples_ = None
@@ -160,9 +162,9 @@ class BaseForestHT(MetaEstimatorMixin):
         self.n_features_in_ = None
         self._is_fitted = False
         self._seeds = None
+        self._y = None
 
-    def _get_estimators_indices(self, stratifier, sample_separate=False):
-
+    def _get_estimators_indices(self, stratifier=None, sample_separate=False):
         # Check stratifier
         # if stratifier is None, stratifier is regressor
         if stratifier is not None:
@@ -173,6 +175,8 @@ class BaseForestHT(MetaEstimatorMixin):
                     f"If running on a new dataset, call the 'reset' method."
                 )
 
+            # Type of target should be one that fits a classifier as this is
+            # the only instance where stratification is needed.
             if (
                 self._type_of_target_ is not None
                 and type_of_target(stratifier) != self._type_of_target_
@@ -238,7 +242,8 @@ class BaseForestHT(MetaEstimatorMixin):
             for _ in self.estimator_.estimators_:
                 yield indices_train, indices_test
 
-    def train_test_samples_(self, stratifier):
+    @property
+    def train_test_samples_(self):
         """
         The subset of drawn samples for each base estimator.
 
@@ -252,6 +257,9 @@ class BaseForestHT(MetaEstimatorMixin):
         """
         if self._n_samples_ is None:
             raise RuntimeError("The estimator must be fitted before accessing this attribute.")
+
+        # Stratifier uses a cached _y attribute if available
+        stratifier = self._y if is_classifier(self.estimator_) and self.stratify else None
 
         return [
             (indices_train, indices_test)
@@ -364,6 +372,10 @@ class BaseForestHT(MetaEstimatorMixin):
         else:
             self.permuted_estimator_ = self._get_estimator()
             estimator = self.permuted_estimator_
+
+        # Store a cache of the y variable
+        if is_classifier(self._get_estimator()):
+            self._y = y.copy()
 
         # Infer type of target y
         if not hasattr(self, "_type_of_target"):
@@ -519,7 +531,7 @@ class BaseForestHT(MetaEstimatorMixin):
             # If not sampling a new dataset per tree, then we may either be
             # permuting the covariate index per tree or per forest. If not permuting
             # there is only one train and test split, so we can just use that
-            _, indices_test = self.train_test_samples_(stratifier=y)[0]
+            _, indices_test = self.train_test_samples_[0]
             indices_test = observe_samples
             y_test = y[indices_test, :]
             y_pred_proba_normal = observe_posteriors[:, indices_test, :]
@@ -658,6 +670,7 @@ class FeatureImportanceForestRegressor(BaseForestHT):
             test_size=test_size,
             permute_per_tree=permute_per_tree,
             sample_dataset_per_tree=sample_dataset_per_tree,
+            stratify=False,
         )
 
     def _get_estimator(self):
@@ -750,13 +763,11 @@ class FeatureImportanceForestRegressor(BaseForestHT):
                     self.permute_per_tree,
                     self._type_of_target_,
                 )
-                for idx, (indices_train, indices_test) in enumerate(
-                    self._get_estimators_indices(y, sample_separate=True)
-                )
+                for idx, (indices_train, indices_test) in enumerate(self.train_test_samples_)
             )
         else:
             # fitting a forest will only get one unique train/test split
-            indices_train, indices_test = self.train_test_samples_(stratifier=None)[0]
+            indices_train, indices_test = self.train_test_samples_[0]
 
             X_train, X_test = X[indices_train, :], X[indices_test, :]
             y_train, y_test = y[indices_train, :], y[indices_test, :]
@@ -903,6 +914,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
         test_size=0.2,
         permute_per_tree=True,
         sample_dataset_per_tree=True,
+        stratify=True,
     ):
         super().__init__(
             estimator=estimator,
@@ -911,6 +923,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
             test_size=test_size,
             permute_per_tree=permute_per_tree,
             sample_dataset_per_tree=sample_dataset_per_tree,
+            stratify=stratify,
         )
 
     def _get_estimator(self):
@@ -971,13 +984,11 @@ class FeatureImportanceForestClassifier(BaseForestHT):
                     self.permute_per_tree,
                     self._type_of_target_,
                 )
-                for idx, (indices_train, indices_test) in enumerate(
-                    self._get_estimators_indices(y, sample_separate=True)
-                )
+                for idx, (indices_train, indices_test) in enumerate(self.train_test_samples_)
             )
         else:
             # fitting a forest will only get one unique train/test split
-            indices_train, indices_test = self.train_test_samples_(stratifier=y)[0]
+            indices_train, indices_test = self.train_test_samples_[0]
 
             X_train, X_test = X[indices_train, :], X[indices_test, :]
             y_train = y[indices_train, :]
