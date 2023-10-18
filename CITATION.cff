@@ -1,0 +1,31 @@
+# YAML 1.2
+---
+# Metadata for citation of this software according to the CFF format (https://citation-file-format.github.io/)
+cff-version: 1.2.0
+title: "Scikit-tree: Modern decision-trees compatible with scikit-learn in Python."
+abstract: "scikit-tree is a scikit-learn compatible API for building state-of-the-art decision trees. These include unsupervised trees, oblique trees, uncertainty trees, quantile trees and causal trees."
+authors:
+  - given-names: Adam
+    family-names: Li
+    affiliation: "Department of Computer Science, Columbia University, New York, NY, USA"
+    orcid: "https://orcid.org/0000-0001-8421-365X"
+  - given-names: Sambit
+    family-names: Panda
+    affiliation: "Department of Biomedical Engineering, Johns Hopkins University, Baltimore, MD, USA"
+    orcid: "https://orcid.org/0000-0001-8455-4243"
+  - given-names: Haoyin
+    family-names: Xu
+    affiliation: "Department of Biomedical Engineering, Johns Hopkins University, Baltimore, MD, USA"
+    orcid: "https://orcid.org/0000-0001-8235-4950"
+type: software
+repository-code: "https://github.com/neurodata/scikit-tree"
+license: 'BSD-3-Clause'
+keywords:
+  - random forest
+  - oblique trees
+  - honest forests
+  - statisical learning
+  - machine learning
+message: >-
+  Please cite this software using the metadata from
+  'preferred-citation' in the CITATION.cff file.
