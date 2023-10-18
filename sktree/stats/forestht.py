@@ -363,6 +363,8 @@ class BaseForestHT(MetaEstimatorMixin):
 
         if self._n_samples_ is None:
             self._n_samples_, self.n_features_in_ = X.shape
+
+        # Infer type of target y
         if self._type_of_target_ is None:
             self._type_of_target_ = type_of_target(y)
 
@@ -376,10 +378,6 @@ class BaseForestHT(MetaEstimatorMixin):
         # Store a cache of the y variable
         if is_classifier(self._get_estimator()):
             self._y = y.copy()
-
-        # Infer type of target y
-        if not hasattr(self, "_type_of_target"):
-            self._type_of_target_ = type_of_target(y)
 
         # XXX: this can be improved as an extra fit can be avoided, by just doing error-checking
         # and then setting the internal meta data structures

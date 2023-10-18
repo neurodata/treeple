@@ -82,44 +82,42 @@ def test_featureimportance_forest_stratified(sample_dataset_per_tree):
         sample_dataset_per_tree=sample_dataset_per_tree,
     )
     n_samples = 100
-    est.statistic(iris_X[:n_samples], iris_y[:n_samples], metric="mse")
+    est.statistic(iris_X[:n_samples], iris_y[:n_samples], metric="mi")
 
     iris_y_class0 = iris_y[iris_y == 0]
     iris_y_class1 = iris_y[iris_y == 1]
 
     assert (
         len(est.train_test_samples_[0][1])
-        == len(iris_y_class1) * est.test_size + len(iris_y_class0) * est.test_size
+        == sum(iris_y_class1) * est.test_size + sum(iris_y_class0) * est.test_size
     ), (
         f"{len(est.train_test_samples_[0][1])} "
-        f"{len(iris_y_class1) * est.test_size + len(iris_y_class0) * est.test_size}"
+        f"{sum(iris_y_class1) * est.test_size + sum(iris_y_class0) * est.test_size}"
     )
     assert len(est.train_test_samples_[0][0]) == est._n_samples_ - (
-        len(iris_y_class1) * est.test_size + len(iris_y_class0) * est.test_size
+        sum(iris_y_class1) * est.test_size + sum(iris_y_class0) * est.test_size
     )
 
-    est.test(iris_X[:n_samples], iris_y[:n_samples], [0, 1], n_repeats=10, metric="mse")
+    est.test(iris_X[:n_samples], iris_y[:n_samples], [0, 1], n_repeats=10, metric="mi")
     assert (
         len(est.train_test_samples_[0][1])
-        == len(iris_y_class1) * est.test_size + len(iris_y_class0) * est.test_size
+        == sum(iris_y_class1) * est.test_size + sum(iris_y_class0) * est.test_size
     ), (
         f"{len(est.train_test_samples_[0][1])} "
-        f"{len(iris_y_class1) * est.test_size + len(iris_y_class0) * est.test_size}"
+        f"{sum(iris_y_class1) * est.test_size + sum(iris_y_class0) * est.test_size}"
     )
     assert len(est.train_test_samples_[0][0]) == est._n_samples_ - (
-        len(iris_y_class1) * est.test_size + len(iris_y_class0) * est.test_size
+        sum(iris_y_class1) * est.test_size + sum(iris_y_class0) * est.test_size
     )
 
-    with pytest.raises(RuntimeError, match="Metric must be"):
-        est.statistic(iris_X[:n_samples], iris_y[:n_samples], metric="mi")
+    # Test if y has different shape
+    with pytest.raises(RuntimeError, match="Stratifier must have"):
+        est.statistic(iris_X[: n_samples - 1], iris_y[: n_samples - 1], metric="mi")
 
-    # covariate index must be an iterable
-    with pytest.raises(RuntimeError, match="covariate_index must be an iterable"):
-        est.statistic(iris_X[:n_samples], iris_y[:n_samples], 0, metric="mi")
-
-    # covariate index must be an iterable of ints
-    with pytest.raises(RuntimeError, match="Not all covariate_index"):
-        est.statistic(iris_X[:n_samples], iris_y[:n_samples], [0, 1.0], metric="mi")
+    # Test if y has different type
+    with pytest.raises(RuntimeError, match="Stratifier must have type"):
+        iris_y = np.hstack((iris_y[:n_samples].reshape(-1, 1), iris_y[:n_samples].reshape(-1, 1)))
+        est.statistic(iris_X[:n_samples], iris_y, metric="mi")
 
 
 def test_featureimportance_forest_errors():
