@@ -1,7 +1,7 @@
 """
-===========================================================
-Mutual Information for Gigantic Hypothesis Testing (MIGHT)
-===========================================================
+=========================================================
+Mutual Information for Genuine Hypothesis Testing (MIGHT)
+=========================================================
 
 An example using :class:`~sktree.stats.FeatureImportanceForestClassifier` for nonparametric
 multivariate hypothesis test, on simulated datasets. Here, we present a simulation

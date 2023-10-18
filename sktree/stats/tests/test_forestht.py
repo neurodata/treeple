@@ -116,8 +116,10 @@ def test_featureimportance_forest_stratified(sample_dataset_per_tree):
 
     # Test if y has different type
     with pytest.raises(RuntimeError, match="Stratifier must have type"):
-        iris_y = np.hstack((iris_y[:n_samples].reshape(-1, 1), iris_y[:n_samples].reshape(-1, 1)))
-        est.statistic(iris_X[:n_samples], iris_y, metric="mi")
+        iris_y_new = np.hstack(
+            (iris_y[:n_samples].reshape(-1, 1), iris_y[:n_samples].reshape(-1, 1))
+        )
+        est.statistic(iris_X[:n_samples], iris_y_new, metric="mi")
 
 
 def test_featureimportance_forest_errors():
