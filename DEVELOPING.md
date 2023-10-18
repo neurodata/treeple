@@ -20,20 +20,22 @@
 # Requirements
 
 * Python 3.9+
-* numpy
-* scipy
+* numpy>=1.25
+* scipy>=1.11
 * scikit-learn>=1.3.1
 
 For the other requirements, inspect the ``pyproject.toml`` file.
 
 # Setting up your development environment
 
-We recommend using miniconda, as python virtual environments may not setup properly compilers necessary for our compiled code. 
+We recommend using miniconda, as python virtual environments may not setup properly compilers necessary for our compiled code. For detailed information on setting up and managing conda environments, see https://conda.io/docs/test-drive.html.
 
 <!-- Setup a conda env -->
 
-    conda create -n sktree python=3.9 
+    conda create -n sktree
     conda activate sktree
+
+**Make sure you specify a Python version if your system defaults to anything less than Python 3.9.**
 
 **Any commands should ALWAYS be after you have activated your conda environment.**
 Next, install necessary build dependencies. For more information, see https://scikit-learn.org/stable/developers/advanced_installation.html.
@@ -57,7 +59,11 @@ Other requirements can be installed as such:
 
 We leverage meson to build scikit-tree from source. We utilize a CLI tool, called [spin](https://github.com/scientific-python/spin), which wraps certain meson commands to make building easier.
 
-For example, the following command will build the project
+For example, the following command will build the project completely from scratch
+
+    spin build --clean
+
+If you have part of the build already done, you can run:
 
     spin build
 
@@ -71,11 +77,11 @@ For other commands, see
 
 Note at this stage, you will be unable to run Python commands directly. For example, ``pytest ./sktree`` will not work.
 
-However, after installing and building the project from source using meson, you can leverage editable installs to make testing code changes much faster.
+However, after installing and building the project from source using meson, you can leverage editable installs to make testing code changes much faster. For more information on meson-python's progress supporting editable installs in a better fashion, see https://meson-python.readthedocs.io/en/latest/how-to-guides/editable-installs.html.
 
     pip install --no-build-isolation --editable .
 
-This will now link the meson build to your Python runtime. Now if you run
+**Note: editable installs for scikit-tree REQUIRE you to have built the project using meson already.** This will now link the meson build to your Python runtime. Now if you run
 
     pytest ./sktree
 
