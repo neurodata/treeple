@@ -84,11 +84,8 @@ def test_featureimportance_forest_stratified(sample_dataset_per_tree):
     n_samples = 100
     est.statistic(iris_X[:n_samples], iris_y[:n_samples], metric="mi")
 
-    iris_y_class0 = iris_y[iris_y == 0]
-    iris_y_class1 = iris_y[iris_y == 1]
-
     _, indices_test = est.train_test_samples_[0]
-    y_test = y[indices_test, :]
+    y_test = iris_y[indices_test, :]
 
     assert sum(y_test[y_test == 0]) == sum(y_test[y_test == 1]), (
         f"{sum(y_test[y_test==0])} " f"{sum(y_test[y_test==1])}"
@@ -97,7 +94,7 @@ def test_featureimportance_forest_stratified(sample_dataset_per_tree):
     est.test(iris_X[:n_samples], iris_y[:n_samples], [0, 1], n_repeats=10, metric="mi")
 
     _, indices_test = est.train_test_samples_[0]
-    y_test = y[indices_test, :]
+    y_test = iris_y[indices_test, :]
 
     assert sum(y_test[y_test == 0]) == sum(y_test[y_test == 1]), (
         f"{sum(y_test[y_test==0])} " f"{sum(y_test[y_test==1])}"
