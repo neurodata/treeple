@@ -174,13 +174,17 @@ https://github.com/neurodata/scikit-tree/actions/workflows/build_wheels.yml will
 
 2. Upload wheels to test PyPi
 
-    twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+```
+twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+```
 
 Verify that installations work as expected on your machine.
 
 3. Upload wheels
 
-    twine upload dist/*
+```
+twine upload dist/*
+```
 
 or if you have two-factor authentication enabled: https://pypi.org/help/#apitoken
 
