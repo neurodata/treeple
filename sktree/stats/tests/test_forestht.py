@@ -81,7 +81,7 @@ def test_featureimportance_forest_stratified(sample_dataset_per_tree):
         random_state=seed,
         sample_dataset_per_tree=sample_dataset_per_tree,
     )
-    n_samples = 100
+    n_samples = 80
     est.statistic(iris_X[:n_samples], iris_y[:n_samples], metric="mi")
 
     iris_y_class0 = iris_y[iris_y == 0]
