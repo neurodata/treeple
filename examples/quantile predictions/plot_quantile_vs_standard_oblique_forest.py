@@ -8,7 +8,6 @@ instance on a synthetic, right-skewed dataset.
 In a right-skewed distribution, the mean is to the right of the median.
 
 """
-print(__doc__)
 
 from collections import defaultdict
 

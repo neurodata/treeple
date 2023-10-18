@@ -9,7 +9,6 @@ The example compares the predictions to a ground truth function used
 to generate noisy samples.
 
 """
-print(__doc__)
 
 from collections import defaultdict
 

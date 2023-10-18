@@ -7,7 +7,6 @@ An example of how to generate quantile prediction intervals with
 Random Forest Regressor class on the California Housing dataset.
 
 """
-print(__doc__)
 
 from collections import defaultdict
 
