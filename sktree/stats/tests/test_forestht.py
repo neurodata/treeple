@@ -81,33 +81,26 @@ def test_featureimportance_forest_stratified(sample_dataset_per_tree):
         random_state=seed,
         sample_dataset_per_tree=sample_dataset_per_tree,
     )
-    n_samples = 80
+    n_samples = 100
     est.statistic(iris_X[:n_samples], iris_y[:n_samples], metric="mi")
 
     iris_y_class0 = iris_y[iris_y == 0]
     iris_y_class1 = iris_y[iris_y == 1]
 
-    assert (
-        len(est.train_test_samples_[0][1])
-        == sum(iris_y_class1) * est.test_size + sum(iris_y_class0) * est.test_size
-    ), (
-        f"{len(est.train_test_samples_[0][1])} "
-        f"{sum(iris_y_class1) * est.test_size + sum(iris_y_class0) * est.test_size}"
-    )
-    assert len(est.train_test_samples_[0][0]) == est._n_samples_ - (
-        sum(iris_y_class1) * est.test_size + sum(iris_y_class0) * est.test_size
+    _, indices_test = est.train_test_samples_[0]
+    y_test = y[indices_test, :]
+
+    assert sum(y_test[y_test == 0]) == sum(y_test[y_test == 1]), (
+        f"{sum(y_test[y_test==0])} " f"{sum(y_test[y_test==1])}"
     )
 
     est.test(iris_X[:n_samples], iris_y[:n_samples], [0, 1], n_repeats=10, metric="mi")
-    assert (
-        len(est.train_test_samples_[0][1])
-        == sum(iris_y_class1) * est.test_size + sum(iris_y_class0) * est.test_size
-    ), (
-        f"{len(est.train_test_samples_[0][1])} "
-        f"{sum(iris_y_class1) * est.test_size + sum(iris_y_class0) * est.test_size}"
-    )
-    assert len(est.train_test_samples_[0][0]) == est._n_samples_ - (
-        sum(iris_y_class1) * est.test_size + sum(iris_y_class0) * est.test_size
+
+    _, indices_test = est.train_test_samples_[0]
+    y_test = y[indices_test, :]
+
+    assert sum(y_test[y_test == 0]) == sum(y_test[y_test == 1]), (
+        f"{sum(y_test[y_test==0])} " f"{sum(y_test[y_test==1])}"
     )
 
     # Test if y has different shape
