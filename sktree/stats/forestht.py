@@ -116,6 +116,7 @@ class BaseForestHT(MetaEstimatorMixin):
         test_size=0.2,
         permute_per_tree=False,
         sample_dataset_per_tree=False,
+        permute_forest_fraction=None,
     ):
         self.estimator = estimator
         self.random_state = random_state
@@ -123,7 +124,8 @@ class BaseForestHT(MetaEstimatorMixin):
         self.test_size = test_size
         self.permute_per_tree = permute_per_tree
         self.sample_dataset_per_tree = sample_dataset_per_tree
-
+        self.permute_forest_fraction = permute_forest_fraction
+        
         self.n_samples_test_ = None
         self._n_samples_ = None
         self._metric = None
@@ -618,6 +620,7 @@ class FeatureImportanceForestRegressor(BaseForestHT):
         test_size=0.2,
         permute_per_tree=False,
         sample_dataset_per_tree=False,
+        permute_forest_fraction=None,
     ):
         super().__init__(
             estimator=estimator,
@@ -626,6 +629,7 @@ class FeatureImportanceForestRegressor(BaseForestHT):
             test_size=test_size,
             permute_per_tree=permute_per_tree,
             sample_dataset_per_tree=sample_dataset_per_tree,
+            permute_forest_fraction=permute_forest_fraction
         )
 
     def _get_estimator(self):
@@ -904,6 +908,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
         test_size=0.2,
         permute_per_tree=False,
         sample_dataset_per_tree=False,
+        permute_forest_fraction=None,
     ):
         super().__init__(
             estimator=estimator,
@@ -912,6 +917,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
             test_size=test_size,
             permute_per_tree=permute_per_tree,
             sample_dataset_per_tree=sample_dataset_per_tree,
+            permute_forest_fraction=permute_forest_fraction
         )
 
     def _get_estimator(self):
