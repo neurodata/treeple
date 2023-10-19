@@ -69,6 +69,38 @@ def test_featureimportance_forest_permute_pertree(sample_dataset_per_tree):
         est.statistic(iris_X[:n_samples], iris_y[:n_samples], [0, 1.0], metric="mi")
 
 
+@pytest.mark.parametrize("sample_dataset_per_tree", [True, False])
+def test_featureimportance_forest_stratified(sample_dataset_per_tree):
+    est = FeatureImportanceForestClassifier(
+        estimator=RandomForestClassifier(
+            n_estimators=10,
+            random_state=seed,
+        ),
+        permute_per_tree=True,
+        test_size=0.7,
+        random_state=seed,
+        sample_dataset_per_tree=sample_dataset_per_tree,
+    )
+    n_samples = 100
+    est.statistic(iris_X[:n_samples], iris_y[:n_samples], metric="mi")
+
+    _, indices_test = est.train_test_samples_[0]
+    y_test = iris_y[indices_test]
+
+    assert len(y_test[y_test == 0]) == len(y_test[y_test == 1]), (
+        f"{len(y_test[y_test==0])} " f"{len(y_test[y_test==1])}"
+    )
+
+    est.test(iris_X[:n_samples], iris_y[:n_samples], [0, 1], n_repeats=10, metric="mi")
+
+    _, indices_test = est.train_test_samples_[0]
+    y_test = iris_y[indices_test]
+
+    assert len(y_test[y_test == 0]) == len(y_test[y_test == 1]), (
+        f"{len(y_test[y_test==0])} " f"{len(y_test[y_test==1])}"
+    )
+
+
 def test_featureimportance_forest_errors():
     permute_per_tree = False
     sample_dataset_per_tree = True
