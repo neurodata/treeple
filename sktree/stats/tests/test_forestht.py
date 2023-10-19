@@ -87,8 +87,8 @@ def test_featureimportance_forest_stratified(sample_dataset_per_tree):
     _, indices_test = est.train_test_samples_[0]
     y_test = iris_y[indices_test]
 
-    assert sum(y_test[y_test == 0]) == sum(y_test[y_test == 1]), (
-        f"{sum(y_test[y_test==0])} " f"{sum(y_test[y_test==1])}"
+    assert len(y_test[y_test == 0]) == len(y_test[y_test == 1]), (
+        f"{len(y_test[y_test==0])} " f"{len(y_test[y_test==1])}"
     )
 
     est.test(iris_X[:n_samples], iris_y[:n_samples], [0, 1], n_repeats=10, metric="mi")
@@ -96,8 +96,8 @@ def test_featureimportance_forest_stratified(sample_dataset_per_tree):
     _, indices_test = est.train_test_samples_[0]
     y_test = iris_y[indices_test]
 
-    assert sum(y_test[y_test == 0]) == sum(y_test[y_test == 1]), (
-        f"{sum(y_test[y_test==0])} " f"{sum(y_test[y_test==1])}"
+    assert len(y_test[y_test == 0]) == len(y_test[y_test == 1]), (
+        f"{len(y_test[y_test==0])} " f"{len(y_test[y_test==1])}"
     )
 
     # Test if y has different shape
