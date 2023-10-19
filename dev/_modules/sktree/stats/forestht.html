@@ -558,6 +558,7 @@ document.write(`
         <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
         <span class="n">permute_per_tree</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">sample_dataset_per_tree</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">stratify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="o">=</span> <span class="n">estimator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span>
@@ -565,6 +566,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">test_size</span> <span class="o">=</span> <span class="n">test_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">permute_per_tree</span> <span class="o">=</span> <span class="n">permute_per_tree</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sample_dataset_per_tree</span> <span class="o">=</span> <span class="n">sample_dataset_per_tree</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stratify</span> <span class="o">=</span> <span class="n">stratify</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">n_samples_test_</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_</span> <span class="o">=</span> <span class="kc">None</span>
@@ -596,8 +598,9 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_is_fitted</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_seeds</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">_get_estimators_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_separate</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_estimators_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stratifier</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sample_separate</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
 
         <span class="c1"># Get drawn indices along both sample and feature axes</span>
@@ -627,7 +630,11 @@ document.write(`
                 <span class="c1"># Operations accessing random_state must be performed identically</span>
                 <span class="c1"># to those in `_parallel_build_trees()`</span>
                 <span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
-                    <span class="n">indices</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">seed</span>
+                    <span class="n">indices</span><span class="p">,</span>
+                    <span class="n">test_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_size</span><span class="p">,</span>
+                    <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">stratify</span><span class="o">=</span><span class="n">stratifier</span><span class="p">,</span>
+                    <span class="n">random_state</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
                 <span class="p">)</span>
 
                 <span class="k">yield</span> <span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span>
@@ -638,12 +645,13 @@ document.write(`
                 <span class="k">else</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_seeds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">random_state</span>
 
-            <span class="c1"># TODO: make random_state consistent</span>
             <span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
                 <span class="n">indices</span><span class="p">,</span>
                 <span class="n">test_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_size</span><span class="p">,</span>
+                <span class="n">stratify</span><span class="o">=</span><span class="n">stratifier</span><span class="p">,</span>
                 <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_seeds</span><span class="p">,</span>
             <span class="p">)</span>
+
             <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">estimators_</span><span class="p">:</span>
                 <span class="k">yield</span> <span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span>
 
@@ -663,9 +671,12 @@ document.write(`
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;The estimator must be fitted before accessing this attribute.&quot;</span><span class="p">)</span>
 
+        <span class="c1"># Stratifier uses a cached _y attribute if available</span>
+        <span class="n">stratifier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="k">if</span> <span class="n">is_classifier</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">stratify</span> <span class="k">else</span> <span class="kc">None</span>
+
         <span class="k">return</span> <span class="p">[</span>
             <span class="p">(</span><span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_estimators_indices</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_estimators_indices</span><span class="p">(</span><span class="n">stratifier</span><span class="o">=</span><span class="n">stratifier</span><span class="p">)</span>
         <span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_statistic</span><span class="p">(</span>
@@ -765,6 +776,8 @@ document.write(`
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+
+        <span class="c1"># Infer type of target y</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type_of_target_</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_type_of_target_</span> <span class="o">=</span> <span class="n">type_of_target</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
 
@@ -775,9 +788,9 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">permuted_estimator_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_estimator</span><span class="p">()</span>
             <span class="n">estimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">permuted_estimator_</span>
 
-        <span class="c1"># Infer type of target y</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_type_of_target&quot;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_type_of_target_</span> <span class="o">=</span> <span class="n">type_of_target</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="c1"># Store a cache of the y variable</span>
+        <span class="k">if</span> <span class="n">is_classifier</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_estimator</span><span class="p">()):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
         <span class="c1"># XXX: this can be improved as an extra fit can be avoided, by just doing error-checking</span>
         <span class="c1"># and then setting the internal meta data structures</span>
@@ -898,10 +911,10 @@ document.write(`
             <span class="n">observe_posteriors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">observe_posteriors_</span>
             <span class="n">observe_stat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">observe_stat_</span>
 
-        <span class="c1"># next permute the data</span>
         <span class="k">if</span> <span class="n">covariate_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">covariate_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
 
+        <span class="c1"># next permute the data</span>
         <span class="n">permute_stat</span><span class="p">,</span> <span class="n">permute_posteriors</span><span class="p">,</span> <span class="n">permute_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">statistic</span><span class="p">(</span>
             <span class="n">X</span><span class="p">,</span>
             <span class="n">y</span><span class="p">,</span>
@@ -1165,9 +1178,7 @@ document.write(`
                     <span class="bp">self</span><span class="o">.</span><span class="n">permute_per_tree</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_type_of_target_</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_get_estimators_indices</span><span class="p">(</span><span class="n">sample_separate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_test_samples_</span><span class="p">)</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># fitting a forest will only get one unique train/test split</span>
@@ -1269,6 +1280,9 @@ document.write(`
 <span class="sd">    sample_dataset_per_tree : bool, default=False</span>
 <span class="sd">        Whether to sample the dataset per tree or per forest.</span>
 
+<span class="sd">    stratify : bool, default=True</span>
+<span class="sd">        Whether to stratify the samples by class labels.</span>
+
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    estimator_ : BaseForest</span>
@@ -1321,6 +1335,7 @@ document.write(`
         <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
         <span class="n">permute_per_tree</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">sample_dataset_per_tree</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">stratify</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">estimator</span><span class="o">=</span><span class="n">estimator</span><span class="p">,</span>
@@ -1329,6 +1344,7 @@ document.write(`
             <span class="n">test_size</span><span class="o">=</span><span class="n">test_size</span><span class="p">,</span>
             <span class="n">permute_per_tree</span><span class="o">=</span><span class="n">permute_per_tree</span><span class="p">,</span>
             <span class="n">sample_dataset_per_tree</span><span class="o">=</span><span class="n">sample_dataset_per_tree</span><span class="p">,</span>
+            <span class="n">stratify</span><span class="o">=</span><span class="n">stratify</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1389,9 +1405,7 @@ document.write(`
                     <span class="bp">self</span><span class="o">.</span><span class="n">permute_per_tree</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_type_of_target_</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_get_estimators_indices</span><span class="p">(</span><span class="n">sample_separate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_test_samples_</span><span class="p">)</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># fitting a forest will only get one unique train/test split</span>

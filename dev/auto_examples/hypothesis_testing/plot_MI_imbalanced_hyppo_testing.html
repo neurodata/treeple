@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Mutual Information for Gigantic Hypothesis Testing (MIGHT) with Imbalanced Data &#8212; scikit-tree 0.3.0dev0 documentation</title>
+    <title>Mutual Information for Genuine Hypothesis Testing (MIGHT) with Imbalanced Data &#8212; scikit-tree 0.3.0dev0 documentation</title>
   
   
   
@@ -57,7 +57,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Multi-view learning with Decision-trees" href="../multiview/index.html" />
-    <link rel="prev" title="Mutual Information for Gigantic Hypothesis Testing (MIGHT)" href="plot_MI_gigantic_hypothesis_testing_forest.html" />
+    <link rel="prev" title="Mutual Information for Genuine Hypothesis Testing (MIGHT)" href="plot_MI_genuine_hypothesis_testing_forest.html" />
     <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
     <script type="text/javascript" src="../../_static/copybutton.js"></script>
     <script type="text/javascript" src="../../_static/scrollfix.js"></script>
@@ -399,8 +399,8 @@ document.write(`
 </li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Hypothesis testing with decision trees</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="plot_might_auc.html">Compute partial AUC using Mutual Information for Genuine Hypothesis Testing (MIGHT)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_MI_gigantic_hypothesis_testing_forest.html">Mutual Information for Gigantic Hypothesis Testing (MIGHT)</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Mutual Information for Gigantic Hypothesis Testing (MIGHT) with Imbalanced Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_MI_genuine_hypothesis_testing_forest.html">Mutual Information for Genuine Hypothesis Testing (MIGHT)</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Mutual Information for Genuine Hypothesis Testing (MIGHT) with Imbalanced Data</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../multiview/index.html">Multi-view learning with Decision-trees</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -494,8 +494,8 @@ document.write(`
 <p><a class="reference internal" href="#sphx-glr-download-auto-examples-hypothesis-testing-plot-mi-imbalanced-hyppo-testing-py"><span class="std std-ref">Go to the end</span></a>
 to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="mutual-information-for-gigantic-hypothesis-testing-might-with-imbalanced-data">
-<span id="sphx-glr-auto-examples-hypothesis-testing-plot-mi-imbalanced-hyppo-testing-py"></span><h1>Mutual Information for Gigantic Hypothesis Testing (MIGHT) with Imbalanced Data<a class="headerlink" href="#mutual-information-for-gigantic-hypothesis-testing-might-with-imbalanced-data" title="Link to this heading">#</a></h1>
+<section class="sphx-glr-example-title" id="mutual-information-for-genuine-hypothesis-testing-might-with-imbalanced-data">
+<span id="sphx-glr-auto-examples-hypothesis-testing-plot-mi-imbalanced-hyppo-testing-py"></span><h1>Mutual Information for Genuine Hypothesis Testing (MIGHT) with Imbalanced Data<a class="headerlink" href="#mutual-information-for-genuine-hypothesis-testing-might-with-imbalanced-data" title="Link to this heading">#</a></h1>
 <p>Here, we demonstrate how to do hypothesis testing on highly imbalanced data
 in terms of their feature-set dimensionalities.
 using mutual information as a test statistic. We use the framework of
@@ -508,7 +508,7 @@ forest to estimate the posteriors, here we leverage a multi-view honest random
 forest, with knowledge of the multi-view structure of the <code class="docutils literal notranslate"><span class="pre">X</span></code> data.</p>
 <p>For other examples of hypothesis testing, see the following:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="plot_MI_gigantic_hypothesis_testing_forest.html#sphx-glr-auto-examples-hypothesis-testing-plot-mi-gigantic-hypothesis-testing-forest-py"><span class="std std-ref">Mutual Information for Gigantic Hypothesis Testing (MIGHT)</span></a></p></li>
+<li><p><a class="reference internal" href="plot_MI_genuine_hypothesis_testing_forest.html#sphx-glr-auto-examples-hypothesis-testing-plot-mi-genuine-hypothesis-testing-forest-py"><span class="std std-ref">Mutual Information for Genuine Hypothesis Testing (MIGHT)</span></a></p></li>
 <li><p><a class="reference internal" href="plot_might_auc.html#sphx-glr-auto-examples-hypothesis-testing-plot-might-auc-py"><span class="std std-ref">Compute partial AUC using Mutual Information for Genuine Hypothesis Testing (MIGHT)</span></a></p></li>
 </ul>
 <p>For more information on the multi-view decision-tree, see
@@ -653,8 +653,8 @@ observed test statistic.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Permutation per tree: False and sampling dataset per tree: False
-Estimated MI difference: -0.657808293886789 with Pvalue: 0.000999000999000999
-Estimated MI difference: 0.0 with Pvalue: 0.5164835164835165
+Estimated MI difference: -0.6702711340047818 with Pvalue: 0.000999000999000999
+Estimated MI difference: 0.0 with Pvalue: 0.5274725274725275
 </pre></div>
 </div>
 <p>Let’s investigate what happens when we do not use a multi-view decision tree.
@@ -711,8 +711,8 @@ All other parameters are kept the same.</p>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_plot_MI_imbalanced_hyppo_testing_001.png" srcset="../../_images/sphx_glr_plot_MI_imbalanced_hyppo_testing_001.png" alt="plot MI imbalanced hyppo testing" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Estimated MI difference using regular decision-trees: -0.001175431820767292 with Pvalue: 0.26073926073926074
-Estimated MI difference using regular decision-trees: -0.001267643869818147 with Pvalue: 0.3036963036963037
+<img src="../../_images/sphx_glr_plot_MI_imbalanced_hyppo_testing_001.png" srcset="../../_images/sphx_glr_plot_MI_imbalanced_hyppo_testing_001.png" alt="plot MI imbalanced hyppo testing" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Estimated MI difference using regular decision-trees: -0.00502439987974812 with Pvalue: 0.001998001998001998
+Estimated MI difference using regular decision-trees: -0.0001252431065501547 with Pvalue: 0.5264735264735265
 </pre></div>
 </div>
 </section>
@@ -739,8 +739,8 @@ regular decision tree in this simulation.</p>
 </aside>
 </aside>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 16.250 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  128 MB</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 14.981 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  185 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-hypothesis-testing-plot-mi-imbalanced-hyppo-testing-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/45cc3f30924d00401982aacf040d7b0d/plot_MI_imbalanced_hyppo_testing.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_MI_imbalanced_hyppo_testing.py</span></code></a></p>
@@ -764,12 +764,12 @@ regular decision tree in this simulation.</p>
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="plot_MI_gigantic_hypothesis_testing_forest.html"
+       href="plot_MI_genuine_hypothesis_testing_forest.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Mutual Information for Gigantic Hypothesis Testing (MIGHT)</p>
+        <p class="prev-next-title">Mutual Information for Genuine Hypothesis Testing (MIGHT)</p>
       </div>
     </a>
     <a class="right-next"
