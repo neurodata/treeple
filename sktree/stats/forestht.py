@@ -165,28 +165,6 @@ class BaseForestHT(MetaEstimatorMixin):
         self._y = None
 
     def _get_estimators_indices(self, stratifier=None, sample_separate=False):
-        # Check stratifier
-        # if stratifier is None, stratifier is regressor
-        if stratifier is not None:
-            if self._n_samples_ is not None and stratifier.shape[0] != self._n_samples_:
-                raise RuntimeError(
-                    f"Stratifier must have {self._n_samples_} samples, "
-                    "got {stratifier.shape[0]}. "
-                    f"If running on a new dataset, call the 'reset' method."
-                )
-
-            # Type of target should be one that fits a classifier as this is
-            # the only instance where stratification is needed.
-            if (
-                self._type_of_target_ is not None
-                and type_of_target(stratifier) != self._type_of_target_
-            ):
-                raise RuntimeError(
-                    f"Stratifier must have type {self._type_of_target_}, "
-                    f"got {type_of_target(stratifier)}. "
-                    f"If running on a new dataset, call the 'reset' method."
-                )
-
         indices = np.arange(self._n_samples_, dtype=int)
 
         # Get drawn indices along both sample and feature axes
@@ -231,7 +209,6 @@ class BaseForestHT(MetaEstimatorMixin):
                 else:
                     self._seeds = self.estimator_.random_state
 
-            # TODO: make random_state consistent
             indices_train, indices_test = train_test_split(
                 indices,
                 test_size=self.test_size,
