@@ -116,6 +116,7 @@ class BaseForestHT(MetaEstimatorMixin):
         test_size=0.2,
         permute_per_tree=False,
         sample_dataset_per_tree=False,
+        stratify=False,
         permute_forest_fraction=None,
     ):
         self.estimator = estimator
@@ -125,7 +126,8 @@ class BaseForestHT(MetaEstimatorMixin):
         self.permute_per_tree = permute_per_tree
         self.sample_dataset_per_tree = sample_dataset_per_tree
         self.permute_forest_fraction = permute_forest_fraction
-        
+        self.stratify = stratify
+
         self.n_samples_test_ = None
         self._n_samples_ = None
         self._metric = None
@@ -156,8 +158,9 @@ class BaseForestHT(MetaEstimatorMixin):
         self.n_features_in_ = None
         self._is_fitted = False
         self._seeds = None
+        self._y = None
 
-    def _get_estimators_indices(self, sample_separate=False):
+    def _get_estimators_indices(self, stratifier=None, sample_separate=False):
         indices = np.arange(self._n_samples_, dtype=int)
 
         # Get drawn indices along both sample and feature axes
@@ -187,7 +190,11 @@ class BaseForestHT(MetaEstimatorMixin):
                 # Operations accessing random_state must be performed identically
                 # to those in `_parallel_build_trees()`
                 indices_train, indices_test = train_test_split(
-                    indices, test_size=self.test_size, shuffle=True, random_state=seed
+                    indices,
+                    test_size=self.test_size,
+                    shuffle=True,
+                    stratify=stratifier,
+                    random_state=seed,
                 )
 
                 yield indices_train, indices_test
@@ -198,12 +205,13 @@ class BaseForestHT(MetaEstimatorMixin):
                 else:
                     self._seeds = self.estimator_.random_state
 
-            # TODO: make random_state consistent
             indices_train, indices_test = train_test_split(
                 indices,
                 test_size=self.test_size,
+                stratify=stratifier,
                 random_state=self._seeds,
             )
+
             for _ in self.estimator_.estimators_:
                 yield indices_train, indices_test
 
@@ -223,9 +231,12 @@ class BaseForestHT(MetaEstimatorMixin):
         if self._n_samples_ is None:
             raise RuntimeError("The estimator must be fitted before accessing this attribute.")
 
+        # Stratifier uses a cached _y attribute if available
+        stratifier = self._y if is_classifier(self.estimator_) and self.stratify else None
+
         return [
             (indices_train, indices_test)
-            for indices_train, indices_test in self._get_estimators_indices()
+            for indices_train, indices_test in self._get_estimators_indices(stratifier=stratifier)
         ]
 
     def _statistic(
@@ -325,6 +336,8 @@ class BaseForestHT(MetaEstimatorMixin):
 
         if self._n_samples_ is None:
             self._n_samples_, self.n_features_in_ = X.shape
+
+        # Infer type of target y
         if self._type_of_target_ is None:
             self._type_of_target_ = type_of_target(y)
 
@@ -335,9 +348,9 @@ class BaseForestHT(MetaEstimatorMixin):
             self.permuted_estimator_ = self._get_estimator()
             estimator = self.permuted_estimator_
 
-        # Infer type of target y
-        if not hasattr(self, "_type_of_target"):
-            self._type_of_target_ = type_of_target(y)
+        # Store a cache of the y variable
+        if is_classifier(self._get_estimator()):
+            self._y = y.copy()
 
         # XXX: this can be improved as an extra fit can be avoided, by just doing error-checking
         # and then setting the internal meta data structures
@@ -458,10 +471,10 @@ class BaseForestHT(MetaEstimatorMixin):
             observe_posteriors = self.observe_posteriors_
             observe_stat = self.observe_stat_
 
-        # next permute the data
         if covariate_index is None:
             covariate_index = np.arange(X.shape[1], dtype=int)
 
+        # next permute the data
         permute_stat, permute_posteriors, permute_samples = self.statistic(
             X,
             y,
@@ -629,7 +642,7 @@ class FeatureImportanceForestRegressor(BaseForestHT):
             test_size=test_size,
             permute_per_tree=permute_per_tree,
             sample_dataset_per_tree=sample_dataset_per_tree,
-            permute_forest_fraction=permute_forest_fraction
+            permute_forest_fraction=permute_forest_fraction,
         )
 
     def _get_estimator(self):
@@ -745,7 +758,7 @@ class FeatureImportanceForestRegressor(BaseForestHT):
                     max_samples=estimator.max_samples,
                     random_state=random_states[idx],
                 )
-                for idx, (indices_train, _) in enumerate(self._get_estimators_indices())
+                for idx, (indices_train, _) in enumerate(self.train_test_samples_)
             )
             estimator.estimators_ = trees
         else:
@@ -856,6 +869,9 @@ class FeatureImportanceForestClassifier(BaseForestHT):
     sample_dataset_per_tree : bool, default=False
         Whether to sample the dataset per tree or per forest.
 
+    stratify : bool, default=True
+        Whether to stratify the samples by class labels.
+
     Attributes
     ----------
     estimator_ : BaseForest
@@ -908,6 +924,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
         test_size=0.2,
         permute_per_tree=False,
         sample_dataset_per_tree=False,
+        stratify=True,
         permute_forest_fraction=None,
     ):
         super().__init__(
@@ -917,7 +934,8 @@ class FeatureImportanceForestClassifier(BaseForestHT):
             test_size=test_size,
             permute_per_tree=permute_per_tree,
             sample_dataset_per_tree=sample_dataset_per_tree,
-            permute_forest_fraction=permute_forest_fraction
+            stratify=stratify,
+            permute_forest_fraction=permute_forest_fraction,
         )
 
     def _get_estimator(self):
@@ -1000,7 +1018,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
                     max_samples=estimator.max_samples,
                     random_state=random_states[idx],
                 )
-                for idx, (indices_train, _) in enumerate(self._get_estimators_indices())
+                for idx, (indices_train, _) in enumerate(self.train_test_samples_)
             )
             estimator.estimators_ = trees
         else:

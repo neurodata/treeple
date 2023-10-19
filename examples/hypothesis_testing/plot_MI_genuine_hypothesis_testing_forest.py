@@ -1,7 +1,7 @@
 """
-===========================================================
-Mutual Information for Gigantic Hypothesis Testing (MIGHT)
-===========================================================
+=========================================================
+Mutual Information for Genuine Hypothesis Testing (MIGHT)
+=========================================================
 
 An example using :class:`~sktree.stats.FeatureImportanceForestClassifier` for nonparametric
 multivariate hypothesis test, on simulated datasets. Here, we present a simulation
@@ -49,8 +49,8 @@ rng = np.random.default_rng(seed)
 # We simulate the two feature sets, and the target variable. We then combine them
 # into a single dataset to perform hypothesis testing.
 
-n_samples = 1000
-n_features_set = 500
+n_samples = 2000
+n_features_set = 20
 mean = 1.0
 sigma = 2.0
 beta = 5.0
@@ -91,7 +91,7 @@ y = rng.binomial(n=1, p=expit(beta * X_important[:, :10].sum(axis=1)), size=n_sa
 # computed as the proportion of samples in the null distribution that are less than the
 # observed test statistic.
 
-n_estimators = 200
+n_estimators = 100
 max_features = "sqrt"
 test_size = 0.2
 n_repeats = 1000
@@ -103,7 +103,7 @@ est = FeatureImportanceForestClassifier(
         max_features=max_features,
         tree_estimator=DecisionTreeClassifier(),
         random_state=seed,
-        honest_fraction=0.7,
+        honest_fraction=0.25,
         n_jobs=n_jobs,
     ),
     random_state=seed,

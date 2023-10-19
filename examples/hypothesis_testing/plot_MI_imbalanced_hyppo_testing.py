@@ -1,7 +1,7 @@
 """
-===============================================================================
-Mutual Information for Gigantic Hypothesis Testing (MIGHT) with Imbalanced Data
-===============================================================================
+==============================================================================
+Mutual Information for Genuine Hypothesis Testing (MIGHT) with Imbalanced Data
+==============================================================================
 
 Here, we demonstrate how to do hypothesis testing on highly imbalanced data
 in terms of their feature-set dimensionalities.
@@ -17,7 +17,7 @@ forest, with knowledge of the multi-view structure of the ``X`` data.
 
 For other examples of hypothesis testing, see the following:
 
-- :ref:`sphx_glr_auto_examples_hypothesis_testing_plot_MI_gigantic_hypothesis_testing_forest.py`
+- :ref:`sphx_glr_auto_examples_hypothesis_testing_plot_MI_genuine_hypothesis_testing_forest.py`
 - :ref:`sphx_glr_auto_examples_hypothesis_testing_plot_might_auc.py`
 
 For more information on the multi-view decision-tree, see
