@@ -122,7 +122,7 @@ class BaseForestHT(MetaEstimatorMixin):
         test_size=0.2,
         permute_per_tree=True,
         sample_dataset_per_tree=True,
-        stratify=True,
+        stratify=False,
     ):
         self.estimator = estimator
         self.random_state = random_state
@@ -645,7 +645,6 @@ class FeatureImportanceForestRegressor(BaseForestHT):
             test_size=test_size,
             permute_per_tree=permute_per_tree,
             sample_dataset_per_tree=sample_dataset_per_tree,
-            stratify=False,
         )
 
     def _get_estimator(self):
@@ -836,6 +835,9 @@ class FeatureImportanceForestClassifier(BaseForestHT):
 
     sample_dataset_per_tree : bool, default=False
         Whether to sample the dataset per tree or per forest.
+
+    stratify : bool, default=True
+        Whether to stratify the samples by class labels.
 
     Attributes
     ----------
