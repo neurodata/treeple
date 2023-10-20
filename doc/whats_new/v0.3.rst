@@ -25,4 +25,4 @@ the project since version inception, including:
 
 * `Adam Li`_
 * `Sambit Panda`_
-* `Yuxin Bai`_
+
