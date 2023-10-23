@@ -5,6 +5,9 @@ Quantile prediction intervals with Random Forest Regressor
 
 An example of how to generate quantile prediction intervals with
 Random Forest Regressor class on the California Housing dataset.
+The plot compares the conditional median with the quantile prediction intervals, i.e. prediction at
+quantile parameter being 0.025, 0.5 and 0.975. This allows us to generate predictions at 95%
+intervals with upper and lower bounds.
 
 """
 
@@ -17,6 +20,20 @@ from sklearn import datasets
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import KFold
 from sklearn.utils.validation import check_random_state
+
+# %%
+# Quantile Prediction Function
+# ----------------------------
+#
+# The following function is used to generate quantile predictions using the samples
+# that fall into the same leaf node. We collect the corresponding values for each sample and
+# use those as the bases for making quantile predictions.
+# The function takes the following arguments:
+# 1. estimator :class:`~sklearn.ensemble.RandomForestRegressor` estimator or any other variations.
+# 2. X_train : training data to be used to train the tree.
+# 3. X_test : testing data to be used to predict the quantiles.
+# 4. y_train : training labels to be used to train the tree and to make quantile predictions.
+# 5. quantiles : list of quantiles to be predicted.
 
 
 # function to calculate the quantile predictions
@@ -59,7 +76,9 @@ rng = check_random_state(0)
 
 dollar_formatter = FuncFormatter(lambda x, p: "$" + format(int(x), ","))
 
+# %%
 # Load the California Housing Prices dataset.
+
 california = datasets.fetch_california_housing()
 n_samples = min(california.target.size, 1000)
 perm = rng.permutation(n_samples)
@@ -99,6 +118,16 @@ y_true *= 1e5
 y_pred *= 1e5
 y_pred_lower *= 1e5
 y_pred_upper *= 1e5
+
+# %%
+# Plot the results
+# ----------------
+# Plot the conditional median and prediction intervals.
+# The left plot shows the predicted  (conditional median) with the confidence intervals at 95%
+# against the training data. The upper and lower bounds are indicated with the blue lines segments.
+# The right plot shows showed the same prediction sorted by the predicted value and centered at the
+# halfway point between the upper and lower bounds. This allows us to see the distribution of the
+# confidence intervals, which increases as the variance of the predicted value increases.
 
 fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(10, 4))
 

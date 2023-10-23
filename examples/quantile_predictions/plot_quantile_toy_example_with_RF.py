@@ -17,6 +17,9 @@ import numpy as np
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 
+# %%
+# Generate the data
+
 
 def make_toy_dataset(n_samples, seed=0):
     rng = np.random.RandomState(seed)
@@ -37,6 +40,11 @@ X, y = make_toy_dataset(n_samples)
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
 
 xx = np.atleast_2d(np.linspace(0, 10, n_samples)).T
+
+
+# %%
+# Fit the model to the training samples
+# -------------------------------------
 
 rf = RandomForestRegressor(max_depth=3, random_state=0)
 rf.fit(X_train, y_train)
@@ -71,6 +79,14 @@ for sample in range(leaf_ids_test.shape[0]):
 y_pred_low = [np.quantile(y_pred_quatile[i], 0.025) for i in range(len(y_pred_quatile))]
 y_pred_med = [np.quantile(y_pred_quatile[i], 0.5) for i in range(len(y_pred_quatile))]
 y_pred_upp = [np.quantile(y_pred_quatile[i], 0.975) for i in range(len(y_pred_quatile))]
+
+# %%
+# Plot the results
+# ----------------
+# Plot the conditional median and prediction intervals.
+# The blue line is the predicted median and the shaded area indicates the 95% confidence interval
+# of the prediction. The dots are the training data and the black line indicates the function that
+# is used to generated those samples.
 
 plt.plot(X_test, y_test, ".", c="#f2a619", label="Test Observations", ms=5)
 plt.plot(xx, (xx * np.sin(xx)), c="black", label="$f(x) = x\,\sin(x)$", lw=2)

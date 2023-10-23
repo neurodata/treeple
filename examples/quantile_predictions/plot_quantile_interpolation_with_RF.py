@@ -14,9 +14,27 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
 
-# Create toy dataset.
+# %%
+# Generate the data
+# -----------------
+# We use four simple data points to illustrate the difference between the intervals that are
+# generated using different interpolation methods.
+
 X = np.array([[-1, -1], [-1, -1], [-1, -1], [1, 1], [1, 1]])
 y = np.array([-2, -1, 0, 1, 2])
+
+# %%
+# The interpolation methods
+# -------------------------
+# The following interpolation methods demonstrated here are:
+# To interpolate between the data points, i and j (i<=j),
+# 1. linear: i + (j - i)*fraction, where fraction is the fractional part of
+# the index surrounded by i and j.
+# 2. lower:  i
+# 3. higher: j
+# 4. midpoint: (i + j)/2.
+# 5. nearest: i or j whichever is nearest.
+# The difference between the methods can be illustrated with the following example:
 
 interpolations = ["linear", "lower", "higher", "midpoint", "nearest"]
 colors = ["#006aff", "#ffd237", "#0d4599", "#f2a619", "#a6e5ff"]
