@@ -1064,17 +1064,17 @@ class FeatureImportanceForestClassifier(BaseForestHT):
                 delayed(_parallel_predict_proba)(
                     estimator.estimators_[idx].predict_proba, X, indices_test
                 )
-                for idx, (_, indices_test) in enumerate(self._get_estimators_indices())
+                for idx, (_, indices_test) in enumerate(self._get_estimators_indices(y))
             )
         else:
             all_proba = Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose)(
                 delayed(_parallel_predict_proba)(
                     estimator.estimators_[idx].predict, X, indices_test
                 )
-                for idx, (_, indices_test) in enumerate(self._get_estimators_indices())
+                for idx, (_, indices_test) in enumerate(self._get_estimators_indices(y))
             )
         for itree, (proba, est_indices) in enumerate(
-            zip(all_proba, self._get_estimators_indices())
+            zip(all_proba, self._get_estimators_indices(y))
         ):
             _, indices_test = est_indices
 
