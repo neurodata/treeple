@@ -328,14 +328,8 @@ def test_pickle(tmpdir):
 
 @pytest.mark.parametrize(
     "permute_forest_fraction",
-    [
-        None,
-        #  0.5
-    ],
-    ids=[
-        "no_permute"
-        #  "permute_forest_fraction",
-    ],
+    [None, 0.5],
+    ids=["no_permute", "permute_forest_fraction"],
 )
 @pytest.mark.parametrize(
     "sample_dataset_per_tree", [True, False], ids=["sample_dataset_per_tree", "no_sample_dataset"]
@@ -363,11 +357,12 @@ def test_sample_size_consistency_of_estimator_indices_(
     _, posteriors, samples = clf.statistic(
         X, y, covariate_index=None, return_posteriors=True, metric="mi"
     )
-    print(clf._seeds)
-    if sample_dataset_per_tree:
+
+    if sample_dataset_per_tree or permute_forest_fraction is not None:
         # check the non-nans
         non_nan_idx = _non_nan_samples(posteriors)
-        assert clf.n_samples_test_ == n_samples, f"{clf.n_samples_test_} != {n_samples}"
+        if sample_dataset_per_tree:
+            assert clf.n_samples_test_ == n_samples, f"{clf.n_samples_test_} != {n_samples}"
 
         sorted_sample_idx = sorted(np.unique(samples))
         sorted_est_samples_idx = sorted(
