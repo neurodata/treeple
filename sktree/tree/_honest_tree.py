@@ -528,6 +528,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
 
         nonzero_indices = np.where(_sample_weight > 0)[0]
 
+        # TODO: perhaps we want to stratify this split
         self.structure_indices_ = rng.choice(
             nonzero_indices,
             int((1 - self.honest_fraction) * len(nonzero_indices)),
