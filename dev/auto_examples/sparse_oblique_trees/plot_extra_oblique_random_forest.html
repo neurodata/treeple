@@ -411,11 +411,18 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../outlier_detection/plot_extended_isolation_forest.html">ExtendedIsolationForest example</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../sklearn_vs_sktree/index.html">Comparing sklearn and sktree decision trees</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../quantile_predictions/index.html">Quantile Predictions with Random Forest</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../quantile_predictions/plot_quantile_interpolation_with_RF.html">Predicting with different quantile interpolation methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quantile_predictions/plot_quantile_regression_intervals_with_RF.html">Quantile prediction intervals with Random Forest Regressor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quantile_predictions/plot_quantile_toy_example_with_RF.html">Quantile prediction with Random Forest Regressor class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quantile_predictions/plot_quantile_vs_standard_oblique_forest.html">Quantile regression vs. standard and oblique regression forest</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../sklearn_vs_sktree/index.html">Comparing sklearn and sktree decision trees</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../sklearn_vs_sktree/plot_iris_dtc.html">Plot the decision surface of decision trees trained on the iris dataset</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Sparse oblique projections with oblique decision-trees</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Sparse oblique projections with oblique decision-trees</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Compare extra oblique forest and oblique random forest predictions on cc18 datasets</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_oblique_forests_iris.html">Compare the decision surfaces of oblique extra-trees with standard oblique trees</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_oblique_random_forest.html">Plot oblique forest and axis-aligned random forest predictions on cc18 datasets</a></li>
@@ -423,7 +430,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="plot_extra_orf_sample_size.html">Speed of Extra Oblique Random Forest vs Oblique Random Forest on different dataset sizes</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../splitters/index.html">Decision-tree splitters</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../splitters/index.html">Decision-tree splitters</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../splitters/plot_multiview_axis_aligned_splitter.html">Demonstrate and visualize a multi-view projection matrix for an axis-aligned tree</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../splitters/plot_projection_matrices.html">Plot the projection matrices of an oblique tree for sampling images, or time-series</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../splitters/plot_sparse_projection_matrix.html">Plot the sparse projection matrices of an oblique tree</a></li>
@@ -593,16 +600,16 @@ n_repeats        1
 n_jobs          -1
                                     time_taken
 dataset          dimension   model
-PhishingWebsites (2000, 30)  EORF     1.097538
-                             ORF      1.074083
-cnae-9           (864, 856)  EORF     1.182199
-                             ORF      1.211657
-har              (2000, 561) EORF     1.140605
-                             ORF      1.923878
-lsvt             (100, 310)  EORF     0.912563
-                             ORF      0.940730
-wdbc             (455, 30)   EORF     0.927035
-                             ORF      0.933781
+PhishingWebsites (2000, 30)  EORF     1.372485
+                             ORF      1.325058
+cnae-9           (864, 856)  EORF     1.312429
+                             ORF      1.275248
+har              (2000, 561) EORF     1.353095
+                             ORF      2.144297
+lsvt             (100, 310)  EORF     1.092102
+                             ORF      1.204551
+wdbc             (455, 30)   EORF     1.007590
+                             ORF      1.024712
 </pre></div>
 </div>
 <div class="line-block">
@@ -735,8 +742,8 @@ wdbc             (455, 30)   EORF     0.927035
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 31.774 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  140 MB</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 37.015 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  88 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-sparse-oblique-trees-plot-extra-oblique-random-forest-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/85ca306af8c9c82712ad771553d9bddb/plot_extra_oblique_random_forest.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_extra_oblique_random_forest.py</span></code></a></p>
@@ -821,7 +828,7 @@ wdbc             (455, 30)   EORF     0.927035
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-10-19.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-10-24.
       <br/>
     
   </p>

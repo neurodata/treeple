@@ -56,7 +56,7 @@
         </script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Comparing sklearn and sktree decision trees" href="../sklearn_vs_sktree/index.html" />
+    <link rel="next" title="Quantile Predictions with Random Forest" href="../quantile_predictions/index.html" />
     <link rel="prev" title="Outlier-detection" href="index.html" />
     <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
     <script type="text/javascript" src="../../_static/copybutton.js"></script>
@@ -411,11 +411,18 @@ document.write(`
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">ExtendedIsolationForest example</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../sklearn_vs_sktree/index.html">Comparing sklearn and sktree decision trees</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../quantile_predictions/index.html">Quantile Predictions with Random Forest</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../quantile_predictions/plot_quantile_interpolation_with_RF.html">Predicting with different quantile interpolation methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quantile_predictions/plot_quantile_regression_intervals_with_RF.html">Quantile prediction intervals with Random Forest Regressor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quantile_predictions/plot_quantile_toy_example_with_RF.html">Quantile prediction with Random Forest Regressor class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quantile_predictions/plot_quantile_vs_standard_oblique_forest.html">Quantile regression vs. standard and oblique regression forest</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../sklearn_vs_sktree/index.html">Comparing sklearn and sktree decision trees</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../sklearn_vs_sktree/plot_iris_dtc.html">Plot the decision surface of decision trees trained on the iris dataset</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../sparse_oblique_trees/index.html">Sparse oblique projections with oblique decision-trees</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../sparse_oblique_trees/index.html">Sparse oblique projections with oblique decision-trees</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../sparse_oblique_trees/plot_extra_oblique_random_forest.html">Compare extra oblique forest and oblique random forest predictions on cc18 datasets</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../sparse_oblique_trees/plot_oblique_forests_iris.html">Compare the decision surfaces of oblique extra-trees with standard oblique trees</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../sparse_oblique_trees/plot_oblique_random_forest.html">Plot oblique forest and axis-aligned random forest predictions on cc18 datasets</a></li>
@@ -423,7 +430,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../sparse_oblique_trees/plot_extra_orf_sample_size.html">Speed of Extra Oblique Random Forest vs Oblique Random Forest on different dataset sizes</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../splitters/index.html">Decision-tree splitters</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../splitters/index.html">Decision-tree splitters</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../splitters/plot_multiview_axis_aligned_splitter.html">Demonstrate and visualize a multi-view projection matrix for an axis-aligned tree</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../splitters/plot_projection_matrices.html">Plot the projection matrices of an oblique tree for sampling images, or time-series</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../splitters/plot_sparse_projection_matrix.html">Plot the sparse projection matrices of an oblique tree</a></li>
@@ -719,8 +726,8 @@ is located at the bottom right corner of the plot.</p>
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
-<li><img src="../../_images/sphx_glr_plot_extended_isolation_forest_009.png" srcset="../../_images/sphx_glr_plot_extended_isolation_forest_009.png" alt="IsoForest Nominal: Mean=1.104, Var=0.009 Anomaly: Mean=0.776, Var=0.053" class = "sphx-glr-multi-img"/></li>
-<li><img src="../../_images/sphx_glr_plot_extended_isolation_forest_010.png" srcset="../../_images/sphx_glr_plot_extended_isolation_forest_010.png" alt="ExtendedIsoForest Nominal: Mean=1.069, Var=0.018 Anomaly: Mean=0.87, Var=0.054" class = "sphx-glr-multi-img"/></li>
+<li><img src="../../_images/sphx_glr_plot_extended_isolation_forest_009.png" srcset="../../_images/sphx_glr_plot_extended_isolation_forest_009.png" alt="IsoForest Nominal: Mean=1.114, Var=0.007 Anomaly: Mean=0.794, Var=0.056" class = "sphx-glr-multi-img"/></li>
+<li><img src="../../_images/sphx_glr_plot_extended_isolation_forest_010.png" srcset="../../_images/sphx_glr_plot_extended_isolation_forest_010.png" alt="ExtendedIsoForest Nominal: Mean=1.076, Var=0.017 Anomaly: Mean=0.838, Var=0.051" class = "sphx-glr-multi-img"/></li>
 </ul>
 </section>
 <section id="references">
@@ -733,8 +740,8 @@ is located at the bottom right corner of the plot.</p>
 </aside>
 </aside>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 7.215 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  34 MB</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 8.373 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  30 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-outlier-detection-plot-extended-isolation-forest-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/350036b41dece1cef3eba8f9e25af2d9/plot_extended_isolation_forest.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_extended_isolation_forest.py</span></code></a></p>
@@ -767,11 +774,11 @@ is located at the bottom right corner of the plot.</p>
       </div>
     </a>
     <a class="right-next"
-       href="../sklearn_vs_sktree/index.html"
+       href="../quantile_predictions/index.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Comparing sklearn and sktree decision trees</p>
+        <p class="prev-next-title">Quantile Predictions with Random Forest</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -823,7 +830,7 @@ is located at the bottom right corner of the plot.</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-10-19.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-10-24.
       <br/>
     
   </p>
