@@ -47,7 +47,7 @@ y_pred_orf = regr_orf.predict(X_test)
 # The idea is for each prediction, the training samples that fell into the same leaf nodes
 # are collected then used to generate the quantile statistics for the desired prediction.
 
-# Fit the model to the training samples
+# Get the leaf-nodes the training samples fall into
 leaf_ids = regr_orf.apply(X_train)
 # create a list of dictionary that maps node to samples that fell into it
 # for each tree
