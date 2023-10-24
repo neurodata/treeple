@@ -177,13 +177,13 @@ class BaseForestHT(MetaEstimatorMixin):
                         self._seeds.append(tree.random_state)
             seeds = self._seeds
 
-            if sample_separate:
-                if self._perm_seeds is None:
-                    new_rng = np.random.default_rng(np.random.randint(0, 1e6))
-                    self._perm_seeds = new_rng.integers(
-                        low=0, high=np.iinfo(np.int32).max, size=len(self.estimator_.estimators_)
-                    )
-                seeds = self._perm_seeds
+            # if sample_separate:
+            #     if self._perm_seeds is None:
+            #         new_rng = np.random.default_rng(np.random.randint(0, 1e6))
+            #         self._perm_seeds = new_rng.integers(
+            #             low=0, high=np.iinfo(np.int32).max, size=len(self.estimator_.estimators_)
+            #         )
+            #     seeds = self._perm_seeds
             for idx, tree in enumerate(self.estimator_.estimators_):
                 seed = seeds[idx]
 
@@ -207,6 +207,7 @@ class BaseForestHT(MetaEstimatorMixin):
 
             indices_train, indices_test = train_test_split(
                 indices,
+                shuffle=True,
                 test_size=self.test_size,
                 stratify=stratifier,
                 random_state=self._seeds,
@@ -796,10 +797,10 @@ class FeatureImportanceForestRegressor(BaseForestHT):
         # accumulate the predictions across all trees
         all_proba = Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose)(
             delayed(_parallel_predict_proba)(estimator.estimators_[idx].predict, X, indices_test)
-            for idx, (_, indices_test) in enumerate(self._get_estimators_indices())
+            for idx, (_, indices_test) in enumerate(self.train_test_samples_)
         )
         for itree, (proba, est_indices) in enumerate(
-            zip(all_proba, self._get_estimators_indices())
+            zip(all_proba, self.train_test_samples_)
         ):
             _, indices_test = est_indices
             posterior_arr[itree, indices_test, ...] = proba.reshape(-1, estimator.n_outputs_)
@@ -1064,17 +1065,17 @@ class FeatureImportanceForestClassifier(BaseForestHT):
                 delayed(_parallel_predict_proba)(
                     estimator.estimators_[idx].predict_proba, X, indices_test
                 )
-                for idx, (_, indices_test) in enumerate(self._get_estimators_indices(y))
+                for idx, (_, indices_test) in enumerate(self.train_test_samples_)
             )
         else:
             all_proba = Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose)(
                 delayed(_parallel_predict_proba)(
                     estimator.estimators_[idx].predict, X, indices_test
                 )
-                for idx, (_, indices_test) in enumerate(self._get_estimators_indices(y))
+                for idx, (_, indices_test) in enumerate(self.train_test_samples_)
             )
         for itree, (proba, est_indices) in enumerate(
-            zip(all_proba, self._get_estimators_indices(y))
+            zip(all_proba, self.train_test_samples_)
         ):
             _, indices_test = est_indices
 
