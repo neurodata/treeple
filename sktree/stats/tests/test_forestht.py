@@ -512,3 +512,57 @@ def test_small_dataset_dependent(seed):
 
     stat, pvalue = clf.test(X, y, metric="mi")
     assert pvalue <= 0.05
+
+
+@flaky(max_runs=3)
+def test_no_traintest_split():
+    n_samples = 500
+    n_features = 5
+    rng = np.random.default_rng(seed)
+
+    X = rng.uniform(size=(n_samples, n_features))
+    X = rng.uniform(size=(n_samples // 2, n_features))
+    X2 = X * 2
+    X = np.vstack([X, X2])
+    y = np.vstack(
+        [np.zeros((n_samples // 2, 1)), np.ones((n_samples // 2, 1))]
+    )  # Binary classification
+
+    clf = FeatureImportanceForestClassifier(
+        estimator=HonestForestClassifier(
+            n_estimators=50,
+            max_features=n_features,
+            random_state=seed,
+            n_jobs=1,
+            honest_fraction=0.5,
+        ),
+        test_size=0.2,
+        train_test_split=False,
+        permute_forest_fraction=None,
+        sample_dataset_per_tree=False,
+    )
+    stat, pvalue = clf.test(X, y, covariate_index=[1, 2], metric="mi")
+
+    # since no train-test split, the training is all the data and the testing is none of the data
+    assert_array_equal(clf.train_test_samples_[0][0], np.arange(n_samples))
+    assert_array_equal(clf.train_test_samples_[0][1], np.array([]))
+
+    assert ~np.isnan(pvalue)
+    assert ~np.isnan(stat)
+    assert pvalue <= 0.05, f"{pvalue}"
+
+    stat, pvalue = clf.test(X, y, metric="mi")
+    assert pvalue <= 0.05, f"{pvalue}"
+
+    X = rng.uniform(size=(n_samples, n_features))
+    y = rng.integers(0, 2, size=n_samples)  # Binary classification
+    clf.reset()
+
+    stat, pvalue = clf.test(X, y, metric="mi")
+    assert_almost_equal(stat, 0.0, decimal=1)
+    assert pvalue > 0.05, f"{pvalue}"
+
+    stat, pvalue = clf.test(X, y, covariate_index=[1, 2], metric="mi")
+    assert ~np.isnan(pvalue)
+    assert ~np.isnan(stat)
+    assert pvalue > 0.05, f"{pvalue}"

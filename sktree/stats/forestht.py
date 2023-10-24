@@ -10,7 +10,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.utils.multiclass import type_of_target
 from sklearn.utils.validation import _is_fitted, check_X_y
 
-from sktree import HonestForestClassifier
 from sktree._lib.sklearn.ensemble._forest import (
     ForestClassifier,
     ForestRegressor,
@@ -19,6 +18,7 @@ from sktree._lib.sklearn.ensemble._forest import (
     _get_n_samples_bootstrap,
     _parallel_build_trees,
 )
+from sktree.ensemble._honest_forest import HonestForestClassifier
 from sktree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sktree.tree._classes import DTYPE
 
@@ -253,9 +253,12 @@ class BaseForestHT(MetaEstimatorMixin):
         if self._n_samples_ is None:
             raise RuntimeError("The estimator must be fitted before accessing this attribute.")
 
-        # we are not train/test splitting, then 
+        # we are not train/test splitting, then
         if not self.train_test_split:
-            return [(np.arange(self._n_samples_, dtype=int), np.array([], dtype=int)) for _ in range(len(self.estimator_.estimators_))]
+            return [
+                (np.arange(self._n_samples_, dtype=int), np.array([], dtype=int))
+                for _ in range(len(self.estimator_.estimators_))
+            ]
 
         # Stratifier uses a cached _y attribute if available
         stratifier = self._y if is_classifier(self.estimator_) and self.stratify else None
@@ -310,9 +313,11 @@ class BaseForestHT(MetaEstimatorMixin):
                 f"y must have type {self._type_of_target_}, got {type_of_target(y)}. "
                 f"If running on a new dataset, call the 'reset' method."
             )
-        
+
         if not self.train_test_split and not isinstance(self.estimator, HonestForestClassifier):
-            raise RuntimeError(f'Train test split must occur if not using honest forest classifier.')
+            raise RuntimeError(
+                "Train test split must occur if not using honest forest classifier."
+            )
 
         return X, y, covariate_index
 
@@ -807,21 +812,24 @@ class FeatureImportanceForestRegressor(BaseForestHT):
         if self.train_test_split:
             # accumulate the predictions across all trees
             all_proba = Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose)(
-                delayed(_parallel_predict_proba)(estimator.estimators_[idx].predict, X, indices_test)
+                delayed(_parallel_predict_proba)(
+                    estimator.estimators_[idx].predict, X, indices_test
+                )
                 for idx, (_, indices_test) in enumerate(self.train_test_samples_)
             )
             for itree, (proba, est_indices) in enumerate(zip(all_proba, self.train_test_samples_)):
                 _, indices_test = est_indices
                 posterior_arr[itree, indices_test, ...] = proba.reshape(-1, estimator.n_outputs_)
         else:
+            all_indices = np.arange(self._n_samples_, dtype=int)
+
             # accumulate the predictions across all trees
             all_proba = Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose)(
-                delayed(_parallel_predict_proba)(estimator.estimators_[idx].predict, X, indices_test)
-                for idx, honest_tree in enumerate(estimator.estimators_)
+                delayed(_parallel_predict_proba)(estimator.estimators_[idx].predict, X, all_indices)
+                for idx in range(len(estimator.estimators_))
             )
-            for itree, (proba, est_indices) in enumerate(zip(all_proba, self.train_test_samples_)):
-                _, indices_test = est_indices
-                posterior_arr[itree, indices_test, ...] = proba.reshape(-1, estimator.n_outputs_)
+            for itree, proba in enumerate(all_proba):
+                posterior_arr[itree, ...] = proba.reshape(-1, estimator.n_outputs_)
 
         # determine if there are any nans in the final posterior array, when
         # averaged over the trees
@@ -1050,29 +1058,37 @@ class FeatureImportanceForestClassifier(BaseForestHT):
                 y_train = y_train.ravel()
             estimator.fit(X_train, y_train)
 
-            # construct posterior array for all trees (n_trees, n_samples_test, n_outputs)
-            # for itree, tree in enumerate(estimator.estimators_):
-            #     if predict_posteriors:
-            #         # XXX: currently assumes n_outputs_ == 1
-            #         posterior_arr[itree, indices_test, ...] = tree.predict_proba(X_test).reshape(
-            #             -1, tree.n_classes_
-            #         )
-            #     else:
-            #         posterior_arr[itree, indices_test, ...] = tree.predict(X_test).reshape(
-            #             -1, tree.n_outputs_
-            #         )
-
             # set variables to compute metric
             samples = indices_test
 
         # list of tree outputs. Each tree output is (n_samples, n_outputs), or (n_samples,)
         if predict_posteriors:
-            all_proba = Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose)(
-                delayed(_parallel_predict_proba)(
-                    estimator.estimators_[idx].predict_proba, X, indices_test
+            # all_proba = Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose)(
+            #     delayed(_parallel_predict_proba)(
+            #         estimator.estimators_[idx].predict_proba, X, indices_test
+            #     )
+            #     for idx, (_, indices_test) in enumerate(self.train_test_samples_)
+            # )
+
+            # TODO: probably a more elegant way of doing this
+            if self.train_test_split:
+                # accumulate the predictions across all trees
+                all_proba = Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose)(
+                    delayed(_parallel_predict_proba)(
+                        estimator.estimators_[idx].predict_proba, X, indices_test
+                    )
+                    for idx, (_, indices_test) in enumerate(self.train_test_samples_)
                 )
-                for idx, (_, indices_test) in enumerate(self.train_test_samples_)
-            )
+            else:
+                all_indices = np.arange(self._n_samples_, dtype=int)
+
+                # accumulate the predictions across all trees
+                all_proba = Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose)(
+                    delayed(_parallel_predict_proba)(
+                        estimator.estimators_[idx].predict_proba, X, all_indices
+                    )
+                    for idx in range(len(estimator.estimators_))
+                )
         else:
             all_proba = Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose)(
                 delayed(_parallel_predict_proba)(
@@ -1084,7 +1100,12 @@ class FeatureImportanceForestClassifier(BaseForestHT):
             _, indices_test = est_indices
 
             if predict_posteriors:
-                posterior_arr[itree, indices_test, ...] = proba.reshape(-1, estimator.n_classes_)
+                if self.train_test_split:
+                    posterior_arr[itree, indices_test, ...] = proba.reshape(
+                        -1, estimator.n_classes_
+                    )
+                else:
+                    posterior_arr[itree, ...] = proba.reshape(-1, estimator.n_classes_)
             else:
                 posterior_arr[itree, indices_test, ...] = proba.reshape(-1, estimator.n_outputs_)
 
