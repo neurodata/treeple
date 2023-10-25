@@ -175,7 +175,7 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         next 20 features, then ``feature_set_ends = [10, 30]``. If ``None``,
         then this will assume that there is only one feature set.
 
-    apply_sampling_per_feature_set : bool, default=False
+    apply_max_features_per_feature_set : bool, default=False
         Whether to apply sampling per feature set, where ``max_features`` is applied
         to each feature-set. If ``False``, then sampling
         is applied over the entire feature space.
@@ -242,6 +242,8 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
             Interval(Real, 1.0, None, closed="left"),
             None,
         ],
+        "feature_set_ends": ["array-like", None],
+        "apply_max_features_per_feature_set": ["boolean"],
     }
 
     def __init__(
@@ -263,7 +265,7 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         store_leaf_values=False,
         monotonic_cst=None,
         feature_set_ends=None,
-        apply_sampling_per_feature_set=False,
+        apply_max_features_per_feature_set=False,
     ):
         super().__init__(
             criterion=criterion,
@@ -284,7 +286,7 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
 
         self.feature_combinations = feature_combinations
         self.feature_set_ends = feature_set_ends
-        self.apply_sampling_per_feature_set = apply_sampling_per_feature_set
+        self.apply_max_features_per_feature_set = apply_max_features_per_feature_set
 
     def _build_tree(
         self,
@@ -372,9 +374,10 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         else:
             SPLITTERS = DENSE_SPLITTERS
 
-        if self.apply_sampling_per_feature_set:
+        if self.apply_max_features_per_feature_set:
             # XXX: experimental
-            # we can replace max_features_ here based on whether or not uniform logic over feature sets
+            # we can replace max_features_ here based on whether or not uniform logic over
+            # feature sets
             max_features_per_set = []
             n_features_in_prev = 0
             for idx in range(self.n_feature_sets_):

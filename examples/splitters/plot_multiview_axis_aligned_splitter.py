@@ -40,6 +40,7 @@ random_state = np.random.RandomState(10)
 feature_set_ends = np.array([3, 5, 9], dtype=np.intp)
 n_feature_sets = len(feature_set_ends)
 
+max_features_per_set_ = None
 feature_combinations = 1
 monotonic_cst = None
 missing_value_feature_mask = None
@@ -70,6 +71,7 @@ splitter = MultiViewSplitterTester(
     feature_combinations,
     feature_set_ends,
     n_feature_sets,
+    max_features_per_set_,
 )
 splitter.init_test(X, y, sample_weight, missing_value_feature_mask)
 
@@ -116,9 +118,73 @@ colorbar.ax.set_yticklabels(["0", "1"])
 plt.show()
 
 # %%
+# Sampling split candidates scaled to each feature-set dimensionality
+# -------------------------------------------------------------------
+# In the previous setup, we do not specify the ``max_features_per_set`` parameter.
+# This results in the splitter sampling from all features uniformly. However, we can
+# also specify ``max_features_per_set`` to sample from each feature set with a different
+# scaling factor. For example, if we want to sample from the first feature set three times
+# more than the second feature set, we can specify ``max_features_per_set`` as follows:
+# ``max_features_per_set = [3, 1]``. This will sample from the first feature set three times
+# and the second feature set once.
+#
+# .. note:: In practice, this is controlled by the ``apply_max_features_per_feature_set`` parameter
+# in :class:`sktree.tree.MultiViewDecisionTreeClassifier`.
+
+max_features_per_set_ = np.array([1, 2, 3], dtype=int)
+max_features = np.sum(max_features_per_set_)
+
+splitter = MultiViewSplitterTester(
+    criterion,
+    max_features,
+    min_samples_leaf,
+    min_weight_leaf,
+    random_state,
+    monotonic_cst,
+    feature_combinations,
+    feature_set_ends,
+    n_feature_sets,
+    max_features_per_set_,
+)
+splitter.init_test(X, y, sample_weight, missing_value_feature_mask)
+
+# Here, we sampled 1 feature from the first feature set, 2 features from the second feature set
+# and 3 features from the third feature set.
+projection_matrix = splitter.sample_projection_matrix_py()
+print(projection_matrix)
+
+# Create a heatmap to visualize the indices
+fig, ax = plt.subplots(figsize=(6, 6))
+
+ax.imshow(
+    projection_matrix, cmap=cmap, aspect=feature_set_ends[-1] / max_features, interpolation="none"
+)
+ax.axvline(feature_set_ends[0] - 0.5, color="black", linewidth=1, label="Feature Sets")
+for iend in feature_set_ends[1:]:
+    ax.axvline(iend - 0.5, color="black", linewidth=1)
+
+ax.set(title="Sampled Projection Matrix", xlabel="Feature Index", ylabel="Projection Vector Index")
+ax.set_xticks(np.arange(feature_set_ends[-1]))
+ax.set_yticks(np.arange(max_features))
+ax.set_yticklabels(np.arange(max_features, dtype=int) + 1)
+ax.set_xticklabels(np.arange(feature_set_ends[-1], dtype=int) + 1)
+ax.legend()
+
+# Create a mappable object
+sm = ScalarMappable(cmap=cmap)
+sm.set_array([])  # You can set an empty array or values here
+
+# Create a color bar with labels for each feature set
+colorbar = fig.colorbar(sm, ax=ax, ticks=[0.25, 0.75], format="%d")
+colorbar.set_label("Projection Weight (I.e. Sampled Feature From a Feature Set)")
+colorbar.ax.set_yticklabels(["0", "1"])
+
+plt.show()
+
+# %%
 # Discussion
 # ----------
-# As we can see, the multi-view splitter samples split candidates uniformly across the feature sets.
+# As we can see, the multi-view splitter samples split candidates across the feature sets.
 # In contrast, the normal splitter in :class:`sklearn.tree.DecisionTreeClassifier` samples
 # randomly across all ``n_features`` features because it is not aware of the multi-view structure.
 # This is the key difference between the two splitters.

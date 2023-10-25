@@ -48,7 +48,7 @@ Building locally with Meson (For developers)
 Make sure you have the necessary packages installed
 
     # install build dependencies
-    pip install numpy scipy meson ninja meson-python Cython scikit-learn scikit-learn-tree
+    pip install numpy scipy meson ninja meson-python Cython scikit-learn
 
     # you may need these optional dependencies to build scikit-learn locally
     conda install -c conda-forge joblib threadpoolctl pytest compilers llvm-openmp

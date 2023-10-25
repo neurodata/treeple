@@ -755,10 +755,10 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
         # of candidates, but if one feature set is exhausted, then that one is no longer sampled
         cdef bint finished_feature_set = False
         cdef intp_t i, j
-        
-        if self.max_features_per_set is None:
-            proj_i = 0
 
+        proj_i = 0
+
+        if self.max_features_per_set is None:
             while proj_i < self.max_features and not finished_feature_set:
                 # sample from a feature set
                 for idx in range(self.n_feature_sets):
@@ -795,28 +795,34 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
         # 02: Algorithm samples a different number features from each set, but considers
         # each feature-set equally
         else:
-            proj_i = 0
-            for idx in range(self.n_feature_sets):
-                # get the max-features for this feature-set
-                max_features = self.max_features_per_set[idx]
+            while proj_i < self.max_features:
+                # sample from a feature set
+                for idx in range(self.n_feature_sets):
+                    # get the max-features for this feature-set
+                    max_features = self.max_features_per_set[idx]
 
-                grid_size = self.multi_indices_to_sample[idx].size()
-                # Note: a temporary variable must not be used, else a copy will be made
-                for i in range(0, self.multi_indices_to_sample[idx].size() - 1):
-                    j = rand_int(i + 1, grid_size, random_state)
-                    self.multi_indices_to_sample[idx][i], self.multi_indices_to_sample[idx][j] = \
-                        self.multi_indices_to_sample[idx][j], self.multi_indices_to_sample[idx][i]
+                    grid_size = self.multi_indices_to_sample[idx].size()
+                    # Note: a temporary variable must not be used, else a copy will be made
+                    for i in range(0, self.multi_indices_to_sample[idx].size() - 1):
+                        j = rand_int(i + 1, grid_size, random_state)
+                        self.multi_indices_to_sample[idx][i], self.multi_indices_to_sample[idx][j] = \
+                            self.multi_indices_to_sample[idx][j], self.multi_indices_to_sample[idx][i]
 
-                for ifeature in range(max_features):
-                    # sample random feature in this set
-                    feat_i = self.multi_indices_to_sample[idx][ifeature]
+                    for ifeature in range(max_features):
+                        # sample random feature in this set
+                        feat_i = self.multi_indices_to_sample[idx][ifeature]
 
-                    # here, axis-aligned splits are entirely weights of 1
-                    weight = 1  # if (rand_int(0, 2, random_state) == 1) else -1
+                        # here, axis-aligned splits are entirely weights of 1
+                        weight = 1  # if (rand_int(0, 2, random_state) == 1) else -1
 
-                    proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
-                    proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
+                        proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
+                        proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
 
+                        proj_i += 1
+                        if proj_i >= self.max_features:
+                            break
+                    if proj_i >= self.max_features:
+                        break
 
 # XXX: not used right now
 cdef class MultiViewObliqueSplitter(BestObliqueSplitter):

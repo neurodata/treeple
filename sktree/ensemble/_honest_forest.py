@@ -411,10 +411,12 @@ class HonestForestClassifier(ForestClassifier):
         X, y = check_X_y(X, y, multi_output=True)
         super().fit(X, y, sample_weight=sample_weight, classes=classes)
 
+        print('Called fit...')
         # Compute honest decision function
         self.honest_decision_function_ = self._predict_proba(
             X, indices=self.honest_indices_, impute_missing=np.nan
         )
+        print('CAlled honest decision function...')
         return self
 
     def predict_proba(self, X):
@@ -490,11 +492,6 @@ class HonestForestClassifier(ForestClassifier):
         """The indices used to fit the leaf nodes."""
         check_is_fitted(self)
         return [tree.honest_indices_ for tree in self.estimators_]
-
-    @property
-    def feature_importances_(self):
-        """The feature importances."""
-        return self.estimator_.feature_importances_
 
     def _more_tags(self):
         return {"multioutput": False}

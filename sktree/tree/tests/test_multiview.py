@@ -100,17 +100,12 @@ def test_multiview_errors():
     with pytest.raises(ValueError, match="The last feature set end must be equal"):
         clf.fit(X, y)
 
-
-def test_multiview_errors_with_max_features_per_feature_set():
-    """Test that an error is raised when max_features is greater than the number of features."""
-    X = np.random.random((10, 10))
-    y = np.random.randint(0, 2, size=10)
-
+    # Test that an error is raised when max_features is greater than the number of features.
     clf = MultiViewDecisionTreeClassifier(
         random_state=seed,
-        feature_set_ends=[6, 10],
+        feature_set_ends=[3, 5],
         max_features=6,
-        apply_sampling_per_feature_set=True,
+        apply_max_features_per_feature_set=True,
     )
     with pytest.raises(ValueError, match="the number of features in feature set"):
         clf.fit(X, y)
@@ -125,7 +120,7 @@ def test_multiview_separate_feature_set_sampling_sets_attributes():
         random_state=seed,
         feature_set_ends=[6, 10],
         max_features=0.5,
-        apply_sampling_per_feature_set=True,
+        apply_max_features_per_feature_set=True,
     )
     clf.fit(X, y)
 
@@ -138,7 +133,7 @@ def test_multiview_separate_feature_set_sampling_sets_attributes():
         random_state=seed,
         feature_set_ends=[9, 13],
         max_features="sqrt",
-        apply_sampling_per_feature_set=True,
+        apply_max_features_per_feature_set=True,
     )
     clf.fit(X, y)
     assert_array_equal(clf.max_features_per_set_, [3, 2])
@@ -150,7 +145,7 @@ def test_multiview_separate_feature_set_sampling_sets_attributes():
         random_state=seed,
         feature_set_ends=[5, 9],
         max_features="sqrt",
-        apply_sampling_per_feature_set=True,
+        apply_max_features_per_feature_set=True,
     )
     clf.fit(X, y)
     assert_array_equal(clf.max_features_per_set_, [2, 2])
