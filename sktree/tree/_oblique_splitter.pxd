@@ -150,6 +150,8 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
     cdef const intp_t[:] feature_set_ends   # an array indicating the column indices of the end of each feature set
     cdef intp_t n_feature_sets                  # the number of feature sets is the length of feature_set_ends + 1
 
+    cdef const intp_t[:] max_features_per_set  # the maximum number of features to sample from each feature set
+
     cdef vector[vector[intp_t]] multi_indices_to_sample
 
     cdef void sample_proj_mat(

@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from numpy.testing import assert_array_equal
 from sklearn.datasets import make_blobs
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import cross_val_score
@@ -84,3 +85,73 @@ def test_multiview_classification(baseline_est):
     assert (
         cross_val_score(clf, X, y, cv=5).mean() <= 0.6
     ), f"CV score: {cross_val_score(clf, X, y, cv=5).mean()}"
+
+
+def test_multiview_errors():
+    """Test that an error is raised when max_features is greater than the number of features."""
+    X = np.random.random((10, 5))
+    y = np.random.randint(0, 2, size=10)
+
+    clf = MultiViewDecisionTreeClassifier(
+        random_state=seed,
+        feature_set_ends=[3, 10],
+        max_features=2,
+    )
+    with pytest.raises(ValueError, match="The last feature set end must be equal"):
+        clf.fit(X, y)
+
+
+def test_multiview_errors_with_max_features_per_feature_set():
+    """Test that an error is raised when max_features is greater than the number of features."""
+    X = np.random.random((10, 10))
+    y = np.random.randint(0, 2, size=10)
+
+    clf = MultiViewDecisionTreeClassifier(
+        random_state=seed,
+        feature_set_ends=[6, 10],
+        max_features=6,
+        apply_sampling_per_feature_set=True,
+    )
+    with pytest.raises(ValueError, match="the number of features in feature set"):
+        clf.fit(X, y)
+
+
+def test_multiview_separate_feature_set_sampling_sets_attributes():
+    X = np.random.random((20, 10))
+    y = np.random.randint(0, 2, size=20)
+
+    # test with max_features as a float
+    clf = MultiViewDecisionTreeClassifier(
+        random_state=seed,
+        feature_set_ends=[6, 10],
+        max_features=0.5,
+        apply_sampling_per_feature_set=True,
+    )
+    clf.fit(X, y)
+
+    assert_array_equal(clf.max_features_per_set_, [3, 2])
+    assert clf.max_features_ == 5
+
+    # test with max_features as sqrt
+    X = np.random.random((20, 13))
+    clf = MultiViewDecisionTreeClassifier(
+        random_state=seed,
+        feature_set_ends=[9, 13],
+        max_features="sqrt",
+        apply_sampling_per_feature_set=True,
+    )
+    clf.fit(X, y)
+    assert_array_equal(clf.max_features_per_set_, [3, 2])
+    assert clf.max_features_ == 5
+
+    # test with max_features as 'sqrt' but not a perfect square
+    X = np.random.random((20, 9))
+    clf = MultiViewDecisionTreeClassifier(
+        random_state=seed,
+        feature_set_ends=[5, 9],
+        max_features="sqrt",
+        apply_sampling_per_feature_set=True,
+    )
+    clf.fit(X, y)
+    assert_array_equal(clf.max_features_per_set_, [2, 2])
+    assert clf.max_features_ == 4
