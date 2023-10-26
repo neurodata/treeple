@@ -129,6 +129,7 @@ print(f"Shape of Tree Posteriors for the positive class: {posterior_arr.shape}")
 #
 # Observed Samples: ``est_mv.observe_samples_``
 #
-# Tree Posteriors for the positive class: ``est_mv.observe_posteriors_`` (n_trees, n_samples_test, 1)
+# Tree Posteriors for the positive class: ``est_mv.observe_posteriors_``
+# (n_trees, n_samples_test, 1)
 #
 # True Labels: ``est_mv.y_true_final_``
