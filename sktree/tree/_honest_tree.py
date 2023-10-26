@@ -151,7 +151,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         Read more in the :ref:`User Guide <monotonic_cst_gbdt>`.
 
     tree_estimator : object, default=None
-        Instatiated tree of type BaseDecisionTree from sktree.
+        Instantiated tree of type BaseDecisionTree from sktree.
         If None, then DecisionTreeClassifier with default parameters will
         be used. Note that one MUST use trees imported from the `sktree.tree`
         API namespace rather than from `sklearn.tree`.
