@@ -430,7 +430,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
             y,
             sample_weight=_sample_weight,
             check_input=check_input,
-            classes=classes,
+            # classes=classes,
         )
         self._inherit_estimator_attributes()
 
@@ -592,7 +592,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
             sample_weight=_sample_weight,
             check_input=check_input,
             missing_values_in_feature_mask=missing_values_in_feature_mask,
-            classes=classes,
+            # classes=classes,
         )
         self._inherit_estimator_attributes()
 
