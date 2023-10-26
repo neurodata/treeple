@@ -411,12 +411,10 @@ class HonestForestClassifier(ForestClassifier):
         X, y = check_X_y(X, y, multi_output=True)
         super().fit(X, y, sample_weight=sample_weight, classes=classes)
 
-        print('Called fit...')
         # Compute honest decision function
         self.honest_decision_function_ = self._predict_proba(
             X, indices=self.honest_indices_, impute_missing=np.nan
         )
-        print('CAlled honest decision function...')
         return self
 
     def predict_proba(self, X):
