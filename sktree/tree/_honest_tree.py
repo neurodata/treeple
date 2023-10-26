@@ -560,25 +560,26 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
             #     raise RuntimeError("Instead of using sklearn.tree, use trees import from sktree.")
 
             # XXX: maybe error out if the tree_estimator is already fitted
-            self.estimator_ = clone(self.tree_estimator)
-            self.estimator_.set_params(
-                **dict(
-                    criterion=self.criterion,
-                    splitter=self.splitter,
-                    max_depth=self.max_depth,
-                    min_samples_split=self.min_samples_split,
-                    min_samples_leaf=self.min_samples_leaf,
-                    min_weight_fraction_leaf=self.min_weight_fraction_leaf,
-                    max_features=self.max_features,
-                    max_leaf_nodes=self.max_leaf_nodes,
-                    class_weight=self.class_weight,
-                    random_state=self.random_state,
-                    min_impurity_decrease=self.min_impurity_decrease,
-                    ccp_alpha=self.ccp_alpha,
-                    monotonic_cst=self.monotonic_cst,
-                    store_leaf_values=self.store_leaf_values,
-                )
-            )
+            self.estimator_ = deepcopy(self.tree_estimator)
+            # self.estimator_ = clone(self.tree_estimator)
+            # self.estimator_.set_params(
+            #     **dict(
+            #         criterion=self.criterion,
+            #         splitter=self.splitter,
+            #         max_depth=self.max_depth,
+            #         min_samples_split=self.min_samples_split,
+            #         min_samples_leaf=self.min_samples_leaf,
+            #         min_weight_fraction_leaf=self.min_weight_fraction_leaf,
+            #         max_features=self.max_features,
+            #         max_leaf_nodes=self.max_leaf_nodes,
+            #         class_weight=self.class_weight,
+            #         random_state=self.random_state,
+            #         min_impurity_decrease=self.min_impurity_decrease,
+            #         ccp_alpha=self.ccp_alpha,
+            #         monotonic_cst=self.monotonic_cst,
+            #         store_leaf_values=self.store_leaf_values,
+            #     )
+            # )
 
             if self.random_state is not None:
                 _set_random_states(self.estimator_, self.random_state)
