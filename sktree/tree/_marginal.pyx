@@ -171,7 +171,7 @@ cdef inline cnp.ndarray _apply_dense_marginal(
                             n_left_samples = tree.nodes[node.left_child].n_node_samples
                             n_right_samples = tree.nodes[node.right_child].n_node_samples
 
-                        # compute the probabilies for going left and right
+                        # compute the probabilities for going left and right
                         p_left = (<float64_t>n_left_samples / n_node_samples)
 
                         # randomly sample a direction
