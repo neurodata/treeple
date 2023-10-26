@@ -556,8 +556,8 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
             )
         else:
             # we throw an error if the user is using trees from sklearn:main
-            if isinstance(self.tree_estimator, skBaseDecisionTree):
-                raise RuntimeError("Instead of using sklearn.tree, use trees import from sktree.")
+            # if isinstance(self.tree_estimator, skBaseDecisionTree):
+            #     raise RuntimeError("Instead of using sklearn.tree, use trees import from sktree.")
 
             # XXX: maybe error out if the tree_estimator is already fitted
             self.estimator_ = clone(self.tree_estimator)
