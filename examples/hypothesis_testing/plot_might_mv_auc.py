@@ -4,8 +4,8 @@ Compute partial AUC using multi-view MIGHT (MV-MIGHT)
 =====================================================
 
 An example using :class:`~sktree.stats.FeatureImportanceForestClassifier` for nonparametric
-multivariate hypothesis test, on simulated mutli-view datasets. Here, we present a simulation
-of how MIGHT is used to evaluate how a "feature set is important for predicting the target".
+multivariate hypothesis test, on simulated mutli-view datasets. Here, we present
+how to estinate partial AUROC from a multi-view feature set.
 
 We simulate a dataset with 510 features, 1000 samples, and a binary class target variable.
 The first 10 features (X) are strongly correlated with the target, and the second
