@@ -1,6 +1,7 @@
 # Authors: Ronan Perry, Sambit Panda, Haoyin Xu
 # Adopted from: https://github.com/neurodata/honest-forests
 
+from copy import deepcopy
 import numpy as np
 from sklearn.base import ClassifierMixin, MetaEstimatorMixin, _fit_context, clone
 from sklearn.ensemble._base import _set_random_states
