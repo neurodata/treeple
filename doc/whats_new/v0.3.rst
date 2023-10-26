@@ -16,6 +16,7 @@ Changelog
 - |Fix| Fixes a bug where covariate indices were not shuffled by default when running FeatureImportanceForestClassifier and FeatureImportanceForestRegressor test methods, by `Sambit Panda`_ (:pr:`140`)
 - |Enhancement| Add multi-view splitter for axis-aligned decision trees, by `Adam Li`_ (:pr:`129`)
 - |Enhancement| Add stratified sampling option to ``FeatureImportance*`` via the ``stratify`` keyword argument, by `Yuxin Bai`_ (:pr:`143`)
+- |Bug| Fixed usage of ``feature_importances_`` property in ``HonestForestClassifier``, by `Adam Li`_ (:pr:`156`)
 
 Code and Documentation Contributors
 -----------------------------------
