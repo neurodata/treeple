@@ -1,0 +1,800 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-theme="auto">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>sktree.stats.PermutationForestRegressor &#8212; scikit-tree 0.3.0dev0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "auto";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.css?v=42c02ab7" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=c5ced968eda925caa686" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=c5ced968eda925caa686" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=c5ced968eda925caa686"></script>
+
+    <script src="../_static/documentation_options.js?v=fdbe2418"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=fd10adb8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/sktree.stats.PermutationForestRegressor';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.14.2';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/scikit-tree/main/doc/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="sktree.experimental.mutual_info_ksg" href="sktree.experimental.mutual_info_ksg.html" />
+    <link rel="prev" title="sktree.stats.PermutationForestClassifier" href="sktree.stats.PermutationForestClassifier.html" />
+    <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <script type="text/javascript" src="../_static/scrollfix.js"></script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="auto">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">scikit-tree 0.3.0dev0 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../api.html">
+                        API Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../user_guide.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../whats_new.html">
+                        Release History
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../install.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../use.html">
+                        Examples using scikit-tree
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../api.html">
+                        API Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../user_guide.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../whats_new.html">
+                        Release History
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../install.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../use.html">
+                        Examples using scikit-tree
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-3"
+      type="button"
+      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-3"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-3"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-3">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="sktree.RandomForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.RandomForestClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.RandomForestRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.RandomForestRegressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.ExtraTreesClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ExtraTreesClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.ExtraTreesRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ExtraTreesRegressor</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="sktree.tree.DecisionTreeClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.DecisionTreeClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.tree.DecisionTreeRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.DecisionTreeRegressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.tree.ExtraTreeClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.ExtraTreeClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.tree.ExtraTreeRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.ExtraTreeRegressor</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="sktree.ObliqueRandomForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ObliqueRandomForestClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.ObliqueRandomForestRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ObliqueRandomForestRegressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.PatchObliqueRandomForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.PatchObliqueRandomForestClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.PatchObliqueRandomForestRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.PatchObliqueRandomForestRegressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.HonestForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.HonestForestClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.MultiViewRandomForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.MultiViewRandomForestClassifier</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="sktree.tree.ObliqueDecisionTreeClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.ObliqueDecisionTreeClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.tree.ObliqueDecisionTreeRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.ObliqueDecisionTreeRegressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.tree.PatchObliqueDecisionTreeClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.PatchObliqueDecisionTreeClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.tree.PatchObliqueDecisionTreeRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.PatchObliqueDecisionTreeRegressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.tree.HonestTreeClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.HonestTreeClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.tree.MultiViewDecisionTreeClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.MultiViewDecisionTreeClassifier</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="sktree.UnsupervisedRandomForest.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.UnsupervisedRandomForest</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.UnsupervisedObliqueRandomForest.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.UnsupervisedObliqueRandomForest</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="sktree.tree.UnsupervisedDecisionTree.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.UnsupervisedDecisionTree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.tree.UnsupervisedObliqueDecisionTree.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.UnsupervisedObliqueDecisionTree</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="sktree.ExtendedIsolationForest.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ExtendedIsolationForest</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="sktree.tree.compute_forest_similarity_matrix.html">sktree.tree.compute_forest_similarity_matrix</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="sktree.NearestNeighborsMetaEstimator.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.NearestNeighborsMetaEstimator</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="sktree.stats.FeatureImportanceForestRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.FeatureImportanceForestRegressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.stats.FeatureImportanceForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.FeatureImportanceForestClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.stats.PermutationForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.PermutationForestClassifier</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.PermutationForestRegressor</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="sktree.experimental.mutual_info_ksg.html">sktree.experimental.mutual_info_ksg</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="sktree.experimental.simulate.simulate_multivariate_gaussian.html">sktree.experimental.simulate.simulate_multivariate_gaussian</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.experimental.simulate.simulate_helix.html">sktree.experimental.simulate.simulate_helix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.experimental.simulate.simulate_sphere.html">sktree.experimental.simulate.simulate_sphere</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="sktree.experimental.mutual_info.mi_gaussian.html">sktree.experimental.mutual_info.mi_gaussian</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.experimental.mutual_info.cmi_gaussian.html">sktree.experimental.mutual_info.cmi_gaussian</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.experimental.mutual_info.entropy_gaussian.html">sktree.experimental.mutual_info.entropy_gaussian</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../api.html" class="nav-link">API Documentation</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><code...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="sktree-stats-permutationforestregressor">
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.PermutationForestRegressor<a class="headerlink" href="#sktree-stats-permutationforestregressor" title="Link to this heading">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="sktree.stats.PermutationForestRegressor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sktree.stats.</span></span><span class="sig-name descname"><span class="pre">PermutationForestRegressor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sktree/stats/permutationforest.html#PermutationForestRegressor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sktree.stats.PermutationForestRegressor" title="Link to this definition">#</a></dt>
+<dd><p>Hypothesis testing of covariates with a permutation forest regressor.</p>
+<p>This implements permutation testing of a null hypothesis using a random forest.
+The null hypothesis is generated by permuting <code class="docutils literal notranslate"><span class="pre">n_repeats</span></code> times the covariate
+indices and then a random forest is trained for each permuted instance. This
+is compared to the original random forest that was computed on the regular
+non-permuted data.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Permutation testing with forests is computationally expensive.
+As a result, if you are testing for the importance of feature sets, consider
+using <code class="docutils literal notranslate"><span class="pre">sktree.FeatureImportanceForestRegressor</span></code> or
+<code class="docutils literal notranslate"><span class="pre">sktree.FeatureImportanceForestClassifier</span></code> instead, which is
+much more computationally efficient.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This does not allow testing on the posteriors.</p>
+</div>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>estimator</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">object</span></code></a>, default=None</span></dt><dd><p>Type of forest estimator to use. By default <code class="docutils literal notranslate"><span class="pre">None</span></code>, which defaults to
+<a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.ensemble.RandomForestRegressor.html#sklearn.ensemble.RandomForestRegressor" title="(in scikit-learn v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.ensemble.RandomForestRegressor</span></code></a> with default parameters.</p>
+</dd>
+<dt><strong>test_size</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, default=0.2</span></dt><dd><p>The proportion of samples to leave out for each tree to compute metric on.</p>
+</dd>
+<dt><strong>random_state</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://numpy.org/devdocs/reference/random/legacy.html#numpy.random.RandomState" title="(in NumPy v2.0.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RandomState</span></code></a> instance or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a>, default=None</span></dt><dd><p>Controls both the randomness of the bootstrapping of the samples used
+when building trees (if <code class="docutils literal notranslate"><span class="pre">bootstrap=True</span></code>) and the sampling of the
+features to consider when looking for the best split at each node
+(if <code class="docutils literal notranslate"><span class="pre">max_features</span> <span class="pre">&lt;</span> <span class="pre">n_features</span></code>).
+See <a class="reference external" href="https://scikit-learn.org/dev/glossary.html#term-random_state" title="(in scikit-learn v1.4)"><span class="xref std std-term">Glossary</span></a> for details.</p>
+</dd>
+<dt><strong>verbose</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, default=0</span></dt><dd><p>Controls the verbosity when fitting and predicting.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>samples_</strong><span class="classifier">ArrayLike of shape (n_samples,)</span></dt><dd><p>The indices of the samples used in the final test.</p>
+</dd>
+<dt><strong>y_true_</strong><span class="classifier">ArrayLike of shape (n_samples_final,)</span></dt><dd><p>The true labels of the samples used in the final test.</p>
+</dd>
+<dt><strong>posterior_</strong><span class="classifier">ArrayLike of shape (n_samples_final, n_outputs)</span></dt><dd><p>The predicted posterior probabilities of the samples used in the final test.</p>
+</dd>
+<dt><strong>null_dist_</strong><span class="classifier">ArrayLike of shape (n_repeats,)</span></dt><dd><p>The null distribution of the test statistic.</p>
+</dd>
+<dt><strong>posterior_null_</strong><span class="classifier">ArrayLike of shape (n_samples_final, n_outputs, n_repeats)</span></dt><dd><p>The posterior probabilities of the samples used in the final test for each
+permutation for the null distribution.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sktree.stats.PermutationForestRegressor.statistic" title="sktree.stats.PermutationForestRegressor.statistic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statistic</span></code></a>(X, y[, covariate_index, metric, ...])</p></td>
+<td><p>Compute the test statistic.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#sktree.stats.PermutationForestRegressor.test" title="sktree.stats.PermutationForestRegressor.test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test</span></code></a>(X, y, covariate_index[, metric, ...])</p></td>
+<td><p>Perform hypothesis test using permutation testing.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="table">
+<tbody>
+<tr class="row-odd"><td><p><strong>reset</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="sktree.stats.PermutationForestRegressor.statistic">
+<span class="sig-name descname"><span class="pre">statistic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariate_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_posteriors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">metric_kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sktree.stats.PermutationForestRegressor.statistic" title="Link to this definition">#</a></dt>
+<dd><p>Compute the test statistic.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>X</strong><span class="classifier">ArrayLike of shape (n_samples, n_features)</span></dt><dd><p>The data matrix.</p>
+</dd>
+<dt><strong>y</strong><span class="classifier">ArrayLike of shape (n_samples, n_outputs)</span></dt><dd><p>The target matrix.</p>
+</dd>
+<dt><strong>covariate_index</strong><span class="classifier">ArrayLike, optional of shape (n_covariates,)</span></dt><dd><p>The index array of covariates to shuffle, by default None.</p>
+</dd>
+<dt><strong>metric</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>The metric to compute, by default “mse”.</p>
+</dd>
+<dt><strong>return_posteriors</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>Whether or not to return the posteriors, by default False.</p>
+</dd>
+<dt><strong>check_input</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>Whether or not to check the input, by default True.</p>
+</dd>
+<dt><strong>seed</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>The random seed to use, by default None.</p>
+</dd>
+<dt><strong>**metric_kwargs</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">dict</span></code></a>, optional</span></dt><dd><p>Keyword arguments to pass to the metric function.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>stat</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>The test statistic.</p>
+</dd>
+<dt><strong>posterior_final</strong><span class="classifier">ArrayLike of shape (n_samples_final, n_outputs), optional</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">return_posteriors</span></code> is True, then the posterior probabilities of the
+samples used in the final test. <code class="docutils literal notranslate"><span class="pre">n_samples_final</span></code> is equal to <code class="docutils literal notranslate"><span class="pre">n_samples</span></code>
+if all samples are encountered in the test set of at least one tree in the
+posterior computation.</p>
+</dd>
+<dt><strong>samples</strong><span class="classifier">ArrayLike of shape (n_samples_final,), optional</span></dt><dd><p>The indices of the samples used in the final test. <code class="docutils literal notranslate"><span class="pre">n_samples_final</span></code> is
+equal to <code class="docutils literal notranslate"><span class="pre">n_samples</span></code> if all samples are encountered in the test set of at
+least one tree in the posterior computation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sktree.stats.PermutationForestRegressor.test">
+<span class="sig-name descname"><span class="pre">test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariate_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_repeats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_posteriors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">metric_kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sktree.stats.PermutationForestRegressor.test" title="Link to this definition">#</a></dt>
+<dd><p>Perform hypothesis test using permutation testing.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>X</strong><span class="classifier">ArrayLike of shape (n_samples, n_features)</span></dt><dd><p>The data matrix.</p>
+</dd>
+<dt><strong>y</strong><span class="classifier">ArrayLike of shape (n_samples, n_outputs)</span></dt><dd><p>The target matrix.</p>
+</dd>
+<dt><strong>covariate_index</strong><span class="classifier">ArrayLike of shape (n_covariates,)</span></dt><dd><p>The covariate indices of <code class="docutils literal notranslate"><span class="pre">X</span></code> to shuffle.</p>
+</dd>
+<dt><strong>metric</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>Metric to compute, by default “mse”.</p>
+</dd>
+<dt><strong>n_repeats</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>Number of times to sample the null distribution, by default 1000.</p>
+</dd>
+<dt><strong>return_posteriors</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>Whether or not to return the posteriors, by default False.</p>
+</dd>
+<dt><strong>**metric_kwargs</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">dict</span></code></a>, optional</span></dt><dd><p>Keyword arguments to pass to the metric function.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>observe_stat</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>Observed test statistic.</p>
+</dd>
+<dt><strong>pvalue</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>Pvalue of the test.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sktree.stats.PermutationForestRegressor.train_test_samples_">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">train_test_samples_</span></span><a class="headerlink" href="#sktree.stats.PermutationForestRegressor.train_test_samples_" title="Link to this definition">#</a></dt>
+<dd><p>The subset of drawn samples for each base estimator.</p>
+<p>Returns a dynamically generated list of indices identifying
+the samples used for fitting each member of the ensemble, i.e.,
+the in-bag samples.</p>
+<p>Note: the list is re-created at each call to the property in order
+to reduce the object memory footprint by not storing the sampling
+data. Thus fetching the property may be slower than expected.</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="clearer"></div></section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="sktree.stats.PermutationForestClassifier.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.PermutationForestClassifier</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="sktree.experimental.mutual_info_ksg.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">sktree.experimental.mutual_info_ksg</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.stats.PermutationForestRegressor"><code class="docutils literal notranslate"><span class="pre">PermutationForestRegressor</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.stats.PermutationForestRegressor.statistic"><code class="docutils literal notranslate"><span class="pre">PermutationForestRegressor.statistic()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.stats.PermutationForestRegressor.test"><code class="docutils literal notranslate"><span class="pre">PermutationForestRegressor.test()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.stats.PermutationForestRegressor.train_test_samples_"><code class="docutils literal notranslate"><span class="pre">PermutationForestRegressor.train_test_samples_</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=c5ced968eda925caa686"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=c5ced968eda925caa686"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-10-27.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
