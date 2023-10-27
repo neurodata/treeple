@@ -229,6 +229,10 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
     n_feature_sets_ : int
         The number of feature sets.
 
+    max_features_per_set_ : array-like of int of shape (n_feature_sets,)
+        The number of features to sample per feature set. If ``None``, then
+        ``max_features`` is applied to the entire feature space.
+
     See Also
     --------
     sklearn.tree.DecisionTreeClassifier : An axis-aligned decision tree classifier.
