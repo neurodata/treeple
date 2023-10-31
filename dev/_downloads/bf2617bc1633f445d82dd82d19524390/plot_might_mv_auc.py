@@ -55,7 +55,7 @@ y = rng.binomial(n=1, p=expit(beta * X_important[:, :10].sum(axis=1)), size=n_sa
 # You can specify the maximum specificity by modifying ``max_fpr`` in ``statistic``.
 
 n_estimators = 125
-max_features = 100
+max_features = "sqrt"
 metric = "auc"
 test_size = 0.2
 n_jobs = -1
