@@ -6,11 +6,11 @@
 - [Development Tasks](#development-tasks)
         - [Basic Verification](#basic-verification)
         - [Docsite](#docsite)
-    - [Details](#details)
-        - [Coding Style](#coding-style)
-        - [Lint](#lint)
-        - [Type checking](#type-checking)
-        - [Unit tests](#unit-tests)
+  - [Details](#details)
+    - [Coding Style](#coding-style)
+    - [Lint](#lint)
+    - [Type checking](#type-checking)
+    - [Unit tests](#unit-tests)
 - [Advanced Updating submodules](#advanced-updating-submodules)
 - [Cython and C++](#cython-and-c)
 - [Making a Release](#making-a-release)
@@ -19,16 +19,16 @@
 
 # Requirements
 
-* Python 3.9+
-* numpy>=1.25
-* scipy>=1.11
-* scikit-learn>=1.3.1
+- Python 3.9+
+- numpy>=1.25
+- scipy>=1.11
+- scikit-learn>=1.3.1
 
 For the other requirements, inspect the ``pyproject.toml`` file.
 
 # Setting up your development environment
 
-We recommend using miniconda, as python virtual environments may not setup properly compilers necessary for our compiled code. For detailed information on setting up and managing conda environments, see https://conda.io/docs/test-drive.html.
+We recommend using miniconda, as python virtual environments may not setup properly compilers necessary for our compiled code. For detailed information on setting up and managing conda environments, see <https://conda.io/docs/test-drive.html>.
 
 <!-- Setup a conda env -->
 
@@ -38,7 +38,7 @@ We recommend using miniconda, as python virtual environments may not setup prope
 **Make sure you specify a Python version if your system defaults to anything less than Python 3.9.**
 
 **Any commands should ALWAYS be after you have activated your conda environment.**
-Next, install necessary build dependencies. For more information, see https://scikit-learn.org/stable/developers/advanced_installation.html.
+Next, install necessary build dependencies. For more information, see <https://scikit-learn.org/stable/developers/advanced_installation.html>.
 
     conda install -c conda-forge joblib threadpoolctl pytest compilers llvm-openmp
 
@@ -77,7 +77,7 @@ For other commands, see
 
 Note at this stage, you will be unable to run Python commands directly. For example, ``pytest ./sktree`` will not work.
 
-However, after installing and building the project from source using meson, you can leverage editable installs to make testing code changes much faster. For more information on meson-python's progress supporting editable installs in a better fashion, see https://meson-python.readthedocs.io/en/latest/how-to-guides/editable-installs.html.
+However, after installing and building the project from source using meson, you can leverage editable installs to make testing code changes much faster. For more information on meson-python's progress supporting editable installs in a better fashion, see <https://meson-python.readthedocs.io/en/latest/how-to-guides/editable-installs.html>.
 
     pip install --no-build-isolation --editable .
 
@@ -88,6 +88,7 @@ However, after installing and building the project from source using meson, you 
 the unit-tests should run.
 
 # Development Tasks
+
 There are a series of top-level tasks available through Poetry. If you are updated the dependencies, please run `poetry update` to update the lock file. These can each be run via
 
  `poetry run poe <taskname>`
@@ -99,16 +100,18 @@ To do so, first install poetry and poethepoet.
 Now, you are ready to run quick commands to format the codebase, lint the codebase and type-check the codebase.
 
 ### Basic Verification
+
 * **format** - runs the suite of formatting tools applying tools to make code compliant
-* **format_check** - runs the suite of formatting tools checking for compliance
-* **lint** - runs the suite of linting tools
-* **type_check** - performs static typechecking of the codebase using mypy
-* **unit_test** - executes fast unit tests
-* **verify** - executes the basic PR verification suite, which includes all the tasks listed above
+- **format_check** - runs the suite of formatting tools checking for compliance
+- **lint** - runs the suite of linting tools
+- **type_check** - performs static typechecking of the codebase using mypy
+- **unit_test** - executes fast unit tests
+- **verify** - executes the basic PR verification suite, which includes all the tasks listed above
 
 ### Docsite
+
 * **build_docs** - build the API documentation site
-* **build_docs_noplot** - build the API documentation site without running explicitly any of the examples, for faster local checks of any documentation updates.
+- **build_docs_noplot** - build the API documentation site without running explicitly any of the examples, for faster local checks of any documentation updates.
 
 ## Details
 
@@ -144,8 +147,8 @@ In order for any code to be added to the repository, we require unit tests to pa
 
 # (Advanced) Updating submodules
 
-Scikit-tree relies on a submodule of a forked-version of scikit-learn for certain Python and Cython code that extends the ``DecisionTree*`` models. Usually, if a developer is making changes, they should go over to the ``submodulev3`` branch on ``https://github.com/neurodata/scikit-learn`` and 
-submit a PR to make changes to the submodule. 
+Scikit-tree relies on a submodule of a forked-version of scikit-learn for certain Python and Cython code that extends the ``DecisionTree*`` models. Usually, if a developer is making changes, they should go over to the ``submodulev3`` branch on ``https://github.com/neurodata/scikit-learn`` and
+submit a PR to make changes to the submodule.
 
 This should **ALWAYS** be supported by some use-case in scikit-tree. We want the minimal amount of code-change in our forked version of scikit-learn to make it very easy to merge in upstream changes, bug fixes and features for tree-based code.
 
@@ -160,6 +163,7 @@ Now, you can re-build the project using the latest submodule changes.
     spin build --clean
 
 # Cython and C++
+
 The general design of scikit-tree follows that of the tree-models inside scikit-learn, where tree-based models are inherently Cythonized, or written with C++. Then the actual forest (e.g. RandomForest, or ExtraForest) is just a Python API wrapper that creates an ensemble of the trees.
 
 In order to develop new tree models, generally Cython and C++ code will need to be written in order to optimize the tree building process, otherwise fitting a single forest model would take very long.
@@ -170,7 +174,7 @@ Scikit-tree is in-line with scikit-learn and thus relies on each new version rel
 
 1. Download wheels from GH Actions and put all wheels into a ``dist/`` folder
 
-https://github.com/neurodata/scikit-tree/actions/workflows/build_wheels.yml will have all the wheels for common OSes built for each Python version.
+<https://github.com/neurodata/scikit-tree/actions/workflows/build_wheels.yml> will have all the wheels for common OSes built for each Python version.
 
 2. Upload wheels to test PyPi
 
@@ -186,7 +190,7 @@ Verify that installations work as expected on your machine.
 twine upload dist/*
 ```
 
-or if you have two-factor authentication enabled: https://pypi.org/help/#apitoken
+or if you have two-factor authentication enabled: <https://pypi.org/help/#apitoken>
 
     twine upload dist/* --repository scikit-tree
 
