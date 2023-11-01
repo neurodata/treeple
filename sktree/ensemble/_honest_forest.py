@@ -491,11 +491,6 @@ class HonestForestClassifier(ForestClassifier):
         check_is_fitted(self)
         return [tree.honest_indices_ for tree in self.estimators_]
 
-    @property
-    def feature_importances_(self):
-        """The feature importances."""
-        return self.estimator_.feature_importances_
-
     def _more_tags(self):
         return {"multioutput": False}
 
