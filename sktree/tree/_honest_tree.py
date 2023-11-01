@@ -538,6 +538,30 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
 
         if self.tree_estimator is None:
             self.estimator_ = DecisionTreeClassifier(
+                # criterion=self.criterion,
+                # splitter=self.splitter,
+                # max_depth=self.max_depth,
+                # min_samples_split=self.min_samples_split,
+                # min_samples_leaf=self.min_samples_leaf,
+                # min_weight_fraction_leaf=self.min_weight_fraction_leaf,
+                # max_features=self.max_features,
+                # max_leaf_nodes=self.max_leaf_nodes,
+                # class_weight=self.class_weight,
+                # min_impurity_decrease=self.min_impurity_decrease,
+                # ccp_alpha=self.ccp_alpha,
+                # monotonic_cst=self.monotonic_cst,
+                # store_leaf_values=self.store_leaf_values,
+            )
+        else:
+            # XXX: Remove this?
+            # we throw an error if the user is using trees from sklearn:main
+            # if isinstance(self.tree_estimator, skBaseDecisionTree):
+            #     raise RuntimeError("Instead of using sklearn.tree, use trees import from sktree.")
+
+            # XXX: maybe error out if the tree_estimator is already fitted
+            self.estimator_ = clone(self.tree_estimator)
+        self.estimator_.set_params(
+            **dict(
                 criterion=self.criterion,
                 splitter=self.splitter,
                 max_depth=self.max_depth,
@@ -550,45 +574,22 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
                 random_state=self.random_state,
                 min_impurity_decrease=self.min_impurity_decrease,
                 ccp_alpha=self.ccp_alpha,
-                monotonic_cst=self.monotonic_cst,
-                store_leaf_values=self.store_leaf_values,
             )
-        else:
-            # XXX: Remove this?
-            # we throw an error if the user is using trees from sklearn:main
-            # if isinstance(self.tree_estimator, skBaseDecisionTree):
-            #     raise RuntimeError("Instead of using sklearn.tree, use trees import from sktree.")
-
-            # XXX: maybe error out if the tree_estimator is already fitted
-            self.estimator_ = clone(self.tree_estimator)
+        )
+        try:
+            self.estimator_.set_params(**dict(monotonic_cst=self.monotonic_cst))
             self.estimator_.set_params(
                 **dict(
-                    criterion=self.criterion,
-                    splitter=self.splitter,
-                    max_depth=self.max_depth,
-                    min_samples_split=self.min_samples_split,
-                    min_samples_leaf=self.min_samples_leaf,
-                    min_weight_fraction_leaf=self.min_weight_fraction_leaf,
-                    max_features=self.max_features,
-                    max_leaf_nodes=self.max_leaf_nodes,
-                    class_weight=self.class_weight,
-                    random_state=self.random_state,
-                    min_impurity_decrease=self.min_impurity_decrease,
-                    ccp_alpha=self.ccp_alpha,
+                    store_leaf_values=self.store_leaf_values,
                 )
             )
-            try:
-                self.estimator_.set_params(**dict(monotonic_cst=self.monotonic_cst))
-                self.estimator_.set_params(
-                    **dict(
-                        store_leaf_values=self.store_leaf_values,
-                    )
-                )
-            except Exception:
-                print("Using sklearn tree")
+        except Exception:
+            from warnings import warn
 
-            if self.random_state is not None:
-                _set_random_states(self.estimator_, self.random_state)
+            warn("Using sklearn tree so store_leaf_values cannot be set.")
+
+        if self.random_state is not None:
+            _set_random_states(self.estimator_, self.random_state)
 
         # Learn structure on subsample
         # XXX: this allows us to use BaseDecisionTree without partial_fit API
