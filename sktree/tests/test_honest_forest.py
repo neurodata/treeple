@@ -5,7 +5,10 @@ from sklearn import datasets
 from sklearn.metrics import accuracy_score, r2_score
 from sklearn.utils import check_random_state
 from sklearn.utils.estimator_checks import parametrize_with_checks
+from sklearn.tree import DecisionTreeClassifier as skDecisionTreeClassifier
+from sklearn.model_selection import cross_val_score
 
+from sktree.datasets.hyppo import quadratic
 from sktree._lib.sklearn.tree import DecisionTreeClassifier
 from sktree.ensemble import HonestForestClassifier
 from sktree.tree import ObliqueDecisionTreeClassifier, PatchObliqueDecisionTreeClassifier
@@ -252,3 +255,35 @@ def test_importances(dtype, criterion):
         est.fit(X, y, sample_weight=scale * sample_weight)
         importances_bis = est.feature_importances_
         assert np.abs(importances - importances_bis).mean() < tolerance
+
+
+def test_honest_forest_with_sklearn_trees():
+    """Test against regression in power-curves discussed in: https://github.com/neurodata/scikit-tree/pull/157."""
+
+    # generate the high-dimensional quadratic data
+    X, y = quadratic(1024, 4096, noise=False, seed=0)
+    print(X.shape, y.shape)
+    print(np.sum(y) / len(y))
+
+    clf = HonestForestClassifier(tree_estimator=skDecisionTreeClassifier(), random_state=0)
+    honestsk_scores = cross_val_score(clf, X, y, cv=5)
+    print(honestsk_scores)
+
+    clf = HonestForestClassifier(tree_estimator=DecisionTreeClassifier(), random_state=0)
+    honest_scores = cross_val_score(clf, X, y, cv=5)
+    print(honest_scores)
+
+    clf = HonestForestClassifier(random_state=0)
+    honest_scores = cross_val_score(clf, X, y, cv=5)
+    print(honest_scores)
+
+    skest = skDecisionTreeClassifier(random_state=0)
+    sk_scores = cross_val_score(skest, X, y, cv=5)
+
+    est = DecisionTreeClassifier(random_state=0)
+    scores = cross_val_score(est, X, y, cv=5)
+
+    print(sk_scores, scores)
+    print(np.mean(sk_scores), np.mean(scores))
+    assert np.mean(sk_scores) == np.mean(scores)
+    assert False

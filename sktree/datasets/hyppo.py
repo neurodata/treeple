@@ -7,18 +7,20 @@ def quadratic(n_samples: int, n_features: int, noise=False, seed=None):
     Parameters
     ----------
     n_samples : int
-        _description_
+        The number of samples to generate.
     n_features : int
-        _description_
+        The number of dimensions in the dataset.
     noise : bool, optional
-        _description_, by default False
-    seed : _type_, optional
-        _description_, by default None
+        Whether or not to add noise, by default False.
+    seed : int, optional
+        Random seed, by default None.
 
     Returns
     -------
-    _type_
-        _description_
+    x : array-like, shape (n_samples, n_features)
+        Data array.
+    v : array-like, shape (n_samples,)
+        Target array of 1's and 0's.
     """
     rng = np.random.default_rng(seed)
 

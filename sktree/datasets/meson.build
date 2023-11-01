@@ -1,6 +1,7 @@
 python_sources = [
   '__init__.py',
   'multiview.py',
+  'hyppo.py',
 ]
 
 py3.install_sources(
