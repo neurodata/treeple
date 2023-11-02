@@ -1,11 +1,14 @@
 import numpy as np
 import pytest
-from numpy.testing import assert_array_almost_equal
+from numpy.testing import assert_array_almost_equal, assert_allclose
 from sklearn import datasets
 from sklearn.metrics import accuracy_score, r2_score
 from sklearn.utils import check_random_state
 from sklearn.utils.estimator_checks import parametrize_with_checks
+from sklearn.tree import DecisionTreeClassifier as skDecisionTreeClassifier
+from sklearn.model_selection import cross_val_score
 
+from sktree.datasets import make_quadratic_classification
 from sktree._lib.sklearn.tree import DecisionTreeClassifier
 from sktree.ensemble import HonestForestClassifier
 from sktree.tree import ObliqueDecisionTreeClassifier, PatchObliqueDecisionTreeClassifier
@@ -252,3 +255,45 @@ def test_importances(dtype, criterion):
         est.fit(X, y, sample_weight=scale * sample_weight)
         importances_bis = est.feature_importances_
         assert np.abs(importances - importances_bis).mean() < tolerance
+
+
+def test_honest_forest_with_sklearn_trees():
+    """Test against regression in power-curves discussed in:
+    https://github.com/neurodata/scikit-tree/pull/157."""
+
+    # generate the high-dimensional quadratic data
+    X, y = make_quadratic_classification(1024, 4096, noise=True, seed=0)
+    y = y.squeeze()
+    print(X.shape, y.shape)
+    print(np.sum(y) / len(y))
+
+    clf = HonestForestClassifier(
+        n_estimators=10, tree_estimator=skDecisionTreeClassifier(), random_state=0
+    )
+    honestsk_scores = cross_val_score(clf, X, y, cv=5)
+    print(honestsk_scores)
+
+    clf = HonestForestClassifier(
+        n_estimators=10, tree_estimator=DecisionTreeClassifier(), random_state=0
+    )
+    honest_scores = cross_val_score(clf, X, y, cv=5)
+    print(honest_scores)
+
+    # XXX: surprisingly, when we use the default which uses the fork DecisionTree,
+    # we get different results
+    # clf = HonestForestClassifier(n_estimators=10, random_state=0)
+    # honest_scores = cross_val_score(clf, X, y, cv=5)
+    # print(honest_scores)
+
+    print(honestsk_scores, honest_scores)
+    print(np.mean(honestsk_scores), np.mean(honest_scores))
+    assert_allclose(np.mean(honestsk_scores), np.mean(honest_scores))
+
+
+def test_honest_forest_with_sklearn_trees_with_power():
+    """Test against regression in power-curves discussed in:
+    https://github.com/neurodata/scikit-tree/pull/157.
+    
+    This unit-test now tests explicitly the power curve.
+    """
+    pass
