@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 from numpy.typing import ArrayLike
 from sklearn.base import MetaEstimatorMixin, clone, is_classifier
@@ -62,7 +64,7 @@ class BasePermutationForest(MetaEstimatorMixin):
         estimator: BaseForest,
         X: ArrayLike,
         y: ArrayLike,
-        covariate_index: ArrayLike = None,
+        covariate_index: Optional[ArrayLike] = None,
         metric="mse",
         return_posteriors: bool = False,
         seed=None,
@@ -117,7 +119,7 @@ class BasePermutationForest(MetaEstimatorMixin):
         self,
         X: ArrayLike,
         y: ArrayLike,
-        covariate_index: ArrayLike = None,
+        covariate_index: Optional[ArrayLike] = None,
         metric="mse",
         return_posteriors: bool = False,
         check_input: bool = True,

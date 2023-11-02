@@ -1,15 +1,15 @@
 import numpy as np
 import pytest
-from numpy.testing import assert_array_almost_equal, assert_allclose
+from numpy.testing import assert_allclose, assert_array_almost_equal
 from sklearn import datasets
-from sklearn.metrics import accuracy_score, r2_score
+from sklearn.metrics import accuracy_score, r2_score, roc_auc_score
+from sklearn.model_selection import cross_val_score
+from sklearn.tree import DecisionTreeClassifier as skDecisionTreeClassifier
 from sklearn.utils import check_random_state
 from sklearn.utils.estimator_checks import parametrize_with_checks
-from sklearn.tree import DecisionTreeClassifier as skDecisionTreeClassifier
-from sklearn.model_selection import cross_val_score
 
-from sktree.datasets import make_quadratic_classification
 from sktree._lib.sklearn.tree import DecisionTreeClassifier
+from sktree.datasets import make_quadratic_classification
 from sktree.ensemble import HonestForestClassifier
 from sktree.tree import ObliqueDecisionTreeClassifier, PatchObliqueDecisionTreeClassifier
 
@@ -293,7 +293,35 @@ def test_honest_forest_with_sklearn_trees():
 def test_honest_forest_with_sklearn_trees_with_power():
     """Test against regression in power-curves discussed in:
     https://github.com/neurodata/scikit-tree/pull/157.
-    
+
     This unit-test now tests explicitly the power curve.
     """
-    pass
+    skForest = HonestForestClassifier(
+        n_estimators=10, tree_estimator=skDecisionTreeClassifier(), random_state=0
+    )
+
+    Forest = HonestForestClassifier(
+        n_estimators=10, tree_estimator=DecisionTreeClassifier(), random_state=0
+    )
+
+    scores = []
+    sk_scores = []
+    for idx in range(10):
+        X, y = make_quadratic_classification(1024, 4096, noise=True, seed=idx)
+        y = y.squeeze()
+
+        skForest.fit(X, y)
+        Forest.fit(X, y)
+
+        # compute partial-AUC
+        sk_score = roc_auc_score(y, skForest.predict_proba(X)[:, 1], max_fpr=0.1)
+        score = roc_auc_score(y, Forest.predict_proba(X)[:, 1], max_fpr=0.1)
+
+        scores.append(score)
+        sk_scores.append(sk_score)
+
+    print(scores, sk_scores)
+    print(np.mean(scores), np.mean(sk_scores))
+    print(np.std(scores), np.std(sk_scores))
+
+    assert_allclose(np.mean(sk_scores), np.mean(scores), atol=0.05)

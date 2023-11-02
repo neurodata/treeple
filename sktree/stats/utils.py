@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Optional, Tuple
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -112,7 +112,7 @@ def _compute_null_distribution_perm(
     est: ForestClassifier,
     metric: str = "mse",
     n_repeats: int = 1000,
-    seed: int = None,
+    seed: Optional[int] = None,
 ) -> ArrayLike:
     """Compute null distribution using permutation method.
 
@@ -173,7 +173,7 @@ def _compute_null_distribution_coleman(
     y_pred_proba_perm: ArrayLike,
     metric: str = "mse",
     n_repeats: int = 1000,
-    seed: int = None,
+    seed: Optional[int] = None,
 ) -> Tuple[ArrayLike, ArrayLike]:
     """Compute null distribution using Coleman method.
 
