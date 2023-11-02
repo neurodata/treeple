@@ -1,5 +1,5 @@
+# Original source: https://github.com/mvlearn/mvlearn
 # License: MIT
-# Author: Ronan Perry
 
 import numpy as np
 from scipy.stats import ortho_group
@@ -339,7 +339,7 @@ def make_joint_factor_model(
     U = np.linalg.qr(U)[0]
 
     # random noise for each view
-    Es = [noise_std * rng.standard_normal(size=(n_samples, d)) for d in zip(n_features)]
+    Es = [noise_std * rng.standard_normal(size=(n_samples, d)) for d in n_features]
     Xs = [(U * svals) @ view_loadings[b].T + Es[b] for b in range(n_views)]
 
     if return_decomp:

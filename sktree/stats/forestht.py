@@ -1,4 +1,4 @@
-from typing import Callable, Tuple, Union
+from typing import Optional, Callable, Tuple, Union
 
 import numpy as np
 from joblib import Parallel, delayed
@@ -43,7 +43,7 @@ def _parallel_build_trees_and_compute_posteriors(
     predict_posteriors: bool,
     permute_per_tree: bool,
     type_of_target,
-    sample_weight: ArrayLike = None,
+    sample_weight: Optional[ArrayLike] = None,
     class_weight=None,
     missing_values_in_feature_mask=None,
     classes=None,
@@ -255,7 +255,7 @@ class BaseForestHT(MetaEstimatorMixin):
     ):
         raise NotImplementedError("Subclasses should implement this!")
 
-    def _check_input(self, X: ArrayLike, y: ArrayLike, covariate_index: ArrayLike = None):
+    def _check_input(self, X: ArrayLike, y: ArrayLike, covariate_index: Optional[ArrayLike] = None):
         X, y = check_X_y(X, y, ensure_2d=True, copy=True, multi_output=True)
         if y.ndim != 2:
             y = y.reshape(-1, 1)
@@ -295,7 +295,7 @@ class BaseForestHT(MetaEstimatorMixin):
         self,
         X: ArrayLike,
         y: ArrayLike,
-        covariate_index: ArrayLike = None,
+        covariate_index: Optional[ArrayLike] = None,
         metric="mi",
         return_posteriors: bool = False,
         check_input: bool = True,
@@ -414,7 +414,7 @@ class BaseForestHT(MetaEstimatorMixin):
         self,
         X,
         y,
-        covariate_index: ArrayLike = None,
+        covariate_index: Optional[ArrayLike] = None,
         metric: str = "mi",
         n_repeats: int = 1000,
         return_posteriors: bool = True,
@@ -660,7 +660,7 @@ class FeatureImportanceForestRegressor(BaseForestHT):
         self,
         X: ArrayLike,
         y: ArrayLike,
-        covariate_index: ArrayLike = None,
+        covariate_index: Optional[ArrayLike] = None,
         metric="mse",
         return_posteriors: bool = False,
         check_input: bool = True,

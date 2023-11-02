@@ -9,7 +9,7 @@ from sklearn.utils import check_random_state
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from sktree._lib.sklearn.tree import DecisionTreeClassifier
-from sktree.datasets.hyppo import quadratic
+from sktree.datasets.hyppo import make_quadratic_classification
 from sktree.ensemble import HonestForestClassifier
 from sktree.tree import ObliqueDecisionTreeClassifier, PatchObliqueDecisionTreeClassifier
 
@@ -262,7 +262,7 @@ def test_honest_forest_with_sklearn_trees():
     https://github.com/neurodata/scikit-tree/pull/157."""
 
     # generate the high-dimensional quadratic data
-    X, y = quadratic(1024, 4096, noise=True, seed=0)
+    X, y = make_quadratic_classification(1024, 4096, noise=True, seed=0)
     y = y.squeeze()
     print(X.shape, y.shape)
     print(np.sum(y) / len(y))

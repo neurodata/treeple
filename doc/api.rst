@@ -150,6 +150,19 @@ tree models.
    PermutationForestClassifier
    PermutationForestRegressor
 
+Datasets
+------------------------------
+We provide some convenience functions for simulating datasets beyond
+those offered in scikit-learn.
+
+.. currentmodule:: sktree.datasets
+.. autosummary::
+   :toctree: generated/
+
+   make_gaussian_mixture
+   make_joint_factor_model
+   make_quadratic_classification
+
 
 Experimental Functionality
 --------------------------

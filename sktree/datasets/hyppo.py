@@ -1,8 +1,10 @@
 import numpy as np
 
 
-def quadratic(n_samples: int, n_features: int, noise=False, seed=None):
+def make_quadratic_classification(n_samples: int, n_features: int, noise=False, seed=None):
     """Simulate classification data from a quadratic model.
+
+    This is a form of the simulation used in :footcite:`panda2018learning`.
 
     Parameters
     ----------
@@ -21,6 +23,10 @@ def quadratic(n_samples: int, n_features: int, noise=False, seed=None):
         Data array.
     v : array-like, shape (n_samples,)
         Target array of 1's and 0's.
+
+    References
+    ----------
+    .. footbibliography::
     """
     rng = np.random.default_rng(seed)
 
@@ -31,6 +37,7 @@ def quadratic(n_samples: int, n_features: int, noise=False, seed=None):
     x_coeffs = x * coeffs
     y = x_coeffs**2 + noise * eps
 
+    # generate the classification labels
     n1 = x.shape[0]
     n2 = y.shape[0]
     v = np.vstack([np.zeros((n1, 1)), np.ones((n2, 1))])
