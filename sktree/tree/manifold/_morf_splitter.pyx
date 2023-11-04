@@ -19,7 +19,7 @@ from ..._lib.sklearn.tree._criterion cimport Criterion
 from .._utils cimport ravel_multi_index_cython, unravel_index_cython
 
 
-cdef class PatchSplitter(BaseObliqueSplitter):
+cdef class PatchSplitter(BestObliqueSplitter):
     """Patch splitter.
 
     A convolutional 2D patch splitter.
@@ -30,22 +30,22 @@ cdef class PatchSplitter(BaseObliqueSplitter):
     def __setstate__(self, d):
         pass
 
-    cdef int init(
+    cdef intp_t init(
         self,
         object X,
-        const DOUBLE_t[:, ::1] y,
-        const DOUBLE_t[:] sample_weight,
+        const float64_t[:, ::1] y,
+        const float64_t[:] sample_weight,
         const unsigned char[::1] missing_values_in_feature_mask,
     ) except -1:
-        BaseObliqueSplitter.init(self, X, y, sample_weight, missing_values_in_feature_mask)
+        BestObliqueSplitter.init(self, X, y, sample_weight, missing_values_in_feature_mask)
 
         return 0
 
-    cdef int node_reset(
+    cdef intp_t node_reset(
         self,
-        SIZE_t start,
-        SIZE_t end,
-        double* weighted_n_node_samples
+        intp_t start,
+        intp_t end,
+        float64_t* weighted_n_node_samples
     ) except -1 nogil:
         """Reset splitter on node samples[start:end].
 
@@ -54,11 +54,11 @@ cdef class PatchSplitter(BaseObliqueSplitter):
 
         Parameters
         ----------
-        start : SIZE_t
+        start : intp_t
             The index of the first sample to consider
-        end : SIZE_t
+        end : intp_t
             The index of the last sample to consider
-        weighted_n_node_samples : ndarray, dtype=double pointer
+        weighted_n_node_samples : ndarray, dtype=float64_t pointer
             The total weight of those samples
         """
 
@@ -81,8 +81,8 @@ cdef class PatchSplitter(BaseObliqueSplitter):
 
     cdef void sample_proj_mat(
         self,
-        vector[vector[DTYPE_t]]& proj_mat_weights,
-        vector[vector[SIZE_t]]& proj_mat_indices
+        vector[vector[float32_t]]& proj_mat_weights,
+        vector[vector[intp_t]]& proj_mat_indices
     ) noexcept nogil:
         """ Sample the projection vector.
 
@@ -91,18 +91,18 @@ cdef class PatchSplitter(BaseObliqueSplitter):
         """
         pass
 
-    cdef (SIZE_t, SIZE_t) sample_top_left_seed(self) noexcept nogil:
+    cdef (intp_t, intp_t) sample_top_left_seed(self) noexcept nogil:
         pass
 
 
 cdef class BaseDensePatchSplitter(PatchSplitter):
-    cdef int init(
+    cdef intp_t init(
         self,
         object X,
-        const DOUBLE_t[:, ::1] y,
-        const DOUBLE_t[:] sample_weight,
+        const float64_t[:, ::1] y,
+        const float64_t[:] sample_weight,
         const unsigned char[::1] missing_values_in_feature_mask,
-        # const INT32_t[:] n_categories
+        # const int32_t[:] n_categories
     ) except -1:
         """Initialize the splitter
 
@@ -120,17 +120,18 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
     def __cinit__(
         self,
         Criterion criterion,
-        SIZE_t max_features,
-        SIZE_t min_samples_leaf,
-        double min_weight_leaf,
+        intp_t max_features,
+        intp_t min_samples_leaf,
+        float64_t min_weight_leaf,
         object random_state,
         const cnp.int8_t[:] monotonic_cst,
-        const SIZE_t[:] min_patch_dims,
-        const SIZE_t[:] max_patch_dims,
+        float64_t feature_combinations,
+        const intp_t[:] min_patch_dims,
+        const intp_t[:] max_patch_dims,
         const cnp.uint8_t[:] dim_contiguous,
-        const SIZE_t[:] data_dims,
+        const intp_t[:] data_dims,
         bytes boundary,
-        const DTYPE_t[:, :] feature_weight,
+        const float32_t[:, :] feature_weight,
         *argv
     ):
         self.criterion = criterion
@@ -146,8 +147,8 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
         self.monotonic_cst = monotonic_cst
 
         # Sparse max_features x n_features projection matrix
-        self.proj_mat_weights = vector[vector[DTYPE_t]](self.max_features)
-        self.proj_mat_indices = vector[vector[SIZE_t]](self.max_features)
+        self.proj_mat_weights = vector[vector[float32_t]](self.max_features)
+        self.proj_mat_indices = vector[vector[intp_t]](self.max_features)
 
         # initialize state to allow generalization to higher-dimensional tensors
         self.ndim = data_dims.shape[0]
@@ -186,6 +187,7 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
                 self.min_weight_leaf,
                 self.random_state,
                 self.monotonic_cst.base if self.monotonic_cst is not None else None,
+                self.feature_combinations,
                 self.min_patch_dims.base if self.min_patch_dims is not None else None,
                 self.max_patch_dims.base if self.max_patch_dims is not None else None,
                 self.dim_contiguous.base if self.dim_contiguous is not None else None,
@@ -194,31 +196,31 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
                 self.feature_weight.base if self.feature_weight is not None else None,
             ), self.__getstate__())
 
-    cdef (SIZE_t, SIZE_t) sample_top_left_seed(self) noexcept nogil:
+    cdef (intp_t, intp_t) sample_top_left_seed(self) noexcept nogil:
         """Sample the top-left seed for the n-dim patch.
 
         Returns
         -------
-        top_left_seed : SIZE_t
+        top_left_seed : intp_t
             The top-left seed vectorized (i.e. raveled) for the n-dim patch.
-        patch_size : SIZE_t
+        patch_size : intp_t
             The total size of the n-dim patch (i.e. the volume).
         """
         # now get the top-left seed that is used to then determine the top-left
         # position in patch
         # compute top-left seed for the multi-dimensional patch
-        cdef SIZE_t top_left_patch_seed
-        cdef SIZE_t patch_size = 1
+        cdef intp_t top_left_patch_seed
+        cdef intp_t patch_size = 1
 
         cdef UINT32_t* random_state = &self.rand_r_state
 
         # define parameters for the random patch
-        cdef SIZE_t patch_dim
-        cdef SIZE_t delta_patch_dim
+        cdef intp_t patch_dim
+        cdef intp_t delta_patch_dim
 
-        cdef SIZE_t dim
+        cdef intp_t dim
 
-        cdef SIZE_t idx
+        cdef intp_t idx
 
         for idx in range(self.ndim):
             # compute random patch width and height
@@ -270,23 +272,23 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
 
     cdef void sample_proj_mat(
         self,
-        vector[vector[DTYPE_t]]& proj_mat_weights,
-        vector[vector[SIZE_t]]& proj_mat_indices
+        vector[vector[float32_t]]& proj_mat_weights,
+        vector[vector[intp_t]]& proj_mat_indices
     ) noexcept nogil:
         """Sample projection matrix using a contiguous patch.
 
         Randomly sample patches with weight of 1.
         """
-        cdef SIZE_t max_features = self.max_features
-        cdef int proj_i
+        cdef intp_t max_features = self.max_features
+        cdef intp_t proj_i
 
         # define parameters for vectorized points in the original data shape
         # and top-left seed
-        cdef SIZE_t top_left_patch_seed
+        cdef intp_t top_left_patch_seed
 
         # size of the sampled patch, which is just the size of the n-dim patch
         # (\prod_i self.patch_dims_buff[i])
-        cdef SIZE_t patch_size
+        cdef intp_t patch_size
 
         for proj_i in range(0, max_features):
             # now get the top-left seed that is used to then determine the top-left
@@ -306,34 +308,34 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
 
     cdef void sample_proj_vec(
         self,
-        vector[vector[DTYPE_t]]& proj_mat_weights,
-        vector[vector[SIZE_t]]& proj_mat_indices,
-        SIZE_t proj_i,
-        SIZE_t patch_size,
-        SIZE_t top_left_patch_seed,
-        const SIZE_t[:] patch_dims,
+        vector[vector[float32_t]]& proj_mat_weights,
+        vector[vector[intp_t]]& proj_mat_indices,
+        intp_t proj_i,
+        intp_t patch_size,
+        intp_t top_left_patch_seed,
+        const intp_t[:] patch_dims,
     ) noexcept nogil:
         cdef UINT32_t* random_state = &self.rand_r_state
         # iterates over the size of the patch
-        cdef SIZE_t patch_idx
+        cdef intp_t patch_idx
 
         # stores how many patches we have iterated so far
-        cdef int vectorized_patch_offset
-        cdef SIZE_t vectorized_point_offset
-        cdef SIZE_t vectorized_point
+        cdef intp_t vectorized_patch_offset
+        cdef intp_t vectorized_point_offset
+        cdef intp_t vectorized_point
 
-        cdef SIZE_t dim_idx
+        cdef intp_t dim_idx
 
         # weights are default to 1
-        cdef DTYPE_t weight = 1.
+        cdef float32_t weight = 1.
 
         # XXX: still unsure if it works yet
         # XXX: THIS ONLY WORKS FOR THE FIRST DIMENSION THAT IS DISCONTIGUOUS.
-        cdef SIZE_t other_dims_offset
-        cdef SIZE_t row_index
+        cdef intp_t other_dims_offset
+        cdef intp_t row_index
 
-        cdef SIZE_t i
-        cdef int num_rows = self.data_dims[0]
+        cdef intp_t i
+        cdef intp_t num_rows = self.data_dims[0]
         if self._discontiguous:
             # fill with values 0, 1, ..., dimension - 1
             for i in range(0, self.data_dims[0]):
@@ -405,22 +407,22 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
 
     cdef void compute_features_over_samples(
         self,
-        SIZE_t start,
-        SIZE_t end,
-        const SIZE_t[:] samples,
-        DTYPE_t[:] feature_values,
-        vector[DTYPE_t]* proj_vec_weights,  # weights of the vector (max_features,)
-        vector[SIZE_t]* proj_vec_indices    # indices of the features (max_features,)
+        intp_t start,
+        intp_t end,
+        const intp_t[:] samples,
+        float32_t[:] feature_values,
+        vector[float32_t]* proj_vec_weights,  # weights of the vector (max_features,)
+        vector[intp_t]* proj_vec_indices    # indices of the features (max_features,)
     ) noexcept nogil:
         """Compute the feature values for the samples[start:end] range.
 
         Returns -1 in case of failure to allocate memory (and raise MemoryError)
         or 0 otherwise.
         """
-        cdef SIZE_t idx, jdx
+        cdef intp_t idx, jdx
 
         # initialize feature weight to normalize across patch
-        cdef DTYPE_t patch_weight
+        cdef float32_t patch_weight
 
         # Compute linear combination of features and then
         # sort samples according to the feature values.
@@ -452,14 +454,14 @@ cdef class BestPatchSplitterTester(BestPatchSplitter):
 
     cpdef sample_projection_vector_py(
         self,
-        SIZE_t proj_i,
-        SIZE_t patch_size,
-        SIZE_t top_left_patch_seed,
-        SIZE_t[:] patch_dims,
+        intp_t proj_i,
+        intp_t patch_size,
+        intp_t top_left_patch_seed,
+        intp_t[:] patch_dims,
     ):
-        cdef vector[vector[DTYPE_t]] proj_mat_weights = vector[vector[DTYPE_t]](self.max_features)
-        cdef vector[vector[SIZE_t]] proj_mat_indices = vector[vector[SIZE_t]](self.max_features)
-        cdef SIZE_t i, j
+        cdef vector[vector[float32_t]] proj_mat_weights = vector[vector[float32_t]](self.max_features)
+        cdef vector[vector[intp_t]] proj_mat_indices = vector[vector[intp_t]](self.max_features)
+        cdef intp_t i, j
 
         # sample projection matrix in C/C++
         self.sample_proj_vec(
@@ -480,16 +482,16 @@ cdef class BestPatchSplitterTester(BestPatchSplitter):
                 proj_vecs[i, feat] = weight
         return proj_vecs
 
-    cpdef sample_projection_matrix(self):
+    cpdef sample_projection_matrix_py(self):
         """Sample projection matrix using a patch.
 
         Used for testing purposes.
 
         Randomly sample patches with weight of 1.
         """
-        cdef vector[vector[DTYPE_t]] proj_mat_weights = vector[vector[DTYPE_t]](self.max_features)
-        cdef vector[vector[SIZE_t]] proj_mat_indices = vector[vector[SIZE_t]](self.max_features)
-        cdef SIZE_t i, j
+        cdef vector[vector[float32_t]] proj_mat_weights = vector[vector[float32_t]](self.max_features)
+        cdef vector[vector[intp_t]] proj_mat_indices = vector[vector[intp_t]](self.max_features)
+        cdef intp_t i, j
 
         # sample projection matrix in C/C++
         self.sample_proj_mat(proj_mat_weights, proj_mat_indices)

@@ -53,6 +53,7 @@ CRITERIA_REG = {
 OBLIQUE_DENSE_SPLITTERS = {
     "best": _oblique_splitter.BestObliqueSplitter,
     "random": _oblique_splitter.RandomObliqueSplitter,
+    "best-multiview": _oblique_splitter.MultiViewSplitter,
 }
 
 PATCH_DENSE_SPLITTERS = {
@@ -579,7 +580,7 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
 
 
 class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
-    """A decision tree classifier.
+    """An oblique decision tree classifier.
 
     Read more in the :ref:`User Guide <sklearn:tree>`. The implementation follows
     that of :footcite:`breiman2001random` and :footcite:`TomitaSPORF2020`.
@@ -708,6 +709,20 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         ``(max_features, n_features)``. Thus this value must always be less than
         ``n_features`` in order to be valid.
 
+    ccp_alpha : non-negative float, default=0.0
+        Not used.
+
+    store_leaf_values : bool, default=False
+        Whether to store the leaf values.
+
+    monotonic_cst : array-like of int of shape (n_features), default=None
+        Indicates the monotonicity constraint to enforce on each feature.
+          - 1: monotonic increase
+          - 0: no constraint
+          - -1: monotonic decrease
+
+        Not used.
+
     Attributes
     ----------
     classes_ : ndarray of shape (n_classes,) or list of ndarray
@@ -829,6 +844,9 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         min_impurity_decrease=0.0,
         class_weight=None,
         feature_combinations=None,
+        ccp_alpha=0.0,
+        store_leaf_values=False,
+        monotonic_cst=None,
     ):
         super().__init__(
             criterion=criterion,
@@ -842,6 +860,9 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
             class_weight=class_weight,
             random_state=random_state,
             min_impurity_decrease=min_impurity_decrease,
+            ccp_alpha=ccp_alpha,
+            store_leaf_values=store_leaf_values,
+            monotonic_cst=monotonic_cst,
         )
 
         self.feature_combinations = feature_combinations
@@ -1084,6 +1105,20 @@ class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         ``(max_features, n_features)``. Thus this value must always be less than
         ``n_features`` in order to be valid.
 
+    ccp_alpha : non-negative float, default=0.0
+        Not used.
+
+    store_leaf_values : bool, default=False
+        Whether to store the leaf values.
+
+    monotonic_cst : array-like of int of shape (n_features), default=None
+        Indicates the monotonicity constraint to enforce on each feature.
+          - 1: monotonic increase
+          - 0: no constraint
+          - -1: monotonic decrease
+
+        Not used.
+
     Attributes
     ----------
     feature_importances_ : ndarray of shape (n_features,)
@@ -1190,6 +1225,9 @@ class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         max_leaf_nodes=None,
         min_impurity_decrease=0.0,
         feature_combinations=None,
+        ccp_alpha=0.0,
+        store_leaf_values=False,
+        monotonic_cst=None,
     ):
         super().__init__(
             criterion=criterion,
@@ -1202,6 +1240,9 @@ class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
             max_leaf_nodes=max_leaf_nodes,
             random_state=random_state,
             min_impurity_decrease=min_impurity_decrease,
+            ccp_alpha=ccp_alpha,
+            store_leaf_values=store_leaf_values,
+            monotonic_cst=monotonic_cst,
         )
 
         self.feature_combinations = feature_combinations
@@ -1476,6 +1517,20 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
         as follows: for every patch that is sampled, the feature weights over
         the entire patch is summed and normalizes the patch.
 
+    ccp_alpha : non-negative float, default=0.0
+        Not used.
+
+    store_leaf_values : bool, default=False
+        Whether to store the leaf values.
+
+    monotonic_cst : array-like of int of shape (n_features), default=None
+        Indicates the monotonicity constraint to enforce on each feature.
+          - 1: monotonic increase
+          - 0: no constraint
+          - -1: monotonic decrease
+
+        Not used.
+
     Attributes
     ----------
     classes_ : ndarray of shape (n_classes,) or list of ndarray
@@ -1578,6 +1633,9 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
         data_dims=None,
         boundary=None,
         feature_weight=None,
+        ccp_alpha=0.0,
+        store_leaf_values=False,
+        monotonic_cst=None,
     ):
         super().__init__(
             criterion=criterion,
@@ -1591,6 +1649,9 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
             class_weight=class_weight,
             random_state=random_state,
             min_impurity_decrease=min_impurity_decrease,
+            ccp_alpha=ccp_alpha,
+            store_leaf_values=store_leaf_values,
+            monotonic_cst=monotonic_cst,
         )
 
         self.min_patch_dims = min_patch_dims
@@ -1652,6 +1713,9 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
         random_state : int, RandomState instance or None, default=None
             Controls the randomness of the estimator.
         """
+        # Not used. Here for API compatibility
+        self.feature_combinations_ = 1
+
         if self.feature_weight is not None:
             self.feature_weight = self._validate_data(
                 self.feature_weight, ensure_2d=True, dtype=DTYPE
@@ -1741,6 +1805,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
                 min_weight_leaf,
                 random_state,
                 monotonic_cst,
+                self.feature_combinations_,
                 self.min_patch_dims_,
                 self.max_patch_dims_,
                 self.dim_contiguous_,
@@ -1917,6 +1982,20 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         as follows: for every patch that is sampled, the feature weights over
         the entire patch is summed and normalizes the patch.
 
+    ccp_alpha : non-negative float, default=0.0
+        Not used.
+
+    store_leaf_values : bool, default=False
+        Whether to store the leaf values.
+
+    monotonic_cst : array-like of int of shape (n_features), default=None
+        Indicates the monotonicity constraint to enforce on each feature.
+          - 1: monotonic increase
+          - 0: no constraint
+          - -1: monotonic decrease
+
+        Not used.
+
     Attributes
     ----------
     feature_importances_ : ndarray of shape (n_features,)
@@ -2022,6 +2101,9 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         data_dims=None,
         boundary=None,
         feature_weight=None,
+        ccp_alpha=0.0,
+        store_leaf_values=False,
+        monotonic_cst=None,
     ):
         super().__init__(
             criterion=criterion,
@@ -2034,6 +2116,9 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
             max_leaf_nodes=max_leaf_nodes,
             random_state=random_state,
             min_impurity_decrease=min_impurity_decrease,
+            ccp_alpha=ccp_alpha,
+            store_leaf_values=store_leaf_values,
+            monotonic_cst=monotonic_cst,
         )
 
         self.min_patch_dims = min_patch_dims
@@ -2094,6 +2179,9 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         random_state : int, RandomState instance or None, default=None
             Controls the randomness of the estimator.
         """
+        # Not used. Here for API compatibility
+        self.feature_combinations_ = 1
+
         if self.feature_weight is not None:
             self.feature_weight = self._validate_data(
                 self.feature_weight, ensure_2d=True, dtype=DTYPE
@@ -2184,6 +2272,7 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
                 min_weight_leaf,
                 random_state,
                 monotonic_cst,
+                self.feature_combinations_,
                 self.min_patch_dims_,
                 self.max_patch_dims_,
                 self.dim_contiguous_,
@@ -2367,6 +2456,20 @@ class ExtraObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
         ``(max_features, n_features)``. Thus this value must always be less than
         ``n_features`` in order to be valid.
 
+    ccp_alpha : non-negative float, default=0.0
+        Not used.
+
+    store_leaf_values : bool, default=False
+        Whether to store the leaf values.
+
+    monotonic_cst : array-like of int of shape (n_features), default=None
+        Indicates the monotonicity constraint to enforce on each feature.
+          - 1: monotonic increase
+          - 0: no constraint
+          - -1: monotonic decrease
+
+        Not used.
+
     Attributes
     ----------
     classes_ : ndarray of shape (n_classes,) or list of ndarray
@@ -2492,6 +2595,9 @@ class ExtraObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
         min_impurity_decrease=0.0,
         class_weight=None,
         feature_combinations=None,
+        ccp_alpha=0.0,
+        store_leaf_values=False,
+        monotonic_cst=None,
     ):
         super().__init__(
             criterion=criterion,
@@ -2505,6 +2611,9 @@ class ExtraObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
             class_weight=class_weight,
             random_state=random_state,
             min_impurity_decrease=min_impurity_decrease,
+            ccp_alpha=ccp_alpha,
+            store_leaf_values=store_leaf_values,
+            monotonic_cst=monotonic_cst,
         )
 
         self.feature_combinations = feature_combinations
@@ -2756,6 +2865,20 @@ class ExtraObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         ``(max_features, n_features)``. Thus this value must always be less than
         ``n_features`` in order to be valid.
 
+    ccp_alpha : non-negative float, default=0.0
+        Not used.
+
+    store_leaf_values : bool, default=False
+        Whether to store the leaf values.
+
+    monotonic_cst : array-like of int of shape (n_features), default=None
+        Indicates the monotonicity constraint to enforce on each feature.
+          - 1: monotonic increase
+          - 0: no constraint
+          - -1: monotonic decrease
+
+        Not used.
+
     Attributes
     ----------
     feature_importances_ : ndarray of shape (n_features,)
@@ -2863,6 +2986,9 @@ class ExtraObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         max_leaf_nodes=None,
         min_impurity_decrease=0.0,
         feature_combinations=None,
+        ccp_alpha=0.0,
+        store_leaf_values=False,
+        monotonic_cst=None,
     ):
         super().__init__(
             criterion=criterion,
@@ -2875,6 +3001,9 @@ class ExtraObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
             max_leaf_nodes=max_leaf_nodes,
             random_state=random_state,
             min_impurity_decrease=min_impurity_decrease,
+            ccp_alpha=ccp_alpha,
+            store_leaf_values=store_leaf_values,
+            monotonic_cst=monotonic_cst,
         )
 
         self.feature_combinations = feature_combinations

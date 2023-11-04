@@ -1,0 +1,33 @@
+:orphan:
+
+.. include:: _contributors.rst
+.. currentmodule:: sktree
+
+.. _v0_3:
+
+Version 0.3
+===========
+
+This release includes a number of bug fixes and enhancements related to hypothesis testing with decision trees.
+Moreover, we have added an experimental multi-view decision tree / random forest, which considers multiple views
+of the data when building trees. The documentation page has also undergone an organizational overhaul
+making it easier for users to find examples related to specific use cases.
+
+Changelog
+---------
+- |Fix| Fixes a bug in consistency of train/test samples when ``random_state`` is not set in FeatureImportanceForestClassifier and FeatureImportanceForestRegressor, by `Adam Li`_ (:pr:`135`)
+- |Fix| Fixes a bug where covariate indices were not shuffled by default when running FeatureImportanceForestClassifier and FeatureImportanceForestRegressor test methods, by `Sambit Panda`_ (:pr:`140`)
+- |Enhancement| Add multi-view splitter for axis-aligned decision trees, by `Adam Li`_ (:pr:`129`)
+- |Enhancement| Add stratified sampling option to ``FeatureImportance*`` via the ``stratify`` keyword argument, by `Yuxin Bai`_ (:pr:`143`)
+- |Fix| Fixed usage of ``feature_importances_`` property in ``HonestForestClassifier``, by `Adam Li`_ (:pr:`156`)
+- |Fix| Fixed ``HonestForestClassifier`` to allow decision-trees from sklearn, albeit with a limited API, by `Adam Li`_ (:pr:`158`)
+
+Code and Documentation Contributors
+-----------------------------------
+
+Thanks to everyone who has contributed to the maintenance and improvement of
+the project since version inception, including:
+
+* `Adam Li`_
+* `Sambit Panda`_
+* `Yuxin Bai`_

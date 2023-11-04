@@ -3,7 +3,7 @@ import logging
 import os
 import sys
 
-__version__ = "0.2.0dev0"
+__version__ = "0.4dev0"
 logger = logging.getLogger(__name__)
 
 
@@ -36,7 +36,7 @@ if __sktree_SETUP__:
     # process, as it may not be compiled yet
 else:
     try:
-        from . import _lib, tree, ensemble, experimental
+        from . import _lib, tree, ensemble, experimental, stats
         from ._lib.sklearn.ensemble._forest import (
             RandomForestClassifier,
             RandomForestRegressor,
@@ -44,7 +44,7 @@ else:
             ExtraTreesRegressor,
         )
         from .neighbors import NearestNeighborsMetaEstimator
-        from .ensemble import ExtendedIsolationForest
+        from .ensemble import ExtendedIsolationForest, MultiViewRandomForestClassifier
         from .ensemble._unsupervised_forest import (
             UnsupervisedRandomForest,
             UnsupervisedObliqueRandomForest,
@@ -59,6 +59,7 @@ else:
         )
         from .ensemble._honest_forest import HonestForestClassifier
     except ImportError as e:
+        print(e.msg)
         msg = """Error importing scikit-tree: you cannot import scikit-tree while
         being in scikit-tree source directory; please exit the scikit-tree source
         tree first and relaunch your Python interpreter."""
@@ -69,6 +70,7 @@ else:
         "tree",
         "experimental",
         "ensemble",
+        "stats",
         "ExtraObliqueRandomForestClassifier",
         "ExtraObliqueRandomForestRegressor",
         "NearestNeighborsMetaEstimator",
@@ -84,4 +86,5 @@ else:
         "ExtraTreesClassifier",
         "ExtraTreesRegressor",
         "ExtendedIsolationForest",
+        "MultiViewRandomForestClassifier",
     ]

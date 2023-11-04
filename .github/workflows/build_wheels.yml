@@ -19,6 +19,17 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  create_artifacts_folder:
+    name: Create Artifacts Folder
+    runs-on: ubuntu-latest
+    outputs:
+      artifacts_folder: ${{ steps.set_folder.outputs.folder_name }}
+
+    steps:
+      - name: Set Artifacts Folder
+        id: set_folder
+        run: echo "folder_name=artifacts/${{ github.run_id }}" >> $GITHUB_ENV
+
   build_wheels:
     name: Build wheels on ${{ matrix.os[1] }} - ${{ matrix.os[2] }} with Python ${{ matrix.python[0] }}
     runs-on: ${{ matrix.os[0] }}
@@ -33,7 +44,7 @@ jobs:
           # - [macos-12, macosx_*, arm64]
           - [windows-2019, win, AMD64]
 
-        python: [["cp39", "3.9"], ["cp310", "3.10"], ["cp311", "3.11.0-alpha - 3.11.0"]]
+        python: [["cp39", "3.9"], ["cp310", "3.10"], ["cp311", "3.11"]]
         # python[0] is used to specify the python versions made by cibuildwheel
     
     env:
@@ -60,7 +71,7 @@ jobs:
         if: ${{ runner.os == 'Windows' && env.IS_32_BIT == 'false' }}
         
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.16.0
+        uses: pypa/cibuildwheel@v2.16.2
         # Build all wheels here, apart from macosx_arm64, linux_aarch64
         # cibuildwheel is currently unable to pass configuration flags to
         # CIBW_BUILD_FRONTEND https://github.com/pypa/cibuildwheel/issues/1227
@@ -109,7 +120,7 @@ jobs:
           python spin setup-submodule
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.16.0
+        uses: pypa/cibuildwheel@v2.16.2
         env:
           CIBW_BUILD: ${{ matrix.python[0] }}-macosx_arm64
           CIBW_ARCHS_MACOS: arm64

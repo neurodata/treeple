@@ -5,6 +5,7 @@ import threading
 
 import numpy as np
 from joblib import Parallel, delayed
+from sklearn.base import _fit_context
 from sklearn.ensemble._base import _partition_estimators
 from sklearn.utils.validation import check_is_fitted, check_X_y
 
@@ -186,7 +187,9 @@ class HonestForestClassifier(ForestClassifier):
 
     tree_estimator : object, default=None
         Type of decision tree classifier to use. By default `None`, which
-        defaults to :class:`sklearn.tree.DecisionTreeClassifier`.
+        defaults to `sktree.tree.DecisionTreeClassifier`. Note
+        that one MUST use trees imported from the `sktree.tree`
+        API namespace rather than from `sklearn.tree`.
 
     Attributes
     ----------
@@ -374,6 +377,7 @@ class HonestForestClassifier(ForestClassifier):
         self.honest_prior = honest_prior
         self.tree_estimator = tree_estimator
 
+    @_fit_context(prefer_skip_nested_validation=True)
     def fit(self, X, y, sample_weight=None, classes=None):
         """
         Build a forest of trees from the training set (X, y).
@@ -447,12 +451,12 @@ class HonestForestClassifier(ForestClassifier):
         posteriors = [
             np.zeros((X.shape[0], j), dtype=np.float64) for j in np.atleast_1d(self.n_classes_)
         ]
-        lock = threading.Lock()
-
         if indices is None:
             indices = [None] * self.n_estimators
+
+        lock = threading.Lock()
         Parallel(n_jobs=n_jobs, verbose=self.verbose, require="sharedmem")(
-            delayed(_accumulate_prediction)(tree, X, posteriors, lock, idx)
+            delayed(_accumulate_prediction)(tree.predict_proba, X, posteriors, lock, idx)
             for tree, idx in zip(self.estimators_, indices)
         )
 
@@ -486,11 +490,6 @@ class HonestForestClassifier(ForestClassifier):
         """The indices used to fit the leaf nodes."""
         check_is_fitted(self)
         return [tree.honest_indices_ for tree in self.estimators_]
-
-    @property
-    def feature_importances_(self):
-        """The feature importances."""
-        return self.estimator_.feature_importances_
 
     def _more_tags(self):
         return {"multioutput": False}
@@ -577,7 +576,7 @@ class HonestForestClassifier(ForestClassifier):
         return self.estimator_.get_leaf_node_samples(X)
 
 
-def _accumulate_prediction(tree, X, out, lock, indices=None):
+def _accumulate_prediction(predict, X, out, lock, indices=None):
     """
     See https://github.com/scikit-learn/scikit-learn/blob/
     95119c13af77c76e150b753485c662b7c52a41a2/sklearn/ensemble/_forest.py#L460
@@ -588,7 +587,7 @@ def _accumulate_prediction(tree, X, out, lock, indices=None):
 
     if indices is None:
         indices = np.arange(X.shape[0])
-    proba = tree.predict_proba(X[indices], check_input=False)
+    proba = predict(X[indices], check_input=False)
 
     with lock:
         if len(out) == 1:

@@ -87,6 +87,8 @@ nitpicky = False
 # TODO: figure out why these are raising an error?
 nitpick_ignore = [
     ("py:mod", "sktree.tree"),
+    ("py:mod", "sktree.stats"),
+    ("py:class", "sklearn.utils.metadata_routing.MetadataRequest"),
 ]
 
 # The name of a reST role (builtin or Sphinx extension) to use as the default
@@ -112,6 +114,7 @@ html_css_files = ["style.css"]
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
+switcher_version_match = "dev" if "dev" in release else version
 html_theme_options = {
     "icon_links": [
         dict(
@@ -123,7 +126,11 @@ html_theme_options = {
     "use_edit_page_button": False,
     "navigation_with_keys": False,
     "show_toc_level": 1,
-    "navbar_end": ["version-switcher", "navbar-icon-links"],
+    "navbar_end": ["theme-switcher", "version-switcher", "navbar-icon-links"],
+    "switcher": {
+        "json_url": "https://raw.githubusercontent.com/neurodata/scikit-tree/main/doc/_static/versions.json",  # noqa: E501
+        "version_match": switcher_version_match,
+    },
 }
 # Custom sidebar templates, maps document names to template names.
 html_sidebars = {
@@ -133,10 +140,8 @@ html_sidebars = {
 html_context = {
     "pygment_light_style": "tango",
     "pygment_dark_style": "native",
-    "versions_dropdown": {
-        "dev": "v0.2 (devel)",
-        "stable": "v0.1",
-    },
+    "default_mode": "auto",
+    "doc_path": "doc",
 }
 
 # -- autosummary -------------------------------------------------------------
@@ -204,6 +209,8 @@ numpydoc_xref_ignore = {
     "matrix",
     "Ignored",
     "UnsupervisedSplitter",
+    "n_repeats",
+    "n_samples_test_used",
     # from sklearn
     "such",
     "arrays",
@@ -213,6 +220,7 @@ numpydoc_xref_ignore = {
     "Tree",
     "_type_",
     "MetadataRequest",
+    "sklearn.utils.metadata_routing.MetadataRequest",
     "~utils.metadata_routing.MetadataRequest",
     "quantiles",
     "n_quantiles",
@@ -230,6 +238,12 @@ numpydoc_xref_ignore = {
     "joblib.parallel_backend",
     "length",
     "instances",
+    "decision_path",
+    "n_samples_final",
+    "predict",
+    "fit",
+    "apply",
+    "TreeBuilder",
 }
 
 # validation

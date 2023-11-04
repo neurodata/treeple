@@ -58,6 +58,9 @@ best split hence the complexity is `O(n\log(n))`. In Extra trees, samples
 are not sorted and the split is determined by randomly drawing a threshold from the feature's
 range, hence the complexity is `O(n)`. This makes the algorithm more suitable for large datasets.
 
+To see how sample-sizes affect the performance of Extra Oblique Trees vs regular Oblique Trees,
+see :ref:`sphx_glr_auto_examples_sparse_oblique_trees_plot_extra_orf_sample_size.py`
+
 References
 ----------
 .. [1] P. Geurts, D. Ernst., and L. Wehenkel, "Extremely randomized trees", Machine Learning, 63(1),
@@ -149,6 +152,7 @@ params = {
     "random_state": random_state,
     "n_cv": 10,
     "n_repeats": 1,
+    "n_jobs": -1,
 }
 
 for data_id in data_ids:

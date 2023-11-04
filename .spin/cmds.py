@@ -1,5 +1,4 @@
 import os
-import shutil
 import subprocess
 import sys
 
@@ -13,39 +12,27 @@ def get_git_revision_hash(submodule) -> str:
 
 
 @click.command()
-@click.option("--build-dir", default="build", help="Build directory; default is `$PWD/build`")
-@click.option("--clean", is_flag=True, help="Clean previously built docs before building")
-@click.option("--noplot", is_flag=True, help="Build docs without plots")
+@click.argument("slowtest", default=True)
 @click.pass_context
-def docs(ctx, build_dir, clean=False, noplot=False):
-    """📖 Build documentation"""
-    if clean:
-        doc_dir = "./docs/_build"
-        if os.path.isdir(doc_dir):
-            print(f"Removing `{doc_dir}`")
-            shutil.rmtree(doc_dir)
-
-    site_path = meson._get_site_packages()
-    if site_path is None:
-        print("No built scikit-tree found; run `./spin build` first.")
-        sys.exit(1)
-
-    util.run(["pip", "install", "-q", "-r", "doc_requirements.txt"])
-
-    ctx.invoke(meson.docs)
-    # os.environ["SPHINXOPTS"] = "-W"
-    # os.environ["PYTHONPATH"] = f'{site_path}{os.sep}:{os.environ.get("PYTHONPATH", "")}'
-    # if noplot:
-    #     util.run(["make", "-C", "docs", "clean", "html-noplot"], replace=True)
-    # else:
-    #     util.run(["make", "-C", "docs", "clean", "html"], replace=True)
-
-
-@click.command()
-@click.pass_context
-def coverage(ctx):
+def coverage(ctx, slowtest):
     """📊 Generate coverage report"""
-    pytest_args = ("-o", "python_functions=test_*", "sktree", "--cov=sktree", "--cov-report=xml")
+    if slowtest:
+        pytest_args = (
+            "-o",
+            "python_functions=test_*",
+            "sktree",
+            "--cov=sktree",
+            "--cov-report=xml",
+            "-k .",
+        )
+    else:
+        pytest_args = (
+            "-o",
+            "python_functions=test_*",
+            "sktree",
+            "--cov=sktree",
+            "--cov-report=xml",
+        )
     ctx.invoke(meson.test, pytest_args=pytest_args)
 
 
@@ -67,7 +54,7 @@ def setup_submodule(forcesubmodule=False):
     This will update the submodule, which then must be commited so that
     git knows the submodule needs to be at a certain commit hash.
     """
-    commit_fpath = "./sktree/_lib/sklearn_fork/commit.txt"
+    commit_fpath = "./sktree/_lib/commit.txt"
     submodule = "./sktree/_lib/sklearn_fork"
     commit = ""
     current_hash = ""

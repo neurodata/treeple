@@ -26,3 +26,4 @@
 .. _SUKI-O : https://github.com/SUKI-O
 .. _Ronan Perry : https://rflperry.github.io/
 .. _Haoyin Xu : https://github.com/PSSF23
+.. _Yuxin Bai : https://github.com/YuxinB

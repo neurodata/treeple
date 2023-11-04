@@ -34,6 +34,15 @@ to the scikit-learn estimators.
    ExtraTreesClassifier
    ExtraTreesRegressor
 
+.. currentmodule:: sktree.tree
+.. autosummary::
+   :toctree: generated/
+
+   DecisionTreeClassifier
+   DecisionTreeRegressor
+   ExtraTreeClassifier
+   ExtraTreeRegressor
+
 Supervised
 ----------
 Decision-tree models are traditionally implemented with axis-aligned splits and
@@ -56,6 +65,7 @@ how scikit-learn builds trees.
    PatchObliqueRandomForestClassifier
    PatchObliqueRandomForestRegressor
    HonestForestClassifier
+   MultiViewRandomForestClassifier
 
 .. currentmodule:: sktree.tree
 .. autosummary::
@@ -66,6 +76,7 @@ how scikit-learn builds trees.
    PatchObliqueDecisionTreeClassifier
    PatchObliqueDecisionTreeRegressor
    HonestTreeClassifier
+   MultiViewDecisionTreeClassifier
 
 Unsupervised
 ------------
@@ -124,6 +135,20 @@ an API-like interface similar to :class:`~sklearn.neighbors.NearestNeighbors`.
    :toctree: generated/
 
    NearestNeighborsMetaEstimator
+
+Statistical Hypothesis Testing
+------------------------------
+We provide an API for performing statistical hypothesis testing using Decision
+tree models.
+
+.. currentmodule:: sktree.stats
+.. autosummary::
+   :toctree: generated/
+
+   FeatureImportanceForestRegressor
+   FeatureImportanceForestClassifier
+   PermutationForestClassifier
+   PermutationForestRegressor
 
 
 Experimental Functionality

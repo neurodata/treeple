@@ -1,10 +1,9 @@
 # Authors: Ronan Perry, Sambit Panda, Haoyin Xu
 # Adopted from: https://github.com/neurodata/honest-forests
 
-from copy import deepcopy
-
 import numpy as np
-from sklearn.base import ClassifierMixin, MetaEstimatorMixin, _fit_context
+from sklearn.base import ClassifierMixin, MetaEstimatorMixin, _fit_context, clone
+from sklearn.ensemble._base import _set_random_states
 from sklearn.utils.multiclass import _check_partial_fit_first_call, check_classification_targets
 from sklearn.utils.validation import check_is_fitted, check_X_y
 
@@ -151,9 +150,10 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         Read more in the :ref:`User Guide <monotonic_cst_gbdt>`.
 
     tree_estimator : object, default=None
-        Instatiated tree of type BaseDecisionTree.
+        Instantiated tree of type BaseDecisionTree from sktree.
         If None, then DecisionTreeClassifier with default parameters will
-        be used.
+        be used. Note that one MUST use trees imported from the `sktree.tree`
+        API namespace rather than from `sklearn.tree`.
 
     honest_fraction : float, default=0.5
         Fraction of training samples used for estimates in the leaves. The
@@ -536,7 +536,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
 
         _sample_weight[self.honest_indices_] = 0
 
-        if not self.tree_estimator:
+        if self.tree_estimator is None:
             self.estimator_ = DecisionTreeClassifier(
                 criterion=self.criterion,
                 splitter=self.splitter,
@@ -554,18 +554,61 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
                 store_leaf_values=self.store_leaf_values,
             )
         else:
+            # XXX: Remove this?
+            # we throw an error if the user is using trees from sklearn:main
+            # if isinstance(self.tree_estimator, skBaseDecisionTree):
+            #     raise RuntimeError("Instead of using sklearn.tree, use trees import from sktree.")
+
             # XXX: maybe error out if the tree_estimator is already fitted
-            self.estimator_ = deepcopy(self.tree_estimator)
+            self.estimator_ = clone(self.tree_estimator)
+            self.estimator_.set_params(
+                **dict(
+                    criterion=self.criterion,
+                    splitter=self.splitter,
+                    max_depth=self.max_depth,
+                    min_samples_split=self.min_samples_split,
+                    min_samples_leaf=self.min_samples_leaf,
+                    min_weight_fraction_leaf=self.min_weight_fraction_leaf,
+                    max_features=self.max_features,
+                    max_leaf_nodes=self.max_leaf_nodes,
+                    class_weight=self.class_weight,
+                    random_state=self.random_state,
+                    min_impurity_decrease=self.min_impurity_decrease,
+                    ccp_alpha=self.ccp_alpha,
+                )
+            )
+            try:
+                self.estimator_.set_params(**dict(monotonic_cst=self.monotonic_cst))
+                self.estimator_.set_params(
+                    **dict(
+                        store_leaf_values=self.store_leaf_values,
+                    )
+                )
+            except Exception:
+                print("Using sklearn tree")
+
+            if self.random_state is not None:
+                _set_random_states(self.estimator_, self.random_state)
 
         # Learn structure on subsample
-        self.estimator_._fit(
-            X,
-            y,
-            sample_weight=_sample_weight,
-            check_input=check_input,
-            missing_values_in_feature_mask=missing_values_in_feature_mask,
-            classes=classes,
-        )
+        # XXX: this allows us to use BaseDecisionTree without partial_fit API
+        try:
+            self.estimator_._fit(
+                X,
+                y,
+                sample_weight=_sample_weight,
+                check_input=check_input,
+                missing_values_in_feature_mask=missing_values_in_feature_mask,
+                classes=classes,
+            )
+        except Exception:
+            self.estimator_._fit(
+                X,
+                y,
+                sample_weight=_sample_weight,
+                check_input=check_input,
+                missing_values_in_feature_mask=missing_values_in_feature_mask,
+            )
         self._inherit_estimator_attributes()
 
         # update the number of classes, unsplit

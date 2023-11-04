@@ -55,6 +55,7 @@ python_sources = [
   '__init__.py',
   'neighbors.py',
   'utils.py'
+  'conftest.py',
 ]
 
 py3.install_sources(
@@ -81,7 +82,8 @@ cython_c_args += ['-Wno-cpp']
 cython_cpp_args = cython_c_args
 
 subdir('_lib')
-subdir('tree')
 subdir('ensemble')
 subdir('experimental')
+subdir('stats')
 subdir('tests')
+subdir('tree')
