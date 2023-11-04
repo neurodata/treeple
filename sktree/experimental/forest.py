@@ -190,7 +190,7 @@ def cond_entropy(
             class_counts[tree_vote_leaves[i], true_classes[i]] += 1
 
         # compute total number of samples in each leaf node
-        # then compute probabilies per class for each node
+        # then compute probabilities per class for each node
         # (n_nodes, n_classes_)
         n_node_leaves = class_counts.sum(axis=1)
         class_probs = _finite_sample_correction(class_counts, n_node_leaves, n_classes, kappa=kappa)

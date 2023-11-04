@@ -238,7 +238,15 @@ def embed_high_dims(data, n_dims=50, random_state=None):
     return new_data
 
 
-def simulate_separate_gaussians(n_dims=2, n_samples=1000, n_classes=2, mean1: float=None, var1: float=None, pi=None, seed=None):
+def simulate_separate_gaussians(
+    n_dims=2,
+    n_samples=1000,
+    n_classes=2,
+    mean1: float = None,
+    var1: float = None,
+    pi=None,
+    seed=None,
+):
     """Simulate data from separate multivariate Gaussians.
 
     Parameters

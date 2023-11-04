@@ -1,21 +1,20 @@
 # Reimplementation of Figure 4 from Uncertainty Forests
 
+import copy
+import pickle
+
+import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-import matplotlib.pyplot as plt
-import pickle
-import copy
-
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.calibration import CalibratedClassifierCV
-
 from joblib import Parallel, delayed
-from scipy.stats import entropy, multivariate_normal
 from scipy.integrate import nquad
+from scipy.stats import entropy, multivariate_normal
+from sklearn.calibration import CalibratedClassifierCV
+from sklearn.ensemble import RandomForestClassifier
 
 from sktree import HonestForestClassifier
-from sktree.tree import ObliqueDecisionTreeClassifier
 from sktree.experimental.simulate import simulate_separate_gaussians
+from sktree.tree import ObliqueDecisionTreeClassifier
 
 
 def plot_setting(X, y, name, ax):

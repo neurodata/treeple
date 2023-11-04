@@ -435,7 +435,7 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
         deref(oblique_split).impurity_right = best_split.impurity_right
         return 0
 
-      
+
 cdef class RandomObliqueSplitter(ObliqueSplitter):
     def __reduce__(self):
         """Enable pickling the splitter."""
