@@ -329,7 +329,7 @@ def test_honest_forest_with_sklearn_trees_with_auc():
     print(scores, sk_scores)
     print(np.mean(scores), np.mean(sk_scores))
     print(np.std(scores), np.std(sk_scores))
-    assert_allclose(np.mean(sk_scores), np.mean(scores), atol=0.05)
+    assert_allclose(np.mean(sk_scores), np.mean(scores), atol=0.005)
 
 
 def test_honest_forest_with_sklearn_trees_with_mi():
@@ -371,4 +371,4 @@ def test_honest_forest_with_sklearn_trees_with_mi():
     print(scores, sk_scores)
     print(np.mean(scores), np.mean(sk_scores))
     print(np.std(scores), np.std(sk_scores))
-    assert_allclose(np.mean(sk_scores), np.mean(scores), atol=0.05)
+    assert_allclose(np.mean(sk_scores), np.mean(scores), atol=0.005)
