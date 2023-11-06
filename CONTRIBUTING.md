@@ -3,11 +3,7 @@
 Thanks for considering contributing! Please read this document to learn the various ways you can contribute to this project and how to go about doing it.
 
 **Submodule dependency on a fork of scikit-learn**
-<<<<<<< Updated upstream
-Due to the current state of scikit-learn's internal Cython code for trees, we have to instead leverage a maintained fork of scikit-learn at https://github.com/neurodata/scikit-learn, where specifically, the `submodulev2` branch is used to build and install this repo. We keep that fork well-maintained and up-to-date with respect to the main sklearn repo. The only difference is the refactoring of the `tree/` submodule. This fork is used internally under the namespace ``sktree._lib.sklearn``. It is necessary to use this fork for anything related to:
-=======
 Due to the current state of scikit-learn's internal Cython code for trees, we have to instead leverage a maintained fork of scikit-learn at <https://github.com/neurodata/scikit-learn>, where specifically, the `submodulev3` branch is used to build and install this repo. We keep that fork well-maintained and up-to-date with respect to the main sklearn repo. The only difference is the refactoring of the `tree/` submodule. This fork is used internally under the namespace ``sktree._lib.sklearn``. It is necessary to use this fork for anything related to:
->>>>>>> Stashed changes
 
 - `RandomForest*`
 - `ExtraTrees*`
