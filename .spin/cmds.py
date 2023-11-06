@@ -137,7 +137,7 @@ def setup_submodule(forcesubmodule=False):
 def build(ctx, meson_args, jobs=None, clean=False, forcesubmodule=False, verbose=False):
     """Build scikit-tree using submodules.
 
-    git submodule update --recursive --remote
+        git submodule update --recursive --remote
 
     To update submodule wrt latest commits:
 

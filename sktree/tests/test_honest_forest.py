@@ -1,7 +1,6 @@
 import numpy as np
 import pytest
 from numpy.testing import assert_allclose, assert_array_almost_equal
-from scipy.stats import entropy
 from sklearn import datasets
 from sklearn.metrics import accuracy_score, r2_score, roc_auc_score
 from sklearn.model_selection import cross_val_score
@@ -358,16 +357,13 @@ def test_honest_forest_with_sklearn_trees_with_mi():
         Forest.fit(X, y)
 
         # compute MI
-        _, counts = np.unique(y, return_counts=True)
-        H_Y = entropy(counts, base=np.exp(1))
-
+        # _, counts = np.unique(y, return_counts=True)
+        # H_Y = entropy(counts, base=np.exp(1))
         sk_posterior = skForest.predict_proba(X)
-        H_YX = np.mean(entropy(sk_posterior, base=np.exp(1), axis=1))
-        sk_score = max(H_Y - H_YX, 0)
+        sk_score = _mutual_information(y, sk_posterior)
 
         posterior = Forest.predict_proba(X)
-        H_YX = np.mean(entropy(posterior, base=np.exp(1), axis=1))
-        score = max(H_Y - H_YX, 0)
+        score = _mutual_information(y, posterior)
 
         scores.append(score)
         sk_scores.append(sk_score)
