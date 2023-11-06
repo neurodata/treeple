@@ -144,7 +144,7 @@ class BaseForestHT(MetaEstimatorMixin):
 
     @property
     def n_estimators(self):
-        return self.estimator_.n_estimators
+        return self._n_estimators
 
     def reset(self):
         class_attributes = dir(type(self))
@@ -174,7 +174,8 @@ class BaseForestHT(MetaEstimatorMixin):
             if self._seeds is None:
                 self._seeds = []
 
-                for tree in self.estimator_.estimators_:
+                for itree in range(self.estimator_.n_estimators):
+                    tree = self.estimator_.estimators_[itree]
                     if tree.random_state is None:
                         self._seeds.append(rng.integers(low=0, high=np.iinfo(np.int32).max))
                     else:
@@ -216,7 +217,7 @@ class BaseForestHT(MetaEstimatorMixin):
                 random_state=self._seeds,
             )
 
-            for _ in self.estimator_.estimators_:
+            for _ in range(self.estimator_.n_estimators):
                 yield indices_train, indices_test
 
     @property
@@ -352,6 +353,27 @@ class BaseForestHT(MetaEstimatorMixin):
             self.permuted_estimator_ = self._get_estimator()
             estimator = self.permuted_estimator_
 
+            if not hasattr(self, "estimator_") or self.estimator_ is None:
+                self.estimator_ = self._get_estimator()
+
+                # Ensure that the estimator_ is fitted at least
+                if not _is_fitted(self.estimator_) and is_classifier(self.estimator_):
+                    _unique_y = []
+                    for axis in range(y.shape[1]):
+                        _unique_y.append(np.unique(y[:, axis]))
+                    unique_y = np.hstack(_unique_y)
+                    if unique_y.ndim > 1 and unique_y.shape[1] == 1:
+                        unique_y = unique_y.ravel()
+                    X_dummy = np.zeros((unique_y.shape[0], X.shape[1]))
+                    self.estimator_.fit(X_dummy, unique_y)
+                elif not _is_fitted(estimator):
+                    if y.ndim > 1 and y.shape[1] == 1:
+                        self.estimator_.fit(X[:2], y[:2].ravel())
+                    else:
+                        self.estimator_.fit(X[:2], y[:2])
+
+        self._n_estimators = estimator.n_estimators
+
         # Store a cache of the y variable
         if is_classifier(self._get_estimator()):
             self._y = y.copy()
@@ -392,7 +414,7 @@ class BaseForestHT(MetaEstimatorMixin):
             )
         self._metric = metric
 
-        if not is_classifier(self.estimator_) and metric not in REGRESSOR_METRICS:
+        if not is_classifier(estimator) and metric not in REGRESSOR_METRICS:
             raise RuntimeError(
                 f'Metric must be either "mse" or "mae" if using Regression, got {metric}'
             )

@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from numpy.testing import assert_allclose, assert_array_almost_equal
 from sklearn import datasets
-from sklearn.metrics import accuracy_score, r2_score, roc_auc_score
+from sklearn.metrics import accuracy_score, r2_score
 from sklearn.model_selection import cross_val_score
 from sklearn.tree import DecisionTreeClassifier as skDecisionTreeClassifier
 from sklearn.utils import check_random_state
@@ -11,6 +11,7 @@ from sklearn.utils.estimator_checks import parametrize_with_checks
 from sktree._lib.sklearn.tree import DecisionTreeClassifier
 from sktree.datasets import make_quadratic_classification
 from sktree.ensemble import HonestForestClassifier
+from sktree.stats.utils import _mutual_information
 from sktree.tree import ObliqueDecisionTreeClassifier, PatchObliqueDecisionTreeClassifier
 
 CLF_CRITERIONS = ("gini", "entropy")
@@ -313,12 +314,15 @@ def test_honest_forest_with_sklearn_trees_with_power():
         skForest.fit(X, y)
         Forest.fit(X, y)
 
-        # compute partial-AUC
-        sk_score = roc_auc_score(y, skForest.predict_proba(X)[:, 1], max_fpr=0.1)
-        score = roc_auc_score(y, Forest.predict_proba(X)[:, 1], max_fpr=0.1)
+        # compute MI
+        y_pred_proba = skForest.predict_proba(X)[:, 1]
+        sk_mi = _mutual_information(y, y_pred_proba)
 
-        scores.append(score)
-        sk_scores.append(sk_score)
+        y_pred_proba = Forest.predict_proba(X)[:, 1]
+        mi = _mutual_information(y, y_pred_proba)
+
+        scores.append(mi)
+        sk_scores.append(sk_mi)
 
     print(scores, sk_scores)
     print(np.mean(scores), np.mean(sk_scores))

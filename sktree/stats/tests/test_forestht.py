@@ -60,11 +60,19 @@ def test_featureimportance_forest_permute_pertree(sample_dataset_per_tree):
     with pytest.raises(RuntimeError, match="Metric must be"):
         est.statistic(iris_X[:n_samples], iris_y[:n_samples], metric="mi")
 
+    # covariate index should work with mse
+    est.reset()
+    est.statistic(iris_X[:n_samples], iris_y[:n_samples], covariate_index=[1], metric="mse")
+    with pytest.raises(RuntimeError, match="Metric must be"):
+        est.statistic(iris_X[:n_samples], iris_y[:n_samples], covariate_index=[1], metric="mi")
+
     # covariate index must be an iterable
+    est.reset()
     with pytest.raises(RuntimeError, match="covariate_index must be an iterable"):
         est.statistic(iris_X[:n_samples], iris_y[:n_samples], 0, metric="mi")
 
     # covariate index must be an iterable of ints
+    est.reset()
     with pytest.raises(RuntimeError, match="Not all covariate_index"):
         est.statistic(iris_X[:n_samples], iris_y[:n_samples], [0, 1.0], metric="mi")
 
