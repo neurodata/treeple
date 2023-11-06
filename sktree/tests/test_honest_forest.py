@@ -290,7 +290,7 @@ def test_honest_forest_with_sklearn_trees():
     assert_allclose(np.mean(honestsk_scores), np.mean(honest_scores))
 
 
-def test_honest_forest_with_sklearn_trees_with_power():
+def test_honest_forest_with_sklearn_trees_with_auc():
     """Test against regression in power-curves discussed in:
     https://github.com/neurodata/scikit-tree/pull/157.
 
@@ -316,6 +316,51 @@ def test_honest_forest_with_sklearn_trees_with_power():
         # compute partial-AUC
         sk_score = roc_auc_score(y, skForest.predict_proba(X)[:, 1], max_fpr=0.1)
         score = roc_auc_score(y, Forest.predict_proba(X)[:, 1], max_fpr=0.1)
+
+        scores.append(score)
+        sk_scores.append(sk_score)
+
+    print(scores, sk_scores)
+    print(np.mean(scores), np.mean(sk_scores))
+    print(np.std(scores), np.std(sk_scores))
+
+    assert_allclose(np.mean(sk_scores), np.mean(scores), atol=0.05)
+
+
+def test_honest_forest_with_sklearn_trees_with_mi():
+    """Test against regression in power-curves discussed in:
+    https://github.com/neurodata/scikit-tree/pull/157.
+
+    This unit-test now tests explicitly the power curve.
+    """
+    skForest = HonestForestClassifier(
+        n_estimators=10, tree_estimator=skDecisionTreeClassifier(), random_state=0
+    )
+
+    Forest = HonestForestClassifier(
+        n_estimators=10, tree_estimator=DecisionTreeClassifier(), random_state=0
+    )
+
+    scores = []
+    sk_scores = []
+    for idx in range(10):
+        X, y = make_quadratic_classification(1024, 4096, noise=True, seed=idx)
+        y = y.squeeze()
+
+        skForest.fit(X, y)
+        Forest.fit(X, y)
+
+        # compute MI
+        _, counts = np.unique(y, return_counts=True)
+        H_Y = entropy(counts, base=np.exp(1))
+
+        sk_posterior = skForest.predict_proba(X)
+        H_YX = np.mean(entropy(sk_posterior, base=np.exp(1), axis=1))
+        sk_score = max(H_Y - H_YX, 0)
+
+        posterior = Forest.predict_proba(X)
+        H_YX = np.mean(entropy(posterior, base=np.exp(1), axis=1))
+        score = max(H_Y - H_YX, 0)
 
         scores.append(score)
         sk_scores.append(sk_score)
