@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from scipy.stats import entropy
 from numpy.testing import assert_allclose, assert_array_almost_equal
 from sklearn import datasets
 from sklearn.metrics import accuracy_score, r2_score, roc_auc_score
