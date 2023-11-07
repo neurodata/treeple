@@ -32,7 +32,6 @@ rng = np.random.default_rng(seed)
             {
                 "estimator": RandomForestRegressor(
                     max_features="sqrt",
-                    random_state=seed,
                     n_estimators=75,
                     n_jobs=-1,
                 ),
@@ -47,7 +46,6 @@ rng = np.random.default_rng(seed)
             {
                 "estimator": RandomForestRegressor(
                     max_features="sqrt",
-                    # random_state=seed,
                     n_estimators=125,
                     n_jobs=-1,
                 ),
@@ -81,11 +79,10 @@ rng = np.random.default_rng(seed)
             {
                 "estimator": RandomForestRegressor(
                     max_features="sqrt",
-                    # random_state=seed,
                     n_estimators=125,
                     n_jobs=-1,
                 ),
-                # "random_state": seed,
+                "random_state": seed,
                 "permute_per_tree": True,
                 "sample_dataset_per_tree": False,
             },
@@ -151,7 +148,6 @@ def test_linear_model(hypotester, model_kwargs, n_samples, n_repeats, test_size)
             {
                 "estimator": RandomForestClassifier(
                     max_features="sqrt",
-                    random_state=seed,
                     n_estimators=50,
                     n_jobs=-1,
                 ),
@@ -167,11 +163,10 @@ def test_linear_model(hypotester, model_kwargs, n_samples, n_repeats, test_size)
             {
                 "estimator": RandomForestClassifier(
                     max_features="sqrt",
-                    # random_state=seed,
                     n_estimators=100,
                     n_jobs=-1,
                 ),
-                # "random_state": seed,
+                "random_state": seed,
                 "permute_per_tree": False,
                 "sample_dataset_per_tree": False,
             },
@@ -202,11 +197,10 @@ def test_linear_model(hypotester, model_kwargs, n_samples, n_repeats, test_size)
             {
                 "estimator": RandomForestClassifier(
                     max_features="sqrt",
-                    # random_state=seed,
                     n_estimators=100,
                     n_jobs=-1,
                 ),
-                # "random_state": seed,
+                "random_state": seed,
                 "permute_per_tree": True,
                 "sample_dataset_per_tree": False,
             },

@@ -357,8 +357,6 @@ def test_honest_forest_with_sklearn_trees_with_mi():
         Forest.fit(X, y)
 
         # compute MI
-        # _, counts = np.unique(y, return_counts=True)
-        # H_Y = entropy(counts, base=np.exp(1))
         sk_posterior = skForest.predict_proba(X)
         sk_score = _mutual_information(y, sk_posterior)
 
