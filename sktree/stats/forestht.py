@@ -207,13 +207,6 @@ class BaseForestHT(MetaEstimatorMixin):
             # deterministically
             seeds = self._seeds
 
-            # if sample_separate:
-            #     if self._perm_seeds is None:
-            #         new_rng = np.random.default_rng(np.random.randint(0, 1e6))
-            #         self._perm_seeds = new_rng.integers(
-            #             low=0, high=np.iinfo(np.int32).max, size=len(self.estimator_.estimators_)
-            #         )
-            #     seeds = self._perm_seeds
             for idx, tree in enumerate(self.estimator_.estimators_):
                 seed = seeds[idx]
 
