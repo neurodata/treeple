@@ -10,6 +10,7 @@ from sklearn.utils.validation import check_X_y
 from sktree._lib.sklearn.ensemble._forest import BaseForest, ForestClassifier, ForestRegressor
 
 from .utils import METRIC_FUNCTIONS, REGRESSOR_METRICS, _compute_null_distribution_perm
+from typing import Optional
 
 
 class BasePermutationForest(MetaEstimatorMixin):
@@ -62,7 +63,7 @@ class BasePermutationForest(MetaEstimatorMixin):
         estimator: BaseForest,
         X: ArrayLike,
         y: ArrayLike,
-        covariate_index: ArrayLike = None,
+        covariate_index: Optional[ArrayLike] = None,
         metric="mse",
         return_posteriors: bool = False,
         seed=None,
@@ -117,7 +118,7 @@ class BasePermutationForest(MetaEstimatorMixin):
         self,
         X: ArrayLike,
         y: ArrayLike,
-        covariate_index: ArrayLike = None,
+        covariate_index: Optional[ArrayLike] = None,
         metric="mse",
         return_posteriors: bool = False,
         check_input: bool = True,
