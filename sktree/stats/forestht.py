@@ -1,4 +1,4 @@
-from typing import Optional, Callable, Tuple, Union
+from typing import Callable, Optional, Tuple, Union
 
 import numpy as np
 from joblib import Parallel, delayed

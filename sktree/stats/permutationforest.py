@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 from numpy.typing import ArrayLike
 from sklearn.base import MetaEstimatorMixin, clone, is_classifier
@@ -10,7 +12,6 @@ from sklearn.utils.validation import check_X_y
 from sktree._lib.sklearn.ensemble._forest import BaseForest, ForestClassifier, ForestRegressor
 
 from .utils import METRIC_FUNCTIONS, REGRESSOR_METRICS, _compute_null_distribution_perm
-from typing import Optional
 
 
 class BasePermutationForest(MetaEstimatorMixin):
