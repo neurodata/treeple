@@ -22,12 +22,12 @@ permutation (compared to a standard permutation) of samples.
 
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.datasets import make_blobs, make_spd_matrix
+from sklearn.datasets import make_spd_matrix
 
 from sktree import HonestForestClassifier
+from sktree.datasets import make_gaussian_mixture
 from sktree.stats import FeatureImportanceForestClassifier
 from sktree.tree import DecisionTreeClassifier, MultiViewDecisionTreeClassifier
-from sktree.datasets import make_gaussian_mixture
 
 seed = 12345
 rng = np.random.default_rng(seed)
@@ -214,7 +214,7 @@ covariances = [
 # data from the graphical model:
 #
 # $(X_1 \\rightarrow Y; X_2)$
-# 
+#
 # Here, we either have $X_1$ or $X_2$ informative for the target, but not both. We will
 # then perform hypothesis testing using the same procedure as above. We will test the settings
 # when the high-dimensional feature-set is informative for the target, and when the
@@ -230,9 +230,7 @@ Xs, y = make_gaussian_mixture(
     class_probs=class_probs,
     random_state=seed,
 )
-X = np.hstack(
-    (Xs[1], rng.standard_normal(size=(n_samples, n_features_2)))
-)
+X = np.hstack((Xs[1], rng.standard_normal(size=(n_samples, n_features_2))))
 n_features_ends = [
     n_features + noise_dims,
     n_features_2 + n_features + noise_dims,
@@ -268,9 +266,7 @@ mv_results = dict()
 
 # we test for the first feature set, which is lower-dimensional
 covariate_index = np.arange(n_features_ends[0], dtype=int)
-stat, pvalue = est.test(
-    X, y, covariate_index=covariate_index, metric="mi", n_repeats=n_repeats
-)
+stat, pvalue = est.test(X, y, covariate_index=covariate_index, metric="mi", n_repeats=n_repeats)
 
 mv_results["low_dim_feature_stat"] = stat
 mv_results["low_dim_feature_pvalue"] = pvalue
@@ -287,7 +283,10 @@ stat, pvalue = est.test(
 )
 mv_results["high_dim_feature_stat"] = stat
 mv_results["high_dim_feature_pvalue"] = pvalue
-print(f"Estimated MI difference testing second view (does not have dependency): {stat} with Pvalue: {pvalue}")
+print(
+    f"Estimated MI difference testing second view (does not have dependency): "
+    f"{stat} with Pvalue: {pvalue}"
+)
 
 # Now, examine when the important feature-set is high-dimensional
 Xs, y = make_gaussian_mixture(
@@ -302,10 +301,10 @@ Xs, y = make_gaussian_mixture(
 )
 X = np.hstack(
     (
-        Xs[1], 
+        Xs[1],
         rng.standard_normal(size=(n_samples, n_features_2 - Xs[1].shape[1])),
-        rng.standard_normal(size=(n_samples, n_features))
-     )
+        rng.standard_normal(size=(n_samples, n_features)),
+    )
 )
 n_features_ends = [
     n_features_2,
@@ -342,9 +341,7 @@ mv_results = dict()
 
 # we test for the first feature set, which is lower-dimensional
 covariate_index = np.arange(n_features_ends[0], dtype=int)
-stat, pvalue = est.test(
-    X, y, covariate_index=covariate_index, metric="mi", n_repeats=n_repeats
-)
+stat, pvalue = est.test(X, y, covariate_index=covariate_index, metric="mi", n_repeats=n_repeats)
 
 mv_results["low_dim_feature_stat"] = stat
 mv_results["low_dim_feature_pvalue"] = pvalue
@@ -361,12 +358,15 @@ stat, pvalue = est.test(
 )
 mv_results["high_dim_feature_stat"] = stat
 mv_results["high_dim_feature_pvalue"] = pvalue
-print(f"Estimated MI difference testing second view (does not have dependency): {stat} with Pvalue: {pvalue}")
+print(
+    f"Estimated MI difference testing second view (does not have dependency): "
+    f"{stat} with Pvalue: {pvalue}"
+)
 
 # %%
 # Analysis of an exact replication of a feature-set
 # -------------------------------------------------
-# 
+#
 
 Xs, y = make_gaussian_mixture(
     centers,
@@ -378,14 +378,9 @@ Xs, y = make_gaussian_mixture(
     class_probs=class_probs,
     random_state=seed,
 )
-X = np.hstack(
-    (Xs[1], rng.standard_normal(size=(n_samples, n_features)))
-)
+X = np.hstack((Xs[1], rng.standard_normal(size=(n_samples, n_features))))
 X = np.hstack((X, X))
-n_features_ends = [
-    X.shape[1] // 2,
-    X.shape[1]
-]
+n_features_ends = [X.shape[1] // 2, X.shape[1]]
 
 print(X.shape, y.shape, n_features_ends)
 
@@ -417,16 +412,17 @@ mv_results = dict()
 
 # we test for the first feature set, which is the same as the second feature-set,
 # so in an ideal world, we should not reject the null hypothesis
-print('Testing hypothesis tester with the same feature set...')
+print("Testing hypothesis tester with the same feature set...")
 
 covariate_index = np.arange(n_features_ends[0], dtype=int)
-stat, pvalue = est.test(
-    X, y, covariate_index=covariate_index, metric="mi", n_repeats=n_repeats
-)
+stat, pvalue = est.test(X, y, covariate_index=covariate_index, metric="mi", n_repeats=n_repeats)
 
 mv_results["low_dim_feature_stat"] = stat
 mv_results["low_dim_feature_pvalue"] = pvalue
-print(f"Estimated MI difference with first view (does not have dependency): {stat} with Pvalue: {pvalue}")
+print(
+    f"Estimated MI difference with first view (does not have dependency): "
+    f"{stat} with Pvalue: {pvalue}"
+)
 
 # we test for the second feature set, which is higher-dimensional
 covariate_index = np.arange(n_features_ends[0], n_features_ends[1], dtype=int)
@@ -439,8 +435,10 @@ stat, pvalue = est.test(
 )
 mv_results["high_dim_feature_stat"] = stat
 mv_results["high_dim_feature_pvalue"] = pvalue
-print(f"Estimated MI difference testing second view (does not have dependency): {stat} with Pvalue: {pvalue}")
-
+print(
+    f"Estimated MI difference testing second view (does not have dependency): "
+    f"{stat} with Pvalue: {pvalue}"
+)
 
 
 # %%

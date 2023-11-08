@@ -19,6 +19,7 @@ from sktree._lib.sklearn.ensemble._forest import (
     _get_n_samples_bootstrap,
     _parallel_build_trees,
 )
+from sktree.experimental import conditional_resample
 from sktree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 
 from .utils import (
@@ -123,6 +124,7 @@ class BaseForestHT(MetaEstimatorMixin):
         permute_per_tree=True,
         sample_dataset_per_tree=True,
         stratify=False,
+        conditional_perm=False,
     ):
         self.estimator = estimator
         self.random_state = random_state
@@ -131,6 +133,7 @@ class BaseForestHT(MetaEstimatorMixin):
         self.permute_per_tree = permute_per_tree
         self.sample_dataset_per_tree = sample_dataset_per_tree
         self.stratify = stratify
+        self.conditional_perm = conditional_perm
 
         self.n_samples_test_ = None
         self._n_samples_ = None
@@ -584,6 +587,11 @@ class FeatureImportanceForestRegressor(BaseForestHT):
     sample_dataset_per_tree : bool, default=False
         Whether to sample the dataset per tree or per forest.
 
+    conditional_perm : bool, default=False
+        Whether or not to conditionally permute the covariate index. If True,
+        then the covariate index is permuted while preserving the joint with respect
+        to the rest of the covariates.
+
     Attributes
     ----------
     estimator_ : BaseForest
@@ -638,6 +646,7 @@ class FeatureImportanceForestRegressor(BaseForestHT):
         test_size=0.2,
         permute_per_tree=True,
         sample_dataset_per_tree=True,
+        conditional_perm=False,
     ):
         super().__init__(
             estimator=estimator,
@@ -646,6 +655,7 @@ class FeatureImportanceForestRegressor(BaseForestHT):
             test_size=test_size,
             permute_per_tree=permute_per_tree,
             sample_dataset_per_tree=sample_dataset_per_tree,
+            conditional_perm=conditional_perm,
         )
 
     def _get_estimator(self):
@@ -749,14 +759,20 @@ class FeatureImportanceForestRegressor(BaseForestHT):
 
             if covariate_index is not None:
                 # perform permutation of covariates
-                n_samples_train = X_train.shape[0]
-                index_arr = rng.choice(
-                    np.arange(n_samples_train, dtype=int),
-                    size=(n_samples_train, 1),
-                    replace=False,
-                    shuffle=True,
-                )
-                X_train[:, covariate_index] = X_train[index_arr, covariate_index]
+                if self.conditional_perm:
+                    X_perm_cov_ind = conditional_resample(
+                        X_train, X_train[:, covariate_index], replace=False, random_state=rng
+                    )
+                    X_train[:, covariate_index] = X_perm_cov_ind
+                else:
+                    n_samples_train = X_train.shape[0]
+                    index_arr = rng.choice(
+                        np.arange(n_samples_train, dtype=int),
+                        size=(n_samples_train, 1),
+                        replace=False,
+                        shuffle=True,
+                    )
+                    X_train[:, covariate_index] = X_train[index_arr, covariate_index]
 
             if self._type_of_target_ == "binary":
                 y_train = y_train.ravel()
@@ -840,6 +856,11 @@ class FeatureImportanceForestClassifier(BaseForestHT):
     stratify : bool, default=True
         Whether to stratify the samples by class labels.
 
+    conditional_perm : bool, default=False
+        Whether or not to conditionally permute the covariate index. If True,
+        then the covariate index is permuted while preserving the joint with respect
+        to the rest of the covariates.
+
     Attributes
     ----------
     estimator_ : BaseForest
@@ -893,6 +914,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
         permute_per_tree=True,
         sample_dataset_per_tree=True,
         stratify=True,
+        conditional_perm=False,
     ):
         super().__init__(
             estimator=estimator,
@@ -902,6 +924,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
             permute_per_tree=permute_per_tree,
             sample_dataset_per_tree=sample_dataset_per_tree,
             stratify=stratify,
+            conditional_perm=conditional_perm,
         )
 
     def _get_estimator(self):
@@ -973,14 +996,20 @@ class FeatureImportanceForestClassifier(BaseForestHT):
 
             if covariate_index is not None:
                 # perform permutation of covariates
-                n_samples_train = X_train.shape[0]
-                index_arr = rng.choice(
-                    np.arange(n_samples_train, dtype=int),
-                    size=(n_samples_train, 1),
-                    replace=False,
-                    shuffle=True,
-                )
-                X_train[:, covariate_index] = X_train[index_arr, covariate_index]
+                if self.conditional_perm:
+                    X_perm_cov_ind = conditional_resample(
+                        X_train, X_train[:, covariate_index], replace=False, random_state=rng
+                    )
+                    X_train[:, covariate_index] = X_perm_cov_ind
+                else:
+                    n_samples_train = X_train.shape[0]
+                    index_arr = rng.choice(
+                        np.arange(n_samples_train, dtype=int),
+                        size=(n_samples_train, 1),
+                        replace=False,
+                        shuffle=True,
+                    )
+                    X_train[:, covariate_index] = X_train[index_arr, covariate_index]
 
             if self._type_of_target_ == "binary" or (y.ndim > 1 and y.shape[1] == 1):
                 y_train = y_train.ravel()
