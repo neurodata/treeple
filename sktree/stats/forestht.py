@@ -1,4 +1,4 @@
-from typing import Optional, Callable, Tuple, Union
+from typing import Callable, Optional, Tuple, Union
 
 import numpy as np
 from joblib import Parallel, delayed
@@ -453,7 +453,8 @@ class BaseForestHT(MetaEstimatorMixin):
         Returns
         -------
         stat : float
-            The test statistic.
+            The observed statistic. To compute the test statistic, take
+            ``permute_stat_`` and subtract ``observe_stat_``.
         pval : float
             The p-value of the test statistic.
         """
@@ -522,14 +523,14 @@ class BaseForestHT(MetaEstimatorMixin):
             )
         # metric^\pi - metric = observed test statistic, which under the
         # null is normally distributed around 0
-        observe_stat = permute_stat - observe_stat
+        observe_test_stat = permute_stat - observe_stat
 
         # metric^\pi_j - metric_j, which is centered at 0
         null_dist = metric_star_pi - metric_star
 
         # compute pvalue
         if metric in POSITIVE_METRICS:
-            pvalue = (1 + (null_dist <= observe_stat).sum()) / (1 + n_repeats)
+            pvalue = (1 + (null_dist <= observe_test_stat).sum()) / (1 + n_repeats)
         else:
             pvalue = (1 + (null_dist >= observe_stat).sum()) / (1 + n_repeats)
 

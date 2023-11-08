@@ -173,6 +173,7 @@ We also include experimental functionality that is works in progress.
    :toctree: generated/
 
    mutual_info_ksg
+   conditional_resample
 
 We also include functions that help simulate and evaluate mutual information (MI)
 and conditional mutual information (CMI) estimators. Specifically, functions that
