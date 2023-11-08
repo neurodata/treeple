@@ -190,4 +190,6 @@ or if you have two-factor authentication enabled: https://pypi.org/help/#apitoke
 
     twine upload dist/* --repository scikit-tree
 
-4. Update version number on ``meson.build`` and ``_version.py`` to the relevant version.
+4. Update version number on ``meson.build`` and ``pyproject.toml`` to the relevant version.
+
+See https://github.com/neurodata/scikit-tree/pull/160 as an example.

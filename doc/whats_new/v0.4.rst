@@ -1,0 +1,25 @@
+:orphan:
+
+.. include:: _contributors.rst
+.. currentmodule:: sktree
+
+.. _current:
+
+Version 0.4
+===========
+
+**In Development**
+
+Changelog
+---------
+
+- |API| ``FeatureImportanceForest*`` now has a hyperparameter to control the number of permutations is done per forest ``permute_per_forest_fraction``, by `Adam Li`_ (:pr:`145`)
+
+Code and Documentation Contributors
+-----------------------------------
+
+Thanks to everyone who has contributed to the maintenance and improvement of
+the project since version inception, including:
+
+* `Adam Li`_
+

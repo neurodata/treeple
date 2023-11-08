@@ -4,7 +4,7 @@ name = "scikit-tree"
 # 0.0.0 is standard placeholder for poetry-dynamic-versioning
 # any changes to this should not be checked in
 #
-version = "0.3.0dev0"
+version = "0.4.0dev0"
 description = "Modern decision trees in Python"
 maintainers = [
     {name="Neurodata", email="adam.li@columbia.edu"}
@@ -130,7 +130,7 @@ optional = true
 [tool.poetry.group.style.dependencies]
 poethepoet = "^0.16.0"
 mypy = "^0.971"
-black = {extras = ["jupyter"], version = "^22.12.0"}
+black = {extras = ["jupyter"], version = "^23.10.1"}
 isort = "^5.10.1"
 flake8 = "^5.0.4"
 bandit = "^1.7.4"
