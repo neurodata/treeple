@@ -40,8 +40,7 @@ def test_featureimportance_forest_permute_pertree(sample_dataset_per_tree):
             n_estimators=n_estimators,
             random_state=seed,
         ),
-        # permute_per_tree=True,
-        permute_forest_fraction=1.0 / n_estimators,
+        permute_forest_fraction=1.0 / n_estimators * 5,
         test_size=0.7,
         random_state=seed,
         sample_dataset_per_tree=sample_dataset_per_tree,
@@ -78,7 +77,6 @@ def test_featureimportance_forest_permute_pertree(sample_dataset_per_tree):
                 n_estimators=n_estimators,
                 random_state=seed,
             ),
-            # permute_per_tree=True,
             permute_forest_fraction=1.0 / n_samples,
             test_size=0.7,
             random_state=seed,
@@ -92,8 +90,7 @@ def test_featureimportance_forest_permute_pertree(sample_dataset_per_tree):
                 n_estimators=n_estimators,
                 random_state=seed,
             ),
-            # permute_per_tree=True,
-            permute_forest_fraction=-1.0 / n_estimators,
+            permute_forest_fraction=-1.0 / n_estimators * 5,
             test_size=0.7,
             random_state=seed,
             sample_dataset_per_tree=sample_dataset_per_tree,
@@ -110,8 +107,7 @@ def test_featureimportance_forest_stratified(sample_dataset_per_tree):
             n_estimators=n_estimators,
             random_state=seed,
         ),
-        # permute_per_tree=True,
-        permute_forest_fraction=1.0 / n_estimators,
+        permute_forest_fraction=1.0 / n_estimators * 5,
         test_size=0.7,
         random_state=seed,
         sample_dataset_per_tree=sample_dataset_per_tree,
@@ -136,7 +132,6 @@ def test_featureimportance_forest_stratified(sample_dataset_per_tree):
 
 
 def test_featureimportance_forest_errors():
-    # permute_per_tree = False
     sample_dataset_per_tree = True
     n_estimators = 10
     est = FeatureImportanceForestClassifier(
@@ -187,7 +182,7 @@ def test_iris_pauc_statistic(
     limit = 0.1
     max_features = "sqrt"
     n_repeats = 200
-    n_estimators = 100
+    n_estimators = 25
     test_size = 0.2
 
     # Check consistency on dataset iris.
@@ -254,7 +249,6 @@ def test_iris_pauc_statistic(
                 n_estimators=10,
             ),
             random_state=seed,
-            # permute_per_tree=False,
             permute_forest_fraction=None,
             sample_dataset_per_tree=False,
         ),
@@ -376,7 +370,6 @@ def test_sample_size_consistency_of_estimator_indices_(
             n_estimators=10, random_state=seed, n_jobs=1, honest_fraction=0.2
         ),
         test_size=0.5,
-        # permute_per_tree=permute_per_tree,
         permute_forest_fraction=permute_forest_fraction,
         sample_dataset_per_tree=sample_dataset_per_tree,
         stratify=False,
@@ -423,7 +416,7 @@ def test_sample_size_consistency_of_estimator_indices_(
 
 @pytest.mark.parametrize("sample_dataset_per_tree", [True, False])
 @pytest.mark.parametrize("seed", [None, 0])
-def test_permute_per_tree_samples_consistency_with_sklearnforest(seed, sample_dataset_per_tree):
+def test_sample_per_tree_samples_consistency_with_sklearnforest(seed, sample_dataset_per_tree):
     n_samples = 100
     n_features = 5
     X = rng.uniform(size=(n_samples, n_features))
@@ -434,7 +427,6 @@ def test_permute_per_tree_samples_consistency_with_sklearnforest(seed, sample_da
             n_estimators=n_estimators, random_state=seed, n_jobs=1, honest_fraction=0.2
         ),
         test_size=0.5,
-        # permute_per_tree=True,
         permute_forest_fraction=1.0 / n_estimators,
         sample_dataset_per_tree=sample_dataset_per_tree,
     )
@@ -443,7 +435,6 @@ def test_permute_per_tree_samples_consistency_with_sklearnforest(seed, sample_da
             n_estimators=10, random_state=seed, n_jobs=1, honest_fraction=0.2
         ),
         test_size=0.5,
-        # permute_per_tree=False,
         permute_forest_fraction=None,
         sample_dataset_per_tree=sample_dataset_per_tree,
     )
@@ -500,7 +491,6 @@ def test_small_dataset_independent(seed):
             n_estimators=10, random_state=seed, n_jobs=1, honest_fraction=0.5
         ),
         test_size=0.2,
-        # permute_per_tree=False,
         permute_forest_fraction=None,
         sample_dataset_per_tree=False,
     )
@@ -534,7 +524,6 @@ def test_small_dataset_dependent(seed):
             n_estimators=50, random_state=seed, n_jobs=1, honest_fraction=0.5
         ),
         test_size=0.2,
-        # permute_per_tree=False,
         permute_forest_fraction=None,
         sample_dataset_per_tree=False,
     )
