@@ -34,13 +34,14 @@ iris_y = iris_y[p]
 @pytest.mark.parametrize("sample_dataset_per_tree", [True, False])
 def test_featureimportance_forest_permute_pertree(sample_dataset_per_tree):
     n_samples = 50
+    n_estimators = 10
     est = FeatureImportanceForestClassifier(
         estimator=RandomForestClassifier(
-            n_estimators=10,
+            n_estimators=n_estimators,
             random_state=seed,
         ),
         # permute_per_tree=True,
-        permute_forest_fraction=1.0 / n_samples,
+        permute_forest_fraction=1.0 / n_estimators,
         test_size=0.7,
         random_state=seed,
         sample_dataset_per_tree=sample_dataset_per_tree,
@@ -69,17 +70,48 @@ def test_featureimportance_forest_permute_pertree(sample_dataset_per_tree):
     with pytest.raises(RuntimeError, match="Not all covariate_index"):
         est.statistic(iris_X[:n_samples], iris_y[:n_samples], [0, 1.0], metric="mi")
 
+    with pytest.raises(
+        RuntimeError, match="permute_forest_fraction must be greater than 1./n_estimators"
+    ):
+        est = FeatureImportanceForestClassifier(
+            estimator=RandomForestClassifier(
+                n_estimators=n_estimators,
+                random_state=seed,
+            ),
+            # permute_per_tree=True,
+            permute_forest_fraction=1.0 / n_samples,
+            test_size=0.7,
+            random_state=seed,
+            sample_dataset_per_tree=sample_dataset_per_tree,
+        )
+        est.statistic(iris_X[:n_samples], iris_y[:n_samples], metric="mse")
+
+    with pytest.raises(RuntimeError, match="permute_forest_fraction must be non-negative."):
+        est = FeatureImportanceForestClassifier(
+            estimator=RandomForestClassifier(
+                n_estimators=n_estimators,
+                random_state=seed,
+            ),
+            # permute_per_tree=True,
+            permute_forest_fraction=-1.0 / n_estimators,
+            test_size=0.7,
+            random_state=seed,
+            sample_dataset_per_tree=sample_dataset_per_tree,
+        )
+        est.statistic(iris_X[:n_samples], iris_y[:n_samples], metric="mse")
+
 
 @pytest.mark.parametrize("sample_dataset_per_tree", [True, False])
 def test_featureimportance_forest_stratified(sample_dataset_per_tree):
     n_samples = 100
+    n_estimators = 10
     est = FeatureImportanceForestClassifier(
         estimator=RandomForestClassifier(
-            n_estimators=10,
+            n_estimators=n_estimators,
             random_state=seed,
         ),
         # permute_per_tree=True,
-        permute_forest_fraction=1.0 / n_samples,
+        permute_forest_fraction=1.0 / n_estimators,
         test_size=0.7,
         random_state=seed,
         sample_dataset_per_tree=sample_dataset_per_tree,
@@ -106,9 +138,10 @@ def test_featureimportance_forest_stratified(sample_dataset_per_tree):
 def test_featureimportance_forest_errors():
     # permute_per_tree = False
     sample_dataset_per_tree = True
+    n_estimators = 10
     est = FeatureImportanceForestClassifier(
         estimator=RandomForestClassifier(
-            n_estimators=10,
+            n_estimators=n_estimators,
         ),
         test_size=0.5,
         permute_forest_fraction=None,
@@ -395,14 +428,14 @@ def test_permute_per_tree_samples_consistency_with_sklearnforest(seed, sample_da
     n_features = 5
     X = rng.uniform(size=(n_samples, n_features))
     y = rng.integers(0, 2, size=n_samples)  # Binary classification
-
+    n_estimators = 10
     clf = FeatureImportanceForestClassifier(
         estimator=HonestForestClassifier(
-            n_estimators=10, random_state=seed, n_jobs=1, honest_fraction=0.2
+            n_estimators=n_estimators, random_state=seed, n_jobs=1, honest_fraction=0.2
         ),
         test_size=0.5,
         # permute_per_tree=True,
-        permute_forest_fraction=1.0 / n_samples,
+        permute_forest_fraction=1.0 / n_estimators,
         sample_dataset_per_tree=sample_dataset_per_tree,
     )
     other_clf = FeatureImportanceForestClassifier(

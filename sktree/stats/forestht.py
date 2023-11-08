@@ -144,7 +144,15 @@ class BaseForestHT(MetaEstimatorMixin):
 
     @property
     def n_estimators(self):
-        return self.estimator_.n_estimators
+        try:
+            return self.estimator_.n_estimators
+        except Exception:
+            return self.permuted_estimator_.n_estimators
+        finally:
+            return self._get_estimator().n_estimators
+
+    def _get_estimator(self):
+        pass
 
     def reset(self):
         class_attributes = dir(type(self))
@@ -317,6 +325,18 @@ class BaseForestHT(MetaEstimatorMixin):
 
         if not self.train_test_split and not isinstance(self.estimator, HonestForestClassifier):
             raise RuntimeError("Train test split must occur if not using honest forest classifier.")
+
+        if self.permute_forest_fraction is not None and self.permute_forest_fraction < 0.0:
+            raise RuntimeError("permute_forest_fraction must be non-negative.")
+
+        if (
+            self.permute_forest_fraction is not None
+            and self.permute_forest_fraction * self.n_estimators < 1.0
+        ):
+            raise RuntimeError(
+                "permute_forest_fraction must be greater than 1./n_estimators, "
+                f"got {self.permute_forest_fraction}."
+            )
 
         return X, y, covariate_index
 
