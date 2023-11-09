@@ -332,7 +332,7 @@ def test_pickle(tmpdir):
         1.0 + (clf_pickle.null_dist_ <= (clf_pickle.permute_stat_ - clf_pickle.observe_stat_)).sum()
     ) / (1.0 + n_repeats)
     assert pvalue == pickle_pvalue
-    assert clf_pickle.permute_stat_ - clf_pickle.observe_stat_ == stat
+    assert clf_pickle.observe_stat_ == stat, f"{clf_pickle.observe_stat_} != {stat}"
 
     attr_list = [
         "test_size",

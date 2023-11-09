@@ -94,7 +94,7 @@ def test_conditional_resample_with_stratify():
     # Test conditional resampling with the custom stratify function
     stratify = custom_stratify(y, category_to_stratify)
     resampled_arrays = conditional_resample(
-        conditional_array, X, y, nn_estimator=NearestNeighbors(), stratify=stratify
+        conditional_array, X, y, nn_estimator=NearestNeighbors(), stratify=stratify, random_state=0
     )
 
     # Get the distribution of the specified category after resampling
