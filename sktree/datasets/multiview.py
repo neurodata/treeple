@@ -26,9 +26,6 @@ def make_gaussian_mixture(
 
     Parameters
     ----------
-    n_samples : int
-        The number of points in each view, divided across Gaussians per
-        `class_probs`.
     centers : 1D array-like or list of 1D array-likes
         The mean(s) of the Gaussian(s) from which the latent
         points are sampled. If is a list of 1D array-likes, each is the
@@ -38,10 +35,13 @@ def make_gaussian_mixture(
     covariances : 2D array-like or list of 2D array-likes
         The covariance matrix(s) of the Gaussian(s), matched
         to the specified centers.
+    n_samples : int
+        The number of points in each view, divided across Gaussians per
+        `class_probs`.
     transform : 'linear' | 'sin' | poly' | callable, (default 'linear')
         Transformation to perform on the latent variable. If a function,
         applies it to the latent. Otherwise uses an implemented function.
-    noise : double or None (default=None)
+    noise : float or None (default=None)
         Variance of mean zero Gaussian noise added to the first view.
     noise_dims : int or None (default=None)
         Number of additional dimensions of standard normal noise to add.
@@ -53,16 +53,16 @@ def make_gaussian_mixture(
         If set, can be used to reproduce the data generated.
     shuffle : bool, default=False
         If ``True``, data is shuffled so the labels are not ordered.
-    return_latents : boolean (default False)
+    return_latents : bool (default False)
         If true, returns the non-noisy latent variables.
-    add_latent_noise : boolean (default False)
+    add_latent_noise : bool (default False)
         If true, adds noise to the latent variables before applying the
         transformation.
 
     Returns
     -------
-    Xs : list of np.ndarray, each shape (n_samples, n_features)
-        The latent data and its noisy transformation
+    Xs : list of np.ndarray, of shape (n_samples, n_features)
+        The latent data and its noisy transformation.
 
     y : np.ndarray, shape (n_samples,)
         The integer labels for each sample's Gaussian membership.
@@ -232,7 +232,7 @@ def _rand_orthog(n, K, random_state=None):
 
     Notes
     -----
-    See Section A.1.1 of :footcite:`perry2009crossvalidation`
+    See Section A.1.1 of :footcite:`perry2009crossvalidation`.
 
     References
     ----------
@@ -270,7 +270,7 @@ def make_joint_factor_model(
     n_views : int
         Number of views to sample. This corresponds to ``B`` in the notes.
 
-    n_features: int, or list of ints
+    n_features : int, or list of int
         Number of features in each view. A list specifies a different number
         of features for each view.
 
@@ -290,15 +290,18 @@ def make_joint_factor_model(
         Controls random orthonormal matrix sampling and random noise
         generation. Set for reproducible results.
 
-    return_decomp : boolean, default=False
+    return_decomp : bool, default=False
         If ``True``, returns the ``view_loadings`` as well.
 
     Returns
     -------
     Xs : list of array-likes or numpy.ndarray
+        List of samples data matrices:
+
         - Xs length: n_views
         - Xs[i] shape: (n_samples, n_features_i)
-        List of samples data matrices
+
+        If ``return_decomp`` is False, returns just an array.
 
     U: (n_samples, joint_rank)
         The true orthonormal joint scores matrix. Returned if

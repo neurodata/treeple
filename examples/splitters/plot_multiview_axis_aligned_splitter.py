@@ -129,7 +129,7 @@ plt.show()
 # and the second feature set once.
 #
 # .. note:: In practice, this is controlled by the ``apply_max_features_per_feature_set`` parameter
-# in :class:`sktree.tree.MultiViewDecisionTreeClassifier`.
+#   in :class:`sktree.tree.MultiViewDecisionTreeClassifier`.
 
 max_features_per_set_ = np.array([1, 2, 3], dtype=int)
 max_features = np.sum(max_features_per_set_)

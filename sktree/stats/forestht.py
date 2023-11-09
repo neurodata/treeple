@@ -921,6 +921,11 @@ class FeatureImportanceForestClassifier(BaseForestHT):
     stratify : bool, default=True
         Whether to stratify the samples by class labels.
 
+    conditional_perm : bool, default=False
+        Whether or not to conditionally permute the covariate index. If True,
+        then the covariate index is permuted while preserving the joint with respect
+        to the rest of the covariates.
+
     sample_dataset_per_tree : bool, default=False
         Whether to sample the dataset per tree or per forest.
 
@@ -930,11 +935,6 @@ class FeatureImportanceForestClassifier(BaseForestHT):
 
     train_test_split : bool, default=True
         Whether to split the data into train/test before passing to the forest.
-
-    conditional_perm : bool, default=False
-        Whether or not to conditionally permute the covariate index. If True,
-        then the covariate index is permuted while preserving the joint with respect
-        to the rest of the covariates.
 
     Attributes
     ----------
