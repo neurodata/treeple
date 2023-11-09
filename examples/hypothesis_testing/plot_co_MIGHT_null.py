@@ -170,9 +170,9 @@ fig, ax = plt.subplots(figsize=(5, 3))
 
 # plot pvalues
 ax.bar(0, rf_results["low_dim_feature_pvalue"], label="Low-dim Feature Set (RF)", color="black")
-ax.bar(1, rf_results["high_dim_feature_pvalue"], label="High-dim Feature Set (RF)", color="black")
+ax.bar(1, rf_results["high_dim_feature_pvalue"], label="High-dim Feature Set (RF)", color="gray")
 ax.bar(2, mv_results["low_dim_feature_pvalue"], label="Low-dim Feature Set (MV)", color="green")
-ax.bar(3, mv_results["high_dim_feature_pvalue"], label="High-dim Feature Set (MV)", color="green")
+ax.bar(3, mv_results["high_dim_feature_pvalue"], label="High-dim Feature Set (MV)", color="blue")
 ax.axhline(0.05, color="k", linestyle="--", label="alpha=0.05")
 ax.set(
     ylabel="Log10(PValue)",

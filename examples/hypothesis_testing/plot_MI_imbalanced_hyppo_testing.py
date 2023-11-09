@@ -32,14 +32,19 @@ from sktree import HonestForestClassifier
 from sktree.stats import FeatureImportanceForestClassifier
 from sktree.tree import DecisionTreeClassifier, MultiViewDecisionTreeClassifier
 
-seed = 12345
-rng = np.random.default_rng(seed)
-
 # %%
 # Simulate data
 # -------------
 # We simulate the two feature sets, and the target variable. We then combine them
 # into a single dataset to perform hypothesis testing.
+#
+# Our data will follow the following graphical model:
+#
+# $(X_1 \rightarrow Y; X_2)$
+#
+# where $X_1$ is our signal feature set, $X_2$ is our noise feature set, and $Y$ is our target.
+# $X_1$ will be low-dimensional, but $X_2$ is high-dimensional noise.
+
 seed = 12345
 rng = np.random.default_rng(seed)
 
@@ -54,26 +59,21 @@ def make_multiview_classification(
     X0_first, y0 = make_blobs(
         n_samples=n_samples,
         cluster_std=cluster_std,
-        n_features=n_features_1 // 2,
+        n_features=n_features_1,
         random_state=rng.integers(1, 10000),
         centers=1,
+        center_box=(-2, 2.0),
     )
 
     X1_first, y1 = make_blobs(
         n_samples=n_samples,
         cluster_std=cluster_std,
-        n_features=n_features_1 // 2,
+        n_features=n_features_1,
         random_state=rng.integers(1, 10000),
         centers=1,
+        center_box=(-2.0, 2.0),
     )
 
-    # create the first views for y=0 and y=1
-    X0_first = np.concatenate(
-        (X0_first, rng.standard_normal(size=(n_samples, n_features_1 // 2))), axis=1
-    )
-    X1_first = np.concatenate(
-        (X1_first, rng.standard_normal(size=(n_samples, n_features_1 // 2))), axis=1
-    )
     y1[:] = 1
 
     # add the second view for y=0 and y=1, which is completely noise
@@ -91,18 +91,19 @@ def make_multiview_classification(
 
 
 n_samples = 100
-n_features = 10000
 n_features_1 = 10
-n_features_2 = n_features
+n_features_2 = 10_000
 n_features_views = [n_features_1, n_features_1 + n_features_2]
 
 X, y = make_multiview_classification(
     n_samples=n_samples,
     n_features_1=n_features_1,
     n_features_2=n_features_2,
-    cluster_std=2.0,
+    cluster_std=5.0,
     seed=seed,
 )
+
+print(X.shape, y.shape, n_features_views)
 # %%
 # Perform hypothesis testing using Mutual Information
 # ---------------------------------------------------
@@ -117,7 +118,7 @@ X, y = make_multiview_classification(
 # computed as the proportion of samples in the null distribution that are less than the
 # observed test statistic.
 
-n_estimators = 200
+n_estimators = 100
 max_features = "sqrt"
 test_size = 0.2
 n_repeats = 1000
@@ -127,7 +128,10 @@ est = FeatureImportanceForestClassifier(
     estimator=HonestForestClassifier(
         n_estimators=n_estimators,
         max_features=max_features,
-        tree_estimator=MultiViewDecisionTreeClassifier(feature_set_ends=n_features_views),
+        tree_estimator=MultiViewDecisionTreeClassifier(
+            feature_set_ends=n_features_views,
+            apply_max_features_per_feature_set=True,
+        ),
         random_state=seed,
         honest_fraction=0.5,
         n_jobs=n_jobs,
@@ -144,9 +148,15 @@ print(
     f"Permutation per tree: {est.permute_per_tree} and sampling dataset per tree: "
     f"{est.sample_dataset_per_tree}"
 )
+# we test for the overall MI of X vs y
+stat, pvalue = est.test(X, y, metric="mi", n_repeats=n_repeats)
+mv_results["feature_stat"] = stat
+mv_results["feature_pvalue"] = pvalue
+print(f"Estimated MI difference: {stat} with Pvalue: {pvalue}")
+
 # we test for the first feature set, which is important and thus should return a pvalue < 0.05
 stat, pvalue = est.test(
-    X, y, covariate_index=np.arange(10, dtype=int), metric="mi", n_repeats=n_repeats
+    X, y, covariate_index=np.arange(n_features_1, dtype=int), metric="mi", n_repeats=n_repeats
 )
 mv_results["important_feature_stat"] = stat
 mv_results["important_feature_pvalue"] = pvalue
@@ -156,7 +166,7 @@ print(f"Estimated MI difference: {stat} with Pvalue: {pvalue}")
 stat, pvalue = est.test(
     X,
     y,
-    covariate_index=np.arange(10, n_features, dtype=int),
+    covariate_index=np.arange(n_features_1, n_features_2, dtype=int),
     metric="mi",
     n_repeats=n_repeats,
 )
@@ -167,6 +177,9 @@ print(f"Estimated MI difference: {stat} with Pvalue: {pvalue}")
 # %%
 # Let's investigate what happens when we do not use a multi-view decision tree.
 # All other parameters are kept the same.
+
+# to ensure max-features is the same across the two models
+max_features = int(np.sqrt(n_features_1) + np.sqrt(n_features_2))
 
 est = FeatureImportanceForestClassifier(
     estimator=HonestForestClassifier(
@@ -185,9 +198,16 @@ est = FeatureImportanceForestClassifier(
 
 rf_results = dict()
 
+# we test for the overall MI of X vs y
+stat, pvalue = est.test(X, y, metric="mi", n_repeats=n_repeats)
+rf_results["feature_stat"] = stat
+rf_results["feature_pvalue"] = pvalue
+print("\n\nAnalyzing regular decision tree models:")
+print(f"Estimated MI difference using regular decision-trees: {stat} with Pvalue: {pvalue}")
+
 # we test for the first feature set, which is important and thus should return a pvalue < 0.05
 stat, pvalue = est.test(
-    X, y, covariate_index=np.arange(10, dtype=int), metric="mi", n_repeats=n_repeats
+    X, y, covariate_index=np.arange(n_features_1, dtype=int), metric="mi", n_repeats=n_repeats
 )
 rf_results["important_feature_stat"] = stat
 rf_results["important_feature_pvalue"] = pvalue
@@ -197,7 +217,7 @@ print(f"Estimated MI difference using regular decision-trees: {stat} with Pvalue
 stat, pvalue = est.test(
     X,
     y,
-    covariate_index=np.arange(10, n_features, dtype=int),
+    covariate_index=np.arange(n_features_1, n_features_2, dtype=int),
     metric="mi",
     n_repeats=n_repeats,
 )
@@ -208,12 +228,14 @@ print(f"Estimated MI difference using regular decision-trees: {stat} with Pvalue
 fig, ax = plt.subplots(figsize=(5, 3))
 
 # plot pvalues
-ax.bar(0, rf_results["important_feature_pvalue"], label="Important Feature Set (RF)")
-ax.bar(1, rf_results["unimportant_feature_pvalue"], label="Unimportant Feature Set (RF)")
-ax.bar(2, mv_results["important_feature_pvalue"], label="Important Feature Set (MV)")
-ax.bar(3, mv_results["unimportant_feature_pvalue"], label="Unimportant Feature Set (MV)")
+ax.bar(0, rf_results["important_feature_pvalue"], label="Permuting $X_1$ (RF)")
+ax.bar(1, rf_results["unimportant_feature_pvalue"], label="Permuting $X_2$ (RF)")
+ax.bar(2, mv_results["important_feature_pvalue"], label="Permuting $X_1$ (MV)")
+ax.bar(3, mv_results["unimportant_feature_pvalue"], label="Permuting $X_2$ (MV)")
+ax.bar(4, mv_results["feature_pvalue"], label="Overall Feature Set (MV)")
+ax.bar(5, rf_results["feature_pvalue"], label="Overall Feature Set (RF)")
 ax.axhline(0.05, color="k", linestyle="--", label="alpha=0.05")
-ax.set(ylabel="Log10(PValue)", xlim=[-0.5, 3.5], yscale="log")
+ax.set(ylabel="Log10(PValue)", xlim=[-0.5, 5.5], yscale="log")
 ax.legend()
 
 fig.tight_layout()
