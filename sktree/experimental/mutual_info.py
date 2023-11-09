@@ -147,7 +147,7 @@ def mutual_info_ksg(
     algorithm="kd_tree",
     n_jobs: int = -1,
     transform: str = "rank",
-    random_seed: int = None,
+    random_seed: Optional[int] = None,
 ):
     """Compute the generalized (conditional) mutual information KSG estimate.
 

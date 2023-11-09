@@ -12,7 +12,8 @@ Version 0.4
 
 Changelog
 ---------
-- 
+
+- |API| ``FeatureImportanceForest*`` now has a hyperparameter to control the number of permutations is done per forest ``permute_per_forest_fraction``, by `Adam Li`_ (:pr:`145`)
 
 Code and Documentation Contributors
 -----------------------------------

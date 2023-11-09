@@ -33,17 +33,18 @@ iris_y = iris_y[p]
 
 @pytest.mark.parametrize("sample_dataset_per_tree", [True, False])
 def test_featureimportance_forest_permute_pertree(sample_dataset_per_tree):
+    n_samples = 50
+    n_estimators = 10
     est = FeatureImportanceForestClassifier(
         estimator=RandomForestClassifier(
-            n_estimators=10,
+            n_estimators=n_estimators,
             random_state=seed,
         ),
-        permute_per_tree=True,
+        permute_forest_fraction=1.0 / n_estimators * 5,
         test_size=0.7,
         random_state=seed,
         sample_dataset_per_tree=sample_dataset_per_tree,
     )
-    n_samples = 50
     est.statistic(iris_X[:n_samples], iris_y[:n_samples], metric="mse")
 
     assert (
@@ -68,20 +69,49 @@ def test_featureimportance_forest_permute_pertree(sample_dataset_per_tree):
     with pytest.raises(RuntimeError, match="Not all covariate_index"):
         est.statistic(iris_X[:n_samples], iris_y[:n_samples], [0, 1.0], metric="mi")
 
+    with pytest.raises(
+        RuntimeError, match="permute_forest_fraction must be greater than 1./n_estimators"
+    ):
+        est = FeatureImportanceForestClassifier(
+            estimator=RandomForestClassifier(
+                n_estimators=n_estimators,
+                random_state=seed,
+            ),
+            permute_forest_fraction=1.0 / n_samples,
+            test_size=0.7,
+            random_state=seed,
+            sample_dataset_per_tree=sample_dataset_per_tree,
+        )
+        est.statistic(iris_X[:n_samples], iris_y[:n_samples], metric="mse")
+
+    with pytest.raises(RuntimeError, match="permute_forest_fraction must be non-negative."):
+        est = FeatureImportanceForestClassifier(
+            estimator=RandomForestClassifier(
+                n_estimators=n_estimators,
+                random_state=seed,
+            ),
+            permute_forest_fraction=-1.0 / n_estimators * 5,
+            test_size=0.7,
+            random_state=seed,
+            sample_dataset_per_tree=sample_dataset_per_tree,
+        )
+        est.statistic(iris_X[:n_samples], iris_y[:n_samples], metric="mse")
+
 
 @pytest.mark.parametrize("sample_dataset_per_tree", [True, False])
 def test_featureimportance_forest_stratified(sample_dataset_per_tree):
+    n_samples = 100
+    n_estimators = 10
     est = FeatureImportanceForestClassifier(
         estimator=RandomForestClassifier(
-            n_estimators=10,
+            n_estimators=n_estimators,
             random_state=seed,
         ),
-        permute_per_tree=True,
+        permute_forest_fraction=1.0 / n_estimators * 5,
         test_size=0.7,
         random_state=seed,
         sample_dataset_per_tree=sample_dataset_per_tree,
     )
-    n_samples = 100
     est.statistic(iris_X[:n_samples], iris_y[:n_samples], metric="mi")
 
     _, indices_test = est.train_test_samples_[0]
@@ -102,14 +132,14 @@ def test_featureimportance_forest_stratified(sample_dataset_per_tree):
 
 
 def test_featureimportance_forest_errors():
-    permute_per_tree = False
     sample_dataset_per_tree = True
+    n_estimators = 10
     est = FeatureImportanceForestClassifier(
         estimator=RandomForestClassifier(
-            n_estimators=10,
+            n_estimators=n_estimators,
         ),
         test_size=0.5,
-        permute_per_tree=permute_per_tree,
+        permute_forest_fraction=None,
         sample_dataset_per_tree=sample_dataset_per_tree,
     )
     with pytest.raises(RuntimeError, match="The estimator must be fitted"):
@@ -139,20 +169,20 @@ def test_featureimportance_forest_errors():
     ],
 )
 @pytest.mark.parametrize(
-    "permute_per_tree",
+    "permute_forest_fraction",
     [
-        True,
-        False,
+        None,
+        0.5,
     ],
 )
 @pytest.mark.parametrize("sample_dataset_per_tree", [True, False])
 def test_iris_pauc_statistic(
-    criterion, honest_prior, estimator, permute_per_tree, sample_dataset_per_tree
+    criterion, honest_prior, estimator, permute_forest_fraction, sample_dataset_per_tree
 ):
     limit = 0.1
     max_features = "sqrt"
     n_repeats = 200
-    n_estimators = 100
+    n_estimators = 25
     test_size = 0.2
 
     # Check consistency on dataset iris.
@@ -168,14 +198,14 @@ def test_iris_pauc_statistic(
         ),
         test_size=test_size,
         sample_dataset_per_tree=sample_dataset_per_tree,
-        permute_per_tree=permute_per_tree,
+        permute_forest_fraction=permute_forest_fraction,
     )
     # now add completely uninformative feature
     X = np.hstack((iris_X, rng.standard_normal(size=(iris_X.shape[0], 4))))
 
     # test for unimportant feature set
     clf.reset()
-    if sample_dataset_per_tree and not permute_per_tree:
+    if sample_dataset_per_tree and permute_forest_fraction is None:
         # test in another test
         return
 
@@ -219,7 +249,7 @@ def test_iris_pauc_statistic(
                 n_estimators=10,
             ),
             random_state=seed,
-            permute_per_tree=False,
+            permute_forest_fraction=None,
             sample_dataset_per_tree=False,
         ),
     ],
@@ -323,19 +353,26 @@ def test_pickle(tmpdir):
         assert_array_equal(getattr(clf, attr), getattr(clf_pickle, attr))
 
 
-@pytest.mark.parametrize("permute_per_tree", [True, False], ids=["permute_per_tree", "no_permute"])
+@pytest.mark.parametrize(
+    "permute_forest_fraction",
+    [None, 0.5],
+    ids=["no_permute", "permute_forest_fraction"],
+)
 @pytest.mark.parametrize(
     "sample_dataset_per_tree", [True, False], ids=["sample_dataset_per_tree", "no_sample_dataset"]
 )
-def test_sample_size_consistency_of_estimator_indices_(permute_per_tree, sample_dataset_per_tree):
+def test_sample_size_consistency_of_estimator_indices_(
+    permute_forest_fraction, sample_dataset_per_tree
+):
     """Test that the test-sample indices are what is expected."""
     clf = FeatureImportanceForestClassifier(
         estimator=HonestForestClassifier(
             n_estimators=10, random_state=seed, n_jobs=1, honest_fraction=0.2
         ),
         test_size=0.5,
-        permute_per_tree=permute_per_tree,
+        permute_forest_fraction=permute_forest_fraction,
         sample_dataset_per_tree=sample_dataset_per_tree,
+        stratify=False,
     )
 
     n_samples = 100
@@ -346,10 +383,12 @@ def test_sample_size_consistency_of_estimator_indices_(permute_per_tree, sample_
     _, posteriors, samples = clf.statistic(
         X, y, covariate_index=None, return_posteriors=True, metric="mi"
     )
-    if sample_dataset_per_tree:
+
+    if sample_dataset_per_tree or permute_forest_fraction is not None:
         # check the non-nans
         non_nan_idx = _non_nan_samples(posteriors)
-        assert clf.n_samples_test_ == n_samples, f"{clf.n_samples_test_} != {n_samples}"
+        if sample_dataset_per_tree:
+            assert clf.n_samples_test_ == n_samples, f"{clf.n_samples_test_} != {n_samples}"
 
         sorted_sample_idx = sorted(np.unique(samples))
         sorted_est_samples_idx = sorted(
@@ -367,24 +406,28 @@ def test_sample_size_consistency_of_estimator_indices_(permute_per_tree, sample_
                 f"{set(sorted_est_samples_idx) - set(sorted_sample_idx)}",
             )
     else:
-        assert_array_equal(samples, sorted(clf.train_test_samples_[0][1]))
+        assert_array_equal(
+            samples,
+            sorted(clf.train_test_samples_[0][1]),
+            err_msg=f"Samples {set(samples) - set(sorted(clf.train_test_samples_[0][1]))}.",
+        )
     assert len(_non_nan_samples(posteriors)) == len(samples)
 
 
 @pytest.mark.parametrize("sample_dataset_per_tree", [True, False])
 @pytest.mark.parametrize("seed", [None, 0])
-def test_permute_per_tree_samples_consistency_with_sklearnforest(seed, sample_dataset_per_tree):
+def test_sample_per_tree_samples_consistency_with_sklearnforest(seed, sample_dataset_per_tree):
     n_samples = 100
     n_features = 5
     X = rng.uniform(size=(n_samples, n_features))
     y = rng.integers(0, 2, size=n_samples)  # Binary classification
-
+    n_estimators = 10
     clf = FeatureImportanceForestClassifier(
         estimator=HonestForestClassifier(
-            n_estimators=10, random_state=seed, n_jobs=1, honest_fraction=0.2
+            n_estimators=n_estimators, random_state=seed, n_jobs=1, honest_fraction=0.2
         ),
         test_size=0.5,
-        permute_per_tree=True,
+        permute_forest_fraction=1.0 / n_estimators,
         sample_dataset_per_tree=sample_dataset_per_tree,
     )
     other_clf = FeatureImportanceForestClassifier(
@@ -392,7 +435,7 @@ def test_permute_per_tree_samples_consistency_with_sklearnforest(seed, sample_da
             n_estimators=10, random_state=seed, n_jobs=1, honest_fraction=0.2
         ),
         test_size=0.5,
-        permute_per_tree=False,
+        permute_forest_fraction=None,
         sample_dataset_per_tree=sample_dataset_per_tree,
     )
 
@@ -405,8 +448,8 @@ def test_permute_per_tree_samples_consistency_with_sklearnforest(seed, sample_da
         assert_array_equal(clf.train_test_samples_[idx][0], estimator_train_test_indices[idx][0])
         assert_array_equal(clf.train_test_samples_[idx][1], estimator_train_test_indices[idx][1])
 
-    # if the sample_dataset_per_tree, then the indices should be different across all
-    if sample_dataset_per_tree:
+    # if the sample_dataset_per_tree, then the indices should be different across all trees
+    if sample_dataset_per_tree or clf.permute_forest_fraction > 0.0:
         for indices, other_indices in combinations(clf.train_test_samples_, 2):
             assert not np.array_equal(indices[0], other_indices[0])
             assert not np.array_equal(indices[1], other_indices[1])
@@ -426,7 +469,7 @@ def test_permute_per_tree_samples_consistency_with_sklearnforest(seed, sample_da
         )
 
         # when seed is passed, the indices should be deterministic
-        if seed is not None:
+        if seed is not None and sample_dataset_per_tree:
             assert_array_equal(
                 clf.train_test_samples_[idx][0], other_clf.train_test_samples_[idx][0]
             )
@@ -448,7 +491,7 @@ def test_small_dataset_independent(seed):
             n_estimators=10, random_state=seed, n_jobs=1, honest_fraction=0.5
         ),
         test_size=0.2,
-        permute_per_tree=False,
+        permute_forest_fraction=None,
         sample_dataset_per_tree=False,
     )
     stat, pvalue = clf.test(X, y, covariate_index=[1, 2], metric="mi")
@@ -475,14 +518,13 @@ def test_small_dataset_dependent(seed):
     y = np.vstack(
         [np.zeros((n_samples // 2, 1)), np.ones((n_samples // 2, 1))]
     )  # Binary classification
-    print(X.shape, y.shape)
 
     clf = FeatureImportanceForestClassifier(
         estimator=HonestForestClassifier(
             n_estimators=50, random_state=seed, n_jobs=1, honest_fraction=0.5
         ),
         test_size=0.2,
-        permute_per_tree=False,
+        permute_forest_fraction=None,
         sample_dataset_per_tree=False,
     )
     stat, pvalue = clf.test(X, y, covariate_index=[1, 2], metric="mi")
@@ -494,20 +536,55 @@ def test_small_dataset_dependent(seed):
     assert pvalue <= 0.05
 
 
-# @pytest.mark.monitor_test
-# def test_memory_usage():
-#     n_samples = 1000
-#     n_features = 5000
-#     X = rng.uniform(size=(n_samples, n_features))
-#     y = rng.integers(0, 2, size=n_samples)  # Binary classification
+@flaky(max_runs=3)
+def test_no_traintest_split():
+    n_samples = 500
+    n_features = 5
+    rng = np.random.default_rng(seed)
 
-#     clf = FeatureImportanceForestClassifier(
-#         estimator=HonestForestClassifier(
-#             n_estimators=10, random_state=seed, n_jobs=-1, honest_fraction=0.5
-#         ),
-#         test_size=0.2,
-#         permute_per_tree=False,
-#         sample_dataset_per_tree=False,
-#     )
+    X = rng.uniform(size=(n_samples, n_features))
+    X = rng.uniform(size=(n_samples // 2, n_features))
+    X2 = X * 2
+    X = np.vstack([X, X2])
+    y = np.vstack(
+        [np.zeros((n_samples // 2, 1)), np.ones((n_samples // 2, 1))]
+    )  # Binary classification
 
-#     stat, pvalue = clf.test(X, y, covariate_index=[1, 2], metric="mi")
+    clf = FeatureImportanceForestClassifier(
+        estimator=HonestForestClassifier(
+            n_estimators=50,
+            max_features=n_features,
+            random_state=seed,
+            n_jobs=1,
+            honest_fraction=0.5,
+        ),
+        test_size=0.2,
+        train_test_split=False,
+        permute_forest_fraction=None,
+        sample_dataset_per_tree=False,
+    )
+    stat, pvalue = clf.test(X, y, covariate_index=[1, 2], metric="mi")
+
+    # since no train-test split, the training is all the data and the testing is none of the data
+    assert_array_equal(clf.train_test_samples_[0][0], np.arange(n_samples))
+    assert_array_equal(clf.train_test_samples_[0][1], np.array([]))
+
+    assert ~np.isnan(pvalue)
+    assert ~np.isnan(stat)
+    assert pvalue <= 0.05, f"{pvalue}"
+
+    stat, pvalue = clf.test(X, y, metric="mi")
+    assert pvalue <= 0.05, f"{pvalue}"
+
+    X = rng.uniform(size=(n_samples, n_features))
+    y = rng.integers(0, 2, size=n_samples)  # Binary classification
+    clf.reset()
+
+    stat, pvalue = clf.test(X, y, metric="mi")
+    assert_almost_equal(stat, 0.0, decimal=1)
+    assert pvalue > 0.05, f"{pvalue}"
+
+    stat, pvalue = clf.test(X, y, covariate_index=[1, 2], metric="mi")
+    assert ~np.isnan(pvalue)
+    assert ~np.isnan(stat)
+    assert pvalue > 0.05, f"{pvalue}"
