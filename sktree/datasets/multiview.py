@@ -17,6 +17,7 @@ def make_gaussian_mixture(
     random_state=None,
     shuffle=False,
     return_latents=False,
+    add_latent_noise=False,
 ):
     r"""Two-view Gaussian mixture model dataset generator.
 
@@ -54,6 +55,9 @@ def make_gaussian_mixture(
         If ``True``, data is shuffled so the labels are not ordered.
     return_latents : boolean (default False)
         If true, returns the non-noisy latent variables.
+    add_latent_noise : boolean (default False)
+        If true, adds noise to the latent variables before applying the
+        transformation.
 
     Returns
     -------
@@ -134,6 +138,9 @@ def make_gaussian_mixture(
     y = np.concatenate(
         [i * np.ones(int(class_probs[i] * n_samples)) for i in range(len(class_probs))]
     )
+
+    if add_latent_noise:
+        latent += rng.standard_normal(size=latent.shape) * 0.1
 
     # shuffle latent samples and labels
     if shuffle:

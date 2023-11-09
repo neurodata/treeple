@@ -210,10 +210,7 @@ def conditional_resample(
     # convert sparse matrices to CSR for row-based indexing
     arrays_ = [a.tocsr() if issparse(a) else a for a in arrays]
     resampled_arrays = [_safe_indexing(a, indices) for a in arrays_]
-    print("in here...")
-    print([x.shape for x in arrays])
-    print([x.shape for x in resampled_arrays])
-    print([x.shape for x in arrays_])
+
     if len(resampled_arrays) == 1:
         # syntactic sugar for the unit argument case
         return resampled_arrays[0]
