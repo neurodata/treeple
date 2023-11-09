@@ -14,6 +14,7 @@ Changelog
 ---------
 
 - |API| ``FeatureImportanceForest*`` now has a hyperparameter to control the number of permutations is done per forest ``permute_per_forest_fraction``, by `Adam Li`_ (:pr:`145`)
+- |Enhancement| Add dataset generators for regression and classification and hypothesis testing, by `Adam Li`_ (:pr:`160`)
 
 Code and Documentation Contributors
 -----------------------------------
