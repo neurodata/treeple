@@ -199,7 +199,7 @@ def test_linear_model(hypotester, model_kwargs, n_samples, n_repeats, test_size)
             FeatureImportanceForestClassifier,
             {
                 "estimator": RandomForestClassifier(
-                    max_features='sqrt',
+                    max_features="sqrt",
                     # random_state=seed,
                     n_estimators=100,
                     n_jobs=-1,
