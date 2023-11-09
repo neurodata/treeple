@@ -72,7 +72,7 @@ est_mv = FeatureImportanceForestClassifier(
     ),
     random_state=seed,
     test_size=test_size,
-    permute_per_tree=True,
+    permute_forest_fraction=1.0 / n_estimators,
     sample_dataset_per_tree=True,
 )
 
@@ -104,7 +104,7 @@ est = FeatureImportanceForestClassifier(
     ),
     random_state=seed,
     test_size=test_size,
-    permute_per_tree=True,
+    permute_forest_fraction=1.0 / n_estimators,
     sample_dataset_per_tree=True,
 )
 

@@ -138,8 +138,6 @@ est = FeatureImportanceForestClassifier(
     ),
     random_state=seed,
     test_size=test_size,
-    permute_per_tree=False,
-    sample_dataset_per_tree=False,
 )
 
 mv_results = dict()
@@ -192,8 +190,6 @@ est = FeatureImportanceForestClassifier(
     ),
     random_state=seed,
     test_size=test_size,
-    permute_per_tree=False,
-    sample_dataset_per_tree=False,
 )
 
 rf_results = dict()

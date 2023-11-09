@@ -14,6 +14,7 @@ Changelog
 ---------
 - |Enhancement| Multi-view trees now are able to scale the sampling of split candidates at the same rate per feature-set now, which means 'sqrt' would sample split candidates equal to the square root of each feature-set size, by `Adam Li`_ (:pr:`152`)
 - |Enhancement| Add :func:`sktree.experimental.conditional_resample`, which allows conditional resampling of rows based on nearest-neighbors defined via a feature set, by `Adam Li`_ (:pr:`152`)
+- |API| ``FeatureImportanceForest*`` now has a hyperparameter to control the number of permutations is done per forest ``permute_per_forest_fraction``, by `Adam Li`_ (:pr:`145`)
 
 Code and Documentation Contributors
 -----------------------------------
