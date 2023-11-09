@@ -538,27 +538,8 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         _sample_weight[self.honest_indices_] = 0
 
         if self.tree_estimator is None:
-            self.estimator_ = DecisionTreeClassifier(
-                # criterion=self.criterion,
-                # splitter=self.splitter,
-                # max_depth=self.max_depth,
-                # min_samples_split=self.min_samples_split,
-                # min_samples_leaf=self.min_samples_leaf,
-                # min_weight_fraction_leaf=self.min_weight_fraction_leaf,
-                # max_features=self.max_features,
-                # max_leaf_nodes=self.max_leaf_nodes,
-                # class_weight=self.class_weight,
-                # min_impurity_decrease=self.min_impurity_decrease,
-                # ccp_alpha=self.ccp_alpha,
-                # monotonic_cst=self.monotonic_cst,
-                # store_leaf_values=self.store_leaf_values,
-            )
+            self.estimator_ = DecisionTreeClassifier()
         else:
-            # XXX: Remove this?
-            # we throw an error if the user is using trees from sklearn:main
-            # if isinstance(self.tree_estimator, skBaseDecisionTree):
-            #     raise RuntimeError("Instead of using sklearn.tree, use trees import from sktree.")
-
             # XXX: maybe error out if the tree_estimator is already fitted
             self.estimator_ = clone(self.tree_estimator)
         self.estimator_.set_params(
