@@ -92,12 +92,14 @@ def make_multiview_classification(
 
 n_samples = 100
 n_features = 10000
-n_features_views = [10, n_features]
+n_features_1 = 10
+n_features_2 = n_features
+n_features_views = [n_features_1, n_features_1 + n_features_2]
 
 X, y = make_multiview_classification(
     n_samples=n_samples,
-    n_features_1=10,
-    n_features_2=n_features,
+    n_features_1=n_features_1,
+    n_features_2=n_features_2,
     cluster_std=2.0,
     seed=seed,
 )
