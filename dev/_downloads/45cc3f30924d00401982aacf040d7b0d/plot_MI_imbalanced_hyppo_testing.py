@@ -134,16 +134,10 @@ est = FeatureImportanceForestClassifier(
     ),
     random_state=seed,
     test_size=test_size,
-    permute_per_tree=False,
-    sample_dataset_per_tree=False,
 )
 
 mv_results = dict()
 
-print(
-    f"Permutation per tree: {est.permute_per_tree} and sampling dataset per tree: "
-    f"{est.sample_dataset_per_tree}"
-)
 # we test for the first feature set, which is important and thus should return a pvalue < 0.05
 stat, pvalue = est.test(
     X, y, covariate_index=np.arange(10, dtype=int), metric="mi", n_repeats=n_repeats
@@ -179,8 +173,6 @@ est = FeatureImportanceForestClassifier(
     ),
     random_state=seed,
     test_size=test_size,
-    permute_per_tree=False,
-    sample_dataset_per_tree=False,
 )
 
 rf_results = dict()

@@ -453,7 +453,7 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for sktree.stats.forestht</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">joblib</span> <span class="kn">import</span> <span class="n">Parallel</span><span class="p">,</span> <span class="n">delayed</span>
@@ -466,7 +466,6 @@ document.write(`
 <span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">_is_fitted</span><span class="p">,</span> <span class="n">check_X_y</span>
 
 <span class="kn">from</span> <span class="nn">sktree._lib.sklearn.ensemble._forest</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">BaseForest</span><span class="p">,</span>
     <span class="n">ForestClassifier</span><span class="p">,</span>
     <span class="n">ForestRegressor</span><span class="p">,</span>
     <span class="n">RandomForestClassifier</span><span class="p">,</span>
@@ -474,7 +473,9 @@ document.write(`
     <span class="n">_get_n_samples_bootstrap</span><span class="p">,</span>
     <span class="n">_parallel_build_trees</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">sktree.ensemble._honest_forest</span> <span class="kn">import</span> <span class="n">HonestForestClassifier</span>
 <span class="kn">from</span> <span class="nn">sktree.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span><span class="p">,</span> <span class="n">DecisionTreeRegressor</span>
+<span class="kn">from</span> <span class="nn">sktree.tree._classes</span> <span class="kn">import</span> <span class="n">DTYPE</span>
 
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">METRIC_FUNCTIONS</span><span class="p">,</span>
@@ -486,45 +487,51 @@ document.write(`
 <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_parallel_build_trees_and_compute_posteriors</span><span class="p">(</span>
-    <span class="n">forest</span><span class="p">:</span> <span class="n">BaseForest</span><span class="p">,</span>
+<span class="k">def</span> <span class="nf">_parallel_predict_proba</span><span class="p">(</span><span class="n">predict_proba</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is a utility function for joblib&#39;s Parallel.</span>
+
+<span class="sd">    It can&#39;t go locally in ForestClassifier or ForestRegressor, because joblib</span>
+<span class="sd">    complains that it cannot pickle it when placed there.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># each tree predicts proba with a list of output (n_samples, n_classes[i])</span>
+    <span class="n">prediction</span> <span class="o">=</span> <span class="n">predict_proba</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">indices_test</span><span class="p">,</span> <span class="p">:],</span> <span class="n">check_input</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">prediction</span>
+
+
+<span class="k">def</span> <span class="nf">_parallel_build_trees_with_sepdata</span><span class="p">(</span>
+    <span class="n">tree</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DecisionTreeClassifier</span><span class="p">,</span> <span class="n">DecisionTreeRegressor</span><span class="p">],</span>
+    <span class="n">n_trees</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">indices_train</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
-    <span class="n">indices_test</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
     <span class="n">X</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
     <span class="n">y</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
     <span class="n">covariate_index</span><span class="p">,</span>
-    <span class="n">posterior_arr</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
-    <span class="n">predict_posteriors</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-    <span class="n">permute_per_tree</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-    <span class="n">type_of_target</span><span class="p">,</span>
-    <span class="n">sample_weight</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">bootstrap</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">max_samples</span><span class="p">,</span>
+    <span class="n">sample_weight</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ArrayLike</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">class_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">missing_values_in_feature_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">classes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Parallel function to build trees and compute posteriors.</span>
 
 <span class="sd">    This inherently assumes that the caller function defines the indices</span>
 <span class="sd">    for the training and testing data for each tree.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">tree</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DecisionTreeClassifier</span><span class="p">,</span> <span class="n">DecisionTreeRegressor</span><span class="p">]</span> <span class="o">=</span> <span class="n">forest</span><span class="o">.</span><span class="n">estimators_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">permute_per_tree</span> <span class="ow">and</span> <span class="n">covariate_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">random_state</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">random_state</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">random_state</span> <span class="o">=</span> <span class="n">forest</span><span class="o">.</span><span class="n">random_state</span>
-
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
     <span class="n">X_train</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">indices_train</span><span class="p">,</span> <span class="p">:]</span>
     <span class="n">y_train</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">indices_train</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
-    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">forest</span><span class="o">.</span><span class="n">bootstrap</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">bootstrap</span><span class="p">:</span>
         <span class="n">n_samples_bootstrap</span> <span class="o">=</span> <span class="n">_get_n_samples_bootstrap</span><span class="p">(</span>
-            <span class="n">n_samples</span><span class="o">=</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">max_samples</span><span class="o">=</span><span class="n">forest</span><span class="o">.</span><span class="n">max_samples</span>
+            <span class="n">n_samples</span><span class="o">=</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">max_samples</span><span class="o">=</span><span class="n">max_samples</span>
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">n_samples_bootstrap</span> <span class="o">=</span> <span class="kc">None</span>
 
+    <span class="c1"># XXX: this currently creates a copy of X_train on RAM, which is not ideal</span>
     <span class="c1"># individual tree permutation of y labels</span>
     <span class="k">if</span> <span class="n">covariate_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
@@ -533,32 +540,21 @@ document.write(`
         <span class="n">perm_X_cov</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[</span><span class="n">index_arr</span><span class="p">,</span> <span class="n">covariate_index</span><span class="p">]</span>
         <span class="n">X_train</span><span class="p">[:,</span> <span class="n">covariate_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">perm_X_cov</span>
 
-    <span class="k">if</span> <span class="n">type_of_target</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span><span class="p">:</span>
-        <span class="n">y_train</span> <span class="o">=</span> <span class="n">y_train</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
-
     <span class="n">tree</span> <span class="o">=</span> <span class="n">_parallel_build_trees</span><span class="p">(</span>
         <span class="n">tree</span><span class="p">,</span>
-        <span class="n">forest</span><span class="o">.</span><span class="n">bootstrap</span><span class="p">,</span>
+        <span class="n">bootstrap</span><span class="p">,</span>
         <span class="n">X_train</span><span class="p">,</span>
         <span class="n">y_train</span><span class="p">,</span>
         <span class="n">sample_weight</span><span class="p">,</span>
         <span class="n">idx</span><span class="p">,</span>
-        <span class="nb">len</span><span class="p">(</span><span class="n">forest</span><span class="o">.</span><span class="n">estimators_</span><span class="p">),</span>
+        <span class="n">n_trees</span><span class="p">,</span>
         <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">class_weight</span><span class="o">=</span><span class="n">class_weight</span><span class="p">,</span>
         <span class="n">n_samples_bootstrap</span><span class="o">=</span><span class="n">n_samples_bootstrap</span><span class="p">,</span>
         <span class="n">missing_values_in_feature_mask</span><span class="o">=</span><span class="n">missing_values_in_feature_mask</span><span class="p">,</span>
         <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span>
     <span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">predict_posteriors</span><span class="p">:</span>
-        <span class="c1"># XXX: currently assumes n_outputs_ == 1</span>
-        <span class="n">y_pred</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">indices_test</span><span class="p">,</span> <span class="p">:])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">tree</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">y_pred</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">indices_test</span><span class="p">,</span> <span class="p">:])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">tree</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">)</span>
-
-    <span class="c1"># Fill test set posteriors &amp; set rest NaN</span>
-    <span class="n">posterior_arr</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">y_pred</span>  <span class="c1"># posterior</span>
+    <span class="k">return</span> <span class="n">tree</span>
 
 
 <span class="k">class</span> <span class="nc">BaseForestHT</span><span class="p">(</span><span class="n">MetaEstimatorMixin</span><span class="p">):</span>
@@ -575,17 +571,21 @@ document.write(`
         <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
-        <span class="n">permute_per_tree</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">sample_dataset_per_tree</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">stratify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">sample_dataset_per_tree</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">permute_forest_fraction</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">train_test_split</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="o">=</span> <span class="n">estimator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_size</span> <span class="o">=</span> <span class="n">test_size</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">permute_per_tree</span> <span class="o">=</span> <span class="n">permute_per_tree</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sample_dataset_per_tree</span> <span class="o">=</span> <span class="n">sample_dataset_per_tree</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stratify</span> <span class="o">=</span> <span class="n">stratify</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_test_split</span> <span class="o">=</span> <span class="n">train_test_split</span>
+        <span class="c1"># XXX: possibly removing these parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_dataset_per_tree</span> <span class="o">=</span> <span class="n">sample_dataset_per_tree</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">permute_forest_fraction</span> <span class="o">=</span> <span class="n">permute_forest_fraction</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">n_samples_test_</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_</span> <span class="o">=</span> <span class="kc">None</span>
@@ -599,7 +599,15 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_estimators</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">n_estimators</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">n_estimators</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">permuted_estimator_</span><span class="o">.</span><span class="n">n_estimators</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_estimator</span><span class="p">()</span><span class="o">.</span><span class="n">n_estimators</span>
+
+    <span class="k">def</span> <span class="nf">_get_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
     <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">class_attributes</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
@@ -625,24 +633,35 @@ document.write(`
         <span class="c1"># Get drawn indices along both sample and feature axes</span>
         <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_dataset_per_tree</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">permute_forest_fraction</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">permute_forest_fraction</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">permute_forest_fraction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">permute_forest_fraction</span>
+
+        <span class="c1"># TODO: consolidate how we &quot;sample/permute&quot; per subset of the forest</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_dataset_per_tree</span> <span class="ow">or</span> <span class="n">permute_forest_fraction</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="c1"># sample random seeds</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seeds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_seeds</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_n_permutations</span> <span class="o">=</span> <span class="mi">0</span>
 
-                <span class="k">for</span> <span class="n">tree</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">estimators_</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">tree</span><span class="o">.</span><span class="n">random_state</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">_seeds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">))</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">_seeds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+                <span class="n">num_trees_per_seed</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                    <span class="nb">int</span><span class="p">(</span><span class="n">permute_forest_fraction</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">estimators_</span><span class="p">)),</span> <span class="mi">1</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">tree_idx</span><span class="p">,</span> <span class="n">tree</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">estimators_</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">tree_idx</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">tree_idx</span> <span class="o">%</span> <span class="n">num_trees_per_seed</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">tree</span><span class="o">.</span><span class="n">random_state</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">seed</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">seed</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">random_state</span>
+
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_n_permutations</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_seeds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+
+            <span class="c1"># now that we have the random seeds, we can sample the train/test indices</span>
+            <span class="c1"># deterministically</span>
             <span class="n">seeds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seeds</span>
 
-            <span class="k">if</span> <span class="n">sample_separate</span><span class="p">:</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_perm_seeds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">new_rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1e6</span><span class="p">))</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_perm_seeds</span> <span class="o">=</span> <span class="n">new_rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span>
-                        <span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">estimators_</span><span class="p">)</span>
-                    <span class="p">)</span>
-                <span class="n">seeds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_perm_seeds</span>
             <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">tree</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">estimators_</span><span class="p">):</span>
                 <span class="n">seed</span> <span class="o">=</span> <span class="n">seeds</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
 
@@ -666,6 +685,7 @@ document.write(`
 
             <span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
                 <span class="n">indices</span><span class="p">,</span>
+                <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">test_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_size</span><span class="p">,</span>
                 <span class="n">stratify</span><span class="o">=</span><span class="n">stratifier</span><span class="p">,</span>
                 <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_seeds</span><span class="p">,</span>
@@ -690,6 +710,13 @@ document.write(`
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;The estimator must be fitted before accessing this attribute.&quot;</span><span class="p">)</span>
 
+        <span class="c1"># we are not train/test splitting, then</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_test_split</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span>
+                <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">estimators_</span><span class="p">))</span>
+            <span class="p">]</span>
+
         <span class="c1"># Stratifier uses a cached _y attribute if available</span>
         <span class="n">stratifier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="k">if</span> <span class="n">is_classifier</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">stratify</span> <span class="k">else</span> <span class="kc">None</span>
 
@@ -710,8 +737,8 @@ document.write(`
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Subclasses should implement this!&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">covariate_index</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">check_X_y</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">ensure_2d</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">covariate_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ArrayLike</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">check_X_y</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">ensure_2d</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
             <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
@@ -744,13 +771,28 @@ document.write(`
                 <span class="sa">f</span><span class="s2">&quot;If running on a new dataset, call the &#39;reset&#39; method.&quot;</span>
             <span class="p">)</span>
 
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_test_split</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="p">,</span> <span class="n">HonestForestClassifier</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Train test split must occur if not using honest forest classifier.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">permute_forest_fraction</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">permute_forest_fraction</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;permute_forest_fraction must be non-negative.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">permute_forest_fraction</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">permute_forest_fraction</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_estimators</span> <span class="o">&lt;</span> <span class="mf">1.0</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;permute_forest_fraction must be greater than 1./n_estimators, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">permute_forest_fraction</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+
         <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">covariate_index</span>
 
     <span class="k">def</span> <span class="nf">statistic</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">X</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
         <span class="n">y</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
-        <span class="n">covariate_index</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">covariate_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ArrayLike</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;mi&quot;</span><span class="p">,</span>
         <span class="n">return_posteriors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">check_input</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -869,7 +911,7 @@ document.write(`
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">X</span><span class="p">,</span>
         <span class="n">y</span><span class="p">,</span>
-        <span class="n">covariate_index</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">covariate_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ArrayLike</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mi&quot;</span><span class="p">,</span>
         <span class="n">n_repeats</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
         <span class="n">return_posteriors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -1034,11 +1076,16 @@ document.write(`
 <span class="sd">    test_size : float, default=0.2</span>
 <span class="sd">        Proportion of samples per tree to use for the test set.</span>
 
-<span class="sd">    permute_per_tree : bool, default=True</span>
-<span class="sd">        Whether to permute the covariate index per tree or per forest.</span>
-
 <span class="sd">    sample_dataset_per_tree : bool, default=False</span>
 <span class="sd">        Whether to sample the dataset per tree or per forest.</span>
+
+<span class="sd">    permute_forest_fraction : float, default=None</span>
+<span class="sd">        The fraction of trees to permute the covariate index for. If None, then</span>
+<span class="sd">        just one permutation is performed. If sampling a permutation per tree</span>
+<span class="sd">        is desirable, then the fraction should be set to ``1. / n_estimators``.</span>
+
+<span class="sd">    train_test_split : bool, default=True</span>
+<span class="sd">        Whether to split the dataset before passing to the forest.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -1092,16 +1139,18 @@ document.write(`
         <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
-        <span class="n">permute_per_tree</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">sample_dataset_per_tree</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">sample_dataset_per_tree</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">permute_forest_fraction</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">train_test_split</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">estimator</span><span class="o">=</span><span class="n">estimator</span><span class="p">,</span>
             <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
             <span class="n">test_size</span><span class="o">=</span><span class="n">test_size</span><span class="p">,</span>
-            <span class="n">permute_per_tree</span><span class="o">=</span><span class="n">permute_per_tree</span><span class="p">,</span>
             <span class="n">sample_dataset_per_tree</span><span class="o">=</span><span class="n">sample_dataset_per_tree</span><span class="p">,</span>
+            <span class="n">permute_forest_fraction</span><span class="o">=</span><span class="n">permute_forest_fraction</span><span class="p">,</span>
+            <span class="n">train_test_split</span><span class="o">=</span><span class="n">train_test_split</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1119,7 +1168,7 @@ document.write(`
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">X</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
         <span class="n">y</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
-        <span class="n">covariate_index</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">covariate_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ArrayLike</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;mse&quot;</span><span class="p">,</span>
         <span class="n">return_posteriors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">check_input</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -1182,28 +1231,33 @@ document.write(`
 
         <span class="c1"># both sampling dataset per tree or permuting per tree requires us to bypass the</span>
         <span class="c1"># sklearn API to fit each tree individually</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_dataset_per_tree</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">permute_per_tree</span><span class="p">:</span>
-            <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">estimator</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span> <span class="n">prefer</span><span class="o">=</span><span class="s2">&quot;threads&quot;</span><span class="p">)(</span>
-                <span class="n">delayed</span><span class="p">(</span><span class="n">_parallel_build_trees_and_compute_posteriors</span><span class="p">)(</span>
-                    <span class="n">estimator</span><span class="p">,</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_dataset_per_tree</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">permute_forest_fraction</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">permute_forest_fraction</span> <span class="ow">and</span> <span class="n">covariate_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">random_states</span> <span class="o">=</span> <span class="p">[</span><span class="n">tree</span><span class="o">.</span><span class="n">random_state</span> <span class="k">for</span> <span class="n">tree</span> <span class="ow">in</span> <span class="n">estimator</span><span class="o">.</span><span class="n">estimators_</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">random_states</span> <span class="o">=</span> <span class="p">[</span><span class="n">estimator</span><span class="o">.</span><span class="n">random_state</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">estimator</span><span class="o">.</span><span class="n">estimators_</span><span class="p">)</span>
+
+            <span class="n">trees</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">estimator</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span> <span class="n">prefer</span><span class="o">=</span><span class="s2">&quot;threads&quot;</span><span class="p">)(</span>
+                <span class="n">delayed</span><span class="p">(</span><span class="n">_parallel_build_trees_with_sepdata</span><span class="p">)(</span>
+                    <span class="n">estimator</span><span class="o">.</span><span class="n">estimators_</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+                    <span class="nb">len</span><span class="p">(</span><span class="n">estimator</span><span class="o">.</span><span class="n">estimators_</span><span class="p">),</span>
                     <span class="n">idx</span><span class="p">,</span>
                     <span class="n">indices_train</span><span class="p">,</span>
-                    <span class="n">indices_test</span><span class="p">,</span>
                     <span class="n">X</span><span class="p">,</span>
                     <span class="n">y</span><span class="p">,</span>
                     <span class="n">covariate_index</span><span class="p">,</span>
-                    <span class="n">posterior_arr</span><span class="p">,</span>
-                    <span class="kc">False</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">permute_per_tree</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_type_of_target_</span><span class="p">,</span>
+                    <span class="n">bootstrap</span><span class="o">=</span><span class="n">estimator</span><span class="o">.</span><span class="n">bootstrap</span><span class="p">,</span>
+                    <span class="n">max_samples</span><span class="o">=</span><span class="n">estimator</span><span class="o">.</span><span class="n">max_samples</span><span class="p">,</span>
+                    <span class="n">random_state</span><span class="o">=</span><span class="n">random_states</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
                 <span class="p">)</span>
-                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_test_samples_</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">indices_train</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_test_samples_</span><span class="p">)</span>
             <span class="p">)</span>
+            <span class="n">estimator</span><span class="o">.</span><span class="n">estimators_</span> <span class="o">=</span> <span class="n">trees</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># fitting a forest will only get one unique train/test split</span>
             <span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_test_samples_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-            <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">indices_train</span><span class="p">,</span> <span class="p">:],</span> <span class="n">X</span><span class="p">[</span><span class="n">indices_test</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="n">X_train</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">indices_train</span><span class="p">,</span> <span class="p">:],</span> <span class="n">X</span><span class="p">[</span><span class="n">indices_test</span><span class="p">,</span> <span class="p">:]</span>
             <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">indices_train</span><span class="p">,</span> <span class="p">:],</span> <span class="n">y</span><span class="p">[</span><span class="n">indices_test</span><span class="p">,</span> <span class="p">:]</span>
 
             <span class="k">if</span> <span class="n">covariate_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1221,15 +1275,32 @@ document.write(`
                 <span class="n">y_train</span> <span class="o">=</span> <span class="n">y_train</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
             <span class="n">estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 
-            <span class="c1"># construct posterior array for all trees (n_trees, n_samples_test, n_outputs)</span>
-            <span class="k">for</span> <span class="n">itree</span><span class="p">,</span> <span class="n">tree</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">estimator</span><span class="o">.</span><span class="n">estimators_</span><span class="p">):</span>
-                <span class="n">posterior_arr</span><span class="p">[</span><span class="n">itree</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
-                    <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">tree</span><span class="o">.</span><span class="n">n_outputs_</span>
-                <span class="p">)</span>
-
             <span class="c1"># set variables to compute metric</span>
             <span class="n">samples</span> <span class="o">=</span> <span class="n">indices_test</span>
             <span class="n">y_true_final</span> <span class="o">=</span> <span class="n">y_test</span>
+
+        <span class="c1"># TODO: probably a more elegant way of doing this</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_test_split</span><span class="p">:</span>
+            <span class="c1"># accumulate the predictions across all trees</span>
+            <span class="n">all_proba</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">estimator</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)(</span>
+                <span class="n">delayed</span><span class="p">(</span><span class="n">_parallel_predict_proba</span><span class="p">)(</span>
+                    <span class="n">estimator</span><span class="o">.</span><span class="n">estimators_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">predict</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">indices_test</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_test_samples_</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">itree</span><span class="p">,</span> <span class="p">(</span><span class="n">proba</span><span class="p">,</span> <span class="n">est_indices</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">all_proba</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_test_samples_</span><span class="p">)):</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">indices_test</span> <span class="o">=</span> <span class="n">est_indices</span>
+                <span class="n">posterior_arr</span><span class="p">[</span><span class="n">itree</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">proba</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">estimator</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">all_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+            <span class="c1"># accumulate the predictions across all trees</span>
+            <span class="n">all_proba</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">estimator</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)(</span>
+                <span class="n">delayed</span><span class="p">(</span><span class="n">_parallel_predict_proba</span><span class="p">)(</span><span class="n">estimator</span><span class="o">.</span><span class="n">estimators_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">predict</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">all_indices</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">estimator</span><span class="o">.</span><span class="n">estimators_</span><span class="p">))</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">itree</span><span class="p">,</span> <span class="n">proba</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">all_proba</span><span class="p">):</span>
+                <span class="n">posterior_arr</span><span class="p">[</span><span class="n">itree</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">proba</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">estimator</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">)</span>
 
         <span class="c1"># determine if there are any nans in the final posterior array, when</span>
         <span class="c1"># averaged over the trees</span>
@@ -1293,14 +1364,18 @@ document.write(`
 <span class="sd">    test_size : float, default=0.2</span>
 <span class="sd">        Proportion of samples per tree to use for the test set.</span>
 
-<span class="sd">    permute_per_tree : bool, default=True</span>
-<span class="sd">        Whether to permute the covariate index per tree or per forest.</span>
+<span class="sd">    stratify : bool, default=True</span>
+<span class="sd">        Whether to stratify the samples by class labels.</span>
 
 <span class="sd">    sample_dataset_per_tree : bool, default=False</span>
 <span class="sd">        Whether to sample the dataset per tree or per forest.</span>
 
-<span class="sd">    stratify : bool, default=True</span>
-<span class="sd">        Whether to stratify the samples by class labels.</span>
+<span class="sd">    permute_forest_fraction : float, default=None</span>
+<span class="sd">        The fraction of trees to permute the covariate index for. If None, then</span>
+<span class="sd">        just one permutation is performed.</span>
+
+<span class="sd">    train_test_split : bool, default=True</span>
+<span class="sd">        Whether to split the data into train/test before passing to the forest.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -1352,18 +1427,20 @@ document.write(`
         <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
-        <span class="n">permute_per_tree</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">sample_dataset_per_tree</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">stratify</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">sample_dataset_per_tree</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">permute_forest_fraction</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">train_test_split</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">estimator</span><span class="o">=</span><span class="n">estimator</span><span class="p">,</span>
             <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
             <span class="n">test_size</span><span class="o">=</span><span class="n">test_size</span><span class="p">,</span>
-            <span class="n">permute_per_tree</span><span class="o">=</span><span class="n">permute_per_tree</span><span class="p">,</span>
             <span class="n">sample_dataset_per_tree</span><span class="o">=</span><span class="n">sample_dataset_per_tree</span><span class="p">,</span>
             <span class="n">stratify</span><span class="o">=</span><span class="n">stratify</span><span class="p">,</span>
+            <span class="n">train_test_split</span><span class="o">=</span><span class="n">train_test_split</span><span class="p">,</span>
+            <span class="n">permute_forest_fraction</span><span class="o">=</span><span class="n">permute_forest_fraction</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1409,28 +1486,33 @@ document.write(`
 
         <span class="c1"># both sampling dataset per tree or permuting per tree requires us to bypass the</span>
         <span class="c1"># sklearn API to fit each tree individually</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_dataset_per_tree</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">permute_per_tree</span><span class="p">:</span>
-            <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">estimator</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span> <span class="n">prefer</span><span class="o">=</span><span class="s2">&quot;threads&quot;</span><span class="p">)(</span>
-                <span class="n">delayed</span><span class="p">(</span><span class="n">_parallel_build_trees_and_compute_posteriors</span><span class="p">)(</span>
-                    <span class="n">estimator</span><span class="p">,</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_dataset_per_tree</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">permute_forest_fraction</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">permute_forest_fraction</span> <span class="ow">and</span> <span class="n">covariate_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">random_states</span> <span class="o">=</span> <span class="p">[</span><span class="n">tree</span><span class="o">.</span><span class="n">random_state</span> <span class="k">for</span> <span class="n">tree</span> <span class="ow">in</span> <span class="n">estimator</span><span class="o">.</span><span class="n">estimators_</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">random_states</span> <span class="o">=</span> <span class="p">[</span><span class="n">estimator</span><span class="o">.</span><span class="n">random_state</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">estimator</span><span class="o">.</span><span class="n">estimators_</span><span class="p">)</span>
+
+            <span class="n">trees</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">estimator</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span> <span class="n">prefer</span><span class="o">=</span><span class="s2">&quot;threads&quot;</span><span class="p">)(</span>
+                <span class="n">delayed</span><span class="p">(</span><span class="n">_parallel_build_trees_with_sepdata</span><span class="p">)(</span>
+                    <span class="n">estimator</span><span class="o">.</span><span class="n">estimators_</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+                    <span class="nb">len</span><span class="p">(</span><span class="n">estimator</span><span class="o">.</span><span class="n">estimators_</span><span class="p">),</span>
                     <span class="n">idx</span><span class="p">,</span>
                     <span class="n">indices_train</span><span class="p">,</span>
-                    <span class="n">indices_test</span><span class="p">,</span>
                     <span class="n">X</span><span class="p">,</span>
                     <span class="n">y</span><span class="p">,</span>
                     <span class="n">covariate_index</span><span class="p">,</span>
-                    <span class="n">posterior_arr</span><span class="p">,</span>
-                    <span class="n">predict_posteriors</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">permute_per_tree</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_type_of_target_</span><span class="p">,</span>
+                    <span class="n">bootstrap</span><span class="o">=</span><span class="n">estimator</span><span class="o">.</span><span class="n">bootstrap</span><span class="p">,</span>
+                    <span class="n">max_samples</span><span class="o">=</span><span class="n">estimator</span><span class="o">.</span><span class="n">max_samples</span><span class="p">,</span>
+                    <span class="n">random_state</span><span class="o">=</span><span class="n">random_states</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
                 <span class="p">)</span>
-                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_test_samples_</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">indices_train</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_test_samples_</span><span class="p">)</span>
             <span class="p">)</span>
+            <span class="n">estimator</span><span class="o">.</span><span class="n">estimators_</span> <span class="o">=</span> <span class="n">trees</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># fitting a forest will only get one unique train/test split</span>
             <span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_test_samples_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-            <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">indices_train</span><span class="p">,</span> <span class="p">:],</span> <span class="n">X</span><span class="p">[</span><span class="n">indices_test</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="n">X_train</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">indices_train</span><span class="p">,</span> <span class="p">:],</span> <span class="n">X</span><span class="p">[</span><span class="n">indices_test</span><span class="p">,</span> <span class="p">:]</span>
             <span class="n">y_train</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">indices_train</span><span class="p">,</span> <span class="p">:]</span>
 
             <span class="k">if</span> <span class="n">covariate_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1448,20 +1530,57 @@ document.write(`
                 <span class="n">y_train</span> <span class="o">=</span> <span class="n">y_train</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
             <span class="n">estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 
-            <span class="c1"># construct posterior array for all trees (n_trees, n_samples_test, n_outputs)</span>
-            <span class="k">for</span> <span class="n">itree</span><span class="p">,</span> <span class="n">tree</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">estimator</span><span class="o">.</span><span class="n">estimators_</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">predict_posteriors</span><span class="p">:</span>
-                    <span class="c1"># XXX: currently assumes n_outputs_ == 1</span>
-                    <span class="n">posterior_arr</span><span class="p">[</span><span class="n">itree</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
-                        <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">tree</span><span class="o">.</span><span class="n">n_classes_</span>
-                    <span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">posterior_arr</span><span class="p">[</span><span class="n">itree</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
-                        <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">tree</span><span class="o">.</span><span class="n">n_outputs_</span>
-                    <span class="p">)</span>
-
             <span class="c1"># set variables to compute metric</span>
             <span class="n">samples</span> <span class="o">=</span> <span class="n">indices_test</span>
+
+        <span class="c1"># list of tree outputs. Each tree output is (n_samples, n_outputs), or (n_samples,)</span>
+        <span class="k">if</span> <span class="n">predict_posteriors</span><span class="p">:</span>
+            <span class="c1"># all_proba = Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose)(</span>
+            <span class="c1">#     delayed(_parallel_predict_proba)(</span>
+            <span class="c1">#         estimator.estimators_[idx].predict_proba, X, indices_test</span>
+            <span class="c1">#     )</span>
+            <span class="c1">#     for idx, (_, indices_test) in enumerate(self.train_test_samples_)</span>
+            <span class="c1"># )</span>
+
+            <span class="c1"># TODO: probably a more elegant way of doing this</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_test_split</span><span class="p">:</span>
+                <span class="c1"># accumulate the predictions across all trees</span>
+                <span class="n">all_proba</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">estimator</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)(</span>
+                    <span class="n">delayed</span><span class="p">(</span><span class="n">_parallel_predict_proba</span><span class="p">)(</span>
+                        <span class="n">estimator</span><span class="o">.</span><span class="n">estimators_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">indices_test</span>
+                    <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_test_samples_</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">all_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+                <span class="c1"># accumulate the predictions across all trees</span>
+                <span class="n">all_proba</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">estimator</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)(</span>
+                    <span class="n">delayed</span><span class="p">(</span><span class="n">_parallel_predict_proba</span><span class="p">)(</span>
+                        <span class="n">estimator</span><span class="o">.</span><span class="n">estimators_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">all_indices</span>
+                    <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">estimator</span><span class="o">.</span><span class="n">estimators_</span><span class="p">))</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">all_proba</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">estimator</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)(</span>
+                <span class="n">delayed</span><span class="p">(</span><span class="n">_parallel_predict_proba</span><span class="p">)(</span>
+                    <span class="n">estimator</span><span class="o">.</span><span class="n">estimators_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">predict</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">indices_test</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_test_samples_</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">for</span> <span class="n">itree</span><span class="p">,</span> <span class="p">(</span><span class="n">proba</span><span class="p">,</span> <span class="n">est_indices</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">all_proba</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_test_samples_</span><span class="p">)):</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">indices_test</span> <span class="o">=</span> <span class="n">est_indices</span>
+
+            <span class="k">if</span> <span class="n">predict_posteriors</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_test_split</span><span class="p">:</span>
+                    <span class="n">posterior_arr</span><span class="p">[</span><span class="n">itree</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">proba</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                        <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">estimator</span><span class="o">.</span><span class="n">n_classes_</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">posterior_arr</span><span class="p">[</span><span class="n">itree</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">proba</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">estimator</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">posterior_arr</span><span class="p">[</span><span class="n">itree</span><span class="p">,</span> <span class="n">indices_test</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">proba</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">estimator</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">metric</span> <span class="o">==</span> <span class="s2">&quot;auc&quot;</span><span class="p">:</span>
             <span class="c1"># at this point, posterior_final is the predicted posterior for only the positive class</span>
             <span class="c1"># as more than one output is not supported.</span>
