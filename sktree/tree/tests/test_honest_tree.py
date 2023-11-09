@@ -110,7 +110,12 @@ def test_impute_classes():
     assert y_proba.shape[1] == 3
 
 
-@parametrize_with_checks([HonestTreeClassifier(random_state=1)])
+@parametrize_with_checks(
+    [
+        HonestTreeClassifier(random_state=0),
+        HonestTreeClassifier(random_state=0, tree_estimator=DecisionTreeClassifier()),
+    ]
+)
 def test_sklearn_compatible_estimator(estimator, check):
     # 1. check_class_weight_classifiers is not supported since it requires sample weight
     # XXX: can include this "generalization" in the future if it's useful

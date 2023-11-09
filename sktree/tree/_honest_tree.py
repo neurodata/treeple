@@ -3,7 +3,6 @@
 
 import numpy as np
 from sklearn.base import ClassifierMixin, MetaEstimatorMixin, _fit_context, clone
-from sklearn.ensemble._base import _set_random_states
 from sklearn.utils.multiclass import _check_partial_fit_first_call, check_classification_targets
 from sklearn.utils.validation import check_is_fitted, check_X_y
 
@@ -538,10 +537,11 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         _sample_weight[self.honest_indices_] = 0
 
         if self.tree_estimator is None:
-            self.estimator_ = DecisionTreeClassifier()
+            self.estimator_ = DecisionTreeClassifier(random_state=self.random_state)
         else:
             # XXX: maybe error out if the tree_estimator is already fitted
             self.estimator_ = clone(self.tree_estimator)
+
         self.estimator_.set_params(
             **dict(
                 criterion=self.criterion,
@@ -555,8 +555,10 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
                 class_weight=self.class_weight,
                 min_impurity_decrease=self.min_impurity_decrease,
                 ccp_alpha=self.ccp_alpha,
+                random_state=self.random_state,
             )
         )
+
         try:
             self.estimator_.set_params(**dict(monotonic_cst=self.monotonic_cst))
             self.estimator_.set_params(
@@ -568,9 +570,6 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
             from warnings import warn
 
             warn("Using sklearn tree so store_leaf_values cannot be set.")
-
-        if self.random_state is not None:
-            _set_random_states(self.estimator_, self.random_state)
 
         # Learn structure on subsample
         # XXX: this allows us to use BaseDecisionTree without partial_fit API
