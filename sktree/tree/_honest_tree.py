@@ -553,7 +553,6 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
                 max_features=self.max_features,
                 max_leaf_nodes=self.max_leaf_nodes,
                 class_weight=self.class_weight,
-                random_state=self.random_state,
                 min_impurity_decrease=self.min_impurity_decrease,
                 ccp_alpha=self.ccp_alpha,
             )

@@ -142,10 +142,6 @@ est = FeatureImportanceForestClassifier(
 
 mv_results = dict()
 
-print(
-    f"Permutation per tree: {est.permute_per_tree} and sampling dataset per tree: "
-    f"{est.sample_dataset_per_tree}"
-)
 # we test for the overall MI of X vs y
 stat, pvalue = est.test(X, y, metric="mi", n_repeats=n_repeats)
 mv_results["feature_stat"] = stat
