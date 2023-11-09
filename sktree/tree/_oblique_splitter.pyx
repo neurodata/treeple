@@ -701,7 +701,7 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
                     self.feature_combinations,
                     self.feature_set_ends.base if self.feature_set_ends is not None else None,
                     self.n_feature_sets,
-                    self.max_features_per_set if self.max_features_per_set is not None else None,
+                    self.max_features_per_set.base if self.max_features_per_set is not None else None,
                 ), self.__getstate__())
 
     cdef intp_t init(
