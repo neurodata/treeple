@@ -52,7 +52,7 @@ rng = np.random.default_rng(seed)
                     n_jobs=-1,
                 ),
                 "random_state": seed,
-                "permute_per_forest_fraction": None,
+                "permute_forest_fraction": None,
                 "sample_dataset_per_tree": False,
             },
             300,  # n_samples
@@ -69,7 +69,7 @@ rng = np.random.default_rng(seed)
         #             n_estimators=150,
         #             n_jobs=-1,
         #         ),
-        #         "permute_per_forest_fraction": 1. / 150,
+        #         "permute_forest_fraction": 1. / 150,
         #         "sample_dataset_per_tree": True,
         #     },
         #     300,  # n_samples
@@ -86,7 +86,7 @@ rng = np.random.default_rng(seed)
                     n_jobs=-1,
                 ),
                 # "random_state": seed,
-                "permute_per_forest_fraction": 1.0 / 125,
+                "permute_forest_fraction": 1.0 / 125,
                 "sample_dataset_per_tree": False,
             },
             300,  # n_samples
@@ -188,7 +188,7 @@ def test_linear_model(hypotester, model_kwargs, n_samples, n_repeats, test_size)
         #             n_jobs=-1,
         #         ),
         #         # "random_state": seed,
-        #         "permute_per_forest_fraction": 1. / 150,
+        #         "permute_forest_fraction": 1. / 150,
         #         "sample_dataset_per_tree": True,
         #     },
         #     600,  # n_samples
@@ -204,7 +204,7 @@ def test_linear_model(hypotester, model_kwargs, n_samples, n_repeats, test_size)
                     n_estimators=100,
                     n_jobs=-1,
                 ),
-                "permute_per_forest_fraction": 1.0 / 100,
+                "permute_forest_fraction": 1.0 / 100,
                 "sample_dataset_per_tree": False,
             },
             600,  # n_samples
