@@ -26,6 +26,16 @@ def test_make_gaussian_mixture_errors():
     ):
         make_gaussian_mixture([[0, 1], [2, 3]], [np.eye(2), np.eye(2)], class_probs=[1.0])
 
+    # Test invalid transform type
+    with pytest.raises(ValueError, match="Transform type must be one of {'linear', 'poly', 'sin'}"):
+        make_gaussian_mixture([[0, 1], [2, 3]], [np.eye(2), np.eye(2)], transform="invalid")
+
+    # Test invalid transform type (callable)
+    with pytest.raises(
+        TypeError, match="'transform' must be of type string or a callable function"
+    ):
+        make_gaussian_mixture([[0, 1], [2, 3]], [np.eye(2), np.eye(2)], transform=123)
+
 
 def test_make_gaussian_mixture():
     # Test basic functionality
@@ -48,20 +58,35 @@ def test_make_gaussian_mixture():
     assert Xs[1].shape == (100, 4)  # 2 original dimensions + 2 noise dimensions
     assert y.shape == (100,)
 
-    # Test with custom transformation
-    def custom_transform(x):
-        return x + 2
 
+def custom_transform(x):
+    return x + 2
+
+
+@pytest.mark.parametrize("transform", ["linear", "poly", "sin", custom_transform])
+def test_make_gaussian_mixture_with_transform(transform):
+    # Test with any transformation
     Xs, y = make_gaussian_mixture(
         [[0, 1], [2, 3]],
         [np.eye(2), np.eye(2)],
-        transform=custom_transform,
+        transform=transform,
         random_state=0,
     )
     assert len(Xs) == 2
     assert Xs[0].shape == (100, 2)
     assert Xs[1].shape == (100, 2)
     assert y.shape[0] == 100
+    old_sum = np.sum(y)
+
+    # Test with any transformation
+    Xs, y = make_gaussian_mixture(
+        [[0, 1], [2, 3]], [np.eye(2), np.eye(2)], transform=transform, random_state=0, shuffle=True
+    )
+    assert len(Xs) == 2
+    assert Xs[0].shape == (100, 2)
+    assert Xs[1].shape == (100, 2)
+    assert y.shape[0] == 100
+    assert np.sum(y) == old_sum
 
 
 def test_make_joint_factor_model():
