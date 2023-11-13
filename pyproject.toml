@@ -209,6 +209,7 @@ extend-exclude = '''
     | sktree/_lib
     | .asv
     | env
+    | build-install
 )
 '''
 

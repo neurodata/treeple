@@ -19,9 +19,9 @@ def make_quadratic_classification(n_samples: int, n_features: int, noise=False, 
 
     Returns
     -------
-    x : array-like, shape (n_samples, n_features)
+    x : array-like, shape (2 * n_samples, n_features)
         Data array.
-    v : array-like, shape (n_samples,)
+    v : array-like, shape (2* n_samples,)
         Target array of 1's and 0's.
 
     References

@@ -92,12 +92,14 @@ def make_multiview_classification(
 
 n_samples = 100
 n_features = 10000
-n_features_views = [10, n_features]
+n_features_1 = 10
+n_features_2 = n_features
+n_features_views = [n_features_1, n_features_1 + n_features_2]
 
 X, y = make_multiview_classification(
     n_samples=n_samples,
-    n_features_1=10,
-    n_features_2=n_features,
+    n_features_1=n_features_1,
+    n_features_2=n_features_2,
     cluster_std=2.0,
     seed=seed,
 )
@@ -132,16 +134,10 @@ est = FeatureImportanceForestClassifier(
     ),
     random_state=seed,
     test_size=test_size,
-    permute_per_tree=False,
-    sample_dataset_per_tree=False,
 )
 
 mv_results = dict()
 
-print(
-    f"Permutation per tree: {est.permute_per_tree} and sampling dataset per tree: "
-    f"{est.sample_dataset_per_tree}"
-)
 # we test for the first feature set, which is important and thus should return a pvalue < 0.05
 stat, pvalue = est.test(
     X, y, covariate_index=np.arange(10, dtype=int), metric="mi", n_repeats=n_repeats
@@ -177,8 +173,6 @@ est = FeatureImportanceForestClassifier(
     ),
     random_state=seed,
     test_size=test_size,
-    permute_per_tree=False,
-    sample_dataset_per_tree=False,
 )
 
 rf_results = dict()

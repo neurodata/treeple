@@ -17,14 +17,16 @@ Tree-models have withstood the test of time, and are consistently used for moder
 Documentation
 =============
 
-See here for the documentation for our dev version: https://docs.neurodata.io/scikit-tree/dev/index.html
+See here for the documentation for our dev version: <https://docs.neurodata.io/scikit-tree/dev/index.html>
 
 Why oblique trees and why trees beyond those in scikit-learn?
 =============================================================
+
 In 2001, Leo Breiman proposed two types of Random Forests. One was known as ``Forest-RI``, which is the axis-aligned traditional random forest. One was known as ``Forest-RC``, which is the random oblique linear combinations random forest. This leveraged random combinations of features to perform splits. [MORF](1) builds upon ``Forest-RC`` by proposing additional functions to combine features. Other modern tree variants such as Canonical Correlation Forests (CCF), Extended Isolation Forests, Quantile Forests, or unsupervised random forests are also important at solving real-world problems using robust decision tree models.
 
 Installation
 ============
+
 Our installation will try to follow scikit-learn installation as close as possible, as we contain Cython code subclassed, or inspired by the scikit-learn tree submodule.
 
 Dependencies
@@ -37,18 +39,20 @@ We minimally require:
     * scipy
     * scikit-learn >= 1.3
 
-Installation with Pip (https://pypi.org/project/scikit-tree/)
+Installation with Pip (<https://pypi.org/project/scikit-tree/>)
 -------------------------------------------------------------
+
 Installing with pip on a conda environment is the recommended route.
 
     pip install scikit-tree
 
 Building locally with Meson (For developers)
 --------------------------------------------
+
 Make sure you have the necessary packages installed
 
     # install build dependencies
-    pip install numpy scipy meson ninja meson-python Cython scikit-learn scikit-learn-tree
+    pip install -r build_requirements.txt
 
     # you may need these optional dependencies to build scikit-learn locally
     conda install -c conda-forge joblib threadpoolctl pytest compilers llvm-openmp
@@ -102,11 +106,13 @@ After building locally, you can use editable installs (warning: this only regist
 
 Development
 ===========
+
 We welcome contributions for modern tree-based algorithms. We use Cython to achieve fast C/C++ speeds, while abiding by a scikit-learn compatible (tested) API. Moreover, our Cython internals are easily extensible because they follow the internal Cython API of scikit-learn as well.
 
-Due to the current state of scikit-learn's internal Cython code for trees, we have to instead leverage a fork of scikit-learn at https://github.com/neurodata/scikit-learn when
+Due to the current state of scikit-learn's internal Cython code for trees, we have to instead leverage a fork of scikit-learn at <https://github.com/neurodata/scikit-learn> when
 extending the decision tree model API of scikit-learn. Specifically, we extend the Python and Cython API of the tree submodule in scikit-learn in our submodule, so we can introduce the tree models housed in this package. Thus these extend the functionality of decision-tree based models in a way that is not possible yet in scikit-learn itself. As one example, we introduce an abstract API to allow users to implement their own oblique splits. Our plan in the future is to benchmark these functionalities and introduce them upstream to scikit-learn where applicable and inclusion criterion are met.
 
 References
 ==========
+
 [1]: [`Li, Adam, et al. "Manifold Oblique Random Forests: Towards Closing the Gap on Convolutional Deep Networks" SIAM Journal on Mathematics of Data Science, 5(1), 77-96, 2023`](https://doi.org/10.1137/21M1449117)

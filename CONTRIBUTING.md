@@ -27,16 +27,16 @@ code sample or an executable test case demonstrating the expected behavior.
 
 We use GitHub issues to track feature requests. Before you create an feature request:
 
-* Make sure you have a clear idea of the enhancement you would like. If you have a vague idea, consider discussing
+- Make sure you have a clear idea of the enhancement you would like. If you have a vague idea, consider discussing
 it first on a GitHub issue.
-* Check the documentation to make sure your feature does not already exist.
-* Do [a quick search](https://github.com/neurodata/scikit-tree/issues) to see whether your feature has already been suggested.
+- Check the documentation to make sure your feature does not already exist.
+- Do [a quick search](https://github.com/neurodata/scikit-tree/issues) to see whether your feature has already been suggested.
 
 When creating your request, please:
 
-* Provide a clear title and description.
-* Explain why the enhancement would be useful. It may be helpful to highlight the feature in other libraries.
-* Include code examples to demonstrate how the enhancement would be used.
+- Provide a clear title and description.
+- Explain why the enhancement would be useful. It may be helpful to highlight the feature in other libraries.
+- Include code examples to demonstrate how the enhancement would be used.
 
 ## Making a pull request
 
@@ -52,7 +52,7 @@ When you're ready to contribute code to address an open issue, please follow the
 
         git clone https://github.com/USERNAME/scikit-tree.git
 
-    or 
+    or
 
         git clone git@github.com:USERNAME/scikit-tree.git
 
@@ -142,6 +142,7 @@ When you're ready to contribute code to address an open issue, please follow the
     </details>
 
 ### Installing locally with Meson
+
 Meson is a modern build system with a lot of nice features, which is why we use it for our build system to compile the Cython/C++ code.
 However, there are some intricacies that might be new to a pure Python developer.
 
@@ -151,7 +152,7 @@ In general, the steps to build scikit-tree are:
 - build and install scikit-tree locally using `spin`
 
 Example would be:
-        
+
         pip uninstall scikit-learn
 
         # install the fork of scikit-learn
@@ -172,13 +173,13 @@ The most common errors come from the following:
 
 The CI files for github actions shows how to build and install for each OS.
 
-
 ### Writing docstrings
 
 We use [Sphinx](https://www.sphinx-doc.org/en/master/index.html) to build our API docs, which automatically parses all docstrings
 of public classes and methods. All docstrings should adhere to the [Numpy styling convention](https://www.sphinx-doc.org/en/master/usage/extensions/example_numpy.html).
 
 ### Testing Changes Locally With Poetry
+
 With poetry installed, we have included a few convenience functions to check your code. These checks must pass and will be checked by the PR's continuous integration services. You can install the various different developer dependencies with poetry:
 
     poetry install --with style, docs, test
@@ -216,6 +217,22 @@ If you need to add new, or remove old dependencies, then you need to modify the 
     poetry update
 
 To update the lock file.
+
+## Developing a new Tree model
+
+Here, we define some high-level procedures for how to best approach implementing a new decision-tree model that is not supported yet in scikit-tree.
+
+1. First-pass on implementation:
+
+    Implement a Cython splitter class and expose it in Python afterwards. Follow the framework for PatchObliqueSplitter and ObliqueSplitter and their respective decision-tree models: PatchObliqueDecisionTreeClassifier and ObliqueDecisionTreeClassifier.
+
+2. Second-pass on implementation:
+
+    This involves extending relevant API beyond just the Splitter in Cython. This requires maintaining some degree of backwards-compatibility. Extend the existing API for Tree, TreeBuilder, Criterion, or ObliqueSplitter to enable whatever functionality you desire.
+
+3. Third-pass on implementation:
+
+    This is the most complex implementation and should in theory be rarely used.  This involves both designing a change in the scikit-learn fork submodule as well as relevant changes in scikit-tree itself. Extend the scikit-learn fork API. This requires maintaining some degree of backwards-compatability and testing the proposed changes wrt whatever changes you then make in scikit-tree.
 
 ---
 
