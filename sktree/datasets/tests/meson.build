@@ -1,13 +1,11 @@
 python_sources = [
   '__init__.py',
-  'multiview.py',
-  'hyppo.py',
+  'test_hyppo.py',
+  'test_multiview.py',
 ]
 
 py3.install_sources(
   python_sources,
   pure: false,
-  subdir: 'sktree/datasets'
+  subdir: 'sktree/datasets/tests'
 )
-
-subdir('tests')

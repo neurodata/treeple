@@ -204,7 +204,7 @@ def test_linear_model(hypotester, model_kwargs, n_samples, n_repeats, test_size)
                     n_estimators=100,
                     n_jobs=-1,
                 ),
-                "permute_forest_fraction": 0.3,
+                "permute_forest_fraction": 0.5,
                 "sample_dataset_per_tree": False,
             },
             600,  # n_samples

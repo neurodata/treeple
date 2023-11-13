@@ -295,13 +295,11 @@ def make_joint_factor_model(
 
     Returns
     -------
-    Xs : list of array-likes or numpy.ndarray
-        List of samples data matrices:
+    Xs : list of array-likes
+        List of samples data matrices with the following attributes.
 
         - Xs length: n_views
-        - Xs[i] shape: (n_samples, n_features_i)
-
-        If ``return_decomp`` is False, returns just an array.
+        - Xs[i] shape: (n_samples, n_features_i).
 
     U: (n_samples, joint_rank)
         The true orthonormal joint scores matrix. Returned if
