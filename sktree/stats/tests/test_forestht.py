@@ -106,6 +106,29 @@ def test_featureimportance_forest_permute_pertree(sample_dataset_per_tree):
         est.statistic(iris_X[:n_samples], iris_y[:n_samples], metric="mse")
 
 
+@pytest.mark.parametrize("covariate_index", [None, [0, 1]])
+def test_featureimportance_forest_statistic_with_covariate_index(covariate_index):
+    """Tests that calling `est.statistic` with covariate_index defined works.
+
+    There should be no issue calling `est.statistic` with covariate_index defined.
+    """
+    n_estimators = 10
+    n_samples = 10
+
+    est = FeatureImportanceForestClassifier(
+        estimator=RandomForestClassifier(
+            n_estimators=n_estimators,
+            random_state=seed,
+        ),
+        permute_forest_fraction=-1.0 / n_estimators * 5,
+        test_size=0.7,
+        random_state=seed,
+    )
+    est.statistic(
+        iris_X[:n_samples], iris_y[:n_samples], covariate_index=covariate_index, metric="mi"
+    )
+
+
 @pytest.mark.parametrize("sample_dataset_per_tree", [True, False])
 def test_featureimportance_forest_stratified(sample_dataset_per_tree):
     n_samples = 100
