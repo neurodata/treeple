@@ -144,7 +144,12 @@ class BaseForestHT(MetaEstimatorMixin):
 
     @property
     def n_estimators(self):
-        return self._n_estimators
+        try:
+            return self.estimator_.n_estimators
+        except Exception:
+            return self.permuted_estimator_.n_estimators
+        finally:
+            return self._get_estimator().n_estimators
 
     def reset(self):
         class_attributes = dir(type(self))
@@ -395,8 +400,6 @@ class BaseForestHT(MetaEstimatorMixin):
                         self.estimator_.fit(X[:2], y[:2].ravel())
                     else:
                         self.estimator_.fit(X[:2], y[:2])
-
-        self._n_estimators = estimator.n_estimators
 
         # Store a cache of the y variable
         if is_classifier(self._get_estimator()):
