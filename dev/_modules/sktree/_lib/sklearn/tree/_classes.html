@@ -834,12 +834,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">min_samples_split_</span> <span class="o">=</span> <span class="n">min_samples_split</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_features</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_features</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">is_classification</span><span class="p">:</span>
-                    <span class="n">max_features</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span><span class="p">)))</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">max_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span>
-            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_features</span> <span class="o">==</span> <span class="s2">&quot;sqrt&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_features</span> <span class="o">==</span> <span class="s2">&quot;sqrt&quot;</span><span class="p">:</span>
                 <span class="n">max_features</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span><span class="p">)))</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_features</span> <span class="o">==</span> <span class="s2">&quot;log2&quot;</span><span class="p">:</span>
                 <span class="n">max_features</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span><span class="p">)))</span>
@@ -1436,7 +1431,7 @@ document.write(`
 <span class="sd">        the input samples) required to be at a leaf node. Samples have</span>
 <span class="sd">        equal weight when sample_weight is not provided.</span>
 
-<span class="sd">    max_features : int, float or {&quot;auto&quot;, &quot;sqrt&quot;, &quot;log2&quot;}, default=None</span>
+<span class="sd">    max_features : int, float or {&quot;sqrt&quot;, &quot;log2&quot;}, default=None</span>
 <span class="sd">        The number of features to consider when looking for the best split:</span>
 
 <span class="sd">            - If int, then consider `max_features` features at each split.</span>
@@ -2004,7 +1999,7 @@ document.write(`
 <span class="sd">        the input samples) required to be at a leaf node. Samples have</span>
 <span class="sd">        equal weight when sample_weight is not provided.</span>
 
-<span class="sd">    max_features : int, float or {&quot;auto&quot;, &quot;sqrt&quot;, &quot;log2&quot;}, default=None</span>
+<span class="sd">    max_features : int, float or {&quot;sqrt&quot;, &quot;log2&quot;}, default=None</span>
 <span class="sd">        The number of features to consider when looking for the best split:</span>
 
 <span class="sd">        - If int, then consider `max_features` features at each split.</span>
@@ -2366,19 +2361,19 @@ document.write(`
 <span class="sd">        the input samples) required to be at a leaf node. Samples have</span>
 <span class="sd">        equal weight when sample_weight is not provided.</span>
 
-<span class="sd">    max_features : int, float, {&quot;auto&quot;, &quot;sqrt&quot;, &quot;log2&quot;} or None, default=&quot;sqrt&quot;</span>
+<span class="sd">    max_features : int, float, {&quot;sqrt&quot;, &quot;log2&quot;} or None, default=&quot;sqrt&quot;</span>
 <span class="sd">        The number of features to consider when looking for the best split:</span>
 
-<span class="sd">            - If int, then consider `max_features` features at each split.</span>
-<span class="sd">            - If float, then `max_features` is a fraction and</span>
-<span class="sd">              `max(1, int(max_features * n_features_in_))` features are considered at</span>
-<span class="sd">              each split.</span>
-<span class="sd">            - If &quot;sqrt&quot;, then `max_features=sqrt(n_features)`.</span>
-<span class="sd">            - If &quot;log2&quot;, then `max_features=log2(n_features)`.</span>
-<span class="sd">            - If None, then `max_features=n_features`.</span>
+<span class="sd">        - If int, then consider `max_features` features at each split.</span>
+<span class="sd">        - If float, then `max_features` is a fraction and</span>
+<span class="sd">          `max(1, int(max_features * n_features_in_))` features are considered at</span>
+<span class="sd">          each split.</span>
+<span class="sd">        - If &quot;sqrt&quot;, then `max_features=sqrt(n_features)`.</span>
+<span class="sd">        - If &quot;log2&quot;, then `max_features=log2(n_features)`.</span>
+<span class="sd">        - If None, then `max_features=n_features`.</span>
 
-<span class="sd">            .. versionchanged:: 1.1</span>
-<span class="sd">                The default of `max_features` changed from `&quot;auto&quot;` to `&quot;sqrt&quot;`.</span>
+<span class="sd">        .. versionchanged:: 1.1</span>
+<span class="sd">            The default of `max_features` changed from `&quot;auto&quot;` to `&quot;sqrt&quot;`.</span>
 
 <span class="sd">        Note: the search for a split does not stop until at least one</span>
 <span class="sd">        valid partition of the node samples is found, even if it requires to</span>
@@ -2673,7 +2668,7 @@ document.write(`
 <span class="sd">        the input samples) required to be at a leaf node. Samples have</span>
 <span class="sd">        equal weight when sample_weight is not provided.</span>
 
-<span class="sd">    max_features : int, float, {&quot;auto&quot;, &quot;sqrt&quot;, &quot;log2&quot;} or None, default=1.0</span>
+<span class="sd">    max_features : int, float, {&quot;sqrt&quot;, &quot;log2&quot;} or None, default=1.0</span>
 <span class="sd">        The number of features to consider when looking for the best split:</span>
 
 <span class="sd">        - If int, then consider `max_features` features at each split.</span>
@@ -2900,7 +2895,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-11-09.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-11-13.
       <br/>
     
   </p>

@@ -1276,6 +1276,18 @@ sub-estimator of a meta-estimator, e.g. used inside a
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="sktree.MultiViewRandomForestClassifier.estimators_samples_">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">estimators_samples_</span></span><a class="headerlink" href="#sktree.MultiViewRandomForestClassifier.estimators_samples_" title="Link to this definition">#</a></dt>
+<dd><p>The subset of drawn samples for each base estimator.</p>
+<p>Returns a dynamically generated list of indices identifying
+the samples used for fitting each member of the ensemble, i.e.,
+the in-bag samples.</p>
+<p>Note: the list is re-created at each call to the property in order
+to reduce the object memory footprint by not storing the sampling
+data. Thus fetching the property may be slower than expected.</p>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="sktree.MultiViewRandomForestClassifier.feature_importances_">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">feature_importances_</span></span><a class="headerlink" href="#sktree.MultiViewRandomForestClassifier.feature_importances_" title="Link to this definition">#</a></dt>
 <dd><p>The impurity-based feature importances.</p>
@@ -1370,6 +1382,7 @@ array of zeros.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.MultiViewRandomForestClassifier.set_partial_fit_request"><code class="docutils literal notranslate"><span class="pre">MultiViewRandomForestClassifier.set_partial_fit_request()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.MultiViewRandomForestClassifier.set_score_request"><code class="docutils literal notranslate"><span class="pre">MultiViewRandomForestClassifier.set_score_request()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.MultiViewRandomForestClassifier.base_estimator_"><code class="docutils literal notranslate"><span class="pre">MultiViewRandomForestClassifier.base_estimator_</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.MultiViewRandomForestClassifier.estimators_samples_"><code class="docutils literal notranslate"><span class="pre">MultiViewRandomForestClassifier.estimators_samples_</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.MultiViewRandomForestClassifier.feature_importances_"><code class="docutils literal notranslate"><span class="pre">MultiViewRandomForestClassifier.feature_importances_</span></code></a></li>
 </ul>
 </li>
@@ -1401,7 +1414,7 @@ array of zeros.</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-11-09.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-11-13.
       <br/>
     
   </p>

@@ -593,7 +593,9 @@ document.write(`
 <span class="sd">    Private function used to _parallel_build_trees function.&quot;&quot;&quot;</span>
 
     <span class="n">random_instance</span> <span class="o">=</span> <span class="n">check_random_state</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
-    <span class="n">sample_indices</span> <span class="o">=</span> <span class="n">random_instance</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span> <span class="n">n_samples_bootstrap</span><span class="p">)</span>
+    <span class="n">sample_indices</span> <span class="o">=</span> <span class="n">random_instance</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span>
+        <span class="mi">0</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span> <span class="n">n_samples_bootstrap</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span>
+    <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">sample_indices</span>
 
@@ -946,7 +948,7 @@ document.write(`
                     <span class="s2">&quot;is necessary for Poisson regression.&quot;</span>
                 <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span>
 
         <span class="n">y</span><span class="p">,</span> <span class="n">expanded_class_weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_y_class_weight</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">)</span>
 
@@ -971,6 +973,8 @@ document.write(`
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">n_samples_bootstrap</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_bootstrap</span> <span class="o">=</span> <span class="n">n_samples_bootstrap</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_estimator</span><span class="p">()</span>
 
@@ -1409,6 +1413,36 @@ document.write(`
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">node_samples</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">result_</span><span class="p">):</span>
                 <span class="n">leaf_nodes_samples</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">leaf_nodes_samples</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">node_samples</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">leaf_nodes_samples</span>
+
+    <span class="k">def</span> <span class="nf">_get_estimators_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Get drawn indices along both sample and feature axes</span>
+        <span class="k">for</span> <span class="n">tree</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimators_</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">bootstrap</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_samples</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># tree.random_state is actually an immutable integer seed rather</span>
+                <span class="c1"># than a mutable RandomState instance, so it&#39;s safe to use it</span>
+                <span class="c1"># repeatedly when calling this property.</span>
+                <span class="n">seed</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">random_state</span>
+                <span class="c1"># Operations accessing random_state must be performed identically</span>
+                <span class="c1"># to those in `_parallel_build_trees()`</span>
+                <span class="k">yield</span> <span class="n">_generate_sample_indices</span><span class="p">(</span>
+                    <span class="n">seed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_bootstrap</span>
+                <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">estimators_samples_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The subset of drawn samples for each base estimator.</span>
+
+<span class="sd">        Returns a dynamically generated list of indices identifying</span>
+<span class="sd">        the samples used for fitting each member of the ensemble, i.e.,</span>
+<span class="sd">        the in-bag samples.</span>
+
+<span class="sd">        Note: the list is re-created at each call to the property in order</span>
+<span class="sd">        to reduce the object memory footprint by not storing the sampling</span>
+<span class="sd">        data. Thus fetching the property may be slower than expected.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">sample_indices</span> <span class="k">for</span> <span class="n">sample_indices</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_estimators_indices</span><span class="p">()]</span>
 
     <span class="k">def</span> <span class="nf">_more_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Only the criterion is required to determine if the tree supports</span>
@@ -2149,6 +2183,8 @@ document.write(`
 <span class="sd">    A random forest is a meta estimator that fits a number of decision tree</span>
 <span class="sd">    classifiers on various sub-samples of the dataset and uses averaging to</span>
 <span class="sd">    improve the predictive accuracy and control over-fitting.</span>
+<span class="sd">    Trees in the forest use the best split strategy, i.e. equivalent to passing</span>
+<span class="sd">    `splitter=&quot;best&quot;` to the underlying :class:`~sklearn.tree.DecisionTreeRegressor`.</span>
 <span class="sd">    The sub-sample size is controlled with the `max_samples` parameter if</span>
 <span class="sd">    `bootstrap=True` (default), otherwise the whole dataset is used to build</span>
 <span class="sd">    each tree.</span>
@@ -2422,6 +2458,12 @@ document.write(`
 <span class="sd">        `oob_decision_function_` might contain NaN. This attribute exists</span>
 <span class="sd">        only when ``oob_score`` is True.</span>
 
+<span class="sd">    estimators_samples_ : list of arrays</span>
+<span class="sd">        The subset of drawn samples (i.e., the in-bag samples) for each base</span>
+<span class="sd">        estimator. Each subset is defined by an array of the indices selected.</span>
+
+<span class="sd">        .. versionadded:: 1.4</span>
+
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
 <span class="sd">    sklearn.tree.DecisionTreeClassifier : A decision tree classifier.</span>
@@ -2549,9 +2591,11 @@ document.write(`
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A random forest regressor.</span>
 
-<span class="sd">    A random forest is a meta estimator that fits a number of classifying</span>
-<span class="sd">    decision trees on various sub-samples of the dataset and uses averaging</span>
-<span class="sd">    to improve the predictive accuracy and control over-fitting.</span>
+<span class="sd">    A random forest is a meta estimator that fits a number of decision tree</span>
+<span class="sd">    regressors on various sub-samples of the dataset and uses averaging to</span>
+<span class="sd">    improve the predictive accuracy and control over-fitting.</span>
+<span class="sd">    Trees in the forest use the best split strategy, i.e. equivalent to passing</span>
+<span class="sd">    `splitter=&quot;best&quot;` to the underlying :class:`~sklearn.tree.DecisionTreeRegressor`.</span>
 <span class="sd">    The sub-sample size is controlled with the `max_samples` parameter if</span>
 <span class="sd">    `bootstrap=True` (default), otherwise the whole dataset is used to build</span>
 <span class="sd">    each tree.</span>
@@ -2801,6 +2845,12 @@ document.write(`
 <span class="sd">    oob_prediction_ : ndarray of shape (n_samples,) or (n_samples, n_outputs)</span>
 <span class="sd">        Prediction computed with out-of-bag estimate on the training set.</span>
 <span class="sd">        This attribute exists only when ``oob_score`` is True.</span>
+
+<span class="sd">    estimators_samples_ : list of arrays</span>
+<span class="sd">        The subset of drawn samples (i.e., the in-bag samples) for each base</span>
+<span class="sd">        estimator. Each subset is defined by an array of the indices selected.</span>
+
+<span class="sd">        .. versionadded:: 1.4</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
@@ -3202,6 +3252,12 @@ document.write(`
 <span class="sd">        `oob_decision_function_` might contain NaN. This attribute exists</span>
 <span class="sd">        only when ``oob_score`` is True.</span>
 
+<span class="sd">    estimators_samples_ : list of arrays</span>
+<span class="sd">        The subset of drawn samples (i.e., the in-bag samples) for each base</span>
+<span class="sd">        estimator. Each subset is defined by an array of the indices selected.</span>
+
+<span class="sd">        .. versionadded:: 1.4</span>
+
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
 <span class="sd">    ExtraTreesRegressor : An extra-trees regressor with random splits.</span>
@@ -3566,6 +3622,12 @@ document.write(`
 <span class="sd">        Prediction computed with out-of-bag estimate on the training set.</span>
 <span class="sd">        This attribute exists only when ``oob_score`` is True.</span>
 
+<span class="sd">    estimators_samples_ : list of arrays</span>
+<span class="sd">        The subset of drawn samples (i.e., the in-bag samples) for each base</span>
+<span class="sd">        estimator. Each subset is defined by an array of the indices selected.</span>
+
+<span class="sd">        .. versionadded:: 1.4</span>
+
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
 <span class="sd">    ExtraTreesClassifier : An extra-trees classifier with random splits.</span>
@@ -3821,6 +3883,12 @@ document.write(`
 
 <span class="sd">    one_hot_encoder_ : OneHotEncoder instance</span>
 <span class="sd">        One-hot encoder used to create the sparse embedding.</span>
+
+<span class="sd">    estimators_samples_ : list of arrays</span>
+<span class="sd">        The subset of drawn samples (i.e., the in-bag samples) for each base</span>
+<span class="sd">        estimator. Each subset is defined by an array of the indices selected.</span>
+
+<span class="sd">        .. versionadded:: 1.4</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
@@ -4084,7 +4152,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-11-09.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-11-13.
       <br/>
     
   </p>

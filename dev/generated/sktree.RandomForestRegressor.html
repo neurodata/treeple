@@ -538,9 +538,11 @@ document.write(`
 <dt class="sig sig-object py" id="sktree.RandomForestRegressor">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sktree.</span></span><span class="sig-name descname"><span class="pre">RandomForestRegressor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_estimators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criterion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'squared_error'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_samples_split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_samples_leaf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_weight_fraction_leaf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_features</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_leaf_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_impurity_decrease</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bootstrap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oob_score</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warm_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ccp_alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_leaf_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">monotonic_cst</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sktree/_lib/sklearn/ensemble/_forest.html#RandomForestRegressor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sktree.RandomForestRegressor" title="Link to this definition">#</a></dt>
 <dd><p>A random forest regressor.</p>
-<p>A random forest is a meta estimator that fits a number of classifying
-decision trees on various sub-samples of the dataset and uses averaging
-to improve the predictive accuracy and control over-fitting.
+<p>A random forest is a meta estimator that fits a number of decision tree
+regressors on various sub-samples of the dataset and uses averaging to
+improve the predictive accuracy and control over-fitting.
+Trees in the forest use the best split strategy, i.e. equivalent to passing
+<code class="docutils literal notranslate"><span class="pre">splitter=&quot;best&quot;</span></code> to the underlying <a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.tree.DecisionTreeRegressor.html#sklearn.tree.DecisionTreeRegressor" title="(in scikit-learn v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DecisionTreeRegressor</span></code></a>.
 The sub-sample size is controlled with the <code class="docutils literal notranslate"><span class="pre">max_samples</span></code> parameter if
 <code class="docutils literal notranslate"><span class="pre">bootstrap=True</span></code> (default), otherwise the whole dataset is used to build
 each tree.</p>
@@ -811,6 +813,8 @@ This attribute exists only when <code class="docutils literal notranslate"><span
 </dd>
 <dt><strong>oob_prediction_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_samples,) or (n_samples, n_outputs)</span></dt><dd><p>Prediction computed with out-of-bag estimate on the training set.
 This attribute exists only when <code class="docutils literal notranslate"><span class="pre">oob_score</span></code> is True.</p>
+</dd>
+<dt><a class="reference internal" href="#sktree.RandomForestRegressor.estimators_samples_" title="sktree.RandomForestRegressor.estimators_samples_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimators_samples_</span></code></a><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of arrays</span></dt><dd><p>The subset of drawn samples for each base estimator.</p>
 </dd>
 </dl>
 </dd>
@@ -1214,6 +1218,18 @@ sub-estimator of a meta-estimator, e.g. used inside a
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="sktree.RandomForestRegressor.estimators_samples_">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">estimators_samples_</span></span><a class="headerlink" href="#sktree.RandomForestRegressor.estimators_samples_" title="Link to this definition">#</a></dt>
+<dd><p>The subset of drawn samples for each base estimator.</p>
+<p>Returns a dynamically generated list of indices identifying
+the samples used for fitting each member of the ensemble, i.e.,
+the in-bag samples.</p>
+<p>Note: the list is re-created at each call to the property in order
+to reduce the object memory footprint by not storing the sampling
+data. Thus fetching the property may be slower than expected.</p>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="sktree.RandomForestRegressor.feature_importances_">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">feature_importances_</span></span><a class="headerlink" href="#sktree.RandomForestRegressor.feature_importances_" title="Link to this definition">#</a></dt>
 <dd><p>The impurity-based feature importances.</p>
@@ -1297,6 +1313,7 @@ array of zeros.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.RandomForestRegressor.set_params"><code class="docutils literal notranslate"><span class="pre">RandomForestRegressor.set_params()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.RandomForestRegressor.set_score_request"><code class="docutils literal notranslate"><span class="pre">RandomForestRegressor.set_score_request()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.RandomForestRegressor.base_estimator_"><code class="docutils literal notranslate"><span class="pre">RandomForestRegressor.base_estimator_</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.RandomForestRegressor.estimators_samples_"><code class="docutils literal notranslate"><span class="pre">RandomForestRegressor.estimators_samples_</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.RandomForestRegressor.feature_importances_"><code class="docutils literal notranslate"><span class="pre">RandomForestRegressor.feature_importances_</span></code></a></li>
 </ul>
 </li>
@@ -1327,7 +1344,7 @@ array of zeros.</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-11-09.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-11-13.
       <br/>
     
   </p>
