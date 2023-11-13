@@ -15,7 +15,7 @@ Changelog
 
 - |API| ``FeatureImportanceForest*`` now has a hyperparameter to control the number of permutations is done per forest ``permute_per_forest_fraction``, by `Adam Li`_ (:pr:`145`)
 - |Enhancement| Add dataset generators for regression and classification and hypothesis testing, by `Adam Li`_ (:pr:`169`)
-- |Enhancement| Add :func:`sktree.experimental.conditional_resample`, which allows conditional resampling of rows based on nearest-neighbors defined via a feature set, by `Adam Li`_ (:pr:`152`)
+- |Enhancement| Add :func:`sktree.experimental.conditional_resample`, which allows conditional resampling of rows based on nearest-neighbors defined via a feature set, by `Adam Li`_ (:pr:`170`)
 
 Code and Documentation Contributors
 -----------------------------------
