@@ -244,6 +244,7 @@ numpydoc_xref_ignore = {
     "fit",
     "apply",
     "TreeBuilder",
+    "joint_rank",
 }
 
 # validation
