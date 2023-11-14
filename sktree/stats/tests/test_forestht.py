@@ -596,6 +596,8 @@ def test_no_traintest_split():
 
 
 pytest.mark.parametrize("covariate_index", [None, [0, 1]])
+
+
 def test_featureimportance_forest_statistic_with_covariate_index(covariate_index):
     """Tests that calling `est.statistic` with covariate_index defined works.
     There should be no issue calling `est.statistic` with covariate_index defined.
@@ -608,7 +610,7 @@ def test_featureimportance_forest_statistic_with_covariate_index(covariate_index
             n_estimators=n_estimators,
             random_state=seed,
         ),
-        permute_forest_fraction=-1.0 / n_estimators * 5,
+        permute_forest_fraction=1.0 / n_estimators * 5,
         test_size=0.7,
         random_state=seed,
     )
