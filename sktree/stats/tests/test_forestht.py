@@ -58,14 +58,19 @@ def test_featureimportance_forest_permute_pertree(sample_dataset_per_tree):
     ), f"{len(est.train_test_samples_[0][1])} {n_samples * est.test_size}"
     assert len(est.train_test_samples_[0][0]) == est._n_samples_ - n_samples * est.test_size
 
+    # covariate index should work with mse
+    est.reset()
+    est.statistic(iris_X[:n_samples], iris_y[:n_samples], covariate_index=[1], metric="mse")
     with pytest.raises(RuntimeError, match="Metric must be"):
-        est.statistic(iris_X[:n_samples], iris_y[:n_samples], metric="mi")
+        est.statistic(iris_X[:n_samples], iris_y[:n_samples], covariate_index=[1], metric="mi")
 
     # covariate index must be an iterable
+    est.reset()
     with pytest.raises(RuntimeError, match="covariate_index must be an iterable"):
         est.statistic(iris_X[:n_samples], iris_y[:n_samples], 0, metric="mi")
 
     # covariate index must be an iterable of ints
+    est.reset()
     with pytest.raises(RuntimeError, match="Not all covariate_index"):
         est.statistic(iris_X[:n_samples], iris_y[:n_samples], [0, 1.0], metric="mi")
 
@@ -588,3 +593,25 @@ def test_no_traintest_split():
     assert ~np.isnan(pvalue)
     assert ~np.isnan(stat)
     assert pvalue > 0.05, f"{pvalue}"
+
+
+pytest.mark.parametrize("covariate_index", [None, [0, 1]])
+def test_featureimportance_forest_statistic_with_covariate_index(covariate_index):
+    """Tests that calling `est.statistic` with covariate_index defined works.
+    There should be no issue calling `est.statistic` with covariate_index defined.
+    """
+    n_estimators = 10
+    n_samples = 10
+
+    est = FeatureImportanceForestClassifier(
+        estimator=RandomForestClassifier(
+            n_estimators=n_estimators,
+            random_state=seed,
+        ),
+        permute_forest_fraction=-1.0 / n_estimators * 5,
+        test_size=0.7,
+        random_state=seed,
+    )
+    est.statistic(
+        iris_X[:n_samples], iris_y[:n_samples], covariate_index=covariate_index, metric="mi"
+    )
