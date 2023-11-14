@@ -82,7 +82,7 @@ rng = np.random.default_rng(seed)
                     n_estimators=200,
                     n_jobs=-1,
                 ),
-                # "random_state": seed,
+                "random_state": seed,
                 "permute_forest_fraction": 0.5,
                 "sample_dataset_per_tree": False,
             },
@@ -167,6 +167,7 @@ def test_linear_model(hypotester, model_kwargs, n_samples, n_repeats, test_size)
                     n_jobs=-1,
                 ),
                 "sample_dataset_per_tree": False,
+                "random_state": seed,
             },
             600,  # n_samples
             1000,  # n_repeats
@@ -200,6 +201,7 @@ def test_linear_model(hypotester, model_kwargs, n_samples, n_repeats, test_size)
                 ),
                 "permute_forest_fraction": 0.5,
                 "sample_dataset_per_tree": False,
+                "random_state": seed,
             },
             600,  # n_samples
             1000,  # n_repeats
