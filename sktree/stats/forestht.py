@@ -822,10 +822,6 @@ class FeatureImportanceForestRegressor(BaseForestHT):
                 y_train = y_train.ravel()
             estimator.fit(X_train, y_train)
 
-            # set variables to compute metric
-            samples = indices_test
-            y_true_final = y_test
-
         # TODO: probably a more elegant way of doing this
         if self.train_test_split:
             # accumulate the predictions across all trees
@@ -1073,9 +1069,6 @@ class FeatureImportanceForestClassifier(BaseForestHT):
             if self._type_of_target_ == "binary" or (y.ndim > 1 and y.shape[1] == 1):
                 y_train = y_train.ravel()
             estimator.fit(X_train, y_train)
-
-            # set variables to compute metric
-            samples = indices_test
 
         # list of tree outputs. Each tree output is (n_samples, n_outputs), or (n_samples,)
         if predict_posteriors:
