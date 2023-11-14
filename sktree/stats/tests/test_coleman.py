@@ -79,7 +79,7 @@ rng = np.random.default_rng(seed)
             {
                 "estimator": RandomForestRegressor(
                     max_features="sqrt",
-                    n_estimators=125,
+                    n_estimators=200,
                     n_jobs=-1,
                 ),
                 # "random_state": seed,
