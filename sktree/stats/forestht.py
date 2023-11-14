@@ -151,9 +151,6 @@ class BaseForestHT(MetaEstimatorMixin):
         finally:
             return self._get_estimator().n_estimators
 
-    def _get_estimator(self):
-        pass
-
     def reset(self):
         class_attributes = dir(type(self))
         instance_attributes = dir(self)
@@ -190,21 +187,12 @@ class BaseForestHT(MetaEstimatorMixin):
                 self._seeds = []
                 self._n_permutations = 0
 
-                num_trees_per_seed = max(
-                    int(permute_forest_fraction * len(self.estimator_.estimators_)), 1
-                )
-                for tree_idx, tree in enumerate(self.estimator_.estimators_):
-                    if tree_idx == 0 or tree_idx % num_trees_per_seed == 0:
-                        if tree.random_state is None:
-                            seed = rng.integers(low=0, high=np.iinfo(np.int32).max)
-                        else:
-                            seed = tree.random_state
-
-                        self._n_permutations += 1
-                    self._seeds.append(seed)
-
-            # now that we have the random seeds, we can sample the train/test indices
-            # deterministically
+                for itree in range(self.estimator_.n_estimators):
+                    tree = self.estimator_.estimators_[itree]
+                    if tree.random_state is None:
+                        self._seeds.append(rng.integers(low=0, high=np.iinfo(np.int32).max))
+                    else:
+                        self._seeds.append(tree.random_state)
             seeds = self._seeds
 
             for idx, tree in enumerate(self.estimator_.estimators_):
@@ -236,7 +224,7 @@ class BaseForestHT(MetaEstimatorMixin):
                 random_state=self._seeds,
             )
 
-            for _ in self.estimator_.estimators_:
+            for _ in range(self.estimator_.n_estimators):
                 yield indices_train, indices_test
 
     @property
@@ -394,6 +382,25 @@ class BaseForestHT(MetaEstimatorMixin):
             self.permuted_estimator_ = self._get_estimator()
             estimator = self.permuted_estimator_
 
+            if not hasattr(self, "estimator_") or self.estimator_ is None:
+                self.estimator_ = self._get_estimator()
+
+                # Ensure that the estimator_ is fitted at least
+                if not _is_fitted(self.estimator_) and is_classifier(self.estimator_):
+                    _unique_y = []
+                    for axis in range(y.shape[1]):
+                        _unique_y.append(np.unique(y[:, axis]))
+                    unique_y = np.hstack(_unique_y)
+                    if unique_y.ndim > 1 and unique_y.shape[1] == 1:
+                        unique_y = unique_y.ravel()
+                    X_dummy = np.zeros((unique_y.shape[0], X.shape[1]))
+                    self.estimator_.fit(X_dummy, unique_y)
+                elif not _is_fitted(estimator):
+                    if y.ndim > 1 and y.shape[1] == 1:
+                        self.estimator_.fit(X[:2], y[:2].ravel())
+                    else:
+                        self.estimator_.fit(X[:2], y[:2])
+
         # Store a cache of the y variable
         if is_classifier(self._get_estimator()):
             self._y = y.copy()
@@ -437,7 +444,7 @@ class BaseForestHT(MetaEstimatorMixin):
             )
         self._metric = metric
 
-        if not is_classifier(self.estimator_) and metric not in REGRESSOR_METRICS:
+        if not is_classifier(estimator) and metric not in REGRESSOR_METRICS:
             raise RuntimeError(
                 f'Metric must be either "mse" or "mae" if using Regression, got {metric}'
             )
@@ -801,7 +808,7 @@ class FeatureImportanceForestRegressor(BaseForestHT):
             indices_train, indices_test = self.train_test_samples_[0]
 
             X_train, _ = X[indices_train, :], X[indices_test, :]
-            y_train, y_test = y[indices_train, :], y[indices_test, :]
+            y_train, _ = y[indices_train, :], y[indices_test, :]
 
             if covariate_index is not None:
                 # perform permutation of covariates
@@ -817,10 +824,6 @@ class FeatureImportanceForestRegressor(BaseForestHT):
             if self._type_of_target_ == "binary":
                 y_train = y_train.ravel()
             estimator.fit(X_train, y_train)
-
-            # set variables to compute metric
-            samples = indices_test
-            y_true_final = y_test
 
         # TODO: probably a more elegant way of doing this
         if self.train_test_split:
@@ -1069,9 +1072,6 @@ class FeatureImportanceForestClassifier(BaseForestHT):
             if self._type_of_target_ == "binary" or (y.ndim > 1 and y.shape[1] == 1):
                 y_train = y_train.ravel()
             estimator.fit(X_train, y_train)
-
-            # set variables to compute metric
-            samples = indices_test
 
         # list of tree outputs. Each tree output is (n_samples, n_outputs), or (n_samples,)
         if predict_posteriors:
