@@ -2,15 +2,16 @@ import numpy as np
 import pytest
 from numpy.testing import assert_allclose, assert_array_almost_equal
 from sklearn import datasets
-from sklearn.metrics import accuracy_score, r2_score
+from sklearn.metrics import accuracy_score, r2_score, roc_auc_score
 from sklearn.model_selection import cross_val_score
 from sklearn.tree import DecisionTreeClassifier as skDecisionTreeClassifier
 from sklearn.utils import check_random_state
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from sktree._lib.sklearn.tree import DecisionTreeClassifier
-from sktree.datasets.hyppo import make_quadratic_classification
+from sktree.datasets import make_quadratic_classification
 from sktree.ensemble import HonestForestClassifier
+from sktree.stats.utils import _mutual_information
 from sktree.tree import ObliqueDecisionTreeClassifier, PatchObliqueDecisionTreeClassifier
 
 CLF_CRITERIONS = ("gini", "entropy")
@@ -288,3 +289,84 @@ def test_honest_forest_with_sklearn_trees():
     print(honestsk_scores, honest_scores)
     print(np.mean(honestsk_scores), np.mean(honest_scores))
     assert_allclose(np.mean(honestsk_scores), np.mean(honest_scores))
+
+
+def test_honest_forest_with_sklearn_trees_with_auc():
+    """Test against regression in power-curves discussed in:
+    https://github.com/neurodata/scikit-tree/pull/157.
+
+    This unit-test tests the equivalent of the AUC using sklearn's DTC
+    vs our forked version of sklearn's DTC as the base tree.
+    """
+    skForest = HonestForestClassifier(
+        n_estimators=10, tree_estimator=skDecisionTreeClassifier(), random_state=0
+    )
+
+    Forest = HonestForestClassifier(
+        n_estimators=10, tree_estimator=DecisionTreeClassifier(), random_state=0
+    )
+
+    max_fpr = 0.1
+    scores = []
+    sk_scores = []
+    for idx in range(10):
+        X, y = make_quadratic_classification(1024, 4096, noise=True, seed=idx)
+        y = y.squeeze()
+
+        skForest.fit(X, y)
+        Forest.fit(X, y)
+
+        # compute MI
+        y_pred_proba = skForest.predict_proba(X)[:, 1].reshape(-1, 1)
+        sk_mi = roc_auc_score(y, y_pred_proba, max_fpr=max_fpr)
+
+        y_pred_proba = Forest.predict_proba(X)[:, 1].reshape(-1, 1)
+        mi = roc_auc_score(y, y_pred_proba, max_fpr=max_fpr)
+
+        scores.append(mi)
+        sk_scores.append(sk_mi)
+
+    print(scores, sk_scores)
+    print(np.mean(scores), np.mean(sk_scores))
+    print(np.std(scores), np.std(sk_scores))
+    assert_allclose(np.mean(sk_scores), np.mean(scores), atol=0.005)
+
+
+def test_honest_forest_with_sklearn_trees_with_mi():
+    """Test against regression in power-curves discussed in:
+    https://github.com/neurodata/scikit-tree/pull/157.
+
+    This unit-test tests the equivalent of the MI using sklearn's DTC
+    vs our forked version of sklearn's DTC as the base tree.
+    """
+    skForest = HonestForestClassifier(
+        n_estimators=10, tree_estimator=skDecisionTreeClassifier(), random_state=0
+    )
+
+    Forest = HonestForestClassifier(
+        n_estimators=10, tree_estimator=DecisionTreeClassifier(), random_state=0
+    )
+
+    scores = []
+    sk_scores = []
+    for idx in range(10):
+        X, y = make_quadratic_classification(1024, 4096, noise=True, seed=idx)
+        y = y.squeeze()
+
+        skForest.fit(X, y)
+        Forest.fit(X, y)
+
+        # compute MI
+        sk_posterior = skForest.predict_proba(X)
+        sk_score = _mutual_information(y, sk_posterior)
+
+        posterior = Forest.predict_proba(X)
+        score = _mutual_information(y, posterior)
+
+        scores.append(score)
+        sk_scores.append(sk_score)
+
+    print(scores, sk_scores)
+    print(np.mean(scores), np.mean(sk_scores))
+    print(np.std(scores), np.std(sk_scores))
+    assert_allclose(np.mean(sk_scores), np.mean(scores), atol=0.005)

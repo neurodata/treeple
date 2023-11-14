@@ -41,7 +41,7 @@ def coverage(ctx, slowtest):
 def setup_submodule(forcesubmodule=False):
     """Build scikit-tree using submodules.
 
-    git submodule set-branch -b submodulev2 sktree/_lib/sklearn
+    git submodule set-branch -b submodulev3 sktree/_lib/sklearn
 
     git submodule update --recursive --remote
 
@@ -137,7 +137,7 @@ def setup_submodule(forcesubmodule=False):
 def build(ctx, meson_args, jobs=None, clean=False, forcesubmodule=False, verbose=False):
     """Build scikit-tree using submodules.
 
-    git submodule update --recursive --remote
+        git submodule update --recursive --remote
 
     To update submodule wrt latest commits:
 
