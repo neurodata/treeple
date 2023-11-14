@@ -218,7 +218,7 @@ profile = 'black'
 multi_line_output = 3
 line_length = 100
 py_version = 38
-extend_skip_glob = ['sktree/__init__.py', 'sktree/_lib/*', '.asv/*', 'env/*']
+extend_skip_glob = ['sktree/__init__.py', 'sktree/_lib/*', '.asv/*', 'env/*', 'build-install/*']
 
 [tool.pydocstyle]
 convention = 'numpy'
