@@ -382,6 +382,29 @@ class BaseForestHT(MetaEstimatorMixin):
             self.permuted_estimator_ = self._get_estimator()
             estimator = self.permuted_estimator_
 
+            if not hasattr(self, "estimator_"):
+                self.estimator_ = self._get_estimator()
+
+                # XXX: this can be improved as an extra fit can be avoided, by
+                # just doing error-checking
+                # and then setting the internal meta data structures
+                # first run a dummy fit on the samples to initialize the
+                # internal data structure of the forest
+                if is_classifier(self.estimator_):
+                    _unique_y = []
+                    for axis in range(y.shape[1]):
+                        _unique_y.append(np.unique(y[:, axis]))
+                    unique_y = np.hstack(_unique_y)
+                    if unique_y.ndim > 1 and unique_y.shape[1] == 1:
+                        unique_y = unique_y.ravel()
+                    X_dummy = np.zeros((unique_y.shape[0], X.shape[1]))
+                    self.estimator_.fit(X_dummy, unique_y)
+                else:
+                    if y.ndim > 1 and y.shape[1] == 1:
+                        self.estimator_.fit(X[:2], y[:2].ravel())
+                    else:
+                        self.estimator_.fit(X[:2], y[:2])
+
         # Store a cache of the y variable
         if is_classifier(estimator):
             self._y = y.copy()
