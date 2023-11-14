@@ -83,7 +83,7 @@ rng = np.random.default_rng(seed)
                     n_jobs=-1,
                 ),
                 # "random_state": seed,
-                "permute_forest_fraction": 1.0 / 125,
+                "permute_forest_fraction": 0.5,
                 "sample_dataset_per_tree": False,
             },
             300,  # n_samples
