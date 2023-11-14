@@ -120,7 +120,7 @@ def test_featureimportance_forest_statistic_with_covariate_index(covariate_index
             n_estimators=n_estimators,
             random_state=seed,
         ),
-        permute_forest_fraction=-1.0 / n_estimators * 5,
+        permute_forest_fraction=1.0 / n_estimators * 5,
         test_size=0.7,
         random_state=seed,
     )
