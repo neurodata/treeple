@@ -157,10 +157,12 @@ def test_linear_model(hypotester, model_kwargs, n_samples, n_repeats, test_size)
             {
                 "estimator": RandomForestClassifier(
                     max_features="sqrt",
-                    n_estimators=200,
+                    n_estimators=100,
                     n_jobs=-1,
+                    random_state=rng.integers(0, 1000),
                 ),
                 "permute_forest_fraction": 0.5,
+                "random_state": rng.integers(0, 1000),
             },
             600,  # n_samples
             1000,  # n_repeats

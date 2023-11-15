@@ -190,12 +190,17 @@ class BaseForestHT(MetaEstimatorMixin):
                 self._seeds = []
                 self._n_permutations = 0
 
-                for itree in range(self.estimator_.n_estimators):
-                    tree = self.estimator_.estimators_[itree]
-                    if tree.random_state is None:
-                        self._seeds.append(rng.integers(low=0, high=np.iinfo(np.int32).max))
-                    else:
-                        self._seeds.append(tree.random_state)
+                for itree in range(self.n_estimators):
+                    # For every N-trees that are defined by permute forest fraction
+                    # we will sample a new seed appropriately
+                    if itree % int(permute_forest_fraction * self.n_estimators) == 0:
+                        tree = self.estimator_.estimators_[itree]
+                        if tree.random_state is None:
+                            seed = rng.integers(low=0, high=np.iinfo(np.int32).max)
+                        else:
+                            seed = tree.random_state
+
+                    self._seeds.append(seed)
             seeds = self._seeds
 
             for idx, tree in enumerate(self.estimator_.estimators_):
