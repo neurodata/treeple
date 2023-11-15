@@ -49,31 +49,12 @@ rng = np.random.default_rng(seed)
                     n_estimators=125,
                     n_jobs=-1,
                 ),
-                "random_state": seed,
-                "permute_forest_fraction": None,
-                "sample_dataset_per_tree": False,
             },
             300,  # n_samples
             1000,  # n_repeats
             0.2,  # test_size
         ],
         # XXX: Currently does not work with permute and sample dataset per tree
-        # [
-        #     FeatureImportanceForestRegressor,
-        #     {
-        #         "estimator": RandomForestRegressor(
-        #             max_features=1.0,
-        #             # random_state=seed,
-        #             n_estimators=150,
-        #             n_jobs=-1,
-        #         ),
-        #         "permute_forest_fraction": 1. / 150,
-        #         "sample_dataset_per_tree": True,
-        #     },
-        #     300,  # n_samples
-        #     1000,  # n_repeats
-        #     0.2,  # test_size
-        # ],
         [
             FeatureImportanceForestRegressor,
             {
@@ -81,11 +62,8 @@ rng = np.random.default_rng(seed)
                     max_features="sqrt",
                     n_estimators=250,
                     n_jobs=-1,
-                    random_state=rng.integers(0, 1000),
                 ),
-                "random_state": seed,
                 "permute_forest_fraction": 0.5,
-                "sample_dataset_per_tree": False,
             },
             300,  # n_samples
             1000,  # n_repeats
@@ -168,30 +146,12 @@ def test_linear_model(hypotester, model_kwargs, n_samples, n_repeats, test_size)
                     n_jobs=-1,
                 ),
                 "sample_dataset_per_tree": False,
-                "random_state": seed,
             },
             600,  # n_samples
             1000,  # n_repeats
             1.0 / 6,  # test_size
         ],
         # XXX: Currently does not work with permute and sample dataset per tree
-        # [
-        #     FeatureImportanceForestClassifier,
-        #     {
-        #         "estimator": RandomForestClassifier(
-        #             max_features=1.0,
-        #             # random_state=seed,
-        #             n_estimators=150,
-        #             n_jobs=-1,
-        #         ),
-        #         # "random_state": seed,
-        #         "permute_forest_fraction": 1. / 150,
-        #         "sample_dataset_per_tree": True,
-        #     },
-        #     600,  # n_samples
-        #     1000,  # n_repeats
-        #     1.0 / 6,  # test_size
-        # ],
         [
             FeatureImportanceForestClassifier,
             {
@@ -199,11 +159,8 @@ def test_linear_model(hypotester, model_kwargs, n_samples, n_repeats, test_size)
                     max_features="sqrt",
                     n_estimators=200,
                     n_jobs=-1,
-                    random_state=seed,
                 ),
                 "permute_forest_fraction": 0.5,
-                "sample_dataset_per_tree": False,
-                "random_state": seed,
             },
             600,  # n_samples
             1000,  # n_repeats
