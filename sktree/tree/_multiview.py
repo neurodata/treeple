@@ -416,7 +416,8 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
             self.max_features_ = np.sum(max_features_per_set)
             if self.max_features_ > n_features:
                 raise ValueError(
-                    "max_features is greater than the number of features. "
+                    "max_features is greater than the number of features: "
+                    f"{max_features} > {n_features}."
                     "This should not be possible. Please submit a bug report."
                 )
             self.max_features_per_set_ = np.asarray(max_features_per_set, dtype=np.intp)
