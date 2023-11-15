@@ -57,7 +57,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Compute partial AUC using multi-view MIGHT (MV-MIGHT)" href="plot_might_mv_auc.html" />
-    <link rel="prev" title="Hypothesis testing with decision trees" href="index.html" />
+    <link rel="prev" title="Co-MIGHT when Data Exhibits Conditional Independence" href="plot_co_MIGHT_null.html" />
     <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
     <script type="text/javascript" src="../../_static/copybutton.js"></script>
     <script type="text/javascript" src="../../_static/scrollfix.js"></script>
@@ -417,8 +417,10 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Hypothesis testing with decision trees</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="plot_co_MIGHT_null.html">Co-MIGHT when Data Exhibits Conditional Independence</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Compute partial AUC using Mutual Information for Genuine Hypothesis Testing (MIGHT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_might_mv_auc.html">Compute partial AUC using multi-view MIGHT (MV-MIGHT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_co_MIGHT_alternative.html">Demonstrate Conditional Mutual Information for Genuine Hypothesis Testing (Co-MIGHT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_MI_genuine_hypothesis_testing_forest.html">Mutual Information for Genuine Hypothesis Testing (MIGHT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_MI_imbalanced_hyppo_testing.html">Mutual Information for Genuine Hypothesis Testing (MIGHT) with Imbalanced Data</a></li>
 </ul>
@@ -617,7 +619,7 @@ into a single dataset to perform hypothesis testing.</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Shape of Tree Posteriors for the positive class: </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">posterior_arr</span><span class="o">.</span><span class="n">shape</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ASH-90 / Partial AUC: 0.5737670462272666
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ASH-90 / Partial AUC: 0.5470205935322214
 Shape of Observed Samples: (1000,)
 Shape of Tree Posteriors for the positive class: (125, 1000, 1)
 </pre></div>
@@ -639,7 +641,7 @@ Shape of Tree Posteriors for the positive class: (125, 1000, 1)
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Shape of Tree Posteriors for the positive class: </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">posterior_arr</span><span class="o">.</span><span class="n">shape</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ASH-90 / Partial AUC: 0.5047785072264876
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ASH-90 / Partial AUC: 0.5164002324345042
 Shape of Observed Samples: (1000,)
 Shape of Tree Posteriors for the positive class: (125, 1000, 1)
 </pre></div>
@@ -652,8 +654,8 @@ Shape of Tree Posteriors for the positive class: (125, 1000, 1)
 <p>Observed Samples: <code class="docutils literal notranslate"><span class="pre">est.observe_samples_</span></code></p>
 <p>Tree Posteriors for the positive class: <code class="docutils literal notranslate"><span class="pre">est.observe_posteriors_</span></code> (n_trees, n_samples_test, 1)</p>
 <p>True Labels: <code class="docutils literal notranslate"><span class="pre">est.y_true_final_</span></code></p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 8.641 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  204 MB</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 7.792 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  207 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-hypothesis-testing-plot-might-auc-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/10887d3ab52c3e5fb8f21e441027254b/plot_might_auc.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_might_auc.py</span></code></a></p>
@@ -677,12 +679,12 @@ Shape of Tree Posteriors for the positive class: (125, 1000, 1)
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="index.html"
+       href="plot_co_MIGHT_null.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Hypothesis testing with decision trees</p>
+        <p class="prev-next-title">Co-MIGHT when Data Exhibits Conditional Independence</p>
       </div>
     </a>
     <a class="right-next"

@@ -56,7 +56,7 @@
         </script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Compute partial AUC using Mutual Information for Genuine Hypothesis Testing (MIGHT)" href="plot_might_auc.html" />
+    <link rel="next" title="Co-MIGHT when Data Exhibits Conditional Independence" href="plot_co_MIGHT_null.html" />
     <link rel="prev" title="Plot honest forest calibrations on overlapping gaussian simulations" href="../calibration/plot_overlapping_gaussians.html" />
     <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
     <script type="text/javascript" src="../../_static/copybutton.js"></script>
@@ -413,8 +413,10 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Hypothesis testing with decision trees</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="plot_co_MIGHT_null.html">Co-MIGHT when Data Exhibits Conditional Independence</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_might_auc.html">Compute partial AUC using Mutual Information for Genuine Hypothesis Testing (MIGHT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_might_mv_auc.html">Compute partial AUC using multi-view MIGHT (MV-MIGHT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_co_MIGHT_alternative.html">Demonstrate Conditional Mutual Information for Genuine Hypothesis Testing (Co-MIGHT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_MI_genuine_hypothesis_testing_forest.html">Mutual Information for Genuine Hypothesis Testing (MIGHT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_MI_imbalanced_hyppo_testing.html">Mutual Information for Genuine Hypothesis Testing (MIGHT) with Imbalanced Data</a></li>
 </ul>
@@ -512,12 +514,18 @@ document.write(`
   <section id="hypothesis-testing-with-decision-trees">
 <span id="hyppo-examples"></span><span id="sphx-glr-auto-examples-hypothesis-testing"></span><h1>Hypothesis testing with decision trees<a class="headerlink" href="#hypothesis-testing-with-decision-trees" title="Link to this heading">#</a></h1>
 <p>Examples demonstrating how to use decision-trees for statistical hypothesis testing.</p>
-<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="An example using FeatureImportanceForestClassifier for nonparametric multivariate hypothesis te..."><img alt="" src="../../_images/sphx_glr_plot_might_auc_thumb.png" />
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="In this example, we demonstrate how to test the conditional mutual information (CMI) hypothesis..."><img alt="" src="../../_images/sphx_glr_plot_co_MIGHT_null_thumb.png" />
+<p><a class="reference internal" href="plot_co_MIGHT_null.html#sphx-glr-auto-examples-hypothesis-testing-plot-co-might-null-py"><span class="std std-ref">Co-MIGHT when Data Exhibits Conditional Independence</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Co-MIGHT when Data Exhibits Conditional Independence</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="An example using FeatureImportanceForestClassifier for nonparametric multivariate hypothesis te..."><img alt="" src="../../_images/sphx_glr_plot_might_auc_thumb.png" />
 <p><a class="reference internal" href="plot_might_auc.html#sphx-glr-auto-examples-hypothesis-testing-plot-might-auc-py"><span class="std std-ref">Compute partial AUC using Mutual Information for Genuine Hypothesis Testing (MIGHT)</span></a></p>
   <div class="sphx-glr-thumbnail-title">Compute partial AUC using Mutual Information for Genuine Hypothesis Testing (MIGHT)</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="An example using FeatureImportanceForestClassifier for nonparametric multivariate hypothesis te..."><img alt="" src="../../_images/sphx_glr_plot_might_mv_auc_thumb.png" />
 <p><a class="reference internal" href="plot_might_mv_auc.html#sphx-glr-auto-examples-hypothesis-testing-plot-might-mv-auc-py"><span class="std std-ref">Compute partial AUC using multi-view MIGHT (MV-MIGHT)</span></a></p>
   <div class="sphx-glr-thumbnail-title">Compute partial AUC using multi-view MIGHT (MV-MIGHT)</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we demonstrate how to test the conditional mutual information (CMI) hypothesis..."><img alt="" src="../../_images/sphx_glr_plot_co_MIGHT_alternative_thumb.png" />
+<p><a class="reference internal" href="plot_co_MIGHT_alternative.html#sphx-glr-auto-examples-hypothesis-testing-plot-co-might-alternative-py"><span class="std std-ref">Demonstrate Conditional Mutual Information for Genuine Hypothesis Testing (Co-MIGHT)</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Demonstrate Conditional Mutual Information for Genuine Hypothesis Testing (Co-MIGHT)</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="An example using FeatureImportanceForestClassifier for nonparametric multivariate hypothesis te..."><img alt="" src="../../_images/sphx_glr_plot_MI_genuine_hypothesis_testing_forest_thumb.png" />
 <p><a class="reference internal" href="plot_MI_genuine_hypothesis_testing_forest.html#sphx-glr-auto-examples-hypothesis-testing-plot-mi-genuine-hypothesis-testing-forest-py"><span class="std std-ref">Mutual Information for Genuine Hypothesis Testing (MIGHT)</span></a></p>
   <div class="sphx-glr-thumbnail-title">Mutual Information for Genuine Hypothesis Testing (MIGHT)</div>
@@ -548,11 +556,11 @@ document.write(`
       </div>
     </a>
     <a class="right-next"
-       href="plot_might_auc.html"
+       href="plot_co_MIGHT_null.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Compute partial AUC using Mutual Information for Genuine Hypothesis Testing (MIGHT)</p>
+        <p class="prev-next-title">Co-MIGHT when Data Exhibits Conditional Independence</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

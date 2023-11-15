@@ -632,6 +632,11 @@ document.write(`
 <span class="sd">        next 20 features, then ``feature_set_ends = [10, 30]``. If ``None``,</span>
 <span class="sd">        then this will assume that there is only one feature set.</span>
 
+<span class="sd">    apply_max_features_per_feature_set : bool, default=False</span>
+<span class="sd">        Whether to apply sampling per feature set, where ``max_features`` is applied</span>
+<span class="sd">        to each feature-set. If ``False``, then sampling</span>
+<span class="sd">        is applied over the entire feature space.</span>
+
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    classes_ : ndarray of shape (n_classes,) or list of ndarray</span>
@@ -681,6 +686,10 @@ document.write(`
 <span class="sd">    n_feature_sets_ : int</span>
 <span class="sd">        The number of feature sets.</span>
 
+<span class="sd">    max_features_per_set_ : array-like of int of shape (n_feature_sets,)</span>
+<span class="sd">        The number of features to sample per feature set. If ``None``, then</span>
+<span class="sd">        ``max_features`` is applied to the entire feature space.</span>
+
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
 <span class="sd">    sklearn.tree.DecisionTreeClassifier : An axis-aligned decision tree classifier.</span>
@@ -694,6 +703,8 @@ document.write(`
             <span class="n">Interval</span><span class="p">(</span><span class="n">Real</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">),</span>
             <span class="kc">None</span><span class="p">,</span>
         <span class="p">],</span>
+        <span class="s2">&quot;feature_set_ends&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;array-like&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+        <span class="s2">&quot;apply_max_features_per_feature_set&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;boolean&quot;</span><span class="p">],</span>
     <span class="p">}</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -715,6 +726,7 @@ document.write(`
         <span class="n">store_leaf_values</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">monotonic_cst</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">feature_set_ends</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">apply_max_features_per_feature_set</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">criterion</span><span class="o">=</span><span class="n">criterion</span><span class="p">,</span>
@@ -735,6 +747,7 @@ document.write(`
 
         <span class="bp">self</span><span class="o">.</span><span class="n">feature_combinations</span> <span class="o">=</span> <span class="n">feature_combinations</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">feature_set_ends</span> <span class="o">=</span> <span class="n">feature_set_ends</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">apply_max_features_per_feature_set</span> <span class="o">=</span> <span class="n">apply_max_features_per_feature_set</span>
 
     <span class="k">def</span> <span class="nf">_build_tree</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -807,6 +820,11 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">feature_set_ends_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_set_ends</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_feature_sets_</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_set_ends_</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_set_ends_</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">n_features</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The last feature set end must be equal to the number of features, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n_features</span><span class="si">}</span><span class="s2">, but got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_set_ends_</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
 
         <span class="n">splitter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splitter</span>
         <span class="k">if</span> <span class="n">issparse</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
@@ -816,6 +834,52 @@ document.write(`
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">SPLITTERS</span> <span class="o">=</span> <span class="n">DENSE_SPLITTERS</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_max_features_per_feature_set</span><span class="p">:</span>
+            <span class="c1"># XXX: experimental</span>
+            <span class="c1"># we can replace max_features_ here based on whether or not uniform logic over</span>
+            <span class="c1"># feature sets</span>
+            <span class="n">max_features_per_set</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">n_features_in_prev</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_feature_sets_</span><span class="p">):</span>
+                <span class="n">n_features_in_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_set_ends_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">-</span> <span class="n">n_features_in_prev</span>
+                <span class="n">n_features_in_prev</span> <span class="o">=</span> <span class="n">n_features_in_</span>
+                <span class="kn">import</span> <span class="nn">numbers</span>
+
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_features</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_features</span> <span class="o">==</span> <span class="s2">&quot;sqrt&quot;</span><span class="p">:</span>
+                        <span class="n">max_features</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n_features_in_</span><span class="p">)))</span>
+                    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_features</span> <span class="o">==</span> <span class="s2">&quot;log2&quot;</span><span class="p">:</span>
+                        <span class="n">max_features</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">n_features_in_</span><span class="p">)))</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_features</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">max_features</span> <span class="o">=</span> <span class="n">n_features_in_</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_features</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Integral</span><span class="p">):</span>
+                    <span class="n">max_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_features</span>
+                <span class="k">else</span><span class="p">:</span>  <span class="c1"># float</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_features</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
+                        <span class="n">max_features</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_features</span> <span class="o">*</span> <span class="n">n_features_in_</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">max_features</span> <span class="o">=</span> <span class="mi">0</span>
+
+                <span class="k">if</span> <span class="n">max_features</span> <span class="o">&gt;</span> <span class="n">n_features_in_</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;max_features must be less than or equal to &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;the number of features in feature set </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">n_features_in_</span><span class="si">}</span><span class="s2">, but &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;max_features = </span><span class="si">{</span><span class="n">max_features</span><span class="si">}</span><span class="s2"> when applying sampling&quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;per feature set.&quot;</span>
+                    <span class="p">)</span>
+
+                <span class="n">max_features_per_set</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">max_features</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_features_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">max_features_per_set</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_features_</span> <span class="o">&gt;</span> <span class="n">n_features</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;max_features is greater than the number of features: &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">max_features</span><span class="si">}</span><span class="s2"> &gt; </span><span class="si">{</span><span class="n">n_features</span><span class="si">}</span><span class="s2">.&quot;</span>
+                    <span class="s2">&quot;This should not be possible. Please submit a bug report.&quot;</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_features_per_set_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">max_features_per_set</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_features_per_set_</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splitter</span><span class="p">,</span> <span class="n">ObliqueSplitter</span><span class="p">):</span>
             <span class="n">splitter</span> <span class="o">=</span> <span class="n">SPLITTERS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">splitter</span><span class="p">](</span>
@@ -828,6 +892,7 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">feature_combinations_</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">feature_set_ends_</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">n_feature_sets_</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">max_features_per_set_</span><span class="p">,</span>
             <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span> <span class="o">=</span> <span class="n">ObliqueTree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">)</span>

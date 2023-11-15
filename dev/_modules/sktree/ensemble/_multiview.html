@@ -629,6 +629,11 @@ document.write(`
 <span class="sd">        next 20 features, then ``feature_set_ends = [10, 30]``. If ``None``,</span>
 <span class="sd">        then this will assume that there is only one feature set.</span>
 
+<span class="sd">    apply_max_features_per_feature_set : bool, default=False</span>
+<span class="sd">        Whether to apply sampling per feature set, where ``max_features`` is applied</span>
+<span class="sd">        to each feature-set. If ``False``, then sampling</span>
+<span class="sd">        is applied over the entire feature space.</span>
+
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    base_estimator_ : sktree.tree.ObliqueDecisionTreeClassifier</span>
@@ -725,6 +730,7 @@ document.write(`
         <span class="n">max_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">feature_combinations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">feature_set_ends</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">apply_max_features_per_feature_set</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">estimator</span><span class="o">=</span><span class="n">MultiViewDecisionTreeClassifier</span><span class="p">(),</span>
@@ -741,6 +747,7 @@ document.write(`
                 <span class="s2">&quot;random_state&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;feature_combinations&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;feature_set_ends&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;apply_max_features_per_feature_set&quot;</span><span class="p">,</span>
             <span class="p">),</span>
             <span class="n">bootstrap</span><span class="o">=</span><span class="n">bootstrap</span><span class="p">,</span>
             <span class="n">oob_score</span><span class="o">=</span><span class="n">oob_score</span><span class="p">,</span>
@@ -758,6 +765,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">max_features</span> <span class="o">=</span> <span class="n">max_features</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">feature_combinations</span> <span class="o">=</span> <span class="n">feature_combinations</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">feature_set_ends</span> <span class="o">=</span> <span class="n">feature_set_ends</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">apply_max_features_per_feature_set</span> <span class="o">=</span> <span class="n">apply_max_features_per_feature_set</span>
 
         <span class="c1"># unused by oblique forests</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_weight_fraction_leaf</span> <span class="o">=</span> <span class="n">min_weight_fraction_leaf</span>

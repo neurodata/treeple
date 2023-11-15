@@ -458,7 +458,6 @@ document.write(`
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">ClassifierMixin</span><span class="p">,</span> <span class="n">MetaEstimatorMixin</span><span class="p">,</span> <span class="n">_fit_context</span><span class="p">,</span> <span class="n">clone</span>
-<span class="kn">from</span> <span class="nn">sklearn.ensemble._base</span> <span class="kn">import</span> <span class="n">_set_random_states</span>
 <span class="kn">from</span> <span class="nn">sklearn.utils.multiclass</span> <span class="kn">import</span> <span class="n">_check_partial_fit_first_call</span><span class="p">,</span> <span class="n">check_classification_targets</span>
 <span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">check_is_fitted</span><span class="p">,</span> <span class="n">check_X_y</span>
 
@@ -1001,7 +1000,13 @@ document.write(`
         <span class="n">_sample_weight</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree_estimator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span> <span class="o">=</span> <span class="n">DecisionTreeClassifier</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span> <span class="o">=</span> <span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># XXX: maybe error out if the tree_estimator is already fitted</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span> <span class="o">=</span> <span class="n">clone</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_estimator</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">set_params</span><span class="p">(</span>
+            <span class="o">**</span><span class="nb">dict</span><span class="p">(</span>
                 <span class="n">criterion</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">,</span>
                 <span class="n">splitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">splitter</span><span class="p">,</span>
                 <span class="n">max_depth</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_depth</span><span class="p">,</span>
@@ -1011,48 +1016,23 @@ document.write(`
                 <span class="n">max_features</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_features</span><span class="p">,</span>
                 <span class="n">max_leaf_nodes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_leaf_nodes</span><span class="p">,</span>
                 <span class="n">class_weight</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">class_weight</span><span class="p">,</span>
-                <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">,</span>
                 <span class="n">min_impurity_decrease</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span><span class="p">,</span>
                 <span class="n">ccp_alpha</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ccp_alpha</span><span class="p">,</span>
-                <span class="n">monotonic_cst</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">monotonic_cst</span><span class="p">,</span>
-                <span class="n">store_leaf_values</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">store_leaf_values</span><span class="p">,</span>
+                <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># XXX: Remove this?</span>
-            <span class="c1"># we throw an error if the user is using trees from sklearn:main</span>
-            <span class="c1"># if isinstance(self.tree_estimator, skBaseDecisionTree):</span>
-            <span class="c1">#     raise RuntimeError(&quot;Instead of using sklearn.tree, use trees import from sktree.&quot;)</span>
+        <span class="p">)</span>
 
-            <span class="c1"># XXX: maybe error out if the tree_estimator is already fitted</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span> <span class="o">=</span> <span class="n">clone</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_estimator</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">set_params</span><span class="p">(</span><span class="o">**</span><span class="nb">dict</span><span class="p">(</span><span class="n">monotonic_cst</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">monotonic_cst</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">set_params</span><span class="p">(</span>
                 <span class="o">**</span><span class="nb">dict</span><span class="p">(</span>
-                    <span class="n">criterion</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">,</span>
-                    <span class="n">splitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">splitter</span><span class="p">,</span>
-                    <span class="n">max_depth</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_depth</span><span class="p">,</span>
-                    <span class="n">min_samples_split</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_samples_split</span><span class="p">,</span>
-                    <span class="n">min_samples_leaf</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_samples_leaf</span><span class="p">,</span>
-                    <span class="n">min_weight_fraction_leaf</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_weight_fraction_leaf</span><span class="p">,</span>
-                    <span class="n">max_features</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_features</span><span class="p">,</span>
-                    <span class="n">max_leaf_nodes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_leaf_nodes</span><span class="p">,</span>
-                    <span class="n">class_weight</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">class_weight</span><span class="p">,</span>
-                    <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">,</span>
-                    <span class="n">min_impurity_decrease</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span><span class="p">,</span>
-                    <span class="n">ccp_alpha</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ccp_alpha</span><span class="p">,</span>
+                    <span class="n">store_leaf_values</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">store_leaf_values</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="p">)</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">set_params</span><span class="p">(</span><span class="o">**</span><span class="nb">dict</span><span class="p">(</span><span class="n">monotonic_cst</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">monotonic_cst</span><span class="p">))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">set_params</span><span class="p">(</span>
-                    <span class="o">**</span><span class="nb">dict</span><span class="p">(</span>
-                        <span class="n">store_leaf_values</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">store_leaf_values</span><span class="p">,</span>
-                    <span class="p">)</span>
-                <span class="p">)</span>
-            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using sklearn tree&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
 
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">_set_random_states</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+            <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Using sklearn tree so store_leaf_values cannot be set.&quot;</span><span class="p">)</span>
 
         <span class="c1"># Learn structure on subsample</span>
         <span class="c1"># XXX: this allows us to use BaseDecisionTree without partial_fit API</span>

@@ -474,6 +474,7 @@ document.write(`
     <span class="n">_parallel_build_trees</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">sktree.ensemble._honest_forest</span> <span class="kn">import</span> <span class="n">HonestForestClassifier</span>
+<span class="kn">from</span> <span class="nn">sktree.experimental</span> <span class="kn">import</span> <span class="n">conditional_resample</span>
 <span class="kn">from</span> <span class="nn">sktree.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span><span class="p">,</span> <span class="n">DecisionTreeRegressor</span>
 <span class="kn">from</span> <span class="nn">sktree.tree._classes</span> <span class="kn">import</span> <span class="n">DTYPE</span>
 
@@ -572,6 +573,7 @@ document.write(`
         <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
         <span class="n">stratify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">conditional_perm</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">sample_dataset_per_tree</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">permute_forest_fraction</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">train_test_split</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -581,6 +583,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_size</span> <span class="o">=</span> <span class="n">test_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stratify</span> <span class="o">=</span> <span class="n">stratify</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conditional_perm</span> <span class="o">=</span> <span class="n">conditional_perm</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">train_test_split</span> <span class="o">=</span> <span class="n">train_test_split</span>
         <span class="c1"># XXX: possibly removing these parameters</span>
@@ -642,12 +645,17 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">_seeds</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_n_permutations</span> <span class="o">=</span> <span class="mi">0</span>
 
-                <span class="k">for</span> <span class="n">itree</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">n_estimators</span><span class="p">):</span>
-                    <span class="n">tree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">estimators_</span><span class="p">[</span><span class="n">itree</span><span class="p">]</span>
-                    <span class="k">if</span> <span class="n">tree</span><span class="o">.</span><span class="n">random_state</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">_seeds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">))</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">_seeds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">itree</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_estimators</span><span class="p">):</span>
+                    <span class="c1"># For every N-trees that are defined by permute forest fraction</span>
+                    <span class="c1"># we will sample a new seed appropriately</span>
+                    <span class="k">if</span> <span class="n">itree</span> <span class="o">%</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">permute_forest_fraction</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_estimators</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">tree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">estimators_</span><span class="p">[</span><span class="n">itree</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">tree</span><span class="o">.</span><span class="n">random_state</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">seed</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">seed</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">random_state</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_seeds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
             <span class="n">seeds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seeds</span>
 
             <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">tree</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">estimators_</span><span class="p">):</span>
@@ -961,7 +969,8 @@ document.write(`
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        stat : float</span>
-<span class="sd">            The test statistic.</span>
+<span class="sd">            The test statistic. To compute the test statistic, take</span>
+<span class="sd">            ``permute_stat_`` and subtract ``observe_stat_``.</span>
 <span class="sd">        pval : float</span>
 <span class="sd">            The p-value of the test statistic.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1030,16 +1039,16 @@ document.write(`
             <span class="p">)</span>
         <span class="c1"># metric^\pi - metric = observed test statistic, which under the</span>
         <span class="c1"># null is normally distributed around 0</span>
-        <span class="n">observe_stat</span> <span class="o">=</span> <span class="n">permute_stat</span> <span class="o">-</span> <span class="n">observe_stat</span>
+        <span class="n">observe_test_stat</span> <span class="o">=</span> <span class="n">permute_stat</span> <span class="o">-</span> <span class="n">observe_stat</span>
 
         <span class="c1"># metric^\pi_j - metric_j, which is centered at 0</span>
         <span class="n">null_dist</span> <span class="o">=</span> <span class="n">metric_star_pi</span> <span class="o">-</span> <span class="n">metric_star</span>
 
         <span class="c1"># compute pvalue</span>
         <span class="k">if</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">POSITIVE_METRICS</span><span class="p">:</span>
-            <span class="n">pvalue</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">null_dist</span> <span class="o">&lt;=</span> <span class="n">observe_stat</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">n_repeats</span><span class="p">)</span>
+            <span class="n">pvalue</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">null_dist</span> <span class="o">&lt;=</span> <span class="n">observe_test_stat</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">n_repeats</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">pvalue</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">null_dist</span> <span class="o">&gt;=</span> <span class="n">observe_stat</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">n_repeats</span><span class="p">)</span>
+            <span class="n">pvalue</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">null_dist</span> <span class="o">&gt;=</span> <span class="n">observe_test_stat</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">n_repeats</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">return_posteriors</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">observe_posteriors_</span> <span class="o">=</span> <span class="n">observe_posteriors</span>
@@ -1048,7 +1057,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">permute_samples_</span> <span class="o">=</span> <span class="n">permute_samples</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">null_dist_</span> <span class="o">=</span> <span class="n">null_dist</span>
-        <span class="k">return</span> <span class="n">observe_stat</span><span class="p">,</span> <span class="n">pvalue</span>
+        <span class="k">return</span> <span class="n">observe_test_stat</span><span class="p">,</span> <span class="n">pvalue</span>
 
 
 <div class="viewcode-block" id="FeatureImportanceForestRegressor">
@@ -1089,6 +1098,11 @@ document.write(`
 
 <span class="sd">    sample_dataset_per_tree : bool, default=False</span>
 <span class="sd">        Whether to sample the dataset per tree or per forest.</span>
+
+<span class="sd">    conditional_perm : bool, default=False</span>
+<span class="sd">        Whether or not to conditionally permute the covariate index. If True,</span>
+<span class="sd">        then the covariate index is permuted while preserving the joint with respect</span>
+<span class="sd">        to the rest of the covariates.</span>
 
 <span class="sd">    permute_forest_fraction : float, default=None</span>
 <span class="sd">        The fraction of trees to permute the covariate index for. If None, then</span>
@@ -1151,6 +1165,7 @@ document.write(`
         <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
         <span class="n">sample_dataset_per_tree</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">conditional_perm</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">permute_forest_fraction</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">train_test_split</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
@@ -1160,6 +1175,7 @@ document.write(`
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
             <span class="n">test_size</span><span class="o">=</span><span class="n">test_size</span><span class="p">,</span>
             <span class="n">sample_dataset_per_tree</span><span class="o">=</span><span class="n">sample_dataset_per_tree</span><span class="p">,</span>
+            <span class="n">conditional_perm</span><span class="o">=</span><span class="n">conditional_perm</span><span class="p">,</span>
             <span class="n">permute_forest_fraction</span><span class="o">=</span><span class="n">permute_forest_fraction</span><span class="p">,</span>
             <span class="n">train_test_split</span><span class="o">=</span><span class="n">train_test_split</span><span class="p">,</span>
         <span class="p">)</span>
@@ -1273,14 +1289,20 @@ document.write(`
 
             <span class="k">if</span> <span class="n">covariate_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="c1"># perform permutation of covariates</span>
-                <span class="n">n_samples_train</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">index_arr</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
-                    <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_samples_train</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
-                    <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n_samples_train</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-                    <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                    <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="p">)</span>
-                <span class="n">X_train</span><span class="p">[:,</span> <span class="n">covariate_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[</span><span class="n">index_arr</span><span class="p">,</span> <span class="n">covariate_index</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conditional_perm</span><span class="p">:</span>
+                    <span class="n">X_perm_cov_ind</span> <span class="o">=</span> <span class="n">conditional_resample</span><span class="p">(</span>
+                        <span class="n">X_train</span><span class="p">,</span> <span class="n">X_train</span><span class="p">[:,</span> <span class="n">covariate_index</span><span class="p">],</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">rng</span>
+                    <span class="p">)</span>
+                    <span class="n">X_train</span><span class="p">[:,</span> <span class="n">covariate_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">X_perm_cov_ind</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">n_samples_train</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">index_arr</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_samples_train</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+                        <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n_samples_train</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">X_train</span><span class="p">[:,</span> <span class="n">covariate_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[</span><span class="n">index_arr</span><span class="p">,</span> <span class="n">covariate_index</span><span class="p">]</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type_of_target_</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span><span class="p">:</span>
                 <span class="n">y_train</span> <span class="o">=</span> <span class="n">y_train</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
@@ -1374,6 +1396,11 @@ document.write(`
 <span class="sd">    stratify : bool, default=True</span>
 <span class="sd">        Whether to stratify the samples by class labels.</span>
 
+<span class="sd">    conditional_perm : bool, default=False</span>
+<span class="sd">        Whether or not to conditionally permute the covariate index. If True,</span>
+<span class="sd">        then the covariate index is permuted while preserving the joint with respect</span>
+<span class="sd">        to the rest of the covariates.</span>
+
 <span class="sd">    sample_dataset_per_tree : bool, default=False</span>
 <span class="sd">        Whether to sample the dataset per tree or per forest.</span>
 
@@ -1435,6 +1462,7 @@ document.write(`
         <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
         <span class="n">stratify</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">conditional_perm</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">sample_dataset_per_tree</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">permute_forest_fraction</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">train_test_split</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -1446,6 +1474,7 @@ document.write(`
             <span class="n">test_size</span><span class="o">=</span><span class="n">test_size</span><span class="p">,</span>
             <span class="n">sample_dataset_per_tree</span><span class="o">=</span><span class="n">sample_dataset_per_tree</span><span class="p">,</span>
             <span class="n">stratify</span><span class="o">=</span><span class="n">stratify</span><span class="p">,</span>
+            <span class="n">conditional_perm</span><span class="o">=</span><span class="n">conditional_perm</span><span class="p">,</span>
             <span class="n">train_test_split</span><span class="o">=</span><span class="n">train_test_split</span><span class="p">,</span>
             <span class="n">permute_forest_fraction</span><span class="o">=</span><span class="n">permute_forest_fraction</span><span class="p">,</span>
         <span class="p">)</span>
@@ -1524,14 +1553,20 @@ document.write(`
 
             <span class="k">if</span> <span class="n">covariate_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="c1"># perform permutation of covariates</span>
-                <span class="n">n_samples_train</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">index_arr</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
-                    <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_samples_train</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
-                    <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n_samples_train</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-                    <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                    <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="p">)</span>
-                <span class="n">X_train</span><span class="p">[:,</span> <span class="n">covariate_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[</span><span class="n">index_arr</span><span class="p">,</span> <span class="n">covariate_index</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conditional_perm</span><span class="p">:</span>
+                    <span class="n">X_perm_cov_ind</span> <span class="o">=</span> <span class="n">conditional_resample</span><span class="p">(</span>
+                        <span class="n">X_train</span><span class="p">,</span> <span class="n">X_train</span><span class="p">[:,</span> <span class="n">covariate_index</span><span class="p">],</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">rng</span>
+                    <span class="p">)</span>
+                    <span class="n">X_train</span><span class="p">[:,</span> <span class="n">covariate_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">X_perm_cov_ind</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">n_samples_train</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">index_arr</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_samples_train</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+                        <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n_samples_train</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">X_train</span><span class="p">[:,</span> <span class="n">covariate_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[</span><span class="n">index_arr</span><span class="p">,</span> <span class="n">covariate_index</span><span class="p">]</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type_of_target_</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span> <span class="ow">or</span> <span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
                 <span class="n">y_train</span> <span class="o">=</span> <span class="n">y_train</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
