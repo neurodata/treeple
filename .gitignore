@@ -13,6 +13,7 @@ commit.txt
 sktree/_lib/sklearn/
 
 *.png
+_data
 
 # Sphinx documentation
 doc/_build/

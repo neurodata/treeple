@@ -175,6 +175,11 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         next 20 features, then ``feature_set_ends = [10, 30]``. If ``None``,
         then this will assume that there is only one feature set.
 
+    apply_max_features_per_feature_set : bool, default=False
+        Whether to apply sampling per feature set, where ``max_features`` is applied
+        to each feature-set. If ``False``, then sampling
+        is applied over the entire feature space.
+
     Attributes
     ----------
     classes_ : ndarray of shape (n_classes,) or list of ndarray
@@ -224,6 +229,10 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
     n_feature_sets_ : int
         The number of feature sets.
 
+    max_features_per_set_ : array-like of int of shape (n_feature_sets,)
+        The number of features to sample per feature set. If ``None``, then
+        ``max_features`` is applied to the entire feature space.
+
     See Also
     --------
     sklearn.tree.DecisionTreeClassifier : An axis-aligned decision tree classifier.
@@ -237,6 +246,8 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
             Interval(Real, 1.0, None, closed="left"),
             None,
         ],
+        "feature_set_ends": ["array-like", None],
+        "apply_max_features_per_feature_set": ["boolean"],
     }
 
     def __init__(
@@ -258,6 +269,7 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         store_leaf_values=False,
         monotonic_cst=None,
         feature_set_ends=None,
+        apply_max_features_per_feature_set=False,
     ):
         super().__init__(
             criterion=criterion,
@@ -278,6 +290,7 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
 
         self.feature_combinations = feature_combinations
         self.feature_set_ends = feature_set_ends
+        self.apply_max_features_per_feature_set = apply_max_features_per_feature_set
 
     def _build_tree(
         self,
@@ -350,6 +363,11 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         else:
             self.feature_set_ends_ = np.atleast_1d(self.feature_set_ends).astype(np.intp)
         self.n_feature_sets_ = len(self.feature_set_ends_)
+        if self.feature_set_ends_[-1] != n_features:
+            raise ValueError(
+                f"The last feature set end must be equal to the number of features, "
+                f"{n_features}, but got {self.feature_set_ends_[-1]}."
+            )
 
         splitter = self.splitter
         if issparse(X):
@@ -359,6 +377,52 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
             )
         else:
             SPLITTERS = DENSE_SPLITTERS
+
+        if self.apply_max_features_per_feature_set:
+            # XXX: experimental
+            # we can replace max_features_ here based on whether or not uniform logic over
+            # feature sets
+            max_features_per_set = []
+            n_features_in_prev = 0
+            for idx in range(self.n_feature_sets_):
+                n_features_in_ = self.feature_set_ends_[idx] - n_features_in_prev
+                n_features_in_prev = n_features_in_
+                import numbers
+
+                if isinstance(self.max_features, str):
+                    if self.max_features == "sqrt":
+                        max_features = max(1, int(np.sqrt(n_features_in_)))
+                    elif self.max_features == "log2":
+                        max_features = max(1, int(np.log2(n_features_in_)))
+                elif self.max_features is None:
+                    max_features = n_features_in_
+                elif isinstance(self.max_features, numbers.Integral):
+                    max_features = self.max_features
+                else:  # float
+                    if self.max_features > 0.0:
+                        max_features = max(1, int(self.max_features * n_features_in_))
+                    else:
+                        max_features = 0
+
+                if max_features > n_features_in_:
+                    raise ValueError(
+                        f"max_features must be less than or equal to "
+                        f"the number of features in feature set {idx}: {n_features_in_}, but "
+                        f"max_features = {max_features} when applying sampling"
+                        f"per feature set."
+                    )
+
+                max_features_per_set.append(max_features)
+            self.max_features_ = np.sum(max_features_per_set)
+            if self.max_features_ > n_features:
+                raise ValueError(
+                    "max_features is greater than the number of features: "
+                    f"{max_features} > {n_features}."
+                    "This should not be possible. Please submit a bug report."
+                )
+            self.max_features_per_set_ = np.asarray(max_features_per_set, dtype=np.intp)
+        else:
+            self.max_features_per_set_ = None
 
         if not isinstance(self.splitter, ObliqueSplitter):
             splitter = SPLITTERS[self.splitter](
@@ -371,6 +435,7 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                 self.feature_combinations_,
                 self.feature_set_ends_,
                 self.n_feature_sets_,
+                self.max_features_per_set_,
             )
 
         self.tree_ = ObliqueTree(self.n_features_in_, self.n_classes_, self.n_outputs_)

@@ -35,27 +35,37 @@ rng = np.random.default_rng(seed)
 
 
 def make_multiview_classification(
-    n_samples=100, n_features_1=5, n_features_2=1000, cluster_std=2.0, seed=None
+    n_samples=100,
+    n_features_1=5,
+    n_features_2=1000,
+    cluster_std_first=2.0,
+    cluster_std_second=5.0,
+    X0_first=None,
+    y0=None,
+    X1_first=None,
+    y1=None,
+    seed=None,
 ):
     rng = np.random.default_rng(seed=seed)
 
-    # Create a high-dimensional multiview dataset with a low-dimensional informative
-    # subspace in one view of the dataset.
-    X0_first, y0 = make_blobs(
-        n_samples=n_samples,
-        cluster_std=cluster_std,
-        n_features=n_features_1,
-        random_state=rng.integers(1, 10000),
-        centers=1,
-    )
+    if X0_first is None and y0 is None:
+        # Create a high-dimensional multiview dataset with a low-dimensional informative
+        # subspace in one view of the dataset.
+        X0_first, y0 = make_blobs(
+            n_samples=n_samples,
+            cluster_std=cluster_std_first,
+            n_features=n_features_1,
+            random_state=rng.integers(1, 10000),
+            centers=1,
+        )
 
-    X1_first, y1 = make_blobs(
-        n_samples=n_samples,
-        cluster_std=cluster_std,
-        n_features=n_features_1,
-        random_state=rng.integers(1, 10000),
-        centers=1,
-    )
+        X1_first, y1 = make_blobs(
+            n_samples=n_samples,
+            cluster_std=cluster_std_second,
+            n_features=n_features_1,
+            random_state=rng.integers(1, 10000),
+            centers=1,
+        )
     y1[:] = 1
     X0 = np.concatenate([X0_first, rng.standard_normal(size=(n_samples, n_features_2))], axis=1)
     X1 = np.concatenate([X1_first, rng.standard_normal(size=(n_samples, n_features_2))], axis=1)
@@ -75,16 +85,37 @@ def make_multiview_classification(
 # dimensions. The sample-size will be kept fixed, so we can compare the performance of
 # regular Random forests with Multi-view Random Forests.
 
-n_samples = 100
-n_features_views = np.linspace(5, 10000, 5).astype(int)
+n_samples = 500
+n_features_views = np.linspace(5, 20000, 5).astype(int)
 
 datasets = []
+
+# make the signal portions of the dataset
+X0_first, y0 = make_blobs(
+    n_samples=n_samples,
+    cluster_std=5.0,
+    n_features=5,
+    random_state=rng.integers(1, 10000),
+    centers=1,
+)
+X1_first, y1 = make_blobs(
+    n_samples=n_samples,
+    cluster_std=10.0,
+    n_features=5,
+    random_state=rng.integers(1, 10000),
+    centers=1,
+)
+
+# increasingly add noise dimensions to the second view
 for idx, n_features in enumerate(n_features_views):
     X, y = make_multiview_classification(
         n_samples=n_samples,
         n_features_1=5,
         n_features_2=n_features,
-        cluster_std=2.0,
+        cluster_std_first=5.0,
+        cluster_std_second=10.0,
+        # X0_first=X0_first, y0=y0,
+        # X1_first=X1_first, y1=y1,
         seed=seed + idx,
     )
     datasets.append((X, y))
@@ -96,6 +127,7 @@ for idx, n_features in enumerate(n_features_views):
 
 n_estimators = 100
 n_jobs = -1
+max_features = "sqrt"
 
 scores = defaultdict(list)
 
@@ -106,28 +138,30 @@ for idx, ((X, y), n_features) in enumerate(zip(datasets, n_features_views)):
         n_estimators=n_estimators,
         n_jobs=n_jobs,
         random_state=seed,
+        max_features=max_features,
     )
 
     mvrf = MultiViewRandomForestClassifier(
         n_estimators=n_estimators,
         n_jobs=n_jobs,
-        feature_set_ends=n_features_views,
+        feature_set_ends=feature_set_ends,
         random_state=seed,
+        max_features=max_features,
     )
 
     # obtain the cross-validation score
-    rf_score = cross_val_score(rf, X, y, cv=2).mean()
-    mvrf_score = cross_val_score(mvrf, X, y, cv=2).mean()
+    rf_scores = cross_val_score(rf, X, y, cv=3)
+    mvrf_scores = cross_val_score(mvrf, X, y, cv=3)
 
-    scores["rf"].append(rf_score)
-    scores["mvrf"].append(mvrf_score)
+    scores["rf"].extend(rf_scores)
+    scores["mvrf"].extend(mvrf_scores)
+    scores["n_features"].extend([n_features + 5] * len(rf_scores))
 
 # %%
 # Visualize scores and compare performance
 # ----------------------------------------
 # Now, we can compare the performance from the cross-validation experiment.
 
-scores["n_features"] = n_features_views
 df = pd.DataFrame(scores)
 
 # melt the dataframe, to make it easier to plot
