@@ -58,8 +58,11 @@ def test_featureimportance_forest_permute_pertree(sample_dataset_per_tree):
     ), f"{len(est.train_test_samples_[0][1])} {n_samples * est.test_size}"
     assert len(est.train_test_samples_[0][0]) == est._n_samples_ - n_samples * est.test_size
 
+    # covariate index should work with mse
+    est.reset()
+    est.statistic(iris_X[:n_samples], iris_y[:n_samples], covariate_index=[1], metric="mse")
     with pytest.raises(RuntimeError, match="Metric must be"):
-        est.statistic(iris_X[:n_samples], iris_y[:n_samples], metric="mi")
+        est.statistic(iris_X[:n_samples], iris_y[:n_samples], covariate_index=[1], metric="mi")
 
     # covariate index should work with mse
     est.reset()

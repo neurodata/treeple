@@ -79,10 +79,11 @@ rng = np.random.default_rng(seed)
             {
                 "estimator": RandomForestRegressor(
                     max_features="sqrt",
-                    n_estimators=125,
+                    n_estimators=250,
                     n_jobs=-1,
+                    random_state=rng.integers(0, 1000),
                 ),
-                # "random_state": seed,
+                "random_state": seed,
                 "permute_forest_fraction": 0.5,
                 "sample_dataset_per_tree": False,
             },
@@ -167,6 +168,7 @@ def test_linear_model(hypotester, model_kwargs, n_samples, n_repeats, test_size)
                     n_jobs=-1,
                 ),
                 "sample_dataset_per_tree": False,
+                "random_state": seed,
             },
             600,  # n_samples
             1000,  # n_repeats
@@ -197,9 +199,11 @@ def test_linear_model(hypotester, model_kwargs, n_samples, n_repeats, test_size)
                     max_features="sqrt",
                     n_estimators=200,
                     n_jobs=-1,
+                    random_state=seed,
                 ),
                 "permute_forest_fraction": 0.5,
                 "sample_dataset_per_tree": False,
+                "random_state": seed,
             },
             600,  # n_samples
             1000,  # n_repeats

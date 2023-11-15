@@ -385,11 +385,15 @@ class BaseForestHT(MetaEstimatorMixin):
             self.permuted_estimator_ = self._get_estimator()
             estimator = self.permuted_estimator_
 
-            if not hasattr(self, "estimator_") or self.estimator_ is None:
+            if not hasattr(self, "estimator_"):
                 self.estimator_ = self._get_estimator()
 
-                # Ensure that the estimator_ is fitted at least
-                if not _is_fitted(self.estimator_) and is_classifier(self.estimator_):
+                # XXX: this can be improved as an extra fit can be avoided, by
+                # just doing error-checking
+                # and then setting the internal meta data structures
+                # first run a dummy fit on the samples to initialize the
+                # internal data structure of the forest
+                if is_classifier(self.estimator_):
                     _unique_y = []
                     for axis in range(y.shape[1]):
                         _unique_y.append(np.unique(y[:, axis]))
@@ -398,20 +402,20 @@ class BaseForestHT(MetaEstimatorMixin):
                         unique_y = unique_y.ravel()
                     X_dummy = np.zeros((unique_y.shape[0], X.shape[1]))
                     self.estimator_.fit(X_dummy, unique_y)
-                elif not _is_fitted(estimator):
+                else:
                     if y.ndim > 1 and y.shape[1] == 1:
                         self.estimator_.fit(X[:2], y[:2].ravel())
                     else:
                         self.estimator_.fit(X[:2], y[:2])
 
         # Store a cache of the y variable
-        if is_classifier(self._get_estimator()):
+        if is_classifier(estimator):
             self._y = y.copy()
 
-        # XXX: this can be improved as an extra fit can be avoided, by just doing error-checking
-        # and then setting the internal meta data structures
-        # first run a dummy fit on the samples to initialize the
-        # internal data structure of the forest
+        # # XXX: this can be improved as an extra fit can be avoided, by just doing error-checking
+        # # and then setting the internal meta data structures
+        # # first run a dummy fit on the samples to initialize the
+        # # internal data structure of the forest
         if not _is_fitted(estimator) and is_classifier(estimator):
             _unique_y = []
             for axis in range(y.shape[1]):
