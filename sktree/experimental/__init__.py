@@ -1,4 +1,5 @@
 from . import mutual_info, sdf, simulate
+from .monte_carlo import conditional_resample
 from .mutual_info import (
     cmi_from_entropy,
     cmi_gaussian,

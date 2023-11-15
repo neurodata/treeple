@@ -3,6 +3,7 @@ python_sources = [
   'test_mutual_info.py',
   'test_simulate.py',
   'test_sdf.py',
+  'test_monte_carlo.py',
 ]
 
 py3.install_sources(
