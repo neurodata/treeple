@@ -193,7 +193,7 @@ class BaseForestHT(MetaEstimatorMixin):
                 for itree in range(self.n_estimators):
                     # For every N-trees that are defined by permute forest fraction
                     # we will sample a new seed appropriately
-                    if itree % int(permute_forest_fraction * self.n_estimators) == 0:
+                    if itree % max(int(permute_forest_fraction * self.n_estimators), 1) == 0:
                         tree = self.estimator_.estimators_[itree]
                         if tree.random_state is None:
                             seed = rng.integers(low=0, high=np.iinfo(np.int32).max)
