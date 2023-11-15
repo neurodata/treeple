@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>sktree.stats.FeatureImportanceForestRegressor &#8212; scikit-tree 0.4dev0 documentation</title>
+    <title>sktree.datasets.make_gaussian_mixture &#8212; scikit-tree 0.4dev0 documentation</title>
   
   
   
@@ -47,7 +47,8 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=fd10adb8"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/sktree.stats.FeatureImportanceForestRegressor';</script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/sktree.datasets.make_gaussian_mixture';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.14.3';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/scikit-tree/main/doc/_static/versions.json';
@@ -56,8 +57,8 @@
         </script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sktree.stats.FeatureImportanceForestClassifier" href="sktree.stats.FeatureImportanceForestClassifier.html" />
-    <link rel="prev" title="sktree.NearestNeighborsMetaEstimator" href="sktree.NearestNeighborsMetaEstimator.html" />
+    <link rel="next" title="sktree.datasets.make_joint_factor_model" href="sktree.datasets.make_joint_factor_model.html" />
+    <link rel="prev" title="sktree.stats.PermutationForestRegressor" href="sktree.stats.PermutationForestRegressor.html" />
     <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
     <script type="text/javascript" src="../_static/copybutton.js"></script>
     <script type="text/javascript" src="../_static/scrollfix.js"></script>
@@ -456,14 +457,14 @@ document.write(`
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="sktree.NearestNeighborsMetaEstimator.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.NearestNeighborsMetaEstimator</a></li>
 </ul>
-<ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.FeatureImportanceForestRegressor</a></li>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="sktree.stats.FeatureImportanceForestRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.FeatureImportanceForestRegressor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sktree.stats.FeatureImportanceForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.FeatureImportanceForestClassifier</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sktree.stats.PermutationForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.PermutationForestClassifier</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sktree.stats.PermutationForestRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.PermutationForestRegressor</a></li>
 </ul>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="sktree.datasets.make_gaussian_mixture.html">sktree.datasets.make_gaussian_mixture</a></li>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">sktree.datasets.make_gaussian_mixture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sktree.datasets.make_joint_factor_model.html">sktree.datasets.make_joint_factor_model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sktree.datasets.make_quadratic_classification.html">sktree.datasets.make_quadratic_classification</a></li>
 </ul>
@@ -520,7 +521,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="../api.html" class="nav-link">API Documentation</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><code...</li>
+    <li class="breadcrumb-item active" aria-current="page">sktree.datas...</li>
   </ul>
 </nav>
 </div>
@@ -537,208 +538,89 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="sktree-stats-featureimportanceforestregressor">
-<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.FeatureImportanceForestRegressor<a class="headerlink" href="#sktree-stats-featureimportanceforestregressor" title="Link to this heading">#</a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="sktree.stats.FeatureImportanceForestRegressor">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sktree.stats.</span></span><span class="sig-name descname"><span class="pre">FeatureImportanceForestRegressor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_dataset_per_tree</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">permute_forest_fraction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_test_split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sktree/stats/forestht.html#FeatureImportanceForestRegressor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sktree.stats.FeatureImportanceForestRegressor" title="Link to this definition">#</a></dt>
-<dd><p>Forest hypothesis testing with continuous <code class="docutils literal notranslate"><span class="pre">y</span></code> variable.</p>
-<p>Implements the algorithm described in <a class="footnote-reference brackets" href="#footcite-coleman2022scalable" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
-<p>The dataset is split into a training and testing dataset initially. Then there
-are two forests that are trained: one on the original dataset, and one on the
-permuted dataset. The dataset is either permuted once, or independently for
-each tree in the permuted forest. The original test statistic is computed by
-comparing the metric on both forests <code class="docutils literal notranslate"><span class="pre">(metric_forest</span> <span class="pre">-</span> <span class="pre">metric_perm_forest)</span></code>.</p>
-<p>Then the output predictions are randomly sampled to recompute the test statistic
-<code class="docutils literal notranslate"><span class="pre">n_repeats</span></code> times. The p-value is computed as the proportion of times the
-null test statistic is greater than the original test statistic.</p>
+  <section id="sktree-datasets-make-gaussian-mixture">
+<h1>sktree.datasets.make_gaussian_mixture<a class="headerlink" href="#sktree-datasets-make-gaussian-mixture" title="Link to this heading">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="sktree.datasets.make_gaussian_mixture">
+<span class="sig-prename descclassname"><span class="pre">sktree.datasets.</span></span><span class="sig-name descname"><span class="pre">make_gaussian_mixture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">centers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariances</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">class_probs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shuffle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_latents</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_latent_noise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sktree/datasets/multiview.html#make_gaussian_mixture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sktree.datasets.make_gaussian_mixture" title="Link to this definition">#</a></dt>
+<dd><p>Two-view Gaussian mixture model dataset generator.</p>
+<p>This creates a two-view dataset from a Gaussian mixture model and
+a (possibly nonlinear) transformation.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>estimator</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">object</span></code></a>, default=None</span></dt><dd><p>Type of forest estimator to use. By default <code class="docutils literal notranslate"><span class="pre">None</span></code>, which defaults to
-<a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.ensemble.RandomForestRegressor.html#sklearn.ensemble.RandomForestRegressor" title="(in scikit-learn v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.ensemble.RandomForestRegressor</span></code></a>.</p>
+<dt><strong>centers</strong><span class="classifier">1D <a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.0.dev0)"><span>array_like</span></a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of 1D array-likes</span></dt><dd><p>The mean(s) of the Gaussian(s) from which the latent
+points are sampled. If is a list of 1D array-likes, each is the
+mean of a distinct Gaussian, sampled from with
+probability given by <code class="docutils literal notranslate"><span class="pre">class_probs</span></code>. Otherwise is the mean of a
+single Gaussian from which all are sampled.</p>
 </dd>
-<dt><strong>random_state</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://numpy.org/devdocs/reference/random/legacy.html#numpy.random.RandomState" title="(in NumPy v2.0.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RandomState</span></code></a> instance or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a>, default=None</span></dt><dd><p>Controls both the randomness of the bootstrapping of the samples used
-when building trees (if <code class="docutils literal notranslate"><span class="pre">bootstrap=True</span></code>) and the sampling of the
-features to consider when looking for the best split at each node
-(if <code class="docutils literal notranslate"><span class="pre">max_features</span> <span class="pre">&lt;</span> <span class="pre">n_features</span></code>).
-See <a class="reference external" href="https://scikit-learn.org/dev/glossary.html#term-random_state" title="(in scikit-learn v1.4)"><span class="xref std std-term">Glossary</span></a> for details.</p>
+<dt><strong>covariances</strong><span class="classifier">2D <a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.0.dev0)"><span>array_like</span></a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of 2D array-likes</span></dt><dd><p>The covariance matrix(s) of the Gaussian(s), matched
+to the specified centers.</p>
 </dd>
-<dt><strong>verbose</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, default=0</span></dt><dd><p>Controls the verbosity when fitting and predicting.</p>
+<dt><strong>n_samples</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>The number of points in each view, divided across Gaussians per
+<code class="docutils literal notranslate"><span class="pre">class_probs</span></code>.</p>
 </dd>
-<dt><strong>test_size</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, default=0.2</span></dt><dd><p>Proportion of samples per tree to use for the test set.</p>
+<dt><strong>transform</strong><span class="classifier">‘linear’ | ‘sin’ | poly’ | <a class="reference external" href="https://docs.python.org/3/library/functions.html#callable" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">callable()</span></code></a>, (default ‘linear’)</span></dt><dd><p>Transformation to perform on the latent variable. If a function,
+applies it to the latent. Otherwise uses an implemented function.</p>
 </dd>
-<dt><strong>sample_dataset_per_tree</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=False</span></dt><dd><p>Whether to sample the dataset per tree or per forest.</p>
+<dt><strong>noise</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a> (default=None)</span></dt><dd><p>Variance of mean zero Gaussian noise added to the first view.</p>
 </dd>
-<dt><strong>permute_forest_fraction</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, default=None</span></dt><dd><p>The fraction of trees to permute the covariate index for. If None, then
-just one permutation is performed. If sampling a permutation per tree
-is desirable, then the fraction should be set to <code class="docutils literal notranslate"><span class="pre">1.</span> <span class="pre">/</span> <span class="pre">n_estimators</span></code>.</p>
+<dt><strong>noise_dims</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a> (default=None)</span></dt><dd><p>Number of additional dimensions of standard normal noise to add.</p>
 </dd>
-<dt><strong>train_test_split</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=True</span></dt><dd><p>Whether to split the dataset before passing to the forest.</p>
+<dt><strong>class_probs</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.0.dev0)"><span>array_like</span></a>, default=None</span></dt><dd><p>A list of probabilities specifying the probability of a latent
+point being sampled from each of the Gaussians. Must sum to 1. If
+None, then is taken to be uniform over the Gaussians.</p>
+</dd>
+<dt><strong>random_state</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, default=None</span></dt><dd><p>If set, can be used to reproduce the data generated.</p>
+</dd>
+<dt><strong>shuffle</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=False</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, data is shuffled so the labels are not ordered.</p>
+</dd>
+<dt><strong>return_latents</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a> (default <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">False</span></code></a>)</span></dt><dd><p>If true, returns the non-noisy latent variables.</p>
+</dd>
+<dt><strong>add_latent_noise</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a> (default <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">False</span></code></a>)</span></dt><dd><p>If true, adds noise to the latent variables before applying the
+transformation.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>Xs</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a>, of shape (n_samples, n_features)</span></dt><dd><p>The latent data and its noisy transformation.</p>
+</dd>
+<dt><strong>y</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a>, shape (n_samples,)</span></dt><dd><p>The integer labels for each sample’s Gaussian membership.</p>
+</dd>
+<dt><strong>latents</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a>, shape (n_samples, n_features)</span></dt><dd><p>The non-noisy latent variables. Only returned if
+<code class="docutils literal notranslate"><span class="pre">return_latents=True</span></code>.</p>
 </dd>
 </dl>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>This class trains two forests: one on the original dataset, and one on the
-permuted dataset. The forest from the original dataset is cached and re-used to
-compute the test-statistic each time the <a class="reference internal" href="#sktree.stats.FeatureImportanceForestRegressor.test" title="sktree.stats.FeatureImportanceForestRegressor.test"><code class="xref py py-meth docutils literal notranslate"><span class="pre">test()</span></code></a> method is called. However,
-the forest from the permuted dataset is re-trained each time the <a class="reference internal" href="#sktree.stats.FeatureImportanceForestRegressor.test" title="sktree.stats.FeatureImportanceForestRegressor.test"><code class="xref py py-meth docutils literal notranslate"><span class="pre">test()</span></code></a> is called
-if the <code class="docutils literal notranslate"><span class="pre">covariate_index</span></code> differs from the previous run.</p>
-<p>To fully start from a new dataset, call the <code class="docutils literal notranslate"><span class="pre">reset</span></code> method, which will then
-re-train both forests upon calling the <a class="reference internal" href="#sktree.stats.FeatureImportanceForestRegressor.test" title="sktree.stats.FeatureImportanceForestRegressor.test"><code class="xref py py-meth docutils literal notranslate"><span class="pre">test()</span></code></a> and <a class="reference internal" href="#sktree.stats.FeatureImportanceForestRegressor.statistic" title="sktree.stats.FeatureImportanceForestRegressor.statistic"><code class="xref py py-meth docutils literal notranslate"><span class="pre">statistic()</span></code></a> methods.</p>
-<p class="rubric">References</p>
-<div class="docutils container" id="id2">
-<aside class="footnote-list brackets">
-<aside class="footnote brackets" id="footcite-coleman2022scalable" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
-<p>Tim Coleman, Wei Peng, and Lucas Mentch. Scalable and efficient hypothesis testing with random forests. <em>The Journal of Machine Learning Research</em>, 23(1):7679–7713, 2022.</p>
-</aside>
-</aside>
+<p>For each class <span class="math notranslate nohighlight">\(i\)</span> with prior probability <span class="math notranslate nohighlight">\(p_i\)</span>,
+center and covariance matrix <span class="math notranslate nohighlight">\(\mu_i\)</span> and <span class="math notranslate nohighlight">\(\Sigma_i\)</span>, and
+<span class="math notranslate nohighlight">\(n\)</span> total samples, the latent data is sampled such that:</p>
+<div class="math notranslate nohighlight">
+\[(X_1, y_1), \dots, (X_{np_i}, Y_{np_i}) \overset{i.i.d.}{\sim}
+    \mathcal{N}(\mu_i, \Sigma_i)\]</div>
+<p>Two views of data are returned, the first being the latent samples and
+the second being a specified transformation of the latent samples.
+Additional noise may be added to the first view or added as noise
+dimensions to both views.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sktree.datasets.multiview</span> <span class="kn">import</span> <span class="n">make_gaussian_mixture</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n_samples</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">centers</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">covariances</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Xs</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">make_gaussian_mixture</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">centers</span><span class="p">,</span> <span class="n">covariances</span><span class="p">,</span>
+<span class="gp">... </span>                              <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">shuffle_random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="go">[1. 0. 1. 0. 1. 0. 1. 0. 0. 1.]</span>
+</pre></div>
 </div>
-<dl class="field-list">
-<dt class="field-odd">Attributes<span class="colon">:</span></dt>
-<dd class="field-odd"><dl>
-<dt><strong>estimator_</strong><span class="classifier">BaseForest</span></dt><dd><p>The estimator used to compute the test statistic.</p>
-</dd>
-<dt><strong>n_samples_test_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>The number of samples used in the final test set.</p>
-</dd>
-<dt><strong>indices_train_</strong><span class="classifier">ArrayLike of shape (n_samples_train,)</span></dt><dd><p>The indices of the samples used in the training set.</p>
-</dd>
-<dt><strong>indices_test_</strong><span class="classifier">ArrayLike of shape (n_samples_test,)</span></dt><dd><p>The indices of the samples used in the testing set.</p>
-</dd>
-<dt><strong>samples_</strong><span class="classifier">ArrayLike of shape (n_samples_final,)</span></dt><dd><p>The indices of the samples used in the final test set that would slice
-the original <code class="docutils literal notranslate"><span class="pre">(X,</span> <span class="pre">y)</span></code> input.</p>
-</dd>
-<dt><strong>y_true_final_</strong><span class="classifier">ArrayLike of shape (n_samples_final,)</span></dt><dd><p>The true labels of the samples used in the final test.</p>
-</dd>
-<dt><strong>observe_posteriors_</strong><span class="classifier">ArrayLike of shape (n_estimators, n_samples, n_outputs) or</span></dt><dd><p>(n_estimators, n_samples, n_classes)
-The predicted posterior probabilities of the samples used in the final test.
-For samples that are NaNs for all estimators, means the sample was not used
-in the test set at all across all trees.</p>
-</dd>
-<dt><strong>null_dist_</strong><span class="classifier">ArrayLike of shape (n_repeats,)</span></dt><dd><p>The null distribution of the test statistic.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-<p class="rubric">Methods</p>
-<table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sktree.stats.FeatureImportanceForestRegressor.statistic" title="sktree.stats.FeatureImportanceForestRegressor.statistic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statistic</span></code></a>(X, y[, covariate_index, metric, ...])</p></td>
-<td><p>Compute the test statistic.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sktree.stats.FeatureImportanceForestRegressor.test" title="sktree.stats.FeatureImportanceForestRegressor.test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test</span></code></a>(X, y[, covariate_index, metric, ...])</p></td>
-<td><p>Perform hypothesis test using Coleman method.</p></td>
-</tr>
-</tbody>
-</table>
-<table class="table">
-<tbody>
-<tr class="row-odd"><td><p><strong>reset</strong></p></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<dl class="py method">
-<dt class="sig sig-object py" id="sktree.stats.FeatureImportanceForestRegressor.statistic">
-<span class="sig-name descname"><span class="pre">statistic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariate_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_posteriors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">metric_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sktree/stats/forestht.html#FeatureImportanceForestRegressor.statistic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sktree.stats.FeatureImportanceForestRegressor.statistic" title="Link to this definition">#</a></dt>
-<dd><p>Compute the test statistic.</p>
-<dl class="field-list">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl>
-<dt><strong>X</strong><span class="classifier">ArrayLike of shape (n_samples, n_features)</span></dt><dd><p>The data matrix.</p>
-</dd>
-<dt><strong>y</strong><span class="classifier">ArrayLike of shape (n_samples, n_outputs)</span></dt><dd><p>The target matrix.</p>
-</dd>
-<dt><strong>covariate_index</strong><span class="classifier">ArrayLike, optional of shape (n_covariates,)</span></dt><dd><p>The index array of covariates to shuffle, by default None.</p>
-</dd>
-<dt><strong>metric</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>The metric to compute, by default “mse”.</p>
-</dd>
-<dt><strong>return_posteriors</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>Whether or not to return the posteriors, by default False.</p>
-</dd>
-<dt><strong>check_input</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>Whether or not to check the input, by default True.</p>
-</dd>
-<dt><strong>**metric_kwargs</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">dict</span></code></a>, optional</span></dt><dd><p>Additional keyword arguments to pass to the metric function.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl>
-<dt><strong>stat</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>The test statistic.</p>
-</dd>
-<dt><strong>posterior_final</strong><span class="classifier">ArrayLike of shape (n_estimators, n_samples_final, n_outputs) or</span></dt><dd><p>(n_estimators, n_samples_final), optional
-If <code class="docutils literal notranslate"><span class="pre">return_posteriors</span></code> is True, then the posterior probabilities of the
-samples used in the final test. <code class="docutils literal notranslate"><span class="pre">n_samples_final</span></code> is equal to <code class="docutils literal notranslate"><span class="pre">n_samples</span></code>
-if all samples are encountered in the test set of at least one tree in the
-posterior computation.</p>
-</dd>
-<dt><strong>samples</strong><span class="classifier">ArrayLike of shape (n_samples_final,), optional</span></dt><dd><p>The indices of the samples used in the final test. <code class="docutils literal notranslate"><span class="pre">n_samples_final</span></code> is
-equal to <code class="docutils literal notranslate"><span class="pre">n_samples</span></code> if all samples are encountered in the test set of at
-least one tree in the posterior computation.</p>
-</dd>
-</dl>
-</dd>
-</dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="sktree.stats.FeatureImportanceForestRegressor.test">
-<span class="sig-name descname"><span class="pre">test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariate_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mi'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_repeats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_posteriors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">metric_kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sktree.stats.FeatureImportanceForestRegressor.test" title="Link to this definition">#</a></dt>
-<dd><p>Perform hypothesis test using Coleman method.</p>
-<p>X is split into a training/testing split. Optionally, the covariate index
-columns are shuffled.</p>
-<p>On the training dataset, two honest forests are trained and then the posterior
-is estimated on the testing dataset. One honest forest is trained on the
-permuted dataset and the other is trained on the original dataset.</p>
-<p>Finally, resample the posteriors of the two forests to compute the null
-distribution of the statistics.</p>
-<dl class="field-list">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl>
-<dt><strong>X</strong><span class="classifier">ArrayLike of shape (n_samples, n_features)</span></dt><dd><p>The data matrix.</p>
-</dd>
-<dt><strong>y</strong><span class="classifier">ArrayLike of shape (n_samples, n_outputs)</span></dt><dd><p>The target matrix.</p>
-</dd>
-<dt><strong>covariate_index</strong><span class="classifier">ArrayLike, optional of shape (n_covariates,)</span></dt><dd><p>The index array of covariates to shuffle, will shuffle all columns by
-default (corresponding to None).</p>
-</dd>
-<dt><strong>metric</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>The metric to compute, by default “mse”.</p>
-</dd>
-<dt><strong>n_repeats</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>Number of times to sample the null distribution, by default 1000.</p>
-</dd>
-<dt><strong>return_posteriors</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>Whether or not to return the posteriors, by default True.</p>
-</dd>
-<dt><strong>**metric_kwargs</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">dict</span></code></a>, optional</span></dt><dd><p>Additional keyword arguments to pass to the metric function.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl>
-<dt><strong>stat</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>The test statistic.</p>
-</dd>
-<dt><strong>pval</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>The p-value of the test statistic.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="sktree.stats.FeatureImportanceForestRegressor.train_test_samples_">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">train_test_samples_</span></span><a class="headerlink" href="#sktree.stats.FeatureImportanceForestRegressor.train_test_samples_" title="Link to this definition">#</a></dt>
-<dd><p>The subset of drawn samples for each base estimator.</p>
-<p>Returns a dynamically generated list of indices identifying
-the samples used for fitting each member of the ensemble, i.e.,
-the in-bag samples.</p>
-<p>Note: the list is re-created at each call to the property in order
-to reduce the object memory footprint by not storing the sampling
-data. Thus fetching the property may be slower than expected.</p>
-</dd></dl>
-
-</dd></dl>
-
-<div class="clearer"></div></section>
+<span class="target" id="sphx-glr-backreferences-sktree-datasets-make-gaussian-mixture"></span></section>
 
 
                 </article>
@@ -751,20 +633,20 @@ data. Thus fetching the property may be slower than expected.</p>
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="sktree.NearestNeighborsMetaEstimator.html"
+       href="sktree.stats.PermutationForestRegressor.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.NearestNeighborsMetaEstimator</p>
+        <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.PermutationForestRegressor</p>
       </div>
     </a>
     <a class="right-next"
-       href="sktree.stats.FeatureImportanceForestClassifier.html"
+       href="sktree.datasets.make_joint_factor_model.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.FeatureImportanceForestClassifier</p>
+        <p class="prev-next-title">sktree.datasets.make_joint_factor_model</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -783,12 +665,7 @@ data. Thus fetching the property may be slower than expected.</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.stats.FeatureImportanceForestRegressor"><code class="docutils literal notranslate"><span class="pre">FeatureImportanceForestRegressor</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.stats.FeatureImportanceForestRegressor.statistic"><code class="docutils literal notranslate"><span class="pre">FeatureImportanceForestRegressor.statistic()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.stats.FeatureImportanceForestRegressor.test"><code class="docutils literal notranslate"><span class="pre">FeatureImportanceForestRegressor.test()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.stats.FeatureImportanceForestRegressor.train_test_samples_"><code class="docutils literal notranslate"><span class="pre">FeatureImportanceForestRegressor.train_test_samples_</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.datasets.make_gaussian_mixture"><code class="docutils literal notranslate"><span class="pre">make_gaussian_mixture()</span></code></a></li>
 </ul>
   </nav></div>
 

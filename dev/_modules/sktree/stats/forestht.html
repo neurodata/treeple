@@ -837,11 +837,15 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">permuted_estimator_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_estimator</span><span class="p">()</span>
             <span class="n">estimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">permuted_estimator_</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;estimator_&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;estimator_&quot;</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_estimator</span><span class="p">()</span>
 
-                <span class="c1"># Ensure that the estimator_ is fitted at least</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_classifier</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="p">):</span>
+                <span class="c1"># XXX: this can be improved as an extra fit can be avoided, by</span>
+                <span class="c1"># just doing error-checking</span>
+                <span class="c1"># and then setting the internal meta data structures</span>
+                <span class="c1"># first run a dummy fit on the samples to initialize the</span>
+                <span class="c1"># internal data structure of the forest</span>
+                <span class="k">if</span> <span class="n">is_classifier</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="p">):</span>
                     <span class="n">_unique_y</span> <span class="o">=</span> <span class="p">[]</span>
                     <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
                         <span class="n">_unique_y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y</span><span class="p">[:,</span> <span class="n">axis</span><span class="p">]))</span>
@@ -850,20 +854,20 @@ document.write(`
                         <span class="n">unique_y</span> <span class="o">=</span> <span class="n">unique_y</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
                     <span class="n">X_dummy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">unique_y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_dummy</span><span class="p">,</span> <span class="n">unique_y</span><span class="p">)</span>
-                <span class="k">elif</span> <span class="ow">not</span> <span class="n">_is_fitted</span><span class="p">(</span><span class="n">estimator</span><span class="p">):</span>
+                <span class="k">else</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="n">y</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="n">y</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
 
         <span class="c1"># Store a cache of the y variable</span>
-        <span class="k">if</span> <span class="n">is_classifier</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_estimator</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="n">is_classifier</span><span class="p">(</span><span class="n">estimator</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-        <span class="c1"># XXX: this can be improved as an extra fit can be avoided, by just doing error-checking</span>
-        <span class="c1"># and then setting the internal meta data structures</span>
-        <span class="c1"># first run a dummy fit on the samples to initialize the</span>
-        <span class="c1"># internal data structure of the forest</span>
+        <span class="c1"># # XXX: this can be improved as an extra fit can be avoided, by just doing error-checking</span>
+        <span class="c1"># # and then setting the internal meta data structures</span>
+        <span class="c1"># # first run a dummy fit on the samples to initialize the</span>
+        <span class="c1"># # internal data structure of the forest</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_fitted</span><span class="p">(</span><span class="n">estimator</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_classifier</span><span class="p">(</span><span class="n">estimator</span><span class="p">):</span>
             <span class="n">_unique_y</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
@@ -1656,7 +1660,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-11-14.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-11-15.
       <br/>
     
   </p>
