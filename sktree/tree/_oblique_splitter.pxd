@@ -31,8 +31,8 @@ cdef struct ObliqueSplitRecord:
     float64_t impurity_left        # Impurity of the left split.
     float64_t impurity_right       # Impurity of the right split.
 
-    vector[float32_t]* proj_vec_weights   # weights of the vector (max_features,)
-    vector[intp_t]* proj_vec_indices    # indices of the features (max_features,)
+    vector[float32_t]* proj_vec_weights  # weights of the vector (max_features,)
+    vector[intp_t]* proj_vec_indices     # indices of the features (max_features,)
 
 
 cdef class BaseObliqueSplitter(Splitter):

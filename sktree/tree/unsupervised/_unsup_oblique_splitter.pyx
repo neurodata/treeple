@@ -304,8 +304,8 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
                 end,
                 samples,
                 feature_values,
-                current_split.proj_vec_weights,
-                current_split.proj_vec_indices
+                &self.proj_mat_weights[feat_i],
+                &self.proj_mat_indices[feat_i]
             )
 
             # Sort the samples
