@@ -509,7 +509,7 @@ class BaseForestHT(MetaEstimatorMixin):
         Returns
         -------
         stat : float
-            The observed statistic. To compute the test statistic, take
+            The test statistic. To compute the test statistic, take
             ``permute_stat_`` and subtract ``observe_stat_``.
         pval : float
             The p-value of the test statistic.
@@ -588,7 +588,7 @@ class BaseForestHT(MetaEstimatorMixin):
         if metric in POSITIVE_METRICS:
             pvalue = (1 + (null_dist <= observe_test_stat).sum()) / (1 + n_repeats)
         else:
-            pvalue = (1 + (null_dist >= observe_stat).sum()) / (1 + n_repeats)
+            pvalue = (1 + (null_dist >= observe_test_stat).sum()) / (1 + n_repeats)
 
         if return_posteriors:
             self.observe_posteriors_ = observe_posteriors
@@ -597,7 +597,7 @@ class BaseForestHT(MetaEstimatorMixin):
             self.permute_samples_ = permute_samples
 
         self.null_dist_ = null_dist
-        return observe_stat, pvalue
+        return observe_test_stat, pvalue
 
 
 class FeatureImportanceForestRegressor(BaseForestHT):
