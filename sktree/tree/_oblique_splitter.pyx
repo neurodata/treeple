@@ -671,12 +671,16 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
         float64_t feature_combinations,
         const intp_t[:] feature_set_ends,
         intp_t n_feature_sets,
+        const intp_t[:] max_features_per_set,
         *argv
     ):
         self.feature_set_ends = feature_set_ends
 
         # infer the number of feature sets
         self.n_feature_sets = n_feature_sets
+
+        # replaces usage of max_features
+        self.max_features_per_set = max_features_per_set
 
     def __getstate__(self):
         return {}
@@ -697,6 +701,7 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
                     self.feature_combinations,
                     self.feature_set_ends.base if self.feature_set_ends is not None else None,
                     self.n_feature_sets,
+                    self.max_features_per_set.base if self.max_features_per_set is not None else None,
                 ), self.__getstate__())
 
     cdef intp_t init(
@@ -744,43 +749,80 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
         cdef intp_t ifeature = 0
         cdef intp_t grid_size
 
-        # 03: Algorithm samples features from each set with equal probability
-        proj_i = 0
+        cdef intp_t max_features
+
+        # 01: Algorithm samples features from each set equally with the same number
+        # of candidates, but if one feature set is exhausted, then that one is no longer sampled
         cdef bint finished_feature_set = False
-
         cdef intp_t i, j
-        while proj_i < self.max_features and not finished_feature_set:
-            # sample from a feature set
-            for idx in range(self.n_feature_sets):
-                # indices_to_sample = self.multi_indices_to_sample[idx]
-                grid_size = self.multi_indices_to_sample[idx].size()
 
-                # Note: a temporary variable must occur
-                if proj_i == 0:
+        proj_i = 0
+
+        if self.max_features_per_set is None:
+            while proj_i < self.max_features and not finished_feature_set:
+                # sample from a feature set
+                for idx in range(self.n_feature_sets):
+                    # indices_to_sample = self.multi_indices_to_sample[idx]
+                    grid_size = self.multi_indices_to_sample[idx].size()
+
+                    # Note: a temporary variable must not be used, else a copy will be made
+                    if proj_i == 0:
+                        for i in range(0, self.multi_indices_to_sample[idx].size() - 1):
+                            j = rand_int(i + 1, grid_size, random_state)
+                            self.multi_indices_to_sample[idx][i], self.multi_indices_to_sample[idx][j] = \
+                                self.multi_indices_to_sample[idx][j], self.multi_indices_to_sample[idx][i]
+
+                    if ifeature >= grid_size:
+                        finished_feature_set = True
+                        continue
+
+                    # sample random feature in this set
+                    feat_i = self.multi_indices_to_sample[idx][ifeature]
+
+                    # here, axis-aligned splits are entirely weights of 1
+                    weight = 1  # if (rand_int(0, 2, random_state) == 1) else -1
+
+                    proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
+                    proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
+
+                    proj_i += 1
+                    if proj_i >= self.max_features:
+                        break
+
+                    finished_feature_set = False
+
+                ifeature += 1
+        # 02: Algorithm samples a different number features from each set, but considers
+        # each feature-set equally
+        else:
+            while proj_i < self.max_features:
+                # sample from a feature set
+                for idx in range(self.n_feature_sets):
+                    # get the max-features for this feature-set
+                    max_features = self.max_features_per_set[idx]
+
+                    grid_size = self.multi_indices_to_sample[idx].size()
+                    # Note: a temporary variable must not be used, else a copy will be made
                     for i in range(0, self.multi_indices_to_sample[idx].size() - 1):
                         j = rand_int(i + 1, grid_size, random_state)
-                        self.multi_indices_to_sample[idx][i], self.multi_indices_to_sample[idx][j] = self.multi_indices_to_sample[idx][j], self.multi_indices_to_sample[idx][i]
+                        self.multi_indices_to_sample[idx][i], self.multi_indices_to_sample[idx][j] = \
+                            self.multi_indices_to_sample[idx][j], self.multi_indices_to_sample[idx][i]
 
-                if ifeature >= grid_size:
-                    finished_feature_set = True
-                    continue
+                    for ifeature in range(max_features):
+                        # sample random feature in this set
+                        feat_i = self.multi_indices_to_sample[idx][ifeature]
 
-                # sample random feature in this set
-                feat_i = self.multi_indices_to_sample[idx][ifeature]
+                        # here, axis-aligned splits are entirely weights of 1
+                        weight = 1  # if (rand_int(0, 2, random_state) == 1) else -1
 
-                # here, axis-aligned splits are entirely weights of 1
-                weight = 1  # if (rand_int(0, 2, random_state) == 1) else -1
+                        proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
+                        proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
 
-                proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
-                proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
-
-                proj_i += 1
-                if proj_i >= self.max_features:
-                    break
-
-                finished_feature_set = False
-
-            ifeature += 1
+                        proj_i += 1
+                        if proj_i >= self.max_features:
+                            break
+                    if proj_i >= self.max_features:
+                        break
 
 # XXX: not used right now
 cdef class MultiViewObliqueSplitter(BestObliqueSplitter):

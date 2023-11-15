@@ -104,6 +104,10 @@ After building locally, you can use editable installs (warning: this only regist
 
     pip install --no-build-isolation --editable .
 
+Or if you have spin v0.8+ installed, you can just run directly
+
+    spin install
+
 Development
 ===========
 

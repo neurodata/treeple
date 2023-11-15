@@ -19,6 +19,7 @@ from sktree._lib.sklearn.ensemble._forest import (
     _parallel_build_trees,
 )
 from sktree.ensemble._honest_forest import HonestForestClassifier
+from sktree.experimental import conditional_resample
 from sktree.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sktree.tree._classes import DTYPE
 
@@ -117,6 +118,7 @@ class BaseForestHT(MetaEstimatorMixin):
         verbose=0,
         test_size=0.2,
         stratify=False,
+        conditional_perm=False,
         sample_dataset_per_tree=False,
         permute_forest_fraction=None,
         train_test_split=True,
@@ -126,6 +128,7 @@ class BaseForestHT(MetaEstimatorMixin):
         self.verbose = verbose
         self.test_size = test_size
         self.stratify = stratify
+        self.conditional_perm = conditional_perm
 
         self.train_test_split = train_test_split
         # XXX: possibly removing these parameters
@@ -187,12 +190,17 @@ class BaseForestHT(MetaEstimatorMixin):
                 self._seeds = []
                 self._n_permutations = 0
 
-                for itree in range(self.estimator_.n_estimators):
-                    tree = self.estimator_.estimators_[itree]
-                    if tree.random_state is None:
-                        self._seeds.append(rng.integers(low=0, high=np.iinfo(np.int32).max))
-                    else:
-                        self._seeds.append(tree.random_state)
+                for itree in range(self.n_estimators):
+                    # For every N-trees that are defined by permute forest fraction
+                    # we will sample a new seed appropriately
+                    if itree % max(int(permute_forest_fraction * self.n_estimators), 1) == 0:
+                        tree = self.estimator_.estimators_[itree]
+                        if tree.random_state is None:
+                            seed = rng.integers(low=0, high=np.iinfo(np.int32).max)
+                        else:
+                            seed = tree.random_state
+
+                    self._seeds.append(seed)
             seeds = self._seeds
 
             for idx, tree in enumerate(self.estimator_.estimators_):
@@ -506,7 +514,8 @@ class BaseForestHT(MetaEstimatorMixin):
         Returns
         -------
         stat : float
-            The test statistic.
+            The test statistic. To compute the test statistic, take
+            ``permute_stat_`` and subtract ``observe_stat_``.
         pval : float
             The p-value of the test statistic.
         """
@@ -575,16 +584,16 @@ class BaseForestHT(MetaEstimatorMixin):
             )
         # metric^\pi - metric = observed test statistic, which under the
         # null is normally distributed around 0
-        observe_stat = permute_stat - observe_stat
+        observe_test_stat = permute_stat - observe_stat
 
         # metric^\pi_j - metric_j, which is centered at 0
         null_dist = metric_star_pi - metric_star
 
         # compute pvalue
         if metric in POSITIVE_METRICS:
-            pvalue = (1 + (null_dist <= observe_stat).sum()) / (1 + n_repeats)
+            pvalue = (1 + (null_dist <= observe_test_stat).sum()) / (1 + n_repeats)
         else:
-            pvalue = (1 + (null_dist >= observe_stat).sum()) / (1 + n_repeats)
+            pvalue = (1 + (null_dist >= observe_test_stat).sum()) / (1 + n_repeats)
 
         if return_posteriors:
             self.observe_posteriors_ = observe_posteriors
@@ -593,7 +602,7 @@ class BaseForestHT(MetaEstimatorMixin):
             self.permute_samples_ = permute_samples
 
         self.null_dist_ = null_dist
-        return observe_stat, pvalue
+        return observe_test_stat, pvalue
 
 
 class FeatureImportanceForestRegressor(BaseForestHT):
@@ -632,6 +641,11 @@ class FeatureImportanceForestRegressor(BaseForestHT):
 
     sample_dataset_per_tree : bool, default=False
         Whether to sample the dataset per tree or per forest.
+
+    conditional_perm : bool, default=False
+        Whether or not to conditionally permute the covariate index. If True,
+        then the covariate index is permuted while preserving the joint with respect
+        to the rest of the covariates.
 
     permute_forest_fraction : float, default=None
         The fraction of trees to permute the covariate index for. If None, then
@@ -694,6 +708,7 @@ class FeatureImportanceForestRegressor(BaseForestHT):
         verbose=0,
         test_size=0.2,
         sample_dataset_per_tree=False,
+        conditional_perm=False,
         permute_forest_fraction=None,
         train_test_split=True,
     ):
@@ -703,6 +718,7 @@ class FeatureImportanceForestRegressor(BaseForestHT):
             verbose=verbose,
             test_size=test_size,
             sample_dataset_per_tree=sample_dataset_per_tree,
+            conditional_perm=conditional_perm,
             permute_forest_fraction=permute_forest_fraction,
             train_test_split=train_test_split,
         )
@@ -813,14 +829,20 @@ class FeatureImportanceForestRegressor(BaseForestHT):
 
             if covariate_index is not None:
                 # perform permutation of covariates
-                n_samples_train = X_train.shape[0]
-                index_arr = rng.choice(
-                    np.arange(n_samples_train, dtype=int),
-                    size=(n_samples_train, 1),
-                    replace=False,
-                    shuffle=True,
-                )
-                X_train[:, covariate_index] = X_train[index_arr, covariate_index]
+                if self.conditional_perm:
+                    X_perm_cov_ind = conditional_resample(
+                        X_train, X_train[:, covariate_index], replace=False, random_state=rng
+                    )
+                    X_train[:, covariate_index] = X_perm_cov_ind
+                else:
+                    n_samples_train = X_train.shape[0]
+                    index_arr = rng.choice(
+                        np.arange(n_samples_train, dtype=int),
+                        size=(n_samples_train, 1),
+                        replace=False,
+                        shuffle=True,
+                    )
+                    X_train[:, covariate_index] = X_train[index_arr, covariate_index]
 
             if self._type_of_target_ == "binary":
                 y_train = y_train.ravel()
@@ -911,6 +933,11 @@ class FeatureImportanceForestClassifier(BaseForestHT):
     stratify : bool, default=True
         Whether to stratify the samples by class labels.
 
+    conditional_perm : bool, default=False
+        Whether or not to conditionally permute the covariate index. If True,
+        then the covariate index is permuted while preserving the joint with respect
+        to the rest of the covariates.
+
     sample_dataset_per_tree : bool, default=False
         Whether to sample the dataset per tree or per forest.
 
@@ -972,6 +999,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
         verbose=0,
         test_size=0.2,
         stratify=True,
+        conditional_perm=False,
         sample_dataset_per_tree=False,
         permute_forest_fraction=None,
         train_test_split=True,
@@ -983,6 +1011,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
             test_size=test_size,
             sample_dataset_per_tree=sample_dataset_per_tree,
             stratify=stratify,
+            conditional_perm=conditional_perm,
             train_test_split=train_test_split,
             permute_forest_fraction=permute_forest_fraction,
         )
@@ -1061,14 +1090,20 @@ class FeatureImportanceForestClassifier(BaseForestHT):
 
             if covariate_index is not None:
                 # perform permutation of covariates
-                n_samples_train = X_train.shape[0]
-                index_arr = rng.choice(
-                    np.arange(n_samples_train, dtype=int),
-                    size=(n_samples_train, 1),
-                    replace=False,
-                    shuffle=True,
-                )
-                X_train[:, covariate_index] = X_train[index_arr, covariate_index]
+                if self.conditional_perm:
+                    X_perm_cov_ind = conditional_resample(
+                        X_train, X_train[:, covariate_index], replace=False, random_state=rng
+                    )
+                    X_train[:, covariate_index] = X_perm_cov_ind
+                else:
+                    n_samples_train = X_train.shape[0]
+                    index_arr = rng.choice(
+                        np.arange(n_samples_train, dtype=int),
+                        size=(n_samples_train, 1),
+                        replace=False,
+                        shuffle=True,
+                    )
+                    X_train[:, covariate_index] = X_train[index_arr, covariate_index]
 
             if self._type_of_target_ == "binary" or (y.ndim > 1 and y.shape[1] == 1):
                 y_train = y_train.ravel()
