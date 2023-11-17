@@ -13,6 +13,7 @@ from sktree._lib.sklearn.ensemble._forest import BaseForest, ForestClassifier, F
 
 from .utils import (
     METRIC_FUNCTIONS,
+    POSITIVE_METRICS,
     POSTERIOR_FUNCTIONS,
     REGRESSOR_METRICS,
     _compute_null_distribution_perm,
@@ -285,7 +286,10 @@ class BasePermutationForest(MetaEstimatorMixin):
             self.posterior_null_ = np.array([x[1] for x in null_dist])
 
         n_repeats = len(self.null_dist_)
-        pvalue = (1 + (self.null_dist_ < observe_stat).sum()) / (1 + n_repeats)
+        if metric in POSITIVE_METRICS:
+            pvalue = (1 + (self.null_dist_ >= observe_stat).sum()) / (1 + n_repeats)
+        else:
+            pvalue = (1 + (self.null_dist_ <= observe_stat).sum()) / (1 + n_repeats)
         return observe_stat, pvalue
 
 
