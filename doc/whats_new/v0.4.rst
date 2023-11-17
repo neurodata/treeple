@@ -3,12 +3,14 @@
 .. include:: _contributors.rst
 .. currentmodule:: sktree
 
-.. _current:
+.. _v0_4:
 
 Version 0.4
 ===========
 
-**In Development**
+This version patches some issues with the ``FeatureImportance*`` classes and also adds a feature to the
+`MultiViewDecisionTreeClassifier` class that allows one to scale the number of split candidates sampled per feature-set
+equally.
 
 Changelog
 ---------
