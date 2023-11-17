@@ -4,7 +4,7 @@ name = "scikit-tree"
 # 0.0.0 is standard placeholder for poetry-dynamic-versioning
 # any changes to this should not be checked in
 #
-version = "0.4.0"
+version = "0.5.0dev0"
 description = "Modern decision trees in Python"
 maintainers = [
     {name="Neurodata", email="adam.li@columbia.edu"}
