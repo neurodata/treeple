@@ -141,7 +141,6 @@ def _compute_null_distribution_perm(
 
     # pre-allocate memory for the index array
     train_index_arr = np.arange(n_samples_train, dtype=int).reshape(-1, 1)
-    test_index_arr = np.arange(n_samples_test, dtype=int).reshape(-1, 1)
 
     null_metrics = np.zeros((n_repeats,))
 
