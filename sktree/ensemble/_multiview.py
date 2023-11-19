@@ -172,6 +172,11 @@ class MultiViewRandomForestClassifier(SimMatrixMixin, ForestClassifier):
         next 20 features, then ``feature_set_ends = [10, 30]``. If ``None``,
         then this will assume that there is only one feature set.
 
+    apply_max_features_per_feature_set : bool, default=False
+        Whether to apply sampling per feature set, where ``max_features`` is applied
+        to each feature-set. If ``False``, then sampling
+        is applied over the entire feature space.
+
     Attributes
     ----------
     base_estimator_ : sktree.tree.ObliqueDecisionTreeClassifier
@@ -268,6 +273,7 @@ class MultiViewRandomForestClassifier(SimMatrixMixin, ForestClassifier):
         max_samples=None,
         feature_combinations=None,
         feature_set_ends=None,
+        apply_max_features_per_feature_set=False,
     ):
         super().__init__(
             estimator=MultiViewDecisionTreeClassifier(),
@@ -284,6 +290,7 @@ class MultiViewRandomForestClassifier(SimMatrixMixin, ForestClassifier):
                 "random_state",
                 "feature_combinations",
                 "feature_set_ends",
+                "apply_max_features_per_feature_set",
             ),
             bootstrap=bootstrap,
             oob_score=oob_score,
@@ -301,6 +308,7 @@ class MultiViewRandomForestClassifier(SimMatrixMixin, ForestClassifier):
         self.max_features = max_features
         self.feature_combinations = feature_combinations
         self.feature_set_ends = feature_set_ends
+        self.apply_max_features_per_feature_set = apply_max_features_per_feature_set
 
         # unused by oblique forests
         self.min_weight_fraction_leaf = min_weight_fraction_leaf

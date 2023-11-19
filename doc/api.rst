@@ -150,6 +150,19 @@ tree models.
    PermutationForestClassifier
    PermutationForestRegressor
 
+Datasets
+------------------------------
+We provide some convenience functions for simulating datasets beyond
+those offered in scikit-learn.
+
+.. currentmodule:: sktree.datasets
+.. autosummary::
+   :toctree: generated/
+
+   make_gaussian_mixture
+   make_joint_factor_model
+   make_quadratic_classification
+
 
 Experimental Functionality
 --------------------------
@@ -160,6 +173,7 @@ We also include experimental functionality that is works in progress.
    :toctree: generated/
 
    mutual_info_ksg
+   conditional_resample
 
 We also include functions that help simulate and evaluate mutual information (MI)
 and conditional mutual information (CMI) estimators. Specifically, functions that

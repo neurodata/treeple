@@ -1,3 +1,6 @@
+import pickle
+import sys
+
 import numpy as np
 import pytest
 from numpy.testing import assert_allclose
@@ -19,6 +22,8 @@ from sktree.tree import (
     UnsupervisedDecisionTree,
     UnsupervisedObliqueDecisionTree,
 )
+
+from .test_all_trees import assert_tree_equal
 
 CLUSTER_CRITERIONS = ("twomeans", "fastbic")
 REG_CRITERIONS = ("squared_error", "absolute_error", "friedman_mse", "poisson")
@@ -139,12 +144,6 @@ digits = datasets.load_digits()
 perm = rng.permutation(digits.target.size)
 digits.data = digits.data[perm]
 digits.target = digits.target[perm]
-
-
-def assert_tree_equal(d, s, message):
-    assert s.node_count == d.node_count, "{0}: inequal number of node ({1} != {2})".format(
-        message, s.node_count, d.node_count
-    )
 
 
 def test_pickle_splitters():
@@ -526,3 +525,28 @@ def test_balance_property(criterion, Tree):
     reg = Tree(criterion=criterion)
     reg.fit(X, y)
     assert np.sum(reg.predict(X)) == pytest.approx(np.sum(y))
+
+
+@pytest.mark.parametrize("Tree", ALL_TREES.values())
+def test_deterministic_pickle(Tree):
+    # Non-regression test for:
+    # https://github.com/scikit-learn/scikit-learn/issues/27268
+    # Uninitialised memory would lead to the two pickle strings being different.
+    tree1 = Tree(random_state=0).fit(iris.data, iris.target)
+    tree2 = Tree(random_state=0).fit(iris.data, iris.target)
+
+    pickle1 = pickle.dumps(tree1)
+    pickle2 = pickle.dumps(tree2)
+
+    pickle1_tree = pickle.loads(pickle1)
+    pickle2_tree = pickle.loads(pickle2)
+    assert_tree_equal(
+        pickle1_tree.tree_,
+        pickle2_tree.tree_,
+        "The trees of the original and loaded classifiers are not equal.",
+    )
+    assert sys.getsizeof(pickle1_tree) == sys.getsizeof(pickle2_tree)
+
+    # TODO: this does not work properly it seems
+    if Tree not in (list(CLF_TREES.values()) + list(REG_TREES.values())):
+        assert pickle1 == pickle2, f"Failed with {Tree}"

@@ -3,7 +3,6 @@
 
 import numpy as np
 from sklearn.base import ClassifierMixin, MetaEstimatorMixin, _fit_context, clone
-from sklearn.ensemble._base import _set_random_states
 from sklearn.utils.multiclass import _check_partial_fit_first_call, check_classification_targets
 from sklearn.utils.validation import check_is_fitted, check_X_y
 
@@ -527,6 +526,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
 
         nonzero_indices = np.where(_sample_weight > 0)[0]
 
+        # TODO: perhaps we want to stratify this split
         self.structure_indices_ = rng.choice(
             nonzero_indices,
             int((1 - self.honest_fraction) * len(nonzero_indices)),
@@ -537,7 +537,13 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         _sample_weight[self.honest_indices_] = 0
 
         if self.tree_estimator is None:
-            self.estimator_ = DecisionTreeClassifier(
+            self.estimator_ = DecisionTreeClassifier(random_state=self.random_state)
+        else:
+            # XXX: maybe error out if the tree_estimator is already fitted
+            self.estimator_ = clone(self.tree_estimator)
+
+        self.estimator_.set_params(
+            **dict(
                 criterion=self.criterion,
                 splitter=self.splitter,
                 max_depth=self.max_depth,
@@ -547,48 +553,23 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
                 max_features=self.max_features,
                 max_leaf_nodes=self.max_leaf_nodes,
                 class_weight=self.class_weight,
-                random_state=self.random_state,
                 min_impurity_decrease=self.min_impurity_decrease,
                 ccp_alpha=self.ccp_alpha,
-                monotonic_cst=self.monotonic_cst,
-                store_leaf_values=self.store_leaf_values,
+                random_state=self.random_state,
             )
-        else:
-            # XXX: Remove this?
-            # we throw an error if the user is using trees from sklearn:main
-            # if isinstance(self.tree_estimator, skBaseDecisionTree):
-            #     raise RuntimeError("Instead of using sklearn.tree, use trees import from sktree.")
+        )
 
-            # XXX: maybe error out if the tree_estimator is already fitted
-            self.estimator_ = clone(self.tree_estimator)
+        try:
+            self.estimator_.set_params(**dict(monotonic_cst=self.monotonic_cst))
             self.estimator_.set_params(
                 **dict(
-                    criterion=self.criterion,
-                    splitter=self.splitter,
-                    max_depth=self.max_depth,
-                    min_samples_split=self.min_samples_split,
-                    min_samples_leaf=self.min_samples_leaf,
-                    min_weight_fraction_leaf=self.min_weight_fraction_leaf,
-                    max_features=self.max_features,
-                    max_leaf_nodes=self.max_leaf_nodes,
-                    class_weight=self.class_weight,
-                    random_state=self.random_state,
-                    min_impurity_decrease=self.min_impurity_decrease,
-                    ccp_alpha=self.ccp_alpha,
+                    store_leaf_values=self.store_leaf_values,
                 )
             )
-            try:
-                self.estimator_.set_params(**dict(monotonic_cst=self.monotonic_cst))
-                self.estimator_.set_params(
-                    **dict(
-                        store_leaf_values=self.store_leaf_values,
-                    )
-                )
-            except Exception:
-                print("Using sklearn tree")
+        except Exception:
+            from warnings import warn
 
-            if self.random_state is not None:
-                _set_random_states(self.estimator_, self.random_state)
+            warn("Using sklearn tree so store_leaf_values cannot be set.")
 
         # Learn structure on subsample
         # XXX: this allows us to use BaseDecisionTree without partial_fit API

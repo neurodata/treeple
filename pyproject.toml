@@ -4,7 +4,7 @@ name = "scikit-tree"
 # 0.0.0 is standard placeholder for poetry-dynamic-versioning
 # any changes to this should not be checked in
 #
-version = "0.4.0dev0"
+version = "0.5.0dev0"
 description = "Modern decision trees in Python"
 maintainers = [
     {name="Neurodata", email="adam.li@columbia.edu"}
@@ -209,6 +209,7 @@ extend-exclude = '''
     | sktree/_lib
     | .asv
     | env
+    | build-install
 )
 '''
 
@@ -217,7 +218,7 @@ profile = 'black'
 multi_line_output = 3
 line_length = 100
 py_version = 38
-extend_skip_glob = ['sktree/__init__.py', 'sktree/_lib/*', '.asv/*', 'env/*']
+extend_skip_glob = ['sktree/__init__.py', 'sktree/_lib/*', '.asv/*', 'env/*', 'build-install/*']
 
 [tool.pydocstyle]
 convention = 'numpy'

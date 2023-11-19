@@ -1,15 +1,13 @@
 python_sources = [
   '__init__.py',
-  'mutual_info.py',
-  'simulate.py',
-  'sdf.py',
-  'monte_carlo.py',
+  'multiview.py',
+  'hyppo.py',
 ]
 
 py3.install_sources(
   python_sources,
   pure: false,
-  subdir: 'sktree/experimental'
+  subdir: 'sktree/datasets'
 )
 
 subdir('tests')
