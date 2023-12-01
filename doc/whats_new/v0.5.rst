@@ -13,9 +13,7 @@ Version 0.5
 Changelog
 ---------
 
-- |FIX| Fixes bug in :class:`sktree.tree.MultiViewDecisionTreeClassifier` where the max_features argument applied over
-    more than two views with ``apply_max_features_per_set`` set to ``True`` results in an incorrect and oversampled
-    number of max_features in the views after the first two, by `Adam Li`_ (:pr:`172`)
+- 
 
 Code and Documentation Contributors
 -----------------------------------
