@@ -258,10 +258,10 @@ package = 'sktree'
 
 [tool.spin.commands]
 Build = [
-    # "spin.cmds.meson.build", 
     ".spin/cmds.py:build",
     ".spin/cmds.py:setup_submodule",
     "spin.cmds.meson.test",
+    "spin.cmds.pip.install",
 ]
 Environments = [
     'spin.cmds.meson.shell',

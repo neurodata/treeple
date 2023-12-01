@@ -14,7 +14,7 @@ from sktree import HonestForestClassifier, RandomForestClassifier, RandomForestR
 from sktree._lib.sklearn.tree import DecisionTreeClassifier
 from sktree.stats import FeatureImportanceForestClassifier, FeatureImportanceForestRegressor
 from sktree.stats.utils import _non_nan_samples
-from sktree.tree import ObliqueDecisionTreeClassifier
+from sktree.tree import MultiViewDecisionTreeClassifier, ObliqueDecisionTreeClassifier
 
 # load the iris dataset (n_samples, 4)
 # and randomly permute it
@@ -676,3 +676,57 @@ def test_permute_forest_fraction(permute_forest_fraction, seed):
         else:
             assert_array_equal(train_inds, train_test_splits[idx][0])
             assert_array_equal(test_inds, train_test_splits[idx][1])
+
+
+def test_comight_repeated_feature_sets():
+    """Test COMIGHT when there are repeated feature sets."""
+    n_samples = 50
+    n_features = 500
+    rng = np.random.default_rng(seed)
+
+    X = rng.uniform(size=(n_samples, 10))
+    X2 = X + 3
+    X = np.hstack((X, rng.standard_normal(size=(n_samples, n_features - 10))))
+    X2 = np.hstack((X2, rng.standard_normal(size=(n_samples, n_features - 10))))
+    X = np.vstack([X, X2])
+    y = np.vstack([np.zeros((n_samples, 1)), np.ones((n_samples, 1))])  # Binary classification
+
+    X = np.hstack((X, X))
+    feature_set_ends = [n_features, n_features * 2]
+
+    clf = FeatureImportanceForestClassifier(
+        estimator=HonestForestClassifier(
+            n_estimators=50,
+            random_state=seed,
+            n_jobs=1,
+            honest_fraction=0.5,
+            tree_estimator=MultiViewDecisionTreeClassifier(
+                feature_set_ends=feature_set_ends,
+                max_features=0.3,
+                apply_max_features_per_feature_set=True,
+            ),
+        ),
+        test_size=0.2,
+        permute_forest_fraction=None,
+        sample_dataset_per_tree=False,
+        random_state=seed,
+    )
+
+    # first test MIGHT rejects the null, since there is information
+    stat, pvalue = clf.test(X, y, metric="mi")
+    assert pvalue < 0.05
+
+    # second test CoMIGHT fails to reject the null, since the information
+    # is entirely contained in the first feature set
+    stat, pvalue = clf.test(X, y, covariate_index=np.arange(n_features), metric="mi")
+    assert pvalue > 0.05, f"{pvalue}"
+
+
+def test_might_three_feature_sets():
+    """Test MIGHT when there are three feature sets."""
+    pass
+
+
+def test_comight_three_feature_sets():
+    """Test COMIGHT when there are three feature sets."""
+    pass
