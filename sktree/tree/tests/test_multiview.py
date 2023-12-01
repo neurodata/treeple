@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 import pytest
 from numpy.testing import assert_array_equal
@@ -150,3 +152,44 @@ def test_multiview_separate_feature_set_sampling_sets_attributes():
     clf.fit(X, y)
     assert_array_equal(clf.max_features_per_set_, [2, 2])
     assert clf.max_features_ == 4
+
+
+def test_at_least_one_feature_per_view_is_sampled():
+    """Test that multiview decision tree always samples at least one feature per view."""
+
+    X = np.random.random((20, 10))
+    y = np.random.randint(0, 2, size=20)
+
+    # test with max_features as a float
+    clf = MultiViewDecisionTreeClassifier(
+        random_state=seed,
+        feature_set_ends=[1, 2, 4, 10],
+        max_features=0.4,
+        apply_max_features_per_feature_set=True,
+    )
+    clf.fit(X, y)
+
+    assert_array_equal(clf.max_features_per_set_, [1, 1, 1, np.ceil(6 * clf.max_features)])
+    assert clf.max_features_ == np.sum(clf.max_features_per_set_), np.sum(clf.max_features_per_set_)
+
+
+@pytest.mark.parametrize("stratify_mtry_per_view", [True, False])
+def test_separate_mtry_per_feature_set(stratify_mtry_per_view):
+    """Test that multiview decision tree can sample different numbers of features per view.
+
+    Sets the ``max_feature`` argument as an array-like.
+    """
+    X = np.random.random((20, 10))
+    y = np.random.randint(0, 2, size=20)
+
+    # test with max_features as a float
+    clf = MultiViewDecisionTreeClassifier(
+        random_state=seed,
+        feature_set_ends=[1, 2, 4, 10],
+        max_features=[0.4, 0.5, 0.6, 0.7],
+        apply_max_features_per_feature_set=stratify_mtry_per_view,
+    )
+    clf.fit(X, y)
+
+    assert_array_equal(clf.max_features_per_set_, [1, 1, 2, math.ceil(6 * 0.7)])
+    assert clf.max_features_ == np.sum(clf.max_features_per_set_), np.sum(clf.max_features_per_set_)
