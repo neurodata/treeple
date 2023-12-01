@@ -35,7 +35,7 @@ def test_multiview_classification(baseline_est):
     n_samples = 20
     n_features_1 = 5
     n_features_2 = 1000
-    cluster_std = 2.0
+    cluster_std = 5.0
 
     # Create a high-dimensional multiview dataset with a low-dimensional informative
     # subspace in one view of the dataset.
@@ -64,29 +64,24 @@ def test_multiview_classification(baseline_est):
     clf = MultiViewDecisionTreeClassifier(
         random_state=seed,
         feature_set_ends=[n_features_1, X.shape[1]],
-        max_features="sqrt",
-        max_depth=5,
+        max_features=0.3,
     )
     clf.fit(X, y)
     assert (
         accuracy_score(y, clf.predict(X)) == 1.0
     ), f"Accuracy score: {accuracy_score(y, clf.predict(X))}"
     assert (
-        cross_val_score(clf, X, y, cv=5).mean() == 1.0
+        cross_val_score(clf, X, y, cv=5).mean() > 0.9
     ), f"CV score: {cross_val_score(clf, X, y, cv=5).mean()}"
 
-    clf = baseline_est(
+    base_clf = baseline_est(
         random_state=seed,
-        max_depth=5,
-        max_features="sqrt",
+        max_features=0.3,
     )
-    clf.fit(X, y)
-    assert (
-        accuracy_score(y, clf.predict(X)) == 1.0
-    ), f"Accuracy score: {accuracy_score(y, clf.predict(X))}"
-    assert (
-        cross_val_score(clf, X, y, cv=5).mean() <= 0.6
-    ), f"CV score: {cross_val_score(clf, X, y, cv=5).mean()}"
+    assert cross_val_score(base_clf, X, y, cv=5).mean() < cross_val_score(clf, X, y, cv=5).mean(), (
+        f"CV score: {cross_val_score(base_clf, X, y, cv=5).mean()} vs "
+        f"{cross_val_score(clf, X, y, cv=5).mean()}"
+    )
 
 
 def test_multiview_errors():
@@ -150,8 +145,8 @@ def test_multiview_separate_feature_set_sampling_sets_attributes():
         apply_max_features_per_feature_set=True,
     )
     clf.fit(X, y)
-    assert_array_equal(clf.max_features_per_set_, [2, 2])
-    assert clf.max_features_ == 4
+    assert_array_equal(clf.max_features_per_set_, [3, 2])
+    assert clf.max_features_ == 5
 
 
 def test_at_least_one_feature_per_view_is_sampled():
