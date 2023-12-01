@@ -1,4 +1,5 @@
 import copy
+import numbers
 from numbers import Real
 
 import numpy as np
@@ -386,8 +387,7 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
             n_features_in_prev = 0
             for idx in range(self.n_feature_sets_):
                 n_features_in_ = self.feature_set_ends_[idx] - n_features_in_prev
-                n_features_in_prev = n_features_in_
-                import numbers
+                n_features_in_prev += n_features_in_
 
                 if isinstance(self.max_features, str):
                     if self.max_features == "sqrt":
