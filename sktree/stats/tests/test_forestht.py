@@ -720,13 +720,3 @@ def test_comight_repeated_feature_sets():
     # is entirely contained in the first feature set
     stat, pvalue = clf.test(X, y, covariate_index=np.arange(n_features), metric="mi")
     assert pvalue > 0.05, f"{pvalue}"
-
-
-def test_might_three_feature_sets():
-    """Test MIGHT when there are three feature sets."""
-    pass
-
-
-def test_comight_three_feature_sets():
-    """Test COMIGHT when there are three feature sets."""
-    pass
