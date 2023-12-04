@@ -314,4 +314,3 @@ class MultiViewRandomForestClassifier(SimMatrixMixin, ForestClassifier):
         self.min_weight_fraction_leaf = min_weight_fraction_leaf
         self.max_leaf_nodes = max_leaf_nodes
         self.min_impurity_decrease = min_impurity_decrease
-

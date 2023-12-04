@@ -459,6 +459,24 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
             self.max_features_ = np.sum(self.max_features_per_set_)
         else:
             self.max_features_per_set_ = None
+            self.max_features = self._max_features_arr
+            if isinstance(self.max_features, str):
+                if self.max_features == "sqrt":
+                    max_features = max(1, int(np.sqrt(self.n_features_in_)))
+                elif self.max_features == "log2":
+                    max_features = max(1, int(np.log2(self.n_features_in_)))
+            elif self.max_features is None:
+                max_features = self.n_features_in_
+            elif isinstance(self.max_features, numbers.Integral):
+                max_features = self.max_features
+            else:  # float
+                if self.max_features > 0.0:
+                    max_features = max(1, int(self.max_features * self.n_features_in_))
+                else:
+                    max_features = 0
+
+            self.max_features_ = max_features
+            print(self.max_features_, self.max_features_per_set_)
 
         if not isinstance(self.splitter, ObliqueSplitter):
             splitter = SPLITTERS[self.splitter](

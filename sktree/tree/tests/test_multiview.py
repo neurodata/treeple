@@ -214,3 +214,29 @@ def test_separate_mtry_per_feature_set(stratify_mtry_per_view):
         assert clf.max_features_per_set_ is None
         assert clf.max_features_ == 10
     assert clf.max_features_ == 10, np.sum(clf.max_features_per_set_)
+
+
+def test_multiview_without_feature_view_stratification():
+    """Test that multiview decision tree can sample different numbers of features per view.
+
+    Sets the ``max_feature`` argument as an array-like.
+    """
+    rng = np.random.default_rng(seed)
+    X = rng.standard_normal((20, 497))
+    X = np.hstack((X, rng.standard_normal((20, 3))))
+    y = rng.integers(0, 2, size=20)
+
+    # test with max_features as a float
+    clf = MultiViewDecisionTreeClassifier(
+        random_state=seed,
+        feature_set_ends=[497, 500],
+        max_features=0.3,
+        apply_max_features_per_feature_set=False,
+    )
+    clf.fit(X, y)
+
+    assert clf.max_features_per_set_ is None
+    if isinstance(clf.max_features, int):
+        assert clf.max_features_ == clf.max_features, clf.max_features_
+    else:
+        assert clf.max_features_ == 500 * clf.max_features, clf.max_features_
