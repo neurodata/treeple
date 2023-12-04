@@ -315,15 +315,3 @@ class MultiViewRandomForestClassifier(SimMatrixMixin, ForestClassifier):
         self.max_leaf_nodes = max_leaf_nodes
         self.min_impurity_decrease = min_impurity_decrease
 
-    def fit(self, X, y, sample_weight=None, classes=None):
-        # XXX: BaseDecisionTree does a check that requires max_features to not be a list/array-like
-        # so we need to temporarily set it to an acceptable value
-        # in the meantime, we will reset:
-        #  - self.max_features_ to the original value
-        #  - self.max_features_arr contains a possible array-like setting of max_features
-        # self._max_features_arr = self.max_features
-        # self.max_features = None
-
-        self = super().fit(X, y, sample_weight, classes)
-        # self.max_features = self._max_features_arr
-        return self
