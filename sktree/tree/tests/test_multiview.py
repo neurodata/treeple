@@ -197,6 +197,20 @@ def test_separate_mtry_per_feature_set(stratify_mtry_per_view):
         apply_max_features_per_feature_set=stratify_mtry_per_view,
     )
     clf.fit(X, y)
-
     assert_array_equal(clf.max_features_per_set_, [1, 1, 1, 6])
     assert clf.max_features_ == np.sum(clf.max_features_per_set_), np.sum(clf.max_features_per_set_)
+
+    # test with max_features as 1.0
+    clf = MultiViewDecisionTreeClassifier(
+        random_state=seed,
+        feature_set_ends=[1, 2, 4, 10],
+        max_features=1.0,
+        apply_max_features_per_feature_set=stratify_mtry_per_view,
+    )
+    clf.fit(X, y)
+    if stratify_mtry_per_view:
+        assert_array_equal(clf.max_features_per_set_, [1, 1, 2, 6])
+    else:
+        assert clf.max_features_per_set_ is None
+        assert clf.max_features_ == 10
+    assert clf.max_features_ == 10, np.sum(clf.max_features_per_set_)

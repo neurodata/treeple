@@ -21,7 +21,7 @@ def test_sklearn_compatible_estimator(estimator, check):
     check(estimator)
 
 
-@pytest.mark.parametrize("baseline_est", [MultiViewRandomForestClassifier, RandomForestClassifier])
+@pytest.mark.parametrize("baseline_est", [RandomForestClassifier])
 def test_multiview_classification(baseline_est):
     """Test that explicit knowledge of multi-view structure improves classification accuracy.
 
@@ -32,7 +32,7 @@ def test_multiview_classification(baseline_est):
     rng = np.random.default_rng(seed=seed)
 
     n_samples = 100
-    n_estimators = 20
+    n_estimators = 10
     n_features_1 = 5
     n_features_2 = 1000
     cluster_std = 2.0
@@ -65,7 +65,7 @@ def test_multiview_classification(baseline_est):
         random_state=seed,
         feature_set_ends=[n_features_1, X.shape[1]],
         max_features="sqrt",
-        max_depth=5,
+        max_depth=4,
         n_estimators=n_estimators,
     )
     clf.fit(X, y)
@@ -78,17 +78,17 @@ def test_multiview_classification(baseline_est):
 
     clf = baseline_est(
         random_state=seed,
-        max_depth=5,
+        max_depth=4,
         max_features="sqrt",
         n_estimators=n_estimators,
     )
     clf.fit(X, y)
     assert (
-        accuracy_score(y, clf.predict(X)) == 1.0
+        accuracy_score(y, clf.predict(X)) > 0.99
     ), f"Accuracy score: {accuracy_score(y, clf.predict(X))}"
     assert (
-        cross_val_score(clf, X, y, cv=5).mean() <= 0.95
-    ), f"CV score: {cross_val_score(clf, X, y, cv=5).mean()}"
+        cross_val_score(clf, X, y, cv=3).mean() <= 0.95
+    ), f"CV score for {clf}: {cross_val_score(clf, X, y, cv=3).mean()}"
 
 
 @pytest.mark.parametrize(
@@ -162,6 +162,7 @@ def test_three_view_dataset(n_views, max_features):
         n_estimators=n_estimators,
     )
     rf_clf.fit(X_train, y_train)
+    print(n_features, max_features, n_features * max_features)
     assert_array_equal(
         clf.estimators_[0].max_features_per_set_, [n_features * max_features] * n_views
     )

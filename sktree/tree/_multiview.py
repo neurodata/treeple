@@ -305,6 +305,7 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         self.feature_combinations = feature_combinations
         self.feature_set_ends = feature_set_ends
         self.apply_max_features_per_feature_set = apply_max_features_per_feature_set
+        self._max_features_arr = None
 
     def _build_tree(
         self,
@@ -503,6 +504,19 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
             self.classes_ = self.classes_[0]
 
     def fit(self, X, y, sample_weight=None, check_input=True, classes=None):
+        return self._fit(
+            X, y, sample_weight=sample_weight, check_input=check_input, classes=classes
+        )
+
+    def _fit(
+        self,
+        X,
+        y,
+        sample_weight=None,
+        check_input=True,
+        missing_values_in_feature_mask=None,
+        classes=None,
+    ):
         # XXX: BaseDecisionTree does a check that requires max_features to not be a list/array-like
         # so we need to temporarily set it to an acceptable value
         # in the meantime, we will reset:
@@ -510,9 +524,8 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         #  - self.max_features_arr contains a possible array-like setting of max_features
         self._max_features_arr = self.max_features
         self.max_features = None
-
         self = super()._fit(
-            X, y, sample_weight=sample_weight, check_input=check_input, classes=classes
+            X, y, sample_weight, check_input, missing_values_in_feature_mask, classes
         )
         self.max_features = self._max_features_arr
         return self
