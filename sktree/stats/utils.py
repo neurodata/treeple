@@ -113,6 +113,7 @@ def _compute_null_distribution_perm(
     metric: str = "mse",
     n_repeats: int = 1000,
     seed: Optional[int] = None,
+    **metric_kwargs,
 ) -> ArrayLike:
     """Compute null distribution using permutation method.
 
@@ -161,7 +162,7 @@ def _compute_null_distribution_perm(
         y_pred = est.predict(X_test)
 
         # compute two instances of the metric from the sampled trees
-        metric_val = metric_func(y_test, y_pred)
+        metric_val = metric_func(y_test, y_pred, **metric_kwargs)
 
         null_metrics[idx] = metric_val
     return null_metrics
@@ -174,6 +175,7 @@ def _compute_null_distribution_coleman(
     metric: str = "mse",
     n_repeats: int = 1000,
     seed: Optional[int] = None,
+    **metric_kwargs,
 ) -> Tuple[ArrayLike, ArrayLike]:
     """Compute null distribution using Coleman method.
 
@@ -197,6 +199,8 @@ def _compute_null_distribution_coleman(
         The number of times to sample the null, by default 1000.
     seed : int, optional
         Random seed, by default None.
+    metric_kwargs : dict, optional
+        Keyword arguments to pass to the metric function.
 
     Returns
     -------
@@ -257,8 +261,12 @@ def _compute_null_distribution_coleman(
         y_pred_second_half = np.nanmean(second_forest_pred[:, second_forest_samples, :], axis=0)
 
         # compute two instances of the metric from the sampled trees
-        first_half_metric = metric_func(y_test[first_forest_samples, :], y_pred_first_half)
-        second_half_metric = metric_func(y_test[second_forest_samples, :], y_pred_second_half)
+        first_half_metric = metric_func(
+            y_test[first_forest_samples, :], y_pred_first_half, **metric_kwargs
+        )
+        second_half_metric = metric_func(
+            y_test[second_forest_samples, :], y_pred_second_half, **metric_kwargs
+        )
 
         metric_star[idx] = first_half_metric
         metric_star_pi[idx] = second_half_metric

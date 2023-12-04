@@ -236,7 +236,4 @@ def test_multiview_without_feature_view_stratification():
     clf.fit(X, y)
 
     assert clf.max_features_per_set_ is None
-    if isinstance(clf.max_features, int):
-        assert clf.max_features_ == clf.max_features, clf.max_features_
-    else:
-        assert clf.max_features_ == 500 * clf.max_features, clf.max_features_
+    assert clf.max_features_ == 500 * clf.max_features, clf.max_features_

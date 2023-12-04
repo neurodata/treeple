@@ -563,6 +563,7 @@ class BaseForestHT(MetaEstimatorMixin):
                 metric=metric,
                 n_repeats=n_repeats,
                 seed=self.random_state,
+                **metric_kwargs,
             )
         else:
             # If not sampling a new dataset per tree, then we may either be
@@ -581,6 +582,7 @@ class BaseForestHT(MetaEstimatorMixin):
                 metric=metric,
                 n_repeats=n_repeats,
                 seed=self.random_state,
+                **metric_kwargs,
             )
         # metric^\pi - metric = observed test statistic, which under the
         # null is normally distributed around 0
