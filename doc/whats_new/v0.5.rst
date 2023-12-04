@@ -15,10 +15,14 @@ Changelog
 
 - |Enhancement| :class:`sktree.tree.MultiviewDecisionTreeClassifier` now
   rounds up the number of features to split on to the nearest integer when
-  applying ``max_features`` to each feature view, by `Adam Li`_ (:pr:`#181`).
+  applying ``max_features`` to each feature view, by `Adam Li`_ (:pr:`#183`).
 - |Feature| :class:`sktree.tree.MultiviewDecisionTreeClassifier` now
   supports an array passed in for ``max_features``, which applies a different
-  max_features argument per view, by `Adam Li`_ (:pr:`#181`).
+  max_features argument per view, by `Adam Li`_ (:pr:`#183`).
+- |Fix| :class:`sktree.tree.MultiviewDecisionTreeClassifier` now correctly
+  handles the case where there is one feature view that is exhausted, and
+  another that is not for ``apply_max_features_per_feature_set = False``,
+  by `Adam Li`_ (:pr:`#183`).
 
 Code and Documentation Contributors
 -----------------------------------
