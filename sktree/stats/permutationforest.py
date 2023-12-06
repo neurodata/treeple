@@ -2,14 +2,14 @@ from typing import Optional
 
 import numpy as np
 from numpy.typing import ArrayLike
-from sklearn.base import MetaEstimatorMixin, clone, is_classifier
+from sklearn.base import BaseEstimator, MetaEstimatorMixin, clone, is_classifier
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.ensemble._forest import ForestClassifier as sklearnForestClassifier
 from sklearn.ensemble._forest import ForestRegressor as sklearnForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.utils.validation import check_X_y
 
-from sktree._lib.sklearn.ensemble._forest import BaseForest, ForestClassifier, ForestRegressor
+from sktree._lib.sklearn.ensemble._forest import ForestClassifier, ForestRegressor
 
 from .utils import METRIC_FUNCTIONS, REGRESSOR_METRICS, _compute_null_distribution_perm
 
@@ -61,7 +61,7 @@ class BasePermutationForest(MetaEstimatorMixin):
 
     def _statistic(
         self,
-        estimator: BaseForest,
+        estimator: BaseEstimator,
         X: ArrayLike,
         y: ArrayLike,
         covariate_index: Optional[ArrayLike] = None,

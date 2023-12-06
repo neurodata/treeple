@@ -8,9 +8,6 @@ on:
   pull_request:
     paths:
       - "**"
-    #   - "**.py"
-    #   - "**.pxd"
-    #   - "**.pyx"
   push:
     branches: [main]
     paths:
@@ -32,7 +29,6 @@ jobs:
       matrix:
         os: [ubuntu-22.04, macos-latest]
         python-version: [3.9, "3.10", "3.11"]
-        poetry-version: [1.5.0]
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -140,7 +136,6 @@ jobs:
       matrix:
         os: [ubuntu-22.04]
         python-version: ["3.11"]
-        poetry-version: [1.5.0]
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -248,92 +243,90 @@ jobs:
         with:
           name: sktree-build
           path: $PWD/build
+# build-windows:
+#   name: Meson build Windows
+#   runs-on: windows-2019
+#   steps:
+#     - name: Checkout
+#       uses: actions/checkout@v4
+#       with:
+#         submodules: recursive
 
-    # build-windows:
-    #   name: Meson build Windows
-    #   runs-on: windows-2019
-    #   steps:
-    #     - name: Checkout
-    #       uses: actions/checkout@v4
-    #       with:
-    #         submodules: recursive
-  
-    #     - name: Setup Python
-    #       uses: actions/setup-python@v4.6.1
-    #       with:
-    #         python-version: "3.10"
-    #         architecture: "x64"
-    #         cache: "pip"
-    #         cache-dependency-path: "requirements.txt"
-  
-    #     - name: install-rtools
-    #       run: |
-    #         choco install rtools -y --no-progress --force --version=4.0.0.20220206
-    #         echo "c:\rtools40\ucrt64\bin;" >> $env:GITHUB_PATH
-  
-    #     - name: show-gcc
-    #       run: |
-    #         gcc --version
-  
-    #     - name: Install system dependencies
-    #       run: |
-    #         # Download and install Miniconda
-    #         Invoke-WebRequest -Uri https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe -OutFile miniconda.exe
-    #         Start-Process -Wait -FilePath miniconda.exe -ArgumentList '/S', '/AddToPath=1'
-    
-    #         # Add Miniconda to the PATH
-    #         $env:Path += ";C:\Users\runneradmin\Miniconda3\Scripts;C:\Users\runneradmin\Miniconda3"
-    
-    #         # Update conda
-    #         conda update -y conda
-    
-    #         # Add conda-forge channel and install openblas
-    #         conda config --add channels conda-forge
-    #         conda install -y openblas
-  
-    #     - name: pip-packages
-    #       run: |
-    #         pip install -r build_requirements.txt
-    #         pip install -r test_requirements.txt
-    #         pip install spin
-    #         pip install numpy==1.22.4
-  
-    #     # - name: Download cibw_before_build_win.sh for openblas-libs
-    #     #   shell: bash
-    #     #   run: |
-    #     #     # mkdir tools
-    #     #     # mkdir tools/wheels
-    #     #     # curl -L https://raw.githubusercontent.com/scipy/scipy/main/tools/wheels/cibw_before_build_win.sh -o cibw_before_build_win.sh
-    #     #     # curl -L https://raw.githubusercontent.com/scipy/scipy/main/tools/openblas_support.py -o tools/openblas_support.py
-    #     #     # curl -L https://raw.githubusercontent.com/scipy/scipy/main/tools/wheels/LICENSE_win32.txt -o tools/wheels/LICENSE_win32.txt
-  
-    #     # - name: Run cibw_before_build_win.sh for openblas-libs
-    #     #   shell: bash
-    #     #   run: |
-    #     #     set -xe
-    #     #     ls
-    #     #     bash ./tools/setup_windows.sh
-  
-    #     # - name: Set PKG_CONFIG_PATH for openblas-libs
-    #     #   run: echo "PKG_CONFIG_PATH=c:\opt\64\lib\pkgconfig;" >> $GITHUB_ENV
-  
-    #     # - name: Install system dependencies like openblas
-    #     #   run: |
-    #     #     choco install openblas -y
-  
-    #     - name: Build
-    #       run: |
-    #         echo "SCIPY_USE_PROPACK=1" >> $env:GITHUB_ENV
-    #         echo "FORCE_SUBMODULE=True" >> $env:GITHUB_ENV
-    #         python spin setup_submodule --forcesubmodule
-    #         python spin build -j 2
-    #         # Necessary because GitHub Actions checks out the repo to D:\ while OpenBLAS
-    #         # got installed to C:\ higher up. The copying with `--win-cp-openblas` fails
-    #         # when things are split over drives.
-    #         # cp C:\opt\64\bin\*.dll $pwd\build-install\Lib\site-packages\scikit-tree\.libs\
-    #         # python tools\openblas_support.py --write-init $PWD\build-install\Lib\site-packages\scikit-tree\
-  
-    #     - name: test
-    #       run: |
-    #         python spin test
-          
+#     - name: Setup Python
+#       uses: actions/setup-python@v4.6.1
+#       with:
+#         python-version: "3.10"
+#         architecture: "x64"
+#         cache: "pip"
+#         cache-dependency-path: "requirements.txt"
+
+#     - name: install-rtools
+#       run: |
+#         choco install rtools -y --no-progress --force --version=4.0.0.20220206
+#         echo "c:\rtools40\ucrt64\bin;" >> $env:GITHUB_PATH
+
+#     - name: show-gcc
+#       run: |
+#         gcc --version
+
+#     - name: Install system dependencies
+#       run: |
+#         # Download and install Miniconda
+#         Invoke-WebRequest -Uri https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe -OutFile miniconda.exe
+#         Start-Process -Wait -FilePath miniconda.exe -ArgumentList '/S', '/AddToPath=1'
+
+#         # Add Miniconda to the PATH
+#         $env:Path += ";C:\Users\runneradmin\Miniconda3\Scripts;C:\Users\runneradmin\Miniconda3"
+
+#         # Update conda
+#         conda update -y conda
+
+#         # Add conda-forge channel and install openblas
+#         conda config --add channels conda-forge
+#         conda install -y openblas
+
+#     - name: pip-packages
+#       run: |
+#         pip install -r build_requirements.txt
+#         pip install -r test_requirements.txt
+#         pip install spin
+#         pip install numpy==1.22.4
+
+#     # - name: Download cibw_before_build_win.sh for openblas-libs
+#     #   shell: bash
+#     #   run: |
+#     #     # mkdir tools
+#     #     # mkdir tools/wheels
+#     #     # curl -L https://raw.githubusercontent.com/scipy/scipy/main/tools/wheels/cibw_before_build_win.sh -o cibw_before_build_win.sh
+#     #     # curl -L https://raw.githubusercontent.com/scipy/scipy/main/tools/openblas_support.py -o tools/openblas_support.py
+#     #     # curl -L https://raw.githubusercontent.com/scipy/scipy/main/tools/wheels/LICENSE_win32.txt -o tools/wheels/LICENSE_win32.txt
+
+#     # - name: Run cibw_before_build_win.sh for openblas-libs
+#     #   shell: bash
+#     #   run: |
+#     #     set -xe
+#     #     ls
+#     #     bash ./tools/setup_windows.sh
+
+#     # - name: Set PKG_CONFIG_PATH for openblas-libs
+#     #   run: echo "PKG_CONFIG_PATH=c:\opt\64\lib\pkgconfig;" >> $GITHUB_ENV
+
+#     # - name: Install system dependencies like openblas
+#     #   run: |
+#     #     choco install openblas -y
+
+#     - name: Build
+#       run: |
+#         echo "SCIPY_USE_PROPACK=1" >> $env:GITHUB_ENV
+#         echo "FORCE_SUBMODULE=True" >> $env:GITHUB_ENV
+#         python spin setup_submodule --forcesubmodule
+#         python spin build -j 2
+#         # Necessary because GitHub Actions checks out the repo to D:\ while OpenBLAS
+#         # got installed to C:\ higher up. The copying with `--win-cp-openblas` fails
+#         # when things are split over drives.
+#         # cp C:\opt\64\bin\*.dll $pwd\build-install\Lib\site-packages\scikit-tree\.libs\
+#         # python tools\openblas_support.py --write-init $PWD\build-install\Lib\site-packages\scikit-tree\
+
+#     - name: test
+#       run: |
+#         python spin test

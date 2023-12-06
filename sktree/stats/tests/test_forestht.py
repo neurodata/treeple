@@ -8,6 +8,7 @@ import pytest
 from flaky import flaky
 from joblib import Parallel, delayed
 from numpy.testing import assert_almost_equal, assert_array_equal
+from scipy.stats import wilcoxon
 from sklearn import datasets
 
 from sktree import HonestForestClassifier, RandomForestClassifier, RandomForestRegressor
@@ -722,11 +723,52 @@ def test_comight_repeated_feature_sets():
     assert pvalue > 0.05, f"{pvalue}"
 
 
-def test_might_three_feature_sets():
-    """Test MIGHT when there are three feature sets."""
-    pass
+def test_null_with_partial_auc():
+    limit = 0.1
+    max_features = "sqrt"
+    n_repeats = 1000
+    n_estimators = 20
+    test_size = 0.2
 
+    # Check consistency on dataset iris.
+    clf = FeatureImportanceForestClassifier(
+        estimator=HonestForestClassifier(
+            n_estimators=n_estimators,
+            max_features=max_features,
+            random_state=0,
+            n_jobs=1,
+        ),
+        test_size=test_size,
+        random_state=0,
+    )
+    # now add completely uninformative feature
+    X = np.hstack((iris_X, rng.standard_normal(size=(iris_X.shape[0], 4))))
 
-def test_comight_three_feature_sets():
-    """Test COMIGHT when there are three feature sets."""
-    pass
+    stat, pvalue = clf.test(
+        X,
+        iris_y,
+        covariate_index=np.arange(2),
+        n_repeats=n_repeats,
+        metric="auc",
+    )
+    first_null_dist = deepcopy(clf.null_dist_)
+
+    # If we re-run it with a different seed, but now specifying max_fpr
+    # there should be a difference in the partial-AUC distribution
+    clf = FeatureImportanceForestClassifier(
+        estimator=HonestForestClassifier(
+            n_estimators=n_estimators,
+            max_features=max_features,
+            random_state=0,
+            n_jobs=1,
+        ),
+        test_size=test_size,
+        random_state=seed,
+    )
+    stat, pvalue = clf.test(
+        X, iris_y, covariate_index=np.arange(2), n_repeats=n_repeats, metric="auc", max_fpr=limit
+    )
+    second_null_dist = clf.null_dist_
+    null_dist_pvalue = wilcoxon(first_null_dist, second_null_dist).pvalue
+    assert null_dist_pvalue < 0.05, null_dist_pvalue
+    assert pvalue > 0.05, f"pvalue: {pvalue}"

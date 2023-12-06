@@ -753,13 +753,17 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
 
         # 01: Algorithm samples features from each set equally with the same number
         # of candidates, but if one feature set is exhausted, then that one is no longer sampled
-        cdef bint finished_feature_set = False
+        cdef intp_t finished_feature_set_count = 0
+        cdef bint finished_feature_sets = False
         cdef intp_t i, j
 
         proj_i = 0
 
         if self.max_features_per_set is None:
-            while proj_i < self.max_features and not finished_feature_set:
+            while proj_i < self.max_features and not finished_feature_sets:
+                finished_feature_sets = False
+                finished_feature_set_count = 0
+
                 # sample from a feature set
                 for idx in range(self.n_feature_sets):
                     # indices_to_sample = self.multi_indices_to_sample[idx]
@@ -772,8 +776,9 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
                             self.multi_indices_to_sample[idx][i], self.multi_indices_to_sample[idx][j] = \
                                 self.multi_indices_to_sample[idx][j], self.multi_indices_to_sample[idx][i]
 
+                    # keep track of which feature-sets are exhausted
                     if ifeature >= grid_size:
-                        finished_feature_set = True
+                        finished_feature_set_count += 1
                         continue
 
                     # sample random feature in this set
@@ -789,7 +794,8 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
                     if proj_i >= self.max_features:
                         break
 
-                    finished_feature_set = False
+                if finished_feature_set_count == self.n_feature_sets:
+                    finished_feature_sets = True
 
                 ifeature += 1
         # 02: Algorithm samples a different number features from each set, but considers

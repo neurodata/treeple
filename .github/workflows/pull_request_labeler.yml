@@ -4,7 +4,7 @@ on:
     types: [created]
 
 permissions:
-  contents: write # to add labels
+  contents: write  # to add labels
 
 jobs:
   label_pull_request:

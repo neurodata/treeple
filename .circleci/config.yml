@@ -132,11 +132,11 @@ jobs:
       - store_artifacts:
           path: doc/_build/html
           destination: dev
-      
+
       - store_artifacts:
           path: doc/_build/html_stable/
           destination: stable
-          
+
       - persist_to_workspace:
           root: doc/_build
           paths:

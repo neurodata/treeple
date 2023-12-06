@@ -1,4 +1,5 @@
 from .forestht import FeatureImportanceForestClassifier, FeatureImportanceForestRegressor
+from .monte_carlo import PermutationTest
 from .permutationforest import PermutationForestClassifier, PermutationForestRegressor
 
 __all__ = [
@@ -6,4 +7,5 @@ __all__ = [
     "FeatureImportanceForestRegressor",
     "PermutationForestClassifier",
     "PermutationForestRegressor",
+    "PermutationTest",
 ]

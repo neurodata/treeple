@@ -266,7 +266,7 @@ def make_joint_factor_model(
     shared scores.
 
     Parameters
-    -----------
+    ----------
     n_views : int
         Number of views to sample. This corresponds to ``B`` in the notes.
 
