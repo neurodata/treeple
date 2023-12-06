@@ -7,3 +7,8 @@ pydocstyle
 codespell
 toml
 cython-lint
+pre-commit
+yamllint
+toml-sort
+ruff
+rstcheck
