@@ -264,7 +264,8 @@ ignore_directives = [
   "rst-class",
   "tab-set",
   "tabularcolumns",
-  "toctree"
+  "toctree",
+  "use",
 ]
 ignore_messages = "^.*(Unknown target name|Undefined substitution referenced)[^`]*$"
 ignore_roles = [
