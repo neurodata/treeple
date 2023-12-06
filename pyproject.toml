@@ -17,10 +17,6 @@ requires = [
 
 [project]
 name = "scikit-tree"
-#
-# 0.0.0 is standard placeholder for poetry-dynamic-versioning
-# any changes to this should not be checked in
-#
 version = "0.5.0dev0"
 description = "Modern decision trees in Python"
 maintainers = [
@@ -77,9 +73,8 @@ build = [
   'ninja',
   'numpy',
   'rich-click',
-  'pydevtool',
+  'pydevtool'
 ]
-
 doc = [
   'memory-profiler',
   'numpydoc',
@@ -150,7 +145,7 @@ extend-exclude = '''
 [tool.codespell]
 builtin = "clear,rare,informal,names,usage"
 ignore-words = ".codespellignore"
-skip = "doc/references.bib"
+skip = "doc/references.bib,sktree/_lib/"
 
 [tool.coverage.report]
 exclude_lines = ['pragma: no cover', 'if __name__ == .__main__.:']
@@ -194,7 +189,8 @@ extend_skip_glob = ['sktree/__init__.py', 'sktree/_lib/*', '.asv/*', 'env/*', 'b
 ignore_missing_imports = true
 no_site_packages = true
 exclude = [
-  'sktree/_lib/'
+  'sktree/_lib/',
+  'benchmarks_nonasv/'
 ]
 
 [tool.poe.tasks]
@@ -237,87 +233,6 @@ sequence = ['_changelog', '_apply_version']
 sequence = ['format', 'lint', 'type_check', 'unit_test']
 ignore_fail = "return_non_zero"
 
-[tool.poetry]
-name = "sktree"
-#
-# 0.0.0 is standard placeholder for poetry-dynamic-versioning
-# any changes to this should not be checked in
-#
-version = "0.0.0"
-description = "Modern decision trees in Python"
-authors = ["Neurodata <adam.li@columbia.edu>"]
-license = "BSD-3"
-documentation = "https://scikit-tree.neurodata.io"
-repository = "https://github.com/neurodata/scikit-tree"
-readme = "README.md"
-classifiers = [
-  'Development Status :: 4 - Beta',
-  'Programming Language :: Python :: 3.9',
-  'Programming Language :: Python :: 3.10',
-  'Programming Language :: Python :: 3.11'
-]
-keywords = ['tree', 'oblique trees', 'manifold-learning', 'scikit-learn']
-include = [
-  {path = "meson.build", format = "sdist"}
-]
-
-[tool.poetry.dependencies]
-python = ">=3.9,<3.12"
-numpy = "^1.23.0"
-scipy = "^1.9.0"
-scikit-learn = "^1.2.2"
-importlib-resources = {version = "*", python = "<3.10"}
-
-[tool.poetry.group.docs]
-optional = true
-
-[tool.poetry.group.docs.dependencies]
-poethepoet = "^0.16.0"
-portray = "^1.7.0"
-matplotlib = {version = "^3.5"}
-numpydoc = {version = "^1.4"}
-pydata-sphinx-theme = {version = "^0.9.0"}
-sphinx = {version = "^5.1.1"}
-sphinxcontrib-bibtex = {version = "^2.4.2"}
-sphinx-issues = {version = "^3.0.1"}
-sphinx-copybutton = {version = "^0.5.0"}
-sphinx-gallery = {version = "^0.11.0"}
-ipython = {version = "^7.4.0"}
-nbsphinx = {version = "^0.8"}
-pandas = {version = "^1.1"}
-memory_profiler = {version = "^0.60.0"}
-
-[tool.poetry.group.style]
-optional = true
-
-[tool.poetry.group.style.dependencies]
-poethepoet = "^0.16.0"
-mypy = "^0.971"
-black = {extras = ["jupyter"], version = "^23.10.1"}
-isort = "^5.10.1"
-flake8 = "^5.0.4"
-bandit = "^1.7.4"
-pydocstyle = "^6.1.1"
-codespell = "^2.1.0"
-toml = "^0.10.2"
-cython-lint = "^0.15.0"
-
-[tool.poetry.group.test]
-optional = true
-
-[tool.poetry.group.test.dependencies]
-poethepoet = "^0.16.0"
-pytest = "^7.1.2"
-pytest-cov = "^3.0.0"
-memory_profiler = {version = "^0.60.0"}
-
-[tool.poetry-dynamic-versioning]
-enable = true
-vcs = "git"
-
-[tool.poetry-dynamic-versioning.substitution]
-files = ["sktree/__init__.py"]
-
 [tool.pydocstyle]
 convention = 'numpy'
 ignore-decorators = '(copy_doc|property|.*setter|.*getter)'
@@ -329,30 +244,6 @@ add_ignore = 'D100,D104,D105,D107'
 minversion = '6.0'
 addopts = '--durations 20 --junit-xml=junit-results.xml --verbose --ignore=sktree/_lib/ -k "not slowtest"'
 filterwarnings = []
-
-[tool.spin]
-package = 'sktree'
-
-[tool.spin.commands]
-Build = [
-  ".spin/cmds.py:build",
-  ".spin/cmds.py:setup_submodule",
-  "spin.cmds.meson.test",
-  "spin.cmds.pip.install"
-]
-Environments = [
-  'spin.cmds.meson.shell',
-  'spin.cmds.meson.ipython',
-  'spin.cmds.meson.python'
-]
-Documentation = [
-  'spin.cmds.meson.docs'
-]
-Metrics = [
-  '.spin/cmds.py:coverage',
-  '.spin/cmds.py:asv'
-]
-
 
 [tool.rstcheck]
 ignore_directives = [
@@ -373,7 +264,7 @@ ignore_directives = [
   "rst-class",
   "tab-set",
   "tabularcolumns",
-  "toctree",
+  "toctree"
 ]
 ignore_messages = "^.*(Unknown target name|Undefined substitution referenced)[^`]*$"
 ignore_roles = [
@@ -397,7 +288,7 @@ ignore_roles = [
   "samp",
   "term",
   "doi",
-  "arxiv",
+  "arxiv"
 ]
 report_level = "WARNING"
 
@@ -405,9 +296,33 @@ report_level = "WARNING"
 extend-exclude = [
   'benchmarks',
   'doc',
+  'validation'
 ]
 line-length = 88
 ignore = ['E731']
 
 [tool.ruff.per-file-ignores]
 '__init__.py' = ['F401']
+
+[tool.spin]
+package = 'sktree'
+
+[tool.spin.commands]
+Build = [
+  ".spin/cmds.py:build",
+  ".spin/cmds.py:setup_submodule",
+  "spin.cmds.meson.test",
+  "spin.cmds.pip.install"
+]
+Environments = [
+  'spin.cmds.meson.shell',
+  'spin.cmds.meson.ipython',
+  'spin.cmds.meson.python'
+]
+Documentation = [
+  'spin.cmds.meson.docs'
+]
+Metrics = [
+  '.spin/cmds.py:coverage',
+  '.spin/cmds.py:asv'
+]

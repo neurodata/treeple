@@ -7,7 +7,7 @@ from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from sktree import MultiViewRandomForestClassifier, RandomForestClassifier
-from sktree.datasets import make_joint_factor_model
+from sktree.datasets.multiview import make_joint_factor_model
 
 seed = 12345
 

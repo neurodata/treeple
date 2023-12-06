@@ -72,21 +72,21 @@ First, create a virtual environment using Conda.
 # activate the virtual environment and install necessary packages to build from source
 
     conda activate sklearn-dev
-    conda install -c conda-forge numpy scipy cython joblib threadpoolctl pytest compilers llvm-openmp poetry
+    conda install -c conda-forge numpy scipy cython joblib threadpoolctl pytest compilers llvm-openmp
 
 Next, `sktree` from source:
 
-    pip install -e .
+    pip install .[build]
 
     # if editing Cython files
     pip install --verbose --no-build-isolation --editable .
 
-To install the package from github, clone the repository and then `cd` into the directory. You can then use `poetry` to install:
+To install the package from github, clone the repository and then `cd` into the directory.:
 
-    poetry install
+    ./spin build
 
-    # if you would like an editable install of dodiscover for dev purposes
-    pip install -e .
+    # if you would like an editable install of scikit-tree for dev purposes
+    pip install --verbose --no-build-isolation --editable .
 
     pip install https://api.github.com/repos/neurodata/scikit-tree/zipball/main
 
