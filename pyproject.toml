@@ -265,7 +265,6 @@ ignore_directives = [
   "tab-set",
   "tabularcolumns",
   "toctree",
-  "use",
   "auto_examples"
 ]
 ignore_messages = "^.*(Unknown target name|Undefined substitution referenced)[^`]*$"
