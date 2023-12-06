@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.utils.multiclass import type_of_target
 from sklearn.utils.validation import _is_fitted, check_X_y
 
-from sktree._lib.sklearn.ensemble._forest import (
+from .._lib.sklearn.ensemble._forest import (
     ForestClassifier,
     ForestRegressor,
     RandomForestClassifier,
@@ -18,10 +18,10 @@ from sktree._lib.sklearn.ensemble._forest import (
     _get_n_samples_bootstrap,
     _parallel_build_trees,
 )
-from sktree.ensemble._honest_forest import HonestForestClassifier
-from sktree.experimental import conditional_resample
-from sktree.tree import DecisionTreeClassifier, DecisionTreeRegressor
-from sktree.tree._classes import DTYPE
+from ..ensemble._honest_forest import HonestForestClassifier
+from ..experimental import conditional_resample
+from ..tree import DecisionTreeClassifier, DecisionTreeRegressor
+from ..tree._classes import DTYPE
 
 from .utils import (
     METRIC_FUNCTIONS,
