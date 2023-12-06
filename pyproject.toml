@@ -266,6 +266,7 @@ ignore_directives = [
   "tabularcolumns",
   "toctree",
   "use",
+  "auto_examples"
 ]
 ignore_messages = "^.*(Unknown target name|Undefined substitution referenced)[^`]*$"
 ignore_roles = [
