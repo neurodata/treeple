@@ -478,14 +478,14 @@ document.write(`
 </section>
 <section id="installing-with-pip">
 <h2>Installing with <code class="docutils literal notranslate"><span class="pre">pip</span></code><a class="headerlink" href="#installing-with-pip" title="Link to this heading">#</a></h2>
-<p><strong>scikit-tree</strong> is available [on PyPI](<a class="reference external" href="https://pypi.org/project/scikit-tree/">https://pypi.org/project/scikit-tree/</a>). Just run</p>
+<p><strong>scikit-tree</strong> is available on <a class="reference external" href="https://pypi.org/project/scikit-tree/">PyPI</a>. Just run</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>sktree
 </pre></div>
 </div>
 </section>
 <section id="installing-from-source-with-meson">
 <h2>Installing from source with Meson<a class="headerlink" href="#installing-from-source-with-meson" title="Link to this heading">#</a></h2>
-<p>To install <strong>scikit-tree</strong> from source, first clone [the repository](<a class="github reference external" href="https://github.com/neurodata/scikit-tree">neurodata/scikit-tree</a>):</p>
+<p>To install <strong>scikit-tree</strong> from source, first clone the <a class="reference external" href="https://github.com/neurodata/scikit-tree">repository</a>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/neurodata/scikit-tree.git
 <span class="nb">cd</span><span class="w"> </span>scikit-tree
 
@@ -525,23 +525,23 @@ pip<span class="w"> </span>install<span class="w"> </span>--verbose<span class="
 <p># activate the virtual environment and install necessary packages to build from source</p>
 <blockquote>
 <div><p>conda activate sklearn-dev
-conda install -c conda-forge numpy scipy cython joblib threadpoolctl pytest compilers llvm-openmp poetry</p>
+conda install -c conda-forge numpy scipy cython joblib threadpoolctl pytest compilers llvm-openmp</p>
 </div></blockquote>
 <p>Next, <code class="docutils literal notranslate"><span class="pre">sktree</span></code> from source:</p>
 <blockquote>
-<div><p>pip install -e .</p>
+<div><p>pip install .[build]</p>
 <p># if editing Cython files
 pip install –verbose –no-build-isolation –editable .</p>
 </div></blockquote>
-<p>To install the package from github, clone the repository and then <code class="docutils literal notranslate"><span class="pre">cd</span></code> into the directory. You can then use <code class="docutils literal notranslate"><span class="pre">poetry</span></code> to install:</p>
+<p>To install the package from github, clone the repository and then <code class="docutils literal notranslate"><span class="pre">cd</span></code> into the directory.:</p>
 <blockquote>
-<div><p>poetry install</p>
-<p># if you would like an editable install of dodiscover for dev purposes
-pip install -e .</p>
+<div><p>./spin build</p>
+<p># if you would like an editable install of scikit-tree for dev purposes
+pip install –verbose –no-build-isolation –editable .</p>
 <p>pip install <a class="reference external" href="https://api.github.com/repos/neurodata/scikit-tree/zipball/main">https://api.github.com/repos/neurodata/scikit-tree/zipball/main</a></p>
 <p>pip install <a class="reference external" href="https://api.github.com/repos/neurodata/scikit-learn/zipball/obliquepr">https://api.github.com/repos/neurodata/scikit-learn/zipball/obliquepr</a></p>
 </div></blockquote>
-<p>Note that currently, we need to build the development version of scikit-learn with oblique trees within this [PR](<a class="github reference external" href="https://github.com/scikit-learn/scikit-learn/pull/22754">scikit-learn/scikit-learn#22754</a>).</p>
+<p>Note that currently, we need to build the development version of scikit-learn with oblique trees within this <a class="reference external" href="https://github.com/scikit-learn/scikit-learn/pull/22754">PR</a>.</p>
 <p>Checkout this PR code, and build from source, using scikit-learn’s build from source page instructions.</p>
 </section>
 </section>
@@ -622,7 +622,7 @@ pip install -e .</p>
 
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-12-01.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-12-06.
       <br/>
     
   </p>

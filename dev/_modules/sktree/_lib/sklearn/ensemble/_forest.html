@@ -767,7 +767,6 @@ document.write(`
         <span class="n">warm_start</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">class_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">max_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">base_estimator</span><span class="o">=</span><span class="s2">&quot;deprecated&quot;</span><span class="p">,</span>
         <span class="n">max_bins</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">store_leaf_values</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
@@ -775,7 +774,6 @@ document.write(`
             <span class="n">estimator</span><span class="o">=</span><span class="n">estimator</span><span class="p">,</span>
             <span class="n">n_estimators</span><span class="o">=</span><span class="n">n_estimators</span><span class="p">,</span>
             <span class="n">estimator_params</span><span class="o">=</span><span class="n">estimator_params</span><span class="p">,</span>
-            <span class="n">base_estimator</span><span class="o">=</span><span class="n">base_estimator</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">bootstrap</span> <span class="o">=</span> <span class="n">bootstrap</span>
@@ -1086,7 +1084,10 @@ document.write(`
             <span class="n">n_more_estimators</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;oob_score_&quot;</span><span class="p">)</span>
         <span class="p">):</span>
             <span class="n">y_type</span> <span class="o">=</span> <span class="n">type_of_target</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">y_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;multiclass-multioutput&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">y_type</span> <span class="o">==</span> <span class="s2">&quot;unknown&quot;</span> <span class="ow">or</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_estimator_type</span> <span class="o">==</span> <span class="s2">&quot;classifier&quot;</span>
+                <span class="ow">and</span> <span class="n">y_type</span> <span class="o">==</span> <span class="s2">&quot;multiclass-multioutput&quot;</span>
+            <span class="p">):</span>
                 <span class="c1"># FIXME: we could consider to support multiclass-multioutput if</span>
                 <span class="c1"># we introduce or reuse a constructor parameter (e.g.</span>
                 <span class="c1"># oob_score) allowing our user to pass a callable defining the</span>
@@ -1508,7 +1509,6 @@ document.write(`
         <span class="n">warm_start</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">class_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">max_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">base_estimator</span><span class="o">=</span><span class="s2">&quot;deprecated&quot;</span><span class="p">,</span>
         <span class="n">max_bins</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">store_leaf_values</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
@@ -1524,7 +1524,6 @@ document.write(`
             <span class="n">warm_start</span><span class="o">=</span><span class="n">warm_start</span><span class="p">,</span>
             <span class="n">class_weight</span><span class="o">=</span><span class="n">class_weight</span><span class="p">,</span>
             <span class="n">max_samples</span><span class="o">=</span><span class="n">max_samples</span><span class="p">,</span>
-            <span class="n">base_estimator</span><span class="o">=</span><span class="n">base_estimator</span><span class="p">,</span>
             <span class="n">max_bins</span><span class="o">=</span><span class="n">max_bins</span><span class="p">,</span>
             <span class="n">store_leaf_values</span><span class="o">=</span><span class="n">store_leaf_values</span><span class="p">,</span>
         <span class="p">)</span>
@@ -2026,7 +2025,6 @@ document.write(`
         <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">warm_start</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">max_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">base_estimator</span><span class="o">=</span><span class="s2">&quot;deprecated&quot;</span><span class="p">,</span>
         <span class="n">max_bins</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">store_leaf_values</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
@@ -2041,7 +2039,6 @@ document.write(`
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
             <span class="n">warm_start</span><span class="o">=</span><span class="n">warm_start</span><span class="p">,</span>
             <span class="n">max_samples</span><span class="o">=</span><span class="n">max_samples</span><span class="p">,</span>
-            <span class="n">base_estimator</span><span class="o">=</span><span class="n">base_estimator</span><span class="p">,</span>
             <span class="n">max_bins</span><span class="o">=</span><span class="n">max_bins</span><span class="p">,</span>
             <span class="n">store_leaf_values</span><span class="o">=</span><span class="n">store_leaf_values</span><span class="p">,</span>
         <span class="p">)</span>
@@ -2408,14 +2405,6 @@ document.write(`
 
 <span class="sd">        .. versionadded:: 1.2</span>
 <span class="sd">           `base_estimator_` was renamed to `estimator_`.</span>
-
-<span class="sd">    base_estimator_ : DecisionTreeClassifier</span>
-<span class="sd">        The child estimator template used to create the collection of fitted</span>
-<span class="sd">        sub-estimators.</span>
-
-<span class="sd">        .. deprecated:: 1.2</span>
-<span class="sd">            `base_estimator_` is deprecated and will be removed in 1.4.</span>
-<span class="sd">            Use `estimator_` instead.</span>
 
 <span class="sd">    estimators_ : list of DecisionTreeClassifier</span>
 <span class="sd">        The collection of fitted sub-estimators.</span>
@@ -2809,14 +2798,6 @@ document.write(`
 <span class="sd">        .. versionadded:: 1.2</span>
 <span class="sd">           `base_estimator_` was renamed to `estimator_`.</span>
 
-<span class="sd">    base_estimator_ : DecisionTreeRegressor</span>
-<span class="sd">        The child estimator template used to create the collection of fitted</span>
-<span class="sd">        sub-estimators.</span>
-
-<span class="sd">        .. deprecated:: 1.2</span>
-<span class="sd">            `base_estimator_` is deprecated and will be removed in 1.4.</span>
-<span class="sd">            Use `estimator_` instead.</span>
-
 <span class="sd">    estimators_ : list of DecisionTreeRegressor</span>
 <span class="sd">        The collection of fitted sub-estimators.</span>
 
@@ -3203,14 +3184,6 @@ document.write(`
 <span class="sd">        .. versionadded:: 1.2</span>
 <span class="sd">           `base_estimator_` was renamed to `estimator_`.</span>
 
-<span class="sd">    base_estimator_ : ExtraTreesClassifier</span>
-<span class="sd">        The child estimator template used to create the collection of fitted</span>
-<span class="sd">        sub-estimators.</span>
-
-<span class="sd">        .. deprecated:: 1.2</span>
-<span class="sd">            `base_estimator_` is deprecated and will be removed in 1.4.</span>
-<span class="sd">            Use `estimator_` instead.</span>
-
 <span class="sd">    estimators_ : list of DecisionTreeClassifier</span>
 <span class="sd">        The collection of fitted sub-estimators.</span>
 
@@ -3585,14 +3558,6 @@ document.write(`
 <span class="sd">        .. versionadded:: 1.2</span>
 <span class="sd">           `base_estimator_` was renamed to `estimator_`.</span>
 
-<span class="sd">    base_estimator_ : ExtraTreeRegressor</span>
-<span class="sd">        The child estimator template used to create the collection of fitted</span>
-<span class="sd">        sub-estimators.</span>
-
-<span class="sd">        .. deprecated:: 1.2</span>
-<span class="sd">            `base_estimator_` is deprecated and will be removed in 1.4.</span>
-<span class="sd">            Use `estimator_` instead.</span>
-
 <span class="sd">    estimators_ : list of DecisionTreeRegressor</span>
 <span class="sd">        The collection of fitted sub-estimators.</span>
 
@@ -3859,14 +3824,6 @@ document.write(`
 
 <span class="sd">        .. versionadded:: 1.2</span>
 <span class="sd">           `base_estimator_` was renamed to `estimator_`.</span>
-
-<span class="sd">    base_estimator_ : :class:`~sklearn.tree.ExtraTreeRegressor` instance</span>
-<span class="sd">        The child estimator template used to create the collection of fitted</span>
-<span class="sd">        sub-estimators.</span>
-
-<span class="sd">        .. deprecated:: 1.2</span>
-<span class="sd">            `base_estimator_` is deprecated and will be removed in 1.4.</span>
-<span class="sd">            Use `estimator_` instead.</span>
 
 <span class="sd">    estimators_ : list of :class:`~sklearn.tree.ExtraTreeRegressor` instances</span>
 <span class="sd">        The collection of fitted sub-estimators.</span>
@@ -4160,7 +4117,7 @@ document.write(`
 
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-12-01.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-12-06.
       <br/>
     
   </p>

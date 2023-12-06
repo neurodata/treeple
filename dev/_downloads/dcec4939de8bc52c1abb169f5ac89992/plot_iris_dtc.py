@@ -16,23 +16,17 @@ the same thresholding rule as regular decision trees.
 
 We also show the tree structure of a model built on all of the features.
 """
-# %%
-# First load the copy of the Iris dataset shipped with scikit-learn:
-from sklearn.datasets import load_iris
-
-iris = load_iris()
-
-
 import matplotlib.pyplot as plt
-
-# %%
-# Display the decision functions of trees trained on all pairs of features.
 import numpy as np
 from sklearn.datasets import load_iris
 from sklearn.inspection import DecisionBoundaryDisplay
 
 from sktree._lib.sklearn.tree import DecisionTreeClassifier, plot_tree
 from sktree.tree import ObliqueDecisionTreeClassifier
+
+# %%
+# First load the copy of the Iris dataset shipped with scikit-learn:
+iris = load_iris()
 
 # Parameters
 n_classes = 3

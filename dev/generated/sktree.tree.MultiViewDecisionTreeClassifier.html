@@ -589,7 +589,7 @@ number of samples for each node.</p></li>
 the input samples) required to be at a leaf node. Samples have
 equal weight when sample_weight is not provided.</p>
 </dd>
-<dt><strong>max_features</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a> or {“auto”, “sqrt”, “log2”}, default=None</span></dt><dd><p>The number of features to consider when looking for the best split:</p>
+<dt><strong>max_features</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.0.dev0)"><span>array_like</span></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a> or {“auto”, “sqrt”, “log2”}, default=None</span></dt><dd><p>The number of features to consider when looking for the best split:</p>
 <blockquote>
 <div><ul class="simple">
 <li><p>If int, then consider <code class="docutils literal notranslate"><span class="pre">max_features</span></code> features at each split.</p></li>
@@ -602,6 +602,9 @@ split.</p></li>
 <li><p>If None, then <code class="docutils literal notranslate"><span class="pre">max_features=n_features</span></code>.</p></li>
 </ul>
 </div></blockquote>
+<p>If array-like, then <code class="docutils literal notranslate"><span class="pre">max_features</span></code> is the number of features to consider
+for each feature set following the same logic as above, where
+<code class="docutils literal notranslate"><span class="pre">n_features</span></code> is the number of features in the respective feature set.</p>
 <p>Note: the search for a split does not stop until at least one
 valid partition of the node samples is found, even if it requires to
 effectively inspect more than <code class="docutils literal notranslate"><span class="pre">max_features</span></code> features.</p>
@@ -916,7 +919,7 @@ indicates that the samples goes through the nodes.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="sktree.tree.MultiViewDecisionTreeClassifier.fit">
-<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sktree.tree.MultiViewDecisionTreeClassifier.fit" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sktree/tree/_multiview.html#MultiViewDecisionTreeClassifier.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sktree.tree.MultiViewDecisionTreeClassifier.fit" title="Link to this definition">#</a></dt>
 <dd><p>Build a decision tree classifier from the training set (X, y).</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -942,7 +945,7 @@ Don’t use this parameter unless you know what you’re doing.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>self</strong><span class="classifier"><a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.tree.DecisionTreeClassifier.html#sklearn.tree.DecisionTreeClassifier" title="(in scikit-learn v1.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DecisionTreeClassifier</span></code></a></span></dt><dd><p>Fitted estimator.</p>
+<dt><strong>self</strong><span class="classifier"><a class="reference internal" href="#sktree.tree.MultiViewDecisionTreeClassifier" title="sktree.tree.MultiViewDecisionTreeClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MultiViewDecisionTreeClassifier</span></code></a></span></dt><dd><p>Fitted estimator.</p>
 </dd>
 </dl>
 </dd>
@@ -1482,25 +1485,7 @@ high cardinality features (many unique values). See
 
 </dd></dl>
 
-<section id="examples-using-sktree-tree-multiviewdecisiontreeclassifier">
-<h2>Examples using <code class="docutils literal notranslate"><span class="pre">sktree.tree.MultiViewDecisionTreeClassifier</span></code><a class="headerlink" href="#examples-using-sktree-tree-multiviewdecisiontreeclassifier" title="Link to this heading">#</a></h2>
-<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="In this example, we demonstrate how to test the conditional mutual information (CMI) hypothesis..."><img alt="" src="../_images/sphx_glr_plot_co_MIGHT_null_thumb.png" />
-<p><a class="reference internal" href="../auto_examples/hypothesis_testing/plot_co_MIGHT_null.html#sphx-glr-auto-examples-hypothesis-testing-plot-co-might-null-py"><span class="std std-ref">Co-MIGHT when Data Exhibits Conditional Independence</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Co-MIGHT when Data Exhibits Conditional Independence</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="An example using FeatureImportanceForestClassifier for nonparametric multivariate hypothesis te..."><img alt="" src="../_images/sphx_glr_plot_might_mv_auc_thumb.png" />
-<p><a class="reference internal" href="../auto_examples/hypothesis_testing/plot_might_mv_auc.html#sphx-glr-auto-examples-hypothesis-testing-plot-might-mv-auc-py"><span class="std std-ref">Compute partial AUC using multi-view MIGHT (MV-MIGHT)</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Compute partial AUC using multi-view MIGHT (MV-MIGHT)</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we demonstrate how to test the conditional mutual information (CMI) hypothesis..."><img alt="" src="../_images/sphx_glr_plot_co_MIGHT_alternative_thumb.png" />
-<p><a class="reference internal" href="../auto_examples/hypothesis_testing/plot_co_MIGHT_alternative.html#sphx-glr-auto-examples-hypothesis-testing-plot-co-might-alternative-py"><span class="std std-ref">Demonstrate Conditional Mutual Information for Genuine Hypothesis Testing (Co-MIGHT)</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Demonstrate Conditional Mutual Information for Genuine Hypothesis Testing (Co-MIGHT)</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Here, we demonstrate how to do hypothesis testing on highly imbalanced data in terms of their f..."><img alt="" src="../_images/sphx_glr_plot_MI_imbalanced_hyppo_testing_thumb.png" />
-<p><a class="reference internal" href="../auto_examples/hypothesis_testing/plot_MI_imbalanced_hyppo_testing.html#sphx-glr-auto-examples-hypothesis-testing-plot-mi-imbalanced-hyppo-testing-py"><span class="std std-ref">Mutual Information for Genuine Hypothesis Testing (MIGHT) with Imbalanced Data</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Mutual Information for Genuine Hypothesis Testing (MIGHT) with Imbalanced Data</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This example shows how multi-view projection matrices are generated for a decision tree, specif..."><img alt="" src="../_images/sphx_glr_plot_multiview_axis_aligned_splitter_thumb.png" />
-<p><a class="reference internal" href="../auto_examples/splitters/plot_multiview_axis_aligned_splitter.html#sphx-glr-auto-examples-splitters-plot-multiview-axis-aligned-splitter-py"><span class="std std-ref">Demonstrate and visualize a multi-view projection matrix for an axis-aligned tree</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Demonstrate and visualize a multi-view projection matrix for an axis-aligned tree</div>
-</div></div><div class="clearer"></div></section>
-</section>
+<div class="clearer"></div></section>
 
 
                 </article>
@@ -1572,7 +1557,6 @@ high cardinality features (many unique values). See
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.tree.MultiViewDecisionTreeClassifier.feature_importances_"><code class="docutils literal notranslate"><span class="pre">MultiViewDecisionTreeClassifier.feature_importances_</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples-using-sktree-tree-multiviewdecisiontreeclassifier">Examples using <code class="docutils literal notranslate"><span class="pre">sktree.tree.MultiViewDecisionTreeClassifier</span></code></a></li>
 </ul>
   </nav></div>
 
@@ -1601,7 +1585,7 @@ high cardinality features (many unique values). See
 
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-12-01.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-12-06.
       <br/>
     
   </p>

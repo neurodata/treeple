@@ -538,22 +538,17 @@ the training samples. The oblique decision tree learns oblique decision boundari
 made from linear combinations of the features in the training samples and then
 the same thresholding rule as regular decision trees.</p>
 <p>We also show the tree structure of a model built on all of the features.</p>
-<p>First load the copy of the Iris dataset shipped with scikit-learn:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <a href="https://scikit-learn.org/dev/modules/generated/sklearn.datasets.load_iris.html#sklearn.datasets.load_iris" title="sklearn.datasets.load_iris" class="sphx-glr-backref-module-sklearn-datasets sphx-glr-backref-type-py-function"><span class="n">load_iris</span></a>
-
-<a href="https://scikit-learn.org/dev/modules/generated/sklearn.utils.Bunch.html#sklearn.utils.Bunch" title="sklearn.utils.Bunch" class="sphx-glr-backref-module-sklearn-utils sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">iris</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/dev/modules/generated/sklearn.datasets.load_iris.html#sklearn.datasets.load_iris" title="sklearn.datasets.load_iris" class="sphx-glr-backref-module-sklearn-datasets sphx-glr-backref-type-py-function"><span class="n">load_iris</span></a><span class="p">()</span>
-
-
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-</pre></div>
-</div>
-<p>Display the decision functions of trees trained on all pairs of features.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <a href="https://scikit-learn.org/dev/modules/generated/sklearn.datasets.load_iris.html#sklearn.datasets.load_iris" title="sklearn.datasets.load_iris" class="sphx-glr-backref-module-sklearn-datasets sphx-glr-backref-type-py-function"><span class="n">load_iris</span></a>
 <span class="kn">from</span> <span class="nn">sklearn.inspection</span> <span class="kn">import</span> <span class="n">DecisionBoundaryDisplay</span>
 
 <span class="kn">from</span> <span class="nn">sktree._lib.sklearn.tree</span> <span class="kn">import</span> <a href="https://scikit-learn.org/dev/modules/generated/sklearn.base.ClassifierMixin.html#sklearn.base.ClassifierMixin" title="sklearn.base.ClassifierMixin" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">DecisionTreeClassifier</span></a><span class="p">,</span> <span class="n">plot_tree</span>
 <span class="kn">from</span> <span class="nn">sktree.tree</span> <span class="kn">import</span> <a href="../../generated/sktree.tree.ObliqueDecisionTreeClassifier.html#sktree.tree.ObliqueDecisionTreeClassifier" title="sktree.tree.ObliqueDecisionTreeClassifier" class="sphx-glr-backref-module-sktree-tree sphx-glr-backref-type-py-class"><span class="n">ObliqueDecisionTreeClassifier</span></a>
+</pre></div>
+</div>
+<p>First load the copy of the Iris dataset shipped with scikit-learn:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://scikit-learn.org/dev/modules/generated/sklearn.utils.Bunch.html#sklearn.utils.Bunch" title="sklearn.utils.Bunch" class="sphx-glr-backref-module-sklearn-utils sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">iris</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/dev/modules/generated/sklearn.datasets.load_iris.html#sklearn.datasets.load_iris" title="sklearn.datasets.load_iris" class="sphx-glr-backref-module-sklearn-datasets sphx-glr-backref-type-py-function"><span class="n">load_iris</span></a><span class="p">()</span>
 
 <span class="c1"># Parameters</span>
 <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_classes</span></a> <span class="o">=</span> <span class="mi">3</span>
@@ -616,29 +611,29 @@ the same thresholding rule as regular decision trees.</p>
 <li><img src="../../_images/sphx_glr_plot_iris_dtc_001.png" srcset="../../_images/sphx_glr_plot_iris_dtc_001.png" alt="Decision surface of Axis-aligned decision trees trained on pairs of features" class = "sphx-glr-multi-img"/></li>
 <li><img src="../../_images/sphx_glr_plot_iris_dtc_002.png" srcset="../../_images/sphx_glr_plot_iris_dtc_002.png" alt="Decision surface of Oblique decision trees trained on pairs of features" class = "sphx-glr-multi-img"/></li>
 </ul>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/circleci/project/examples/sklearn_vs_sktree/plot_iris_dtc.py:78: UserWarning: No data for colormapping provided via &#39;c&#39;. Parameters &#39;cmap&#39; will be ignored
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/circleci/project/examples/sklearn_vs_sktree/plot_iris_dtc.py:72: UserWarning: No data for colormapping provided via &#39;c&#39;. Parameters &#39;cmap&#39; will be ignored
   ax.scatter(
-/home/circleci/project/examples/sklearn_vs_sktree/plot_iris_dtc.py:78: UserWarning: No data for colormapping provided via &#39;c&#39;. Parameters &#39;cmap&#39; will be ignored
+/home/circleci/project/examples/sklearn_vs_sktree/plot_iris_dtc.py:72: UserWarning: No data for colormapping provided via &#39;c&#39;. Parameters &#39;cmap&#39; will be ignored
   ax.scatter(
-/home/circleci/project/examples/sklearn_vs_sktree/plot_iris_dtc.py:78: UserWarning: No data for colormapping provided via &#39;c&#39;. Parameters &#39;cmap&#39; will be ignored
+/home/circleci/project/examples/sklearn_vs_sktree/plot_iris_dtc.py:72: UserWarning: No data for colormapping provided via &#39;c&#39;. Parameters &#39;cmap&#39; will be ignored
   ax.scatter(
-/home/circleci/project/examples/sklearn_vs_sktree/plot_iris_dtc.py:78: UserWarning: No data for colormapping provided via &#39;c&#39;. Parameters &#39;cmap&#39; will be ignored
+/home/circleci/project/examples/sklearn_vs_sktree/plot_iris_dtc.py:72: UserWarning: No data for colormapping provided via &#39;c&#39;. Parameters &#39;cmap&#39; will be ignored
   ax.scatter(
-/home/circleci/project/examples/sklearn_vs_sktree/plot_iris_dtc.py:78: UserWarning: No data for colormapping provided via &#39;c&#39;. Parameters &#39;cmap&#39; will be ignored
+/home/circleci/project/examples/sklearn_vs_sktree/plot_iris_dtc.py:72: UserWarning: No data for colormapping provided via &#39;c&#39;. Parameters &#39;cmap&#39; will be ignored
   ax.scatter(
-/home/circleci/project/examples/sklearn_vs_sktree/plot_iris_dtc.py:78: UserWarning: No data for colormapping provided via &#39;c&#39;. Parameters &#39;cmap&#39; will be ignored
+/home/circleci/project/examples/sklearn_vs_sktree/plot_iris_dtc.py:72: UserWarning: No data for colormapping provided via &#39;c&#39;. Parameters &#39;cmap&#39; will be ignored
   ax.scatter(
-/home/circleci/project/examples/sklearn_vs_sktree/plot_iris_dtc.py:78: UserWarning: No data for colormapping provided via &#39;c&#39;. Parameters &#39;cmap&#39; will be ignored
+/home/circleci/project/examples/sklearn_vs_sktree/plot_iris_dtc.py:72: UserWarning: No data for colormapping provided via &#39;c&#39;. Parameters &#39;cmap&#39; will be ignored
   ax.scatter(
-/home/circleci/project/examples/sklearn_vs_sktree/plot_iris_dtc.py:78: UserWarning: No data for colormapping provided via &#39;c&#39;. Parameters &#39;cmap&#39; will be ignored
+/home/circleci/project/examples/sklearn_vs_sktree/plot_iris_dtc.py:72: UserWarning: No data for colormapping provided via &#39;c&#39;. Parameters &#39;cmap&#39; will be ignored
   ax.scatter(
-/home/circleci/project/examples/sklearn_vs_sktree/plot_iris_dtc.py:78: UserWarning: No data for colormapping provided via &#39;c&#39;. Parameters &#39;cmap&#39; will be ignored
+/home/circleci/project/examples/sklearn_vs_sktree/plot_iris_dtc.py:72: UserWarning: No data for colormapping provided via &#39;c&#39;. Parameters &#39;cmap&#39; will be ignored
   ax.scatter(
-/home/circleci/project/examples/sklearn_vs_sktree/plot_iris_dtc.py:78: UserWarning: No data for colormapping provided via &#39;c&#39;. Parameters &#39;cmap&#39; will be ignored
+/home/circleci/project/examples/sklearn_vs_sktree/plot_iris_dtc.py:72: UserWarning: No data for colormapping provided via &#39;c&#39;. Parameters &#39;cmap&#39; will be ignored
   ax.scatter(
-/home/circleci/project/examples/sklearn_vs_sktree/plot_iris_dtc.py:78: UserWarning: No data for colormapping provided via &#39;c&#39;. Parameters &#39;cmap&#39; will be ignored
+/home/circleci/project/examples/sklearn_vs_sktree/plot_iris_dtc.py:72: UserWarning: No data for colormapping provided via &#39;c&#39;. Parameters &#39;cmap&#39; will be ignored
   ax.scatter(
-/home/circleci/project/examples/sklearn_vs_sktree/plot_iris_dtc.py:78: UserWarning: No data for colormapping provided via &#39;c&#39;. Parameters &#39;cmap&#39; will be ignored
+/home/circleci/project/examples/sklearn_vs_sktree/plot_iris_dtc.py:72: UserWarning: No data for colormapping provided via &#39;c&#39;. Parameters &#39;cmap&#39; will be ignored
   ax.scatter(
 </pre></div>
 </div>
@@ -656,7 +651,7 @@ together.</p>
 <li><img src="../../_images/sphx_glr_plot_iris_dtc_003.png" srcset="../../_images/sphx_glr_plot_iris_dtc_003.png" alt="Axis-aligned decision tree trained on all the iris features" class = "sphx-glr-multi-img"/></li>
 <li><img src="../../_images/sphx_glr_plot_iris_dtc_004.png" srcset="../../_images/sphx_glr_plot_iris_dtc_004.png" alt="Oblique decision tree trained on all the iris features" class = "sphx-glr-multi-img"/></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 3.909 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 3.703 seconds)</p>
 <p><strong>Estimated memory usage:</strong>  9 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-sklearn-vs-sktree-plot-iris-dtc-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
@@ -727,7 +722,7 @@ together.</p>
 
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-12-01.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-12-06.
       <br/>
     
   </p>

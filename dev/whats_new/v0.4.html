@@ -495,6 +495,12 @@ equally.</p>
 <li><p><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  Fixes a bug where <code class="docutils literal notranslate"><span class="pre">FeatureImportanceForest*</span></code> was unable to be run when calling <code class="docutils literal notranslate"><span class="pre">statistic</span></code> with <code class="docutils literal notranslate"><span class="pre">covariate_index</span></code> defined for MI, AUC metrics, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/164">#164</a>)</p></li>
 <li><p><span class="raw-html"><span class="badge badge-info">Enhancement</span></span>  Add <a class="reference internal" href="../generated/sktree.experimental.conditional_resample.html#sktree.experimental.conditional_resample" title="sktree.experimental.conditional_resample"><code class="xref py py-func docutils literal notranslate"><span class="pre">sktree.experimental.conditional_resample()</span></code></a>, which allows conditional resampling of rows based on nearest-neighbors defined via a feature set, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/170">#170</a>)</p></li>
 <li><p><span class="raw-html"><span class="badge badge-info">Enhancement</span></span>  Multi-view trees now are able to scale the sampling of split candidates at the same rate per feature-set now, which means ‘sqrt’ would sample split candidates equal to the square root of each feature-set size, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/152">#152</a>)</p></li>
+<li><dl class="simple">
+<dt><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  Fixes bug in <a class="reference internal" href="../generated/sktree.tree.MultiViewDecisionTreeClassifier.html#sktree.tree.MultiViewDecisionTreeClassifier" title="sktree.tree.MultiViewDecisionTreeClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">sktree.tree.MultiViewDecisionTreeClassifier</span></code></a> where the max_features argument applied over</dt><dd><p>more than two views with <code class="docutils literal notranslate"><span class="pre">apply_max_features_per_set</span></code> set to <code class="docutils literal notranslate"><span class="pre">True</span></code> results in an incorrect and oversampled
+number of max_features in the views after the first two, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/172">#172</a>)</p>
+</dd>
+</dl>
+</li>
 </ul>
 </section>
 <section id="code-and-documentation-contributors">
@@ -581,7 +587,7 @@ the project since version inception, including:</p>
 
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-12-01.
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-12-06.
       <br/>
     
   </p>
