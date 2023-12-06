@@ -19,7 +19,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read # to fetch code (actions/checkout)
+  contents: read  # to fetch code (actions/checkout)
 
 jobs:
   style:
@@ -37,7 +37,7 @@ jobs:
         with:
           python-version: "3.10"
           architecture: "x64"
-      
+
       - name: Install packages for Ubuntu
         run: |
           sudo apt-get update
@@ -63,3 +63,9 @@ jobs:
 
       - name: Type check
         run: poetry run poe type_check
+
+      - name: Run toml-sort
+        run: toml-sort pyproject.toml --check
+
+      - name: Run yamllint
+        run: yamllint . -c .yamllint.yml --strict
