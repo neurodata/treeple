@@ -177,7 +177,7 @@ def test_separate_mtry_per_feature_set(stratify_mtry_per_view):
     X = np.random.random((20, 10))
     y = np.random.randint(0, 2, size=20)
 
-    # test with max_features as a float
+    # test with max_features as an array
     clf = MultiViewDecisionTreeClassifier(
         random_state=seed,
         feature_set_ends=[1, 2, 4, 10],
@@ -189,7 +189,7 @@ def test_separate_mtry_per_feature_set(stratify_mtry_per_view):
     assert_array_equal(clf.max_features_per_set_, [1, 1, 2, math.ceil(6 * 0.7)])
     assert clf.max_features_ == np.sum(clf.max_features_per_set_), np.sum(clf.max_features_per_set_)
 
-    # test with max_features as a float
+    # test with max_features as an array
     clf = MultiViewDecisionTreeClassifier(
         random_state=seed,
         feature_set_ends=[1, 2, 4, 10],
