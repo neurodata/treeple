@@ -42,6 +42,13 @@ repos:
       - id: yamllint
         args: [--strict, -c, .yamllint.yml]
 
+  # toml-sort
+  - repo: https://github.com/pappasam/toml-sort
+    rev: v0.23.1
+    hooks:
+      - id: toml-sort
+        files: ^pyproject\.toml$
+
   # rstcheck
   - repo: https://github.com/rstcheck/rstcheck.git
     rev: v6.2.0
