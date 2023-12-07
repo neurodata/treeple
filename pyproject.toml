@@ -17,7 +17,7 @@ requires = [
 
 [project]
 name = "scikit-tree"
-version = "0.5.0dev0"
+version = "0.5.0"
 description = "Modern decision trees in Python"
 maintainers = [
   {name = "Neurodata", email = "adam.li@columbia.edu"}
@@ -292,6 +292,8 @@ ignore_roles = [
   "arxiv"
 ]
 report_level = "WARNING"
+ignore = ["SEVERE/4"]
+paths = ["doc/use.rst"]
 
 [tool.ruff]
 extend-exclude = [
