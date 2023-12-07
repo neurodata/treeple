@@ -3,15 +3,12 @@
 .. include:: _contributors.rst
 .. currentmodule:: sktree
 
-.. _v0_5:
+.. _current:
 
-Version 0.5
+Version 0.6
 ===========
 
-This release includes a number of enhancements and bug fixes, mainly
-to the :class:`sktree.tree.MultiViewDecisionTreeClassifier`. Most notably,
-the ``max_features`` argument now supports an array of values, which
-applies a different ``max_features`` argument per feature view.
+**In Development**
 
 Changelog
 ---------
