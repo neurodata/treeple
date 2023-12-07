@@ -75,6 +75,12 @@ docstyle: pydocstyle
 build-doc:
 	@echo "Building documentation"
 	make -C doc/ clean
+	make -C doc/ html
+	cd doc/ && make view
+
+build-doc-noplot:
+	@echo "Building documentation"
+	make -C doc/ clean
 	make -C doc/ html-noplot
 	cd doc/ && make view
 
