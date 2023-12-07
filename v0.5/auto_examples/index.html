@@ -1,0 +1,653 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-theme="auto">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Examples &#8212; scikit-tree 0.5.0dev0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "auto";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.css?v=42c02ab7" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=c5ced968eda925caa686" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=c5ced968eda925caa686" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=c5ced968eda925caa686"></script>
+
+    <script src="../_static/documentation_options.js?v=2c64dd7b"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=fd10adb8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'auto_examples/index';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.14.2';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/scikit-tree/main/doc/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <script type="text/javascript" src="../_static/scrollfix.js"></script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="auto">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">scikit-tree 0.5.0dev0 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api.html">
+                        API Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../user_guide.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../whats_new.html">
+                        Release History
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../install.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../use.html">
+                        Examples using scikit-tree
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api.html">
+                        API Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../user_guide.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../whats_new.html">
+                        Release History
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../install.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../use.html">
+                        Examples using scikit-tree
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-3"
+      type="button"
+      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-3"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-3"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-3">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Examples</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="examples">
+<h1>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h1>
+<p>Examples demonstrating how to use scikit-tree algorithms.</p>
+<div class="sphx-glr-thumbnails"></div><section id="calibrated-decision-trees-via-honesty">
+<h2>Calibrated decision trees via honesty<a class="headerlink" href="#calibrated-decision-trees-via-honesty" title="Link to this heading">#</a></h2>
+<p>Examples demonstrating the usage of honest decision trees to obtain calibrated predictions.</p>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Compare the prediction results of honest forests and random forests with various methods of cal..."><img alt="" src="../_images/sphx_glr_plot_overlapping_gaussians_thumb.png" />
+<p><a class="reference internal" href="calibration/plot_overlapping_gaussians.html#sphx-glr-auto-examples-calibration-plot-overlapping-gaussians-py"><span class="std std-ref">Plot honest forest calibrations on overlapping gaussian simulations</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Plot honest forest calibrations on overlapping gaussian simulations</div>
+</div></div></section>
+<section id="hypothesis-testing-with-decision-trees">
+<h2>Hypothesis testing with decision trees<a class="headerlink" href="#hypothesis-testing-with-decision-trees" title="Link to this heading">#</a></h2>
+<p>Examples demonstrating how to use decision-trees for statistical hypothesis testing.</p>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="In this example, we demonstrate how to test the conditional mutual information (CMI) hypothesis..."><img alt="" src="../_images/sphx_glr_plot_co_MIGHT_null_thumb.png" />
+<p><a class="reference internal" href="hypothesis_testing/plot_co_MIGHT_null.html#sphx-glr-auto-examples-hypothesis-testing-plot-co-might-null-py"><span class="std std-ref">Co-MIGHT when Data Exhibits Conditional Independence</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Co-MIGHT when Data Exhibits Conditional Independence</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="An example using FeatureImportanceForestClassifier for nonparametric multivariate hypothesis te..."><img alt="" src="../_images/sphx_glr_plot_might_auc_thumb.png" />
+<p><a class="reference internal" href="hypothesis_testing/plot_might_auc.html#sphx-glr-auto-examples-hypothesis-testing-plot-might-auc-py"><span class="std std-ref">Compute partial AUC using Mutual Information for Genuine Hypothesis Testing (MIGHT)</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Compute partial AUC using Mutual Information for Genuine Hypothesis Testing (MIGHT)</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="An example using FeatureImportanceForestClassifier for nonparametric multivariate hypothesis te..."><img alt="" src="../_images/sphx_glr_plot_might_mv_auc_thumb.png" />
+<p><a class="reference internal" href="hypothesis_testing/plot_might_mv_auc.html#sphx-glr-auto-examples-hypothesis-testing-plot-might-mv-auc-py"><span class="std std-ref">Compute partial AUC using multi-view MIGHT (MV-MIGHT)</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Compute partial AUC using multi-view MIGHT (MV-MIGHT)</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="In this example, we demonstrate how to test the conditional mutual information (CMI) hypothesis..."><img alt="" src="../_images/sphx_glr_plot_co_MIGHT_alternative_thumb.png" />
+<p><a class="reference internal" href="hypothesis_testing/plot_co_MIGHT_alternative.html#sphx-glr-auto-examples-hypothesis-testing-plot-co-might-alternative-py"><span class="std std-ref">Demonstrate Conditional Mutual Information for Genuine Hypothesis Testing (Co-MIGHT)</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Demonstrate Conditional Mutual Information for Genuine Hypothesis Testing (Co-MIGHT)</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="An example using FeatureImportanceForestClassifier for nonparametric multivariate hypothesis te..."><img alt="" src="../_images/sphx_glr_plot_MI_genuine_hypothesis_testing_forest_thumb.png" />
+<p><a class="reference internal" href="hypothesis_testing/plot_MI_genuine_hypothesis_testing_forest.html#sphx-glr-auto-examples-hypothesis-testing-plot-mi-genuine-hypothesis-testing-forest-py"><span class="std std-ref">Mutual Information for Genuine Hypothesis Testing (MIGHT)</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Mutual Information for Genuine Hypothesis Testing (MIGHT)</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Here, we demonstrate how to do hypothesis testing on highly imbalanced data in terms of their f..."><img alt="" src="../_images/sphx_glr_plot_MI_imbalanced_hyppo_testing_thumb.png" />
+<p><a class="reference internal" href="hypothesis_testing/plot_MI_imbalanced_hyppo_testing.html#sphx-glr-auto-examples-hypothesis-testing-plot-mi-imbalanced-hyppo-testing-py"><span class="std std-ref">Mutual Information for Genuine Hypothesis Testing (MIGHT) with Imbalanced Data</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Mutual Information for Genuine Hypothesis Testing (MIGHT) with Imbalanced Data</div>
+</div></div></section>
+<section id="multi-view-learning-with-decision-trees">
+<h2>Multi-view learning with Decision-trees<a class="headerlink" href="#multi-view-learning-with-decision-trees" title="Link to this heading">#</a></h2>
+<p>Examples demonstrating multi-view learning using random forest variants.</p>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="An example using MultiViewRandomForestClassifier for high-dimensional classification when there..."><img alt="" src="../_images/sphx_glr_plot_multiview_dtc_thumb.png" />
+<p><a class="reference internal" href="multiview/plot_multiview_dtc.html#sphx-glr-auto-examples-multiview-plot-multiview-dtc-py"><span class="std std-ref">Analyze a multi-view dataset with a multi-view random forest</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Analyze a multi-view dataset with a multi-view random forest</div>
+</div></div></section>
+<section id="outlier-detection">
+<h2>Outlier-detection<a class="headerlink" href="#outlier-detection" title="Link to this heading">#</a></h2>
+<p>Examples concerning how to do outlier detection with decision trees.</p>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="An example using ExtendedIsolationForest for anomaly detection, which compares to the Isolation..."><img alt="" src="../_images/sphx_glr_plot_extended_isolation_forest_thumb.png" />
+<p><a class="reference internal" href="outlier_detection/plot_extended_isolation_forest.html#sphx-glr-auto-examples-outlier-detection-plot-extended-isolation-forest-py"><span class="std std-ref">ExtendedIsolationForest example</span></a></p>
+  <div class="sphx-glr-thumbnail-title">ExtendedIsolationForest example</div>
+</div></div></section>
+<section id="quantile-predictions-with-random-forest">
+<h2>Quantile Predictions with Random Forest<a class="headerlink" href="#quantile-predictions-with-random-forest" title="Link to this heading">#</a></h2>
+<p>Examples demonstrating how to generate quantile predictions using Random Forest variants.</p>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="An example comparison of interpolation methods that can be applied during prediction when the d..."><img alt="" src="../_images/sphx_glr_plot_quantile_interpolation_with_RF_thumb.png" />
+<p><a class="reference internal" href="quantile_predictions/plot_quantile_interpolation_with_RF.html#sphx-glr-auto-examples-quantile-predictions-plot-quantile-interpolation-with-rf-py"><span class="std std-ref">Predicting with different quantile interpolation methods</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Predicting with different quantile interpolation methods</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="An example of how to generate quantile prediction intervals with Random Forest Regressor class ..."><img alt="" src="../_images/sphx_glr_plot_quantile_regression_intervals_with_RF_thumb.png" />
+<p><a class="reference internal" href="quantile_predictions/plot_quantile_regression_intervals_with_RF.html#sphx-glr-auto-examples-quantile-predictions-plot-quantile-regression-intervals-with-rf-py"><span class="std std-ref">Quantile prediction intervals with Random Forest Regressor</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Quantile prediction intervals with Random Forest Regressor</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="An example that demonstrates how to use the Random Forest to generate quantile predictions such..."><img alt="" src="../_images/sphx_glr_plot_quantile_toy_example_with_RF_thumb.png" />
+<p><a class="reference internal" href="quantile_predictions/plot_quantile_toy_example_with_RF.html#sphx-glr-auto-examples-quantile-predictions-plot-quantile-toy-example-with-rf-py"><span class="std std-ref">Quantile prediction with Random Forest Regressor class</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Quantile prediction with Random Forest Regressor class</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="An example to generate quantile predictions using an oblique random forest instance on a synthe..."><img alt="" src="../_images/sphx_glr_plot_quantile_vs_standard_oblique_forest_thumb.png" />
+<p><a class="reference internal" href="quantile_predictions/plot_quantile_vs_standard_oblique_forest.html#sphx-glr-auto-examples-quantile-predictions-plot-quantile-vs-standard-oblique-forest-py"><span class="std std-ref">Quantile regression vs. standard and oblique regression forest</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Quantile regression vs. standard and oblique regression forest</div>
+</div></div></section>
+<section id="comparing-sklearn-and-sktree-decision-trees">
+<h2>Comparing sklearn and sktree decision trees<a class="headerlink" href="#comparing-sklearn-and-sktree-decision-trees" title="Link to this heading">#</a></h2>
+<p>Examples demonstrating the difference between sklearn and sktree decision trees.</p>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Plot the decision surface of a decision tree and oblique decision tree trained on pairs of feat..."><img alt="" src="../_images/sphx_glr_plot_iris_dtc_thumb.png" />
+<p><a class="reference internal" href="sklearn_vs_sktree/plot_iris_dtc.html#sphx-glr-auto-examples-sklearn-vs-sktree-plot-iris-dtc-py"><span class="std std-ref">Plot the decision surface of decision trees trained on the iris dataset</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Plot the decision surface of decision trees trained on the iris dataset</div>
+</div></div></section>
+<section id="sparse-oblique-projections-with-oblique-decision-trees">
+<h2>Sparse oblique projections with oblique decision-trees<a class="headerlink" href="#sparse-oblique-projections-with-oblique-decision-trees" title="Link to this heading">#</a></h2>
+<p>Examples demonstrating learning using oblique random forests.</p>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="A performance comparison between extra oblique forest and standard oblique random forest using ..."><img alt="" src="../_images/sphx_glr_plot_extra_oblique_random_forest_thumb.png" />
+<p><a class="reference internal" href="sparse_oblique_trees/plot_extra_oblique_random_forest.html#sphx-glr-auto-examples-sparse-oblique-trees-plot-extra-oblique-random-forest-py"><span class="std std-ref">Compare extra oblique forest and oblique random forest predictions on cc18 datasets</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Compare extra oblique forest and oblique random forest predictions on cc18 datasets</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Plot the decision surfaces of forests of randomized oblique trees trained on pairs of features ..."><img alt="" src="../_images/sphx_glr_plot_oblique_forests_iris_thumb.png" />
+<p><a class="reference internal" href="sparse_oblique_trees/plot_oblique_forests_iris.html#sphx-glr-auto-examples-sparse-oblique-trees-plot-oblique-forests-iris-py"><span class="std std-ref">Compare the decision surfaces of oblique extra-trees with standard oblique trees</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Compare the decision surfaces of oblique extra-trees with standard oblique trees</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="A performance comparison between oblique forest and standard axis- aligned random forest using ..."><img alt="" src="../_images/sphx_glr_plot_oblique_random_forest_thumb.png" />
+<p><a class="reference internal" href="sparse_oblique_trees/plot_oblique_random_forest.html#sphx-glr-auto-examples-sparse-oblique-trees-plot-oblique-random-forest-py"><span class="std std-ref">Plot oblique forest and axis-aligned random forest predictions on cc18 datasets</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Plot oblique forest and axis-aligned random forest predictions on cc18 datasets</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation"><img alt="" src="../_images/sphx_glr_plot_oblique_axis_aligned_forests_sparse_parity_thumb.png" />
+<p><a class="reference internal" href="sparse_oblique_trees/plot_oblique_axis_aligned_forests_sparse_parity.html#sphx-glr-auto-examples-sparse-oblique-trees-plot-oblique-axis-aligned-forests-sparse-parity-py"><span class="std std-ref">Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="A performance comparison between extra oblique forest and standard oblique random forest on dif..."><img alt="" src="../_images/sphx_glr_plot_extra_orf_sample_size_thumb.png" />
+<p><a class="reference internal" href="sparse_oblique_trees/plot_extra_orf_sample_size.html#sphx-glr-auto-examples-sparse-oblique-trees-plot-extra-orf-sample-size-py"><span class="std std-ref">Speed of Extra Oblique Random Forest vs Oblique Random Forest on different dataset sizes</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Speed of Extra Oblique Random Forest vs Oblique Random Forest on different dataset sizes</div>
+</div></div></section>
+<section id="decision-tree-splitters">
+<h2>Decision-tree splitters<a class="headerlink" href="#decision-tree-splitters" title="Link to this heading">#</a></h2>
+<p>Examples demonstrating different node-splitting strategies for decision trees.</p>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example shows how multi-view projection matrices are generated for a decision tree, specif..."><img alt="" src="../_images/sphx_glr_plot_multiview_axis_aligned_splitter_thumb.png" />
+<p><a class="reference internal" href="splitters/plot_multiview_axis_aligned_splitter.html#sphx-glr-auto-examples-splitters-plot-multiview-axis-aligned-splitter-py"><span class="std std-ref">Demonstrate and visualize a multi-view projection matrix for an axis-aligned tree</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Demonstrate and visualize a multi-view projection matrix for an axis-aligned tree</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example shows how projection matrices are generated for an oblique tree, specifically the ..."><img alt="" src="../_images/sphx_glr_plot_projection_matrices_thumb.png" />
+<p><a class="reference internal" href="splitters/plot_projection_matrices.html#sphx-glr-auto-examples-splitters-plot-projection-matrices-py"><span class="std std-ref">Plot the projection matrices of an oblique tree for sampling images, or time-series</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Plot the projection matrices of an oblique tree for sampling images, or time-series</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example shows how projection matrices are generated for an oblique tree, specifically the ..."><img alt="" src="../_images/sphx_glr_plot_sparse_projection_matrix_thumb.png" />
+<p><a class="reference internal" href="splitters/plot_sparse_projection_matrix.html#sphx-glr-auto-examples-splitters-plot-sparse-projection-matrix-py"><span class="std std-ref">Plot the sparse projection matrices of an oblique tree</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Plot the sparse projection matrices of an oblique tree</div>
+</div></div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-footer sphx-glr-footer-gallery docutils container">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/07fcc19ba03226cd3d83d4e40ec44385/auto_examples_python.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">all</span> <span class="pre">examples</span> <span class="pre">in</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">auto_examples_python.zip</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/6f1e7a639e0699d6164445b55e6c116d/auto_examples_jupyter.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">all</span> <span class="pre">examples</span> <span class="pre">in</span> <span class="pre">Jupyter</span> <span class="pre">notebooks:</span> <span class="pre">auto_examples_jupyter.zip</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calibrated-decision-trees-via-honesty">Calibrated decision trees via honesty</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hypothesis-testing-with-decision-trees">Hypothesis testing with decision trees</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multi-view-learning-with-decision-trees">Multi-view learning with Decision-trees</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlier-detection">Outlier-detection</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quantile-predictions-with-random-forest">Quantile Predictions with Random Forest</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparing-sklearn-and-sktree-decision-trees">Comparing sklearn and sktree decision trees</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sparse-oblique-projections-with-oblique-decision-trees">Sparse oblique projections with oblique decision-trees</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#decision-tree-splitters">Decision-tree splitters</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=c5ced968eda925caa686"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=c5ced968eda925caa686"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-12-06.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
