@@ -122,7 +122,7 @@ jobs:
           ls ./
 
       - name: Save build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: sktree-build
           path: $PWD/build
@@ -239,7 +239,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Save build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: sktree-build
           path: $PWD/build

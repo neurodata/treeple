@@ -87,7 +87,7 @@ jobs:
           CIBW_ARCHS: ${{ matrix.os[2] }}
           CIBW_ENVIRONMENT_PASS_LINUX: RUNNER_OS
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           path: ./wheelhouse/
           name: ${{ matrix.python[0] }}-${{ matrix.os[1] }}
@@ -125,7 +125,7 @@ jobs:
           CIBW_BUILD: ${{ matrix.python[0] }}-macosx_arm64
           CIBW_ARCHS_MACOS: arm64
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           path: ./wheelhouse
           name: ${{ matrix.python[0] }}-arm
@@ -152,11 +152,11 @@ jobs:
           python -m build
 
       - name: Store artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: dist/*.tar.gz
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           path: dist
           name: ${{ matrix.python[0] }}-${{ matrix.os[1] }}
