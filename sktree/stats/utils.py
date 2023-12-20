@@ -95,7 +95,6 @@ METRIC_FUNCTIONS = {
     "mi": _mutual_information,
     "cond_entropy": _cond_entropy,
     "sas98": _SAS98,
-    "pvalues": _pvalues,
 }
 
 POSTERIOR_FUNCTIONS = ("mi", "auc", "cond_entropy")
