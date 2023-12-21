@@ -54,7 +54,7 @@ jobs:
       - name: Checkout scikit-tree
         uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v4.6.1
+      - uses: actions/setup-python@v5
         with:
           python-version: 3.9
 
@@ -87,7 +87,7 @@ jobs:
           CIBW_ARCHS: ${{ matrix.os[2] }}
           CIBW_ENVIRONMENT_PASS_LINUX: RUNNER_OS
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           path: ./wheelhouse/
           name: ${{ matrix.python[0] }}-${{ matrix.os[1] }}
@@ -108,7 +108,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4.6.1
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9  # Replace with the desired Python version
 
@@ -125,7 +125,7 @@ jobs:
           CIBW_BUILD: ${{ matrix.python[0] }}-macosx_arm64
           CIBW_ARCHS_MACOS: arm64
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           path: ./wheelhouse
           name: ${{ matrix.python[0] }}-arm
@@ -140,7 +140,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.9"  # update once build dependencies are available
 
@@ -152,11 +152,11 @@ jobs:
           python -m build
 
       - name: Store artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: dist/*.tar.gz
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           path: dist
           name: ${{ matrix.python[0] }}-${{ matrix.os[1] }}
