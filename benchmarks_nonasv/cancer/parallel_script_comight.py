@@ -193,6 +193,7 @@ def _run_parallel_comight(
         comight_null_posteriors_x2=comight_null_posteriors_x2,
     )
 
+
 def _run_parallel_cond_dcorr(
     idx,
     n_samples,
@@ -270,7 +271,7 @@ def _run_parallel_cond_dcorr(
     )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Ensure proper number of arguments are provided
     if len(sys.argv) != 5:
         print("Usage: python script.py idx n_samples n_features_2 sim_type")
