@@ -63,7 +63,7 @@ def mi_gaussian(cov):
         H(X) = \\frac{d}{2} (1 + log(2\\pi)) + \\frac{1}{2} log(det(C))
     """
     # computes the true MI
-    true_mi = -0.5 * np.log(np.linalg.det(cov))
+    true_mi = 0.5 * np.log(np.linalg.det(cov))
     return true_mi
 
 
@@ -143,7 +143,7 @@ def mutual_info_ksg(
     Y,
     Z=None,
     k: float = 0.2,
-    metric="forest",
+    metric="euclidean",
     algorithm="kd_tree",
     n_jobs: int = -1,
     transform: str = "rank",
@@ -287,7 +287,7 @@ def _mi_ksg(data, X, Y, metric, algorithm, knn_here, n_jobs):
     hx = scipy.special.digamma(num_nn_x)
     hy = scipy.special.digamma(num_nn_y)
     hn = scipy.special.digamma(n_samples)
-    val = hxy - (hx + hy).mean() + hn
+    val = -(hxy - (hx + hy).mean() + hn)
     return val
 
 

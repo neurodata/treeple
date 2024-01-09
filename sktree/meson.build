@@ -55,6 +55,7 @@ python_sources = [
   '__init__.py',
   'neighbors.py',
   'conftest.py',
+  'posterior.py',
 ]
 
 py3.install_sources(

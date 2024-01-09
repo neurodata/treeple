@@ -36,7 +36,7 @@ if __sktree_SETUP__:
     # process, as it may not be compiled yet
 else:
     try:
-        from . import _lib, tree, ensemble, experimental, stats
+        from . import _lib, tree, ensemble, experimental, stats, posterior
         from ._lib.sklearn.ensemble._forest import (
             RandomForestClassifier,
             RandomForestRegressor,

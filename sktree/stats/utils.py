@@ -136,21 +136,19 @@ def _compute_null_distribution_perm(
     """
     rng = np.random.default_rng(seed)
     X_test, y_test = check_X_y(X_test, y_test, ensure_2d=True, multi_output=True)
-    n_samples_test = len(y_test)
     n_samples_train = len(y_train)
     metric_func = METRIC_FUNCTIONS[metric]
 
     # pre-allocate memory for the index array
     train_index_arr = np.arange(n_samples_train, dtype=int).reshape(-1, 1)
-    test_index_arr = np.arange(n_samples_test, dtype=int).reshape(-1, 1)
 
     null_metrics = np.zeros((n_repeats,))
 
     for idx in range(n_repeats):
         # permute the covariates inplace
-        rng.shuffle(test_index_arr)
-        perm_X_cov = X_test[test_index_arr, covariate_index]
-        X_test[:, covariate_index] = perm_X_cov
+        # rng.shuffle(test_index_arr)
+        # perm_X_cov = X_test[test_index_arr, covariate_index]
+        # X_test[:, covariate_index] = perm_X_cov
 
         rng.shuffle(train_index_arr)
         perm_X_cov = X_train[train_index_arr, covariate_index]
@@ -262,10 +260,10 @@ def _compute_null_distribution_coleman(
 
         # compute two instances of the metric from the sampled trees
         first_half_metric = metric_func(
-            y_test[first_forest_samples, :], y_pred_first_half, **metric_kwargs
+            y_test[first_forest_samples, ...], y_pred_first_half, **metric_kwargs
         )
         second_half_metric = metric_func(
-            y_test[second_forest_samples, :], y_pred_second_half, **metric_kwargs
+            y_test[second_forest_samples, ...], y_pred_second_half, **metric_kwargs
         )
 
         metric_star[idx] = first_half_metric

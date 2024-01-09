@@ -25,14 +25,23 @@ class PermutationTest(MetaEstimatorMixin):
 
         Parameters
         ----------
-        estimator : _type_
-            _description_
+        estimator : Estimator
+            Instance of estimator that has ``predict`` and ``predict_proba`` implemented.
         n_repeats : int, optional
-            _description_, by default 100
+            Number of repetitions to sample the null distribution, by default 100.
         test_size : float, optional
-            _description_, by default 0.2
-        random_state : _type_, optional
-            _description_, by default None
+            Size of the test set, by default 0.2.
+        store_posteriors : bool
+            Whether or not to store all the posteriors.
+        random_state : int, optional
+            Random seed, by default None.
+
+        Attributes
+        ----------
+        posteriors : ArrayLike of shape (n_estimators, n_samples * test_size, n_classes)
+            The posterior array of the unpermuted dataset.
+        null_posteriors : ArrayLike of shape (n_repeats, n_estimators, n_samples * test_size, n_classes)
+            The posterior array of the permuted dataset.
         """
         self.estimator = estimator
         self.n_repeats = n_repeats
@@ -106,8 +115,11 @@ class PermutationTest(MetaEstimatorMixin):
         indices_train, indices_test = self.train_test_samples_
 
         # train/test split
-        self.estimator_.fit(X[indices_train, :], y[indices_train, :])
+        self.estimator_.fit(X[indices_train, :], y[indices_train, :].squeeze())
         posterior = self.estimator_.predict_proba(X[indices_test, :])
+
+        if return_posteriors:
+            self.posteriors_ = posterior
         pauc = roc_auc_score(y[indices_test, :], posterior[:, 1], max_fpr=0.1)
         self.observe_stat_ = pauc
 
@@ -115,9 +127,9 @@ class PermutationTest(MetaEstimatorMixin):
         # WARNING: this could take a long time, since it fits a new forest
         null_dist = _compute_null_distribution_perm(
             X_train=X[indices_train, :],
-            y_train=y[indices_train, :],
+            y_train=y[indices_train, :].squeeze(),
             X_test=X[indices_test, :],
-            y_test=y[indices_test, :],
+            y_test=y[indices_test, :].squeeze(),
             covariate_index=covariate_index,
             est=self.estimator_,
             metric=metric,
@@ -129,7 +141,7 @@ class PermutationTest(MetaEstimatorMixin):
             self.null_dist_ = np.array(null_dist)
         else:
             self.null_dist_ = np.array([x[0] for x in null_dist])
-            self.posterior_null_ = np.array([x[1] for x in null_dist])
+            self.posteriors_null_ = np.array([x[1] for x in null_dist])
 
         n_repeats = len(self.null_dist_)
         pvalue = (1 + (self.null_dist_ < self.observe_stat_).sum()) / (1 + n_repeats)
