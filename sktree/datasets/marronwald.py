@@ -86,6 +86,7 @@ def _make_two_view_cov(
 
     return joint_cov
 
+
 def make_twoview_classification(
     n_samples=100,
     n_features_1=10,
@@ -114,6 +115,6 @@ def make_twoview_classification(
     X = rng.multivariate_normal(means, joint_cov, size=n_samples)
 
     # now take half the samples and apply a transformation
-    if transform_1 is not None:
+    # if transform_1 is not None:
 
         
