@@ -81,8 +81,12 @@ def _SAS98(y_true: ArrayLike, y_pred_proba: ArrayLike, max_fpr=0.02) -> float:
     float :
         The estimated SAS98.
     """
-
-    fpr, tpr, thresholds = roc_curve(y_true, y_pred_proba)
+    if y_true.squeeze().ndim != 1:
+        raise ValueError(f"y_true must be 1d, not {y_true.shape}")
+    if 0 in y_true or -1 in y_true :
+        fpr, tpr, thresholds = roc_curve(y_true, y_pred_proba[:,1], pos_label=1,drop_intermediate = False)
+    else:
+        fpr, tpr, thresholds = roc_curve(y_true, y_pred_proba[:,1], pos_label=2,drop_intermediate = False)
     s98 = max([tpr for (fpr, tpr) in zip(fpr, tpr) if fpr <= max_fpr])
     return s98
 
