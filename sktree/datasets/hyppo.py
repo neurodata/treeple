@@ -87,8 +87,8 @@ def make_trunk_classification(
         Either 'ma', or 'ar'.
     return_params : bool, optional
         Whether or not to return the distribution parameters of the classes normal distributions.
-    mix : int, optional
-        Whether or not to mix the Gaussians.
+    mix : float, optional
+        Whether or not to mix the Gaussians. Should be a value between 0 and 1.
     random_state : Random State, optional
         Random state, by default None.
 
@@ -110,7 +110,7 @@ def make_trunk_classification(
     """
     rng = np.random.RandomState(seed=random_state)
 
-    mu_1 = np.array([1 / i for i in range(1, n_dim + 1)])
+    mu_1 = np.array([1 / np.sqrt(i) for i in range(1, n_dim + 1)])
     mu_0 = m_factor * mu_1
 
     if rho != 0:
@@ -122,6 +122,9 @@ def make_trunk_classification(
             raise ValueError(f'Band type {band_type} must be one of "ma", or "ar".')
     else:
         cov = np.identity(n_dim)
+
+    if mix < 0 or mix > 1:
+        raise ValueError("Mix must be between 0 and 1.")
 
     X = np.vstack(
         (

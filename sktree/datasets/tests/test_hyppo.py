@@ -40,3 +40,9 @@ def test_make_trunk_classification_invalid_band_type():
     # Test with an invalid band type
     with pytest.raises(ValueError, match=r"Band type .* must be one of"):
         make_trunk_classification(n_samples=50, rho=0.5, band_type="invalid_band_type")
+
+
+def test_make_trunk_classification_invalid_mix():
+    # Test with an invalid band type
+    with pytest.raises(ValueError, match="Mix must be between 0 and 1."):
+        make_trunk_classification(n_samples=50, rho=0.5, mix=2)
