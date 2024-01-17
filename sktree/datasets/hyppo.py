@@ -55,7 +55,7 @@ def make_trunk_classification(
     band_type: str = "ma",
     return_params: bool = False,
     mix: int = 0,
-    random_state=None,
+    seed=None,
 ):
     """Generate trunk dataset.
 
@@ -89,8 +89,8 @@ def make_trunk_classification(
         Whether or not to return the distribution parameters of the classes normal distributions.
     mix : float, optional
         Whether or not to mix the Gaussians. Should be a value between 0 and 1.
-    random_state : Random State, optional
-        Random state, by default None.
+    seed : int, optional
+        Random seed, by default None.
 
     Returns
     -------
@@ -108,7 +108,7 @@ def make_trunk_classification(
     ----------
     .. footbibliography::
     """
-    rng = np.random.RandomState(seed=random_state)
+    rng = np.random.default_rng(seed=seed)
 
     mu_1 = np.array([1 / np.sqrt(i) for i in range(1, n_dim + 1)])
     mu_0 = m_factor * mu_1
@@ -126,13 +126,26 @@ def make_trunk_classification(
     if mix < 0 or mix > 1:
         raise ValueError("Mix must be between 0 and 1.")
 
-    X = np.vstack(
-        (
-            rng.multivariate_normal(mu_0, cov, n_samples // 2),
-            (1 - mix) * rng.multivariate_normal(mu_1, cov, n_samples // 2)
-            + mix * rng.multivariate_normal(mu_0, cov, n_samples // 2),
+    if n_dim > 1000:
+        method = "cholesky"
+    else:
+        method = "svd"
+
+    if mix == 0:
+        X = np.vstack(
+            (
+                rng.multivariate_normal(mu_0, cov, n_samples // 2, method=method),
+                rng.multivariate_normal(mu_1, cov, n_samples // 2, method=method),
+            )
         )
-    )
+    else:
+        X = np.vstack(
+            (
+                rng.multivariate_normal(mu_0, cov, n_samples // 2, method=method),
+                (1 - mix) * rng.multivariate_normal(mu_1, cov, n_samples // 2, method=method)
+                + mix * rng.multivariate_normal(mu_0, cov, n_samples // 2, method=method),
+            )
+        )
     y = np.concatenate((np.zeros(n_samples // 2), np.ones(n_samples // 2)))
 
     if return_params:
