@@ -38,7 +38,7 @@ def make_gaussian_mixture(
     n_samples : int
         The number of points in each view, divided across Gaussians per
         `class_probs`.
-    transform : 'linear' | 'sin' | poly' | callable, (default 'linear')
+    transform : 'linear' | 'sin' | 'poly' | callable, (default 'linear')
         Transformation to perform on the latent variable. If a function,
         applies it to the latent. Otherwise uses an implemented function.
     noise : float or None (default=None)
