@@ -1,4 +1,7 @@
 import numpy as np
+import numpy as np
+from scipy.stats import multivariate_normal, entropy
+from scipy.integrate import nquad
 
 
 def make_quadratic_classification(n_samples: int, n_features: int, noise=False, seed=None):
@@ -43,3 +46,209 @@ def make_quadratic_classification(n_samples: int, n_features: int, noise=False, 
     v = np.vstack([np.zeros((n1, 1)), np.ones((n2, 1))])
     x = np.vstack((x, y))
     return x, v
+
+
+def make_trunk_classification(
+    n_samples,
+    n_dim=10,
+    m_factor: int = -1,
+    rho: int = 0,
+    band_type: str = "ma",
+    return_params: bool = False,
+    random_state=None,
+):
+    """Generate trunk dataset.
+
+    For each dimension in the first distribution, there is a mean of :math:`1 / d`, where
+    ``d`` is the dimensionality. The covariance is the identity matrix.
+    The second distribution has a mean vector that is the negative of the first.
+    As ``d`` increases, the two distributions become closer and closer.
+
+    See full details in :footcite:`trunk1982`.
+
+    Instead of the identity covariance matrix, one can implement a banded covariance matrix
+    that follows :footcite:`Bickel_2008`.
+
+    Parameters
+    ----------
+    n_samples : int
+        Number of sample to generate.
+    n_dim : int, optional
+        The dimensionality of the dataset and the number of
+        unique labels, by default 10.
+    m_factor : int
+        The multiplicative factor to apply to the mean-vector of the first
+        distribution to obtain the mean-vector of the second distribution.
+        By default -1.
+    rho : float
+        The covariance value of the bands. By default 0 indicating, an identity matrix is used.
+    band_type : str
+        The band type to use. For details, see Example 1 and 2 in :footcite:`Bickel_2008`.
+        Either 'ma', or 'ar'.
+    return_params : bool
+        Whether or not to return the distribution parameters of the classes normal distributions.
+    random_state : Random State, optional
+        Random state, by default None.
+
+    Returns
+    -------
+    X : np.ndarray of shape (n, p), dtype=np.float64
+        Trunk dataset as a dense array.
+    y : np.ndarray of shape (n,), dtype=np.intp
+        Labels of the dataset
+    means : list of ArrayLike of shape (p,), dtype=np.float64
+        The mean vector for each class starting with class 0.
+        Returned if ``return_params`` is True.
+    covs : list of ArrayLike of shape (p,p), dtype=np.float64
+        The covariance for each class. Returned if ``return_params`` is True.
+
+    References
+    ----------
+    .. footbibliography::
+    """
+    rng = np.random.RandomState(seed=random_state)
+
+    mu_1 = np.array([1 / i for i in range(1, n_dim + 1)])
+    mu_0 = m_factor * mu_1
+
+    if rho != 0:
+        if band_type == "ma":
+            cov = _moving_avg_cov(n_dim, rho)
+        elif band_type == "ar":
+            cov = _autoregressive_cov(n_dim, rho)
+        else:
+            raise ValueError(f'Band type {band_type} must be one of "ma", or "ar".')
+    else:
+        cov = np.identity(n_dim)
+
+    X = np.vstack(
+        (
+            rng.multivariate_normal(mu_0, cov, n_samples // 2),
+            rng.multivariate_normal(mu_1, cov, n_samples // 2),
+        )
+    )
+    y = np.concatenate((np.zeros(n_samples // 2), np.ones(n_samples // 2)))
+
+    if return_params:
+        return X, y, [mu_0, mu_1], [cov, cov]
+    return X, y
+
+
+def _moving_avg_cov(n_dim, rho):
+    # Create a meshgrid of indices
+    i, j = np.meshgrid(np.arange(1, n_dim + 1), np.arange(1, n_dim + 1), indexing="ij")
+
+    # Calculate the covariance matrix using the corrected formula
+    cov_matrix = rho ** np.abs(i - j)
+
+    # Apply the banding condition
+    cov_matrix[abs(i - j) > 1] = 0
+    return cov_matrix
+
+
+def _autoregressive_cov(n_dim, rho):
+    # Create a meshgrid of indices
+    i, j = np.meshgrid(np.arange(1, n_dim + 1), np.arange(1, n_dim + 1), indexing="ij")
+
+    # Calculate the covariance matrix using the corrected formula
+    cov_matrix = rho ** np.abs(i - j)
+
+    return cov_matrix
+
+
+def approximate_clf_mutual_information(
+    means, covs, class_probs=[0.5, 0.5], base=np.exp(1), seed=None
+):
+    """Approximate MI for multivariate Gaussian for a classification setting.
+
+    Parameters
+    ----------
+    means : list of ArrayLike of shape (n_dims_,)
+        A list of means to sample from for each class.
+    covs : list of ArrayLike of shape (n_dims_, n_dims_)
+        A list of covariances to sample from for each class.
+    class_probs : list, optional
+        List of class probabilities, by default [0.5, 0.5] for
+        balanced binary classification.
+    base : float, optional
+        The bit base to use, by default np.exp(1) for natural logarithm.
+    seed : int, optional
+        Random seed for the multivariate normal, by default None.
+
+    Returns
+    -------
+    I_XY : float
+        Estimated mutual information.
+    H_X : float
+        Estimated entropy of X, the mixture of multivariate Gaussians.
+    H_XY : float
+        The conditional entropy of X given Y.
+    int_err : float
+        The integration error for ``H_X``.
+    """
+    # this implicitly assumes that the signal of interest is between -10 and 10
+    scale = 10
+    n_dims = [cov.shape[1] for cov in covs]
+    lims = [[-scale, scale]] * n_dims
+
+    # Compute entropy and X and Y.
+    def func(*args):
+        x = np.array(args)
+        p = 0
+        for k in range(len(means)):
+            p += class_probs[k] * multivariate_normal(seed=seed).pdf(x, means[k], covs[k])
+        return -p * np.log(p) / np.log(base)
+
+    # numerically integrate H(X)
+    opts = dict(limit=1000)
+    H_X, int_err = nquad(func, lims, opts=opts)
+
+    # Compute MI.
+    H_XY = 0
+    for k in range(len(means)):
+        H_XY += (
+            class_probs[k]
+            * (n_dims[k] * np.log(2 * np.pi) + np.log(np.linalg.det(covs[k])) + n_dims[k])
+            / (2 * np.log(base))
+        )
+    I_XY = H_X - H_XY
+    return I_XY, H_X, H_XY, int_err
+
+
+def _compute_mi_bounds(means, covs, class_probs):
+    # compute bounds using https://arxiv.org/pdf/2101.11670.pdf
+    prior_y = np.array(class_probs)
+    H_Y = entropy(prior_y, base=np.exp(1))
+
+    # number of mixtures
+    N = len(class_probs)
+
+    cov = covs[0]
+
+    H_YX_lb = 0.0
+    H_YX_ub = 0.0
+    for idx in range(N):
+        num = 0.0
+        denom = 0.0
+        mean_i = means[idx]
+
+        for jdx in range(N):
+            mean_j = means[jdx]
+            c_alpha, kl_div = _compute_c_alpha_and_kl(mean_i, mean_j, cov, alpha=0.5)
+            num += class_probs[jdx] * np.exp(-c_alpha)
+
+        for kdx in range(N):
+            mean_k = means[kdx]
+            c_alpha, kl_div = _compute_c_alpha_and_kl(mean_i, mean_k, cov, alpha=0.5)
+            denom += class_probs[jdx] * np.exp(-kl_div)
+        H_YX_lb += class_probs[idx] * np.log(num / denom)
+        H_YX_ub += class_probs[idx] * np.log(denom / num)
+    I_lb = H_Y - H_YX_lb
+    I_ub = H_Y - H_YX_ub
+    return I_lb, I_ub
+
+
+def _compute_c_alpha_and_kl(mean_i, mean_j, cov, alpha=0.5):
+    mean_ij = mean_i - mean_j
+    lambda_ij = mean_ij.T @ np.linalg.inv(cov) @ mean_ij
+    return alpha * (1.0 - alpha) * lambda_ij / 2.0, lambda_ij / 2
