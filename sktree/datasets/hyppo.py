@@ -54,6 +54,7 @@ def make_trunk_classification(
     rho: int = 0,
     band_type: str = "ma",
     return_params: bool = False,
+    mix: int = 0,
     random_state=None,
 ):
     """Generate trunk dataset.
@@ -75,17 +76,19 @@ def make_trunk_classification(
     n_dim : int, optional
         The dimensionality of the dataset and the number of
         unique labels, by default 10.
-    m_factor : int
+    m_factor : int, optional
         The multiplicative factor to apply to the mean-vector of the first
         distribution to obtain the mean-vector of the second distribution.
         By default -1.
-    rho : float
+    rho : float, optional
         The covariance value of the bands. By default 0 indicating, an identity matrix is used.
     band_type : str
         The band type to use. For details, see Example 1 and 2 in :footcite:`Bickel_2008`.
         Either 'ma', or 'ar'.
-    return_params : bool
+    return_params : bool, optional
         Whether or not to return the distribution parameters of the classes normal distributions.
+    mix : int, optional
+        Whether or not to mix the Gaussians.
     random_state : Random State, optional
         Random state, by default None.
 
@@ -123,7 +126,8 @@ def make_trunk_classification(
     X = np.vstack(
         (
             rng.multivariate_normal(mu_0, cov, n_samples // 2),
-            rng.multivariate_normal(mu_1, cov, n_samples // 2),
+            (1 - mix) * rng.multivariate_normal(mu_1, cov, n_samples // 2)
+            + mix * rng.multivariate_normal(mu_0, cov, n_samples // 2),
         )
     )
     y = np.concatenate((np.zeros(n_samples // 2), np.ones(n_samples // 2)))
