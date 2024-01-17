@@ -8,6 +8,7 @@ from joblib import Parallel, delayed
 from sklearn.base import _fit_context
 from sklearn.ensemble._base import _partition_estimators
 from sklearn.utils.validation import check_is_fitted, check_X_y
+from sklearn.ensemble._forest import _generate_unsampled_indices, _get_n_samples_bootstrap
 
 from .._lib.sklearn.ensemble._forest import ForestClassifier
 from .._lib.sklearn.tree import _tree as _sklearn_tree
@@ -257,6 +258,10 @@ class HonestForestClassifier(ForestClassifier):
     honest_indices_ : list of lists, shape=(n_estimators, n_honest)
         Indices of training samples used to learn leaf estimates.
 
+    oob_samples_ : list of lists, shape=(n_estimators, n_samples_bootstrap)
+        The indices of training samples that are "out-of-bag". Only used
+        if ``bootstrap=False``.
+
     Notes
     -----
     The default values for the parameters controlling the size of the trees
@@ -490,6 +495,30 @@ class HonestForestClassifier(ForestClassifier):
         """The indices used to fit the leaf nodes."""
         check_is_fitted(self)
         return [tree.honest_indices_ for tree in self.estimators_]
+
+    @property
+    def oob_samples_(self):
+        """The sample indices that are out-of-bag.
+
+        Only utilized if ``bootstrap=True``, otherwise, all samples are "in-bag".
+        """
+        if self.bootstrap is False:
+            raise RuntimeError("Cannot extract out-of-bag samples when bootstrap is False.")
+        check_is_fitted(self)
+        self._n_samples
+        oob_samples = []
+        n_samples_bootstrap = _get_n_samples_bootstrap(
+            self._n_samples,
+            self.max_samples,
+        )
+        for estimator in self.estimators_:
+            unsampled_indices = _generate_unsampled_indices(
+                estimator.random_state,
+                self._n_samples,
+                n_samples_bootstrap,
+            )
+            oob_samples.append(unsampled_indices)
+        return oob_samples
 
     def _more_tags(self):
         return {"multioutput": False}

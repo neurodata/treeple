@@ -30,6 +30,7 @@ from .utils import (
     REGRESSOR_METRICS,
     _compute_null_distribution_coleman,
     _non_nan_samples,
+    get_per_tree_oob_samples,
 )
 
 
@@ -1005,6 +1006,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
         sample_dataset_per_tree=False,
         permute_forest_fraction=None,
         train_test_split=True,
+        use_oob_as_test=False,
     ):
         super().__init__(
             estimator=estimator,
@@ -1017,6 +1019,8 @@ class FeatureImportanceForestClassifier(BaseForestHT):
             train_test_split=train_test_split,
             permute_forest_fraction=permute_forest_fraction,
         )
+        # TODO: refactor this as part of the BaseFeatureImportanceForest class
+        self.use_oob_as_test = use_oob_as_test
 
     def _get_estimator(self):
         if self.estimator is None:
@@ -1083,6 +1087,40 @@ class FeatureImportanceForestClassifier(BaseForestHT):
                 for idx, (indices_train, _) in enumerate(self.train_test_samples_)
             )
             estimator.estimators_ = trees
+
+            train_test_samples_ = self.train_test_samples_
+        elif self.use_oob_as_test:
+            if not estimator.bootstrap:
+                raise RuntimeError('Use oob as test samples does not work if estimator.bootstrap is False.')
+            
+            # to fill in the predicted statistics, we can use the oob samples instead
+            X_buff = X.copy()
+
+            if covariate_index is not None:
+                # perform permutation of covariates
+                if self.conditional_perm:
+                    X_perm_cov_ind = conditional_resample(
+                        X_buff, X_buff[:, covariate_index], replace=False, random_state=rng
+                    )
+                    X_buff[:, covariate_index] = X_perm_cov_ind
+                else:
+                    n_samples_train = X_buff.shape[0]
+                    index_arr = rng.choice(
+                        np.arange(n_samples_train, dtype=int),
+                        size=(n_samples_train, 1),
+                        replace=False,
+                        shuffle=True,
+                    )
+                    X_buff[:, covariate_index] = X_buff[index_arr, covariate_index]
+
+            if self._type_of_target_ == "binary" or (y.ndim > 1 and y.shape[1] == 1):
+                y = y.ravel()
+            estimator.fit(X_buff, y)
+
+            # now predict on out-of-bag samples
+            oob_samples_ = get_per_tree_oob_samples(estimator)
+            inbag_samples_ = estimator.estimators_samples_
+            train_test_samples_ = zip(inbag_samples_, oob_samples_)
         else:
             # fitting a forest will only get one unique train/test split
             indices_train, indices_test = self.train_test_samples_[0]
@@ -1111,6 +1149,8 @@ class FeatureImportanceForestClassifier(BaseForestHT):
                 y_train = y_train.ravel()
             estimator.fit(X_train, y_train)
 
+            train_test_samples_ = self.train_test_samples_
+
         # list of tree outputs. Each tree output is (n_samples, n_outputs), or (n_samples,)
         if predict_posteriors:
             # all_proba = Parallel(n_jobs=estimator.n_jobs, verbose=self.verbose)(
@@ -1127,7 +1167,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
                     delayed(_parallel_predict_proba)(
                         estimator.estimators_[idx].predict_proba, X, indices_test
                     )
-                    for idx, (_, indices_test) in enumerate(self.train_test_samples_)
+                    for idx, (_, indices_test) in enumerate(train_test_samples_)
                 )
             else:
                 all_indices = np.arange(self._n_samples_, dtype=int)
@@ -1144,9 +1184,10 @@ class FeatureImportanceForestClassifier(BaseForestHT):
                 delayed(_parallel_predict_proba)(
                     estimator.estimators_[idx].predict, X, indices_test
                 )
-                for idx, (_, indices_test) in enumerate(self.train_test_samples_)
+                for idx, (_, indices_test) in enumerate(train_test_samples_)
             )
-        for itree, (proba, est_indices) in enumerate(zip(all_proba, self.train_test_samples_)):
+
+        for itree, (proba, est_indices) in enumerate(zip(all_proba, train_test_samples_)):
             _, indices_test = est_indices
 
             if predict_posteriors:
@@ -1193,3 +1234,32 @@ class FeatureImportanceForestClassifier(BaseForestHT):
             return stat, posterior_arr, samples
 
         return stat
+
+
+def build_hyppo_forest(
+    est,
+    X,
+    y,
+    bootstrap_data=True,
+    bootstrap_forest=True,
+    split_data=True,
+    stratify=True,
+    seed=None
+):
+    # bootstrap the data if required
+    if bootstrap_data:
+        X = X
+
+    if split_data:
+        X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=stratify)
+    else:
+        X_train = X
+        y_train = y
+
+    # build forest
+    est.fit(X_train, y_train)
+
+    # sample M times from the trees to estimate statistics on out-of-bag data
+    
+    
+    pass

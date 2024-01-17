@@ -1,9 +1,7 @@
 import numpy as np
-
+from dataclasses import dataclass
+from numpy.typing import ArrayLike
 from sklearn.datasets import (
-    make_blobs,
-    make_classification,
-    make_sparse_spd_matrix,
     make_spd_matrix,
 )
 
@@ -18,29 +16,12 @@ def _skewed_unimodal(n_dims):
     means = np.zeros((n_dims,))
     cov = np.zeros((n_dims, n_dims))
 
-    _mean = 1./5 * 1/2 + 3./5 * 13/12
-    _var = (1./5)**2 + (1./5)**2 * (2./3)**2 + (3./5)**2 * (5./9)**2
+    _mean = 1.0 / 5 * 1 / 2 + 3.0 / 5 * 13 / 12
+    _var = (1.0 / 5) ** 2 + (1.0 / 5) ** 2 * (2.0 / 3) ** 2 + (3.0 / 5) ** 2 * (5.0 / 9) ** 2
 
     means[:] = _mean
     np.fill_diagonal(cov, _var)
     return means, cov
-
-def _strongly_skewed(n_dims):
-    """Generate strongly skewed density.
-
-    #3 in Marron/Wand:
-
-    X ~ \sum_{i=0}^7 1/8 N(3[(2/3)^i - 1], (2/3)^(2l))
-    """
-    means = np.zeros((n_dims,))
-    cov = np.zeros((n_dims, n_dims))
-
-    _mean = 1./5 * 1/2 + 3./5 * 13/12
-    _var = (1./5)**2 + (1./5)**2 * (2./3)**2 + (3./5)**2 * (5./9)**2
-    means[:] = _mean
-    np.fill_diagonal(cov, _var)
-    return means, cov
-
 
 
 def _strongly_skewed(n_dims):
@@ -53,15 +34,32 @@ def _strongly_skewed(n_dims):
     means = np.zeros((n_dims,))
     cov = np.zeros((n_dims, n_dims))
 
-    _mean = 0.
-    _var = 0.
+    _mean = 1.0 / 5 * 1 / 2 + 3.0 / 5 * 13 / 12
+    _var = (1.0 / 5) ** 2 + (1.0 / 5) ** 2 * (2.0 / 3) ** 2 + (3.0 / 5) ** 2 * (5.0 / 9) ** 2
+    means[:] = _mean
+    np.fill_diagonal(cov, _var)
+    return means, cov
+
+
+def _kurtotic_unimodal(n_dims):
+    """Generate Kurtotic unimodal pdf.
+
+    #4 in Marron/Wand:
+
+    X ~ 2/3 N(0, 1) + 1/3 N(0, (1/10)^2)
+    """
+    # TODO
+    means = np.zeros((n_dims,))
+    cov = np.zeros((n_dims, n_dims))
+
+    _mean = 0.0
+    _var = 0.0
     for idx in range(8):
-        _mean += 1./8 * (3 * (2./3)**idx - 1) + 2./5 ** (2*idx)
-        _var += (1./8)**2 * (2./3)**(2*idx)
+        _mean += 1.0 / 8 * (3 * (2.0 / 3) ** idx - 1) + 2.0 / 5 ** (2 * idx)
+        _var += (1.0 / 8) ** 2 * (2.0 / 3) ** (2 * idx)
     means[:] = _mean
     np.fill_diagonal(cov, _var)
     return means, cov
-
 
 
 def _make_two_view_cov(
@@ -75,8 +73,8 @@ def _make_two_view_cov(
     joint_cov = np.zeros((n_features, n_features))
 
     # now generate random PD matrix for the Covariance
-    if view_relations == 'independent':
-        cov_1 = make_spd_matrix(n_dim=n_features_1, random_state=rng.integers(0, 1e6)),
+    if view_relations == "independent":
+        cov_1 = (make_spd_matrix(n_dim=n_features_1, random_state=rng.integers(0, 1e6)),)
         joint_cov[:n_features_1, :n_features_1] = cov_1
 
         cov_2 = make_spd_matrix(n_dim=n_features_2, random_state=rng.integers(0, 1e6))
@@ -87,13 +85,20 @@ def _make_two_view_cov(
     return joint_cov
 
 
+@dataclass
+class Data:
+    X: ArrayLike
+    y: ArrayLike
+    X_cov: ArrayLike
+    
+
 def make_twoview_classification(
     n_samples=100,
     n_features_1=10,
     n_features_2=100,
     noise_dims_1=90,
     noise_dims_2=3900,
-    view_relations='independent',
+    view_relations="independent",
     transform_1=None,
     transform_2=None,
     flip_y=0.01,
@@ -115,6 +120,8 @@ def make_twoview_classification(
     X = rng.multivariate_normal(means, joint_cov, size=n_samples)
 
     # now take half the samples and apply a transformation
-    # if transform_1 is not None:
+    if transform_1 is not None:
+        X[: n_samples // 2, :] = transform_1(X[: n_samples // 2, :])
 
-        
+
+    return 

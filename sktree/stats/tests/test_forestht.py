@@ -59,6 +59,29 @@ def test_featureimportance_forest_permute_pertree(sample_dataset_per_tree):
     ), f"{len(est.train_test_samples_[0][1])} {n_samples * est.test_size}"
     assert len(est.train_test_samples_[0][0]) == est._n_samples_ - n_samples * est.test_size
 
+    # check the output of the posteriors
+    assert_array_equal(est.observe_posteriors_.shape, (n_estimators, n_samples, 1))
+    assert_array_equal(est.permute_posteriors_.shape, (n_estimators, n_samples, 1))
+
+    # there are no nans
+    assert np.isnan(np.nansum(est.observe_posteriors_, axis=1)).sum() == 0
+
+
+@pytest.mark.parametrize("sample_dataset_per_tree", [True, False])
+def test_might_with_and_without_permute_per_tree_errors(sample_dataset_per_tree):
+    n_samples = 50
+    n_estimators = 10
+    est = FeatureImportanceForestClassifier(
+        estimator=RandomForestClassifier(
+            n_estimators=n_estimators,
+            random_state=seed,
+        ),
+        permute_forest_fraction=1.0 / n_estimators * 5,
+        test_size=0.7,
+        random_state=seed,
+        sample_dataset_per_tree=sample_dataset_per_tree,
+    )
+
     # covariate index should work with mse
     est.reset()
     est.statistic(iris_X[:n_samples], iris_y[:n_samples], covariate_index=[1], metric="mse")
