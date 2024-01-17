@@ -1,5 +1,4 @@
 import numpy as np
-import numpy as np
 from scipy.stats import multivariate_normal, entropy
 from scipy.integrate import nquad
 
