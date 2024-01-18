@@ -94,14 +94,14 @@ def make_trunk_classification(
 
     Returns
     -------
-    X : np.ndarray of shape (n, p), dtype=np.float64
+    X : np.ndarray of shape (n_samples, n_dim), dtype=np.float64
         Trunk dataset as a dense array.
-    y : np.ndarray of shape (n,), dtype=np.intp
-        Labels of the dataset
-    means : list of ArrayLike of shape (p,), dtype=np.float64
+    y : np.ndarray of shape (n_samples,), dtype=np.intp
+        Labels of the dataset.
+    means : list of ArrayLike of shape (n_dim,), dtype=np.float64
         The mean vector for each class starting with class 0.
         Returned if ``return_params`` is True.
-    covs : list of ArrayLike of shape (p,p), dtype=np.float64
+    covs : list of ArrayLike of shape (n_dim, n_dim), dtype=np.float64
         The covariance for each class. Returned if ``return_params`` is True.
 
     References
@@ -182,9 +182,9 @@ def approximate_clf_mutual_information(
 
     Parameters
     ----------
-    means : list of ArrayLike of shape (n_dims_,)
+    means : list of ArrayLike of shape (n_dim,)
         A list of means to sample from for each class.
-    covs : list of ArrayLike of shape (n_dims_, n_dims_)
+    covs : list of ArrayLike of shape (n_dim, n_dim)
         A list of covariances to sample from for each class.
     class_probs : list, optional
         List of class probabilities, by default [0.5, 0.5] for
@@ -235,16 +235,17 @@ def approximate_clf_mutual_information(
 
 
 def approximate_clf_mutual_information_with_monte_carlo(
-    means, covs, n=100_000, class_probs=[0.5, 0.5], base=np.exp(1), seed=None
+    means, covs, n_samples=100_000, class_probs=[0.5, 0.5], base=np.exp(1), seed=None
 ):
     """Approximate MI for multivariate Gaussian for a classification setting.
+
     Parameters
     ----------
-    means : list of ArrayLike of shape (n_dims_,)
+    means : list of ArrayLike of shape (n_dim,)
         A list of means to sample from for each class.
-    covs : list of ArrayLike of shape (n_dims_, n_dims_)
+    covs : list of ArrayLike of shape (n_dim, n_dim)
         A list of covariances to sample from for each class.
-    n : total number of samples
+    n_samples : int
         The total number of simulation samples
     class_probs : list, optional
         List of class probabilities, by default [0.5, 0.5] for
@@ -253,6 +254,7 @@ def approximate_clf_mutual_information_with_monte_carlo(
         The bit base to use, by default np.exp(1) for natural logarithm.
     seed : int, optional
         Random seed for the multivariate normal, by default None.
+
     Returns
     -------
     I_XY : float
@@ -270,7 +272,7 @@ def approximate_clf_mutual_information_with_monte_carlo(
     X = []
     for i in range(len(means)):
         pdf_class.append(multivariate_normal(means[i], covs[i], allow_singular=True))
-        X.append(np.random.normal(means[i], covs[i], size=int(n * P_Y[i])).reshape(-1, 1))
+        X.append(np.random.normal(means[i], covs[i], size=int(n_samples * P_Y[i])).reshape(-1, 1))
 
     X = np.vstack(X)
 
