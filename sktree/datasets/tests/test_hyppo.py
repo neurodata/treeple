@@ -46,3 +46,9 @@ def test_make_trunk_classification_invalid_mix():
     # Test with an invalid band type
     with pytest.raises(ValueError, match="Mix must be between 0 and 1."):
         make_trunk_classification(n_samples=50, rho=0.5, mix=2)
+
+
+def test_make_trunk_classification_invalid_n_informative():
+    # Test with an invalid band type
+    with pytest.raises(ValueError, match="Number of informative dimensions"):
+        make_trunk_classification(n_samples=50, n_dim=10, n_informative=11, rho=0.5, mix=2)

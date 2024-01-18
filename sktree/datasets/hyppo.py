@@ -50,6 +50,7 @@ def make_quadratic_classification(n_samples: int, n_features: int, noise=False, 
 def make_trunk_classification(
     n_samples,
     n_dim=10,
+    n_informative=10,
     m_factor: int = -1,
     rho: int = 0,
     band_type: str = "ma",
@@ -76,6 +77,9 @@ def make_trunk_classification(
     n_dim : int, optional
         The dimensionality of the dataset and the number of
         unique labels, by default 10.
+    n_informative : int, optional
+        The informative dimensions. All others for ``n_dim - n_informative``
+        are uniform noise.
     m_factor : int, optional
         The multiplicative factor to apply to the mean-vector of the first
         distribution to obtain the mean-vector of the second distribution.
@@ -108,25 +112,30 @@ def make_trunk_classification(
     ----------
     .. footbibliography::
     """
+    if n_dim < n_informative:
+        raise ValueError(
+            f"Number of informative dimensions {n_informative} must be less than number "
+            f"of dimensions, {n_dim}"
+        )
     rng = np.random.default_rng(seed=seed)
 
-    mu_1 = np.array([1 / np.sqrt(i) for i in range(1, n_dim + 1)])
+    mu_1 = np.array([1 / np.sqrt(i) for i in range(1, n_informative + 1)])
     mu_0 = m_factor * mu_1
 
     if rho != 0:
         if band_type == "ma":
-            cov = _moving_avg_cov(n_dim, rho)
+            cov = _moving_avg_cov(n_informative, rho)
         elif band_type == "ar":
-            cov = _autoregressive_cov(n_dim, rho)
+            cov = _autoregressive_cov(n_informative, rho)
         else:
             raise ValueError(f'Band type {band_type} must be one of "ma", or "ar".')
     else:
-        cov = np.identity(n_dim)
+        cov = np.identity(n_informative)
 
     if mix < 0 or mix > 1:
         raise ValueError("Mix must be between 0 and 1.")
 
-    if n_dim > 1000:
+    if n_informative > 1000:
         method = "cholesky"
     else:
         method = "svd"
@@ -139,13 +148,27 @@ def make_trunk_classification(
             )
         )
     else:
+        mixture_idx = rng.choice(
+            [0, 1], n_samples // 2, replace=True, shuffle=True, p=[mix, 1 - mix]
+        )
+        X_mixture = np.zeros((n_samples // 2, len(mu_1)))
+        for idx in range(n_samples // 2):
+            if mixture_idx[idx] == 1:
+                X_sample = rng.multivariate_normal(mu_1, cov, 1, method=method)
+            else:
+                X_sample = rng.multivariate_normal(mu_0, cov, 1, method=method)
+            X_mixture[idx, :] = X_sample
+
         X = np.vstack(
             (
                 rng.multivariate_normal(np.zeros(n_dim), cov, n_samples // 2, method=method),
-                (1 - mix) * rng.multivariate_normal(mu_1, cov, n_samples // 2, method=method)
-                + mix * rng.multivariate_normal(mu_0, cov, n_samples // 2, method=method),
+                X_mixture,
             )
         )
+
+    if n_dim > n_informative:
+        X = np.hstack((X, rng.uniform(low=0, high=1, size=(n_samples, n_dim - n_informative))))
+
     y = np.concatenate((np.zeros(n_samples // 2), np.ones(n_samples // 2)))
 
     if return_params:
