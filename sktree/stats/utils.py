@@ -274,7 +274,6 @@ def _compute_null_distribution_coleman(
     return metric_star, metric_star_pi
 
 
-
 def get_per_tree_oob_samples(est: BaseForest):
     """The sample indices that are out-of-bag.
 
