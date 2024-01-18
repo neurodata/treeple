@@ -1,4 +1,8 @@
-from .forestht import FeatureImportanceForestClassifier, FeatureImportanceForestRegressor
+from .forestht import (
+    FeatureImportanceForestClassifier,
+    FeatureImportanceForestRegressor,
+    build_hyppo_forest,
+)
 from .monte_carlo import PermutationTest
 from .permutationforest import PermutationForestClassifier, PermutationForestRegressor
 
@@ -8,4 +12,5 @@ __all__ = [
     "PermutationForestClassifier",
     "PermutationForestRegressor",
     "PermutationTest",
+    "build_hyppo_forest",
 ]
