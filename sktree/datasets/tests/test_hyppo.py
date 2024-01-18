@@ -21,7 +21,13 @@ def test_make_trunk_classification_default():
 def test_make_trunk_classification_custom_parameters():
     # Test with custom parameters
     X, y = make_trunk_classification(
-        n_samples=50, n_dim=5, m_factor=2, rho=0.5, band_type="ma", return_params=False
+        n_samples=50,
+        n_dim=5,
+        n_informative=2,
+        m_factor=2,
+        rho=0.5,
+        band_type="ma",
+        return_params=False,
     )
     assert X.shape == (50, 5)
     assert y.shape == (50,)
