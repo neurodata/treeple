@@ -107,6 +107,11 @@ class HonestForestClassifier(ForestClassifier):
         Whether bootstrap samples are used when building trees. If False, the
         whole dataset is used to build each tree.
 
+        When bootstrap is True, each tree bootstrap samples the dataset, and then
+        the unique indices are split in half, where one half is used to train
+        the structure of the tree and one half is used to train the leaves of the tree.
+        The remaining sample indices are considered "out of bag".
+
     oob_score : bool, default=False
         Whether to use out-of-bag samples to estimate the generalization score.
         Only available if bootstrap=True.

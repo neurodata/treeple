@@ -180,6 +180,7 @@ def test_honest_forest_has_deterministic_sampling_for_oob_structure_and_leaves(b
             assert set(structure_samples[itree]).union(set(leaf_samples[itree])) == set(
                 inbag_samples[itree]
             )
+            assert set(inbag_samples[itree]).intersection(set(oob_samples_[itree])) == set()
             assert_array_equal(oob_samples_[itree], oob_samples[itree])
 
 

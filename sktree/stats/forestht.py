@@ -1,5 +1,9 @@
 from typing import Callable, Optional, Tuple, Union
 
+
+import threading
+from sklearn.ensemble._base import _partition_estimators
+
 import numpy as np
 from joblib import Parallel, delayed
 from numpy.typing import ArrayLike
@@ -1193,3 +1197,56 @@ class FeatureImportanceForestClassifier(BaseForestHT):
             return stat, posterior_arr, samples
 
         return stat
+
+
+def build_hyppo_forest(
+    est,
+    X,
+    y,
+    bootstrap_data=True,
+    bootstrap_forest=True,
+    split_data_first=True,
+    stratify=True,
+    seed=None,
+    verbose=False,
+):
+    assert est.bootstrap
+    # bootstrap the data if required
+    # if bootstrap_data:
+    #     X = X
+
+    if split_data_first:
+        X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=stratify)
+    else:
+        X_train = X
+        y_train = y
+
+    # build forest
+    est.fit(X_train, y_train)
+
+    # now evaluate
+    X = est._validate_X_predict(X)
+
+    # if we trained a binning tree, then we should re-bin the data
+    # XXX: this is inefficient and should be improved to be in line with what
+    # the Histogram Gradient Boosting Tree does, where the binning thresholds
+    # are passed into the tree itself, thus allowing us to set the node feature
+    # value thresholds within the tree itself.
+    if est.max_bins is not None:
+        X = est._bin_data(X, is_training_data=False).astype(DTYPE)
+
+    # Assign chunk of trees to jobs
+    n_jobs, _, _ = _partition_estimators(est.n_estimators, est.n_jobs)
+
+    # avoid storing the output of every estimator by summing them here
+    lock = threading.Lock()
+    # accumulate the predictions across all trees
+    all_proba = np.full(
+        (len(est.estimators_), X.shape[0], est.n_classes_), np.nan, dtype=np.float64
+    )
+    Parallel(n_jobs=n_jobs, verbose=verbose, require="sharedmem")(
+        delayed(_parallel_predict_proba)(e.predict_proba, X, all_proba, idx, train_idx, lock)
+        for idx, (e, train_idx) in enumerate(zip(est.estimators_, est.estimators_samples_))
+    )
+
+    return est, all_proba

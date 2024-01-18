@@ -8,7 +8,7 @@ seed = 1234
 rng = np.random.default_rng(seed)
 
 
-@pytest.mark.parametrize('bootstrap', [True, False])
+@pytest.mark.parametrize("bootstrap", [True, False])
 def test_get_per_tree_oob_samples(bootstrap):
     n_estimators = 5
     est = HonestForestClassifier(n_estimators=n_estimators, random_state=0, bootstrap=bootstrap)
@@ -29,6 +29,5 @@ def test_get_per_tree_oob_samples(bootstrap):
             assert len(oob_samples[itree]) > 1
             assert_array_equal(oob_samples_[itree], oob_samples[itree])
     else:
-        with pytest.raises(RuntimeError, match='Cannot extract out-of-bag samples'):
+        with pytest.raises(RuntimeError, match="Cannot extract out-of-bag samples"):
             get_per_tree_oob_samples(est)
-
