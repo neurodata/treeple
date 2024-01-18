@@ -141,7 +141,7 @@ def make_trunk_classification(
     else:
         X = np.vstack(
             (
-                rng.multivariate_normal(mu_0, cov, n_samples // 2, method=method),
+                rng.multivariate_normal(np.zeros(n_dim), cov, n_samples // 2, method=method),
                 (1 - mix) * rng.multivariate_normal(mu_1, cov, n_samples // 2, method=method)
                 + mix * rng.multivariate_normal(mu_0, cov, n_samples // 2, method=method),
             )
