@@ -29,6 +29,9 @@ Changelog
   has a generative model based on Trunk and banded covariance, :func:`sktree.datasets.approximate_clf_mutual_information` and
   :func:`sktree.datasets.approximate_clf_mutual_information_with_monte_carlo` to
   approximate mutual information either numerically or via Monte-Carlo, by `Adam Li`_ and `Haoyin Xu`_ (:pr:`#199`).
+- |Enhancement| :class:`sktree.ensemble.HonestForestClassifier` now has a fitted
+  property ``oob_samples_``, which reproduces the sample indices per tree that is out
+  of bag, by `Adam Li`_ (:pr:`#200`).
 
 
 Code and Documentation Contributors
