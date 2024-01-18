@@ -162,7 +162,7 @@ class ForestCluster(SimMatrixMixin, TransformerMixin, ClusterMixin, BaseForest):
                     t,
                     self.bootstrap,
                     X,
-                    np.arange(n_samples_bootstrap),
+                    np.arange(X.shape[0]),
                     sample_weight,
                     i,
                     len(trees),
