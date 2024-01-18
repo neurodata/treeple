@@ -141,7 +141,7 @@ def make_trunk_classification(
     else:
         X = np.vstack(
             (
-                rng.multivariate_normal(mu_0, cov, n_samples // 2, method=method),
+                rng.multivariate_normal(np.zeros(n_dim), cov, n_samples // 2, method=method),
                 (1 - mix) * rng.multivariate_normal(mu_1, cov, n_samples // 2, method=method)
                 + mix * rng.multivariate_normal(mu_0, cov, n_samples // 2, method=method),
             )
@@ -264,7 +264,7 @@ def approximate_clf_mutual_information_with_monte_carlo(
     H_Y_on_X : float
         The conditional entropy of Y given X.
     """
-    np.random.seed(seed)
+    rng = np.random.default_rng(seed=seed)
     P_Y = class_probs
 
     # Generate samples
@@ -272,7 +272,7 @@ def approximate_clf_mutual_information_with_monte_carlo(
     X = []
     for i in range(len(means)):
         pdf_class.append(multivariate_normal(means[i], covs[i], allow_singular=True))
-        X.append(np.random.normal(means[i], covs[i], size=int(n_samples * P_Y[i])).reshape(-1, 1))
+        X.append(rng.multivariate_normal(means[i], covs[i], size=int(n_samples * P_Y[i])).reshape(-1, 1))
 
     X = np.vstack(X)
 
