@@ -283,6 +283,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         tree_estimator=None,
         honest_fraction=0.5,
         honest_prior="empirical",
+        stratify=False,
     ):
         self.tree_estimator = tree_estimator
         self.criterion = criterion
@@ -300,6 +301,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         self.honest_fraction = honest_fraction
         self.honest_prior = honest_prior
         self.monotonic_cst = monotonic_cst
+        self.stratify = stratify
 
         # XXX: to enable this, we need to also reset the leaf node samples during `_set_leaf_nodes`
         self.store_leaf_values = False
@@ -528,7 +530,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         nonzero_indices = np.where(_sample_weight > 0)[0]
 
         # TODO: perhaps we want to stratify this split
-        try:
+        if self.stratify:
             ss = StratifiedShuffleSplit(
                 n_splits=1, test_size=self.honest_fraction, random_state=self.random_state
             )
@@ -537,7 +539,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
             ):
                 self.structure_indices_ = nonzero_indices[structure_idx]
                 self.honest_indices_ = nonzero_indices[leaf_idx]
-        except Exception:
+        else:
             self.structure_indices_ = rng.choice(
                 nonzero_indices,
                 int((1 - self.honest_fraction) * len(nonzero_indices)),

@@ -197,6 +197,10 @@ class HonestForestClassifier(ForestClassifier):
         that one MUST use trees imported from the `sktree.tree`
         API namespace rather than from `sklearn.tree`.
 
+    stratify : bool
+        Whether or not to stratify sample when considering structure and leaf indices.
+        By default False.
+
     Attributes
     ----------
     estimator : sktree.tree.HonestTreeClassifier
@@ -344,6 +348,7 @@ class HonestForestClassifier(ForestClassifier):
         honest_prior="empirical",
         honest_fraction=0.5,
         tree_estimator=None,
+        stratify=False,
     ):
         super().__init__(
             estimator=HonestTreeClassifier(),
@@ -363,6 +368,7 @@ class HonestForestClassifier(ForestClassifier):
                 "tree_estimator",
                 "honest_fraction",
                 "honest_prior",
+                "stratify",
             ),
             bootstrap=bootstrap,
             oob_score=oob_score,
@@ -386,6 +392,7 @@ class HonestForestClassifier(ForestClassifier):
         self.honest_fraction = honest_fraction
         self.honest_prior = honest_prior
         self.tree_estimator = tree_estimator
+        self.stratify = stratify
 
     @_fit_context(prefer_skip_nested_validation=True)
     def fit(self, X, y, sample_weight=None, classes=None):
