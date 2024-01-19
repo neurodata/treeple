@@ -1,16 +1,16 @@
 import numpy as np
-from scipy.stats import multivariate_normal, entropy
 from scipy.integrate import nquad
+from scipy.stats import entropy, multivariate_normal
 
 
 def make_bimodal_classification(
     n_samples: int,
-    n_dim: int = 10, 
-    mix: float = 0.5, 
+    n_dim: int = 10,
+    mix: float = 0.5,
     mu_F: float = 0.0,
     mu_G: float = 1.0,
     sigma_F: float = 1.0,
-    sigma_G: float = (2/3)**2,
+    sigma_G: float = (2 / 3) ** 2,
     return_params: bool = False,
     seed=None,
 ):
@@ -50,11 +50,11 @@ def make_bimodal_classification(
     rng = np.random.default_rng(seed=seed)
 
     mu_F = np.zeros(n_dim)
-    mu_G0 = mu_G*np.array([1 / np.sqrt(i) for i in range(1, n_dim + 1)])
+    mu_G0 = mu_G * np.array([1 / np.sqrt(i) for i in range(1, n_dim + 1)])
     mu_G1 = -mu_G0
 
-    cov_F = sigma_F*np.identity(n_dim)
-    cov_G = sigma_G*np.identity(n_dim)
+    cov_F = sigma_F * np.identity(n_dim)
+    cov_G = sigma_G * np.identity(n_dim)
 
     if mix < 0 or mix > 1:
         raise ValueError("Mix must be between 0 and 1.")
@@ -69,24 +69,24 @@ def make_bimodal_classification(
     # generate a binomial random variable to determine which class to sample from
     # of size n_samples // 2
     binom = rng.binomial(1, mix, size=n_samples // 2)
-    # mix the Gaussians together to generate the data from the two classes 
+    # mix the Gaussians together to generate the data from the two classes
     # if binom is 0, then sample from G0, otherwise sample from G1
     # create a new array to store the data
-    G = np.zeros((n_samples//2, n_dim))
+    G = np.zeros((n_samples // 2, n_dim))
     for i, z in enumerate(binom):
         if z == 0:
-            G[i] = rng.multivariate_normal(mu_G0, cov_G, 1, method='svd')
+            G[i] = rng.multivariate_normal(mu_G0, cov_G, 1, method="svd")
         else:
-            G[i] = rng.multivariate_normal(mu_G1, cov_G, 1, method='svd')
+            G[i] = rng.multivariate_normal(mu_G1, cov_G, 1, method="svd")
     # concatenate the two arrays together
     X = np.vstack((F, G))
     y = np.concatenate((np.zeros(n_samples // 2), np.ones(n_samples // 2)))
 
     if return_params:
-        return X, y, (mu_F, [mu_G0, mu_G1]), (cov_F,[cov_G, cov_G])
+        return X, y, (mu_F, [mu_G0, mu_G1]), (cov_F, [cov_G, cov_G])
     return X, y
 
-    
+
 def make_quadratic_classification(n_samples: int, n_features: int, noise=False, seed=None):
     """Simulate classification data from a quadratic model.
 
