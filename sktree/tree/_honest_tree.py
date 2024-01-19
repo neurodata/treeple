@@ -170,7 +170,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
     stratify : bool
         Whether or not to stratify sample when considering structure and leaf indices.
         By default False.
-        
+
     Attributes
     ----------
     estimator_ : object
