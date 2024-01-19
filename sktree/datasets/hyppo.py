@@ -233,19 +233,19 @@ def approximate_clf_mutual_information(
     # this implicitly assumes that the signal of interest is between -10 and 10
     scale = 10
     n_dims = [cov.shape[1] for cov in covs]
-    lims = [[-scale, scale]] * n_dims
+    lims = [[-scale, scale]] * max(n_dims)
 
     # Compute entropy and X and Y.
     def func(*args):
         x = np.array(args)
         p = 0
         for k in range(len(means)):
-            p += class_probs[k] * multivariate_normal(seed=seed).pdf(x, means[k], covs[k])
+            p += class_probs[k] * multivariate_normal.pdf(x, means[k], covs[k])
         return -p * np.log(p) / np.log(base)
 
     # numerically integrate H(X)
-    opts = dict(limit=1000)
-    H_X, int_err = nquad(func, lims, opts=opts)
+    # opts = dict(limit=1000)
+    H_X, int_err = nquad(func, lims)
 
     # Compute MI.
     H_XY = 0
