@@ -38,14 +38,14 @@ jobs:
             exit 0
           fi
           all_changelogs=$(cat ./doc/whats_new/v*.rst)
-          if [[ "$all_changelogs" =~ :pr:\`$PR_NUMBER\` ]]
+          if [[ "$all_changelogs" =~ :pr:\`#$PR_NUMBER\` ]]
           then
             echo "Changelog has been updated."
             # If the pull request is milestoned check the correspondent changelog
             if exist -f ./doc/whats_new/v${TAGGED_MILESTONE:0:4}.rst
             then
               expected_changelog=$(cat ./doc/whats_new/v${TAGGED_MILESTONE:0:4}.rst)
-              if [[ "$expected_changelog" =~ :pr:\`$PR_NUMBER\` ]]
+              if [[ "$expected_changelog" =~ :pr:\`#$PR_NUMBER\` ]]
               then
                 echo "Changelog and milestone correspond."
               else
@@ -56,7 +56,7 @@ jobs:
               fi
             fi
           else
-            echo "A Changelog entry is missing for :pr:\`$PR_NUMBER\`"
+            echo "A Changelog entry is missing for :pr:\`#$PR_NUMBER\`"
             echo ""
             echo "Please add an entry to the changelog at 'doc/whats_new/v*.rst'"
             echo "to document your change assuming that the PR will be merged"

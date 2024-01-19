@@ -293,7 +293,6 @@ ignore_roles = [
 ]
 report_level = "WARNING"
 ignore = ["SEVERE/4"]
-paths = ["doc/use.rst"]
 
 [tool.ruff]
 extend-exclude = [
