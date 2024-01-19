@@ -35,7 +35,17 @@ def make_bimodal_classification(
         The variance of the first Gaussian, by default 1.0.
     sigma_G : float, optional
         The variance of the second Gaussian when the class label is 0, by default (2/3)**2.
-        
+    return_params : bool, optional
+        Whether or not to return the distribution parameters of the classes normal distributions.
+    seed : int, optional
+        Random seed, by default None.
+
+    Returns
+    -------
+    X : np.ndarray of shape (n_samples, n_dim), dtype=np.float64
+        First half from the Normal and the second half from the Bimodal distribution.
+    y : np.ndarray of shape (n_samples,), dtype=np.intp
+        Labels of the dataset.
     """
     rng = np.random.default_rng(seed=seed)
 
