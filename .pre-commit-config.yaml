@@ -71,7 +71,7 @@ repos:
       - id: rstcheck
         additional_dependencies:
           - tomli
-        files: ^doc/.*\.(rst|inc)$
+        files: ^(?!doc/use\.rst$).*\.(rst|inc)$
 
 ci:
   autofix_prs: false
