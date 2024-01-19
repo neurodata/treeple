@@ -161,7 +161,9 @@ def make_trunk_classification(
 
         X = np.vstack(
             (
-                rng.multivariate_normal(np.zeros(n_dim), cov, n_samples // 2, method=method),
+                rng.multivariate_normal(
+                    np.zeros(n_informative), cov, n_samples // 2, method=method
+                ),
                 X_mixture,
             )
         )
