@@ -167,6 +167,10 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         classes). If "empirical", the prior tree posterior is the relative
         class frequency in the voting subsample.
 
+    stratify : bool
+        Whether or not to stratify sample when considering structure and leaf indices.
+        By default False.
+        
     Attributes
     ----------
     estimator_ : object
