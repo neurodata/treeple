@@ -147,11 +147,6 @@ def _compute_null_distribution_perm(
     null_metrics = np.zeros((n_repeats,))
 
     for idx in range(n_repeats):
-        # permute the covariates inplace
-        rng.shuffle(test_index_arr)
-        perm_X_cov = X_test[test_index_arr, covariate_index]
-        X_test[:, covariate_index] = perm_X_cov
-
         rng.shuffle(train_index_arr)
         perm_X_cov = X_train[train_index_arr, covariate_index]
         X_train[:, covariate_index] = perm_X_cov
