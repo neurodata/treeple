@@ -136,13 +136,13 @@ def _compute_null_distribution_perm(
     """
     rng = np.random.default_rng(seed)
     X_test, y_test = check_X_y(X_test, y_test, ensure_2d=True, multi_output=True)
-    n_samples_test = len(y_test)
+    # n_samples_test = len(y_test)
     n_samples_train = len(y_train)
     metric_func = METRIC_FUNCTIONS[metric]
 
     # pre-allocate memory for the index array
     train_index_arr = np.arange(n_samples_train, dtype=int).reshape(-1, 1)
-    test_index_arr = np.arange(n_samples_test, dtype=int).reshape(-1, 1)
+    # test_index_arr = np.arange(n_samples_test, dtype=int).reshape(-1, 1)
 
     null_metrics = np.zeros((n_repeats,))
 
