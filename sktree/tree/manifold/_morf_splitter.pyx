@@ -30,7 +30,7 @@ cdef class PatchSplitter(BestObliqueSplitter):
     def __setstate__(self, d):
         pass
 
-    cdef intp_t init(
+    cdef int init(
         self,
         object X,
         const float64_t[:, ::1] y,
@@ -41,7 +41,7 @@ cdef class PatchSplitter(BestObliqueSplitter):
 
         return 0
 
-    cdef intp_t node_reset(
+    cdef int node_reset(
         self,
         intp_t start,
         intp_t end,
@@ -96,7 +96,7 @@ cdef class PatchSplitter(BestObliqueSplitter):
 
 
 cdef class BaseDensePatchSplitter(PatchSplitter):
-    cdef intp_t init(
+    cdef int init(
         self,
         object X,
         const float64_t[:, ::1] y,

@@ -116,7 +116,7 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
                              self.random_state,
                              self.feature_combinations), self.__getstate__())
 
-    cdef intp_t init(
+    cdef int init(
         self,
         const float32_t[:, :] X,
         const float64_t[:] sample_weight
@@ -128,8 +128,8 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
                                            dtype=np.intp)
         return 0
 
-    cdef intp_t node_reset(self, intp_t start, intp_t end,
-                           float64_t* weighted_n_node_samples) except -1 nogil:
+    cdef int node_reset(self, intp_t start, intp_t end,
+                        float64_t* weighted_n_node_samples) except -1 nogil:
         """Reset splitter on node samples[start:end].
 
         Returns -1 in case of failure to allocate memory (and raise MemoryError)
@@ -242,7 +242,7 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
             proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
             proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
 
-    cdef intp_t node_split(
+    cdef int node_split(
         self,
         float64_t impurity,
         SplitRecord* split,

@@ -285,7 +285,7 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
         if rc == -1:
             raise MemoryError()
 
-    cdef inline intp_t _add_split_node(
+    cdef inline int _add_split_node(
         self,
         UnsupervisedSplitter splitter,
         UnsupervisedTree tree,
