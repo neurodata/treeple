@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.stats import multivariate_normal, entropy
+from scipy.stats import multivariate_normal, entropy, norm
 from scipy.integrate import nquad
 
 
@@ -54,7 +54,7 @@ def make_trunk_classification(
     rho: int = 0,
     band_type: str = "ma",
     return_params: bool = False,
-    mix: int = 0,
+    simulation: str = "trunk",
     seed=None,
 ):
     """Generate trunk dataset.
@@ -87,8 +87,12 @@ def make_trunk_classification(
         Either 'ma', or 'ar'.
     return_params : bool, optional
         Whether or not to return the distribution parameters of the classes normal distributions.
-    mix : float, optional
-        Whether or not to mix the Gaussians. Should be a value between 0 and 1.
+    simulation : str, optional
+        Which simulation to run. Must be: 'trunk', 'trunk_overlap', 'trunk_mix', or one of the
+        following Marron-Wand simulations: 'gaussian', 'skewed_unimodal', 'strongly_skewed',
+        'kurtotic_unimodal', 'outlier', 'bimodal', 'separated_bimodal', 'skewed_bimodal',
+        'trimodal', 'claw', 'double_claw', 'asymmetric_claw', 'asymmetric_double_claw',
+        'smooth_comb', 'discrete_comb'.
     seed : int, optional
         Random seed, by default None.
 
@@ -110,8 +114,9 @@ def make_trunk_classification(
     """
     rng = np.random.default_rng(seed=seed)
 
-    mu_1 = np.array([1 / np.sqrt(i) for i in range(1, n_dim + 1)])
-    mu_0 = m_factor * mu_1
+    mu_1 = m_factor * np.array([1 / np.sqrt(i) for i in range(1, n_dim + 1)])
+    mu_0 = -mu_1
+    w = mu_1
 
     if rho != 0:
         if band_type == "ma":
@@ -123,34 +128,531 @@ def make_trunk_classification(
     else:
         cov = np.identity(n_dim)
 
-    if mix < 0 or mix > 1:
-        raise ValueError("Mix must be between 0 and 1.")
-
     if n_dim > 1000:
         method = "cholesky"
     else:
         method = "svd"
 
-    if mix == 0:
+    MARRON_WAND_SIMS = {
+        "gaussian": [1, [1]],
+        "skewed_unimodal": [3, [1 / 5, 1 / 5, 3 / 5]],
+        "strongly_skewed": [8, None],
+        "kurtotic_unimodal": [2, [2 / 3, 1 / 3]],
+        "outlier": [2, [1 / 10, 9 / 10]],
+        "bimodal": [2, None],
+        "separated_bimodal": [2, None],
+        "skewed_bimodal": [2, [3 / 4, 1 / 4]],
+        "trimodal": [3, [9 / 20, 9 / 20, 1 / 10]],
+        "claw": [6, [1 / 2, *[1 / 10] * 5]],
+        "double_claw": [9, [49 / 100, 49 / 100, *[1 / 350] * 7]],
+        "asymmetric_claw": [6, [1 / 2, *[2 ** (1 - i) / 31 for i in range(-2, 3)]]],
+        "asymmetric_double_claw": [8, [*[46 / 100] * 2, *[1 / 300] * 3, *[7 / 300] * 3]],
+        "smooth_comb": [6, [2 ** (5 - i) / 63 for i in range(6)]],
+        "discrete_comb": [6, [*[2 / 7] * 3, *[1 / 21] * 3]],
+    }
+
+    if simulation == "trunk":
         X = np.vstack(
             (
                 rng.multivariate_normal(mu_0, cov, n_samples // 2, method=method),
                 rng.multivariate_normal(mu_1, cov, n_samples // 2, method=method),
             )
         )
-    else:
+    elif simulation == "trunk_overlap":
         X = np.vstack(
             (
                 rng.multivariate_normal(np.zeros(n_dim), cov, n_samples // 2, method=method),
-                (1 - mix) * rng.multivariate_normal(mu_1, cov, n_samples // 2, method=method)
-                + mix * rng.multivariate_normal(mu_0, cov, n_samples // 2, method=method),
+                rng.multivariate_normal(np.zeros(n_dim), cov, n_samples // 2, method=method),
             )
         )
+    elif simulation == "trunk_mix":
+        mixture_idx = rng.choice(2, n_samples // 2, replace=True, shuffle=True, p=None)
+        X_mixture = np.zeros((n_samples // 2, len(mu_1)))
+        for idx in range(n_samples // 2):
+            if mixture_idx[idx] == 1:
+                X_sample = rng.multivariate_normal(mu_1, cov * (2 / 3) ** 2, 1, method=method)
+            else:
+                X_sample = rng.multivariate_normal(mu_0, cov * (2 / 3) ** 2, 1, method=method)
+            X_mixture[idx, :] = X_sample
+
+        X = np.vstack(
+            (
+                rng.multivariate_normal(np.zeros(n_dim), cov, n_samples // 2, method=method),
+                X_mixture,
+            )
+        )
+    elif simulation in MARRON_WAND_SIMS.keys():
+        mixture_idx = rng.choice(
+            MARRON_WAND_SIMS[simulation][0],
+            n_samples // 2,
+            replace=True,
+            shuffle=True,
+            p=MARRON_WAND_SIMS[simulation][1],
+        )
+        G = np.zeros((n_samples // 2, len(w)))
+        for idx in range(n_samples // 2):
+            G[idx, :] = MarronWandSims(
+                n_dim=n_dim,
+                cov=cov,
+                method=method,
+                mix_id=mixture_idx[idx],
+                rng=rng,
+                max_mix_id=MARRON_WAND_SIMS[simulation][0],
+            )(simulation)
+
+        X = np.vstack(
+            (
+                rng.multivariate_normal(np.zeros(n_dim), cov, n_samples // 2, method=method),
+                (1 - w)
+                * rng.multivariate_normal(np.zeros(n_dim), cov, n_samples // 2, method=method)
+                + w * G,
+            )
+        )
+    else:
+        raise ValueError(
+            f"Simulation must be trunk, trunk_overlap, trunk_mix, {MARRON_WAND_SIMS.keys()}"
+        )
+
     y = np.concatenate((np.zeros(n_samples // 2), np.ones(n_samples // 2)))
 
     if return_params:
         return X, y, [mu_0, mu_1], [cov, cov]
     return X, y
+
+
+class MarronWandSims:
+    def __init__(self, n_dim=0, cov=1, method="svd", rng=None, mix_id=None, max_mix_id=1):
+        self.n_dim = n_dim
+        self.cov = cov
+        self.method = method
+        self.rng = rng
+        self.mix_id = mix_id
+        self.max_mix_id = max_mix_id
+
+    def __call__(self, simulation):
+        sims = self._my_method_generator()
+        if simulation in sims.keys():
+            if self.mix_id in range(self.max_mix_id):
+                return sims[simulation]()
+            else:
+                return ValueError(
+                    f"Invalid value for mix_id, one of these: {range(self.max_mix_id)}"
+                )
+        else:
+            raise ValueError(f"simulation is not one of these: {sims.keys()}")
+
+    def _my_method_generator(self):
+        return {
+            method: getattr(self, method) for method in dir(self) if not method.startswith("__")
+        }
+
+    def gaussian(self):
+        return self.rng.multivariate_normal(np.zeros(self.n_dim), self.cov, 1, method=self.method)
+
+    def skewed_unimodal(self):
+        if self.mix_id == 0:
+            return self.rng.multivariate_normal(
+                np.zeros(self.n_dim), self.cov, 1, method=self.method
+            )
+        elif self.mix_id == 1:
+            return self.rng.multivariate_normal(
+                np.ones(self.n_dim) * 1 / 2, self.cov * (2 / 3) ** 2, 1, method=self.method
+            )
+        elif self.mix_id == 2:
+            return self.rng.multivariate_normal(
+                np.ones(self.n_dim) * 13 / 12, self.cov * (5 / 9) ** 2, 1, method=self.method
+            )
+
+    def strongly_skewed(self):
+        return self.rng.multivariate_normal(
+            np.ones(self.n_dim) * 3 * ((2 / 3) ** self.mix_id - 1),
+            self.cov * (2 / 3) ** (2 * self.mix_id),
+            1,
+            method=self.method,
+        )
+
+    def kurtotic_unimodal(self):
+        if self.mix_id == 0:
+            return self.rng.multivariate_normal(
+                np.zeros(self.n_dim), self.cov, 1, method=self.method
+            )
+        elif self.mix_id == 1:
+            return self.rng.multivariate_normal(
+                np.zeros(self.n_dim), self.cov * (1 / 10) ** 2, 1, method=self.method
+            )
+
+    def outlier(self):
+        if self.mix_id == 0:
+            return self.rng.multivariate_normal(
+                np.zeros(self.n_dim), self.cov, 1, method=self.method
+            )
+        elif self.mix_id == 1:
+            return self.rng.multivariate_normal(
+                np.zeros(self.n_dim), self.cov * (1 / 10) ** 2, 1, method=self.method
+            )
+
+    def bimodal(self):
+        if self.mix_id == 0:
+            return self.rng.multivariate_normal(
+                -np.ones(self.n_dim), self.cov * (2 / 3) ** 2, 1, method=self.method
+            )
+        elif self.mix_id == 1:
+            return self.rng.multivariate_normal(
+                np.ones(self.n_dim), self.cov * (2 / 3) ** 2, 1, method=self.method
+            )
+
+    def separated_bimodal(self):
+        if self.mix_id == 0:
+            return self.rng.multivariate_normal(
+                -np.ones(self.n_dim) * (3 / 2), self.cov * (1 / 2) ** 2, 1, method=self.method
+            )
+        elif self.mix_id == 1:
+            return self.rng.multivariate_normal(
+                np.ones(self.n_dim) * (3 / 2), self.cov * (1 / 2) ** 2, 1, method=self.method
+            )
+
+    def skewed_bimodal(self):
+        if self.mix_id == 0:
+            return self.rng.multivariate_normal(
+                np.zeros(self.n_dim), self.cov, 1, method=self.method
+            )
+        elif self.mix_id == 1:
+            return self.rng.multivariate_normal(
+                np.ones(self.n_dim) * (3 / 2), self.cov * (1 / 3) ** 2, 1, method=self.method
+            )
+
+    def trimodal(self):
+        if self.mix_id == 0:
+            return self.rng.multivariate_normal(
+                np.ones(self.n_dim) * (-6 / 5), self.cov * (3 / 5) ** 2, 1, method=self.method
+            )
+        elif self.mix_id == 1:
+            return self.rng.multivariate_normal(
+                np.ones(self.n_dim) * (6 / 5), self.cov * (3 / 5) ** 2, 1, method=self.method
+            )
+        elif self.mix_id == 2:
+            return self.rng.multivariate_normal(
+                np.zeros(self.n_dim), self.cov * (1 / 4) ** 2, 1, method=self.method
+            )
+
+    def claw(self):
+        if self.mix_id == 0:
+            return self.rng.multivariate_normal(
+                np.zeros(self.n_dim), self.cov, 1, method=self.method
+            )
+        elif self.mix_id in range(1, 7):
+            i = self.mix_id - 1
+            return self.rng.multivariate_normal(
+                np.ones(self.n_dim) * (i / 2 - 1), self.cov * (1 / 10) ** 2, 1, method=self.method
+            )
+
+    def double_claw(self):
+        if self.mix_id == 0:
+            return self.rng.multivariate_normal(
+                -np.ones(self.n_dim), self.cov * (2 / 3) ** 2, 1, method=self.method
+            )
+        elif self.mix_id == 1:
+            return self.rng.multivariate_normal(
+                np.ones(self.n_dim), self.cov * (2 / 3) ** 2, 1, method=self.method
+            )
+        elif self.mix_id in range(2, 9):
+            i = self.mix_id - 2
+            return self.rng.multivariate_normal(
+                np.ones(self.n_dim) * (float(i) - 3) / 2,
+                self.cov * (1 / 100) ** 2,
+                1,
+                method=self.method,
+            )
+
+    def asymmetric_claw(self):
+        if self.mix_id == 0:
+            return self.rng.multivariate_normal(
+                np.zeros(self.n_dim), self.cov, 1, method=self.method
+            )
+        elif self.mix_id in range(1, 6):
+            i = self.mix_id - 3
+            return self.rng.multivariate_normal(
+                np.ones(self.n_dim) * (i + 1 / 2),
+                self.cov * (2 ** -float(i) / 10) ** 2,
+                1,
+                method=self.method,
+            )
+
+    def asymmetric_double_claw(self):
+        if self.mix_id in range(2):
+            return self.rng.multivariate_normal(
+                np.ones(self.n_dim) * (2 * self.mix_id - 1),
+                self.cov * (2 / 3) ** 2,
+                1,
+                method=self.method,
+            )
+        elif self.mix_id in range(2, 5):
+            i = self.mix_id - 1
+            return self.rng.multivariate_normal(
+                -np.ones(self.n_dim) * (i / 2), self.cov * (1 / 100) ** 2, 1, method=self.method
+            )
+        elif self.mix_id in range(5, 8):
+            i = self.mix_id - 4
+            return self.rng.multivariate_normal(
+                np.ones(self.n_dim) * (i / 2), self.cov * (7 / 100) ** 2, 1, method=self.method
+            )
+
+    def smooth_comb(self):
+        return self.rng.multivariate_normal(
+            np.ones(self.n_dim) * (65 - 96 * (1 / 2) ** self.mix_id) / 21,
+            self.cov * (32 / 63) ** 2 / (2 ** (2 * self.mix_id)),
+            1,
+            method=self.method,
+        )
+
+    def discrete_comb(self):
+        if self.mix_id in range(3):
+            return self.rng.multivariate_normal(
+                np.ones(self.n_dim) * (12 * self.mix_id - 15) / 7,
+                self.cov * (2 / 7) ** 2,
+                1,
+                method=self.method,
+            )
+        if self.mix_id in range(3, 6):
+            i = self.mix_id + 5
+            return self.rng.multivariate_normal(
+                np.ones(self.n_dim) * (2 * i) / 7, self.cov * (1 / 21) ** 2, 1, method=self.method
+            )
+
+
+class TrueSimulationDensities:
+    def __init__(self, min_max=[-3, 3], n_samples=200):
+        self.min_max = min_max
+        self.n_samples = n_samples
+
+    def __call__(self, simulation, n_dim=10):
+        self.xs = np.linspace(self.min_max[0], self.min_max[1], self.n_samples)
+        self.mean = 1 / np.sqrt(n_dim)
+        self.weight = self.mean
+        sims = self._my_method_generator()
+        if simulation in sims.keys():
+            return (self.xs, *sims[simulation]())
+        else:
+            raise ValueError(f"simulation is not one of these: {sims.keys()}")
+
+    def _my_method_generator(self):
+        return {
+            method: getattr(self, method) for method in dir(self) if not method.startswith("__")
+        }
+
+    def trunk(self):
+        pop1 = norm.pdf(self.xs, loc=self.mean, scale=1)
+        pop2 = norm.pdf(self.xs, loc=-self.mean, scale=1)
+        return pop1, pop2
+
+    def trunk_overlap(self):
+        pop1 = norm.pdf(self.xs, loc=0, scale=1)
+        pop2 = norm.pdf(self.xs, loc=0, scale=1)
+        return pop1, pop2
+
+    def trunk_mix(self):
+        pop1 = norm.pdf(self.xs, loc=0, scale=(2 / 3) ** 2)
+
+        means = [-self.mean, self.mean]
+        stds = [(2 / 3) ** 2, (2 / 3) ** 2]
+        weights = [1 / 2] * 2
+
+        pop2 = np.zeros_like(self.xs)
+        for l, s, w in zip(means, stds, weights):
+            pop2 += norm.pdf(self.xs, loc=l, scale=s) * w
+        return pop1, pop2
+
+    def gaussian(self):
+        pop1 = norm.pdf(self.xs, loc=0, scale=1)
+        G = self.weight * norm.pdf(self.xs, loc=0, scale=1)
+        pop2 = (1 - self.weight) * norm.pdf(self.xs, loc=0, scale=1) + self.weight * G
+        return pop1, pop2
+
+    def skewed_unimodal(self):
+        pop1 = norm.pdf(self.xs, loc=0, scale=1)
+
+        means = [0, 1 / 2, 13 / 12]
+        stds = [1, (2 / 3) ** 2, (5 / 9) ** 2]
+        weights = [1 / 5, 1 / 5, 3 / 5]
+
+        G = np.zeros_like(self.xs)
+        for l, s, w in zip(means, stds, weights):
+            G += norm.pdf(self.xs, loc=l, scale=s) * w
+        pop2 = (1 - self.weight) * norm.pdf(self.xs, loc=0, scale=1) + self.weight * G
+        return pop1, pop2
+
+    def strongly_skewed(self):
+        pop1 = norm.pdf(self.xs, loc=0, scale=1)
+
+        means = [3 * (((2 / 3) ** l) - 1) for l in range(8)]
+        stds = [(2 / 3) ** (2 * l) for l in range(8)]
+        weights = [1 / 8] * 8
+
+        G = np.zeros_like(self.xs)
+        for l, s, w in zip(means, stds, weights):
+            G += norm.pdf(self.xs, loc=l, scale=s) * w
+        pop2 = (1 - self.weight) * norm.pdf(self.xs, loc=0, scale=1) + self.weight * G
+        return pop1, pop2
+
+    def kurtotic_unimodal(self):
+        pop1 = norm.pdf(self.xs, loc=0, scale=1)
+
+        means = [0, 0]
+        stds = [1, (1 / 10) ** 2]
+        weights = [2 / 3, 1 / 3]
+
+        G = np.zeros_like(self.xs)
+        for l, s, w in zip(means, stds, weights):
+            G += norm.pdf(self.xs, loc=l, scale=s) * w
+        pop2 = (1 - self.weight) * norm.pdf(self.xs, loc=0, scale=1) + self.weight * G
+        return pop1, pop2
+
+    def outlier(self):
+        pop1 = norm.pdf(self.xs, loc=0, scale=1)
+
+        means = [0, 0]
+        stds = [1, (1 / 10) ** 2]
+        weights = [1 / 10, 9 / 10]
+
+        G = np.zeros_like(self.xs)
+        for l, s, w in zip(means, stds, weights):
+            G += norm.pdf(self.xs, loc=l, scale=s) * w
+        pop2 = (1 - self.weight) * norm.pdf(self.xs, loc=0, scale=1) + self.weight * G
+        return pop1, pop2
+
+    def bimodal(self):
+        pop1 = norm.pdf(self.xs, loc=0, scale=1)
+
+        means = [-1, 1]
+        stds = [(2 / 3) ** 2, (2 / 3) ** 2]
+        weights = [1 / 2] * 2
+
+        G = np.zeros_like(self.xs)
+        for l, s, w in zip(means, stds, weights):
+            G += norm.pdf(self.xs, loc=l, scale=s) * w
+        pop2 = (1 - self.weight) * norm.pdf(self.xs, loc=0, scale=1) + self.weight * G
+        return pop1, pop2
+
+    def separated_bimodal(self):
+        pop1 = norm.pdf(self.xs, loc=0, scale=1)
+
+        means = [-3 / 2, 3 / 2]
+        stds = [(2 / 3) ** 2, (2 / 3) ** 2]
+        weights = [1 / 2] * 2
+
+        G = np.zeros_like(self.xs)
+        for l, s, w in zip(means, stds, weights):
+            G += norm.pdf(self.xs, loc=l, scale=s) * w
+        pop2 = (1 - self.weight) * norm.pdf(self.xs, loc=0, scale=1) + self.weight * G
+        return pop1, pop2
+
+    def skewed_bimodal(self):
+        pop1 = norm.pdf(self.xs, loc=0, scale=1)
+
+        means = [0, 3 / 2]
+        stds = [1, (1 / 3) ** 2]
+        weights = [3 / 4, 1 / 4]
+
+        G = np.zeros_like(self.xs)
+        for l, s, w in zip(means, stds, weights):
+            G += norm.pdf(self.xs, loc=l, scale=s) * w
+        pop2 = (1 - self.weight) * norm.pdf(self.xs, loc=0, scale=1) + self.weight * G
+        return pop1, pop2
+
+    def trimodal(self):
+        pop1 = norm.pdf(self.xs, loc=0, scale=1)
+
+        means = [-6 / 5, 6 / 5, 0]
+        stds = [(3 / 5) ** 2, (3 / 5) ** 2, (1 / 4) ** 2]
+        weights = [9 / 20, 9 / 20, 1 / 10]
+
+        G = np.zeros_like(self.xs)
+        for l, s, w in zip(means, stds, weights):
+            G += norm.pdf(self.xs, loc=l, scale=s) * w
+        pop2 = (1 - self.weight) * norm.pdf(self.xs, loc=0, scale=1) + self.weight * G
+        return pop1, pop2
+
+    def claw(self):
+        pop1 = norm.pdf(self.xs, loc=0, scale=1)
+
+        means = [0, *[l / 2 - 1 for l in range(5)]]
+        stds = [1, *[1 / 10] * 5]
+        weights = [1 / 2, *[1 / 10] * 5]
+
+        G = np.zeros_like(self.xs)
+        for l, s, w in zip(means, stds, weights):
+            G += norm.pdf(self.xs, loc=l, scale=s) * w
+        pop2 = (1 - self.weight) * norm.pdf(self.xs, loc=0, scale=1) + self.weight * G
+        return pop1, pop2
+
+    def double_claw(self):
+        pop1 = norm.pdf(self.xs, loc=0, scale=1)
+
+        means = [-1, 1, *[(l - 3) / 2 for l in range(7)]]
+        stds = [(2 / 3) ** 2, (2 / 3) ** 2, *[(1 / 100) ** 2] * 7]
+        weights = [49 / 100, 49 / 100, *[1 / 350] * 7]
+
+        G = np.zeros_like(self.xs)
+        for l, s, w in zip(means, stds, weights):
+            G += norm.pdf(self.xs, loc=l, scale=s) * w
+        pop2 = (1 - self.weight) * norm.pdf(self.xs, loc=0, scale=1) + self.weight * G
+        return pop1, pop2
+
+    def asymmetric_claw(self):
+        pop1 = norm.pdf(self.xs, loc=0, scale=1)
+
+        means = [0, *[l + 1 / 2 for l in range(7)]]
+        stds = [1, *[(2 ** -float(l) / 10) ** 2 for l in range(-2, 3)]]
+        weights = [1 / 2, *[2 ** (1 - float(l)) / 31 for l in range(-2, 3)]]
+
+        G = np.zeros_like(self.xs)
+        for l, s, w in zip(means, stds, weights):
+            G += norm.pdf(self.xs, loc=l, scale=s) * w
+        pop2 = (1 - self.weight) * norm.pdf(self.xs, loc=0, scale=1) + self.weight * G
+        return pop1, pop2
+
+    def asymmetric_double_claw(self):
+        pop1 = norm.pdf(self.xs, loc=0, scale=1)
+
+        means = [
+            *[2 * l - 1 for l in range(2)],
+            *[-l / 2 for l in range(1, 4)],
+            *[l / 2 for l in range(1, 4)],
+        ]
+        stds = [*[(2 / 3) ** 2] * 2, *[(1 / 100) ** 2] * 3, *[(7 / 100) ** 2] * 3]
+        weights = [*[46 / 100] * 2, *[1 / 300] * 3, *[7 / 300] * 3]
+
+        G = np.zeros_like(self.xs)
+        for l, s, w in zip(means, stds, weights):
+            G += norm.pdf(self.xs, loc=l, scale=s) * w
+        pop2 = (1 - self.weight) * norm.pdf(self.xs, loc=0, scale=1) + self.weight * G
+        return pop1, pop2
+
+    def smooth_comb(self):
+        pop1 = norm.pdf(self.xs, loc=0, scale=1)
+
+        means = [(65 - 96 * ((1 / 2) ** l)) / 21 for l in range(6)]
+        stds = [((32 / 63) ** 2) / (2 ** (2 * l)) for l in range(6)]
+        weights = [(2 ** (5 - l)) / 63 for l in range(6)]
+
+        G = np.zeros_like(self.xs)
+        for l, s, w in zip(means, stds, weights):
+            G += norm.pdf(self.xs, loc=l, scale=s) * w
+        pop2 = (1 - self.weight) * norm.pdf(self.xs, loc=0, scale=1) + self.weight * G
+        return pop1, pop2
+
+    def discrete_comb(self):
+        pop1 = norm.pdf(self.xs, loc=0, scale=1)
+
+        means = [*[(12 * l - 15) / 7 for l in range(3)], *[2 * l / 7 for l in range(8, 11)]]
+        stds = [*[(2 / 7) ** 2] * 3, *[(1 / 21) ** 2] * 3]
+        weights = [*[2 / 7] * 3, *[1 / 21] * 3]
+
+        G = np.zeros_like(self.xs)
+        for l, s, w in zip(means, stds, weights):
+            G += norm.pdf(self.xs, loc=l, scale=s) * w
+        pop2 = (1 - self.weight) * norm.pdf(self.xs, loc=0, scale=1) + self.weight * G
+        return pop1, pop2
 
 
 def _moving_avg_cov(n_dim, rho):
