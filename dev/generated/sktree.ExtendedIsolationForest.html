@@ -18,15 +18,15 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -38,9 +38,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/style.css?v=42c02ab7" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
-  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
     <script src="../_static/documentation_options.js?v=a93122ea"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
@@ -50,7 +50,7 @@
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'generated/sktree.ExtendedIsolationForest';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.14.4';
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.2';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/scikit-tree/main/doc/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
@@ -73,10 +73,9 @@
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>
@@ -117,7 +116,7 @@
 </form></div>
   </div>
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
   <label class="sidebar-toggle primary-toggle" for="__primary">
     <span class="fa-solid fa-bars"></span>
@@ -149,12 +148,6 @@
       
         <div class="navbar-item">
 <nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item current active">
@@ -292,10 +285,13 @@ document.write(`
   
 </div>
 
-    </nav>
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
+      
+      
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -308,12 +304,6 @@ document.write(`
         
           <div class="navbar-item">
 <nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item current active">
@@ -475,6 +465,9 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="sktree.datasets.make_gaussian_mixture.html">sktree.datasets.make_gaussian_mixture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sktree.datasets.make_joint_factor_model.html">sktree.datasets.make_joint_factor_model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sktree.datasets.make_quadratic_classification.html">sktree.datasets.make_quadratic_classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.datasets.make_trunk_classification.html">sktree.datasets.make_trunk_classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.datasets.approximate_clf_mutual_information.html">sktree.datasets.approximate_clf_mutual_information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.datasets.approximate_clf_mutual_information_with_monte_carlo.html">sktree.datasets.approximate_clf_mutual_information_with_monte_carlo</a></li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="sktree.experimental.mutual_info_ksg.html">sktree.experimental.mutual_info_ksg</a></li>
@@ -544,7 +537,7 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
   <section id="sktree-extendedisolationforest">
 <h1><a class="reference internal" href="../api.html#module-sktree" title="sktree"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code></a>.ExtendedIsolationForest<a class="headerlink" href="#sktree-extendedisolationforest" title="Link to this heading">#</a></h1>
@@ -558,7 +551,7 @@ sparse linear combination of features and then randomly selecting a split
 value between the maximum and minimum values of the selected feature. The
 main difference from the IsolationForest algorithm is how the splits are
 computed.</p>
-<p>Read more in the <a class="reference external" href="https://scikit-learn.org/dev/modules/outlier_detection.html#isolation-forest" title="(in scikit-learn v1.4)"><span class="xref std std-ref">User Guide</span></a>.</p>
+<p>Read more in the <a class="reference external" href="https://scikit-learn.org/dev/modules/outlier_detection.html#isolation-forest" title="(in scikit-learn v1.5)"><span class="xref std std-ref">User Guide</span></a>.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
@@ -606,18 +599,18 @@ For more information, see <code class="docutils literal notranslate"><span class
 <dt><strong>n_jobs</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, default=None</span></dt><dd><p>The number of jobs to run in parallel for both <a class="reference internal" href="#sktree.ExtendedIsolationForest.fit" title="sktree.ExtendedIsolationForest.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a> and
 <a class="reference internal" href="#sktree.ExtendedIsolationForest.predict" title="sktree.ExtendedIsolationForest.predict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">predict()</span></code></a>. <code class="docutils literal notranslate"><span class="pre">None</span></code> means 1 unless in a
 <a class="reference external" href="https://joblib.readthedocs.io/en/latest/generated/joblib.parallel_backend.html#joblib.parallel_backend" title="(in joblib v1.4.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">joblib.parallel_backend</span></code></a> context. <code class="docutils literal notranslate"><span class="pre">-1</span></code> means using all
-processors. See <a class="reference external" href="https://scikit-learn.org/dev/glossary.html#term-n_jobs" title="(in scikit-learn v1.4)"><span class="xref std std-term">Glossary</span></a> for more details.</p>
+processors. See <a class="reference external" href="https://scikit-learn.org/dev/glossary.html#term-n_jobs" title="(in scikit-learn v1.5)"><span class="xref std std-term">Glossary</span></a> for more details.</p>
 </dd>
 <dt><strong>random_state</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://numpy.org/devdocs/reference/random/legacy.html#numpy.random.RandomState" title="(in NumPy v2.0.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RandomState</span></code></a> instance or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a>, default=None</span></dt><dd><p>Controls the pseudo-randomness of the selection of the feature
 and split values for each branching step and each tree in the forest.</p>
 <p>Pass an int for reproducible results across multiple function calls.
-See <a class="reference external" href="https://scikit-learn.org/dev/glossary.html#term-random_state" title="(in scikit-learn v1.4)"><span class="xref std std-term">Glossary</span></a>.</p>
+See <a class="reference external" href="https://scikit-learn.org/dev/glossary.html#term-random_state" title="(in scikit-learn v1.5)"><span class="xref std std-term">Glossary</span></a>.</p>
 </dd>
 <dt><strong>verbose</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, default=0</span></dt><dd><p>Controls the verbosity of the tree building process.</p>
 </dd>
 <dt><strong>warm_start</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=False</span></dt><dd><p>When set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, reuse the solution of the previous call to fit
 and add more estimators to the ensemble, otherwise, just fit a whole
-new forest. See <a class="reference external" href="https://scikit-learn.org/dev/glossary.html#term-warm_start" title="(in scikit-learn v1.4)"><span class="xref std std-term">the Glossary</span></a>.</p>
+new forest. See <a class="reference external" href="https://scikit-learn.org/dev/glossary.html#term-warm_start" title="(in scikit-learn v1.5)"><span class="xref std std-term">the Glossary</span></a>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.21.</span></p>
 </div>
@@ -628,11 +621,11 @@ new forest. See <a class="reference external" href="https://scikit-learn.org/dev
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
-<dt><a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.covariance.EllipticEnvelope.html#sklearn.covariance.EllipticEnvelope" title="(in scikit-learn v1.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.covariance.EllipticEnvelope</span></code></a></dt><dd><p>An object for detecting outliers in a Gaussian distributed dataset.</p>
+<dt><a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.covariance.EllipticEnvelope.html#sklearn.covariance.EllipticEnvelope" title="(in scikit-learn v1.5)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.covariance.EllipticEnvelope</span></code></a></dt><dd><p>An object for detecting outliers in a Gaussian distributed dataset.</p>
 </dd>
-<dt><a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.svm.OneClassSVM.html#sklearn.svm.OneClassSVM" title="(in scikit-learn v1.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.svm.OneClassSVM</span></code></a></dt><dd><p>Unsupervised Outlier Detection. Estimate the support of a high-dimensional distribution. The implementation is based on libsvm.</p>
+<dt><a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.svm.OneClassSVM.html#sklearn.svm.OneClassSVM" title="(in scikit-learn v1.5)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.svm.OneClassSVM</span></code></a></dt><dd><p>Unsupervised Outlier Detection. Estimate the support of a high-dimensional distribution. The implementation is based on libsvm.</p>
 </dd>
-<dt><a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.neighbors.LocalOutlierFactor.html#sklearn.neighbors.LocalOutlierFactor" title="(in scikit-learn v1.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.neighbors.LocalOutlierFactor</span></code></a></dt><dd><p>Unsupervised Outlier Detection using Local Outlier Factor (LOF).</p>
+<dt><a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.neighbors.LocalOutlierFactor.html#sklearn.neighbors.LocalOutlierFactor" title="(in scikit-learn v1.5)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.neighbors.LocalOutlierFactor</span></code></a></dt><dd><p>Unsupervised Outlier Detection using Local Outlier Factor (LOF).</p>
 </dd>
 </dl>
 </div>
@@ -666,15 +659,13 @@ Data (TKDD) 6.1 (2012): 3.</p>
 <dl class="field-list">
 <dt class="field-odd">Attributes<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>estimator_</strong><span class="classifier"><a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.tree.ExtraTreeRegressor.html#sklearn.tree.ExtraTreeRegressor" title="(in scikit-learn v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExtraTreeRegressor</span></code></a> instance</span></dt><dd><p>The child estimator template used to create the collection of
+<dt><strong>estimator_</strong><span class="classifier"><a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.tree.ExtraTreeRegressor.html#sklearn.tree.ExtraTreeRegressor" title="(in scikit-learn v1.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExtraTreeRegressor</span></code></a> instance</span></dt><dd><p>The child estimator template used to create the collection of
 fitted sub-estimators.</p>
 <div class="versionadded">
-<p><span class="versionmodified added">New in version 1.2: </span><code class="docutils literal notranslate"><span class="pre">base_estimator_</span></code> was renamed to <code class="docutils literal notranslate"><span class="pre">estimator_</span></code>.</p>
+<p><span class="versionmodified added">New in version 1.2.</span></p>
 </div>
 </dd>
-<dt><a class="reference internal" href="#sktree.ExtendedIsolationForest.base_estimator_" title="sktree.ExtendedIsolationForest.base_estimator_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">base_estimator_</span></code></a><span class="classifier"><a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.tree.ExtraTreeRegressor.html#sklearn.tree.ExtraTreeRegressor" title="(in scikit-learn v1.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExtraTreeRegressor</span></code></a> instance</span></dt><dd><p>Estimator used to grow the ensemble.</p>
-</dd>
-<dt><strong>estimators_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.tree.ExtraTreeRegressor.html#sklearn.tree.ExtraTreeRegressor" title="(in scikit-learn v1.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExtraTreeRegressor</span></code></a> instances</span></dt><dd><p>The collection of fitted sub-estimators.</p>
+<dt><strong>estimators_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.tree.ExtraTreeRegressor.html#sklearn.tree.ExtraTreeRegressor" title="(in scikit-learn v1.5)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExtraTreeRegressor</span></code></a> instances</span></dt><dd><p>The collection of fitted sub-estimators.</p>
 </dd>
 <dt><strong>estimators_features_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a></span></dt><dd><p>The subset of drawn features for each base estimator.</p>
 </dd>
@@ -694,12 +685,12 @@ is defined in such a way we obtain the expected number of outliers
 <p><span class="versionmodified added">New in version 0.20.</span></p>
 </div>
 </dd>
-<dt><strong>n_features_in_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>Number of features seen during <a class="reference external" href="https://scikit-learn.org/dev/glossary.html#term-fit" title="(in scikit-learn v1.4)"><span class="xref std std-term">fit</span></a>.</p>
+<dt><strong>n_features_in_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>Number of features seen during <a class="reference external" href="https://scikit-learn.org/dev/glossary.html#term-fit" title="(in scikit-learn v1.5)"><span class="xref std std-term">fit</span></a>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.24.</span></p>
 </div>
 </dd>
-<dt><strong>feature_names_in_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (<code class="docutils literal notranslate"><span class="pre">n_features_in_</span></code>,)</span></dt><dd><p>Names of features seen during <a class="reference external" href="https://scikit-learn.org/dev/glossary.html#term-fit" title="(in scikit-learn v1.4)"><span class="xref std std-term">fit</span></a>. Defined only when <code class="docutils literal notranslate"><span class="pre">X</span></code>
+<dt><strong>feature_names_in_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (<code class="docutils literal notranslate"><span class="pre">n_features_in_</span></code>,)</span></dt><dd><p>Names of features seen during <a class="reference external" href="https://scikit-learn.org/dev/glossary.html#term-fit" title="(in scikit-learn v1.5)"><span class="xref std std-term">fit</span></a>. Defined only when <code class="docutils literal notranslate"><span class="pre">X</span></code>
 has feature names that are all strings.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.0.</span></p>
@@ -799,7 +790,7 @@ efficiency. Sparse matrices are also supported, use sparse
 
 <dl class="py method">
 <dt class="sig sig-object py" id="sktree.ExtendedIsolationForest.fit_predict">
-<span class="sig-name descname"><span class="pre">fit_predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sktree.ExtendedIsolationForest.fit_predict" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">fit_predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sktree.ExtendedIsolationForest.fit_predict" title="Link to this definition">#</a></dt>
 <dd><p>Perform fit on X and returns labels for X.</p>
 <p>Returns -1 for outliers and 1 for inliers.</p>
 <dl class="field-list">
@@ -808,6 +799,11 @@ efficiency. Sparse matrices are also supported, use sparse
 <dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.0.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>The input samples.</p>
 </dd>
 <dt><strong>y</strong><span class="classifier">Ignored</span></dt><dd><p>Not used, present for API consistency by convention.</p>
+</dd>
+<dt><strong>**kwargs</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">dict</span></code></a></span></dt><dd><p>Arguments to be passed to <code class="docutils literal notranslate"><span class="pre">fit</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.4.</span></p>
+</div>
 </dd>
 </dl>
 </dd>
@@ -824,12 +820,12 @@ efficiency. Sparse matrices are also supported, use sparse
 <dt class="sig sig-object py" id="sktree.ExtendedIsolationForest.get_metadata_routing">
 <span class="sig-name descname"><span class="pre">get_metadata_routing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sktree.ExtendedIsolationForest.get_metadata_routing" title="Link to this definition">#</a></dt>
 <dd><p>Get metadata routing of this object.</p>
-<p>Please check <a class="reference external" href="https://scikit-learn.org/dev/metadata_routing.html#metadata-routing" title="(in scikit-learn v1.4)"><span class="xref std std-ref">User Guide</span></a> on how the routing
+<p>Please check <a class="reference external" href="https://scikit-learn.org/dev/metadata_routing.html#metadata-routing" title="(in scikit-learn v1.5)"><span class="xref std std-ref">User Guide</span></a> on how the routing
 mechanism works.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>routing</strong><span class="classifier">MetadataRequest</span></dt><dd><p>A <a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.utils.metadata_routing.MetadataRequest.html#sklearn.utils.metadata_routing.MetadataRequest" title="(in scikit-learn v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetadataRequest</span></code></a> encapsulating
+<dt><strong>routing</strong><span class="classifier">MetadataRequest</span></dt><dd><p>A <a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.utils.metadata_routing.MetadataRequest.html#sklearn.utils.metadata_routing.MetadataRequest" title="(in scikit-learn v1.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetadataRequest</span></code></a> encapsulating
 routing information.</p>
 </dd>
 </dl>
@@ -914,8 +910,8 @@ The lower, the more abnormal.</p>
 <span class="sig-name descname"><span class="pre">set_fit_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'$UNCHANGED$'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sktree.ExtendedIsolationForest.set_fit_request" title="Link to this definition">#</a></dt>
 <dd><p>Request metadata passed to the <code class="docutils literal notranslate"><span class="pre">fit</span></code> method.</p>
 <p>Note that this method is only relevant if
-<code class="docutils literal notranslate"><span class="pre">enable_metadata_routing=True</span></code> (see <a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.set_config.html#sklearn.set_config" title="(in scikit-learn v1.4)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.set_config()</span></code></a>).
-Please see <a class="reference external" href="https://scikit-learn.org/dev/metadata_routing.html#metadata-routing" title="(in scikit-learn v1.4)"><span class="xref std std-ref">User Guide</span></a> on how the routing
+<code class="docutils literal notranslate"><span class="pre">enable_metadata_routing=True</span></code> (see <a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.set_config.html#sklearn.set_config" title="(in scikit-learn v1.5)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.set_config()</span></code></a>).
+Please see <a class="reference external" href="https://scikit-learn.org/dev/metadata_routing.html#metadata-routing" title="(in scikit-learn v1.5)"><span class="xref std std-ref">User Guide</span></a> on how the routing
 mechanism works.</p>
 <p>The options for each parameter are:</p>
 <ul class="simple">
@@ -934,7 +930,7 @@ parameters and not others.</p>
 <p class="admonition-title">Note</p>
 <p>This method is only relevant if this estimator is used as a
 sub-estimator of a meta-estimator, e.g. used inside a
-<a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="(in scikit-learn v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a>. Otherwise it has no effect.</p>
+<a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="(in scikit-learn v1.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a>. Otherwise it has no effect.</p>
 </div>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -957,7 +953,7 @@ sub-estimator of a meta-estimator, e.g. used inside a
 <span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sktree.ExtendedIsolationForest.set_params" title="Link to this definition">#</a></dt>
 <dd><p>Set the parameters of this estimator.</p>
 <p>The method works on simple estimators as well as on nested objects
-(such as <a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="(in scikit-learn v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a>). The latter have
+(such as <a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="(in scikit-learn v1.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a>). The latter have
 parameters of the form <code class="docutils literal notranslate"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it’s
 possible to update each component of a nested object.</p>
 <dl class="field-list">
@@ -974,12 +970,6 @@ possible to update each component of a nested object.</p>
 </dl>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="sktree.ExtendedIsolationForest.base_estimator_">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">base_estimator_</span></span><a class="headerlink" href="#sktree.ExtendedIsolationForest.base_estimator_" title="Link to this definition">#</a></dt>
-<dd><p>Estimator used to grow the ensemble.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -1035,12 +1025,14 @@ data. Thus fetching the property may be slower than expected.</p>
               
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
-  <div class="sidebar-secondary-item">
 
-  <div class="page-toc tocsection onthispage">
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> On this page
   </div>
-  <nav class="bd-toc-nav page-toc">
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.ExtendedIsolationForest"><code class="docutils literal notranslate"><span class="pre">ExtendedIsolationForest</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.ExtendedIsolationForest.decision_function"><code class="docutils literal notranslate"><span class="pre">ExtendedIsolationForest.decision_function()</span></code></a></li>
@@ -1052,7 +1044,6 @@ data. Thus fetching the property may be slower than expected.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.ExtendedIsolationForest.score_samples"><code class="docutils literal notranslate"><span class="pre">ExtendedIsolationForest.score_samples()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.ExtendedIsolationForest.set_fit_request"><code class="docutils literal notranslate"><span class="pre">ExtendedIsolationForest.set_fit_request()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.ExtendedIsolationForest.set_params"><code class="docutils literal notranslate"><span class="pre">ExtendedIsolationForest.set_params()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.ExtendedIsolationForest.base_estimator_"><code class="docutils literal notranslate"><span class="pre">ExtendedIsolationForest.base_estimator_</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.ExtendedIsolationForest.estimators_samples_"><code class="docutils literal notranslate"><span class="pre">ExtendedIsolationForest.estimators_samples_</span></code></a></li>
 </ul>
 </li>
@@ -1072,8 +1063,8 @@ data. Thus fetching the property may be slower than expected.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1084,7 +1075,7 @@ data. Thus fetching the property may be slower than expected.</p>
 
   <p class="copyright">
     
-      © Copyright 2022-2023, scikit-tree Developers. Last updated on 2023-12-19.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-01-26.
       <br/>
     
   </p>
@@ -1098,7 +1089,7 @@ data. Thus fetching the property may be slower than expected.</p>
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
 </p></div>
       
     </div>
