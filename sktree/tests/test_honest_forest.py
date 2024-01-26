@@ -146,15 +146,23 @@ def test_max_samples():
     assert all(np.diff(depths) > 0)
 
 
+@pytest.mark.parametrize("honest_bootstrap", [True, False])
 @pytest.mark.parametrize("bootstrap", [True, False])
-def test_honest_forest_has_deterministic_sampling_for_oob_structure_and_leaves(bootstrap):
+def test_honest_forest_has_deterministic_sampling_for_oob_structure_and_leaves(
+    bootstrap, honest_bootstrap
+):
     """Test that honest forest can produce the oob, structure and leaf-node samples.
 
     When bootstrap is True, oob should be exclusive from structure and leaf-node samples.
     When bootstrap is False, there is no oob.
     """
     n_estimators = 5
-    est = HonestForestClassifier(n_estimators=n_estimators, random_state=0, bootstrap=bootstrap)
+    est = HonestForestClassifier(
+        n_estimators=n_estimators,
+        random_state=0,
+        bootstrap=bootstrap,
+        honest_bootstrap=honest_bootstrap,
+    )
     X = rng.normal(0, 1, (100, 2))
     X[:50] *= -1
     y = [0, 1] * 50
@@ -177,11 +185,19 @@ def test_honest_forest_has_deterministic_sampling_for_oob_structure_and_leaves(b
         oob_samples_ = est.oob_samples_
         for itree in range(n_estimators):
             assert len(oob_samples[itree]) > 1
-            assert set(structure_samples[itree]).union(set(leaf_samples[itree])) == set(
-                inbag_samples[itree]
+            assert (
+                set(structure_samples[itree])
+                .union(set(leaf_samples[itree]))
+                .intersection(set(oob_samples_[itree]))
+                == set()
             )
-            assert set(inbag_samples[itree]).intersection(set(oob_samples_[itree])) == set()
-            assert_array_equal(oob_samples_[itree], oob_samples[itree])
+
+            if not honest_bootstrap:
+                assert set(structure_samples[itree]).union(set(leaf_samples[itree])) == set(
+                    inbag_samples[itree]
+                )
+                assert set(inbag_samples[itree]).intersection(set(oob_samples_[itree])) == set()
+                assert_array_equal(oob_samples_[itree], oob_samples[itree])
 
 
 @pytest.mark.parametrize(

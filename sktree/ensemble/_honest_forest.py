@@ -2,13 +2,17 @@
 # Adopted from: https://github.com/neurodata/honest-forests
 
 import threading
+from warnings import catch_warnings, simplefilter
 
 import numpy as np
 from joblib import Parallel, delayed
 from sklearn.base import _fit_context
 from sklearn.ensemble._base import _partition_estimators
 from sklearn.utils.validation import check_is_fitted, check_X_y
-from sklearn.ensemble._forest import _generate_unsampled_indices, _get_n_samples_bootstrap
+from sklearn.ensemble._forest import (
+    _get_n_samples_bootstrap,
+)
+from sklearn.utils import compute_sample_weight, check_random_state
 
 from .._lib.sklearn.ensemble._forest import ForestClassifier
 from .._lib.sklearn.tree import _tree as _sklearn_tree
@@ -201,6 +205,10 @@ class HonestForestClassifier(ForestClassifier):
         Whether or not to stratify sample when considering structure and leaf indices.
         By default False.
 
+    honest_bootstrap : bool
+        Whether or not we bootstrap the samples to use to set the leaf nodes for each
+        tree.
+
     Attributes
     ----------
     estimator : sktree.tree.HonestTreeClassifier
@@ -269,7 +277,7 @@ class HonestForestClassifier(ForestClassifier):
 
     oob_samples_ : list of lists, shape=(n_estimators, n_samples_bootstrap)
         The indices of training samples that are "out-of-bag". Only used
-        if ``bootstrap=False``.
+        if ``bootstrap=True``.
 
     Notes
     -----
@@ -349,6 +357,7 @@ class HonestForestClassifier(ForestClassifier):
         honest_fraction=0.5,
         tree_estimator=None,
         stratify=False,
+        honest_bootstrap=False,
     ):
         super().__init__(
             estimator=HonestTreeClassifier(),
@@ -393,6 +402,7 @@ class HonestForestClassifier(ForestClassifier):
         self.honest_prior = honest_prior
         self.tree_estimator = tree_estimator
         self.stratify = stratify
+        self.honest_bootstrap = honest_bootstrap
 
     @_fit_context(prefer_skip_nested_validation=True)
     def fit(self, X, y, sample_weight=None, classes=None):
@@ -427,6 +437,50 @@ class HonestForestClassifier(ForestClassifier):
         """
         X, y = check_X_y(X, y, multi_output=True)
         super().fit(X, y, sample_weight=sample_weight, classes=classes)
+
+        if self.honest_bootstrap:
+            # must re-fit the leaves using a bootstrap over the non structure indices
+            # Account for bootstrapping too
+            # nonzero_indices = np.where(_sample_weight > 0)[0]
+            n_samples = X.shape[0]
+
+            for tree in self.estimators_:
+                sample_indices = np.ones((n_samples,), dtype=bool).squeeze()
+
+                # now we need to get the non-structure indices
+                structure_indices = tree.structure_indices_
+                sample_indices[structure_indices] = False
+                non_structure_indices = np.argwhere(sample_indices).squeeze()
+
+                n_samples_non_structure = len(non_structure_indices)
+
+                if sample_weight is None:
+                    curr_sample_weight = np.ones((n_samples,), dtype=np.float64)
+                else:
+                    curr_sample_weight = sample_weight.copy()
+
+                # get the sample weight for bootstrapping the non-structure indices
+                n_samples_bootstrap = _get_n_samples_bootstrap(
+                    n_samples=n_samples_non_structure, max_samples=self.max_samples
+                )
+
+                # bootstrap sample the remaining non-structure indices
+                random_instance = check_random_state(tree.random_state)
+                indices = random_instance.choice(
+                    n_samples_non_structure, n_samples_bootstrap, replace=True
+                )
+                sample_counts = np.bincount(indices, minlength=n_samples)
+                curr_sample_weight *= sample_counts
+
+                if self.class_weight == "subsample":
+                    with catch_warnings():
+                        simplefilter("ignore", DeprecationWarning)
+                        curr_sample_weight *= compute_sample_weight("auto", y, indices=indices)
+                elif self.class_weight == "balanced_subsample":
+                    curr_sample_weight *= compute_sample_weight("balanced", y, indices=indices)
+
+                # re-fit the leaves
+                tree._fit_leaves(X, y, sample_weight=curr_sample_weight)
 
         # Compute honest decision function
         self.honest_decision_function_ = self._predict_proba(
@@ -517,19 +571,26 @@ class HonestForestClassifier(ForestClassifier):
         if self.bootstrap is False:
             raise RuntimeError("Cannot extract out-of-bag samples when bootstrap is False.")
         check_is_fitted(self)
-        self._n_samples
+
         oob_samples = []
-        n_samples_bootstrap = _get_n_samples_bootstrap(
-            self._n_samples,
-            self.max_samples,
-        )
-        for estimator in self.estimators_:
-            unsampled_indices = _generate_unsampled_indices(
-                estimator.random_state,
-                self._n_samples,
-                n_samples_bootstrap,
+
+        possible_indices = np.arange(self._n_samples)
+        for structure_idx, honest_idx in zip(self.structure_indices_, self.honest_indices_):
+            _oob_samples = np.setdiff1d(
+                possible_indices, np.concatenate((structure_idx, honest_idx))
             )
-            oob_samples.append(unsampled_indices)
+            oob_samples.append(_oob_samples)
+        # n_samples_bootstrap = _get_n_samples_bootstrap(
+        #     self._n_samples,
+        #     self.max_samples,
+        # )
+        # for estimator in self.estimators_:
+        #     unsampled_indices = _generate_unsampled_indices(
+        #         estimator.random_state,
+        #         self._n_samples,
+        #         n_samples_bootstrap,
+        #     )
+        #     oob_samples.append(unsampled_indices)
         return oob_samples
 
     def _more_tags(self):

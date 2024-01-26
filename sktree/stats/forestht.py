@@ -1199,7 +1199,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
         return stat
 
 
-def _parallel_predict_proba_oob(predict_proba, X, out, idx, train_idx, lock):
+def _parallel_predict_proba_oob(predict_proba, X, out, idx, test_idx, lock):
     """
     This is a utility function for joblib's Parallel.
     It can't go locally in ForestClassifier or ForestRegressor, because joblib
@@ -1208,8 +1208,8 @@ def _parallel_predict_proba_oob(predict_proba, X, out, idx, train_idx, lock):
     # each tree predicts proba with a list of output (n_samples, n_classes[i])
     prediction = predict_proba(X, check_input=False)
 
-    test_idx = np.ones(X.shape[0], dtype=bool)
-    test_idx[train_idx] = False
+    indices = np.zeros(X.shape[0], dtype=bool)
+    indices[test_idx] = True
     with lock:
         out[idx, test_idx, :] = prediction[test_idx, :]
     return prediction
@@ -1247,8 +1247,8 @@ def build_hyppo_oob_forest(
         (len(est.estimators_), X.shape[0], est.n_classes_), np.nan, dtype=np.float64
     )
     Parallel(n_jobs=n_jobs, verbose=verbose, require="sharedmem")(
-        delayed(_parallel_predict_proba_oob)(e.predict_proba, X, all_proba, idx, train_idx, lock)
-        for idx, (e, train_idx) in enumerate(zip(est.estimators_, est.estimators_samples_))
+        delayed(_parallel_predict_proba_oob)(e.predict_proba, X, all_proba, idx, test_idx, lock)
+        for idx, (e, test_idx) in enumerate(zip(est.estimators_, est.oob_samples_))
     )
 
     return est, all_proba
@@ -1279,6 +1279,7 @@ def build_hyppo_cv_forest(
 
         train_idx_list = [train_idx]
         test_idx_list = [test_idx]
+        n_splits = 1
 
     est_list = []
     all_proba_list = []
@@ -1315,7 +1316,4 @@ def build_hyppo_cv_forest(
         all_proba_list.append(posterior_arr)
         est_list.append(est)
 
-    if n_splits == 1:
-        return est, all_proba
-    else:
-        return est_list, all_proba_list
+    return est_list, all_proba_list
