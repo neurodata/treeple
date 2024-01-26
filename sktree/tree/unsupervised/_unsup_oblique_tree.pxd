@@ -23,11 +23,11 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
     cdef vector[vector[intp_t]] proj_vec_indices   # (capacity, n_features) array of projection vectors
 
     # overridden methods
-    cdef intp_t _resize_c(
+    cdef int _resize_c(
         self,
         intp_t capacity=*
     ) except -1 nogil
-    cdef intp_t _set_split_node(
+    cdef int _set_split_node(
         self,
         SplitRecord* split_node,
         Node *node,

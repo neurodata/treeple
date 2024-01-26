@@ -8,6 +8,7 @@ from joblib import Parallel, delayed
 from sklearn.base import _fit_context
 from sklearn.ensemble._base import _partition_estimators
 from sklearn.utils.validation import check_is_fitted, check_X_y
+from sklearn.ensemble._forest import _generate_unsampled_indices, _get_n_samples_bootstrap
 
 from .._lib.sklearn.ensemble._forest import ForestClassifier
 from .._lib.sklearn.tree import _tree as _sklearn_tree
@@ -106,6 +107,11 @@ class HonestForestClassifier(ForestClassifier):
         Whether bootstrap samples are used when building trees. If False, the
         whole dataset is used to build each tree.
 
+        When bootstrap is True, each tree bootstrap samples the dataset, and then
+        the unique indices are split in half, where one half is used to train
+        the structure of the tree and one half is used to train the leaves of the tree.
+        The remaining sample indices are considered "out of bag".
+
     oob_score : bool, default=False
         Whether to use out-of-bag samples to estimate the generalization score.
         Only available if bootstrap=True.
@@ -191,6 +197,10 @@ class HonestForestClassifier(ForestClassifier):
         that one MUST use trees imported from the `sktree.tree`
         API namespace rather than from `sklearn.tree`.
 
+    stratify : bool
+        Whether or not to stratify sample when considering structure and leaf indices.
+        By default False.
+
     Attributes
     ----------
     estimator : sktree.tree.HonestTreeClassifier
@@ -256,6 +266,10 @@ class HonestForestClassifier(ForestClassifier):
 
     honest_indices_ : list of lists, shape=(n_estimators, n_honest)
         Indices of training samples used to learn leaf estimates.
+
+    oob_samples_ : list of lists, shape=(n_estimators, n_samples_bootstrap)
+        The indices of training samples that are "out-of-bag". Only used
+        if ``bootstrap=False``.
 
     Notes
     -----
@@ -334,6 +348,7 @@ class HonestForestClassifier(ForestClassifier):
         honest_prior="empirical",
         honest_fraction=0.5,
         tree_estimator=None,
+        stratify=False,
     ):
         super().__init__(
             estimator=HonestTreeClassifier(),
@@ -353,6 +368,7 @@ class HonestForestClassifier(ForestClassifier):
                 "tree_estimator",
                 "honest_fraction",
                 "honest_prior",
+                "stratify",
             ),
             bootstrap=bootstrap,
             oob_score=oob_score,
@@ -376,6 +392,7 @@ class HonestForestClassifier(ForestClassifier):
         self.honest_fraction = honest_fraction
         self.honest_prior = honest_prior
         self.tree_estimator = tree_estimator
+        self.stratify = stratify
 
     @_fit_context(prefer_skip_nested_validation=True)
     def fit(self, X, y, sample_weight=None, classes=None):
@@ -490,6 +507,30 @@ class HonestForestClassifier(ForestClassifier):
         """The indices used to fit the leaf nodes."""
         check_is_fitted(self)
         return [tree.honest_indices_ for tree in self.estimators_]
+
+    @property
+    def oob_samples_(self):
+        """The sample indices that are out-of-bag.
+
+        Only utilized if ``bootstrap=True``, otherwise, all samples are "in-bag".
+        """
+        if self.bootstrap is False:
+            raise RuntimeError("Cannot extract out-of-bag samples when bootstrap is False.")
+        check_is_fitted(self)
+        self._n_samples
+        oob_samples = []
+        n_samples_bootstrap = _get_n_samples_bootstrap(
+            self._n_samples,
+            self.max_samples,
+        )
+        for estimator in self.estimators_:
+            unsampled_indices = _generate_unsampled_indices(
+                estimator.random_state,
+                self._n_samples,
+                n_samples_bootstrap,
+            )
+            oob_samples.append(unsampled_indices)
+        return oob_samples
 
     def _more_tags(self):
         return {"multioutput": False}

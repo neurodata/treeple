@@ -9,9 +9,9 @@ from sklearn.metrics import (
     mean_squared_error,
     roc_auc_score,
 )
-from sklearn.utils.validation import check_X_y
-
-from sktree._lib.sklearn.ensemble._forest import ForestClassifier
+from sklearn.utils.validation import check_X_y, check_is_fitted
+from sklearn.ensemble._forest import _generate_unsampled_indices, _get_n_samples_bootstrap
+from sktree._lib.sklearn.ensemble._forest import ForestClassifier, BaseForest
 
 
 def _mutual_information(y_true: ArrayLike, y_pred_proba: ArrayLike) -> float:
@@ -136,22 +136,17 @@ def _compute_null_distribution_perm(
     """
     rng = np.random.default_rng(seed)
     X_test, y_test = check_X_y(X_test, y_test, ensure_2d=True, multi_output=True)
-    n_samples_test = len(y_test)
+    # n_samples_test = len(y_test)
     n_samples_train = len(y_train)
     metric_func = METRIC_FUNCTIONS[metric]
 
     # pre-allocate memory for the index array
     train_index_arr = np.arange(n_samples_train, dtype=int).reshape(-1, 1)
-    test_index_arr = np.arange(n_samples_test, dtype=int).reshape(-1, 1)
+    # test_index_arr = np.arange(n_samples_test, dtype=int).reshape(-1, 1)
 
     null_metrics = np.zeros((n_repeats,))
 
     for idx in range(n_repeats):
-        # permute the covariates inplace
-        rng.shuffle(test_index_arr)
-        perm_X_cov = X_test[test_index_arr, covariate_index]
-        X_test[:, covariate_index] = perm_X_cov
-
         rng.shuffle(train_index_arr)
         perm_X_cov = X_train[train_index_arr, covariate_index]
         X_train[:, covariate_index] = perm_X_cov
@@ -272,3 +267,27 @@ def _compute_null_distribution_coleman(
         metric_star_pi[idx] = second_half_metric
 
     return metric_star, metric_star_pi
+
+
+def get_per_tree_oob_samples(est: BaseForest):
+    """The sample indices that are out-of-bag.
+
+    Only utilized if ``bootstrap=True``, otherwise, all samples are "in-bag".
+    """
+    check_is_fitted(est)
+    if est.bootstrap is False:
+        raise RuntimeError("Cannot extract out-of-bag samples when bootstrap is False.")
+    est._n_samples
+    oob_samples = []
+    n_samples_bootstrap = _get_n_samples_bootstrap(
+        est._n_samples,
+        est.max_samples,
+    )
+    for estimator in est.estimators_:
+        unsampled_indices = _generate_unsampled_indices(
+            estimator.random_state,
+            est._n_samples,
+            n_samples_bootstrap,
+        )
+        oob_samples.append(unsampled_indices)
+    return oob_samples

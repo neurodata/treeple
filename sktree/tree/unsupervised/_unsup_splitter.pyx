@@ -11,8 +11,8 @@ cimport numpy as cnp
 cnp.import_array()
 
 from libc.string cimport memcpy
-from sklearn.tree._utils cimport RAND_R_MAX, rand_int
 
+from ..._lib.sklearn.tree._utils cimport RAND_R_MAX, rand_int
 from .._sklearn_splitter cimport sort
 
 
@@ -79,7 +79,7 @@ cdef class UnsupervisedSplitter(BaseSplitter):
                              self.min_weight_leaf,
                              self.random_state), self.__getstate__())
 
-    cdef intp_t init(
+    cdef int init(
         self,
         const float32_t[:, :] X,
         const float64_t[:] sample_weight
@@ -136,8 +136,8 @@ cdef class UnsupervisedSplitter(BaseSplitter):
         )
         return 0
 
-    cdef intp_t node_reset(self, intp_t start, intp_t end,
-                           float64_t* weighted_n_node_samples) except -1 nogil:
+    cdef int node_reset(self, intp_t start, intp_t end,
+                        float64_t* weighted_n_node_samples) except -1 nogil:
         """Reset splitter on node samples[start:end].
 
         Returns -1 in case of failure to allocate memory (and raise MemoryError)
@@ -174,7 +174,7 @@ cdef class UnsupervisedSplitter(BaseSplitter):
 cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
     """Split in a best_split-first fashion.
     """
-    cdef intp_t node_split(
+    cdef int node_split(
         self,
         float64_t impurity,
         SplitRecord* split,

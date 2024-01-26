@@ -59,7 +59,7 @@ cdef class BaseObliqueSplitter(Splitter):
     ) noexcept nogil
 
     # Redefined here since the new logic requires calling sample_proj_mat
-    cdef intp_t node_reset(
+    cdef int node_reset(
         self,
         intp_t start,
         intp_t end,
@@ -76,7 +76,7 @@ cdef class BaseObliqueSplitter(Splitter):
         vector[intp_t]* proj_vec_indices    # indices of the features (max_features,)
     ) noexcept nogil
 
-    cdef intp_t node_split(
+    cdef int node_split(
         self,
         float64_t impurity,   # Impurity of the node
         SplitRecord* split,
@@ -112,7 +112,7 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
 
 
 cdef class BestObliqueSplitter(ObliqueSplitter):
-    cdef intp_t node_split(
+    cdef int node_split(
         self,
         float64_t impurity,   # Impurity of the node
         SplitRecord* split,
@@ -135,7 +135,7 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
         float64_t current_threshold
     ) noexcept nogil
 
-    cdef intp_t node_split(
+    cdef int node_split(
         self,
         float64_t impurity,   # Impurity of the node
         SplitRecord* split,

@@ -35,7 +35,7 @@ cdef class UnsupervisedTree(BaseTree):
     cdef cnp.ndarray _get_node_ndarray(self)
 
     # Overridden Methods
-    cdef intp_t _set_split_node(
+    cdef int _set_split_node(
         self,
         SplitRecord* split_node,
         Node* node,
