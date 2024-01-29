@@ -13,8 +13,8 @@ cnp.import_array()
 
 from cython.operator cimport dereference as deref
 from libcpp.vector cimport vector
-from sklearn.tree._utils cimport rand_int
 
+from ..._lib.sklearn.tree._utils cimport rand_int
 from ..._lib.sklearn.tree._criterion cimport Criterion
 from .._utils cimport ravel_multi_index_cython, unravel_index_cython
 
@@ -30,7 +30,7 @@ cdef class PatchSplitter(BestObliqueSplitter):
     def __setstate__(self, d):
         pass
 
-    cdef intp_t init(
+    cdef int init(
         self,
         object X,
         const float64_t[:, ::1] y,
@@ -41,7 +41,7 @@ cdef class PatchSplitter(BestObliqueSplitter):
 
         return 0
 
-    cdef intp_t node_reset(
+    cdef int node_reset(
         self,
         intp_t start,
         intp_t end,
@@ -96,7 +96,7 @@ cdef class PatchSplitter(BestObliqueSplitter):
 
 
 cdef class BaseDensePatchSplitter(PatchSplitter):
-    cdef intp_t init(
+    cdef int init(
         self,
         object X,
         const float64_t[:, ::1] y,
@@ -243,7 +243,7 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
                 # write to buffer
                 self.patch_dims_buff[idx] = patch_dim
                 patch_size *= patch_dim
-            elif self.boundary == 'wrap':
+            elif self.boundary == "wrap":
                 # add circular boundary conditions
                 delta_patch_dim = self.data_dims[idx] + 2 * (patch_dim - 1)
 

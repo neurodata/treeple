@@ -52,7 +52,7 @@ from numpy import float64 as DOUBLE
 
 
 cdef float64_t INFINITY = np.inf
-cdef float64_t EPSILON = np.finfo('double').eps
+cdef float64_t EPSILON = np.finfo("double").eps
 
 # Some handy constants (BestFirstTreeBuilder)
 cdef intp_t IS_FIRST = 1
@@ -285,7 +285,7 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
         if rc == -1:
             raise MemoryError()
 
-    cdef inline intp_t _add_split_node(
+    cdef inline int _add_split_node(
         self,
         UnsupervisedSplitter splitter,
         UnsupervisedTree tree,
@@ -620,11 +620,11 @@ cdef class UnsupervisedTree(BaseTree):
     # (i.e. through `_resize` or `__setstate__`)
     @property
     def children_left(self):
-        return self._get_node_ndarray()['left_child'][:self.node_count]
+        return self._get_node_ndarray()["left_child"][:self.node_count]
 
     @property
     def children_right(self):
-        return self._get_node_ndarray()['right_child'][:self.node_count]
+        return self._get_node_ndarray()["right_child"][:self.node_count]
 
     def n_leaves(self):
         return np.sum(np.logical_and(
@@ -633,23 +633,23 @@ cdef class UnsupervisedTree(BaseTree):
 
     @property
     def feature(self):
-        return self._get_node_ndarray()['feature'][:self.node_count]
+        return self._get_node_ndarray()["feature"][:self.node_count]
 
     @property
     def threshold(self):
-        return self._get_node_ndarray()['threshold'][:self.node_count]
+        return self._get_node_ndarray()["threshold"][:self.node_count]
 
     @property
     def impurity(self):
-        return self._get_node_ndarray()['impurity'][:self.node_count]
+        return self._get_node_ndarray()["impurity"][:self.node_count]
 
     @property
     def n_node_samples(self):
-        return self._get_node_ndarray()['n_node_samples'][:self.node_count]
+        return self._get_node_ndarray()["n_node_samples"][:self.node_count]
 
     @property
     def weighted_n_node_samples(self):
-        return self._get_node_ndarray()['weighted_n_node_samples'][:self.node_count]
+        return self._get_node_ndarray()["weighted_n_node_samples"][:self.node_count]
 
     @property
     def value(self):
@@ -695,12 +695,12 @@ cdef class UnsupervisedTree(BaseTree):
         self.max_depth = d["max_depth"]
         self.node_count = d["node_count"]
 
-        if 'nodes' not in d:
-            raise ValueError('You have loaded Tree version which '
-                             'cannot be imported')
+        if "nodes" not in d:
+            raise ValueError("You have loaded Tree version which "
+                             "cannot be imported")
 
-        node_ndarray = d['nodes']
-        value_ndarray = d['values']
+        node_ndarray = d["nodes"]
+        value_ndarray = d["values"]
 
         value_shape = (node_ndarray.shape[0],)
 
@@ -774,8 +774,8 @@ def _check_value_ndarray(value_ndarray, expected_dtype, expected_shape):
         return value_ndarray
 
     # Handles different endianness
-    if value_ndarray.dtype.str.endswith('f8'):
-        return value_ndarray.astype(expected_dtype, casting='equiv')
+    if value_ndarray.dtype.str.endswith("f8"):
+        return value_ndarray.astype(expected_dtype, casting="equiv")
 
     raise ValueError(
         "value array from the pickle has an incompatible dtype:\n"

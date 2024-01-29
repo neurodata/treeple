@@ -179,10 +179,6 @@ class MultiViewRandomForestClassifier(SimMatrixMixin, ForestClassifier):
 
     Attributes
     ----------
-    base_estimator_ : sktree.tree.ObliqueDecisionTreeClassifier
-        The child estimator template used to create the collection of fitted
-        sub-estimators.
-
     estimators_ : list of sktree.tree.ObliqueDecisionTreeClassifier
         The collection of fitted sub-estimators.
 

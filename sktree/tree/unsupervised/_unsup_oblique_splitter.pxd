@@ -49,10 +49,10 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
                               vector[vector[intp_t]]& proj_mat_indices) noexcept nogil
 
     # Redefined here since the new logic requires calling sample_proj_mat
-    cdef intp_t node_reset(self, intp_t start, intp_t end,
-                           float64_t* weighted_n_node_samples) except -1 nogil
+    cdef int node_reset(self, intp_t start, intp_t end,
+                        float64_t* weighted_n_node_samples) except -1 nogil
 
-    cdef intp_t node_split(
+    cdef int node_split(
         self,
         float64_t impurity,   # Impurity of the node
         SplitRecord* split,
@@ -60,7 +60,7 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
         float64_t lower_bound,
         float64_t upper_bound
     ) except -1 nogil
-    cdef intp_t init(
+    cdef int init(
         self,
         const float32_t[:, :] X,
         const float64_t[:] sample_weight

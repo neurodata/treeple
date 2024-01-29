@@ -88,15 +88,6 @@ class ExtendedIsolationForest(IsolationForest):
         fitted sub-estimators.
 
         .. versionadded:: 1.2
-           `base_estimator_` was renamed to `estimator_`.
-
-    base_estimator_ : ExtraTreeRegressor instance
-        The child estimator template used to create the collection of
-        fitted sub-estimators.
-
-        .. deprecated:: 1.2
-            `base_estimator_` is deprecated and will be removed in 1.4.
-            Use `estimator_` instead.
 
     estimators_ : list of ExtraTreeRegressor instances
         The collection of fitted sub-estimators.

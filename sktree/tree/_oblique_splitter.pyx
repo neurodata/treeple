@@ -8,8 +8,8 @@ import numpy as np
 
 from cython.operator cimport dereference as deref
 from libcpp.vector cimport vector
-from sklearn.tree._utils cimport rand_int, rand_uniform
 
+from .._lib.sklearn.tree._utils cimport rand_int, rand_uniform
 from .._lib.sklearn.tree._criterion cimport Criterion
 
 
@@ -44,8 +44,8 @@ cdef class BaseObliqueSplitter(Splitter):
     def __setstate__(self, d):
         pass
 
-    cdef intp_t node_reset(self, intp_t start, intp_t end,
-                           float64_t* weighted_n_node_samples) except -1 nogil:
+    cdef int node_reset(self, intp_t start, intp_t end,
+                        float64_t* weighted_n_node_samples) except -1 nogil:
         """Reset splitter on node samples[start:end].
 
         Returns -1 in case of failure to allocate memory (and raise MemoryError)
@@ -199,7 +199,7 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         # or max w/ 1...
         self.n_non_zeros = max(<intp_t>(self.max_features * self.feature_combinations), 1)
 
-    cdef intp_t init(
+    cdef int init(
         self,
         object X,
         const float64_t[:, ::1] y,
@@ -288,7 +288,7 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
                     self.feature_combinations,
                 ), self.__getstate__())
 
-    cdef intp_t node_split(
+    cdef int node_split(
         self,
         float64_t impurity,
         SplitRecord* split,
@@ -494,7 +494,7 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
         return partition_end
 
     # overwrite the node_split method with random threshold selection
-    cdef intp_t node_split(
+    cdef int node_split(
         self,
         float64_t impurity,
         SplitRecord* split,
@@ -704,7 +704,7 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
                     self.max_features_per_set.base if self.max_features_per_set is not None else None,
                 ), self.__getstate__())
 
-    cdef intp_t init(
+    cdef int init(
         self,
         object X,
         const float64_t[:, ::1] y,
@@ -868,7 +868,7 @@ cdef class MultiViewObliqueSplitter(BestObliqueSplitter):
                     self.uniform_sampling,
                 ), self.__getstate__())
 
-    cdef intp_t init(
+    cdef int init(
         self,
         object X,
         const float64_t[:, ::1] y,

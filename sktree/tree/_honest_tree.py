@@ -5,6 +5,7 @@ import numpy as np
 from sklearn.base import ClassifierMixin, MetaEstimatorMixin, _fit_context, clone
 from sklearn.utils.multiclass import _check_partial_fit_first_call, check_classification_targets
 from sklearn.utils.validation import check_is_fitted, check_X_y
+from sklearn.model_selection import StratifiedShuffleSplit
 
 from .._lib.sklearn.tree import DecisionTreeClassifier
 from .._lib.sklearn.tree._classes import BaseDecisionTree
@@ -166,6 +167,10 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         classes). If "empirical", the prior tree posterior is the relative
         class frequency in the voting subsample.
 
+    stratify : bool
+        Whether or not to stratify sample when considering structure and leaf indices.
+        By default False.
+
     Attributes
     ----------
     estimator_ : object
@@ -282,6 +287,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         tree_estimator=None,
         honest_fraction=0.5,
         honest_prior="empirical",
+        stratify=False,
     ):
         self.tree_estimator = tree_estimator
         self.criterion = criterion
@@ -299,6 +305,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         self.honest_fraction = honest_fraction
         self.honest_prior = honest_prior
         self.monotonic_cst = monotonic_cst
+        self.stratify = stratify
 
         # XXX: to enable this, we need to also reset the leaf node samples during `_set_leaf_nodes`
         self.store_leaf_values = False
@@ -527,12 +534,22 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         nonzero_indices = np.where(_sample_weight > 0)[0]
 
         # TODO: perhaps we want to stratify this split
-        self.structure_indices_ = rng.choice(
-            nonzero_indices,
-            int((1 - self.honest_fraction) * len(nonzero_indices)),
-            replace=False,
-        )
-        self.honest_indices_ = np.setdiff1d(nonzero_indices, self.structure_indices_)
+        if self.stratify:
+            ss = StratifiedShuffleSplit(
+                n_splits=1, test_size=self.honest_fraction, random_state=self.random_state
+            )
+            for structure_idx, leaf_idx in ss.split(
+                np.zeros((len(nonzero_indices), 1)), y[nonzero_indices]
+            ):
+                self.structure_indices_ = nonzero_indices[structure_idx]
+                self.honest_indices_ = nonzero_indices[leaf_idx]
+        else:
+            self.structure_indices_ = rng.choice(
+                nonzero_indices,
+                int((1 - self.honest_fraction) * len(nonzero_indices)),
+                replace=False,
+            )
+            self.honest_indices_ = np.setdiff1d(nonzero_indices, self.structure_indices_)
 
         _sample_weight[self.honest_indices_] = 0
 
