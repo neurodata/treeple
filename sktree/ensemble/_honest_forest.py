@@ -3,17 +3,75 @@
 
 import threading
 
+from numbers import Integral, Real
 import numpy as np
 from joblib import Parallel, delayed
 from sklearn.base import _fit_context
 from sklearn.ensemble._base import _partition_estimators
 from sklearn.utils.validation import check_is_fitted
+from warnings import warn
 
+import numpy as np
+from scipy.sparse import issparse
+
+from sklearn.ensemble._hist_gradient_boosting.binning import _BinMapper
+from sklearn.exceptions import DataConversionWarning
+from sklearn.utils import check_random_state
+from sklearn.utils._openmp_helpers import _openmp_effective_n_threads
+from sklearn.utils.multiclass import (
+    type_of_target,
+)
+from sklearn.utils.parallel import Parallel, delayed
+from sklearn.utils.validation import (
+    _check_sample_weight,
+)
+from .._lib.sklearn.tree._tree import DOUBLE, DTYPE
+from .._lib.sklearn.ensemble._forest import (
+    _parallel_build_trees,
+)
 from .._lib.sklearn.ensemble._forest import ForestClassifier
 from .._lib.sklearn.tree import _tree as _sklearn_tree
 from ..tree import HonestTreeClassifier
 
 DTYPE = _sklearn_tree.DTYPE
+
+
+def _get_n_samples_bootstrap(n_samples, max_samples):
+    """
+    Get the number of samples in a bootstrap sample.
+
+    XXX: Note this is copied from sklearn. We override the ability
+    to sample a higher number of bootstrap samples to enable sampling
+    closer to 80% unique training data points for in-bag computation.
+
+    Parameters
+    ----------
+    n_samples : int
+        Number of samples in the dataset.
+    max_samples : int or float
+        The maximum number of samples to draw from the total available:
+            - if float, this indicates a fraction of the total and should be
+              the interval `(0.0, 1.0]`;
+            - if int, this indicates the exact number of samples;
+            - if None, this indicates the total number of samples.
+
+    Returns
+    -------
+    n_samples_bootstrap : int
+        The total number of samples to draw for the bootstrap sample.
+    """
+    if max_samples is None:
+        return n_samples
+
+    if isinstance(max_samples, Integral):
+        # if max_samples > n_samples:
+        #     msg = "`max_samples` must be <= n_samples={} but got value {}"
+        #     raise ValueError(msg.format(n_samples, max_samples))
+        return max_samples
+
+    if isinstance(max_samples, Real):
+        return round(n_samples * max_samples)
+        # return max(round(n_samples * max_samples), 1)
 
 
 class HonestForestClassifier(ForestClassifier):
@@ -435,28 +493,6 @@ class HonestForestClassifier(ForestClassifier):
         self : object
             Fitted estimator.
         """
-        from warnings import warn
-
-        import numpy as np
-        from scipy.sparse import issparse
-
-        from sklearn.ensemble._hist_gradient_boosting.binning import _BinMapper
-        from sklearn.exceptions import DataConversionWarning
-        from sklearn.utils import check_random_state
-        from sklearn.utils._openmp_helpers import _openmp_effective_n_threads
-        from sklearn.utils.multiclass import (
-            type_of_target,
-        )
-        from sklearn.utils.parallel import Parallel, delayed
-        from sklearn.utils.validation import (
-            _check_sample_weight,
-        )
-        from .._lib.sklearn.tree._tree import DOUBLE, DTYPE
-        from .._lib.sklearn.ensemble._forest import (
-            _get_n_samples_bootstrap,
-            _parallel_build_trees,
-        )
-
         MAX_INT = np.iinfo(np.int32).max
         # Validate or convert input data
         if issparse(y):
@@ -616,6 +652,7 @@ class HonestForestClassifier(ForestClassifier):
             # parallel_backend contexts set at a higher level,
             # since correctness does not rely on using threads.
             if self.permute_per_tree:
+                # TODO: refactor to make this a more robust implementation
                 permutation_arr_per_tree = [
                     random_state.choice(self._n_samples, size=self._n_samples, replace=False)
                     for _ in range(self.n_estimators)
