@@ -1215,6 +1215,74 @@ def _parallel_predict_proba_oob(predict_proba, X, out, idx, test_idx, lock):
     return prediction
 
 
+def build_coleman_forest(
+    est,
+    X,
+    y,
+    covariate_index=None,
+    metric="mi",
+    n_repeats=1000,
+    verbose=False,
+    seed=None,
+    return_posteriors=True,
+    **metric_kwargs,
+):
+    rng = np.random.default_rng(seed)
+    metric_func: Callable[[ArrayLike, ArrayLike], float] = METRIC_FUNCTIONS[metric]
+
+    if covariate_index is None:
+        covariate_index = np.arange(X.shape[1], dtype=int)
+
+    # perform permutation of covariates
+    # TODO: refactor permutations into the HonestForest(?)
+    n_samples_train = X.shape[0]
+    index_arr = rng.choice(
+        np.arange(n_samples_train, dtype=int),
+        size=(n_samples_train, 1),
+        replace=False,
+        shuffle=True,
+    )
+    X_permute = X.copy()
+    X_permute[:, covariate_index] = X_permute[index_arr, covariate_index]
+
+    # build two sets of forests
+    orig_est, orig_forest_proba = build_hyppo_oob_forest(est, X, y, verbose=verbose)
+    perm_est, perm_forest_proba = build_hyppo_oob_forest(est, X_permute, y, verbose=verbose)
+
+    metric_star, metric_star_pi = _compute_null_distribution_coleman(
+        y,
+        orig_forest_proba,
+        perm_forest_proba,
+        metric,
+        n_repeats=n_repeats,
+        seed=seed,
+        **metric_kwargs,
+    )
+
+    y_pred_proba_orig = np.nanmean(orig_forest_proba, axis=0)
+    y_pred_proba_perm = np.nanmean(perm_forest_proba, axis=0)
+    observe_stat = metric_func(y, y_pred_proba_orig, **metric_kwargs)
+    permute_stat = metric_func(y, y_pred_proba_perm, **metric_kwargs)
+
+    # metric^\pi - metric = observed test statistic, which under the
+    # null is normally distributed around 0
+    observe_test_stat = permute_stat - observe_stat
+
+    # metric^\pi_j - metric_j, which is centered at 0
+    null_dist = metric_star_pi - metric_star
+
+    # compute pvalue
+    if metric in POSITIVE_METRICS:
+        pvalue = (1 + (null_dist <= observe_test_stat).sum()) / (1 + n_repeats)
+    else:
+        pvalue = (1 + (null_dist >= observe_test_stat).sum()) / (1 + n_repeats)
+
+    if return_posteriors:
+        return observe_test_stat, pvalue, orig_forest_proba, perm_forest_proba
+    else:
+        return observe_test_stat, pvalue
+
+
 def build_hyppo_oob_forest(
     est,
     X,
@@ -1222,6 +1290,8 @@ def build_hyppo_oob_forest(
     verbose=False,
 ):
     assert est.bootstrap
+
+    est = clone(est)
 
     # build forest
     est.fit(X, y)

@@ -8,6 +8,7 @@ from sklearn.metrics import (
     mean_absolute_error,
     mean_squared_error,
     roc_auc_score,
+    roc_curve,
 )
 from sklearn.utils.validation import check_X_y, check_is_fitted
 from sklearn.ensemble._forest import _generate_unsampled_indices, _get_n_samples_bootstrap
@@ -65,6 +66,35 @@ def _cond_entropy(y_true: ArrayLike, y_pred_proba: ArrayLike) -> float:
     return H_YX
 
 
+# Define function to compute the sensitivity at 98% specificity
+def _SAS98(y_true: ArrayLike, y_pred_proba: ArrayLike, max_fpr=0.02) -> float:
+    """Compute the sensitivity at 98% specificity.
+    Parameters
+    ----------
+    y_true : ArrayLike of shape (n_samples,)
+        The true labels.
+    y_pred_proba : ArrayLike of shape (n_samples, n_outputs)
+        Posterior probabilities.
+    max_fpr : float, optional. Default=0.02
+    Returns
+    -------
+    float :
+        The estimated SAS98.
+    """
+    if y_true.squeeze().ndim != 1:
+        raise ValueError(f"y_true must be 1d, not {y_true.shape}")
+    if 0 in y_true or -1 in y_true:
+        fpr, tpr, thresholds = roc_curve(
+            y_true, y_pred_proba[:, 1], pos_label=1, drop_intermediate=False
+        )
+    else:
+        fpr, tpr, thresholds = roc_curve(
+            y_true, y_pred_proba[:, 1], pos_label=2, drop_intermediate=False
+        )
+    s98 = max([tpr for (fpr, tpr) in zip(fpr, tpr) if fpr <= max_fpr])
+    return s98
+
+
 METRIC_FUNCTIONS = {
     "mse": mean_squared_error,
     "mae": mean_absolute_error,
@@ -72,6 +102,7 @@ METRIC_FUNCTIONS = {
     "auc": roc_auc_score,
     "mi": _mutual_information,
     "cond_entropy": _cond_entropy,
+    "sas98": _SAS98,
 }
 
 POSTERIOR_FUNCTIONS = ("mi", "auc", "cond_entropy")

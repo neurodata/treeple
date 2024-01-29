@@ -2,17 +2,12 @@
 # Adopted from: https://github.com/neurodata/honest-forests
 
 import threading
-from warnings import catch_warnings, simplefilter
 
 import numpy as np
 from joblib import Parallel, delayed
 from sklearn.base import _fit_context
 from sklearn.ensemble._base import _partition_estimators
-from sklearn.utils.validation import check_is_fitted, check_X_y
-from sklearn.ensemble._forest import (
-    _get_n_samples_bootstrap,
-)
-from sklearn.utils import compute_sample_weight, check_random_state
+from sklearn.utils.validation import check_is_fitted
 
 from .._lib.sklearn.ensemble._forest import ForestClassifier
 from .._lib.sklearn.tree import _tree as _sklearn_tree
@@ -207,7 +202,10 @@ class HonestForestClassifier(ForestClassifier):
 
     honest_bootstrap : bool
         Whether or not we bootstrap the samples to use to set the leaf nodes for each
-        tree.
+        tree. May be removed if not useful.
+
+    permute_per_tree : bool
+        Whether or not to permute the labels per tree.
 
     Attributes
     ----------
@@ -358,6 +356,7 @@ class HonestForestClassifier(ForestClassifier):
         tree_estimator=None,
         stratify=False,
         honest_bootstrap=False,
+        permute_per_tree=False,
     ):
         super().__init__(
             estimator=HonestTreeClassifier(),
@@ -403,6 +402,7 @@ class HonestForestClassifier(ForestClassifier):
         self.tree_estimator = tree_estimator
         self.stratify = stratify
         self.honest_bootstrap = honest_bootstrap
+        self.permute_per_tree = permute_per_tree
 
     @_fit_context(prefer_skip_nested_validation=True)
     def fit(self, X, y, sample_weight=None, classes=None):
@@ -432,61 +432,359 @@ class HonestForestClassifier(ForestClassifier):
 
         Returns
         -------
-        self : HonestForestClassifier
-            Fitted tree estimator.
+        self : object
+            Fitted estimator.
         """
-        X, y = check_X_y(X, y, multi_output=True)
-        super().fit(X, y, sample_weight=sample_weight, classes=classes)
+        from warnings import warn
 
-        if self.honest_bootstrap:
-            # must re-fit the leaves using a bootstrap over the non structure indices
-            # Account for bootstrapping too
-            # nonzero_indices = np.where(_sample_weight > 0)[0]
-            n_samples = X.shape[0]
+        import numpy as np
+        from scipy.sparse import issparse
 
-            for tree in self.estimators_:
-                sample_indices = np.ones((n_samples,), dtype=bool).squeeze()
-
-                # now we need to get the non-structure indices
-                structure_indices = tree.structure_indices_
-                sample_indices[structure_indices] = False
-                non_structure_indices = np.argwhere(sample_indices).squeeze()
-
-                n_samples_non_structure = len(non_structure_indices)
-
-                if sample_weight is None:
-                    curr_sample_weight = np.ones((n_samples,), dtype=np.float64)
-                else:
-                    curr_sample_weight = sample_weight.copy()
-
-                # get the sample weight for bootstrapping the non-structure indices
-                n_samples_bootstrap = _get_n_samples_bootstrap(
-                    n_samples=n_samples_non_structure, max_samples=self.max_samples
-                )
-
-                # bootstrap sample the remaining non-structure indices
-                random_instance = check_random_state(tree.random_state)
-                indices = random_instance.choice(
-                    n_samples_non_structure, n_samples_bootstrap, replace=True
-                )
-                sample_counts = np.bincount(indices, minlength=n_samples)
-                curr_sample_weight *= sample_counts
-
-                if self.class_weight == "subsample":
-                    with catch_warnings():
-                        simplefilter("ignore", DeprecationWarning)
-                        curr_sample_weight *= compute_sample_weight("auto", y, indices=indices)
-                elif self.class_weight == "balanced_subsample":
-                    curr_sample_weight *= compute_sample_weight("balanced", y, indices=indices)
-
-                # re-fit the leaves
-                tree._fit_leaves(X, y, sample_weight=curr_sample_weight)
-
-        # Compute honest decision function
-        self.honest_decision_function_ = self._predict_proba(
-            X, indices=self.honest_indices_, impute_missing=np.nan
+        from sklearn.ensemble._hist_gradient_boosting.binning import _BinMapper
+        from sklearn.exceptions import DataConversionWarning
+        from sklearn.utils import check_random_state
+        from sklearn.utils._openmp_helpers import _openmp_effective_n_threads
+        from sklearn.utils.multiclass import (
+            type_of_target,
         )
+        from sklearn.utils.parallel import Parallel, delayed
+        from sklearn.utils.validation import (
+            _check_sample_weight,
+        )
+        from .._lib.sklearn.tree._tree import DOUBLE, DTYPE
+        from .._lib.sklearn.ensemble._forest import (
+            _get_n_samples_bootstrap,
+            _parallel_build_trees,
+        )
+
+        MAX_INT = np.iinfo(np.int32).max
+        # Validate or convert input data
+        if issparse(y):
+            raise ValueError("sparse multilabel-indicator for y is not supported.")
+
+        X, y = self._validate_data(
+            X,
+            y,
+            multi_output=True,
+            accept_sparse="csc",
+            dtype=DTYPE,
+            force_all_finite=False,
+        )
+        # _compute_missing_values_in_feature_mask checks if X has missing values and
+        # will raise an error if the underlying tree base estimator can't handle missing
+        # values. Only the criterion is required to determine if the tree supports
+        # missing values.
+        estimator = type(self.estimator)(criterion=self.criterion)
+        missing_values_in_feature_mask = estimator._compute_missing_values_in_feature_mask(
+            X, estimator_name=self.__class__.__name__
+        )
+
+        if sample_weight is not None:
+            sample_weight = _check_sample_weight(sample_weight, X)
+
+        if issparse(X):
+            # Pre-sort indices to avoid that each individual tree of the
+            # ensemble sorts the indices.
+            X.sort_indices()
+
+        y = np.atleast_1d(y)
+        if y.ndim == 2 and y.shape[1] == 1:
+            warn(
+                (
+                    "A column-vector y was passed when a 1d array was"
+                    " expected. Please change the shape of y to "
+                    "(n_samples,), for example using ravel()."
+                ),
+                DataConversionWarning,
+                stacklevel=2,
+            )
+
+        if y.ndim == 1:
+            # reshape is necessary to preserve the data contiguity against vs
+            # [:, np.newaxis] that does not.
+            y = np.reshape(y, (-1, 1))
+
+        if self.criterion == "poisson":
+            if np.any(y < 0):
+                raise ValueError(
+                    "Some value(s) of y are negative which is "
+                    "not allowed for Poisson regression."
+                )
+            if np.sum(y) <= 0:
+                raise ValueError(
+                    "Sum of y is not strictly positive which "
+                    "is necessary for Poisson regression."
+                )
+
+        self._n_samples, self.n_outputs_ = y.shape
+
+        y, expanded_class_weight = self._validate_y_class_weight(y, classes=classes)
+
+        if getattr(y, "dtype", None) != DOUBLE or not y.flags.contiguous:
+            y = np.ascontiguousarray(y, dtype=DOUBLE)
+
+        if expanded_class_weight is not None:
+            if sample_weight is not None:
+                sample_weight = sample_weight * expanded_class_weight
+            else:
+                sample_weight = expanded_class_weight
+
+        if not self.bootstrap and self.max_samples is not None:
+            raise ValueError(
+                "`max_sample` cannot be set if `bootstrap=False`. "
+                "Either switch to `bootstrap=True` or set "
+                "`max_sample=None`."
+            )
+        elif self.bootstrap:
+            n_samples_bootstrap = _get_n_samples_bootstrap(
+                n_samples=X.shape[0], max_samples=self.max_samples
+            )
+        else:
+            n_samples_bootstrap = None
+
+        self._n_samples_bootstrap = n_samples_bootstrap
+
+        self._validate_estimator()
+
+        if not self.bootstrap and self.oob_score:
+            raise ValueError("Out of bag estimation only available if bootstrap=True")
+
+        random_state = check_random_state(self.random_state)
+
+        if not self.warm_start or not hasattr(self, "estimators_"):
+            # Free allocated memory, if any
+            self.estimators_ = []
+
+        n_more_estimators = self.n_estimators - len(self.estimators_)
+
+        if self.max_bins is not None:
+            # `_openmp_effective_n_threads` is used to take cgroups CPU quotes
+            # into account when determine the maximum number of threads to use.
+            n_threads = _openmp_effective_n_threads()
+
+            # Bin the data
+            # For ease of use of the API, the user-facing GBDT classes accept the
+            # parameter max_bins, which doesn't take into account the bin for
+            # missing values (which is always allocated). However, since max_bins
+            # isn't the true maximal number of bins, all other private classes
+            # (binmapper, histbuilder...) accept n_bins instead, which is the
+            # actual total number of bins. Everywhere in the code, the
+            # convention is that n_bins == max_bins + 1
+            n_bins = self.max_bins + 1  # + 1 for missing values
+            self._bin_mapper = _BinMapper(
+                n_bins=n_bins,
+                # is_categorical=self.is_categorical_,
+                known_categories=None,
+                random_state=random_state,
+                n_threads=n_threads,
+            )
+
+            # XXX: in order for this to work with the underlying tree submodule's Cython
+            # code, we need to convert this into the original data's DTYPE because
+            # the Cython code assumes that `DTYPE` is used.
+            # The proper implementation will be a lot more complicated and should be
+            # tackled once scikit-learn has finalized their inclusion of missing data
+            # and categorical support for decision trees
+            X = self._bin_data(X, is_training_data=True)  # .astype(DTYPE)
+        else:
+            self._bin_mapper = None
+
+        if n_more_estimators < 0:
+            raise ValueError(
+                "n_estimators=%d must be larger or equal to "
+                "len(estimators_)=%d when warm_start==True"
+                % (self.n_estimators, len(self.estimators_))
+            )
+
+        elif n_more_estimators == 0:
+            warn("Warm-start fitting without increasing n_estimators does not " "fit new trees.")
+        else:
+            if self.warm_start and len(self.estimators_) > 0:
+                # We draw from the random state to get the random state we
+                # would have got if we hadn't used a warm_start.
+                random_state.randint(MAX_INT, size=len(self.estimators_))
+
+            trees = [
+                self._make_estimator(append=False, random_state=random_state)
+                for i in range(n_more_estimators)
+            ]
+
+            # Parallel loop: we prefer the threading backend as the Cython code
+            # for fitting the trees is internally releasing the Python GIL
+            # making threading more efficient than multiprocessing in
+            # that case. However, for joblib 0.12+ we respect any
+            # parallel_backend contexts set at a higher level,
+            # since correctness does not rely on using threads.
+            if self.permute_per_tree:
+                permutation_arr_per_tree = [
+                    random_state.choice(self._n_samples, size=self._n_samples, replace=False)
+                    for _ in range(self.n_estimators)
+                ]
+                if sample_weight is None:
+                    sample_weight = np.ones((self._n_samples,))
+
+                trees = Parallel(
+                    n_jobs=self.n_jobs,
+                    verbose=self.verbose,
+                    prefer="threads",
+                )(
+                    delayed(_parallel_build_trees)(
+                        t,
+                        self.bootstrap,
+                        X,
+                        y[perm_idx],
+                        sample_weight[perm_idx],
+                        i,
+                        len(trees),
+                        verbose=self.verbose,
+                        class_weight=self.class_weight,
+                        n_samples_bootstrap=n_samples_bootstrap,
+                        missing_values_in_feature_mask=missing_values_in_feature_mask,
+                        classes=classes,
+                    )
+                    for i, (t, perm_idx) in enumerate(
+                        zip(
+                            trees,
+                            permutation_arr_per_tree,
+                        )
+                    )
+                )
+            else:
+                trees = Parallel(
+                    n_jobs=self.n_jobs,
+                    verbose=self.verbose,
+                    prefer="threads",
+                )(
+                    delayed(_parallel_build_trees)(
+                        t,
+                        self.bootstrap,
+                        X,
+                        y,
+                        sample_weight,
+                        i,
+                        len(trees),
+                        verbose=self.verbose,
+                        class_weight=self.class_weight,
+                        n_samples_bootstrap=n_samples_bootstrap,
+                        missing_values_in_feature_mask=missing_values_in_feature_mask,
+                        classes=classes,
+                    )
+                    for i, t in enumerate(trees)
+                )
+
+            # Collect newly grown trees
+            self.estimators_.extend(trees)
+
+        if self.oob_score and (n_more_estimators > 0 or not hasattr(self, "oob_score_")):
+            y_type = type_of_target(y)
+            if y_type == "unknown" or (
+                self._estimator_type == "classifier" and y_type == "multiclass-multioutput"
+            ):
+                # FIXME: we could consider to support multiclass-multioutput if
+                # we introduce or reuse a constructor parameter (e.g.
+                # oob_score) allowing our user to pass a callable defining the
+                # scoring strategy on OOB sample.
+                raise ValueError(
+                    "The type of target cannot be used to compute OOB "
+                    f"estimates. Got {y_type} while only the following are "
+                    "supported: continuous, continuous-multioutput, binary, "
+                    "multiclass, multilabel-indicator."
+                )
+
+            if callable(self.oob_score):
+                self._set_oob_score_and_attributes(X, y, scoring_function=self.oob_score)
+            else:
+                self._set_oob_score_and_attributes(X, y)
+
+        # Decapsulate classes_ attributes
+        if hasattr(self, "classes_") and self.n_outputs_ == 1:
+            self.n_classes_ = self.n_classes_[0]
+            self.classes_ = self.classes_[0]
+
         return self
+
+    # def fit(self, X, y, sample_weight=None, classes=None):
+    #     """
+    #     Build a forest of trees from the training set (X, y).
+
+    #     Parameters
+    #     ----------
+    #     X : {array-like, sparse matrix} of shape (n_samples, n_features)
+    #         The training input samples. Internally, its dtype will be converted
+    #         to ``dtype=np.float32``. If a sparse matrix is provided, it will be
+    #         converted into a sparse ``csc_matrix``.
+
+    #     y : array-like of shape (n_samples,) or (n_samples, n_outputs)
+    #         The target values (class labels in classification, real numbers in
+    #         regression).
+
+    #     sample_weight : array-like of shape (n_samples,), default=None
+    #         Sample weights. If None, then samples are equally weighted. Splits
+    #         that would create child nodes with net zero or negative weight are
+    #         ignored while searching for a split in each node. In the case of
+    #         classification, splits are also ignored if they would result in any
+    #         single class carrying a negative weight in either child node.
+
+    #     classes : array-like of shape (n_classes,), default=None
+    #         List of all the classes that can possibly appear in the y vector.
+
+    #     Returns
+    #     -------
+    #     self : HonestForestClassifier
+    #         Fitted tree estimator.
+    #     """
+    #     X, y = check_X_y(X, y, multi_output=True)
+    #     super().fit(X, y, sample_weight=sample_weight, classes=classes)
+
+    #     if self.honest_bootstrap:
+    #         # must re-fit the leaves using a bootstrap over the non structure indices
+    #         # Account for bootstrapping too
+    #         # nonzero_indices = np.where(_sample_weight > 0)[0]
+    #         n_samples = X.shape[0]
+
+    #         for tree in self.estimators_:
+    #             sample_indices = np.ones((n_samples,), dtype=bool).squeeze()
+
+    #             # now we need to get the non-structure indices
+    #             structure_indices = tree.structure_indices_
+    #             sample_indices[structure_indices] = False
+    #             non_structure_indices = np.argwhere(sample_indices).squeeze()
+
+    #             n_samples_non_structure = len(non_structure_indices)
+
+    #             if sample_weight is None:
+    #                 curr_sample_weight = np.ones((n_samples,), dtype=np.float64)
+    #             else:
+    #                 curr_sample_weight = sample_weight.copy()
+
+    #             # get the sample weight for bootstrapping the non-structure indices
+    #             n_samples_bootstrap = _get_n_samples_bootstrap(
+    #                 n_samples=n_samples_non_structure, max_samples=self.max_samples
+    #             )
+
+    #             # bootstrap sample the remaining non-structure indices
+    #             random_instance = check_random_state(tree.random_state)
+    #             indices = random_instance.choice(
+    #                 n_samples_non_structure, n_samples_bootstrap, replace=True
+    #             )
+    #             sample_counts = np.bincount(indices, minlength=n_samples)
+    #             curr_sample_weight *= sample_counts
+
+    #             if self.class_weight == "subsample":
+    #                 with catch_warnings():
+    #                     simplefilter("ignore", DeprecationWarning)
+    #                     curr_sample_weight *= compute_sample_weight("auto", y, indices=indices)
+    #             elif self.class_weight == "balanced_subsample":
+    #                 curr_sample_weight *= compute_sample_weight("balanced", y, indices=indices)
+
+    #             # re-fit the leaves
+    #             tree._fit_leaves(X, y, sample_weight=curr_sample_weight)
+
+    #     # Compute honest decision function
+    #     self.honest_decision_function_ = self._predict_proba(
+    #         X, indices=self.honest_indices_, impute_missing=np.nan
+    #     )
+    #     return self
 
     def predict_proba(self, X):
         """
