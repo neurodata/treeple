@@ -11,7 +11,6 @@ from sklearn.ensemble._base import _partition_estimators
 from sklearn.utils.validation import check_is_fitted
 from warnings import warn
 
-import numpy as np
 from scipy.sparse import issparse
 
 from sklearn.ensemble._hist_gradient_boosting.binning import _BinMapper
@@ -21,7 +20,6 @@ from sklearn.utils._openmp_helpers import _openmp_effective_n_threads
 from sklearn.utils.multiclass import (
     type_of_target,
 )
-from sklearn.utils.parallel import Parallel, delayed
 from sklearn.utils.validation import (
     _check_sample_weight,
 )
@@ -30,10 +28,7 @@ from .._lib.sklearn.ensemble._forest import (
     _parallel_build_trees,
 )
 from .._lib.sklearn.ensemble._forest import ForestClassifier
-from .._lib.sklearn.tree import _tree as _sklearn_tree
 from ..tree import HonestTreeClassifier
-
-DTYPE = _sklearn_tree.DTYPE
 
 
 def _get_n_samples_bootstrap(n_samples, max_samples):
