@@ -1227,6 +1227,44 @@ def build_coleman_forest(
     return_posteriors=True,
     **metric_kwargs,
 ):
+    """Build a hypothesis testing forest using oob samples.
+
+    Parameters
+    ----------
+    est : Forest
+        The type of forest to use. Must be enabled with ``bootstrap=True``.
+    X : ArrayLike of shape (n_samples, n_features)
+        Data.
+    y : ArrayLike of shape (n_samples, n_outputs)
+        Binary target, so ``n_outputs`` should be at most 1.
+    covariate_index : ArrayLike, optional of shape (n_covariates,)
+        The index array of covariates to shuffle, by default None.
+    metric : str, optional
+        The metric to compute, by default "mi".
+    n_repeats : int, optional
+        Number of times to bootstrap sample the two forests to construct
+        the null distribution, by default 1000.
+    verbose : bool, optional
+        Verbosity, by default False.
+    seed : int, optional
+        Random seed, by default None.
+    return_posteriors : bool, optional
+        Whether or not to return the posteriors, by default False.
+
+    Returns
+    -------
+    observe_stat : float
+        The test statistic. To compute the test statistic, take
+        ``permute_stat_`` and subtract ``observe_stat_``.
+    pvalue : float
+        The p-value of the test statistic.
+    orig_forest_proba : ArrayLike of shape (n_estimators, n_samples, n_outputs)
+        The predicted posterior probabilities for each estimator on their
+        out of bag samples.
+    perm_forest_proba : ArrayLike of shape (n_estimators, n_samples, n_outputs)
+        The predicted posterior probabilities for each of the permuted estimators
+        on their out of bag samples.
+    """
     rng = np.random.default_rng(seed)
     metric_func: Callable[[ArrayLike, ArrayLike], float] = METRIC_FUNCTIONS[metric]
 
@@ -1289,6 +1327,27 @@ def build_hyppo_oob_forest(
     y,
     verbose=False,
 ):
+    """Build a hypothesis testing forest using oob samples.
+
+    Parameters
+    ----------
+    est : Forest
+        The type of forest to use. Must be enabled with ``bootstrap=True``.
+    X : ArrayLike of shape (n_samples, n_features)
+        Data.
+    y : ArrayLike of shape (n_samples, n_outputs)
+        Binary target, so ``n_outputs`` should be at most 1.
+    verbose : bool, optional
+        Verbosity, by default False.
+
+    Returns
+    -------
+    est : Forest
+        Fitted forest.
+    all_proba : ArrayLike of shape (n_estimators, n_samples, n_outputs)
+        The predicted posterior probabilities for each estimator on their
+        out of bag samples.
+    """
     assert est.bootstrap
 
     est = clone(est)
@@ -1320,7 +1379,6 @@ def build_hyppo_oob_forest(
         delayed(_parallel_predict_proba_oob)(e.predict_proba, X, all_proba, idx, test_idx, lock)
         for idx, (e, test_idx) in enumerate(zip(est.estimators_, est.oob_samples_))
     )
-
     return est, all_proba
 
 

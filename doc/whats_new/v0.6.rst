@@ -32,6 +32,8 @@ Changelog
 - |Enhancement| :class:`sktree.HonestForestClassifier` now has a fitted
   property ``oob_samples_``, which reproduces the sample indices per tree that is out
   of bag, by `Adam Li`_ (:pr:`#200`).
+- |Enhancement| :class:`sktree.HonestForestClassifier` will allow one to bootstrap sample higher
+  than the number of samples, controlled by the ``max_samples`` keyword argument by `Adam Li`_ (:pr:`#206`).
 
 
 Code and Documentation Contributors
