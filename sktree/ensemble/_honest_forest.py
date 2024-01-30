@@ -45,8 +45,7 @@ def _get_n_samples_bootstrap(n_samples, max_samples):
         Number of samples in the dataset.
     max_samples : int or float
         The maximum number of samples to draw from the total available:
-            - if float, this indicates a fraction of the total and should be
-              the interval `(0.0, 1.0]`;
+            - if float, this indicates a fraction of the total;
             - if int, this indicates the exact number of samples;
             - if None, this indicates the total number of samples.
 
@@ -59,14 +58,10 @@ def _get_n_samples_bootstrap(n_samples, max_samples):
         return n_samples
 
     if isinstance(max_samples, Integral):
-        # if max_samples > n_samples:
-        #     msg = "`max_samples` must be <= n_samples={} but got value {}"
-        #     raise ValueError(msg.format(n_samples, max_samples))
         return max_samples
 
     if isinstance(max_samples, Real):
         return round(n_samples * max_samples)
-        # return max(round(n_samples * max_samples), 1)
 
 
 class HonestForestClassifier(ForestClassifier):
@@ -228,8 +223,7 @@ class HonestForestClassifier(ForestClassifier):
 
         - If None (default), then draw `X.shape[0]` samples.
         - If int, then draw `max_samples` samples.
-        - If float, then draw `max_samples * X.shape[0]` samples. Thus,
-          `max_samples` should be in the interval `(0.0, 1.0]`.
+        - If float, then draw `max_samples * X.shape[0]` samples.
 
     honest_prior : {"ignore", "uniform", "empirical"}, default="empirical"
         Method for dealing with empty leaves during evaluation of a test
@@ -252,13 +246,6 @@ class HonestForestClassifier(ForestClassifier):
     stratify : bool
         Whether or not to stratify sample when considering structure and leaf indices.
         By default False.
-
-    honest_bootstrap : bool
-        Whether or not we bootstrap the samples to use to set the leaf nodes for each
-        tree. May be removed if not useful.
-
-    permute_per_tree : bool
-        Whether or not to permute the labels per tree.
 
     Attributes
     ----------
@@ -408,8 +395,6 @@ class HonestForestClassifier(ForestClassifier):
         honest_fraction=0.5,
         tree_estimator=None,
         stratify=False,
-        honest_bootstrap=False,
-        permute_per_tree=False,
     ):
         super().__init__(
             estimator=HonestTreeClassifier(),
@@ -454,8 +439,6 @@ class HonestForestClassifier(ForestClassifier):
         self.honest_prior = honest_prior
         self.tree_estimator = tree_estimator
         self.stratify = stratify
-        self.honest_bootstrap = honest_bootstrap
-        self.permute_per_tree = permute_per_tree
 
     @_fit_context(prefer_skip_nested_validation=True)
     def fit(self, X, y, sample_weight=None, classes=None):
@@ -646,63 +629,27 @@ class HonestForestClassifier(ForestClassifier):
             # that case. However, for joblib 0.12+ we respect any
             # parallel_backend contexts set at a higher level,
             # since correctness does not rely on using threads.
-            if self.permute_per_tree:
-                # TODO: refactor to make this a more robust implementation
-                permutation_arr_per_tree = [
-                    random_state.choice(self._n_samples, size=self._n_samples, replace=False)
-                    for _ in range(self.n_estimators)
-                ]
-                if sample_weight is None:
-                    sample_weight = np.ones((self._n_samples,))
-
-                trees = Parallel(
-                    n_jobs=self.n_jobs,
+            trees = Parallel(
+                n_jobs=self.n_jobs,
+                verbose=self.verbose,
+                prefer="threads",
+            )(
+                delayed(_parallel_build_trees)(
+                    t,
+                    self.bootstrap,
+                    X,
+                    y,
+                    sample_weight,
+                    i,
+                    len(trees),
                     verbose=self.verbose,
-                    prefer="threads",
-                )(
-                    delayed(_parallel_build_trees)(
-                        t,
-                        self.bootstrap,
-                        X,
-                        y[perm_idx],
-                        sample_weight[perm_idx],
-                        i,
-                        len(trees),
-                        verbose=self.verbose,
-                        class_weight=self.class_weight,
-                        n_samples_bootstrap=n_samples_bootstrap,
-                        missing_values_in_feature_mask=missing_values_in_feature_mask,
-                        classes=classes,
-                    )
-                    for i, (t, perm_idx) in enumerate(
-                        zip(
-                            trees,
-                            permutation_arr_per_tree,
-                        )
-                    )
+                    class_weight=self.class_weight,
+                    n_samples_bootstrap=n_samples_bootstrap,
+                    missing_values_in_feature_mask=missing_values_in_feature_mask,
+                    classes=classes,
                 )
-            else:
-                trees = Parallel(
-                    n_jobs=self.n_jobs,
-                    verbose=self.verbose,
-                    prefer="threads",
-                )(
-                    delayed(_parallel_build_trees)(
-                        t,
-                        self.bootstrap,
-                        X,
-                        y,
-                        sample_weight,
-                        i,
-                        len(trees),
-                        verbose=self.verbose,
-                        class_weight=self.class_weight,
-                        n_samples_bootstrap=n_samples_bootstrap,
-                        missing_values_in_feature_mask=missing_values_in_feature_mask,
-                        classes=classes,
-                    )
-                    for i, t in enumerate(trees)
-                )
+                for i, t in enumerate(trees)
+            )
 
             # Collect newly grown trees
             self.estimators_.extend(trees)
@@ -733,90 +680,12 @@ class HonestForestClassifier(ForestClassifier):
             self.n_classes_ = self.n_classes_[0]
             self.classes_ = self.classes_[0]
 
+        # Compute honest decision function
+        self.honest_decision_function_ = self._predict_proba(
+            X, indices=self.honest_indices_, impute_missing=np.nan
+        )
+
         return self
-
-    # def fit(self, X, y, sample_weight=None, classes=None):
-    #     """
-    #     Build a forest of trees from the training set (X, y).
-
-    #     Parameters
-    #     ----------
-    #     X : {array-like, sparse matrix} of shape (n_samples, n_features)
-    #         The training input samples. Internally, its dtype will be converted
-    #         to ``dtype=np.float32``. If a sparse matrix is provided, it will be
-    #         converted into a sparse ``csc_matrix``.
-
-    #     y : array-like of shape (n_samples,) or (n_samples, n_outputs)
-    #         The target values (class labels in classification, real numbers in
-    #         regression).
-
-    #     sample_weight : array-like of shape (n_samples,), default=None
-    #         Sample weights. If None, then samples are equally weighted. Splits
-    #         that would create child nodes with net zero or negative weight are
-    #         ignored while searching for a split in each node. In the case of
-    #         classification, splits are also ignored if they would result in any
-    #         single class carrying a negative weight in either child node.
-
-    #     classes : array-like of shape (n_classes,), default=None
-    #         List of all the classes that can possibly appear in the y vector.
-
-    #     Returns
-    #     -------
-    #     self : HonestForestClassifier
-    #         Fitted tree estimator.
-    #     """
-    #     X, y = check_X_y(X, y, multi_output=True)
-    #     super().fit(X, y, sample_weight=sample_weight, classes=classes)
-
-    #     if self.honest_bootstrap:
-    #         # must re-fit the leaves using a bootstrap over the non structure indices
-    #         # Account for bootstrapping too
-    #         # nonzero_indices = np.where(_sample_weight > 0)[0]
-    #         n_samples = X.shape[0]
-
-    #         for tree in self.estimators_:
-    #             sample_indices = np.ones((n_samples,), dtype=bool).squeeze()
-
-    #             # now we need to get the non-structure indices
-    #             structure_indices = tree.structure_indices_
-    #             sample_indices[structure_indices] = False
-    #             non_structure_indices = np.argwhere(sample_indices).squeeze()
-
-    #             n_samples_non_structure = len(non_structure_indices)
-
-    #             if sample_weight is None:
-    #                 curr_sample_weight = np.ones((n_samples,), dtype=np.float64)
-    #             else:
-    #                 curr_sample_weight = sample_weight.copy()
-
-    #             # get the sample weight for bootstrapping the non-structure indices
-    #             n_samples_bootstrap = _get_n_samples_bootstrap(
-    #                 n_samples=n_samples_non_structure, max_samples=self.max_samples
-    #             )
-
-    #             # bootstrap sample the remaining non-structure indices
-    #             random_instance = check_random_state(tree.random_state)
-    #             indices = random_instance.choice(
-    #                 n_samples_non_structure, n_samples_bootstrap, replace=True
-    #             )
-    #             sample_counts = np.bincount(indices, minlength=n_samples)
-    #             curr_sample_weight *= sample_counts
-
-    #             if self.class_weight == "subsample":
-    #                 with catch_warnings():
-    #                     simplefilter("ignore", DeprecationWarning)
-    #                     curr_sample_weight *= compute_sample_weight("auto", y, indices=indices)
-    #             elif self.class_weight == "balanced_subsample":
-    #                 curr_sample_weight *= compute_sample_weight("balanced", y, indices=indices)
-
-    #             # re-fit the leaves
-    #             tree._fit_leaves(X, y, sample_weight=curr_sample_weight)
-
-    #     # Compute honest decision function
-    #     self.honest_decision_function_ = self._predict_proba(
-    #         X, indices=self.honest_indices_, impute_missing=np.nan
-    #     )
-    #     return self
 
     def predict_proba(self, X):
         """

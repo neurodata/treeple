@@ -69,13 +69,15 @@ def _cond_entropy(y_true: ArrayLike, y_pred_proba: ArrayLike) -> float:
 # Define function to compute the sensitivity at 98% specificity
 def _SAS98(y_true: ArrayLike, y_pred_proba: ArrayLike, max_fpr=0.02) -> float:
     """Compute the sensitivity at 98% specificity.
+
     Parameters
     ----------
     y_true : ArrayLike of shape (n_samples,)
         The true labels.
     y_pred_proba : ArrayLike of shape (n_samples, n_outputs)
         Posterior probabilities.
-    max_fpr : float, optional. Default=0.02
+    max_fpr : float, optional. Default=0.02.
+
     Returns
     -------
     float :
