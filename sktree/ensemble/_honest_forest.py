@@ -471,6 +471,11 @@ class HonestForestClassifier(ForestClassifier):
         self : object
             Fitted estimator.
         """
+        # XXX: This entire function is a copy of what is in scikit-learn
+        # with the exception of:
+        # - _get_n_samples_bootstrap is a re-defined function to allow higher
+        #   max_samples
+
         MAX_INT = np.iinfo(np.int32).max
         # Validate or convert input data
         if issparse(y):
