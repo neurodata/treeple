@@ -280,9 +280,9 @@ class HonestForestClassifier(ForestClassifier):
 
     max_samples : int or float, default=None
         If bootstrap is True, the number of samples to draw from X
-        to train each base tree estimator without replacement.
-        If bootstrap is False, then this will typically subsample
-        the dataset.
+        to train each base tree estimator with replacement.
+        If bootstrap is False, then this will subsample
+        the dataset without replacement.
 
         - If None (default), then draw `X.shape[0]` samples.
         - If int, then draw `max_samples` samples.
