@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>3. Oblique Random Forests &#8212; scikit-tree 0.6.0 documentation</title>
+    <title>Version 0.7 &#8212; scikit-tree 0.6.0 documentation</title>
   
   
   
@@ -47,7 +47,7 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=fd10adb8"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'modules/ensemble';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'whats_new/v0.7';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.2';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/scikit-tree/main/doc/_static/versions.json';
@@ -56,8 +56,8 @@
         </script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Release History" href="../whats_new.html" />
-    <link rel="prev" title="2. Unsupervised Decision Trees" href="unsupervised_tree.html" />
+    <link rel="next" title="Installation" href="../install.html" />
+    <link rel="prev" title="Version 0.6" href="v0.6.html" />
     <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
     <script type="text/javascript" src="../_static/copybutton.js"></script>
     <script type="text/javascript" src="../_static/scrollfix.js"></script>
@@ -156,14 +156,14 @@
                     </li>
                 
 
-                    <li class="nav-item current active">
+                    <li class="nav-item">
                       <a class="nav-link nav-internal" href="../user_guide.html">
                         User Guide
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item current active">
                       <a class="nav-link nav-internal" href="../whats_new.html">
                         Release History
                       </a>
@@ -312,14 +312,14 @@ document.write(`
                     </li>
                 
 
-                    <li class="nav-item current active">
+                    <li class="nav-item">
                       <a class="nav-link nav-internal" href="../user_guide.html">
                         User Guide
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item current active">
                       <a class="nav-link nav-internal" href="../whats_new.html">
                         Release History
                       </a>
@@ -410,10 +410,13 @@ document.write(`
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="supervised_tree.html">1. Supervised Decision Trees</a></li>
-<li class="toctree-l1"><a class="reference internal" href="unsupervised_tree.html">2. Unsupervised Decision Trees</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">3. Oblique Random Forests</a></li>
-
+<li class="toctree-l1"><a class="reference internal" href="v0.1.html">Version 0.1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="v0.2.html">Version 0.2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="v0.3.html">Version 0.3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="v0.4.html">Version 0.4</a></li>
+<li class="toctree-l1"><a class="reference internal" href="v0.5.html">Version 0.5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="v0.6.html">Version 0.6</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Version 0.7 (Unreleased)</a></li>
 </ul>
 </div>
 </nav></div>
@@ -452,9 +455,9 @@ document.write(`
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="../user_guide.html" class="nav-link">User Guide</a></li>
+    <li class="breadcrumb-item"><a href="../whats_new.html" class="nav-link">Release History</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span...</li>
+    <li class="breadcrumb-item active" aria-current="page">Version 0.7</li>
   </ul>
 </nav>
 </div>
@@ -471,100 +474,20 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="oblique-random-forests">
-<span id="oblique-forests"></span><h1><span class="section-number">3. </span>Oblique Random Forests<a class="headerlink" href="#oblique-random-forests" title="Link to this heading">#</a></h1>
-<p>In oblique random forests (see <a class="reference internal" href="../generated/sktree.ObliqueRandomForestClassifier.html#sktree.ObliqueRandomForestClassifier" title="sktree.ObliqueRandomForestClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObliqueRandomForestClassifier</span></code></a> and
-<code class="docutils literal notranslate"><span class="pre">ObliqueRandomForestRegressor</span></code> classes), each tree in the ensemble is built
-from a sample drawn with replacement (i.e., a bootstrap sample) from the
-training set. The oblique random forest is the same as that of a random forest,
-except in how the splits are computed in each tree.</p>
-<p>Similar to how random forests achieve a reduced variance by combining diverse trees,
-sometimes at the cost of a slight increase in bias, oblique random forests aim to do the same.
-They are motivated to construct even more diverse trees, thereby improving model generalization.
-In practice the variance reduction is often significant hence yielding an overall better model.</p>
-<p>In contrast to the original publication <a class="footnote-reference brackets" href="#footcite-breiman2001random" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, the scikit-learn
-implementation allows the user to control the number of features to combine in computing
-candidate splits. This is done via the <code class="docutils literal notranslate"><span class="pre">feature_combinations</span></code> parameter. For
-more information and intuition, see
-<a class="reference internal" href="supervised_tree.html#oblique-trees"><span class="std std-ref">documentation on oblique decision trees</span></a>.</p>
-<aside class="topic">
-<p class="topic-title">Examples:</p>
-<ul class="simple">
-<li><p><a class="reference internal" href="../auto_examples/sparse_oblique_trees/plot_oblique_random_forest.html#sphx-glr-auto-examples-sparse-oblique-trees-plot-oblique-random-forest-py"><span class="std std-ref">Plot oblique forest and axis-aligned random forest predictions on cc18 datasets</span></a></p></li>
-<li><p><a class="reference internal" href="../auto_examples/sparse_oblique_trees/plot_oblique_axis_aligned_forests_sparse_parity.html#sphx-glr-auto-examples-sparse-oblique-trees-plot-oblique-axis-aligned-forests-sparse-parity-py"><span class="std std-ref">Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation</span></a></p></li>
-</ul>
-</aside>
-<aside class="topic">
-<p class="topic-title">References</p>
-<div class="docutils container" id="id2">
-<aside class="footnote-list brackets">
-<aside class="footnote brackets" id="footcite-breiman2001random" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
-<p>Leo Breiman. Random forests. <em>Machine learning</em>, 45:5–32, 2001.</p>
-</aside>
-</aside>
-</div>
-</aside>
+  <section id="version-0-7">
+<span id="current"></span><h1>Version 0.7<a class="headerlink" href="#version-0-7" title="Link to this heading">#</a></h1>
+<p><strong>In Development</strong></p>
+<section id="changelog">
+<h2>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">#</a></h2>
 </section>
-<section id="feature-importance-evaluation">
-<span id="oblique-forest-feature-importance"></span><h1><span class="section-number">4. </span>Feature importance evaluation<a class="headerlink" href="#feature-importance-evaluation" title="Link to this heading">#</a></h1>
-<p>The relative rank (i.e. depth) of a feature used as a decision node in a
-tree can be used to assess the relative importance of that feature with
-respect to the predictability of the target variable. Features used at
-the top of the tree contribute to the final prediction decision of a
-larger fraction of the input samples. The <strong>expected fraction of the
-samples</strong> they contribute to can thus be used as an estimate of the
-<strong>relative importance of the features</strong>. In scikit-tree, the fraction of
-samples a feature contributes to is combined with the decrease in impurity
-from splitting them to create a normalized estimate of the predictive power
-of that feature. This is essentially exactly the same it is done in scikit-learn.</p>
-<p>By <strong>averaging</strong> the estimates of predictive ability over several randomized
-trees one can <strong>reduce the variance</strong> of such an estimate and use it
-for feature selection. This is known as the mean decrease in impurity, or MDI.
-Refer to <a class="reference internal" href="#l2014" id="id3"><span>[L2014]</span></a> for more information on MDI and feature importance
-evaluation with Random Forests. We implement the approach taken in <a class="footnote-reference brackets" href="#footcite-li2023manifold" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>
-and <a class="footnote-reference brackets" href="#footcite-tomitasporf2020" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>The impurity-based feature importances computed on tree-based models suffer
-from two flaws that can lead to misleading conclusions. First they are
-computed on statistics derived from the training dataset and therefore <strong>do
-not necessarily inform us on which features are most important to make good
-predictions on held-out dataset</strong>. Secondly, <strong>they favor high cardinality
-features</strong>, that is features with many unique values.
-<a class="reference external" href="https://scikit-learn.org/dev/modules/permutation_importance.html#permutation-importance" title="(in scikit-learn v1.5)"><span>Permutation feature importance</span></a> is an alternative to impurity-based feature
-importance that does not suffer from these flaws. These two methods of
-obtaining feature importance are explored in:
-<a class="reference external" href="https://scikit-learn.org/dev/auto_examples/inspection/plot_permutation_importance.html#sphx-glr-auto-examples-inspection-plot-permutation-importance-py" title="(in scikit-learn v1.5)"><span>Permutation Importance vs Random Forest Feature Importance (MDI)</span></a>.</p>
-</div>
-<p>In practice those estimates are stored as an attribute named
-<code class="docutils literal notranslate"><span class="pre">feature_importances_</span></code> on the fitted model. This is an array with shape
-<code class="docutils literal notranslate"><span class="pre">(n_features,)</span></code> whose values are positive and sum to 1.0. The higher
-the value, the more important is the contribution of the matching feature
-to the prediction function.</p>
-<aside class="topic">
-<p class="topic-title">References</p>
-<div class="docutils container" id="id6">
-<aside class="footnote-list brackets">
-<aside class="footnote brackets" id="footcite-li2023manifold" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">2</a><span class="fn-bracket">]</span></span>
-<p>Adam Li, Ronan Perry, Chester Huynh, Tyler M. Tomita, Ronak Mehta, Jesus Arroyo, Jesse Patsolic, Ben Falk, Sridevi Sarma, and Joshua Vogelstein. Manifold oblique random forests: towards closing the gap on convolutional deep networks. <em>SIAM Journal on Mathematics of Data Science</em>, 5(1):77–96, 2023. <a class="reference external" href="https://doi.org/10.1137/21M1449117">doi:10.1137/21M1449117</a>.</p>
-</aside>
-<aside class="footnote brackets" id="footcite-tomitasporf2020" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">3</a><span class="fn-bracket">]</span></span>
-<p>Tyler M. Tomita, James Browne, Cencheng Shen, Jaewon Chung, Jesse L. Patsolic, Benjamin Falk, Carey E. Priebe, Jason Yim, Randal Burns, Mauro Maggioni, and Joshua T. Vogelstein. Sparse projection oblique randomer forests. <em>Journal of Machine Learning Research</em>, 21(104):1–39, 2020. URL: <a class="reference external" href="http://jmlr.org/papers/v21/18-664.html">http://jmlr.org/papers/v21/18-664.html</a>.</p>
-</aside>
-</aside>
-</div>
-<div role="list" class="citation-list">
-<div class="citation" id="l2014" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">L2014</a><span class="fn-bracket">]</span></span>
-<p>Louppe, G. <a class="reference external" href="https://arxiv.org/abs/1407.7502">“Understanding Random Forests: From Theory to
-Practice”</a>,
-PhD Thesis, U. of Liege, 2014.</p>
-</div>
-</div>
-</aside>
+<section id="code-and-documentation-contributors">
+<h2>Code and Documentation Contributors<a class="headerlink" href="#code-and-documentation-contributors" title="Link to this heading">#</a></h2>
+<p>Thanks to everyone who has contributed to the maintenance and improvement of
+the project since version inception, including:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://adam2392.github.io">Adam Li</a></p></li>
+</ul>
+</section>
 </section>
 
 
@@ -578,20 +501,20 @@ PhD Thesis, U. of Liege, 2014.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="unsupervised_tree.html"
+       href="v0.6.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><span class="section-number">2. </span>Unsupervised Decision Trees</p>
+        <p class="prev-next-title">Version 0.6</p>
       </div>
     </a>
     <a class="right-next"
-       href="../whats_new.html"
+       href="../install.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Release History</p>
+        <p class="prev-next-title">Installation</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -613,10 +536,9 @@ PhD Thesis, U. of Liege, 2014.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">3. Oblique Random Forests</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#feature-importance-evaluation">4. Feature importance evaluation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#changelog">Changelog</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#code-and-documentation-contributors">Code and Documentation Contributors</a></li>
 </ul>
-
   </nav></div>
 
 </div></div>
