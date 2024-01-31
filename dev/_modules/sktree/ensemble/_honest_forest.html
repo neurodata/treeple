@@ -457,18 +457,65 @@ document.write(`
 
 <span class="kn">import</span> <span class="nn">threading</span>
 
+<span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Integral</span><span class="p">,</span> <span class="n">Real</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">joblib</span> <span class="kn">import</span> <span class="n">Parallel</span><span class="p">,</span> <span class="n">delayed</span>
 <span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">_fit_context</span>
 <span class="kn">from</span> <span class="nn">sklearn.ensemble._base</span> <span class="kn">import</span> <span class="n">_partition_estimators</span>
-<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">check_is_fitted</span><span class="p">,</span> <span class="n">check_X_y</span>
-<span class="kn">from</span> <span class="nn">sklearn.ensemble._forest</span> <span class="kn">import</span> <span class="n">_generate_unsampled_indices</span><span class="p">,</span> <span class="n">_get_n_samples_bootstrap</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">check_is_fitted</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
 
+<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">issparse</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.ensemble._hist_gradient_boosting.binning</span> <span class="kn">import</span> <span class="n">_BinMapper</span>
+<span class="kn">from</span> <span class="nn">sklearn.exceptions</span> <span class="kn">import</span> <span class="n">DataConversionWarning</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils</span> <span class="kn">import</span> <span class="n">check_random_state</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils._openmp_helpers</span> <span class="kn">import</span> <span class="n">_openmp_effective_n_threads</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.multiclass</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">type_of_target</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_check_sample_weight</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.._lib.sklearn.tree._tree</span> <span class="kn">import</span> <span class="n">DOUBLE</span><span class="p">,</span> <span class="n">DTYPE</span>
+<span class="kn">from</span> <span class="nn">.._lib.sklearn.ensemble._forest</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_parallel_build_trees</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.._lib.sklearn.ensemble._forest</span> <span class="kn">import</span> <span class="n">ForestClassifier</span>
-<span class="kn">from</span> <span class="nn">.._lib.sklearn.tree</span> <span class="kn">import</span> <span class="n">_tree</span> <span class="k">as</span> <span class="n">_sklearn_tree</span>
 <span class="kn">from</span> <span class="nn">..tree</span> <span class="kn">import</span> <span class="n">HonestTreeClassifier</span>
 
-<span class="n">DTYPE</span> <span class="o">=</span> <span class="n">_sklearn_tree</span><span class="o">.</span><span class="n">DTYPE</span>
+
+<span class="k">def</span> <span class="nf">_get_n_samples_bootstrap</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">max_samples</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the number of samples in a bootstrap sample.</span>
+
+<span class="sd">    XXX: Note this is copied from sklearn. We override the ability</span>
+<span class="sd">    to sample a higher number of bootstrap samples to enable sampling</span>
+<span class="sd">    closer to 80% unique training data points for in-bag computation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_samples : int</span>
+<span class="sd">        Number of samples in the dataset.</span>
+<span class="sd">    max_samples : int or float</span>
+<span class="sd">        The maximum number of samples to draw from the total available:</span>
+<span class="sd">            - if float, this indicates a fraction of the total;</span>
+<span class="sd">            - if int, this indicates the exact number of samples;</span>
+<span class="sd">            - if None, this indicates the total number of samples.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    n_samples_bootstrap : int</span>
+<span class="sd">        The total number of samples to draw for the bootstrap sample.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">max_samples</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">n_samples</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">max_samples</span><span class="p">,</span> <span class="n">Integral</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">max_samples</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">max_samples</span><span class="p">,</span> <span class="n">Real</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">n_samples</span> <span class="o">*</span> <span class="n">max_samples</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="HonestForestClassifier">
@@ -632,8 +679,7 @@ document.write(`
 
 <span class="sd">        - If None (default), then draw `X.shape[0]` samples.</span>
 <span class="sd">        - If int, then draw `max_samples` samples.</span>
-<span class="sd">        - If float, then draw `max_samples * X.shape[0]` samples. Thus,</span>
-<span class="sd">          `max_samples` should be in the interval `(0.0, 1.0]`.</span>
+<span class="sd">        - If float, then draw `max_samples * X.shape[0]` samples.</span>
 
 <span class="sd">    honest_prior : {&quot;ignore&quot;, &quot;uniform&quot;, &quot;empirical&quot;}, default=&quot;empirical&quot;</span>
 <span class="sd">        Method for dealing with empty leaves during evaluation of a test</span>
@@ -725,7 +771,7 @@ document.write(`
 
 <span class="sd">    oob_samples_ : list of lists, shape=(n_estimators, n_samples_bootstrap)</span>
 <span class="sd">        The indices of training samples that are &quot;out-of-bag&quot;. Only used</span>
-<span class="sd">        if ``bootstrap=False``.</span>
+<span class="sd">        if ``bootstrap=True``.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -880,16 +926,228 @@ document.write(`
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        self : HonestForestClassifier</span>
-<span class="sd">            Fitted tree estimator.</span>
+<span class="sd">        self : object</span>
+<span class="sd">            Fitted estimator.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">check_X_y</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">multi_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">)</span>
+        <span class="c1"># XXX: This entire function is a copy of what is in scikit-learn</span>
+        <span class="c1"># with the exception of:</span>
+        <span class="c1"># - _get_n_samples_bootstrap is a re-defined function to allow higher</span>
+        <span class="c1">#   max_samples</span>
+
+        <span class="n">MAX_INT</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span><span class="o">.</span><span class="n">max</span>
+        <span class="c1"># Validate or convert input data</span>
+        <span class="k">if</span> <span class="n">issparse</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;sparse multilabel-indicator for y is not supported.&quot;</span><span class="p">)</span>
+
+        <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_data</span><span class="p">(</span>
+            <span class="n">X</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">,</span>
+            <span class="n">multi_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">accept_sparse</span><span class="o">=</span><span class="s2">&quot;csc&quot;</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">,</span>
+            <span class="n">force_all_finite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># _compute_missing_values_in_feature_mask checks if X has missing values and</span>
+        <span class="c1"># will raise an error if the underlying tree base estimator can&#39;t handle missing</span>
+        <span class="c1"># values. Only the criterion is required to determine if the tree supports</span>
+        <span class="c1"># missing values.</span>
+        <span class="n">estimator</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="p">)(</span><span class="n">criterion</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">)</span>
+        <span class="n">missing_values_in_feature_mask</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">_compute_missing_values_in_feature_mask</span><span class="p">(</span>
+            <span class="n">X</span><span class="p">,</span> <span class="n">estimator_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">sample_weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sample_weight</span> <span class="o">=</span> <span class="n">_check_sample_weight</span><span class="p">(</span><span class="n">sample_weight</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">issparse</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+            <span class="c1"># Pre-sort indices to avoid that each individual tree of the</span>
+            <span class="c1"># ensemble sorts the indices.</span>
+            <span class="n">X</span><span class="o">.</span><span class="n">sort_indices</span><span class="p">()</span>
+
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">warn</span><span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;A column-vector y was passed when a 1d array was&quot;</span>
+                    <span class="s2">&quot; expected. Please change the shape of y to &quot;</span>
+                    <span class="s2">&quot;(n_samples,), for example using ravel().&quot;</span>
+                <span class="p">),</span>
+                <span class="n">DataConversionWarning</span><span class="p">,</span>
+                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># reshape is necessary to preserve the data contiguity against vs</span>
+            <span class="c1"># [:, np.newaxis] that does not.</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span> <span class="o">==</span> <span class="s2">&quot;poisson&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">y</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Some value(s) of y are negative which is &quot;</span>
+                    <span class="s2">&quot;not allowed for Poisson regression.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Sum of y is not strictly positive which &quot;</span>
+                    <span class="s2">&quot;is necessary for Poisson regression.&quot;</span>
+                <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span>
+
+        <span class="n">y</span><span class="p">,</span> <span class="n">expanded_class_weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_y_class_weight</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="n">DOUBLE</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">y</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">contiguous</span><span class="p">:</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DOUBLE</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">expanded_class_weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sample_weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">sample_weight</span> <span class="o">=</span> <span class="n">sample_weight</span> <span class="o">*</span> <span class="n">expanded_class_weight</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sample_weight</span> <span class="o">=</span> <span class="n">expanded_class_weight</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">bootstrap</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_samples</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;`max_sample` cannot be set if `bootstrap=False`. &quot;</span>
+                <span class="s2">&quot;Either switch to `bootstrap=True` or set &quot;</span>
+                <span class="s2">&quot;`max_sample=None`.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">bootstrap</span><span class="p">:</span>
+            <span class="n">n_samples_bootstrap</span> <span class="o">=</span> <span class="n">_get_n_samples_bootstrap</span><span class="p">(</span>
+                <span class="n">n_samples</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">max_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_samples</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">n_samples_bootstrap</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_bootstrap</span> <span class="o">=</span> <span class="n">n_samples_bootstrap</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_estimator</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">bootstrap</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">oob_score</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Out of bag estimation only available if bootstrap=True&quot;</span><span class="p">)</span>
+
+        <span class="n">random_state</span> <span class="o">=</span> <span class="n">check_random_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">warm_start</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;estimators_&quot;</span><span class="p">):</span>
+            <span class="c1"># Free allocated memory, if any</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">estimators_</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">n_more_estimators</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_estimators</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimators_</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_bins</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># `_openmp_effective_n_threads` is used to take cgroups CPU quotes</span>
+            <span class="c1"># into account when determine the maximum number of threads to use.</span>
+            <span class="n">n_threads</span> <span class="o">=</span> <span class="n">_openmp_effective_n_threads</span><span class="p">()</span>
+
+            <span class="c1"># Bin the data</span>
+            <span class="c1"># For ease of use of the API, the user-facing GBDT classes accept the</span>
+            <span class="c1"># parameter max_bins, which doesn&#39;t take into account the bin for</span>
+            <span class="c1"># missing values (which is always allocated). However, since max_bins</span>
+            <span class="c1"># isn&#39;t the true maximal number of bins, all other private classes</span>
+            <span class="c1"># (binmapper, histbuilder...) accept n_bins instead, which is the</span>
+            <span class="c1"># actual total number of bins. Everywhere in the code, the</span>
+            <span class="c1"># convention is that n_bins == max_bins + 1</span>
+            <span class="n">n_bins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_bins</span> <span class="o">+</span> <span class="mi">1</span>  <span class="c1"># + 1 for missing values</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bin_mapper</span> <span class="o">=</span> <span class="n">_BinMapper</span><span class="p">(</span>
+                <span class="n">n_bins</span><span class="o">=</span><span class="n">n_bins</span><span class="p">,</span>
+                <span class="c1"># is_categorical=self.is_categorical_,</span>
+                <span class="n">known_categories</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">,</span>
+                <span class="n">n_threads</span><span class="o">=</span><span class="n">n_threads</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># XXX: in order for this to work with the underlying tree submodule&#39;s Cython</span>
+            <span class="c1"># code, we need to convert this into the original data&#39;s DTYPE because</span>
+            <span class="c1"># the Cython code assumes that `DTYPE` is used.</span>
+            <span class="c1"># The proper implementation will be a lot more complicated and should be</span>
+            <span class="c1"># tackled once scikit-learn has finalized their inclusion of missing data</span>
+            <span class="c1"># and categorical support for decision trees</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bin_data</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">is_training_data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># .astype(DTYPE)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bin_mapper</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">n_more_estimators</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;n_estimators=</span><span class="si">%d</span><span class="s2"> must be larger or equal to &quot;</span>
+                <span class="s2">&quot;len(estimators_)=</span><span class="si">%d</span><span class="s2"> when warm_start==True&quot;</span>
+                <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_estimators</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimators_</span><span class="p">))</span>
+            <span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">n_more_estimators</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Warm-start fitting without increasing n_estimators does not &quot;</span> <span class="s2">&quot;fit new trees.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">warm_start</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimators_</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># We draw from the random state to get the random state we</span>
+                <span class="c1"># would have got if we hadn&#39;t used a warm_start.</span>
+                <span class="n">random_state</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">MAX_INT</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimators_</span><span class="p">))</span>
+
+            <span class="n">trees</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_make_estimator</span><span class="p">(</span><span class="n">append</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_more_estimators</span><span class="p">)</span>
+            <span class="p">]</span>
+
+            <span class="c1"># Parallel loop: we prefer the threading backend as the Cython code</span>
+            <span class="c1"># for fitting the trees is internally releasing the Python GIL</span>
+            <span class="c1"># making threading more efficient than multiprocessing in</span>
+            <span class="c1"># that case. However, for joblib 0.12+ we respect any</span>
+            <span class="c1"># parallel_backend contexts set at a higher level,</span>
+            <span class="c1"># since correctness does not rely on using threads.</span>
+            <span class="n">trees</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span>
+                <span class="n">n_jobs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">,</span>
+                <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span>
+                <span class="n">prefer</span><span class="o">=</span><span class="s2">&quot;threads&quot;</span><span class="p">,</span>
+            <span class="p">)(</span>
+                <span class="n">delayed</span><span class="p">(</span><span class="n">_parallel_build_trees</span><span class="p">)(</span>
+                    <span class="n">t</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">bootstrap</span><span class="p">,</span>
+                    <span class="n">X</span><span class="p">,</span>
+                    <span class="n">y</span><span class="p">,</span>
+                    <span class="n">sample_weight</span><span class="p">,</span>
+                    <span class="n">i</span><span class="p">,</span>
+                    <span class="nb">len</span><span class="p">(</span><span class="n">trees</span><span class="p">),</span>
+                    <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span>
+                    <span class="n">class_weight</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">class_weight</span><span class="p">,</span>
+                    <span class="n">n_samples_bootstrap</span><span class="o">=</span><span class="n">n_samples_bootstrap</span><span class="p">,</span>
+                    <span class="n">missing_values_in_feature_mask</span><span class="o">=</span><span class="n">missing_values_in_feature_mask</span><span class="p">,</span>
+                    <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">trees</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Collect newly grown trees</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">estimators_</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">trees</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">oob_score</span> <span class="ow">and</span> <span class="p">(</span><span class="n">n_more_estimators</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;oob_score_&quot;</span><span class="p">)):</span>
+            <span class="n">y_type</span> <span class="o">=</span> <span class="n">type_of_target</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">y_type</span> <span class="o">==</span> <span class="s2">&quot;unknown&quot;</span> <span class="ow">or</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_estimator_type</span> <span class="o">==</span> <span class="s2">&quot;classifier&quot;</span> <span class="ow">and</span> <span class="n">y_type</span> <span class="o">==</span> <span class="s2">&quot;multiclass-multioutput&quot;</span>
+            <span class="p">):</span>
+                <span class="c1"># FIXME: we could consider to support multiclass-multioutput if</span>
+                <span class="c1"># we introduce or reuse a constructor parameter (e.g.</span>
+                <span class="c1"># oob_score) allowing our user to pass a callable defining the</span>
+                <span class="c1"># scoring strategy on OOB sample.</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;The type of target cannot be used to compute OOB &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;estimates. Got </span><span class="si">{</span><span class="n">y_type</span><span class="si">}</span><span class="s2"> while only the following are &quot;</span>
+                    <span class="s2">&quot;supported: continuous, continuous-multioutput, binary, &quot;</span>
+                    <span class="s2">&quot;multiclass, multilabel-indicator.&quot;</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">oob_score</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_set_oob_score_and_attributes</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">scoring_function</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">oob_score</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_set_oob_score_and_attributes</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+        <span class="c1"># Decapsulate classes_ attributes</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;classes_&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="c1"># Compute honest decision function</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">honest_decision_function_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_proba</span><span class="p">(</span>
             <span class="n">X</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span><span class="p">,</span> <span class="n">impute_missing</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         <span class="p">)</span>
+
         <span class="k">return</span> <span class="bp">self</span></div>
 
 
@@ -979,19 +1237,26 @@ document.write(`
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bootstrap</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Cannot extract out-of-bag samples when bootstrap is False.&quot;</span><span class="p">)</span>
         <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples</span>
+
         <span class="n">oob_samples</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">n_samples_bootstrap</span> <span class="o">=</span> <span class="n">_get_n_samples_bootstrap</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">max_samples</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">for</span> <span class="n">estimator</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimators_</span><span class="p">:</span>
-            <span class="n">unsampled_indices</span> <span class="o">=</span> <span class="n">_generate_unsampled_indices</span><span class="p">(</span>
-                <span class="n">estimator</span><span class="o">.</span><span class="n">random_state</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples</span><span class="p">,</span>
-                <span class="n">n_samples_bootstrap</span><span class="p">,</span>
+
+        <span class="n">possible_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_samples</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">structure_idx</span><span class="p">,</span> <span class="n">honest_idx</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">structure_indices_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span><span class="p">):</span>
+            <span class="n">_oob_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">(</span>
+                <span class="n">possible_indices</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">structure_idx</span><span class="p">,</span> <span class="n">honest_idx</span><span class="p">))</span>
             <span class="p">)</span>
-            <span class="n">oob_samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">unsampled_indices</span><span class="p">)</span>
+            <span class="n">oob_samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_oob_samples</span><span class="p">)</span>
+        <span class="c1"># n_samples_bootstrap = _get_n_samples_bootstrap(</span>
+        <span class="c1">#     self._n_samples,</span>
+        <span class="c1">#     self.max_samples,</span>
+        <span class="c1"># )</span>
+        <span class="c1"># for estimator in self.estimators_:</span>
+        <span class="c1">#     unsampled_indices = _generate_unsampled_indices(</span>
+        <span class="c1">#         estimator.random_state,</span>
+        <span class="c1">#         self._n_samples,</span>
+        <span class="c1">#         n_samples_bootstrap,</span>
+        <span class="c1">#     )</span>
+        <span class="c1">#     oob_samples.append(unsampled_indices)</span>
         <span class="k">return</span> <span class="n">oob_samples</span>
 
     <span class="k">def</span> <span class="nf">_more_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1154,7 +1419,7 @@ document.write(`
 
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-01-30.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-01-31.
       <br/>
     
   </p>

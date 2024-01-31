@@ -943,6 +943,38 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span></div>
 
 
+    <span class="k">def</span> <span class="nf">_partition_honest_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">):</span>
+        <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+
+        <span class="c1"># Account for bootstrapping too</span>
+        <span class="k">if</span> <span class="n">sample_weight</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_sample_weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">),),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_sample_weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sample_weight</span><span class="p">)</span>
+
+        <span class="n">nonzero_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">_sample_weight</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># sample the structure indices</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stratify</span><span class="p">:</span>
+            <span class="n">ss</span> <span class="o">=</span> <span class="n">StratifiedShuffleSplit</span><span class="p">(</span>
+                <span class="n">n_splits</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_fraction</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">structure_idx</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">ss</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">nonzero_indices</span><span class="p">),</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">y</span><span class="p">[</span><span class="n">nonzero_indices</span><span class="p">]</span>
+            <span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">structure_indices_</span> <span class="o">=</span> <span class="n">nonzero_indices</span><span class="p">[</span><span class="n">structure_idx</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">structure_indices_</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+                <span class="n">nonzero_indices</span><span class="p">,</span>
+                <span class="nb">int</span><span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">honest_fraction</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">nonzero_indices</span><span class="p">)),</span>
+                <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">(</span><span class="n">nonzero_indices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">structure_indices_</span><span class="p">)</span>
+        <span class="n">_sample_weight</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">return</span> <span class="n">_sample_weight</span>
+
     <span class="k">def</span> <span class="nf">_fit</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">X</span><span class="p">,</span>
@@ -983,43 +1015,17 @@ document.write(`
 <span class="sd">        self : HonestTreeClassifier</span>
 <span class="sd">            Fitted tree estimator.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">check_input</span><span class="p">:</span>
             <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">check_X_y</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">multi_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-        <span class="c1"># Account for bootstrapping too</span>
-        <span class="k">if</span> <span class="n">sample_weight</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">_sample_weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">_sample_weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sample_weight</span><span class="p">)</span>
-
-        <span class="n">nonzero_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">_sample_weight</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-
-        <span class="c1"># TODO: perhaps we want to stratify this split</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stratify</span><span class="p">:</span>
-            <span class="n">ss</span> <span class="o">=</span> <span class="n">StratifiedShuffleSplit</span><span class="p">(</span>
-                <span class="n">n_splits</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_fraction</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span>
-            <span class="p">)</span>
-            <span class="k">for</span> <span class="n">structure_idx</span><span class="p">,</span> <span class="n">leaf_idx</span> <span class="ow">in</span> <span class="n">ss</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
-                <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">nonzero_indices</span><span class="p">),</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">y</span><span class="p">[</span><span class="n">nonzero_indices</span><span class="p">]</span>
-            <span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">structure_indices_</span> <span class="o">=</span> <span class="n">nonzero_indices</span><span class="p">[</span><span class="n">structure_idx</span><span class="p">]</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span> <span class="o">=</span> <span class="n">nonzero_indices</span><span class="p">[</span><span class="n">leaf_idx</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">structure_indices_</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
-                <span class="n">nonzero_indices</span><span class="p">,</span>
-                <span class="nb">int</span><span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">honest_fraction</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">nonzero_indices</span><span class="p">)),</span>
-                <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">(</span><span class="n">nonzero_indices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">structure_indices_</span><span class="p">)</span>
-
-        <span class="n">_sample_weight</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree_estimator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span> <span class="o">=</span> <span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># XXX: maybe error out if the tree_estimator is already fitted</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span> <span class="o">=</span> <span class="n">clone</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_estimator</span><span class="p">)</span>
+
+        <span class="c1"># obtain the structure sample weights</span>
+        <span class="n">sample_weights_structure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partition_honest_indices</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">set_params</span><span class="p">(</span>
             <span class="o">**</span><span class="nb">dict</span><span class="p">(</span>
@@ -1056,7 +1062,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">_fit</span><span class="p">(</span>
                 <span class="n">X</span><span class="p">,</span>
                 <span class="n">y</span><span class="p">,</span>
-                <span class="n">sample_weight</span><span class="o">=</span><span class="n">_sample_weight</span><span class="p">,</span>
+                <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weights_structure</span><span class="p">,</span>
                 <span class="n">check_input</span><span class="o">=</span><span class="n">check_input</span><span class="p">,</span>
                 <span class="n">missing_values_in_feature_mask</span><span class="o">=</span><span class="n">missing_values_in_feature_mask</span><span class="p">,</span>
                 <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span>
@@ -1065,11 +1071,29 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">_fit</span><span class="p">(</span>
                 <span class="n">X</span><span class="p">,</span>
                 <span class="n">y</span><span class="p">,</span>
-                <span class="n">sample_weight</span><span class="o">=</span><span class="n">_sample_weight</span><span class="p">,</span>
+                <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weights_structure</span><span class="p">,</span>
                 <span class="n">check_input</span><span class="o">=</span><span class="n">check_input</span><span class="p">,</span>
                 <span class="n">missing_values_in_feature_mask</span><span class="o">=</span><span class="n">missing_values_in_feature_mask</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inherit_estimator_attributes</span><span class="p">()</span>
+
+        <span class="c1"># fit the leaves on the non-structure indices</span>
+        <span class="n">not_honest_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="n">not_honest_mask</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">sample_weight</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sample_weight_leaves</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">),),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sample_weight_leaves</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sample_weight</span><span class="p">)</span>
+        <span class="n">sample_weight_leaves</span><span class="p">[</span><span class="n">not_honest_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fit_leaves</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight_leaves</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">_fit_leaves</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">):</span>
+        <span class="n">nonzero_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">sample_weight</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># sample the structure indices</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span> <span class="o">=</span> <span class="n">nonzero_indices</span>
 
         <span class="c1"># update the number of classes, unsplit</span>
         <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -1112,8 +1136,6 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">empirical_prior_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">empirical_prior_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
-
-        <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">_set_leaf_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">leaf_ids</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Traverse the already built tree with X and set leaf nodes with y.</span>
@@ -1293,7 +1315,7 @@ document.write(`
 
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-01-30.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-01-31.
       <br/>
     
   </p>
