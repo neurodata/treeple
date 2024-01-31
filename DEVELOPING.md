@@ -4,13 +4,6 @@
 - [Setting up your development environment](#setting-up-your-development-environment)
 - [Building the project from source](#building-the-project-from-source)
 - [Development Tasks](#development-tasks)
-        - [Basic Verification](#basic-verification)
-        - [Docsite](#docsite)
-  - [Details](#details)
-    - [Coding Style](#coding-style)
-    - [Lint](#lint)
-    - [Type checking](#type-checking)
-    - [Unit tests](#unit-tests)
 - [Advanced Updating submodules](#advanced-updating-submodules)
 - [Cython and C++](#cython-and-c)
 - [Making a Release](#making-a-release)
@@ -129,7 +122,7 @@ Scikit-tree is in-line with scikit-learn and thus relies on each new version rel
 2. Upload wheels to test PyPi
 
 ```
-twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+twine upload dist/* --repository testpypi
 ```
 
 Verify that installations work as expected on your machine.
