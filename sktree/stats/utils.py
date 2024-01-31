@@ -104,12 +104,12 @@ METRIC_FUNCTIONS = {
     "auc": roc_auc_score,
     "mi": _mutual_information,
     "cond_entropy": _cond_entropy,
-    "sas98": _SAS98,
+    "s@s98": _SAS98,
 }
 
-POSTERIOR_FUNCTIONS = ("mi", "auc", "cond_entropy")
+POSTERIOR_FUNCTIONS = ("mi", "auc", "cond_entropy", "s@s98")
 
-POSITIVE_METRICS = ("mi", "auc", "balanced_accuracy")
+POSITIVE_METRICS = ("mi", "auc", "balanced_accuracy", "s@s98")
 
 REGRESSOR_METRICS = ("mse", "mae")
 
