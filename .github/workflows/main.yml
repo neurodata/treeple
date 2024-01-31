@@ -79,7 +79,7 @@ jobs:
           echo "timestamp=${NOW}" >> $GITHUB_OUTPUT
 
       - name: Setup compiler cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: cache-ccachev1
         # Reference: https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows#matching-a-cache-key
         # NOTE: The caching strategy is modeled in a way that it will always have a unique cache key for each workflow run
@@ -186,7 +186,7 @@ jobs:
           echo "timestamp=${NOW}" >> $GITHUB_OUTPUT
 
       - name: Setup compiler cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: cache-ccachev1
         # Reference: https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows#matching-a-cache-key
         # NOTE: The caching strategy is modeled in a way that it will always have a unique cache key for each workflow run
