@@ -20,5 +20,6 @@ on libraries.io to be notified when new versions are released.
     Version 0.3 <whats_new/v0.3.rst>
     Version 0.4 <whats_new/v0.4.rst>
     Version 0.5 <whats_new/v0.5.rst>
-    Version 0.6 (Unreleased) <whats_new/v0.6.rst>
+    Version 0.6 <whats_new/v0.6.rst>
+    Version 0.7 (Unreleased) <whats_new/v0.7.rst>
 

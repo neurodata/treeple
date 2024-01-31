@@ -3,12 +3,13 @@
 .. include:: _contributors.rst
 .. currentmodule:: sktree
 
-.. _current:
+.. _v0_6:
 
 Version 0.6
 ===========
 
-**In Development**
+This release includes an enhancement mainly in the MultiViewDecisionTreeClassifier
+and HonestForestClassifier, and a new generative model for the make_trunk_classification.
 
 Changelog
 ---------
