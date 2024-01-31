@@ -155,8 +155,8 @@ def make_trunk_classification(
     if simulation == "trunk":
         X = np.vstack(
             (
-                rng.multivariate_normal(mu_0, cov, n_samples // 2, method=method),
                 rng.multivariate_normal(mu_1, cov, n_samples // 2, method=method),
+                rng.multivariate_normal(mu_0, cov, n_samples // 2, method=method),
             )
         )
     elif simulation == "trunk_overlap":
@@ -167,50 +167,39 @@ def make_trunk_classification(
             )
         )
     elif simulation == "trunk_mix":
-        mixture_idx = rng.choice(2, n_samples // 2, replace=True, shuffle=True, p=None)
-        norm_params = [[mu_0, cov * (2 / 3) ** 2], [mu_1, cov * (2 / 3) ** 2]]
-        X_mixture = np.fromiter(
-            (
-                rng.multivariate_normal(*(norm_params[i]), size=1, method=method)
-                for i in mixture_idx
-            ),
-            dtype=np.dtype((float, n_dim)),
+        mixture_idx = rng.choice(
+            2, n_samples // 2, replace=True, shuffle=True, p=None
         )
+        norm_params = [[mu_0, cov * (2/3) ** 2], [mu_1, cov * (2/3) ** 2]]
+        X_mixture = np.fromiter(
+            (rng.multivariate_normal(*(norm_params[i]), size=1, method=method) for i in mixture_idx),
+            dtype=np.dtype((float, n_dim))
 
         X = np.vstack(
             (
-                rng.multivariate_normal(np.zeros(n_dim), cov, n_samples // 2, method=method),
+                rng.multivariate_normal(np.zeros(n_dim), cov*(2/3)**2, n_samples // 2, method=method),
                 X_mixture.reshape(n_samples // 2, n_dim),
             )
         )
     elif simulation in MARRON_WAND_SIMS.keys():
         mixture_idx = rng.choice(
-            MARRON_WAND_SIMS[simulation][0],
-            size=n_samples // 2,
-            replace=True,
-            p=MARRON_WAND_SIMS[simulation][1],
+            MARRON_WAND_SIMS[simulation][0], size=n_samples // 2, replace=True, p=MARRON_WAND_SIMS[simulation][1]
         )
         norm_params = MarronWandSims(n_dim=n_dim, cov=cov)(simulation)
         G = np.fromiter(
-            (
-                rng.multivariate_normal(*(norm_params[i]), size=1, method=method)
-                for i in mixture_idx
-            ),
-            dtype=np.dtype((float, n_dim)),
+            (rng.multivariate_normal(*(norm_params[i]), size=1, method=method) for i in mixture_idx),
+            dtype=np.dtype((float, n_dim))
         )
-
+    
         X = np.vstack(
             (
                 rng.multivariate_normal(np.zeros(n_dim), cov, n_samples // 2, method=method),
-                (1 - w)
-                * rng.multivariate_normal(np.zeros(n_dim), cov, n_samples // 2, method=method)
+                (1 - w) * rng.multivariate_normal(np.zeros(n_dim), cov, n_samples // 2, method=method)
                 + w * G.reshape(n_samples // 2, n_dim),
             )
         )
     else:
-        raise ValueError(
-            f"Simulation must be trunk, trunk_overlap, trunk_mix, {MARRON_WAND_SIMS.keys()}"
-        )
+        raise ValueError(f"Simulation must be trunk, trunk_overlap, trunk_mix, {MARRON_WAND_SIMS.keys()}")
 
     y = np.concatenate((np.zeros(n_samples // 2), np.ones(n_samples // 2)))
 
