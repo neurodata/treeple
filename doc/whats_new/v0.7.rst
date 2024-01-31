@@ -16,7 +16,7 @@ Changelog
 - |Feature| :class:`sktree.HonestForestClassifier` now allows one to specify
     the number of sub-samples to use for the honest trees without having
     to bootstrap sample. This is specified by the ``max_samples`` parameter.
-    By `Adam Li`_ (:pr:`#`)
+    By `Adam Li`_ (:pr:`#210`)
 
 Code and Documentation Contributors
 -----------------------------------
