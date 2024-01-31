@@ -154,7 +154,11 @@ def test_honest_forest_has_deterministic_sampling_for_oob_structure_and_leaves(b
     When bootstrap is False, there is no oob.
     """
     n_estimators = 5
-    est = HonestForestClassifier(n_estimators=n_estimators, random_state=0, bootstrap=bootstrap)
+    est = HonestForestClassifier(
+        n_estimators=n_estimators,
+        random_state=0,
+        bootstrap=bootstrap,
+    )
     X = rng.normal(0, 1, (100, 2))
     X[:50] *= -1
     y = [0, 1] * 50
@@ -177,6 +181,13 @@ def test_honest_forest_has_deterministic_sampling_for_oob_structure_and_leaves(b
         oob_samples_ = est.oob_samples_
         for itree in range(n_estimators):
             assert len(oob_samples[itree]) > 1
+            assert (
+                set(structure_samples[itree])
+                .union(set(leaf_samples[itree]))
+                .intersection(set(oob_samples_[itree]))
+                == set()
+            )
+
             assert set(structure_samples[itree]).union(set(leaf_samples[itree])) == set(
                 inbag_samples[itree]
             )

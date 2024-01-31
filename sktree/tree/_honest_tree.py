@@ -481,6 +481,38 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
 
         return self
 
+    def _partition_honest_indices(self, y, sample_weight):
+        rng = np.random.default_rng(self.random_state)
+
+        # Account for bootstrapping too
+        if sample_weight is None:
+            _sample_weight = np.ones((len(y),), dtype=np.float64)
+        else:
+            _sample_weight = np.array(sample_weight)
+
+        nonzero_indices = np.where(_sample_weight > 0)[0]
+
+        # sample the structure indices
+        if self.stratify:
+            ss = StratifiedShuffleSplit(
+                n_splits=1, test_size=self.honest_fraction, random_state=self.random_state
+            )
+            for structure_idx, _ in ss.split(
+                np.zeros((len(nonzero_indices), 1)), y[nonzero_indices]
+            ):
+                self.structure_indices_ = nonzero_indices[structure_idx]
+        else:
+            self.structure_indices_ = rng.choice(
+                nonzero_indices,
+                int((1 - self.honest_fraction) * len(nonzero_indices)),
+                replace=False,
+            )
+
+        self.honest_indices_ = np.setdiff1d(nonzero_indices, self.structure_indices_)
+        _sample_weight[self.honest_indices_] = 0
+
+        return _sample_weight
+
     def _fit(
         self,
         X,
@@ -521,43 +553,17 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         self : HonestTreeClassifier
             Fitted tree estimator.
         """
-        rng = np.random.default_rng(self.random_state)
         if check_input:
             X, y = check_X_y(X, y, multi_output=True)
-
-        # Account for bootstrapping too
-        if sample_weight is None:
-            _sample_weight = np.ones((X.shape[0],), dtype=np.float64)
-        else:
-            _sample_weight = np.array(sample_weight)
-
-        nonzero_indices = np.where(_sample_weight > 0)[0]
-
-        # TODO: perhaps we want to stratify this split
-        if self.stratify:
-            ss = StratifiedShuffleSplit(
-                n_splits=1, test_size=self.honest_fraction, random_state=self.random_state
-            )
-            for structure_idx, leaf_idx in ss.split(
-                np.zeros((len(nonzero_indices), 1)), y[nonzero_indices]
-            ):
-                self.structure_indices_ = nonzero_indices[structure_idx]
-                self.honest_indices_ = nonzero_indices[leaf_idx]
-        else:
-            self.structure_indices_ = rng.choice(
-                nonzero_indices,
-                int((1 - self.honest_fraction) * len(nonzero_indices)),
-                replace=False,
-            )
-            self.honest_indices_ = np.setdiff1d(nonzero_indices, self.structure_indices_)
-
-        _sample_weight[self.honest_indices_] = 0
 
         if self.tree_estimator is None:
             self.estimator_ = DecisionTreeClassifier(random_state=self.random_state)
         else:
             # XXX: maybe error out if the tree_estimator is already fitted
             self.estimator_ = clone(self.tree_estimator)
+
+        # obtain the structure sample weights
+        sample_weights_structure = self._partition_honest_indices(y, sample_weight)
 
         self.estimator_.set_params(
             **dict(
@@ -594,7 +600,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
             self.estimator_._fit(
                 X,
                 y,
-                sample_weight=_sample_weight,
+                sample_weight=sample_weights_structure,
                 check_input=check_input,
                 missing_values_in_feature_mask=missing_values_in_feature_mask,
                 classes=classes,
@@ -603,11 +609,29 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
             self.estimator_._fit(
                 X,
                 y,
-                sample_weight=_sample_weight,
+                sample_weight=sample_weights_structure,
                 check_input=check_input,
                 missing_values_in_feature_mask=missing_values_in_feature_mask,
             )
         self._inherit_estimator_attributes()
+
+        # fit the leaves on the non-structure indices
+        not_honest_mask = np.ones(len(y), dtype=bool)
+        not_honest_mask[self.honest_indices_] = False
+
+        if sample_weight is None:
+            sample_weight_leaves = np.ones((len(y),), dtype=np.float64)
+        else:
+            sample_weight_leaves = np.array(sample_weight)
+        sample_weight_leaves[not_honest_mask] = 0
+        self._fit_leaves(X, y, sample_weight=sample_weight_leaves)
+        return self
+
+    def _fit_leaves(self, X, y, sample_weight):
+        nonzero_indices = np.where(sample_weight > 0)[0]
+
+        # sample the structure indices
+        self.honest_indices_ = nonzero_indices
 
         # update the number of classes, unsplit
         if y.ndim == 1:
@@ -650,8 +674,6 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
             self.classes_ = self.classes_[0]
             self.empirical_prior_ = self.empirical_prior_[0]
             y = y[:, 0]
-
-        return self
 
     def _set_leaf_nodes(self, leaf_ids, y):
         """Traverse the already built tree with X and set leaf nodes with y.

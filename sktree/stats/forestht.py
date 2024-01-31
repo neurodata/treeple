@@ -1199,7 +1199,7 @@ class FeatureImportanceForestClassifier(BaseForestHT):
         return stat
 
 
-def _parallel_predict_proba_oob(predict_proba, X, out, idx, train_idx, lock):
+def _parallel_predict_proba_oob(predict_proba, X, out, idx, test_idx, lock):
     """
     This is a utility function for joblib's Parallel.
     It can't go locally in ForestClassifier or ForestRegressor, because joblib
@@ -1208,11 +1208,117 @@ def _parallel_predict_proba_oob(predict_proba, X, out, idx, train_idx, lock):
     # each tree predicts proba with a list of output (n_samples, n_classes[i])
     prediction = predict_proba(X, check_input=False)
 
-    test_idx = np.ones(X.shape[0], dtype=bool)
-    test_idx[train_idx] = False
+    indices = np.zeros(X.shape[0], dtype=bool)
+    indices[test_idx] = True
     with lock:
         out[idx, test_idx, :] = prediction[test_idx, :]
     return prediction
+
+
+def build_coleman_forest(
+    est,
+    X,
+    y,
+    covariate_index=None,
+    metric="mi",
+    n_repeats=1000,
+    verbose=False,
+    seed=None,
+    return_posteriors=True,
+    **metric_kwargs,
+):
+    """Build a hypothesis testing forest using oob samples.
+
+    Parameters
+    ----------
+    est : Forest
+        The type of forest to use. Must be enabled with ``bootstrap=True``.
+    X : ArrayLike of shape (n_samples, n_features)
+        Data.
+    y : ArrayLike of shape (n_samples, n_outputs)
+        Binary target, so ``n_outputs`` should be at most 1.
+    covariate_index : ArrayLike, optional of shape (n_covariates,)
+        The index array of covariates to shuffle, by default None.
+    metric : str, optional
+        The metric to compute, by default "mi".
+    n_repeats : int, optional
+        Number of times to bootstrap sample the two forests to construct
+        the null distribution, by default 1000.
+    verbose : bool, optional
+        Verbosity, by default False.
+    seed : int, optional
+        Random seed, by default None.
+    return_posteriors : bool, optional
+        Whether or not to return the posteriors, by default False.
+
+    Returns
+    -------
+    observe_stat : float
+        The test statistic. To compute the test statistic, take
+        ``permute_stat_`` and subtract ``observe_stat_``.
+    pvalue : float
+        The p-value of the test statistic.
+    orig_forest_proba : ArrayLike of shape (n_estimators, n_samples, n_outputs)
+        The predicted posterior probabilities for each estimator on their
+        out of bag samples.
+    perm_forest_proba : ArrayLike of shape (n_estimators, n_samples, n_outputs)
+        The predicted posterior probabilities for each of the permuted estimators
+        on their out of bag samples.
+    """
+    rng = np.random.default_rng(seed)
+    metric_func: Callable[[ArrayLike, ArrayLike], float] = METRIC_FUNCTIONS[metric]
+
+    if covariate_index is None:
+        covariate_index = np.arange(X.shape[1], dtype=int)
+
+    # perform permutation of covariates
+    # TODO: refactor permutations into the HonestForest(?)
+    n_samples_train = X.shape[0]
+    index_arr = rng.choice(
+        np.arange(n_samples_train, dtype=int),
+        size=(n_samples_train, 1),
+        replace=False,
+        shuffle=True,
+    )
+    X_permute = X.copy()
+    X_permute[:, covariate_index] = X_permute[index_arr, covariate_index]
+
+    # build two sets of forests
+    orig_est, orig_forest_proba = build_hyppo_oob_forest(est, X, y, verbose=verbose)
+    perm_est, perm_forest_proba = build_hyppo_oob_forest(est, X_permute, y, verbose=verbose)
+
+    metric_star, metric_star_pi = _compute_null_distribution_coleman(
+        y,
+        orig_forest_proba,
+        perm_forest_proba,
+        metric,
+        n_repeats=n_repeats,
+        seed=seed,
+        **metric_kwargs,
+    )
+
+    y_pred_proba_orig = np.nanmean(orig_forest_proba, axis=0)
+    y_pred_proba_perm = np.nanmean(perm_forest_proba, axis=0)
+    observe_stat = metric_func(y, y_pred_proba_orig, **metric_kwargs)
+    permute_stat = metric_func(y, y_pred_proba_perm, **metric_kwargs)
+
+    # metric^\pi - metric = observed test statistic, which under the
+    # null is normally distributed around 0
+    observe_test_stat = permute_stat - observe_stat
+
+    # metric^\pi_j - metric_j, which is centered at 0
+    null_dist = metric_star_pi - metric_star
+
+    # compute pvalue
+    if metric in POSITIVE_METRICS:
+        pvalue = (1 + (null_dist <= observe_test_stat).sum()) / (1 + n_repeats)
+    else:
+        pvalue = (1 + (null_dist >= observe_test_stat).sum()) / (1 + n_repeats)
+
+    if return_posteriors:
+        return observe_test_stat, pvalue, orig_forest_proba, perm_forest_proba
+    else:
+        return observe_test_stat, pvalue
 
 
 def build_hyppo_oob_forest(
@@ -1221,7 +1327,30 @@ def build_hyppo_oob_forest(
     y,
     verbose=False,
 ):
+    """Build a hypothesis testing forest using oob samples.
+
+    Parameters
+    ----------
+    est : Forest
+        The type of forest to use. Must be enabled with ``bootstrap=True``.
+    X : ArrayLike of shape (n_samples, n_features)
+        Data.
+    y : ArrayLike of shape (n_samples, n_outputs)
+        Binary target, so ``n_outputs`` should be at most 1.
+    verbose : bool, optional
+        Verbosity, by default False.
+
+    Returns
+    -------
+    est : Forest
+        Fitted forest.
+    all_proba : ArrayLike of shape (n_estimators, n_samples, n_outputs)
+        The predicted posterior probabilities for each estimator on their
+        out of bag samples.
+    """
     assert est.bootstrap
+
+    est = clone(est)
 
     # build forest
     est.fit(X, y)
@@ -1247,10 +1376,9 @@ def build_hyppo_oob_forest(
         (len(est.estimators_), X.shape[0], est.n_classes_), np.nan, dtype=np.float64
     )
     Parallel(n_jobs=n_jobs, verbose=verbose, require="sharedmem")(
-        delayed(_parallel_predict_proba_oob)(e.predict_proba, X, all_proba, idx, train_idx, lock)
-        for idx, (e, train_idx) in enumerate(zip(est.estimators_, est.estimators_samples_))
+        delayed(_parallel_predict_proba_oob)(e.predict_proba, X, all_proba, idx, test_idx, lock)
+        for idx, (e, test_idx) in enumerate(zip(est.estimators_, est.oob_samples_))
     )
-
     return est, all_proba
 
 
@@ -1279,6 +1407,7 @@ def build_hyppo_cv_forest(
 
         train_idx_list = [train_idx]
         test_idx_list = [test_idx]
+        n_splits = 1
 
     est_list = []
     all_proba_list = []
@@ -1315,7 +1444,4 @@ def build_hyppo_cv_forest(
         all_proba_list.append(posterior_arr)
         est_list.append(est)
 
-    if n_splits == 1:
-        return est, all_proba
-    else:
-        return est_list, all_proba_list
+    return est_list, all_proba_list
