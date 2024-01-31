@@ -1,0 +1,913 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-theme="auto">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>API Documentation &#8212; scikit-tree 0.6.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "auto";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="_static/style.css?v=42c02ab7" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=c5ced968eda925caa686" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=c5ced968eda925caa686" />
+  <script src="_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=c5ced968eda925caa686"></script>
+
+    <script src="_static/documentation_options.js?v=50f829f1"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=fd10adb8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.14.2';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/scikit-tree/main/doc/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.6.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="sktree.RandomForestClassifier" href="generated/sktree.RandomForestClassifier.html" />
+    <link rel="prev" title="scikit-tree" href="index.html" />
+    <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
+    <script type="text/javascript" src="_static/copybutton.js"></script>
+    <script type="text/javascript" src="_static/scrollfix.js"></script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="auto">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">scikit-tree 0.6.0 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        API Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="user_guide.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="whats_new.html">
+                        Release History
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="install.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="use.html">
+                        Examples using scikit-tree
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        API Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="user_guide.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="whats_new.html">
+                        Release History
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="install.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="use.html">
+                        Examples using scikit-tree
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-3"
+      type="button"
+      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-3"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-3"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-3">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.RandomForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.RandomForestClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.RandomForestRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.RandomForestRegressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.ExtraTreesClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ExtraTreesClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.ExtraTreesRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ExtraTreesRegressor</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.tree.DecisionTreeClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.DecisionTreeClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.tree.DecisionTreeRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.DecisionTreeRegressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.tree.ExtraTreeClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.ExtraTreeClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.tree.ExtraTreeRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.ExtraTreeRegressor</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.ObliqueRandomForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ObliqueRandomForestClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.ObliqueRandomForestRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ObliqueRandomForestRegressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.PatchObliqueRandomForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.PatchObliqueRandomForestClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.PatchObliqueRandomForestRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.PatchObliqueRandomForestRegressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.HonestForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.HonestForestClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.MultiViewRandomForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.MultiViewRandomForestClassifier</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.tree.ObliqueDecisionTreeClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.ObliqueDecisionTreeClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.tree.ObliqueDecisionTreeRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.ObliqueDecisionTreeRegressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.tree.PatchObliqueDecisionTreeClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.PatchObliqueDecisionTreeClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.tree.PatchObliqueDecisionTreeRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.PatchObliqueDecisionTreeRegressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.tree.HonestTreeClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.HonestTreeClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.tree.MultiViewDecisionTreeClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.MultiViewDecisionTreeClassifier</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.UnsupervisedRandomForest.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.UnsupervisedRandomForest</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.UnsupervisedObliqueRandomForest.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.UnsupervisedObliqueRandomForest</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.tree.UnsupervisedDecisionTree.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.UnsupervisedDecisionTree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.tree.UnsupervisedObliqueDecisionTree.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.tree</span></code>.UnsupervisedObliqueDecisionTree</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.ExtendedIsolationForest.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.ExtendedIsolationForest</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.tree.compute_forest_similarity_matrix.html">sktree.tree.compute_forest_similarity_matrix</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.NearestNeighborsMetaEstimator.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.NearestNeighborsMetaEstimator</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.stats.FeatureImportanceForestRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.FeatureImportanceForestRegressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.stats.FeatureImportanceForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.FeatureImportanceForestClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.stats.PermutationForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.PermutationForestClassifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.stats.PermutationForestRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.PermutationForestRegressor</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.datasets.make_gaussian_mixture.html">sktree.datasets.make_gaussian_mixture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.datasets.make_joint_factor_model.html">sktree.datasets.make_joint_factor_model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.datasets.make_quadratic_classification.html">sktree.datasets.make_quadratic_classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.datasets.make_trunk_classification.html">sktree.datasets.make_trunk_classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.datasets.approximate_clf_mutual_information.html">sktree.datasets.approximate_clf_mutual_information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.datasets.approximate_clf_mutual_information_with_monte_carlo.html">sktree.datasets.approximate_clf_mutual_information_with_monte_carlo</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.experimental.mutual_info_ksg.html">sktree.experimental.mutual_info_ksg</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.experimental.conditional_resample.html">sktree.experimental.conditional_resample</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.experimental.simulate.simulate_multivariate_gaussian.html">sktree.experimental.simulate.simulate_multivariate_gaussian</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.experimental.simulate.simulate_helix.html">sktree.experimental.simulate.simulate_helix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.experimental.simulate.simulate_sphere.html">sktree.experimental.simulate.simulate_sphere</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.experimental.mutual_info.mi_gaussian.html">sktree.experimental.mutual_info.mi_gaussian</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.experimental.mutual_info.cmi_gaussian.html">sktree.experimental.mutual_info.cmi_gaussian</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.experimental.mutual_info.entropy_gaussian.html">sktree.experimental.mutual_info.entropy_gaussian</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">API Documentation</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="api-documentation">
+<span id="id1"></span><h1>API Documentation<a class="headerlink" href="#api-documentation" title="Link to this heading">#</a></h1>
+<p><a class="reference internal" href="#module-sktree" title="sktree"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code></a>:</p>
+<p id="module-sktree">Scikit manifold oblique random forests.</p>
+<section id="scikit-learn-tree-estimators">
+<h2>Scikit-learn Tree Estimators<a class="headerlink" href="#scikit-learn-tree-estimators" title="Link to this heading">#</a></h2>
+<p>We provide a drop-in replacement for the scikit-learn tree estimators
+with <strong>experimental</strong> features that we have developed. These estimators
+are still compatible with the scikit-learn API. These estimators all have
+the capability of binning features, which theoretically will improve runtime
+significantly for high-dimensional and high-sample size data.</p>
+<p>Use at your own risk! We have not tested these estimators extensively, compared
+to the scikit-learn estimators.</p>
+<span class="target" id="module-sktree._lib.sklearn.ensemble"></span><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.RandomForestClassifier.html#sktree.RandomForestClassifier" title="sktree.RandomForestClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RandomForestClassifier</span></code></a>([n_estimators, ...])</p></td>
+<td><p>A random forest classifier.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.RandomForestRegressor.html#sktree.RandomForestRegressor" title="sktree.RandomForestRegressor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RandomForestRegressor</span></code></a>([n_estimators, ...])</p></td>
+<td><p>A random forest regressor.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.ExtraTreesClassifier.html#sktree.ExtraTreesClassifier" title="sktree.ExtraTreesClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExtraTreesClassifier</span></code></a>([n_estimators, ...])</p></td>
+<td><p>An extra-trees classifier.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.ExtraTreesRegressor.html#sktree.ExtraTreesRegressor" title="sktree.ExtraTreesRegressor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExtraTreesRegressor</span></code></a>([n_estimators, ...])</p></td>
+<td><p>An extra-trees regressor.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.tree.DecisionTreeClassifier.html#sktree.tree.DecisionTreeClassifier" title="sktree.tree.DecisionTreeClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DecisionTreeClassifier</span></code></a>(*[, criterion, ...])</p></td>
+<td><p>A decision tree classifier.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.tree.DecisionTreeRegressor.html#sktree.tree.DecisionTreeRegressor" title="sktree.tree.DecisionTreeRegressor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DecisionTreeRegressor</span></code></a>(*[, criterion, ...])</p></td>
+<td><p>A decision tree regressor.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.tree.ExtraTreeClassifier.html#sktree.tree.ExtraTreeClassifier" title="sktree.tree.ExtraTreeClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExtraTreeClassifier</span></code></a>(*[, criterion, ...])</p></td>
+<td><p>An extremely randomized tree classifier.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.tree.ExtraTreeRegressor.html#sktree.tree.ExtraTreeRegressor" title="sktree.tree.ExtraTreeRegressor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExtraTreeRegressor</span></code></a>(*[, criterion, splitter, ...])</p></td>
+<td><p>An extremely randomized tree regressor.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="supervised">
+<h2>Supervised<a class="headerlink" href="#supervised" title="Link to this heading">#</a></h2>
+<p>Decision-tree models are traditionally implemented with axis-aligned splits and
+storing the mean outcome (i.e. label) vote in the leaf nodes. However, more
+exotic splits are possible, called “oblique” splits, which are some function
+of multiple feature columns to create a “new feature value” to split on.</p>
+<p>This can take the form of a random (sparse) linear combination of feature columns,
+or even take advantage of the structure in the data (e.g. if it is an image) to
+sample feature indices in a manifold-aware fashion. This class of models generalizes
+the splitting function in the trees, while everything else is consistent with
+how scikit-learn builds trees.</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.ObliqueRandomForestClassifier.html#sktree.ObliqueRandomForestClassifier" title="sktree.ObliqueRandomForestClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ObliqueRandomForestClassifier</span></code></a>([...])</p></td>
+<td><p>An oblique random forest classifier.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.ObliqueRandomForestRegressor.html#sktree.ObliqueRandomForestRegressor" title="sktree.ObliqueRandomForestRegressor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ObliqueRandomForestRegressor</span></code></a>([n_estimators, ...])</p></td>
+<td><p>An oblique random forest regressor.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.PatchObliqueRandomForestClassifier.html#sktree.PatchObliqueRandomForestClassifier" title="sktree.PatchObliqueRandomForestClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PatchObliqueRandomForestClassifier</span></code></a>([...])</p></td>
+<td><p>A patch-oblique random forest classifier.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.PatchObliqueRandomForestRegressor.html#sktree.PatchObliqueRandomForestRegressor" title="sktree.PatchObliqueRandomForestRegressor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PatchObliqueRandomForestRegressor</span></code></a>([...])</p></td>
+<td><p>A patch-oblique random forest regressor.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.HonestForestClassifier.html#sktree.HonestForestClassifier" title="sktree.HonestForestClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HonestForestClassifier</span></code></a>([n_estimators, ...])</p></td>
+<td><p>A forest classifier with honest leaf estimates.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.MultiViewRandomForestClassifier.html#sktree.MultiViewRandomForestClassifier" title="sktree.MultiViewRandomForestClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MultiViewRandomForestClassifier</span></code></a>([...])</p></td>
+<td><p>A multi-view axis-aligned random forest classifier.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.tree.ObliqueDecisionTreeClassifier.html#sktree.tree.ObliqueDecisionTreeClassifier" title="sktree.tree.ObliqueDecisionTreeClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ObliqueDecisionTreeClassifier</span></code></a>(*[, ...])</p></td>
+<td><p>An oblique decision tree classifier.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.tree.ObliqueDecisionTreeRegressor.html#sktree.tree.ObliqueDecisionTreeRegressor" title="sktree.tree.ObliqueDecisionTreeRegressor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ObliqueDecisionTreeRegressor</span></code></a>(*[, criterion, ...])</p></td>
+<td><p>An oblique decision tree Regressor.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.tree.PatchObliqueDecisionTreeClassifier.html#sktree.tree.PatchObliqueDecisionTreeClassifier" title="sktree.tree.PatchObliqueDecisionTreeClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PatchObliqueDecisionTreeClassifier</span></code></a>(*[, ...])</p></td>
+<td><p>A oblique decision tree classifier that operates over patches of data.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.tree.PatchObliqueDecisionTreeRegressor.html#sktree.tree.PatchObliqueDecisionTreeRegressor" title="sktree.tree.PatchObliqueDecisionTreeRegressor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PatchObliqueDecisionTreeRegressor</span></code></a>(*[, ...])</p></td>
+<td><p>A oblique decision tree regressor that operates over patches of data.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.tree.HonestTreeClassifier.html#sktree.tree.HonestTreeClassifier" title="sktree.tree.HonestTreeClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HonestTreeClassifier</span></code></a>([criterion, splitter, ...])</p></td>
+<td><p>A decision tree classifier with honest predictions.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.tree.MultiViewDecisionTreeClassifier.html#sktree.tree.MultiViewDecisionTreeClassifier" title="sktree.tree.MultiViewDecisionTreeClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MultiViewDecisionTreeClassifier</span></code></a>(*[, ...])</p></td>
+<td><p>A multi-view axis-aligned decision tree classifier.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="unsupervised">
+<h2>Unsupervised<a class="headerlink" href="#unsupervised" title="Link to this heading">#</a></h2>
+<p>Decision-tree models are traditionally used for classification and regression.
+However, they are also powerful non-parametric embedding and clustering models.
+The <a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.ensemble.RandomTreesEmbedding.html#sklearn.ensemble.RandomTreesEmbedding" title="(in scikit-learn v1.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomTreesEmbedding</span></code></a> is an example of unsupervised
+tree model. We implement other state-of-the-art models that explicitly split based
+on unsupervised criterion such as variance and BIC.</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.UnsupervisedRandomForest.html#sktree.UnsupervisedRandomForest" title="sktree.UnsupervisedRandomForest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UnsupervisedRandomForest</span></code></a>([n_estimators, ...])</p></td>
+<td><p>Unsupervised random forest.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.UnsupervisedObliqueRandomForest.html#sktree.UnsupervisedObliqueRandomForest" title="sktree.UnsupervisedObliqueRandomForest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UnsupervisedObliqueRandomForest</span></code></a>([...])</p></td>
+<td><p>Unsupervised oblique random forest.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The trees that comprise those forests are also available as standalone classes.</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.tree.UnsupervisedDecisionTree.html#sktree.tree.UnsupervisedDecisionTree" title="sktree.tree.UnsupervisedDecisionTree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tree.UnsupervisedDecisionTree</span></code></a>(*[, ...])</p></td>
+<td><p>Unsupervised decision tree.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.tree.UnsupervisedObliqueDecisionTree.html#sktree.tree.UnsupervisedObliqueDecisionTree" title="sktree.tree.UnsupervisedObliqueDecisionTree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tree.UnsupervisedObliqueDecisionTree</span></code></a>(*[, ...])</p></td>
+<td><p>Unsupervised oblique decision tree.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="outlier-detection">
+<h2>Outlier Detection<a class="headerlink" href="#outlier-detection" title="Link to this heading">#</a></h2>
+<p>Isolation forests are a model implemented in scikit-learn, which is an ensemble of
+extremely randomized axis-aligned decision tree models. Extended isolation forests
+replaces the base tree model with an oblique tree, which allows a more flexible model
+for detecting outliers.</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.ExtendedIsolationForest.html#sktree.ExtendedIsolationForest" title="sktree.ExtendedIsolationForest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExtendedIsolationForest</span></code></a>(*[, n_estimators, ...])</p></td>
+<td><p>Extended Isolation Forest Algorithm.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="distance-metrics">
+<h2>Distance Metrics<a class="headerlink" href="#distance-metrics" title="Link to this heading">#</a></h2>
+<p>Trees inherently produce a “distance-like” metric. We provide an API for
+extracting pairwise distances from the trees that include a correction
+that turns the “tree-distance” into a proper distance metric.</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.tree.compute_forest_similarity_matrix.html#sktree.tree.compute_forest_similarity_matrix" title="sktree.tree.compute_forest_similarity_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_forest_similarity_matrix</span></code></a>(forest, X)</p></td>
+<td><p>Compute the similarity matrix of samples in X using a trained forest.</p></td>
+</tr>
+</tbody>
+</table>
+<p>In addition to providing a distance metric based on leaves, tree-models
+provide a natural way to compute neighbors based on the splits. We provide
+an API for extracting the nearest neighbors from a tree-model. This provides
+an API-like interface similar to <a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.neighbors.NearestNeighbors.html#sklearn.neighbors.NearestNeighbors" title="(in scikit-learn v1.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">NearestNeighbors</span></code></a>.</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.NearestNeighborsMetaEstimator.html#sktree.NearestNeighborsMetaEstimator" title="sktree.NearestNeighborsMetaEstimator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NearestNeighborsMetaEstimator</span></code></a>(estimator[, ...])</p></td>
+<td><p>Meta-estimator for nearest neighbors.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="statistical-hypothesis-testing">
+<h2>Statistical Hypothesis Testing<a class="headerlink" href="#statistical-hypothesis-testing" title="Link to this heading">#</a></h2>
+<p>We provide an API for performing statistical hypothesis testing using Decision
+tree models.</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.stats.FeatureImportanceForestRegressor.html#sktree.stats.FeatureImportanceForestRegressor" title="sktree.stats.FeatureImportanceForestRegressor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FeatureImportanceForestRegressor</span></code></a>([...])</p></td>
+<td><p>Forest hypothesis testing with continuous <code class="docutils literal notranslate"><span class="pre">y</span></code> variable.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.stats.FeatureImportanceForestClassifier.html#sktree.stats.FeatureImportanceForestClassifier" title="sktree.stats.FeatureImportanceForestClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FeatureImportanceForestClassifier</span></code></a>([...])</p></td>
+<td><p>Forest hypothesis testing with categorical <code class="docutils literal notranslate"><span class="pre">y</span></code> variable.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.stats.PermutationForestClassifier.html#sktree.stats.PermutationForestClassifier" title="sktree.stats.PermutationForestClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PermutationForestClassifier</span></code></a>([estimator, ...])</p></td>
+<td><p>Hypothesis testing of covariates with a permutation forest classifier.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.stats.PermutationForestRegressor.html#sktree.stats.PermutationForestRegressor" title="sktree.stats.PermutationForestRegressor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PermutationForestRegressor</span></code></a>([estimator, ...])</p></td>
+<td><p>Hypothesis testing of covariates with a permutation forest regressor.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="datasets">
+<h2>Datasets<a class="headerlink" href="#datasets" title="Link to this heading">#</a></h2>
+<p>We provide some convenience functions for simulating datasets beyond
+those offered in scikit-learn.</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.datasets.make_gaussian_mixture.html#sktree.datasets.make_gaussian_mixture" title="sktree.datasets.make_gaussian_mixture"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_gaussian_mixture</span></code></a>(centers, covariances)</p></td>
+<td><p>Two-view Gaussian mixture model dataset generator.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.datasets.make_joint_factor_model.html#sktree.datasets.make_joint_factor_model" title="sktree.datasets.make_joint_factor_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_joint_factor_model</span></code></a>(n_views, n_features)</p></td>
+<td><p>Joint factor model data generator.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.datasets.make_quadratic_classification.html#sktree.datasets.make_quadratic_classification" title="sktree.datasets.make_quadratic_classification"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_quadratic_classification</span></code></a>(n_samples, ...)</p></td>
+<td><p>Simulate classification data from a quadratic model.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.datasets.make_trunk_classification.html#sktree.datasets.make_trunk_classification" title="sktree.datasets.make_trunk_classification"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_trunk_classification</span></code></a>(n_samples[, ...])</p></td>
+<td><p>Generate trunk dataset.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.datasets.approximate_clf_mutual_information.html#sktree.datasets.approximate_clf_mutual_information" title="sktree.datasets.approximate_clf_mutual_information"><code class="xref py py-obj docutils literal notranslate"><span class="pre">approximate_clf_mutual_information</span></code></a>(means, covs)</p></td>
+<td><p>Approximate MI for multivariate Gaussian for a classification setting.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.datasets.approximate_clf_mutual_information_with_monte_carlo.html#sktree.datasets.approximate_clf_mutual_information_with_monte_carlo" title="sktree.datasets.approximate_clf_mutual_information_with_monte_carlo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">approximate_clf_mutual_information_with_monte_carlo</span></code></a>(...)</p></td>
+<td><p>Approximate MI for multivariate Gaussian for a classification setting.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="experimental-functionality">
+<h2>Experimental Functionality<a class="headerlink" href="#experimental-functionality" title="Link to this heading">#</a></h2>
+<p>We also include experimental functionality that is works in progress.</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.experimental.mutual_info_ksg.html#sktree.experimental.mutual_info_ksg" title="sktree.experimental.mutual_info_ksg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mutual_info_ksg</span></code></a>(X, Y[, Z, k, metric, ...])</p></td>
+<td><p>Compute the generalized (conditional) mutual information KSG estimate.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.experimental.conditional_resample.html#sktree.experimental.conditional_resample" title="sktree.experimental.conditional_resample"><code class="xref py py-obj docutils literal notranslate"><span class="pre">conditional_resample</span></code></a>(conditional_array, *arrays)</p></td>
+<td><p>Conditionally resample arrays or sparse matrices in a consistent way.</p></td>
+</tr>
+</tbody>
+</table>
+<p>We also include functions that help simulate and evaluate mutual information (MI)
+and conditional mutual information (CMI) estimators. Specifically, functions that
+help simulate multivariate gaussian data and compute the analytical solutions
+for the entropy, MI and CMI of the Gaussian distributions.</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.experimental.simulate.simulate_multivariate_gaussian.html#sktree.experimental.simulate.simulate_multivariate_gaussian" title="sktree.experimental.simulate.simulate_multivariate_gaussian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_multivariate_gaussian</span></code></a>([mean, cov, ...])</p></td>
+<td><p>Multivariate gaussian simulation for testing entropy and MI estimators.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.experimental.simulate.simulate_helix.html#sktree.experimental.simulate.simulate_helix" title="sktree.experimental.simulate.simulate_helix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_helix</span></code></a>([radius_a, radius_b, ...])</p></td>
+<td><p>Simulate data from a helix.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.experimental.simulate.simulate_sphere.html#sktree.experimental.simulate.simulate_sphere" title="sktree.experimental.simulate.simulate_sphere"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_sphere</span></code></a>([radius, noise_func, alpha, ...])</p></td>
+<td><p>Simulate samples generated on a sphere.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.experimental.mutual_info.mi_gaussian.html#sktree.experimental.mutual_info.mi_gaussian" title="sktree.experimental.mutual_info.mi_gaussian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mi_gaussian</span></code></a>(cov)</p></td>
+<td><p>Compute mutual information of a multivariate Gaussian.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.experimental.mutual_info.cmi_gaussian.html#sktree.experimental.mutual_info.cmi_gaussian" title="sktree.experimental.mutual_info.cmi_gaussian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cmi_gaussian</span></code></a>(cov, x_index, y_index, z_index)</p></td>
+<td><p>Compute the analytical CMI for a multivariate Gaussian distribution.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.experimental.mutual_info.entropy_gaussian.html#sktree.experimental.mutual_info.entropy_gaussian" title="sktree.experimental.mutual_info.entropy_gaussian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">entropy_gaussian</span></code></a>(cov)</p></td>
+<td><p>Compute entropy of a multivariate Gaussian.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><strong>scikit-tree</strong></p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="generated/sktree.RandomForestClassifier.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree</span></code>.RandomForestClassifier</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scikit-learn-tree-estimators">Scikit-learn Tree Estimators</a><ul class="nav section-nav flex-column">
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#supervised">Supervised</a><ul class="nav section-nav flex-column">
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#unsupervised">Unsupervised</a><ul class="nav section-nav flex-column">
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlier-detection">Outlier Detection</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#distance-metrics">Distance Metrics</a><ul class="nav section-nav flex-column">
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#statistical-hypothesis-testing">Statistical Hypothesis Testing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#datasets">Datasets</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#experimental-functionality">Experimental Functionality</a><ul class="nav section-nav flex-column">
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=c5ced968eda925caa686"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=c5ced968eda925caa686"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-01-31.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

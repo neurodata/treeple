@@ -1,0 +1,880 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-theme="auto">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sktree.datasets.multiview &#8212; scikit-tree 0.6.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "auto";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/style.css?v=42c02ab7" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=c5ced968eda925caa686" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=c5ced968eda925caa686" />
+  <script src="../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=c5ced968eda925caa686"></script>
+
+    <script src="../../../_static/documentation_options.js?v=50f829f1"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=fd10adb8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sktree/datasets/multiview';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.14.2';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/scikit-tree/main/doc/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.6.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
+    <script type="text/javascript" src="../../../_static/copybutton.js"></script>
+    <script type="text/javascript" src="../../../_static/scrollfix.js"></script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="auto">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">scikit-tree 0.6.0 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api.html">
+                        API Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user_guide.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../whats_new.html">
+                        Release History
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../install.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../use.html">
+                        Examples using scikit-tree
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api.html">
+                        API Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user_guide.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../whats_new.html">
+                        Release History
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../install.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../use.html">
+                        Examples using scikit-tree
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-3"
+      type="button"
+      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-3"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-3"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-3">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">sktree.datas...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for sktree.datasets.multiview</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Original source: https://github.com/mvlearn/mvlearn</span>
+<span class="c1"># License: MIT</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">ortho_group</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils</span> <span class="kn">import</span> <span class="n">check_random_state</span>
+
+
+<div class="viewcode-block" id="make_gaussian_mixture">
+<a class="viewcode-back" href="../../../generated/sktree.datasets.make_gaussian_mixture.html#sktree.datasets.make_gaussian_mixture">[docs]</a>
+<span class="k">def</span> <span class="nf">make_gaussian_mixture</span><span class="p">(</span>
+    <span class="n">centers</span><span class="p">,</span>
+    <span class="n">covariances</span><span class="p">,</span>
+    <span class="n">n_samples</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">transform</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span>
+    <span class="n">noise</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">noise_dims</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">class_probs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">return_latents</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">add_latent_noise</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Two-view Gaussian mixture model dataset generator.</span>
+
+<span class="sd">    This creates a two-view dataset from a Gaussian mixture model and</span>
+<span class="sd">    a (possibly nonlinear) transformation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    centers : 1D array-like or list of 1D array-likes</span>
+<span class="sd">        The mean(s) of the Gaussian(s) from which the latent</span>
+<span class="sd">        points are sampled. If is a list of 1D array-likes, each is the</span>
+<span class="sd">        mean of a distinct Gaussian, sampled from with</span>
+<span class="sd">        probability given by `class_probs`. Otherwise is the mean of a</span>
+<span class="sd">        single Gaussian from which all are sampled.</span>
+<span class="sd">    covariances : 2D array-like or list of 2D array-likes</span>
+<span class="sd">        The covariance matrix(s) of the Gaussian(s), matched</span>
+<span class="sd">        to the specified centers.</span>
+<span class="sd">    n_samples : int</span>
+<span class="sd">        The number of points in each view, divided across Gaussians per</span>
+<span class="sd">        `class_probs`.</span>
+<span class="sd">    transform : &#39;linear&#39; | &#39;sin&#39; | &#39;poly&#39; | callable, (default &#39;linear&#39;)</span>
+<span class="sd">        Transformation to perform on the latent variable. If a function,</span>
+<span class="sd">        applies it to the latent. Otherwise uses an implemented function.</span>
+<span class="sd">    noise : float or None (default=None)</span>
+<span class="sd">        Variance of mean zero Gaussian noise added to the first view.</span>
+<span class="sd">    noise_dims : int or None (default=None)</span>
+<span class="sd">        Number of additional dimensions of standard normal noise to add.</span>
+<span class="sd">    class_probs : array-like, default=None</span>
+<span class="sd">        A list of probabilities specifying the probability of a latent</span>
+<span class="sd">        point being sampled from each of the Gaussians. Must sum to 1. If</span>
+<span class="sd">        None, then is taken to be uniform over the Gaussians.</span>
+<span class="sd">    random_state : int, default=None</span>
+<span class="sd">        If set, can be used to reproduce the data generated.</span>
+<span class="sd">    shuffle : bool, default=False</span>
+<span class="sd">        If ``True``, data is shuffled so the labels are not ordered.</span>
+<span class="sd">    return_latents : bool (default False)</span>
+<span class="sd">        If true, returns the non-noisy latent variables.</span>
+<span class="sd">    add_latent_noise : bool (default False)</span>
+<span class="sd">        If true, adds noise to the latent variables before applying the</span>
+<span class="sd">        transformation.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Xs : list of np.ndarray, of shape (n_samples, n_features)</span>
+<span class="sd">        The latent data and its noisy transformation.</span>
+
+<span class="sd">    y : np.ndarray, shape (n_samples,)</span>
+<span class="sd">        The integer labels for each sample&#39;s Gaussian membership.</span>
+
+<span class="sd">    latents : np.ndarray, shape (n_samples, n_features)</span>
+<span class="sd">        The non-noisy latent variables. Only returned if</span>
+<span class="sd">        ``return_latents=True``.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    For each class :math:`i` with prior probability :math:`p_i`,</span>
+<span class="sd">    center and covariance matrix :math:`\mu_i` and :math:`\Sigma_i`, and</span>
+<span class="sd">    :math:`n` total samples, the latent data is sampled such that:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        (X_1, y_1), \dots, (X_{np_i}, Y_{np_i}) \overset{i.i.d.}{\sim}</span>
+<span class="sd">            \mathcal{N}(\mu_i, \Sigma_i)</span>
+
+<span class="sd">    Two views of data are returned, the first being the latent samples and</span>
+<span class="sd">    the second being a specified transformation of the latent samples.</span>
+<span class="sd">    Additional noise may be added to the first view or added as noise</span>
+<span class="sd">    dimensions to both views.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from sktree.datasets.multiview import make_gaussian_mixture</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; n_samples = 10</span>
+<span class="sd">    &gt;&gt;&gt; centers = [[0,1], [0,-1]]</span>
+<span class="sd">    &gt;&gt;&gt; covariances = [np.eye(2), np.eye(2)]</span>
+<span class="sd">    &gt;&gt;&gt; Xs, y = make_gaussian_mixture(n_samples, centers, covariances,</span>
+<span class="sd">    ...                               shuffle=True, shuffle_random_state=42)</span>
+<span class="sd">    &gt;&gt;&gt; print(y)</span>
+<span class="sd">    [1. 0. 1. 0. 1. 0. 1. 0. 0. 1.]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">centers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">centers</span><span class="p">)</span>
+    <span class="n">covariances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">covariances</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">centers</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">centers</span> <span class="o">=</span> <span class="n">centers</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">if</span> <span class="n">covariances</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">covariances</span> <span class="o">=</span> <span class="n">covariances</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">centers</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;centers is of the incorrect shape&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">covariances</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;covariance matrix is of the incorrect shape&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">centers</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">covariances</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;The first dimensions of 2D centers and 3D covariances&quot;</span> <span class="o">+</span> <span class="s2">&quot; must be equal&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">class_probs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">class_probs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">centers</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">class_probs</span> <span class="o">/=</span> <span class="n">centers</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="nb">sum</span><span class="p">(</span><span class="n">class_probs</span><span class="p">)</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;elements of `class_probs` must sum to 1&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">centers</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">class_probs</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">covariances</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">class_probs</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;centers, covariances, and class_probs must be of equal length&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span>
+    <span class="n">latent</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span>
+                <span class="n">centers</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="n">covariances</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="n">size</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">class_probs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_samples</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">class_probs</span><span class="p">))</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">class_probs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_samples</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">class_probs</span><span class="p">))]</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">add_latent_noise</span><span class="p">:</span>
+        <span class="n">latent</span> <span class="o">+=</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">latent</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.1</span>
+
+    <span class="c1"># shuffle latent samples and labels</span>
+    <span class="k">if</span> <span class="n">shuffle</span><span class="p">:</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">latent</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+        <span class="n">rng</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
+        <span class="n">latent</span> <span class="o">=</span> <span class="n">latent</span><span class="p">[</span><span class="n">indices</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">transform</span><span class="p">):</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">transform</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">latent</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;&#39;transform&#39; must be of type string or a callable function,&quot;</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">transform</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">transform</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">_linear2view</span><span class="p">(</span><span class="n">latent</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">transform</span> <span class="o">==</span> <span class="s2">&quot;poly&quot;</span><span class="p">:</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">_poly2view</span><span class="p">(</span><span class="n">latent</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">transform</span> <span class="o">==</span> <span class="s2">&quot;sin&quot;</span><span class="p">:</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">_sin2view</span><span class="p">(</span><span class="n">latent</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Transform type must be one of {&#39;linear&#39;, &#39;poly&#39;, &#39;sin&#39;}&quot;</span>
+            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot; or a callable function. Not </span><span class="si">{</span><span class="n">transform</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">noise</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">Xs</span> <span class="o">=</span> <span class="p">[</span><span class="n">latent</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">noise</span><span class="p">)</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">latent</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="n">X</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">Xs</span> <span class="o">=</span> <span class="p">[</span><span class="n">latent</span><span class="p">,</span> <span class="n">X</span><span class="p">]</span>
+
+    <span class="c1"># if random_state is not None, make sure both views are independent</span>
+    <span class="c1"># but reproducible</span>
+    <span class="k">if</span> <span class="n">noise_dims</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">Xs</span> <span class="o">=</span> <span class="p">[</span><span class="n">_add_noise</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">noise_dims</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span> <span class="k">for</span> <span class="n">X</span> <span class="ow">in</span> <span class="n">Xs</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">return_latents</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Xs</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">latent</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Xs</span><span class="p">,</span> <span class="n">y</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">_add_noise</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">n_noise</span><span class="p">,</span> <span class="n">rng</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Appends dimensions of standard normal noise to X&quot;&quot;&quot;</span>
+    <span class="n">noise_vars</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">n_noise</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">X</span><span class="p">,</span> <span class="n">noise_vars</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">_linear2view</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">rng</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rotates the data, a linear transformation&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="o">-</span><span class="n">X</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">X</span> <span class="o">@</span> <span class="n">ortho_group</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">random_state</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">X</span>
+
+
+<span class="k">def</span> <span class="nf">_poly2view</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Applies a degree 2 polynomial transform to the data&quot;&quot;&quot;</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">X</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">X</span>
+
+
+<span class="k">def</span> <span class="nf">_sin2view</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Applies a sinusoidal transformation to the data&quot;&quot;&quot;</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">X</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">X</span>
+
+
+<span class="k">def</span> <span class="nf">_rand_orthog</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Samples a random orthonormal matrix.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n : int, positive</span>
+<span class="sd">        Number of rows in the matrix</span>
+
+<span class="sd">    K : int, positive</span>
+<span class="sd">        Number of columns in the matrix</span>
+
+<span class="sd">    random_state : None | int | instance of RandomState, optional</span>
+<span class="sd">        Seed to set randomization for reproducible results</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    A: array-like, (n, K)</span>
+<span class="sd">        A random, column orthonormal matrix.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    See Section A.1.1 of :footcite:`perry2009crossvalidation`.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. footbibliography::</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">check_random_state</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
+
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">K</span><span class="p">))</span>
+    <span class="n">Q</span><span class="p">,</span> <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span>
+
+    <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">K</span><span class="p">)</span>
+    <span class="n">neg_mask</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">K</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.5</span>
+    <span class="n">s</span><span class="p">[</span><span class="n">neg_mask</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">Q</span> <span class="o">*</span> <span class="n">s</span>
+
+
+<div class="viewcode-block" id="make_joint_factor_model">
+<a class="viewcode-back" href="../../../generated/sktree.datasets.make_joint_factor_model.html#sktree.datasets.make_joint_factor_model">[docs]</a>
+<span class="k">def</span> <span class="nf">make_joint_factor_model</span><span class="p">(</span>
+    <span class="n">n_views</span><span class="p">,</span>
+    <span class="n">n_features</span><span class="p">,</span>
+    <span class="n">n_samples</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">joint_rank</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">noise_std</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">m</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+    <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">return_decomp</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Joint factor model data generator.</span>
+
+<span class="sd">    Samples from a low rank, joint factor model where there is one set of</span>
+<span class="sd">    shared scores.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_views : int</span>
+<span class="sd">        Number of views to sample. This corresponds to ``B`` in the notes.</span>
+
+<span class="sd">    n_features : int, or list of int</span>
+<span class="sd">        Number of features in each view. A list specifies a different number</span>
+<span class="sd">        of features for each view.</span>
+
+<span class="sd">    n_samples : int</span>
+<span class="sd">        Number of samples in each view</span>
+
+<span class="sd">    joint_rank : int (default 1)</span>
+<span class="sd">        Rank of the common signal across views.</span>
+
+<span class="sd">    noise_std : float (default 1)</span>
+<span class="sd">        Scale of noise distribution.</span>
+
+<span class="sd">    m : float (default 1.5)</span>
+<span class="sd">        Signal strength.</span>
+
+<span class="sd">    random_state : int or RandomState instance, optional (default=None)</span>
+<span class="sd">        Controls random orthonormal matrix sampling and random noise</span>
+<span class="sd">        generation. Set for reproducible results.</span>
+
+<span class="sd">    return_decomp : bool, default=False</span>
+<span class="sd">        If ``True``, returns the ``view_loadings`` as well.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Xs : list of array-likes</span>
+<span class="sd">        List of samples data matrices with the following attributes.</span>
+
+<span class="sd">        - Xs length: n_views</span>
+<span class="sd">        - Xs[i] shape: (n_samples, n_features_i).</span>
+
+<span class="sd">    U: (n_samples, joint_rank)</span>
+<span class="sd">        The true orthonormal joint scores matrix. Returned if</span>
+<span class="sd">        ``return_decomp`` is True.</span>
+
+<span class="sd">    view_loadings: list of numpy.ndarray</span>
+<span class="sd">        The true view loadings matrices. Returned if</span>
+<span class="sd">        ``return_decomp`` is True.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The data is generated as follows, where:</span>
+
+<span class="sd">    - :math:`b` are the different views</span>
+<span class="sd">    - :math:`U` is is a (n_samples, joint_rank) matrix of rotation matrices.</span>
+<span class="sd">    - ``svals`` are the singular values sampled.</span>
+<span class="sd">    - :math:`W_b` are (n_features_b, joint_rank) view loadings matrices, which are</span>
+<span class="sd">        orthonormal matrices to linearly transform the data, while preserving inner</span>
+<span class="sd">        products (i.e. a unitary transformation).</span>
+
+<span class="sd">    For b = 1, .., B</span>
+<span class="sd">        X_b = U @ diag(svals) @ W_b^T + noise_std * E_b</span>
+
+<span class="sd">    where U and each W_b are orthonormal matrices. The singular values are</span>
+<span class="sd">    linearly increasing following :footcite:`choi2017selectingpca` section 2.2.3.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. footbibliography::</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">check_random_state</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n_features</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">n_features</span> <span class="o">=</span> <span class="p">[</span><span class="n">n_features</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_views</span>
+
+    <span class="c1"># generate W_b orthonormal matrices</span>
+    <span class="n">view_loadings</span> <span class="o">=</span> <span class="p">[</span><span class="n">_rand_orthog</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">joint_rank</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">n_features</span><span class="p">]</span>
+
+    <span class="c1"># sample monotonically increasing singular values</span>
+    <span class="c1"># the signal increases linearly and ``m`` determines the strength of the signal</span>
+    <span class="n">svals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">joint_rank</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">svals</span> <span class="o">*=</span> <span class="n">m</span> <span class="o">*</span> <span class="n">noise_std</span> <span class="o">*</span> <span class="p">(</span><span class="n">n_samples</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="n">n_features</span><span class="p">))</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span>
+
+    <span class="c1"># rotation operators that are generated via standard random normal</span>
+    <span class="n">U</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">joint_rank</span><span class="p">))</span>
+    <span class="n">U</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">U</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># random noise for each view</span>
+    <span class="n">Es</span> <span class="o">=</span> <span class="p">[</span><span class="n">noise_std</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">d</span><span class="p">))</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">n_features</span><span class="p">]</span>
+    <span class="n">Xs</span> <span class="o">=</span> <span class="p">[(</span><span class="n">U</span> <span class="o">*</span> <span class="n">svals</span><span class="p">)</span> <span class="o">@</span> <span class="n">view_loadings</span><span class="p">[</span><span class="n">b</span><span class="p">]</span><span class="o">.</span><span class="n">T</span> <span class="o">+</span> <span class="n">Es</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_views</span><span class="p">)]</span>
+
+    <span class="k">if</span> <span class="n">return_decomp</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Xs</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">view_loadings</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Xs</span></div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=c5ced968eda925caa686"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=c5ced968eda925caa686"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-01-31.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

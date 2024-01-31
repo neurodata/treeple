@@ -1,0 +1,963 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-theme="auto">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sktree.stats.permutationforest &#8212; scikit-tree 0.6.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "auto";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/style.css?v=42c02ab7" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=c5ced968eda925caa686" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=c5ced968eda925caa686" />
+  <script src="../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=c5ced968eda925caa686"></script>
+
+    <script src="../../../_static/documentation_options.js?v=50f829f1"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=fd10adb8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sktree/stats/permutationforest';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.14.2';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/scikit-tree/main/doc/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.6.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
+    <script type="text/javascript" src="../../../_static/copybutton.js"></script>
+    <script type="text/javascript" src="../../../_static/scrollfix.js"></script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="auto">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">scikit-tree 0.6.0 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api.html">
+                        API Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user_guide.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../whats_new.html">
+                        Release History
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../install.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../use.html">
+                        Examples using scikit-tree
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api.html">
+                        API Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user_guide.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../whats_new.html">
+                        Release History
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../install.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../use.html">
+                        Examples using scikit-tree
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-3"
+      type="button"
+      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-3"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-3"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-3">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">sktree.stats...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for sktree.stats.permutationforest</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">ArrayLike</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">MetaEstimatorMixin</span><span class="p">,</span> <span class="n">clone</span><span class="p">,</span> <span class="n">is_classifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span><span class="p">,</span> <span class="n">RandomForestRegressor</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble._forest</span> <span class="kn">import</span> <span class="n">ForestClassifier</span> <span class="k">as</span> <span class="n">sklearnForestClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble._forest</span> <span class="kn">import</span> <span class="n">ForestRegressor</span> <span class="k">as</span> <span class="n">sklearnForestRegressor</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">check_X_y</span>
+
+<span class="kn">from</span> <span class="nn">sktree._lib.sklearn.ensemble._forest</span> <span class="kn">import</span> <span class="n">ForestClassifier</span><span class="p">,</span> <span class="n">ForestRegressor</span>
+
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">METRIC_FUNCTIONS</span><span class="p">,</span> <span class="n">REGRESSOR_METRICS</span><span class="p">,</span> <span class="n">_compute_null_distribution_perm</span>
+
+
+<span class="k">class</span> <span class="nc">BasePermutationForest</span><span class="p">(</span><span class="n">MetaEstimatorMixin</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">estimator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+        <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="o">=</span> <span class="n">estimator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_size</span> <span class="o">=</span> <span class="n">test_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">class_attributes</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="n">instance_attributes</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">attr_name</span> <span class="ow">in</span> <span class="n">instance_attributes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">attr_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">attr_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">class_attributes</span><span class="p">:</span>
+                <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">train_test_samples_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The subset of drawn samples for each base estimator.</span>
+
+<span class="sd">        Returns a dynamically generated list of indices identifying</span>
+<span class="sd">        the samples used for fitting each member of the ensemble, i.e.,</span>
+<span class="sd">        the in-bag samples.</span>
+
+<span class="sd">        Note: the list is re-created at each call to the property in order</span>
+<span class="sd">        to reduce the object memory footprint by not storing the sampling</span>
+<span class="sd">        data. Thus fetching the property may be slower than expected.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+        <span class="c1"># Get drawn indices along both sample and feature axes</span>
+        <span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+            <span class="n">indices</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span>
+
+    <span class="k">def</span> <span class="nf">_statistic</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">estimator</span><span class="p">:</span> <span class="n">BaseEstimator</span><span class="p">,</span>
+        <span class="n">X</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+        <span class="n">covariate_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ArrayLike</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;mse&quot;</span><span class="p">,</span>
+        <span class="n">return_posteriors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper function to compute the test statistic.&quot;&quot;&quot;</span>
+        <span class="n">metric_func</span> <span class="o">=</span> <span class="n">METRIC_FUNCTIONS</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_test_samples_</span>
+        <span class="k">if</span> <span class="n">covariate_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">n_samples</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+            <span class="c1"># perform permutation of covariates</span>
+            <span class="n">index_arr</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">X</span><span class="p">[:,</span> <span class="n">covariate_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">index_arr</span><span class="p">,</span> <span class="n">covariate_index</span><span class="p">]</span>
+
+        <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">indices_train</span><span class="p">,</span> <span class="p">:],</span> <span class="n">X</span><span class="p">[</span><span class="n">indices_test</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">indices_train</span><span class="p">,</span> <span class="p">:],</span> <span class="n">y</span><span class="p">[</span><span class="n">indices_test</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="k">if</span> <span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">y_train</span> <span class="o">=</span> <span class="n">y_train</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="n">y_test</span> <span class="o">=</span> <span class="n">y_test</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="n">estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+        <span class="c1"># Either get the predicted value, or the posterior probabilities</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+        <span class="c1"># set variables to compute metric</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="n">indices_test</span>
+        <span class="n">y_true_final</span> <span class="o">=</span> <span class="n">y_test</span>
+        <span class="n">posterior_final</span> <span class="o">=</span> <span class="n">y_pred</span>
+
+        <span class="n">stat</span> <span class="o">=</span> <span class="n">metric_func</span><span class="p">(</span><span class="n">y_true_final</span><span class="p">,</span> <span class="n">posterior_final</span><span class="p">,</span> <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">covariate_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Ignore all NaN values (samples not tested) -&gt; (n_samples_final, n_outputs)</span>
+            <span class="c1"># arrays of y and predicted posterior</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">samples_</span> <span class="o">=</span> <span class="n">samples</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">y_true_</span> <span class="o">=</span> <span class="n">y_true_final</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">posterior_final_</span> <span class="o">=</span> <span class="n">posterior_final</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stat_</span> <span class="o">=</span> <span class="n">stat</span>
+
+        <span class="k">if</span> <span class="n">return_posteriors</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">stat</span><span class="p">,</span> <span class="n">posterior_final</span><span class="p">,</span> <span class="n">samples</span>
+
+        <span class="k">return</span> <span class="n">stat</span>
+
+    <span class="k">def</span> <span class="nf">statistic</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">X</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+        <span class="n">covariate_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ArrayLike</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;mse&quot;</span><span class="p">,</span>
+        <span class="n">return_posteriors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">check_input</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the test statistic.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : ArrayLike of shape (n_samples, n_features)</span>
+<span class="sd">            The data matrix.</span>
+<span class="sd">        y : ArrayLike of shape (n_samples, n_outputs)</span>
+<span class="sd">            The target matrix.</span>
+<span class="sd">        covariate_index : ArrayLike, optional of shape (n_covariates,)</span>
+<span class="sd">            The index array of covariates to shuffle, by default None.</span>
+<span class="sd">        metric : str, optional</span>
+<span class="sd">            The metric to compute, by default &quot;mse&quot;.</span>
+<span class="sd">        return_posteriors : bool, optional</span>
+<span class="sd">            Whether or not to return the posteriors, by default False.</span>
+<span class="sd">        check_input : bool, optional</span>
+<span class="sd">            Whether or not to check the input, by default True.</span>
+<span class="sd">        seed : int, optional</span>
+<span class="sd">            The random seed to use, by default None.</span>
+<span class="sd">        **metric_kwargs : dict, optional</span>
+<span class="sd">            Keyword arguments to pass to the metric function.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        stat : float</span>
+<span class="sd">            The test statistic.</span>
+<span class="sd">        posterior_final : ArrayLike of shape (n_samples_final, n_outputs), optional</span>
+<span class="sd">            If ``return_posteriors`` is True, then the posterior probabilities of the</span>
+<span class="sd">            samples used in the final test. ``n_samples_final`` is equal to ``n_samples``</span>
+<span class="sd">            if all samples are encountered in the test set of at least one tree in the</span>
+<span class="sd">            posterior computation.</span>
+<span class="sd">        samples : ArrayLike of shape (n_samples_final,), optional</span>
+<span class="sd">            The indices of the samples used in the final test. ``n_samples_final`` is</span>
+<span class="sd">            equal to ``n_samples`` if all samples are encountered in the test set of at</span>
+<span class="sd">            least one tree in the posterior computation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">check_input</span><span class="p">:</span>
+            <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">check_X_y</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">ensure_2d</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_estimator</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">is_classifier</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">METRIC_FUNCTIONS</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Metric must be one of </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">METRIC_FUNCTIONS</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">REGRESSOR_METRICS</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Metric must be either &quot;mse&quot; or &quot;mae&quot;, got </span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">covariate_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">estimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">permuted_estimator_</span> <span class="o">=</span> <span class="n">clone</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="p">)</span>
+            <span class="n">estimator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">permuted_estimator_</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_statistic</span><span class="p">(</span>
+            <span class="n">estimator</span><span class="p">,</span>
+            <span class="n">X</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">,</span>
+            <span class="n">covariate_index</span><span class="o">=</span><span class="n">covariate_index</span><span class="p">,</span>
+            <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+            <span class="n">return_posteriors</span><span class="o">=</span><span class="n">return_posteriors</span><span class="p">,</span>
+            <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">X</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+        <span class="n">covariate_index</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+        <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mse&quot;</span><span class="p">,</span>
+        <span class="n">n_repeats</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+        <span class="n">return_posteriors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform hypothesis test using permutation testing.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : ArrayLike of shape (n_samples, n_features)</span>
+<span class="sd">            The data matrix.</span>
+<span class="sd">        y : ArrayLike of shape (n_samples, n_outputs)</span>
+<span class="sd">            The target matrix.</span>
+<span class="sd">        covariate_index : ArrayLike of shape (n_covariates,)</span>
+<span class="sd">            The covariate indices of ``X`` to shuffle.</span>
+<span class="sd">        metric : str, optional</span>
+<span class="sd">            Metric to compute, by default &quot;mse&quot;.</span>
+<span class="sd">        n_repeats : int, optional</span>
+<span class="sd">            Number of times to sample the null distribution, by default 1000.</span>
+<span class="sd">        return_posteriors : bool, optional</span>
+<span class="sd">            Whether or not to return the posteriors, by default False.</span>
+<span class="sd">        **metric_kwargs : dict, optional</span>
+<span class="sd">            Keyword arguments to pass to the metric function.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        observe_stat : float</span>
+<span class="sd">            Observed test statistic.</span>
+<span class="sd">        pvalue : float</span>
+<span class="sd">            Pvalue of the test.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">check_X_y</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">ensure_2d</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># train/test split</span>
+        <span class="c1"># XXX: could add stratifying by y when y is classification</span>
+        <span class="n">indices_train</span><span class="p">,</span> <span class="n">indices_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_test_samples_</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;samples_&quot;</span><span class="p">):</span>
+            <span class="c1"># first compute the test statistic on the un-permuted data</span>
+            <span class="n">observe_stat</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">statistic</span><span class="p">(</span>
+                <span class="n">X</span><span class="p">,</span>
+                <span class="n">y</span><span class="p">,</span>
+                <span class="n">covariate_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+                <span class="n">return_posteriors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">check_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># observe_samples = self.samples_</span>
+            <span class="c1"># observe_posteriors = self.posterior_final_</span>
+            <span class="n">observe_stat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stat_</span>
+
+        <span class="c1"># compute null distribution of the test statistic</span>
+        <span class="c1"># WARNING: this could take a long time, since it fits a new forest</span>
+        <span class="n">null_dist</span> <span class="o">=</span> <span class="n">_compute_null_distribution_perm</span><span class="p">(</span>
+            <span class="n">X_train</span><span class="o">=</span><span class="n">X</span><span class="p">[</span><span class="n">indices_train</span><span class="p">,</span> <span class="p">:],</span>
+            <span class="n">y_train</span><span class="o">=</span><span class="n">y</span><span class="p">[</span><span class="n">indices_train</span><span class="p">,</span> <span class="p">:],</span>
+            <span class="n">X_test</span><span class="o">=</span><span class="n">X</span><span class="p">[</span><span class="n">indices_test</span><span class="p">,</span> <span class="p">:],</span>
+            <span class="n">y_test</span><span class="o">=</span><span class="n">y</span><span class="p">[</span><span class="n">indices_test</span><span class="p">,</span> <span class="p">:],</span>
+            <span class="n">covariate_index</span><span class="o">=</span><span class="n">covariate_index</span><span class="p">,</span>
+            <span class="n">est</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="p">,</span>
+            <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+            <span class="n">n_repeats</span><span class="o">=</span><span class="n">n_repeats</span><span class="p">,</span>
+            <span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">return_posteriors</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">null_dist_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">null_dist</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">null_dist_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">null_dist</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">posterior_null_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">null_dist</span><span class="p">])</span>
+
+        <span class="n">n_repeats</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">null_dist_</span><span class="p">)</span>
+        <span class="n">pvalue</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">null_dist_</span> <span class="o">&lt;</span> <span class="n">observe_stat</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">n_repeats</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">observe_stat</span><span class="p">,</span> <span class="n">pvalue</span>
+
+
+<div class="viewcode-block" id="PermutationForestRegressor">
+<a class="viewcode-back" href="../../../generated/sktree.stats.PermutationForestRegressor.html#sktree.stats.PermutationForestRegressor">[docs]</a>
+<span class="k">class</span> <span class="nc">PermutationForestRegressor</span><span class="p">(</span><span class="n">BasePermutationForest</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Hypothesis testing of covariates with a permutation forest regressor.</span>
+
+<span class="sd">    This implements permutation testing of a null hypothesis using a random forest.</span>
+<span class="sd">    The null hypothesis is generated by permuting ``n_repeats`` times the covariate</span>
+<span class="sd">    indices and then a random forest is trained for each permuted instance. This</span>
+<span class="sd">    is compared to the original random forest that was computed on the regular</span>
+<span class="sd">    non-permuted data.</span>
+
+<span class="sd">    .. warning:: Permutation testing with forests is computationally expensive.</span>
+<span class="sd">        As a result, if you are testing for the importance of feature sets, consider</span>
+<span class="sd">        using `sktree.FeatureImportanceForestRegressor` or</span>
+<span class="sd">        `sktree.FeatureImportanceForestClassifier` instead, which is</span>
+<span class="sd">        much more computationally efficient.</span>
+
+<span class="sd">    .. note:: This does not allow testing on the posteriors.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    estimator : object, default=None</span>
+<span class="sd">        Type of forest estimator to use. By default `None`, which defaults to</span>
+<span class="sd">        :class:`sklearn.ensemble.RandomForestRegressor` with default parameters.</span>
+
+<span class="sd">    test_size : float, default=0.2</span>
+<span class="sd">        The proportion of samples to leave out for each tree to compute metric on.</span>
+
+<span class="sd">    random_state : int, RandomState instance or None, default=None</span>
+<span class="sd">        Controls both the randomness of the bootstrapping of the samples used</span>
+<span class="sd">        when building trees (if ``bootstrap=True``) and the sampling of the</span>
+<span class="sd">        features to consider when looking for the best split at each node</span>
+<span class="sd">        (if ``max_features &lt; n_features``).</span>
+<span class="sd">        See :term:`Glossary &lt;random_state&gt;` for details.</span>
+
+<span class="sd">    verbose : int, default=0</span>
+<span class="sd">        Controls the verbosity when fitting and predicting.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    samples_ : ArrayLike of shape (n_samples,)</span>
+<span class="sd">        The indices of the samples used in the final test.</span>
+
+<span class="sd">    y_true_ : ArrayLike of shape (n_samples_final,)</span>
+<span class="sd">        The true labels of the samples used in the final test.</span>
+
+<span class="sd">    posterior_ : ArrayLike of shape (n_samples_final, n_outputs)</span>
+<span class="sd">        The predicted posterior probabilities of the samples used in the final test.</span>
+
+<span class="sd">    null_dist_ : ArrayLike of shape (n_repeats,)</span>
+<span class="sd">        The null distribution of the test statistic.</span>
+
+<span class="sd">    posterior_null_ : ArrayLike of shape (n_samples_final, n_outputs, n_repeats)</span>
+<span class="sd">        The posterior probabilities of the samples used in the final test for each</span>
+<span class="sd">        permutation for the null distribution.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">estimator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+        <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">estimator</span><span class="o">=</span><span class="n">estimator</span><span class="p">,</span>
+            <span class="n">test_size</span><span class="o">=</span><span class="n">test_size</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;estimator_&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">estimator_</span> <span class="o">=</span> <span class="n">RandomForestRegressor</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="p">,</span> <span class="p">(</span><span class="n">ForestRegressor</span><span class="p">,</span> <span class="n">sklearnForestRegressor</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Estimator must be a ForestRegressor, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">estimator_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span>
+        <span class="k">return</span> <span class="n">estimator_</span></div>
+
+
+
+<div class="viewcode-block" id="PermutationForestClassifier">
+<a class="viewcode-back" href="../../../generated/sktree.stats.PermutationForestClassifier.html#sktree.stats.PermutationForestClassifier">[docs]</a>
+<span class="k">class</span> <span class="nc">PermutationForestClassifier</span><span class="p">(</span><span class="n">BasePermutationForest</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Hypothesis testing of covariates with a permutation forest classifier.</span>
+
+<span class="sd">    This implements permutation testing of a null hypothesis using a random forest.</span>
+<span class="sd">    The null hypothesis is generated by permuting ``n_repeats`` times the covariate</span>
+<span class="sd">    indices and then a random forest is trained for each permuted instance. This</span>
+<span class="sd">    is compared to the original random forest that was computed on the regular</span>
+<span class="sd">    non-permuted data.</span>
+
+<span class="sd">    .. warning:: Permutation testing with forests is computationally expensive.</span>
+<span class="sd">        As a result, if you are testing for the importance of feature sets, consider</span>
+<span class="sd">        using `sktree.FeatureImportanceForestRegressor` or</span>
+<span class="sd">        `sktree.FeatureImportanceForestClassifier` instead, which is</span>
+<span class="sd">        much more computationally efficient.</span>
+
+<span class="sd">    .. note:: This does not allow testing on the posteriors.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    estimator : object, default=None</span>
+<span class="sd">        Type of forest estimator to use. By default `None`, which defaults to</span>
+<span class="sd">        :class:`sklearn.ensemble.RandomForestClassifier`.</span>
+
+<span class="sd">    test_size : float, default=0.2</span>
+<span class="sd">        The proportion of samples to leave out for each tree to compute metric on.</span>
+
+<span class="sd">    random_state : int, RandomState instance or None, default=None</span>
+<span class="sd">        Controls both the randomness of the bootstrapping of the samples used</span>
+<span class="sd">        when building trees (if ``bootstrap=True``) and the sampling of the</span>
+<span class="sd">        features to consider when looking for the best split at each node</span>
+<span class="sd">        (if ``max_features &lt; n_features``).</span>
+<span class="sd">        See :term:`Glossary &lt;random_state&gt;` for details.</span>
+
+<span class="sd">    verbose : int, default=0</span>
+<span class="sd">        Controls the verbosity when fitting and predicting.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    samples_ : ArrayLike of shape (n_samples,)</span>
+<span class="sd">        The indices of the samples used in the final test.</span>
+
+<span class="sd">    y_true_ : ArrayLike of shape (n_samples_final,)</span>
+<span class="sd">        The true labels of the samples used in the final test.</span>
+
+<span class="sd">    posterior_ : ArrayLike of shape (n_samples_final, n_outputs)</span>
+<span class="sd">        The predicted posterior probabilities of the samples used in the final test.</span>
+
+<span class="sd">    null_dist_ : ArrayLike of shape (n_repeats,)</span>
+<span class="sd">        The null distribution of the test statistic.</span>
+
+<span class="sd">    posterior_null_ : ArrayLike of shape (n_samples_final, n_outputs, n_repeats)</span>
+<span class="sd">        The posterior probabilities of the samples used in the final test for each</span>
+<span class="sd">        permutation for the null distribution.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">estimator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+        <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">estimator</span><span class="o">=</span><span class="n">estimator</span><span class="p">,</span>
+            <span class="n">test_size</span><span class="o">=</span><span class="n">test_size</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;estimator_&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">estimator_</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="p">,</span> <span class="p">(</span><span class="n">ForestClassifier</span><span class="p">,</span> <span class="n">sklearnForestClassifier</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Estimator must be a ForestClassifier, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">estimator_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span>
+        <span class="k">return</span> <span class="n">estimator_</span></div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=c5ced968eda925caa686"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=c5ced968eda925caa686"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-01-31.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
