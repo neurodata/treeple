@@ -1220,7 +1220,7 @@ def build_coleman_forest(
     X,
     y,
     covariate_index=None,
-    metric="mi",
+    metric="s@s98",
     n_repeats=1000,
     verbose=False,
     seed=None,
@@ -1240,7 +1240,8 @@ def build_coleman_forest(
     covariate_index : ArrayLike, optional of shape (n_covariates,)
         The index array of covariates to shuffle, by default None.
     metric : str, optional
-        The metric to compute, by default "mi".
+        The metric to compute, by default "s@s98", for sensitivity at
+        98% specificity.
     n_repeats : int, optional
         Number of times to bootstrap sample the two forests to construct
         the null distribution, by default 1000.

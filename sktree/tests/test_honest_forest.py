@@ -147,7 +147,10 @@ def test_max_samples():
 
 
 @pytest.mark.parametrize("bootstrap", [True, False])
-def test_honest_forest_has_deterministic_sampling_for_oob_structure_and_leaves(bootstrap):
+@pytest.mark.parametrize("max_samples", [0.75, 1.0])
+def test_honest_forest_has_deterministic_sampling_for_oob_structure_and_leaves(
+    bootstrap, max_samples
+):
     """Test that honest forest can produce the oob, structure and leaf-node samples.
 
     When bootstrap is True, oob should be exclusive from structure and leaf-node samples.
@@ -158,6 +161,7 @@ def test_honest_forest_has_deterministic_sampling_for_oob_structure_and_leaves(b
         n_estimators=n_estimators,
         random_state=0,
         bootstrap=bootstrap,
+        max_samples=max_samples,
     )
     X = rng.normal(0, 1, (100, 2))
     X[:50] *= -1
@@ -172,7 +176,7 @@ def test_honest_forest_has_deterministic_sampling_for_oob_structure_and_leaves(b
     ]
     structure_samples = est.structure_indices_
     leaf_samples = est.honest_indices_
-    if not bootstrap:
+    if not bootstrap and max_samples == 1.0:
         assert all(oob_list_ == [] for oob_list_ in oob_samples)
 
         with pytest.raises(RuntimeError, match="Cannot extract out-of-bag samples"):
@@ -180,7 +184,7 @@ def test_honest_forest_has_deterministic_sampling_for_oob_structure_and_leaves(b
     else:
         oob_samples_ = est.oob_samples_
         for itree in range(n_estimators):
-            assert len(oob_samples[itree]) > 1
+            assert len(oob_samples[itree]) > 1, oob_samples[itree]
             assert (
                 set(structure_samples[itree])
                 .union(set(leaf_samples[itree]))
