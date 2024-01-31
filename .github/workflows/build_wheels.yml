@@ -77,7 +77,7 @@ jobs:
         if: ${{ runner.os == 'Windows' && env.IS_32_BIT == 'false' }}
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.16.4
+        uses: pypa/cibuildwheel@v2.16.3
         # Build all wheels here, apart from macosx_arm64, linux_aarch64
         # cibuildwheel is currently unable to pass configuration flags to
         # CIBW_BUILD_FRONTEND https://github.com/pypa/cibuildwheel/issues/1227
@@ -106,7 +106,7 @@ jobs:
       # Ensure that a wheel builder finishes even if another fails
       fail-fast: false
       matrix:
-        python: [["cp39", "3.9"], ["cp310", "3.10"], ["cp311", "3.11"]]
+        python: [["cp39", "3.9"], ["cp310", "3.10"], ["cp311", "3.11"], ["cp312", "3.12"]]
         # python[0] is used to specify the python versions made by cibuildwheel
 
     steps:
@@ -126,7 +126,7 @@ jobs:
           python spin setup-submodule
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.16.4
+        uses: pypa/cibuildwheel@v2.16.3
         env:
           CIBW_BUILD: ${{ matrix.python[0] }}-macosx_arm64
           CIBW_ARCHS_MACOS: arm64
