@@ -4,6 +4,7 @@ python_sources = [
   'utils.py',
   'permutationforest.py',
   'monte_carlo.py',
+  'permuteforest.py',
 ]
 
 py3.install_sources(
