@@ -59,7 +59,7 @@ def _parallel_build_trees(
 ):
     """
     Private function used to fit a single tree in parallel.
-    
+
     XXX: this is copied over from scikit-learn and modified to allow sampling with
     and without replacement given ``bootstrap``.
     """
