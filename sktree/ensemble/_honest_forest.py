@@ -24,18 +24,17 @@ from sklearn.utils.validation import (
     _check_sample_weight,
 )
 from .._lib.sklearn.tree._tree import DOUBLE, DTYPE
-
-# from .._lib.sklearn.ensemble._forest import (
-#     # _parallel_build_trees,
-#     # _generate_sample_indices,
-# )
 from .._lib.sklearn.ensemble._forest import ForestClassifier
 from ..tree import HonestTreeClassifier
 
 
 def _generate_sample_indices(random_state, n_samples, n_samples_bootstrap, bootstrap):
     """
-    Private function used to _parallel_build_trees function."""
+    Private function used to _parallel_build_trees function.
+
+    XXX: this is copied over from scikit-learn and modified to allow sampling with
+    and without replacement given ``bootstrap``.
+    """
 
     random_instance = check_random_state(random_state)
     n_sample_idx = np.arange(0, n_samples, dtype=np.int32)
@@ -59,7 +58,11 @@ def _parallel_build_trees(
     classes=None,
 ):
     """
-    Private function used to fit a single tree in parallel."""
+    Private function used to fit a single tree in parallel.
+    
+    XXX: this is copied over from scikit-learn and modified to allow sampling with
+    and without replacement given ``bootstrap``.
+    """
     if verbose > 1:
         print("building tree %d of %d" % (tree_idx + 1, n_trees))
 
