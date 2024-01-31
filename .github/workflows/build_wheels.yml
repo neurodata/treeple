@@ -76,7 +76,7 @@ jobs:
         if: ${{ runner.os == 'Windows' && env.IS_32_BIT == 'false' }}
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.15.0
+        uses: pypa/cibuildwheel@v2.16.4
         # Build all wheels here, apart from macosx_arm64, linux_aarch64
         # cibuildwheel is currently unable to pass configuration flags to
         # CIBW_BUILD_FRONTEND https://github.com/pypa/cibuildwheel/issues/1227
@@ -91,6 +91,12 @@ jobs:
           CIBW_BUILD: ${{ matrix.python[0] }}-${{ matrix.os[1] }}*
           CIBW_ARCHS: ${{ matrix.os[2] }}
           CIBW_ENVIRONMENT_PASS_LINUX: RUNNER_OS
+
+          CIBW_ENVIRONMENT_WINDOWS: >
+            PKG_CONFIG_PATH=c:/opt/64/lib/pkgconfig
+            PIP_PRE=1
+            PIP_EXTRA_INDEX_URL=https://pypi.anaconda.org/scientific-python-nightly-wheels/simple
+            PIP_NO_BUILD_ISOLATION=false
 
       - uses: actions/upload-artifact@v4
         with:
