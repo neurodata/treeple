@@ -17,6 +17,9 @@ Changelog
     the number of sub-samples to use for the honest trees without having
     to bootstrap sample. This is specified by the ``max_samples`` parameter.
     By `Adam Li`_ (:pr:`#210`)
+- |Feature| Introduce a new light-weight class for fitting honest forests while
+    permuting the covariate index :class:`sktree.stats.PermutationHonestForestClassifier`,
+    by `Adam Li`_ (:pr:`#211`)
 
 Code and Documentation Contributors
 -----------------------------------
