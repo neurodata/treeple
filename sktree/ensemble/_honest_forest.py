@@ -9,13 +9,14 @@ from joblib import Parallel, delayed
 from sklearn.base import _fit_context
 from sklearn.ensemble._base import _partition_estimators
 from sklearn.utils.validation import check_is_fitted
-from warnings import warn
+from sklearn.utils._param_validation import Interval, RealNotInt
+from warnings import warn, catch_warnings, simplefilter
 
 from scipy.sparse import issparse
 
 from sklearn.ensemble._hist_gradient_boosting.binning import _BinMapper
 from sklearn.exceptions import DataConversionWarning
-from sklearn.utils import check_random_state
+from sklearn.utils import check_random_state, compute_sample_weight
 from sklearn.utils._openmp_helpers import _openmp_effective_n_threads
 from sklearn.utils.multiclass import (
     type_of_target,
@@ -24,11 +25,75 @@ from sklearn.utils.validation import (
     _check_sample_weight,
 )
 from .._lib.sklearn.tree._tree import DOUBLE, DTYPE
-from .._lib.sklearn.ensemble._forest import (
-    _parallel_build_trees,
-)
 from .._lib.sklearn.ensemble._forest import ForestClassifier
 from ..tree import HonestTreeClassifier
+
+
+def _generate_sample_indices(random_state, n_samples, n_samples_bootstrap, bootstrap):
+    """
+    Private function used to _parallel_build_trees function.
+
+    XXX: this is copied over from scikit-learn and modified to allow sampling with
+    and without replacement given ``bootstrap``.
+    """
+
+    random_instance = check_random_state(random_state)
+    n_sample_idx = np.arange(0, n_samples, dtype=np.int32)
+    sample_indices = random_instance.choice(n_sample_idx, n_samples_bootstrap, replace=bootstrap)
+
+    return sample_indices
+
+
+def _parallel_build_trees(
+    tree,
+    bootstrap,
+    X,
+    y,
+    sample_weight,
+    tree_idx,
+    n_trees,
+    verbose=0,
+    class_weight=None,
+    n_samples_bootstrap=None,
+    missing_values_in_feature_mask=None,
+    classes=None,
+):
+    """
+    Private function used to fit a single tree in parallel.
+
+    XXX: this is copied over from scikit-learn and modified to allow sampling with
+    and without replacement given ``bootstrap``.
+    """
+    if verbose > 1:
+        print("building tree %d of %d" % (tree_idx + 1, n_trees))
+
+    n_samples = X.shape[0]
+    if sample_weight is None:
+        curr_sample_weight = np.ones((n_samples,), dtype=np.float64)
+    else:
+        curr_sample_weight = sample_weight.copy()
+
+    indices = _generate_sample_indices(tree.random_state, n_samples, n_samples_bootstrap, bootstrap)
+    sample_counts = np.bincount(indices, minlength=n_samples)
+    curr_sample_weight *= sample_counts
+
+    if class_weight == "subsample":
+        with catch_warnings():
+            simplefilter("ignore", DeprecationWarning)
+            curr_sample_weight *= compute_sample_weight("auto", y, indices=indices)
+    elif class_weight == "balanced_subsample":
+        curr_sample_weight *= compute_sample_weight("balanced", y, indices=indices)
+
+    tree._fit(
+        X,
+        y,
+        sample_weight=curr_sample_weight,
+        check_input=False,
+        missing_values_in_feature_mask=missing_values_in_feature_mask,
+        classes=classes,
+    )
+
+    return tree
 
 
 def _get_n_samples_bootstrap(n_samples, max_samples):
@@ -219,7 +284,9 @@ class HonestForestClassifier(ForestClassifier):
 
     max_samples : int or float, default=None
         If bootstrap is True, the number of samples to draw from X
-        to train each base tree estimator.
+        to train each base tree estimator with replacement.
+        If bootstrap is False, then this will subsample
+        the dataset without replacement.
 
         - If None (default), then draw `X.shape[0]` samples.
         - If int, then draw `max_samples` samples.
@@ -369,6 +436,16 @@ class HonestForestClassifier(ForestClassifier):
     >>> print(clf.predict([[0, 0, 0, 0]]))
     [1]
     """
+
+    _parameter_constraints: dict = {
+        **ForestClassifier._parameter_constraints,
+    }
+    _parameter_constraints.pop("max_samples")
+    _parameter_constraints["max_samples"] = [
+        None,
+        Interval(RealNotInt, 0.0, None, closed="right"),
+        Interval(Integral, 1, None, closed="left"),
+    ]
 
     def __init__(
         self,
@@ -548,18 +625,11 @@ class HonestForestClassifier(ForestClassifier):
             else:
                 sample_weight = expanded_class_weight
 
-        if not self.bootstrap and self.max_samples is not None:
-            raise ValueError(
-                "`max_sample` cannot be set if `bootstrap=False`. "
-                "Either switch to `bootstrap=True` or set "
-                "`max_sample=None`."
-            )
-        elif self.bootstrap:
-            n_samples_bootstrap = _get_n_samples_bootstrap(
-                n_samples=X.shape[0], max_samples=self.max_samples
-            )
-        else:
-            n_samples_bootstrap = None
+        # compute the number of samples we want to sample for each tree
+        # possibly without replacement
+        n_samples_bootstrap = _get_n_samples_bootstrap(
+            n_samples=X.shape[0], max_samples=self.max_samples
+        )
 
         self._n_samples_bootstrap = n_samples_bootstrap
 
@@ -772,8 +842,11 @@ class HonestForestClassifier(ForestClassifier):
 
         Only utilized if ``bootstrap=True``, otherwise, all samples are "in-bag".
         """
-        if self.bootstrap is False:
-            raise RuntimeError("Cannot extract out-of-bag samples when bootstrap is False.")
+        if self.bootstrap is False and self._n_samples_bootstrap == self._n_samples:
+            raise RuntimeError(
+                "Cannot extract out-of-bag samples when bootstrap is False and "
+                "n_samples == n_samples_bootstrap"
+            )
         check_is_fitted(self)
 
         oob_samples = []
@@ -880,6 +953,22 @@ class HonestForestClassifier(ForestClassifier):
             Samples within each leaf node.
         """
         return self.estimator_.get_leaf_node_samples(X)
+
+    def _get_estimators_indices(self):
+        # Get drawn indices along both sample and feature axes
+        for tree in self.estimators_:
+            if not self.bootstrap and self._n_samples_bootstrap == self._n_samples:
+                yield np.arange(self._n_samples, dtype=np.int32)
+            else:
+                # tree.random_state is actually an immutable integer seed rather
+                # than a mutable RandomState instance, so it's safe to use it
+                # repeatedly when calling this property.
+                seed = tree.random_state
+                # Operations accessing random_state must be performed identically
+                # to those in `_parallel_build_trees()`
+                yield _generate_sample_indices(
+                    seed, self._n_samples, self._n_samples_bootstrap, self.bootstrap
+                )
 
 
 def _accumulate_prediction(predict, X, out, lock, indices=None):
