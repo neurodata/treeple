@@ -9,6 +9,7 @@ from joblib import Parallel, delayed
 from sklearn.base import _fit_context
 from sklearn.ensemble._base import _partition_estimators
 from sklearn.utils.validation import check_is_fitted
+from sklearn.utils._param_validation import Interval, RealNotInt
 from warnings import warn, catch_warnings, simplefilter
 
 from scipy.sparse import issparse
@@ -435,6 +436,16 @@ class HonestForestClassifier(ForestClassifier):
     >>> print(clf.predict([[0, 0, 0, 0]]))
     [1]
     """
+
+    _parameter_constraints: dict = {
+        **ForestClassifier._parameter_constraints,
+    }
+    _parameter_constraints.pop("max_samples")
+    _parameter_constraints["max_samples"] = [
+        None,
+        Interval(RealNotInt, 0.0, None, closed="right"),
+        Interval(Integral, 1, None, closed="left"),
+    ]
 
     def __init__(
         self,

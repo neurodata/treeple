@@ -35,7 +35,10 @@ Changelog
   of bag, by `Adam Li`_ (:pr:`#200`).
 - |Enhancement| :class:`sktree.HonestForestClassifier` will allow one to bootstrap sample higher
   than the number of samples, controlled by the ``max_samples`` keyword argument by `Adam Li`_ (:pr:`#206`).
-
+- |Feature| :class:`sktree.HonestForestClassifier` now allows one to specify
+  the number of sub-samples to use for the honest trees without having
+  to bootstrap sample. This is specified by the ``max_samples`` parameter.
+  By `Adam Li`_ (:pr:`#210`)
 
 Code and Documentation Contributors
 -----------------------------------
