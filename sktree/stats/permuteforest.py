@@ -192,9 +192,6 @@ class PermutationHonestForestClassifier(HonestForestClassifier):
         Whether or not to stratify sample when considering structure and leaf indices.
         By default False.
 
-    covariate_index : ArrayLike of shape (n_features,) or None
-        The index of the dataset to shuffle per tree. By default None.
-
     permute_per_tree : bool
         Whether or not to permute the dataset per tree. By default False.
 

@@ -1251,6 +1251,8 @@ def build_coleman_forest(
         Random seed, by default None.
     return_posteriors : bool, optional
         Whether or not to return the posteriors, by default False.
+    **metric_kwargs : dict, optional
+        Additional keyword arguments to pass to the metric function.
 
     Returns
     -------
@@ -1392,6 +1394,33 @@ def build_hyppo_cv_forest(
     verbose=False,
     seed=None,
 ):
+    """Build a hypothesis testing forest using oob samples.
+
+    Parameters
+    ----------
+    est : Forest
+        The type of forest to use. Must be enabled with ``bootstrap=True``.
+    X : ArrayLike of shape (n_samples, n_features)
+        Data.
+    y : ArrayLike of shape (n_samples, n_outputs)
+        Binary target, so ``n_outputs`` should be at most 1.
+    cv : int, optional
+        Number of folds to use for cross-validation, by default 5.
+    test_size : float, optional
+        Proportion of samples per tree to use for the test set, by default 0.2.
+    verbose : bool, optional
+        Verbosity, by default False.
+    seed : int, optional
+        Random seed, by default None.
+
+    Returns
+    -------
+    est : Forest
+        Fitted forest.
+    all_proba_list : list of ArrayLike of shape (n_estimators, n_samples, n_outputs)
+        The predicted posterior probabilities for each estimator on their
+        out of bag samples. Length of list is equal to the number of splits.
+    """
     X = X.astype(np.float32)
     if cv is not None:
         cv = StratifiedKFold(n_splits=cv, shuffle=True, random_state=seed)
