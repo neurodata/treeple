@@ -459,6 +459,9 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="generated/sktree.stats.FeatureImportanceForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.FeatureImportanceForestClassifier</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sktree.stats.PermutationForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.PermutationForestClassifier</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sktree.stats.PermutationForestRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.PermutationForestRegressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.stats.build_coleman_forest.html">sktree.stats.build_coleman_forest</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.stats.build_hyppo_oob_forest.html">sktree.stats.build_hyppo_oob_forest</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.stats.build_hyppo_cv_forest.html">sktree.stats.build_hyppo_cv_forest</a></li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="generated/sktree.datasets.make_gaussian_mixture.html">sktree.datasets.make_gaussian_mixture</a></li>
@@ -722,6 +725,15 @@ tree models.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.stats.PermutationForestRegressor.html#sktree.stats.PermutationForestRegressor" title="sktree.stats.PermutationForestRegressor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PermutationForestRegressor</span></code></a>([estimator, ...])</p></td>
 <td><p>Hypothesis testing of covariates with a permutation forest regressor.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.stats.build_coleman_forest.html#sktree.stats.build_coleman_forest" title="sktree.stats.build_coleman_forest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_coleman_forest</span></code></a>(est, X, y[, ...])</p></td>
+<td><p>Build a hypothesis testing forest using oob samples.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.stats.build_hyppo_oob_forest.html#sktree.stats.build_hyppo_oob_forest" title="sktree.stats.build_hyppo_oob_forest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_hyppo_oob_forest</span></code></a>(est, X, y[, verbose])</p></td>
+<td><p>Build a hypothesis testing forest using oob samples.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.stats.build_hyppo_cv_forest.html#sktree.stats.build_hyppo_cv_forest" title="sktree.stats.build_hyppo_cv_forest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_hyppo_cv_forest</span></code></a>(est, X, y[, cv, ...])</p></td>
+<td><p>Build a hypothesis testing forest using oob samples.</p></td>
+</tr>
 </tbody>
 </table>
 </section>
@@ -890,7 +902,7 @@ for the entropy, MI and CMI of the Gaussian distributions.</p>
 
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-01-31.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-01.
       <br/>
     
   </p>

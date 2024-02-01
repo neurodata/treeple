@@ -463,13 +463,14 @@ document.write(`
 <span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">_fit_context</span>
 <span class="kn">from</span> <span class="nn">sklearn.ensemble._base</span> <span class="kn">import</span> <span class="n">_partition_estimators</span>
 <span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">check_is_fitted</span>
-<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils._param_validation</span> <span class="kn">import</span> <span class="n">Interval</span><span class="p">,</span> <span class="n">RealNotInt</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span><span class="p">,</span> <span class="n">catch_warnings</span><span class="p">,</span> <span class="n">simplefilter</span>
 
 <span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">issparse</span>
 
 <span class="kn">from</span> <span class="nn">sklearn.ensemble._hist_gradient_boosting.binning</span> <span class="kn">import</span> <span class="n">_BinMapper</span>
 <span class="kn">from</span> <span class="nn">sklearn.exceptions</span> <span class="kn">import</span> <span class="n">DataConversionWarning</span>
-<span class="kn">from</span> <span class="nn">sklearn.utils</span> <span class="kn">import</span> <span class="n">check_random_state</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils</span> <span class="kn">import</span> <span class="n">check_random_state</span><span class="p">,</span> <span class="n">compute_sample_weight</span>
 <span class="kn">from</span> <span class="nn">sklearn.utils._openmp_helpers</span> <span class="kn">import</span> <span class="n">_openmp_effective_n_threads</span>
 <span class="kn">from</span> <span class="nn">sklearn.utils.multiclass</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">type_of_target</span><span class="p">,</span>
@@ -478,11 +479,75 @@ document.write(`
     <span class="n">_check_sample_weight</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.._lib.sklearn.tree._tree</span> <span class="kn">import</span> <span class="n">DOUBLE</span><span class="p">,</span> <span class="n">DTYPE</span>
-<span class="kn">from</span> <span class="nn">.._lib.sklearn.ensemble._forest</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">_parallel_build_trees</span><span class="p">,</span>
-<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.._lib.sklearn.ensemble._forest</span> <span class="kn">import</span> <span class="n">ForestClassifier</span>
 <span class="kn">from</span> <span class="nn">..tree</span> <span class="kn">import</span> <span class="n">HonestTreeClassifier</span>
+
+
+<span class="k">def</span> <span class="nf">_generate_sample_indices</span><span class="p">(</span><span class="n">random_state</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span> <span class="n">n_samples_bootstrap</span><span class="p">,</span> <span class="n">bootstrap</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Private function used to _parallel_build_trees function.</span>
+
+<span class="sd">    XXX: this is copied over from scikit-learn and modified to allow sampling with</span>
+<span class="sd">    and without replacement given ``bootstrap``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">random_instance</span> <span class="o">=</span> <span class="n">check_random_state</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
+    <span class="n">n_sample_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="n">sample_indices</span> <span class="o">=</span> <span class="n">random_instance</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">n_sample_idx</span><span class="p">,</span> <span class="n">n_samples_bootstrap</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="n">bootstrap</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">sample_indices</span>
+
+
+<span class="k">def</span> <span class="nf">_parallel_build_trees</span><span class="p">(</span>
+    <span class="n">tree</span><span class="p">,</span>
+    <span class="n">bootstrap</span><span class="p">,</span>
+    <span class="n">X</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">,</span>
+    <span class="n">sample_weight</span><span class="p">,</span>
+    <span class="n">tree_idx</span><span class="p">,</span>
+    <span class="n">n_trees</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">class_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">n_samples_bootstrap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">missing_values_in_feature_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">classes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Private function used to fit a single tree in parallel.</span>
+
+<span class="sd">    XXX: this is copied over from scikit-learn and modified to allow sampling with</span>
+<span class="sd">    and without replacement given ``bootstrap``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;building tree </span><span class="si">%d</span><span class="s2"> of </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tree_idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_trees</span><span class="p">))</span>
+
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">sample_weight</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">curr_sample_weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">curr_sample_weight</span> <span class="o">=</span> <span class="n">sample_weight</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">_generate_sample_indices</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">random_state</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span> <span class="n">n_samples_bootstrap</span><span class="p">,</span> <span class="n">bootstrap</span><span class="p">)</span>
+    <span class="n">sample_counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">n_samples</span><span class="p">)</span>
+    <span class="n">curr_sample_weight</span> <span class="o">*=</span> <span class="n">sample_counts</span>
+
+    <span class="k">if</span> <span class="n">class_weight</span> <span class="o">==</span> <span class="s2">&quot;subsample&quot;</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">catch_warnings</span><span class="p">():</span>
+            <span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
+            <span class="n">curr_sample_weight</span> <span class="o">*=</span> <span class="n">compute_sample_weight</span><span class="p">(</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="n">indices</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">class_weight</span> <span class="o">==</span> <span class="s2">&quot;balanced_subsample&quot;</span><span class="p">:</span>
+        <span class="n">curr_sample_weight</span> <span class="o">*=</span> <span class="n">compute_sample_weight</span><span class="p">(</span><span class="s2">&quot;balanced&quot;</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="n">indices</span><span class="p">)</span>
+
+    <span class="n">tree</span><span class="o">.</span><span class="n">_fit</span><span class="p">(</span>
+        <span class="n">X</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">,</span>
+        <span class="n">sample_weight</span><span class="o">=</span><span class="n">curr_sample_weight</span><span class="p">,</span>
+        <span class="n">check_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">missing_values_in_feature_mask</span><span class="o">=</span><span class="n">missing_values_in_feature_mask</span><span class="p">,</span>
+        <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tree</span>
 
 
 <span class="k">def</span> <span class="nf">_get_n_samples_bootstrap</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">max_samples</span><span class="p">):</span>
@@ -675,7 +740,9 @@ document.write(`
 
 <span class="sd">    max_samples : int or float, default=None</span>
 <span class="sd">        If bootstrap is True, the number of samples to draw from X</span>
-<span class="sd">        to train each base tree estimator.</span>
+<span class="sd">        to train each base tree estimator with replacement.</span>
+<span class="sd">        If bootstrap is False, then this will subsample</span>
+<span class="sd">        the dataset without replacement.</span>
 
 <span class="sd">        - If None (default), then draw `X.shape[0]` samples.</span>
 <span class="sd">        - If int, then draw `max_samples` samples.</span>
@@ -825,6 +892,16 @@ document.write(`
 <span class="sd">    &gt;&gt;&gt; print(clf.predict([[0, 0, 0, 0]]))</span>
 <span class="sd">    [1]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_parameter_constraints</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="o">**</span><span class="n">ForestClassifier</span><span class="o">.</span><span class="n">_parameter_constraints</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">_parameter_constraints</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;max_samples&quot;</span><span class="p">)</span>
+    <span class="n">_parameter_constraints</span><span class="p">[</span><span class="s2">&quot;max_samples&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="kc">None</span><span class="p">,</span>
+        <span class="n">Interval</span><span class="p">(</span><span class="n">RealNotInt</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span>
+        <span class="n">Interval</span><span class="p">(</span><span class="n">Integral</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">),</span>
+    <span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1006,18 +1083,11 @@ document.write(`
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">sample_weight</span> <span class="o">=</span> <span class="n">expanded_class_weight</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">bootstrap</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_samples</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;`max_sample` cannot be set if `bootstrap=False`. &quot;</span>
-                <span class="s2">&quot;Either switch to `bootstrap=True` or set &quot;</span>
-                <span class="s2">&quot;`max_sample=None`.&quot;</span>
-            <span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">bootstrap</span><span class="p">:</span>
-            <span class="n">n_samples_bootstrap</span> <span class="o">=</span> <span class="n">_get_n_samples_bootstrap</span><span class="p">(</span>
-                <span class="n">n_samples</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">max_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_samples</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">n_samples_bootstrap</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># compute the number of samples we want to sample for each tree</span>
+        <span class="c1"># possibly without replacement</span>
+        <span class="n">n_samples_bootstrap</span> <span class="o">=</span> <span class="n">_get_n_samples_bootstrap</span><span class="p">(</span>
+            <span class="n">n_samples</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">max_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_samples</span>
+        <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_bootstrap</span> <span class="o">=</span> <span class="n">n_samples_bootstrap</span>
 
@@ -1234,8 +1304,11 @@ document.write(`
 
 <span class="sd">        Only utilized if ``bootstrap=True``, otherwise, all samples are &quot;in-bag&quot;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bootstrap</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Cannot extract out-of-bag samples when bootstrap is False.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bootstrap</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_bootstrap</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Cannot extract out-of-bag samples when bootstrap is False and &quot;</span>
+                <span class="s2">&quot;n_samples == n_samples_bootstrap&quot;</span>
+            <span class="p">)</span>
         <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="n">oob_samples</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1353,7 +1426,23 @@ document.write(`
 <span class="sd">            Samples within each leaf node.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">get_leaf_node_samples</span><span class="p">(</span><span class="n">X</span><span class="p">)</span></div>
-</div>
+
+
+    <span class="k">def</span> <span class="nf">_get_estimators_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Get drawn indices along both sample and feature axes</span>
+        <span class="k">for</span> <span class="n">tree</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimators_</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">bootstrap</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_bootstrap</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_samples</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># tree.random_state is actually an immutable integer seed rather</span>
+                <span class="c1"># than a mutable RandomState instance, so it&#39;s safe to use it</span>
+                <span class="c1"># repeatedly when calling this property.</span>
+                <span class="n">seed</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">random_state</span>
+                <span class="c1"># Operations accessing random_state must be performed identically</span>
+                <span class="c1"># to those in `_parallel_build_trees()`</span>
+                <span class="k">yield</span> <span class="n">_generate_sample_indices</span><span class="p">(</span>
+                    <span class="n">seed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_bootstrap</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bootstrap</span>
+                <span class="p">)</span></div>
 
 
 
@@ -1419,7 +1508,7 @@ document.write(`
 
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-01-31.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-01.
       <br/>
     
   </p>

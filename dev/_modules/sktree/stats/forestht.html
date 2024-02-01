@@ -1678,12 +1678,14 @@ document.write(`
     <span class="k">return</span> <span class="n">prediction</span>
 
 
+<div class="viewcode-block" id="build_coleman_forest">
+<a class="viewcode-back" href="../../../generated/sktree.stats.build_coleman_forest.html#sktree.stats.build_coleman_forest">[docs]</a>
 <span class="k">def</span> <span class="nf">build_coleman_forest</span><span class="p">(</span>
     <span class="n">est</span><span class="p">,</span>
     <span class="n">X</span><span class="p">,</span>
     <span class="n">y</span><span class="p">,</span>
     <span class="n">covariate_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;mi&quot;</span><span class="p">,</span>
+    <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;s@s98&quot;</span><span class="p">,</span>
     <span class="n">n_repeats</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1703,7 +1705,8 @@ document.write(`
 <span class="sd">    covariate_index : ArrayLike, optional of shape (n_covariates,)</span>
 <span class="sd">        The index array of covariates to shuffle, by default None.</span>
 <span class="sd">    metric : str, optional</span>
-<span class="sd">        The metric to compute, by default &quot;mi&quot;.</span>
+<span class="sd">        The metric to compute, by default &quot;s@s98&quot;, for sensitivity at</span>
+<span class="sd">        98% specificity.</span>
 <span class="sd">    n_repeats : int, optional</span>
 <span class="sd">        Number of times to bootstrap sample the two forests to construct</span>
 <span class="sd">        the null distribution, by default 1000.</span>
@@ -1713,6 +1716,8 @@ document.write(`
 <span class="sd">        Random seed, by default None.</span>
 <span class="sd">    return_posteriors : bool, optional</span>
 <span class="sd">        Whether or not to return the posteriors, by default False.</span>
+<span class="sd">    **metric_kwargs : dict, optional</span>
+<span class="sd">        Additional keyword arguments to pass to the metric function.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1781,9 +1786,12 @@ document.write(`
     <span class="k">if</span> <span class="n">return_posteriors</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">observe_test_stat</span><span class="p">,</span> <span class="n">pvalue</span><span class="p">,</span> <span class="n">orig_forest_proba</span><span class="p">,</span> <span class="n">perm_forest_proba</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">observe_test_stat</span><span class="p">,</span> <span class="n">pvalue</span>
+        <span class="k">return</span> <span class="n">observe_test_stat</span><span class="p">,</span> <span class="n">pvalue</span></div>
 
 
+
+<div class="viewcode-block" id="build_hyppo_oob_forest">
+<a class="viewcode-back" href="../../../generated/sktree.stats.build_hyppo_oob_forest.html#sktree.stats.build_hyppo_oob_forest">[docs]</a>
 <span class="k">def</span> <span class="nf">build_hyppo_oob_forest</span><span class="p">(</span>
     <span class="n">est</span><span class="p">,</span>
     <span class="n">X</span><span class="p">,</span>
@@ -1842,9 +1850,12 @@ document.write(`
         <span class="n">delayed</span><span class="p">(</span><span class="n">_parallel_predict_proba_oob</span><span class="p">)(</span><span class="n">e</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">all_proba</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">test_idx</span><span class="p">,</span> <span class="n">lock</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">test_idx</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">est</span><span class="o">.</span><span class="n">estimators_</span><span class="p">,</span> <span class="n">est</span><span class="o">.</span><span class="n">oob_samples_</span><span class="p">))</span>
     <span class="p">)</span>
-    <span class="k">return</span> <span class="n">est</span><span class="p">,</span> <span class="n">all_proba</span>
+    <span class="k">return</span> <span class="n">est</span><span class="p">,</span> <span class="n">all_proba</span></div>
 
 
+
+<div class="viewcode-block" id="build_hyppo_cv_forest">
+<a class="viewcode-back" href="../../../generated/sktree.stats.build_hyppo_cv_forest.html#sktree.stats.build_hyppo_cv_forest">[docs]</a>
 <span class="k">def</span> <span class="nf">build_hyppo_cv_forest</span><span class="p">(</span>
     <span class="n">est</span><span class="p">,</span>
     <span class="n">X</span><span class="p">,</span>
@@ -1854,6 +1865,33 @@ document.write(`
     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a hypothesis testing forest using oob samples.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    est : Forest</span>
+<span class="sd">        The type of forest to use. Must be enabled with ``bootstrap=True``.</span>
+<span class="sd">    X : ArrayLike of shape (n_samples, n_features)</span>
+<span class="sd">        Data.</span>
+<span class="sd">    y : ArrayLike of shape (n_samples, n_outputs)</span>
+<span class="sd">        Binary target, so ``n_outputs`` should be at most 1.</span>
+<span class="sd">    cv : int, optional</span>
+<span class="sd">        Number of folds to use for cross-validation, by default 5.</span>
+<span class="sd">    test_size : float, optional</span>
+<span class="sd">        Proportion of samples per tree to use for the test set, by default 0.2.</span>
+<span class="sd">    verbose : bool, optional</span>
+<span class="sd">        Verbosity, by default False.</span>
+<span class="sd">    seed : int, optional</span>
+<span class="sd">        Random seed, by default None.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    est : Forest</span>
+<span class="sd">        Fitted forest.</span>
+<span class="sd">    all_proba_list : list of ArrayLike of shape (n_estimators, n_samples, n_outputs)</span>
+<span class="sd">        The predicted posterior probabilities for each estimator on their</span>
+<span class="sd">        out of bag samples. Length of list is equal to the number of splits.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">cv</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">cv</span> <span class="o">=</span> <span class="n">StratifiedKFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="n">cv</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
@@ -1907,7 +1945,8 @@ document.write(`
         <span class="n">all_proba_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">posterior_arr</span><span class="p">)</span>
         <span class="n">est_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">est</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">est_list</span><span class="p">,</span> <span class="n">all_proba_list</span>
+    <span class="k">return</span> <span class="n">est_list</span><span class="p">,</span> <span class="n">all_proba_list</span></div>
+
 </pre></div>
 
                 </article>
@@ -1951,7 +1990,7 @@ document.write(`
 
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-01-31.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-01.
       <br/>
     
   </p>
