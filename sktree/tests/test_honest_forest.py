@@ -133,17 +133,26 @@ def test_iris_multi(criterion, max_features, honest_prior, estimator):
 
 
 def test_max_samples():
+    """Test different max_samples argument for HonestForestClassifier."""
     max_samples_list = [8, 0.5, None]
     depths = []
     X = rng.normal(0, 1, (100, 2))
     X[:50] *= -1
     y = [0, 1] * 50
     for ms in max_samples_list:
-        uf = HonestForestClassifier(n_estimators=2, random_state=0, max_samples=ms, bootstrap=True)
+        uf = HonestForestClassifier(
+            n_estimators=2, random_state=0, max_samples=ms, bootstrap=True, n_jobs=-1
+        )
         uf = uf.fit(X, y)
         depths.append(uf.estimators_[0].get_depth())
 
-    assert all(np.diff(depths) > 0)
+    assert all(np.diff(depths) > 0), np.diff(depths)
+
+    # Should work for a float greater than 1
+    uf = HonestForestClassifier(
+        n_estimators=2, random_state=0, max_samples=1.6, bootstrap=True, n_jobs=-1
+    )
+    uf = uf.fit(X, y)
 
 
 @pytest.mark.parametrize("bootstrap", [True, False])
