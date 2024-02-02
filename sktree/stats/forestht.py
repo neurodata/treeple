@@ -1217,6 +1217,7 @@ def _parallel_predict_proba_oob(predict_proba, X, out, idx, test_idx, lock):
 
 def build_coleman_forest(
     est,
+    perm_est,
     X,
     y,
     covariate_index=None,
@@ -1233,6 +1234,8 @@ def build_coleman_forest(
     ----------
     est : Forest
         The type of forest to use. Must be enabled with ``bootstrap=True``.
+    perm_est : Forest
+        The forest to use for the permuted dataset.
     X : ArrayLike of shape (n_samples, n_features)
         Data.
     y : ArrayLike of shape (n_samples, n_outputs)
@@ -1287,8 +1290,8 @@ def build_coleman_forest(
     X_permute[:, covariate_index] = X_permute[index_arr, covariate_index]
 
     # build two sets of forests
-    orig_est, orig_forest_proba = build_hyppo_oob_forest(est, X, y, verbose=verbose)
-    perm_est, perm_forest_proba = build_hyppo_oob_forest(est, X_permute, y, verbose=verbose)
+    est, orig_forest_proba = build_hyppo_oob_forest(est, X, y, verbose=verbose)
+    perm_est, perm_forest_proba = build_hyppo_oob_forest(perm_est, X_permute, y, verbose=verbose)
 
     metric_star, metric_star_pi = _compute_null_distribution_coleman(
         y,
