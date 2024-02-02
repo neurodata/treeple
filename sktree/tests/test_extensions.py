@@ -98,5 +98,5 @@ def test_forest_has_deterministic_sampling_for_oob_structure_and_leaves(Forest, 
         for itree in range(n_estimators):
             assert len(oob_samples[itree]) > 1, oob_samples[itree]
             assert set(inbag_samples[itree]).intersection(set(oob_samples_[itree])) == set()
-            assert set(inbag_samples[itree]).intersection(set(oob_samples_[itree])) == set()
+            assert set(inbag_samples[itree]).union(set(oob_samples_[itree])) == set(samples)
             assert_array_equal(oob_samples_[itree], oob_samples[itree])

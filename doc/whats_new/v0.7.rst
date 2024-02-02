@@ -20,6 +20,9 @@ Changelog
     Forest classifiers, which will predict the probability per tree and keep the
     output as a ``(n_estimators, n_samples, n_classes)`` output,
     by `Adam Li`_ (:pr:`#211`)
+- |Feature| Introduce a new class fitted attribute ``oob_samples_`` for all
+    Forest models, which will keep track of the samples used.
+    by `Adam Li`_ (:pr:`#211`)
 
 Code and Documentation Contributors
 -----------------------------------
