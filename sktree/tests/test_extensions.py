@@ -63,7 +63,10 @@ def test_predict_proba_per_tree(Forest, n_classes):
     ],
 )
 @pytest.mark.parametrize("bootstrap", [True, False])
-def test_forest_has_deterministic_sampling_for_oob_structure_and_leaves(Forest, bootstrap):
+@pytest.mark.parametrize("random_state", [None, 0])
+def test_forest_has_deterministic_sampling_for_oob_structure_and_leaves(
+    Forest, bootstrap, random_state
+):
     """Test that honest forest can produce the oob, structure and leaf-node samples.
 
     When bootstrap is True, oob should be exclusive from structure and leaf-node samples.
@@ -74,7 +77,7 @@ def test_forest_has_deterministic_sampling_for_oob_structure_and_leaves(Forest, 
     n_estimators = 5
     est = Forest(
         n_estimators=n_estimators,
-        random_state=0,
+        random_state=random_state,
         bootstrap=bootstrap,
     )
     X = rng.normal(0, 1, (100, 2))
