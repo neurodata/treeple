@@ -67,9 +67,9 @@ def test_predict_proba_per_tree(Forest, n_classes):
 def test_forest_has_deterministic_sampling_for_oob_structure_and_leaves(
     Forest, bootstrap, random_state
 ):
-    """Test that honest forest can produce the oob, structure and leaf-node samples.
+    """Test that forest models can produce the oob and inbag samples deterministically.
 
-    When bootstrap is True, oob should be exclusive from structure and leaf-node samples.
+    When bootstrap is True, oob should be exclusive from in bag samples.
     When bootstrap is False, there is no oob.
     """
     rng = np.random.default_rng(0)
