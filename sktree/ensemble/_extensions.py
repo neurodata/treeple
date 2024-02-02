@@ -26,10 +26,12 @@ def _parallel_predict_proba_per_tree(predict_proba, X, out, idx, test_idx, lock)
     return prediction
 
 
-def _generate_unsampled_indices(random_state, n_samples, n_samples_bootstrap):
+def _generate_unsampled_indices(random_state, n_samples, n_samples_bootstrap, bootstrap):
     """
     Private function used to forest._set_oob_score function."""
-    sample_indices = _generate_sample_indices(random_state, n_samples, n_samples_bootstrap)
+    sample_indices = _generate_sample_indices(
+        random_state, n_samples, n_samples_bootstrap, bootstrap
+    )
     sample_counts = np.bincount(sample_indices, minlength=n_samples)
     unsampled_mask = sample_counts == 0
     indices_range = np.arange(n_samples)
@@ -95,7 +97,9 @@ class ForestMixin:
 
         Only utilized if ``bootstrap=True``, otherwise, all samples are "in-bag".
         """
-        if self.bootstrap is False and self._n_samples_bootstrap == self._n_samples:
+        if self.bootstrap is False and (
+            self._n_samples_bootstrap == self._n_samples or self._n_samples_bootstrap is None
+        ):
             raise RuntimeError(
                 "Cannot extract out-of-bag samples when bootstrap is False and "
                 "n_samples == n_samples_bootstrap"
@@ -113,9 +117,14 @@ class ForestMixin:
                 estimator.random_state,
                 self._n_samples,
                 n_samples_bootstrap,
+                self.bootstrap,
             )
             oob_samples.append(unsampled_indices)
         return oob_samples
+
+
+class ForestClassifierMixin:
+    """A set of mixin methods to extend forests models API."""
 
     def predict_proba_per_tree(self, X, indices=None):
         """

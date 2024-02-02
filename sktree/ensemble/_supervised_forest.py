@@ -10,10 +10,12 @@ from ..tree import (
     PatchObliqueDecisionTreeRegressor,
 )
 from ..tree._neighbors import SimMatrixMixin
-from ._extensions import ForestMixin
+from ._extensions import ForestClassifierMixin, ForestMixin
 
 
-class ObliqueRandomForestClassifier(SimMatrixMixin, ForestMixin, ForestClassifier):
+class ObliqueRandomForestClassifier(
+    SimMatrixMixin, ForestClassifierMixin, ForestMixin, ForestClassifier
+):
     """
     An oblique random forest classifier.
 
@@ -341,7 +343,7 @@ class ObliqueRandomForestClassifier(SimMatrixMixin, ForestMixin, ForestClassifie
         self.min_impurity_decrease = min_impurity_decrease
 
 
-class ObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
+class ObliqueRandomForestRegressor(SimMatrixMixin, ForestMixin, ForestRegressor):
     """An oblique random forest regressor.
 
     A oblique random forest is a meta estimator similar to a random
@@ -640,7 +642,9 @@ class ObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
         self.min_impurity_decrease = min_impurity_decrease
 
 
-class PatchObliqueRandomForestClassifier(SimMatrixMixin, ForestMixin, ForestClassifier):
+class PatchObliqueRandomForestClassifier(
+    SimMatrixMixin, ForestClassifierMixin, ForestMixin, ForestClassifier
+):
     """A patch-oblique random forest classifier.
 
     A patch-oblique random forest is a meta estimator similar to a random
@@ -1292,7 +1296,9 @@ class PatchObliqueRandomForestRegressor(SimMatrixMixin, ForestMixin, ForestRegre
         self.min_impurity_decrease = min_impurity_decrease
 
 
-class ExtraObliqueRandomForestClassifier(SimMatrixMixin, ForestMixin, ForestClassifier):
+class ExtraObliqueRandomForestClassifier(
+    SimMatrixMixin, ForestClassifierMixin, ForestMixin, ForestClassifier
+):
     """
     An extra oblique random forest classifier.
 
@@ -1622,7 +1628,7 @@ class ExtraObliqueRandomForestClassifier(SimMatrixMixin, ForestMixin, ForestClas
         self.min_impurity_decrease = min_impurity_decrease
 
 
-class ExtraObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
+class ExtraObliqueRandomForestRegressor(SimMatrixMixin, ForestMixin, ForestRegressor):
     """An extra oblique random forest regressor.
 
     An extra oblique random forest is a meta estimator similar to a random

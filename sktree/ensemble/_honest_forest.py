@@ -21,7 +21,7 @@ from sklearn.utils.validation import _check_sample_weight, check_is_fitted
 from .._lib.sklearn.ensemble._forest import ForestClassifier
 from .._lib.sklearn.tree._tree import DOUBLE, DTYPE
 from ..tree import HonestTreeClassifier
-from ._extensions import ForestMixin, _generate_sample_indices, _get_n_samples_bootstrap
+from ._extensions import ForestClassifierMixin, _generate_sample_indices, _get_n_samples_bootstrap
 
 
 def _parallel_build_trees(
@@ -76,7 +76,7 @@ def _parallel_build_trees(
     return tree
 
 
-class HonestForestClassifier(ForestClassifier, ForestMixin):
+class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
     """
     A forest classifier with honest leaf estimates.
 
