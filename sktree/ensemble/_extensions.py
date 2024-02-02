@@ -134,8 +134,7 @@ class ForestClassifierMixin:
         ----------
         X : array-like of shape (n_samples, n_features)
             The input data.
-        indices : list of ``n_estimators`` length each of
-            array-like of shape (n_samples,), optional
+        indices : list of ``n_estimators`` length of array-like of shape (n_samples,), optional
             The indices of the samples used to compute the probability estimates
             for each tree in the forest. If None, the indices are every
             sample in the input data.

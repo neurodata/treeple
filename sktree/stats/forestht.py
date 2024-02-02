@@ -1339,6 +1339,8 @@ def build_hyppo_oob_forest(est, X, y, verbose=False, **est_kwargs):
         Binary target, so ``n_outputs`` should be at most 1.
     verbose : bool, optional
         Verbosity, by default False.
+    **est_kwargs : dict, optional
+        Additional keyword arguments to pass to the forest estimator.
 
     Returns
     -------
