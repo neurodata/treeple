@@ -1291,7 +1291,9 @@ def build_coleman_forest(
 
     # build two sets of forests
     est, orig_forest_proba = build_hyppo_oob_forest(est, X, y, verbose=verbose)
-    perm_est, perm_forest_proba = build_hyppo_oob_forest(perm_est, X_permute, y, verbose=verbose)
+    perm_est, perm_forest_proba = build_hyppo_oob_forest(
+        perm_est, X_permute, y, verbose=verbose, covariate_index=covariate_index
+    )
 
     metric_star, metric_star_pi = _compute_null_distribution_coleman(
         y,
@@ -1327,12 +1329,7 @@ def build_coleman_forest(
         return observe_test_stat, pvalue
 
 
-def build_hyppo_oob_forest(
-    est,
-    X,
-    y,
-    verbose=False,
-):
+def build_hyppo_oob_forest(est, X, y, verbose=False, **est_kwargs):
     """Build a hypothesis testing forest using oob samples.
 
     Parameters
@@ -1359,7 +1356,7 @@ def build_hyppo_oob_forest(
     est = clone(est)
 
     # build forest
-    est.fit(X, y)
+    est.fit(X, y, **est_kwargs)
 
     # now evaluate
     X = est._validate_X_predict(X)
