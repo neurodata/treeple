@@ -169,7 +169,7 @@ def make_trunk_classification(
         )
 
     if n_dim > n_informative:
-        X = np.hstack((X, rng.uniform(low=0, high=1, size=(n_samples, n_dim - n_informative))))
+        X = np.hstack((X, rng.uniform(low=0, high=1, size=(X.shape[0], n_dim - n_informative))))
 
     y = np.concatenate((np.zeros(n_samples // 2), np.ones(n_samples // 2)))
 
