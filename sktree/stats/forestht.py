@@ -1352,11 +1352,11 @@ def build_hyppo_oob_forest(est, X, y, verbose=False, **est_kwargs):
         out of bag samples.
     """
     assert est.bootstrap
-
+    assert type_of_target(y) in ("binary")
     est = clone(est)
 
     # build forest
-    est.fit(X, y, **est_kwargs)
+    est.fit(X, y.ravel(), **est_kwargs)
 
     # now evaluate
     X = est._validate_X_predict(X)
