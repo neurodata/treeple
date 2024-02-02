@@ -1,12 +1,22 @@
 [
     {
-        "name": "0.5 (devel)",
+        "name": "0.7 (devel)",
         "version": "dev",
         "url": "https://docs.neurodata.io/scikit-tree/dev/"
     },
     {
+        "name": "0.6",
+        "version": "stable",
+        "url": "https://docs.neurodata.io/scikit-tree/dev/"
+    },
+    {
+        "name": "0.5",
+        "version": "0.5",
+        "url": "https://docs.neurodata.io/scikit-tree/v0.5/"
+    },
+    {
         "name": "0.4",
-        "version": "dev",
+        "version": "0.4",
         "url": "https://docs.neurodata.io/scikit-tree/v0.4/"
     },
     {

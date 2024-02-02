@@ -245,6 +245,9 @@ numpydoc_xref_ignore = {
     "apply",
     "TreeBuilder",
     "joint_rank",
+    "n_dim",
+    "n_samples_bootstrap",
+    "Forest",
 }
 
 # validation

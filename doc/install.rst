@@ -17,7 +17,7 @@ Dependencies
 Installing with ``pip``
 -----------------------
 
-**scikit-tree** is available [on PyPI](https://pypi.org/project/scikit-tree/). Just run
+**scikit-tree** is available on `PyPI <https://pypi.org/project/scikit-tree/>`_. Just run
 
 .. code-block:: bash
 
@@ -26,7 +26,7 @@ Installing with ``pip``
 Installing from source with Meson
 ---------------------------------
 
-To install **scikit-tree** from source, first clone [the repository](https://github.com/neurodata/scikit-tree):
+To install **scikit-tree** from source, first clone the `repository <https://github.com/neurodata/scikit-tree>`_:
 
 .. code-block:: bash
 
@@ -72,27 +72,27 @@ First, create a virtual environment using Conda.
 # activate the virtual environment and install necessary packages to build from source
 
     conda activate sklearn-dev
-    conda install -c conda-forge numpy scipy cython joblib threadpoolctl pytest compilers llvm-openmp poetry
+    conda install -c conda-forge numpy scipy cython joblib threadpoolctl pytest compilers llvm-openmp
 
 Next, `sktree` from source:
 
-    pip install -e .
+    pip install .[build]
 
     # if editing Cython files
     pip install --verbose --no-build-isolation --editable .
 
-To install the package from github, clone the repository and then `cd` into the directory. You can then use `poetry` to install:
+To install the package from github, clone the repository and then `cd` into the directory.:
 
-    poetry install
+    ./spin build
 
-    # if you would like an editable install of dodiscover for dev purposes
-    pip install -e .
+    # if you would like an editable install of scikit-tree for dev purposes
+    pip install --verbose --no-build-isolation --editable .
 
     pip install https://api.github.com/repos/neurodata/scikit-tree/zipball/main
 
 
     pip install https://api.github.com/repos/neurodata/scikit-learn/zipball/obliquepr
 
-Note that currently, we need to build the development version of scikit-learn with oblique trees within this [PR](https://github.com/scikit-learn/scikit-learn/pull/22754).
+Note that currently, we need to build the development version of scikit-learn with oblique trees within this `PR <https://github.com/scikit-learn/scikit-learn/pull/22754>`_.
 
 Checkout this PR code, and build from source, using scikit-learn's build from source page instructions.

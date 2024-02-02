@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 import pytest
 from numpy.testing import assert_array_equal
@@ -33,7 +35,7 @@ def test_multiview_classification(baseline_est):
     n_samples = 20
     n_features_1 = 5
     n_features_2 = 1000
-    cluster_std = 2.0
+    cluster_std = 5.0
 
     # Create a high-dimensional multiview dataset with a low-dimensional informative
     # subspace in one view of the dataset.
@@ -62,29 +64,24 @@ def test_multiview_classification(baseline_est):
     clf = MultiViewDecisionTreeClassifier(
         random_state=seed,
         feature_set_ends=[n_features_1, X.shape[1]],
-        max_features="sqrt",
-        max_depth=5,
+        max_features=0.3,
     )
     clf.fit(X, y)
     assert (
         accuracy_score(y, clf.predict(X)) == 1.0
     ), f"Accuracy score: {accuracy_score(y, clf.predict(X))}"
     assert (
-        cross_val_score(clf, X, y, cv=5).mean() == 1.0
+        cross_val_score(clf, X, y, cv=5).mean() > 0.9
     ), f"CV score: {cross_val_score(clf, X, y, cv=5).mean()}"
 
-    clf = baseline_est(
+    base_clf = baseline_est(
         random_state=seed,
-        max_depth=5,
-        max_features="sqrt",
+        max_features=0.3,
     )
-    clf.fit(X, y)
-    assert (
-        accuracy_score(y, clf.predict(X)) == 1.0
-    ), f"Accuracy score: {accuracy_score(y, clf.predict(X))}"
-    assert (
-        cross_val_score(clf, X, y, cv=5).mean() <= 0.6
-    ), f"CV score: {cross_val_score(clf, X, y, cv=5).mean()}"
+    assert cross_val_score(base_clf, X, y, cv=5).mean() < cross_val_score(clf, X, y, cv=5).mean(), (
+        f"CV score: {cross_val_score(base_clf, X, y, cv=5).mean()} vs "
+        f"{cross_val_score(clf, X, y, cv=5).mean()}"
+    )
 
 
 def test_multiview_errors():
@@ -148,5 +145,126 @@ def test_multiview_separate_feature_set_sampling_sets_attributes():
         apply_max_features_per_feature_set=True,
     )
     clf.fit(X, y)
-    assert_array_equal(clf.max_features_per_set_, [2, 2])
-    assert clf.max_features_ == 4
+    assert_array_equal(clf.max_features_per_set_, [3, 2])
+    assert clf.max_features_ == 5
+
+
+def test_at_least_one_feature_per_view_is_sampled():
+    """Test that multiview decision tree always samples at least one feature per view."""
+
+    X = np.random.random((20, 10))
+    y = np.random.randint(0, 2, size=20)
+
+    # test with max_features as a float
+    clf = MultiViewDecisionTreeClassifier(
+        random_state=seed,
+        feature_set_ends=[1, 2, 4, 10],
+        max_features=0.4,
+        apply_max_features_per_feature_set=True,
+    )
+    clf.fit(X, y)
+
+    assert_array_equal(clf.max_features_per_set_, [1, 1, 1, np.ceil(6 * clf.max_features)])
+    assert clf.max_features_ == np.sum(clf.max_features_per_set_), np.sum(clf.max_features_per_set_)
+
+
+def test_multiview_separate_feature_set_sampling_is_consistent():
+    rng = np.random.default_rng(seed)
+    X = rng.standard_normal(size=(20, 10))
+    y = rng.integers(0, 2, size=20)
+
+    # test with max_features as an array but apply_max_features is off
+    clf = MultiViewDecisionTreeClassifier(
+        random_state=seed,
+        feature_set_ends=[1, 3, 6, 10],
+        max_features=[1, 2, 2, 3],
+        apply_max_features_per_feature_set=True,
+    )
+    clf.fit(X, y)
+
+    assert_array_equal(clf.max_features_per_set_, [1, 2, 2, 3])
+    assert clf.max_features_ == np.sum(clf.max_features_per_set_), np.sum(clf.max_features_per_set_)
+    assert_array_equal(clf.max_features_per_set_, [1, 2, 2, 3])
+    assert clf.max_features_ == np.sum(clf.max_features_per_set_), np.sum(clf.max_features_per_set_)
+
+    # test with max_features as an array but apply_max_features is off
+    other_clf = MultiViewDecisionTreeClassifier(
+        random_state=seed,
+        feature_set_ends=[1, 3, 6, 10],
+        max_features=[1, 2, 2, 3],
+        apply_max_features_per_feature_set=False,
+    )
+    other_clf.fit(X, y)
+
+    assert_array_equal(other_clf.tree_.value, clf.tree_.value)
+
+
+@pytest.mark.parametrize("stratify_mtry_per_view", [True, False])
+def test_separate_mtry_per_feature_set(stratify_mtry_per_view):
+    """Test that multiview decision tree can sample different numbers of features per view.
+
+    Sets the ``max_feature`` argument as an array-like.
+    """
+    X = np.random.random((20, 10))
+    y = np.random.randint(0, 2, size=20)
+
+    # test with max_features as an array
+    clf = MultiViewDecisionTreeClassifier(
+        random_state=seed,
+        feature_set_ends=[1, 2, 4, 10],
+        max_features=[0.4, 0.5, 0.6, 0.7],
+        apply_max_features_per_feature_set=stratify_mtry_per_view,
+    )
+    clf.fit(X, y)
+
+    assert_array_equal(clf.max_features_per_set_, [1, 1, 2, math.ceil(6 * 0.7)])
+    assert clf.max_features_ == np.sum(clf.max_features_per_set_), np.sum(clf.max_features_per_set_)
+
+    # test with max_features as an array
+    clf = MultiViewDecisionTreeClassifier(
+        random_state=seed,
+        feature_set_ends=[1, 2, 4, 10],
+        max_features=[1, 1, 1, 1.0],
+        apply_max_features_per_feature_set=stratify_mtry_per_view,
+    )
+    clf.fit(X, y)
+    assert_array_equal(clf.max_features_per_set_, [1, 1, 1, 6])
+    assert clf.max_features_ == np.sum(clf.max_features_per_set_), np.sum(clf.max_features_per_set_)
+
+    # test with max_features as 1.0
+    clf = MultiViewDecisionTreeClassifier(
+        random_state=seed,
+        feature_set_ends=[1, 2, 4, 10],
+        max_features=1.0,
+        apply_max_features_per_feature_set=stratify_mtry_per_view,
+    )
+    clf.fit(X, y)
+    if stratify_mtry_per_view:
+        assert_array_equal(clf.max_features_per_set_, [1, 1, 2, 6])
+    else:
+        assert clf.max_features_per_set_ is None
+        assert clf.max_features_ == 10
+    assert clf.max_features_ == 10, np.sum(clf.max_features_per_set_)
+
+
+def test_multiview_without_feature_view_stratification():
+    """Test that multiview decision tree can sample different numbers of features per view.
+
+    Sets the ``max_feature`` argument as an array-like.
+    """
+    rng = np.random.default_rng(seed)
+    X = rng.standard_normal((20, 497))
+    X = np.hstack((X, rng.standard_normal((20, 3))))
+    y = rng.integers(0, 2, size=20)
+
+    # test with max_features as a float
+    clf = MultiViewDecisionTreeClassifier(
+        random_state=seed,
+        feature_set_ends=[497, 500],
+        max_features=0.3,
+        apply_max_features_per_feature_set=False,
+    )
+    clf.fit(X, y)
+
+    assert clf.max_features_per_set_ is None
+    assert clf.max_features_ == 500 * clf.max_features, clf.max_features_

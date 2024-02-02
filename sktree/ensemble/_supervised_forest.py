@@ -181,10 +181,6 @@ class ObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
 
     Attributes
     ----------
-    base_estimator_ : sktree.tree.ObliqueDecisionTreeClassifier
-        The child estimator template used to create the collection of fitted
-        sub-estimators.
-
     estimators_ : list of sktree.tree.ObliqueDecisionTreeClassifier
         The collection of fitted sub-estimators.
 
@@ -495,10 +491,6 @@ class ObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
 
     Attributes
     ----------
-    base_estimator_ : ObliqueDecisionTreeRegressor
-        The child estimator template used to create the collection of fitted
-        sub-estimators.
-
     estimators_ : list of ObliqueDecisionTreeRegressor
         The collection of fitted sub-estimators.
 
@@ -824,10 +816,6 @@ class PatchObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
 
     Attributes
     ----------
-    base_estimator_ : PatchObliqueDecisionTreeClassifier
-        The child estimator template used to create the collection of fitted
-        sub-estimators.
-
     estimators_ : list of PatchObliqueDecisionTreeClassifier
         The collection of fitted sub-estimators.
 
@@ -1150,10 +1138,6 @@ class PatchObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
 
     Attributes
     ----------
-    base_estimator_ : PatchObliqueDecisionTreeRegressor
-        The child estimator template used to create the collection of fitted
-        sub-estimators.
-
     estimators_ : list of PatchObliqueDecisionTreeRegressor
         The collection of fitted sub-estimators.
 
@@ -1476,10 +1460,6 @@ class ExtraObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
 
     Attributes
     ----------
-    base_estimator_ : sktree.tree.ExtraObliqueDecisionTreeClassifier
-        The child estimator template used to create the collection of fitted
-        sub-estimators.
-
     estimators_ : list of sktree.tree.ExtraObliqueDecisionTreeClassifier
         The collection of fitted sub-estimators.
 
@@ -1792,10 +1772,6 @@ class ExtraObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
 
     Attributes
     ----------
-    base_estimator_ : ExtraObliqueDecisionTreeRegressor
-        The child estimator template used to create the collection of fitted
-        sub-estimators.
-
     estimators_ : list of ExtraObliqueDecisionTreeRegressor
         The collection of fitted sub-estimators.
 

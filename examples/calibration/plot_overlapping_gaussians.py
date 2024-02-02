@@ -65,7 +65,7 @@ clfs = [
     (
         "IRF",
         CalibratedClassifierCV(
-            base_estimator=RandomForestClassifier(
+            estimator=RandomForestClassifier(
                 n_estimators=n_estimators // clf_cv,
                 max_features=max_features,
                 n_jobs=n_jobs,
@@ -77,7 +77,7 @@ clfs = [
     (
         "SigRF",
         CalibratedClassifierCV(
-            base_estimator=RandomForestClassifier(
+            estimator=RandomForestClassifier(
                 n_estimators=n_estimators // clf_cv,
                 max_features=max_features,
                 n_jobs=n_jobs,

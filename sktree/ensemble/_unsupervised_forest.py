@@ -157,11 +157,12 @@ class ForestCluster(SimMatrixMixin, TransformerMixin, ClusterMixin, BaseForest):
                 verbose=self.verbose,
                 prefer="threads",
             )(
+                # y should be an array to prevent errors
                 delayed(_parallel_build_trees)(
                     t,
                     self.bootstrap,
                     X,
-                    y,
+                    np.arange(X.shape[0]),
                     sample_weight,
                     i,
                     len(trees),

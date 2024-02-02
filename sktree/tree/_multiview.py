@@ -1,9 +1,11 @@
 import copy
-from numbers import Real
+import math
+import numbers
+from numbers import Integral, Real
 
 import numpy as np
 from scipy.sparse import issparse
-from sklearn.utils._param_validation import Interval
+from sklearn.utils._param_validation import Interval, RealNotInt, StrOptions
 
 from .._lib.sklearn.tree import DecisionTreeClassifier, _criterion
 from .._lib.sklearn.tree import _tree as _sklearn_tree
@@ -79,7 +81,7 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         the input samples) required to be at a leaf node. Samples have
         equal weight when sample_weight is not provided.
 
-    max_features : int, float or {"auto", "sqrt", "log2"}, default=None
+    max_features : array-like, int, float or {"auto", "sqrt", "log2"}, default=None
         The number of features to consider when looking for the best split:
 
             - If int, then consider `max_features` features at each split.
@@ -90,6 +92,10 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
             - If "sqrt", then `max_features=sqrt(n_features)`.
             - If "log2", then `max_features=log2(n_features)`.
             - If None, then `max_features=n_features`.
+
+        If array-like, then `max_features` is the number of features to consider
+        for each feature set following the same logic as above, where
+        ``n_features`` is the number of features in the respective feature set.
 
         Note: the search for a split does not stop until at least one
         valid partition of the node samples is found, even if it requires to
@@ -249,6 +255,14 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         "feature_set_ends": ["array-like", None],
         "apply_max_features_per_feature_set": ["boolean"],
     }
+    _parameter_constraints.pop("max_features")
+    _parameter_constraints["max_features"] = [
+        Interval(Integral, 1, None, closed="left"),
+        Interval(RealNotInt, 0.0, 1.0, closed="right"),
+        StrOptions({"sqrt", "log2"}),
+        "array-like",
+        None,
+    ]
 
     def __init__(
         self,
@@ -291,6 +305,7 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         self.feature_combinations = feature_combinations
         self.feature_set_ends = feature_set_ends
         self.apply_max_features_per_feature_set = apply_max_features_per_feature_set
+        self._max_features_arr = None
 
     def _build_tree(
         self,
@@ -378,29 +393,48 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         else:
             SPLITTERS = DENSE_SPLITTERS
 
-        if self.apply_max_features_per_feature_set:
+        if isinstance(self._max_features_arr, (Integral, Real, str, type(None))):
+            max_features_arr_ = [self._max_features_arr] * self.n_feature_sets_
+            stratify_mtry_per_view = self.apply_max_features_per_feature_set
+        else:
+            if not isinstance(self._max_features_arr, (list, np.ndarray)):
+                raise ValueError(
+                    f"max_features must be an array-like, int, float, str, or None; "
+                    f"got {type(self._max_features_arr)}"
+                )
+            if len(self._max_features_arr) != self.n_feature_sets_:
+                raise ValueError(
+                    f"max_features must be an array-like of length {self.n_feature_sets_}; "
+                    f"got {len(self.max_features)}"
+                )
+            max_features_arr_ = self._max_features_arr
+            stratify_mtry_per_view = True
+
+        self.n_features_in_set_ = []
+        if stratify_mtry_per_view:
             # XXX: experimental
             # we can replace max_features_ here based on whether or not uniform logic over
             # feature sets
             max_features_per_set = []
             n_features_in_prev = 0
             for idx in range(self.n_feature_sets_):
-                n_features_in_ = self.feature_set_ends_[idx] - n_features_in_prev
-                n_features_in_prev = n_features_in_
-                import numbers
+                max_features = max_features_arr_[idx]
 
-                if isinstance(self.max_features, str):
-                    if self.max_features == "sqrt":
-                        max_features = max(1, int(np.sqrt(n_features_in_)))
-                    elif self.max_features == "log2":
-                        max_features = max(1, int(np.log2(n_features_in_)))
-                elif self.max_features is None:
+                n_features_in_ = self.feature_set_ends_[idx] - n_features_in_prev
+                n_features_in_prev += n_features_in_
+                self.n_features_in_set_.append(n_features_in_)
+                if isinstance(max_features, str):
+                    if max_features == "sqrt":
+                        max_features = max(1, math.ceil(np.sqrt(n_features_in_)))
+                    elif max_features == "log2":
+                        max_features = max(1, math.ceil(np.log2(n_features_in_)))
+                elif max_features is None:
                     max_features = n_features_in_
-                elif isinstance(self.max_features, numbers.Integral):
-                    max_features = self.max_features
+                elif isinstance(max_features, numbers.Integral):
+                    max_features = max_features
                 else:  # float
-                    if self.max_features > 0.0:
-                        max_features = max(1, int(self.max_features * n_features_in_))
+                    if max_features > 0.0:
+                        max_features = max(1, math.ceil(max_features * n_features_in_))
                     else:
                         max_features = 0
 
@@ -421,8 +455,28 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                     "This should not be possible. Please submit a bug report."
                 )
             self.max_features_per_set_ = np.asarray(max_features_per_set, dtype=np.intp)
+            # the total number of features to sample per split
+            self.max_features_ = np.sum(self.max_features_per_set_)
         else:
             self.max_features_per_set_ = None
+            self.max_features = self._max_features_arr
+            if isinstance(self.max_features, str):
+                if self.max_features == "sqrt":
+                    max_features = max(1, int(np.sqrt(self.n_features_in_)))
+                elif self.max_features == "log2":
+                    max_features = max(1, int(np.log2(self.n_features_in_)))
+            elif self.max_features is None:
+                max_features = self.n_features_in_
+            elif isinstance(self.max_features, numbers.Integral):
+                max_features = self.max_features
+            else:  # float
+                if self.max_features > 0.0:
+                    max_features = max(1, int(self.max_features * self.n_features_in_))
+                else:
+                    max_features = 0
+
+            self.max_features_ = max_features
+            print(self.max_features_, self.max_features_per_set_)
 
         if not isinstance(self.splitter, ObliqueSplitter):
             splitter = SPLITTERS[self.splitter](
@@ -466,3 +520,61 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         if self.n_outputs_ == 1:
             self.n_classes_ = self.n_classes_[0]
             self.classes_ = self.classes_[0]
+
+    def fit(self, X, y, sample_weight=None, check_input=True, classes=None):
+        """Build a decision tree classifier from the training set (X, y).
+
+        Parameters
+        ----------
+        X : {array-like, sparse matrix} of shape (n_samples, n_features)
+            The training input samples. Internally, it will be converted to
+            ``dtype=np.float32`` and if a sparse matrix is provided
+            to a sparse ``csc_matrix``.
+
+        y : array-like of shape (n_samples,) or (n_samples, n_outputs)
+            The target values (class labels) as integers or strings.
+
+        sample_weight : array-like of shape (n_samples,), default=None
+            Sample weights. If None, then samples are equally weighted. Splits
+            that would create child nodes with net zero or negative weight are
+            ignored while searching for a split in each node. Splits are also
+            ignored if they would result in any single class carrying a
+            negative weight in either child node.
+
+        check_input : bool, default=True
+            Allow to bypass several input checking.
+            Don't use this parameter unless you know what you're doing.
+
+        classes : array-like of shape (n_classes,), default=None
+            List of all the classes that can possibly appear in the y vector.
+
+        Returns
+        -------
+        self : MultiViewDecisionTreeClassifier
+            Fitted estimator.
+        """
+        return self._fit(
+            X, y, sample_weight=sample_weight, check_input=check_input, classes=classes
+        )
+
+    def _fit(
+        self,
+        X,
+        y,
+        sample_weight=None,
+        check_input=True,
+        missing_values_in_feature_mask=None,
+        classes=None,
+    ):
+        # XXX: BaseDecisionTree does a check that requires max_features to not be a list/array-like
+        # so we need to temporarily set it to an acceptable value
+        # in the meantime, we will reset:
+        #  - self.max_features_ to the original value
+        #  - self.max_features_arr contains a possible array-like setting of max_features
+        self._max_features_arr = self.max_features
+        self.max_features = None
+        self = super()._fit(
+            X, y, sample_weight, check_input, missing_values_in_feature_mask, classes
+        )
+        self.max_features = self._max_features_arr
+        return self

@@ -5,7 +5,7 @@ on: [status]
 # github actions workflow:
 # https://docs.github.com/en/actions/security-guides/automatic-token-authentication
 permissions: read-all
-  
+
 jobs:
   circleci_artifacts_redirector_job:
     runs-on: ubuntu-20.04

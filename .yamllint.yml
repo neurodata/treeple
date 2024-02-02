@@ -1,0 +1,10 @@
+extends: default
+
+ignore: |
+  sktree/_lib/
+  .asv/
+
+rules:
+  line-length: disable
+  document-start: disable
+  truthy: disable

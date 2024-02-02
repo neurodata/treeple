@@ -130,7 +130,7 @@ When you're ready to contribute code to address an open issue, please follow the
 
     <details><summary>Expand details 👇</summary><br/>
 
-    Our continuous integration (CI) testing runs [a number of checks](https://github.com/neurodata/scikit-tree/actions) for each pull request on [GitHub Actions](https://github.com/features/actions). You can run most of these tests locally, which is something you should do *before* opening a PR to help speed up the review process and make it easier for us. Please see our [development guide](https://github.com/neurodata/scikit-tree/blob/main/DEVELOPING.md) for a comprehensive overview of useful commands leveraging [poetry](https://python-poetry.org). This will cover aspects of code style checking, unit testing, integration testing, and building the documentation. We try to make it as easy as possible with copy/paste commands leveraging poetry which will guide your development process!
+    Our continuous integration (CI) testing runs [a number of checks](https://github.com/neurodata/scikit-tree/actions) for each pull request on [GitHub Actions](https://github.com/features/actions). You can run most of these tests locally, which is something you should do *before* opening a PR to help speed up the review process and make it easier for us. Please see our [development guide](https://github.com/neurodata/scikit-tree/blob/main/DEVELOPING.md) for a comprehensive overview of useful commands. This will cover aspects of code style checking, unit testing, integration testing, and building the documentation.
 
     And finally, please update the [CHANGELOG](https://github.com/neurodata/scikit-tree/docs/whats_new.rst) with notes on your contribution in the "Unreleased" section at the top.
 
@@ -178,45 +178,22 @@ The CI files for github actions shows how to build and install for each OS.
 We use [Sphinx](https://www.sphinx-doc.org/en/master/index.html) to build our API docs, which automatically parses all docstrings
 of public classes and methods. All docstrings should adhere to the [Numpy styling convention](https://www.sphinx-doc.org/en/master/usage/extensions/example_numpy.html).
 
-### Testing Changes Locally With Poetry
+### Testing Changes Locally
 
-With poetry installed, we have included a few convenience functions to check your code. These checks must pass and will be checked by the PR's continuous integration services. You can install the various different developer dependencies with poetry:
+We have included a few convenience functions to check your code. These checks must pass and will be checked by the PR's continuous integration services. You can install the various different developer dependencies:
 
-    poetry install --with style, docs, test
+    pip install .[test,style,doc]
 
 You can verify that your code will pass certain style, formatting and lint checks by running:
 
-    poetry run poe verify
-
-``verify`` runs a sequence of tests that can also be run individually. For example, you can check code formatting with black:
-
-    poetry run poe format_check
-
-If you would like to automatically black format your changes:
-
-    poetry run poe format
-
-You can then check for code style and general linting:
-
-    poetry run poe lint
-
-Finally, you should run some mypy type checks:
-
-    poetry run poe type_check
+    make run-checks
 
 ### Documentation
 
 If you need to build the documentation locally and check for doc errors:
 
-    poetry run poe build_docs
+    make build-doc
 
-### Dependency Changes
-
-If you need to add new, or remove old dependencies, then you need to modify the ``pyproject.toml`` file and then also update the ``poetry.lock`` file, which version-controls all necessary dependencies. If you alter any dependency in the ``pyproject.toml`` file, you must run:
-
-    poetry update
-
-To update the lock file.
 
 ## Developing a new Tree model
 

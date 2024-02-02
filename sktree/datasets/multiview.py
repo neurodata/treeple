@@ -38,7 +38,7 @@ def make_gaussian_mixture(
     n_samples : int
         The number of points in each view, divided across Gaussians per
         `class_probs`.
-    transform : 'linear' | 'sin' | poly' | callable, (default 'linear')
+    transform : 'linear' | 'sin' | 'poly' | callable, (default 'linear')
         Transformation to perform on the latent variable. If a function,
         applies it to the latent. Otherwise uses an implemented function.
     noise : float or None (default=None)
@@ -266,7 +266,7 @@ def make_joint_factor_model(
     shared scores.
 
     Parameters
-    -----------
+    ----------
     n_views : int
         Number of views to sample. This corresponds to ``B`` in the notes.
 

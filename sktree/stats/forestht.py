@@ -1,16 +1,20 @@
 from typing import Callable, Optional, Tuple, Union
 
+
+import threading
+from sklearn.ensemble._base import _partition_estimators
+
 import numpy as np
 from joblib import Parallel, delayed
 from numpy.typing import ArrayLike
 from sklearn.base import MetaEstimatorMixin, clone, is_classifier
 from sklearn.ensemble._forest import ForestClassifier as sklearnForestClassifier
 from sklearn.ensemble._forest import ForestRegressor as sklearnForestRegressor
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, StratifiedKFold
 from sklearn.utils.multiclass import type_of_target
 from sklearn.utils.validation import _is_fitted, check_X_y
 
-from sktree._lib.sklearn.ensemble._forest import (
+from .._lib.sklearn.ensemble._forest import (
     ForestClassifier,
     ForestRegressor,
     RandomForestClassifier,
@@ -18,10 +22,10 @@ from sktree._lib.sklearn.ensemble._forest import (
     _get_n_samples_bootstrap,
     _parallel_build_trees,
 )
-from sktree.ensemble._honest_forest import HonestForestClassifier
-from sktree.experimental import conditional_resample
-from sktree.tree import DecisionTreeClassifier, DecisionTreeRegressor
-from sktree.tree._classes import DTYPE
+from ..ensemble._honest_forest import HonestForestClassifier
+from ..experimental import conditional_resample
+from ..tree import DecisionTreeClassifier, DecisionTreeRegressor
+from ..tree._classes import DTYPE
 
 from .utils import (
     METRIC_FUNCTIONS,
@@ -563,6 +567,7 @@ class BaseForestHT(MetaEstimatorMixin):
                 metric=metric,
                 n_repeats=n_repeats,
                 seed=self.random_state,
+                **metric_kwargs,
             )
         else:
             # If not sampling a new dataset per tree, then we may either be
@@ -581,6 +586,7 @@ class BaseForestHT(MetaEstimatorMixin):
                 metric=metric,
                 n_repeats=n_repeats,
                 seed=self.random_state,
+                **metric_kwargs,
             )
         # metric^\pi - metric = observed test statistic, which under the
         # null is normally distributed around 0
@@ -1191,3 +1197,281 @@ class FeatureImportanceForestClassifier(BaseForestHT):
             return stat, posterior_arr, samples
 
         return stat
+
+
+def _parallel_predict_proba_oob(predict_proba, X, out, idx, test_idx, lock):
+    """
+    This is a utility function for joblib's Parallel.
+    It can't go locally in ForestClassifier or ForestRegressor, because joblib
+    complains that it cannot pickle it when placed there.
+    """
+    # each tree predicts proba with a list of output (n_samples, n_classes[i])
+    prediction = predict_proba(X, check_input=False)
+
+    indices = np.zeros(X.shape[0], dtype=bool)
+    indices[test_idx] = True
+    with lock:
+        out[idx, test_idx, :] = prediction[test_idx, :]
+    return prediction
+
+
+def build_coleman_forest(
+    est,
+    X,
+    y,
+    covariate_index=None,
+    metric="s@s98",
+    n_repeats=1000,
+    verbose=False,
+    seed=None,
+    return_posteriors=True,
+    **metric_kwargs,
+):
+    """Build a hypothesis testing forest using oob samples.
+
+    Parameters
+    ----------
+    est : Forest
+        The type of forest to use. Must be enabled with ``bootstrap=True``.
+    X : ArrayLike of shape (n_samples, n_features)
+        Data.
+    y : ArrayLike of shape (n_samples, n_outputs)
+        Binary target, so ``n_outputs`` should be at most 1.
+    covariate_index : ArrayLike, optional of shape (n_covariates,)
+        The index array of covariates to shuffle, by default None.
+    metric : str, optional
+        The metric to compute, by default "s@s98", for sensitivity at
+        98% specificity.
+    n_repeats : int, optional
+        Number of times to bootstrap sample the two forests to construct
+        the null distribution, by default 1000.
+    verbose : bool, optional
+        Verbosity, by default False.
+    seed : int, optional
+        Random seed, by default None.
+    return_posteriors : bool, optional
+        Whether or not to return the posteriors, by default False.
+    **metric_kwargs : dict, optional
+        Additional keyword arguments to pass to the metric function.
+
+    Returns
+    -------
+    observe_stat : float
+        The test statistic. To compute the test statistic, take
+        ``permute_stat_`` and subtract ``observe_stat_``.
+    pvalue : float
+        The p-value of the test statistic.
+    orig_forest_proba : ArrayLike of shape (n_estimators, n_samples, n_outputs)
+        The predicted posterior probabilities for each estimator on their
+        out of bag samples.
+    perm_forest_proba : ArrayLike of shape (n_estimators, n_samples, n_outputs)
+        The predicted posterior probabilities for each of the permuted estimators
+        on their out of bag samples.
+    """
+    rng = np.random.default_rng(seed)
+    metric_func: Callable[[ArrayLike, ArrayLike], float] = METRIC_FUNCTIONS[metric]
+
+    if covariate_index is None:
+        covariate_index = np.arange(X.shape[1], dtype=int)
+
+    # perform permutation of covariates
+    # TODO: refactor permutations into the HonestForest(?)
+    n_samples_train = X.shape[0]
+    index_arr = rng.choice(
+        np.arange(n_samples_train, dtype=int),
+        size=(n_samples_train, 1),
+        replace=False,
+        shuffle=True,
+    )
+    X_permute = X.copy()
+    X_permute[:, covariate_index] = X_permute[index_arr, covariate_index]
+
+    # build two sets of forests
+    orig_est, orig_forest_proba = build_hyppo_oob_forest(est, X, y, verbose=verbose)
+    perm_est, perm_forest_proba = build_hyppo_oob_forest(est, X_permute, y, verbose=verbose)
+
+    metric_star, metric_star_pi = _compute_null_distribution_coleman(
+        y,
+        orig_forest_proba,
+        perm_forest_proba,
+        metric,
+        n_repeats=n_repeats,
+        seed=seed,
+        **metric_kwargs,
+    )
+
+    y_pred_proba_orig = np.nanmean(orig_forest_proba, axis=0)
+    y_pred_proba_perm = np.nanmean(perm_forest_proba, axis=0)
+    observe_stat = metric_func(y, y_pred_proba_orig, **metric_kwargs)
+    permute_stat = metric_func(y, y_pred_proba_perm, **metric_kwargs)
+
+    # metric^\pi - metric = observed test statistic, which under the
+    # null is normally distributed around 0
+    observe_test_stat = permute_stat - observe_stat
+
+    # metric^\pi_j - metric_j, which is centered at 0
+    null_dist = metric_star_pi - metric_star
+
+    # compute pvalue
+    if metric in POSITIVE_METRICS:
+        pvalue = (1 + (null_dist <= observe_test_stat).sum()) / (1 + n_repeats)
+    else:
+        pvalue = (1 + (null_dist >= observe_test_stat).sum()) / (1 + n_repeats)
+
+    if return_posteriors:
+        return observe_test_stat, pvalue, orig_forest_proba, perm_forest_proba
+    else:
+        return observe_test_stat, pvalue
+
+
+def build_hyppo_oob_forest(
+    est,
+    X,
+    y,
+    verbose=False,
+):
+    """Build a hypothesis testing forest using oob samples.
+
+    Parameters
+    ----------
+    est : Forest
+        The type of forest to use. Must be enabled with ``bootstrap=True``.
+    X : ArrayLike of shape (n_samples, n_features)
+        Data.
+    y : ArrayLike of shape (n_samples, n_outputs)
+        Binary target, so ``n_outputs`` should be at most 1.
+    verbose : bool, optional
+        Verbosity, by default False.
+
+    Returns
+    -------
+    est : Forest
+        Fitted forest.
+    all_proba : ArrayLike of shape (n_estimators, n_samples, n_outputs)
+        The predicted posterior probabilities for each estimator on their
+        out of bag samples.
+    """
+    assert est.bootstrap
+
+    est = clone(est)
+
+    # build forest
+    est.fit(X, y)
+
+    # now evaluate
+    X = est._validate_X_predict(X)
+
+    # if we trained a binning tree, then we should re-bin the data
+    # XXX: this is inefficient and should be improved to be in line with what
+    # the Histogram Gradient Boosting Tree does, where the binning thresholds
+    # are passed into the tree itself, thus allowing us to set the node feature
+    # value thresholds within the tree itself.
+    if est.max_bins is not None:
+        X = est._bin_data(X, is_training_data=False).astype(DTYPE)
+
+    # Assign chunk of trees to jobs
+    n_jobs, _, _ = _partition_estimators(est.n_estimators, est.n_jobs)
+
+    # avoid storing the output of every estimator by summing them here
+    lock = threading.Lock()
+    # accumulate the predictions across all trees
+    all_proba = np.full(
+        (len(est.estimators_), X.shape[0], est.n_classes_), np.nan, dtype=np.float64
+    )
+    Parallel(n_jobs=n_jobs, verbose=verbose, require="sharedmem")(
+        delayed(_parallel_predict_proba_oob)(e.predict_proba, X, all_proba, idx, test_idx, lock)
+        for idx, (e, test_idx) in enumerate(zip(est.estimators_, est.oob_samples_))
+    )
+    return est, all_proba
+
+
+def build_hyppo_cv_forest(
+    est,
+    X,
+    y,
+    cv=5,
+    test_size=0.2,
+    verbose=False,
+    seed=None,
+):
+    """Build a hypothesis testing forest using oob samples.
+
+    Parameters
+    ----------
+    est : Forest
+        The type of forest to use. Must be enabled with ``bootstrap=True``.
+    X : ArrayLike of shape (n_samples, n_features)
+        Data.
+    y : ArrayLike of shape (n_samples, n_outputs)
+        Binary target, so ``n_outputs`` should be at most 1.
+    cv : int, optional
+        Number of folds to use for cross-validation, by default 5.
+    test_size : float, optional
+        Proportion of samples per tree to use for the test set, by default 0.2.
+    verbose : bool, optional
+        Verbosity, by default False.
+    seed : int, optional
+        Random seed, by default None.
+
+    Returns
+    -------
+    est : Forest
+        Fitted forest.
+    all_proba_list : list of ArrayLike of shape (n_estimators, n_samples, n_outputs)
+        The predicted posterior probabilities for each estimator on their
+        out of bag samples. Length of list is equal to the number of splits.
+    """
+    X = X.astype(np.float32)
+    if cv is not None:
+        cv = StratifiedKFold(n_splits=cv, shuffle=True, random_state=seed)
+        n_splits = cv.get_n_splits()
+        train_idx_list, test_idx_list = [], []
+        for train_idx, test_idx in cv.split(X, y):
+            train_idx_list.append(train_idx)
+            test_idx_list.append(test_idx)
+    else:
+        n_samples_idx = np.arange(len(y))
+        train_idx, test_idx = train_test_split(
+            n_samples_idx, test_size=test_size, random_state=seed, shuffle=True, stratify=y
+        )
+
+        train_idx_list = [train_idx]
+        test_idx_list = [test_idx]
+        n_splits = 1
+
+    est_list = []
+    all_proba_list = []
+    for isplit in range(n_splits):
+        X_train, y_train = X[train_idx_list[isplit], :], y[train_idx_list[isplit]]
+        # X_test = X[test_idx_list[isplit], :]
+
+        # build forest
+        est.fit(X_train, y_train)
+
+        # now evaluate
+        X = est._validate_X_predict(X)
+
+        # if we trained a binning tree, then we should re-bin the data
+        # XXX: this is inefficient and should be improved to be in line with what
+        # the Histogram Gradient Boosting Tree does, where the binning thresholds
+        # are passed into the tree itself, thus allowing us to set the node feature
+        # value thresholds within the tree itself.
+        if est.max_bins is not None:
+            X = est._bin_data(X, is_training_data=False).astype(DTYPE)
+
+        # Assign chunk of trees to jobs
+        n_jobs, _, _ = _partition_estimators(est.n_estimators, est.n_jobs)
+
+        # avoid storing the output of every estimator by summing them here
+        all_proba = Parallel(n_jobs=n_jobs, verbose=verbose)(
+            delayed(_parallel_predict_proba)(e.predict_proba, X, test_idx_list[isplit])
+            for e in est.estimators_
+        )
+        posterior_arr = np.full((est.n_estimators, X.shape[0], est.n_classes_), np.nan)
+        for itree, (proba) in enumerate(all_proba):
+            posterior_arr[itree, test_idx_list[isplit], ...] = proba.reshape(-1, est.n_classes_)
+
+        all_proba_list.append(posterior_arr)
+        est_list.append(est)
+
+    return est_list, all_proba_list

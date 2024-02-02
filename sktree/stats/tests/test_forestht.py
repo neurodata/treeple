@@ -8,13 +8,14 @@ import pytest
 from flaky import flaky
 from joblib import Parallel, delayed
 from numpy.testing import assert_almost_equal, assert_array_equal
+from scipy.stats import wilcoxon
 from sklearn import datasets
 
 from sktree import HonestForestClassifier, RandomForestClassifier, RandomForestRegressor
 from sktree._lib.sklearn.tree import DecisionTreeClassifier
 from sktree.stats import FeatureImportanceForestClassifier, FeatureImportanceForestRegressor
 from sktree.stats.utils import _non_nan_samples
-from sktree.tree import ObliqueDecisionTreeClassifier
+from sktree.tree import MultiViewDecisionTreeClassifier, ObliqueDecisionTreeClassifier
 
 # load the iris dataset (n_samples, 4)
 # and randomly permute it
@@ -676,3 +677,98 @@ def test_permute_forest_fraction(permute_forest_fraction, seed):
         else:
             assert_array_equal(train_inds, train_test_splits[idx][0])
             assert_array_equal(test_inds, train_test_splits[idx][1])
+
+
+def test_comight_repeated_feature_sets():
+    """Test COMIGHT when there are repeated feature sets."""
+    n_samples = 50
+    n_features = 500
+    rng = np.random.default_rng(seed)
+
+    X = rng.uniform(size=(n_samples, 10))
+    X2 = X + 3
+    X = np.hstack((X, rng.standard_normal(size=(n_samples, n_features - 10))))
+    X2 = np.hstack((X2, rng.standard_normal(size=(n_samples, n_features - 10))))
+    X = np.vstack([X, X2])
+    y = np.vstack([np.zeros((n_samples, 1)), np.ones((n_samples, 1))])  # Binary classification
+
+    X = np.hstack((X, X))
+    feature_set_ends = [n_features, n_features * 2]
+
+    clf = FeatureImportanceForestClassifier(
+        estimator=HonestForestClassifier(
+            n_estimators=50,
+            random_state=seed,
+            n_jobs=1,
+            honest_fraction=0.5,
+            tree_estimator=MultiViewDecisionTreeClassifier(
+                feature_set_ends=feature_set_ends,
+                max_features=0.3,
+                apply_max_features_per_feature_set=True,
+            ),
+        ),
+        test_size=0.2,
+        permute_forest_fraction=None,
+        sample_dataset_per_tree=False,
+        random_state=seed,
+    )
+
+    # first test MIGHT rejects the null, since there is information
+    stat, pvalue = clf.test(X, y, metric="mi")
+    assert pvalue < 0.05
+
+    # second test CoMIGHT fails to reject the null, since the information
+    # is entirely contained in the first feature set
+    stat, pvalue = clf.test(X, y, covariate_index=np.arange(n_features), metric="mi")
+    assert pvalue > 0.05, f"{pvalue}"
+
+
+def test_null_with_partial_auc():
+    limit = 0.1
+    max_features = "sqrt"
+    n_repeats = 1000
+    n_estimators = 20
+    test_size = 0.2
+
+    # Check consistency on dataset iris.
+    clf = FeatureImportanceForestClassifier(
+        estimator=HonestForestClassifier(
+            n_estimators=n_estimators,
+            max_features=max_features,
+            random_state=0,
+            n_jobs=1,
+        ),
+        test_size=test_size,
+        random_state=0,
+    )
+    # now add completely uninformative feature
+    X = np.hstack((iris_X, rng.standard_normal(size=(iris_X.shape[0], 4))))
+
+    stat, pvalue = clf.test(
+        X,
+        iris_y,
+        covariate_index=np.arange(2),
+        n_repeats=n_repeats,
+        metric="auc",
+    )
+    first_null_dist = deepcopy(clf.null_dist_)
+
+    # If we re-run it with a different seed, but now specifying max_fpr
+    # there should be a difference in the partial-AUC distribution
+    clf = FeatureImportanceForestClassifier(
+        estimator=HonestForestClassifier(
+            n_estimators=n_estimators,
+            max_features=max_features,
+            random_state=0,
+            n_jobs=1,
+        ),
+        test_size=test_size,
+        random_state=seed,
+    )
+    stat, pvalue = clf.test(
+        X, iris_y, covariate_index=np.arange(2), n_repeats=n_repeats, metric="auc", max_fpr=limit
+    )
+    second_null_dist = clf.null_dist_
+    null_dist_pvalue = wilcoxon(first_null_dist, second_null_dist).pvalue
+    assert null_dist_pvalue < 0.05, null_dist_pvalue
+    assert pvalue > 0.05, f"pvalue: {pvalue}"
