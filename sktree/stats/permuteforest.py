@@ -441,7 +441,7 @@ class PermutationHonestForestClassifier(HonestForestClassifier):
             )
         else:
             perm_idx = random_state.choice(self._n_samples, size=self._n_samples, replace=False)
-            X = X[perm_idx, self.covariate_index_]
+            X[:, self.covariate_index_] = X[perm_idx, self.covariate_index_]
 
             trees = Parallel(
                 n_jobs=self.n_jobs,
