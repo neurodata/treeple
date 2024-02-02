@@ -452,19 +452,17 @@ document.write(`
                 <article class="bd-article">
                   
   <h1>Source code for sktree.stats.forestht</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
-
-
-<span class="kn">import</span> <span class="nn">threading</span>
-<span class="kn">from</span> <span class="nn">sklearn.ensemble._base</span> <span class="kn">import</span> <span class="n">_partition_estimators</span>
+<span></span><span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">joblib</span> <span class="kn">import</span> <span class="n">Parallel</span><span class="p">,</span> <span class="n">delayed</span>
 <span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">ArrayLike</span>
 <span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">MetaEstimatorMixin</span><span class="p">,</span> <span class="n">clone</span><span class="p">,</span> <span class="n">is_classifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble._base</span> <span class="kn">import</span> <span class="n">_partition_estimators</span>
 <span class="kn">from</span> <span class="nn">sklearn.ensemble._forest</span> <span class="kn">import</span> <span class="n">ForestClassifier</span> <span class="k">as</span> <span class="n">sklearnForestClassifier</span>
 <span class="kn">from</span> <span class="nn">sklearn.ensemble._forest</span> <span class="kn">import</span> <span class="n">ForestRegressor</span> <span class="k">as</span> <span class="n">sklearnForestRegressor</span>
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span><span class="p">,</span> <span class="n">StratifiedKFold</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">StratifiedKFold</span><span class="p">,</span> <span class="n">train_test_split</span>
 <span class="kn">from</span> <span class="nn">sklearn.utils.multiclass</span> <span class="kn">import</span> <span class="n">type_of_target</span>
 <span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">_is_fitted</span><span class="p">,</span> <span class="n">check_X_y</span>
 
@@ -480,7 +478,6 @@ document.write(`
 <span class="kn">from</span> <span class="nn">..experimental</span> <span class="kn">import</span> <span class="n">conditional_resample</span>
 <span class="kn">from</span> <span class="nn">..tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span><span class="p">,</span> <span class="n">DecisionTreeRegressor</span>
 <span class="kn">from</span> <span class="nn">..tree._classes</span> <span class="kn">import</span> <span class="n">DTYPE</span>
-
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">METRIC_FUNCTIONS</span><span class="p">,</span>
     <span class="n">POSITIVE_METRICS</span><span class="p">,</span>
@@ -1682,6 +1679,7 @@ document.write(`
 <a class="viewcode-back" href="../../../generated/sktree.stats.build_coleman_forest.html#sktree.stats.build_coleman_forest">[docs]</a>
 <span class="k">def</span> <span class="nf">build_coleman_forest</span><span class="p">(</span>
     <span class="n">est</span><span class="p">,</span>
+    <span class="n">perm_est</span><span class="p">,</span>
     <span class="n">X</span><span class="p">,</span>
     <span class="n">y</span><span class="p">,</span>
     <span class="n">covariate_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1698,6 +1696,8 @@ document.write(`
 <span class="sd">    ----------</span>
 <span class="sd">    est : Forest</span>
 <span class="sd">        The type of forest to use. Must be enabled with ``bootstrap=True``.</span>
+<span class="sd">    perm_est : Forest</span>
+<span class="sd">        The forest to use for the permuted dataset.</span>
 <span class="sd">    X : ArrayLike of shape (n_samples, n_features)</span>
 <span class="sd">        Data.</span>
 <span class="sd">    y : ArrayLike of shape (n_samples, n_outputs)</span>
@@ -1752,8 +1752,10 @@ document.write(`
     <span class="n">X_permute</span><span class="p">[:,</span> <span class="n">covariate_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">X_permute</span><span class="p">[</span><span class="n">index_arr</span><span class="p">,</span> <span class="n">covariate_index</span><span class="p">]</span>
 
     <span class="c1"># build two sets of forests</span>
-    <span class="n">orig_est</span><span class="p">,</span> <span class="n">orig_forest_proba</span> <span class="o">=</span> <span class="n">build_hyppo_oob_forest</span><span class="p">(</span><span class="n">est</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
-    <span class="n">perm_est</span><span class="p">,</span> <span class="n">perm_forest_proba</span> <span class="o">=</span> <span class="n">build_hyppo_oob_forest</span><span class="p">(</span><span class="n">est</span><span class="p">,</span> <span class="n">X_permute</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="n">est</span><span class="p">,</span> <span class="n">orig_forest_proba</span> <span class="o">=</span> <span class="n">build_hyppo_oob_forest</span><span class="p">(</span><span class="n">est</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="n">perm_est</span><span class="p">,</span> <span class="n">perm_forest_proba</span> <span class="o">=</span> <span class="n">build_hyppo_oob_forest</span><span class="p">(</span>
+        <span class="n">perm_est</span><span class="p">,</span> <span class="n">X_permute</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">covariate_index</span><span class="o">=</span><span class="n">covariate_index</span>
+    <span class="p">)</span>
 
     <span class="n">metric_star</span><span class="p">,</span> <span class="n">metric_star_pi</span> <span class="o">=</span> <span class="n">_compute_null_distribution_coleman</span><span class="p">(</span>
         <span class="n">y</span><span class="p">,</span>
@@ -1792,12 +1794,7 @@ document.write(`
 
 <div class="viewcode-block" id="build_hyppo_oob_forest">
 <a class="viewcode-back" href="../../../generated/sktree.stats.build_hyppo_oob_forest.html#sktree.stats.build_hyppo_oob_forest">[docs]</a>
-<span class="k">def</span> <span class="nf">build_hyppo_oob_forest</span><span class="p">(</span>
-    <span class="n">est</span><span class="p">,</span>
-    <span class="n">X</span><span class="p">,</span>
-    <span class="n">y</span><span class="p">,</span>
-    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<span class="p">):</span>
+<span class="k">def</span> <span class="nf">build_hyppo_oob_forest</span><span class="p">(</span><span class="n">est</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">est_kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a hypothesis testing forest using oob samples.</span>
 
 <span class="sd">    Parameters</span>
@@ -1810,6 +1807,8 @@ document.write(`
 <span class="sd">        Binary target, so ``n_outputs`` should be at most 1.</span>
 <span class="sd">    verbose : bool, optional</span>
 <span class="sd">        Verbosity, by default False.</span>
+<span class="sd">    **est_kwargs : dict, optional</span>
+<span class="sd">        Additional keyword arguments to pass to the forest estimator.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1820,11 +1819,11 @@ document.write(`
 <span class="sd">        out of bag samples.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="n">est</span><span class="o">.</span><span class="n">bootstrap</span>
-
+    <span class="k">assert</span> <span class="n">type_of_target</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;binary&quot;</span><span class="p">)</span>
     <span class="n">est</span> <span class="o">=</span> <span class="n">clone</span><span class="p">(</span><span class="n">est</span><span class="p">)</span>
 
     <span class="c1"># build forest</span>
-    <span class="n">est</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">est</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="o">**</span><span class="n">est_kwargs</span><span class="p">)</span>
 
     <span class="c1"># now evaluate</span>
     <span class="n">X</span> <span class="o">=</span> <span class="n">est</span><span class="o">.</span><span class="n">_validate_X_predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
@@ -1947,6 +1946,39 @@ document.write(`
 
     <span class="k">return</span> <span class="n">est_list</span><span class="p">,</span> <span class="n">all_proba_list</span></div>
 
+
+
+<span class="k">def</span> <span class="nf">predict_oob_proba</span><span class="p">(</span><span class="n">est</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Predict out of bag posterior probabilities.&quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">check_is_fitted</span>
+
+    <span class="n">check_is_fitted</span><span class="p">(</span><span class="n">est</span><span class="p">)</span>
+
+    <span class="c1"># now evaluate</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">est</span><span class="o">.</span><span class="n">_validate_X_predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+    <span class="c1"># if we trained a binning tree, then we should re-bin the data</span>
+    <span class="c1"># XXX: this is inefficient and should be improved to be in line with what</span>
+    <span class="c1"># the Histogram Gradient Boosting Tree does, where the binning thresholds</span>
+    <span class="c1"># are passed into the tree itself, thus allowing us to set the node feature</span>
+    <span class="c1"># value thresholds within the tree itself.</span>
+    <span class="k">if</span> <span class="n">est</span><span class="o">.</span><span class="n">max_bins</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">est</span><span class="o">.</span><span class="n">_bin_data</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">is_training_data</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">DTYPE</span><span class="p">)</span>
+
+    <span class="c1"># Assign chunk of trees to jobs</span>
+    <span class="n">n_jobs</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_partition_estimators</span><span class="p">(</span><span class="n">est</span><span class="o">.</span><span class="n">n_estimators</span><span class="p">,</span> <span class="n">est</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">)</span>
+
+    <span class="c1"># avoid storing the output of every estimator by summing them here</span>
+    <span class="n">lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+    <span class="c1"># accumulate the predictions across all trees</span>
+    <span class="n">all_proba</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
+        <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">est</span><span class="o">.</span><span class="n">estimators_</span><span class="p">),</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">est</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span>
+    <span class="p">)</span>
+    <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">require</span><span class="o">=</span><span class="s2">&quot;sharedmem&quot;</span><span class="p">)(</span>
+        <span class="n">delayed</span><span class="p">(</span><span class="n">_parallel_predict_proba_oob</span><span class="p">)(</span><span class="n">e</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">all_proba</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">test_idx</span><span class="p">,</span> <span class="n">lock</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">test_idx</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">est</span><span class="o">.</span><span class="n">estimators_</span><span class="p">,</span> <span class="n">est</span><span class="o">.</span><span class="n">oob_samples_</span><span class="p">))</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">all_proba</span>
 </pre></div>
 
                 </article>
@@ -1990,7 +2022,7 @@ document.write(`
 
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-01.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-02.
       <br/>
     
   </p>

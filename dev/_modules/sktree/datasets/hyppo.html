@@ -453,8 +453,8 @@ document.write(`
                   
   <h1>Source code for sktree.datasets.hyppo</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">multivariate_normal</span><span class="p">,</span> <span class="n">entropy</span>
 <span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">nquad</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">entropy</span><span class="p">,</span> <span class="n">multivariate_normal</span>
 
 
 <div class="viewcode-block" id="make_quadratic_classification">
@@ -508,8 +508,8 @@ document.write(`
 <a class="viewcode-back" href="../../../generated/sktree.datasets.make_trunk_classification.html#sktree.datasets.make_trunk_classification">[docs]</a>
 <span class="k">def</span> <span class="nf">make_trunk_classification</span><span class="p">(</span>
     <span class="n">n_samples</span><span class="p">,</span>
-    <span class="n">n_dim</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-    <span class="n">n_informative</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">n_dim</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span>
+    <span class="n">n_informative</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
     <span class="n">m_factor</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">rho</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">band_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ma&quot;</span><span class="p">,</span>
@@ -535,10 +535,10 @@ document.write(`
 <span class="sd">        Number of sample to generate.</span>
 <span class="sd">    n_dim : int, optional</span>
 <span class="sd">        The dimensionality of the dataset and the number of</span>
-<span class="sd">        unique labels, by default 10.</span>
+<span class="sd">        unique labels, by default 4096.</span>
 <span class="sd">    n_informative : int, optional</span>
 <span class="sd">        The informative dimensions. All others for ``n_dim - n_informative``</span>
-<span class="sd">        are uniform noise.</span>
+<span class="sd">        are uniform noise. Default is 256.</span>
 <span class="sd">    m_factor : int, optional</span>
 <span class="sd">        The multiplicative factor to apply to the mean-vector of the first</span>
 <span class="sd">        distribution to obtain the mean-vector of the second distribution.</span>
@@ -628,7 +628,7 @@ document.write(`
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">n_dim</span> <span class="o">&gt;</span> <span class="n">n_informative</span><span class="p">:</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">X</span><span class="p">,</span> <span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">n_dim</span> <span class="o">-</span> <span class="n">n_informative</span><span class="p">))))</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">X</span><span class="p">,</span> <span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">n_dim</span> <span class="o">-</span> <span class="n">n_informative</span><span class="p">))))</span>
 
     <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)))</span>
 
@@ -875,7 +875,7 @@ document.write(`
 
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-01.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-02.
       <br/>
     
   </p>
