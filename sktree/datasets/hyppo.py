@@ -1,6 +1,6 @@
 import numpy as np
-from scipy.stats import multivariate_normal, entropy
 from scipy.integrate import nquad
+from scipy.stats import entropy, multivariate_normal
 
 
 def make_quadratic_classification(n_samples: int, n_features: int, noise=False, seed=None):

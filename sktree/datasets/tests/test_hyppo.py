@@ -1,11 +1,12 @@
-import pytest
 import numpy as np
+import pytest
 from numpy.testing import assert_array_equal
+
 from sktree.datasets import (
-    make_quadratic_classification,
-    make_trunk_classification,
     approximate_clf_mutual_information,
     approximate_clf_mutual_information_with_monte_carlo,
+    make_quadratic_classification,
+    make_trunk_classification,
 )
 
 

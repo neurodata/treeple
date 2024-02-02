@@ -16,6 +16,7 @@ the same thresholding rule as regular decision trees.
 
 We also show the tree structure of a model built on all of the features.
 """
+
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.datasets import load_iris

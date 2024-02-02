@@ -1,11 +1,8 @@
 import numpy as np
 from joblib import Parallel, delayed
-
 from sklearn.base import _fit_context
 
-from .._lib.sklearn.ensemble._forest import (
-    _parallel_build_trees,
-)
+from .._lib.sklearn.ensemble._forest import _parallel_build_trees
 from ..ensemble._honest_forest import HonestForestClassifier
 
 
@@ -405,6 +402,7 @@ class PermutationHonestForestClassifier(HonestForestClassifier):
         # since correctness does not rely on using threads.
         if self.permute_per_tree:
             # TODO: refactor to make this a more robust implementation
+            # XXX: this does not currently allow permuting individual covariates.
             permutation_arr_per_tree = [
                 random_state.choice(self._n_samples, size=self._n_samples, replace=False)
                 for _ in range(self.n_estimators)
@@ -442,6 +440,9 @@ class PermutationHonestForestClassifier(HonestForestClassifier):
                 )
             )
         else:
+            perm_idx = random_state.choice(self._n_samples, size=self._n_samples, replace=False)
+            X = X[perm_idx, self.covariate_index_]
+
             trees = Parallel(
                 n_jobs=self.n_jobs,
                 verbose=self.verbose,

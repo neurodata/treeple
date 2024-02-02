@@ -15,6 +15,7 @@ from the input ``X`` and linearly combined to form candidate split dimensions.
 For details on how to use the hyperparameters related to the patches, see
 :class:`sktree.tree.ObliqueDecisionTreeClassifier`.
 """
+
 import matplotlib.pyplot as plt
 
 # import modules

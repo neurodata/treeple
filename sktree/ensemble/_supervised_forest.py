@@ -10,9 +10,10 @@ from ..tree import (
     PatchObliqueDecisionTreeRegressor,
 )
 from ..tree._neighbors import SimMatrixMixin
+from ._extensions import ForestMixin
 
 
-class ObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
+class ObliqueRandomForestClassifier(SimMatrixMixin, ForestMixin, ForestClassifier):
     """
     An oblique random forest classifier.
 
@@ -639,7 +640,7 @@ class ObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
         self.min_impurity_decrease = min_impurity_decrease
 
 
-class PatchObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
+class PatchObliqueRandomForestClassifier(SimMatrixMixin, ForestMixin, ForestClassifier):
     """A patch-oblique random forest classifier.
 
     A patch-oblique random forest is a meta estimator similar to a random
@@ -978,7 +979,7 @@ class PatchObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
         self.min_impurity_decrease = min_impurity_decrease
 
 
-class PatchObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
+class PatchObliqueRandomForestRegressor(SimMatrixMixin, ForestMixin, ForestRegressor):
     """A patch-oblique random forest regressor.
 
     A patch-oblique random forest is a meta estimator similar to a random
@@ -1291,7 +1292,7 @@ class PatchObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
         self.min_impurity_decrease = min_impurity_decrease
 
 
-class ExtraObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
+class ExtraObliqueRandomForestClassifier(SimMatrixMixin, ForestMixin, ForestClassifier):
     """
     An extra oblique random forest classifier.
 

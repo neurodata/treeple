@@ -1,7 +1,8 @@
-import pytest
 import numpy as np
+import pytest
 from numpy.testing import assert_array_equal
 from sklearn import datasets
+
 from sktree.stats import PermutationHonestForestClassifier
 
 # load the iris dataset (n_samples, 4)
@@ -41,20 +42,23 @@ def test_permutationforest_errors():
         )
 
 
-def test_inbag_samples_different_across_forest():
+@pytest.mark.parametrize("permute_per_tree", [True, False])
+def test_inbag_samples_different_across_forest(permute_per_tree):
     """Test that inbag samples are different across trees."""
     n_estimators = 10
     est = PermutationHonestForestClassifier(
-        n_estimators=n_estimators, random_state=0, permute_per_tree=True
+        n_estimators=n_estimators, random_state=0, permute_per_tree=permute_per_tree
     )
 
     X = iris_X
     y = iris_y
     est.fit(X, y)
 
+    # covariate index when None is all the features
     assert_array_equal(est.covariate_index_, np.arange(X.shape[1], dtype=np.intp))
-    permutation_samples_ = est.permutation_indices_
 
+    # inbag samples should be different across trees when permute_per_tree=True
+    permutation_samples_ = est.permutation_indices_
     permutation_samples_ground = permutation_samples_[0]
     assert not all(
         np.array_equal(permutation_samples_ground, permutation_samples_[idx])

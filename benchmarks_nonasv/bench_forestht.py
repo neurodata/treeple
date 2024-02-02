@@ -4,6 +4,7 @@ Specifically, the simulations for model 1, 2, 3 and 4 are reproduced.
 
 .. note:: This script will take a long time to run, since a power curve is generated.
 """
+
 from collections import defaultdict
 
 import matplotlib.pyplot as plt
