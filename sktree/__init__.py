@@ -1,4 +1,5 @@
 """Scikit manifold oblique random forests."""
+
 import logging
 import os
 import sys

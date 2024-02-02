@@ -1,16 +1,14 @@
-from typing import Callable, Optional, Tuple, Union
-
-
 import threading
-from sklearn.ensemble._base import _partition_estimators
+from typing import Callable, Optional, Tuple, Union
 
 import numpy as np
 from joblib import Parallel, delayed
 from numpy.typing import ArrayLike
 from sklearn.base import MetaEstimatorMixin, clone, is_classifier
+from sklearn.ensemble._base import _partition_estimators
 from sklearn.ensemble._forest import ForestClassifier as sklearnForestClassifier
 from sklearn.ensemble._forest import ForestRegressor as sklearnForestRegressor
-from sklearn.model_selection import train_test_split, StratifiedKFold
+from sklearn.model_selection import StratifiedKFold, train_test_split
 from sklearn.utils.multiclass import type_of_target
 from sklearn.utils.validation import _is_fitted, check_X_y
 
@@ -26,7 +24,6 @@ from ..ensemble._honest_forest import HonestForestClassifier
 from ..experimental import conditional_resample
 from ..tree import DecisionTreeClassifier, DecisionTreeRegressor
 from ..tree._classes import DTYPE
-
 from .utils import (
     METRIC_FUNCTIONS,
     POSITIVE_METRICS,
@@ -1217,6 +1214,7 @@ def _parallel_predict_proba_oob(predict_proba, X, out, idx, test_idx, lock):
 
 def build_coleman_forest(
     est,
+    perm_est,
     X,
     y,
     covariate_index=None,
@@ -1233,6 +1231,8 @@ def build_coleman_forest(
     ----------
     est : Forest
         The type of forest to use. Must be enabled with ``bootstrap=True``.
+    perm_est : Forest
+        The forest to use for the permuted dataset.
     X : ArrayLike of shape (n_samples, n_features)
         Data.
     y : ArrayLike of shape (n_samples, n_outputs)
@@ -1287,8 +1287,10 @@ def build_coleman_forest(
     X_permute[:, covariate_index] = X_permute[index_arr, covariate_index]
 
     # build two sets of forests
-    orig_est, orig_forest_proba = build_hyppo_oob_forest(est, X, y, verbose=verbose)
-    perm_est, perm_forest_proba = build_hyppo_oob_forest(est, X_permute, y, verbose=verbose)
+    est, orig_forest_proba = build_hyppo_oob_forest(est, X, y, verbose=verbose)
+    perm_est, perm_forest_proba = build_hyppo_oob_forest(
+        perm_est, X_permute, y, verbose=verbose, covariate_index=covariate_index
+    )
 
     metric_star, metric_star_pi = _compute_null_distribution_coleman(
         y,
@@ -1324,12 +1326,7 @@ def build_coleman_forest(
         return observe_test_stat, pvalue
 
 
-def build_hyppo_oob_forest(
-    est,
-    X,
-    y,
-    verbose=False,
-):
+def build_hyppo_oob_forest(est, X, y, verbose=False, **est_kwargs):
     """Build a hypothesis testing forest using oob samples.
 
     Parameters
@@ -1342,6 +1339,8 @@ def build_hyppo_oob_forest(
         Binary target, so ``n_outputs`` should be at most 1.
     verbose : bool, optional
         Verbosity, by default False.
+    **est_kwargs : dict, optional
+        Additional keyword arguments to pass to the forest estimator.
 
     Returns
     -------
@@ -1352,11 +1351,11 @@ def build_hyppo_oob_forest(
         out of bag samples.
     """
     assert est.bootstrap
-
+    assert type_of_target(y) in ("binary")
     est = clone(est)
 
     # build forest
-    est.fit(X, y)
+    est.fit(X, y.ravel(), **est_kwargs)
 
     # now evaluate
     X = est._validate_X_predict(X)
@@ -1475,3 +1474,36 @@ def build_hyppo_cv_forest(
         est_list.append(est)
 
     return est_list, all_proba_list
+
+
+def predict_oob_proba(est, X, verbose=False):
+    """Predict out of bag posterior probabilities."""
+    from sklearn.utils.validation import check_is_fitted
+
+    check_is_fitted(est)
+
+    # now evaluate
+    X = est._validate_X_predict(X)
+
+    # if we trained a binning tree, then we should re-bin the data
+    # XXX: this is inefficient and should be improved to be in line with what
+    # the Histogram Gradient Boosting Tree does, where the binning thresholds
+    # are passed into the tree itself, thus allowing us to set the node feature
+    # value thresholds within the tree itself.
+    if est.max_bins is not None:
+        X = est._bin_data(X, is_training_data=False).astype(DTYPE)
+
+    # Assign chunk of trees to jobs
+    n_jobs, _, _ = _partition_estimators(est.n_estimators, est.n_jobs)
+
+    # avoid storing the output of every estimator by summing them here
+    lock = threading.Lock()
+    # accumulate the predictions across all trees
+    all_proba = np.full(
+        (len(est.estimators_), X.shape[0], est.n_classes_), np.nan, dtype=np.float64
+    )
+    Parallel(n_jobs=n_jobs, verbose=verbose, require="sharedmem")(
+        delayed(_parallel_predict_proba_oob)(e.predict_proba, X, all_proba, idx, test_idx, lock)
+        for idx, (e, test_idx) in enumerate(zip(est.estimators_, est.oob_samples_))
+    )
+    return all_proba

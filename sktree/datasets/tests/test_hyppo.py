@@ -1,11 +1,12 @@
-import pytest
 import numpy as np
+import pytest
 from numpy.testing import assert_array_equal
+
 from sktree.datasets import (
-    make_quadratic_classification,
-    make_trunk_classification,
     approximate_clf_mutual_information,
     approximate_clf_mutual_information_with_monte_carlo,
+    make_quadratic_classification,
+    make_trunk_classification,
 )
 
 
@@ -16,13 +17,6 @@ def test_make_quadratic_classification_v():
     assert all(val in [0, 1] for val in v)
     assert x.shape == (n_samples * 2, n_features)
     assert len(x) == len(v)
-
-
-def test_make_trunk_classification_default():
-    # Test with default parameters
-    X, y = make_trunk_classification(n_samples=100)
-    assert X.shape == (100, 10)
-    assert y.shape == (100,)
 
 
 def test_make_trunk_classification_custom_parameters():
@@ -43,9 +37,15 @@ def test_make_trunk_classification_custom_parameters():
 def test_make_trunk_classification_autoregressive_cov():
     # Test with default parameters
     n_dim = 10
+    n_informative = 10
     rho = 0.5
     _, _, _, cov_list = make_trunk_classification(
-        n_samples=100, n_dim=n_dim, rho=rho, band_type="ar", return_params=True
+        n_samples=100,
+        n_dim=n_dim,
+        n_informative=n_informative,
+        rho=rho,
+        band_type="ar",
+        return_params=True,
     )
     assert_array_equal(cov_list[0], cov_list[1])
     assert cov_list[0].shape == (n_dim, n_dim)
@@ -54,14 +54,19 @@ def test_make_trunk_classification_autoregressive_cov():
 
 def test_make_trunk_classification_mixture():
     # Test with default parameters
-    X, y, _, _ = make_trunk_classification(n_samples=100, mix=0.5, return_params=True)
-    assert X.shape == (100, 10)
+    X, y, _, _ = make_trunk_classification(
+        n_samples=100, n_dim=10, n_informative=5, mix=0.5, return_params=True
+    )
+    assert X.shape == (100, 10), X.shape
     assert y.shape == (100,)
 
 
 def test_make_trunk_classification_return_params():
     # Test with return_params=True and uneven number of samples
-    X, y, means, covs = make_trunk_classification(n_samples=75, n_dim=10, return_params=True)
+    n_informative = 5
+    X, y, means, covs = make_trunk_classification(
+        n_samples=75, n_dim=10, n_informative=n_informative, return_params=True
+    )
     assert X.shape == (74, 10), X.shape
     assert y.shape == (74,)
     assert len(means) == 2

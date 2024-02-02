@@ -1,6 +1,6 @@
 import numpy as np
-from scipy.stats import multivariate_normal, entropy
 from scipy.integrate import nquad
+from scipy.stats import entropy, multivariate_normal
 
 
 def make_quadratic_classification(n_samples: int, n_features: int, noise=False, seed=None):
@@ -49,8 +49,8 @@ def make_quadratic_classification(n_samples: int, n_features: int, noise=False, 
 
 def make_trunk_classification(
     n_samples,
-    n_dim=10,
-    n_informative=10,
+    n_dim=4096,
+    n_informative=256,
     m_factor: int = -1,
     rho: int = 0,
     band_type: str = "ma",
@@ -76,10 +76,10 @@ def make_trunk_classification(
         Number of sample to generate.
     n_dim : int, optional
         The dimensionality of the dataset and the number of
-        unique labels, by default 10.
+        unique labels, by default 4096.
     n_informative : int, optional
         The informative dimensions. All others for ``n_dim - n_informative``
-        are uniform noise.
+        are uniform noise. Default is 256.
     m_factor : int, optional
         The multiplicative factor to apply to the mean-vector of the first
         distribution to obtain the mean-vector of the second distribution.
@@ -169,7 +169,7 @@ def make_trunk_classification(
         )
 
     if n_dim > n_informative:
-        X = np.hstack((X, rng.uniform(low=0, high=1, size=(n_samples, n_dim - n_informative))))
+        X = np.hstack((X, rng.uniform(low=0, high=1, size=(X.shape[0], n_dim - n_informative))))
 
     y = np.concatenate((np.zeros(n_samples // 2), np.ones(n_samples // 2)))
 

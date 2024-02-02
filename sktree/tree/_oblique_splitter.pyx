@@ -9,8 +9,8 @@ import numpy as np
 from cython.operator cimport dereference as deref
 from libcpp.vector cimport vector
 
-from .._lib.sklearn.tree._utils cimport rand_int, rand_uniform
 from .._lib.sklearn.tree._criterion cimport Criterion
+from .._lib.sklearn.tree._utils cimport rand_int, rand_uniform
 
 
 cdef float64_t INFINITY = np.inf

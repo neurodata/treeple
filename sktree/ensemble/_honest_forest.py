@@ -2,46 +2,26 @@
 # Adopted from: https://github.com/neurodata/honest-forests
 
 import threading
+from numbers import Integral
+from warnings import catch_warnings, simplefilter, warn
 
-from numbers import Integral, Real
 import numpy as np
 from joblib import Parallel, delayed
+from scipy.sparse import issparse
 from sklearn.base import _fit_context
 from sklearn.ensemble._base import _partition_estimators
-from sklearn.utils.validation import check_is_fitted
-from sklearn.utils._param_validation import Interval, RealNotInt
-from warnings import warn, catch_warnings, simplefilter
-
-from scipy.sparse import issparse
-
 from sklearn.ensemble._hist_gradient_boosting.binning import _BinMapper
 from sklearn.exceptions import DataConversionWarning
 from sklearn.utils import check_random_state, compute_sample_weight
 from sklearn.utils._openmp_helpers import _openmp_effective_n_threads
-from sklearn.utils.multiclass import (
-    type_of_target,
-)
-from sklearn.utils.validation import (
-    _check_sample_weight,
-)
-from .._lib.sklearn.tree._tree import DOUBLE, DTYPE
+from sklearn.utils._param_validation import Interval, RealNotInt
+from sklearn.utils.multiclass import type_of_target
+from sklearn.utils.validation import _check_sample_weight, check_is_fitted
+
 from .._lib.sklearn.ensemble._forest import ForestClassifier
+from .._lib.sklearn.tree._tree import DOUBLE, DTYPE
 from ..tree import HonestTreeClassifier
-
-
-def _generate_sample_indices(random_state, n_samples, n_samples_bootstrap, bootstrap):
-    """
-    Private function used to _parallel_build_trees function.
-
-    XXX: this is copied over from scikit-learn and modified to allow sampling with
-    and without replacement given ``bootstrap``.
-    """
-
-    random_instance = check_random_state(random_state)
-    n_sample_idx = np.arange(0, n_samples, dtype=np.int32)
-    sample_indices = random_instance.choice(n_sample_idx, n_samples_bootstrap, replace=bootstrap)
-
-    return sample_indices
+from ._extensions import ForestClassifierMixin, _generate_sample_indices, _get_n_samples_bootstrap
 
 
 def _parallel_build_trees(
@@ -96,40 +76,7 @@ def _parallel_build_trees(
     return tree
 
 
-def _get_n_samples_bootstrap(n_samples, max_samples):
-    """
-    Get the number of samples in a bootstrap sample.
-
-    XXX: Note this is copied from sklearn. We override the ability
-    to sample a higher number of bootstrap samples to enable sampling
-    closer to 80% unique training data points for in-bag computation.
-
-    Parameters
-    ----------
-    n_samples : int
-        Number of samples in the dataset.
-    max_samples : int or float
-        The maximum number of samples to draw from the total available:
-            - if float, this indicates a fraction of the total;
-            - if int, this indicates the exact number of samples;
-            - if None, this indicates the total number of samples.
-
-    Returns
-    -------
-    n_samples_bootstrap : int
-        The total number of samples to draw for the bootstrap sample.
-    """
-    if max_samples is None:
-        return n_samples
-
-    if isinstance(max_samples, Integral):
-        return max_samples
-
-    if isinstance(max_samples, Real):
-        return round(n_samples * max_samples)
-
-
-class HonestForestClassifier(ForestClassifier):
+class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
     """
     A forest classifier with honest leaf estimates.
 
@@ -693,37 +640,15 @@ class HonestForestClassifier(ForestClassifier):
                 # would have got if we hadn't used a warm_start.
                 random_state.randint(MAX_INT, size=len(self.estimators_))
 
-            trees = [
-                self._make_estimator(append=False, random_state=random_state)
-                for i in range(n_more_estimators)
-            ]
-
-            # Parallel loop: we prefer the threading backend as the Cython code
-            # for fitting the trees is internally releasing the Python GIL
-            # making threading more efficient than multiprocessing in
-            # that case. However, for joblib 0.12+ we respect any
-            # parallel_backend contexts set at a higher level,
-            # since correctness does not rely on using threads.
-            trees = Parallel(
-                n_jobs=self.n_jobs,
-                verbose=self.verbose,
-                prefer="threads",
-            )(
-                delayed(_parallel_build_trees)(
-                    t,
-                    self.bootstrap,
-                    X,
-                    y,
-                    sample_weight,
-                    i,
-                    len(trees),
-                    verbose=self.verbose,
-                    class_weight=self.class_weight,
-                    n_samples_bootstrap=n_samples_bootstrap,
-                    missing_values_in_feature_mask=missing_values_in_feature_mask,
-                    classes=classes,
-                )
-                for i, t in enumerate(trees)
+            trees = self._construct_trees(
+                X,
+                y,
+                sample_weight,
+                random_state,
+                n_samples_bootstrap,
+                missing_values_in_feature_mask,
+                classes,
+                n_more_estimators,
             )
 
             # Collect newly grown trees
@@ -761,6 +686,51 @@ class HonestForestClassifier(ForestClassifier):
         )
 
         return self
+
+    def _construct_trees(
+        self,
+        X,
+        y,
+        sample_weight,
+        random_state,
+        n_samples_bootstrap,
+        missing_values_in_feature_mask,
+        classes,
+        n_more_estimators,
+    ):
+        trees = [
+            self._make_estimator(append=False, random_state=random_state)
+            for i in range(n_more_estimators)
+        ]
+
+        # Parallel loop: we prefer the threading backend as the Cython code
+        # for fitting the trees is internally releasing the Python GIL
+        # making threading more efficient than multiprocessing in
+        # that case. However, for joblib 0.12+ we respect any
+        # parallel_backend contexts set at a higher level,
+        # since correctness does not rely on using threads.
+        trees = Parallel(
+            n_jobs=self.n_jobs,
+            verbose=self.verbose,
+            prefer="threads",
+        )(
+            delayed(_parallel_build_trees)(
+                t,
+                self.bootstrap,
+                X,
+                y,
+                sample_weight,
+                i,
+                len(trees),
+                verbose=self.verbose,
+                class_weight=self.class_weight,
+                n_samples_bootstrap=n_samples_bootstrap,
+                missing_values_in_feature_mask=missing_values_in_feature_mask,
+                classes=classes,
+            )
+            for i, t in enumerate(trees)
+        )
+        return trees
 
     def predict_proba(self, X):
         """
@@ -857,17 +827,6 @@ class HonestForestClassifier(ForestClassifier):
                 possible_indices, np.concatenate((structure_idx, honest_idx))
             )
             oob_samples.append(_oob_samples)
-        # n_samples_bootstrap = _get_n_samples_bootstrap(
-        #     self._n_samples,
-        #     self.max_samples,
-        # )
-        # for estimator in self.estimators_:
-        #     unsampled_indices = _generate_unsampled_indices(
-        #         estimator.random_state,
-        #         self._n_samples,
-        #         n_samples_bootstrap,
-        #     )
-        #     oob_samples.append(unsampled_indices)
         return oob_samples
 
     def _more_tags(self):

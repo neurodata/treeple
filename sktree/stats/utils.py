@@ -3,6 +3,7 @@ from typing import Optional, Tuple
 import numpy as np
 from numpy.typing import ArrayLike
 from scipy.stats import entropy
+from sklearn.ensemble._forest import _generate_unsampled_indices, _get_n_samples_bootstrap
 from sklearn.metrics import (
     balanced_accuracy_score,
     mean_absolute_error,
@@ -10,9 +11,9 @@ from sklearn.metrics import (
     roc_auc_score,
     roc_curve,
 )
-from sklearn.utils.validation import check_X_y, check_is_fitted
-from sklearn.ensemble._forest import _generate_unsampled_indices, _get_n_samples_bootstrap
-from sktree._lib.sklearn.ensemble._forest import ForestClassifier, BaseForest
+from sklearn.utils.validation import check_is_fitted, check_X_y
+
+from sktree._lib.sklearn.ensemble._forest import BaseForest, ForestClassifier
 
 
 def _mutual_information(y_true: ArrayLike, y_pred_proba: ArrayLike) -> float:
