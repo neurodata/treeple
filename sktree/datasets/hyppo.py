@@ -49,8 +49,8 @@ def make_quadratic_classification(n_samples: int, n_features: int, noise=False, 
 
 def make_trunk_classification(
     n_samples,
-    n_dim=10,
-    n_informative=10,
+    n_dim=4096,
+    n_informative=256,
     m_factor: int = -1,
     rho: int = 0,
     band_type: str = "ma",
@@ -76,10 +76,10 @@ def make_trunk_classification(
         Number of sample to generate.
     n_dim : int, optional
         The dimensionality of the dataset and the number of
-        unique labels, by default 10.
+        unique labels, by default 4096.
     n_informative : int, optional
         The informative dimensions. All others for ``n_dim - n_informative``
-        are uniform noise.
+        are uniform noise. Default is 256.
     m_factor : int, optional
         The multiplicative factor to apply to the mean-vector of the first
         distribution to obtain the mean-vector of the second distribution.
