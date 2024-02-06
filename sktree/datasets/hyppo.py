@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.stats import multivariate_normal, entropy, norm
 from scipy.integrate import nquad
+from scipy.stats import entropy, multivariate_normal
 
 
 def make_quadratic_classification(n_samples: int, n_features: int, noise=False, seed=None):
@@ -47,33 +48,38 @@ def make_quadratic_classification(n_samples: int, n_features: int, noise=False, 
     return x, v
 
 
+# Dictionary of simulations from Marron and Wand 1992
+# keys: names of each simulation corresponding to the class MarronWandSims
+# values: probabilities associated with the mixture of Gaussians
 MARRON_WAND_SIMS = {
-    "gaussian": [1, [1]],
-    "skewed_unimodal": [3, [1 / 5, 1 / 5, 3 / 5]],
-    "strongly_skewed": [8, [1 / 8] * 8],
-    "kurtotic_unimodal": [2, [2 / 3, 1 / 3]],
-    "outlier": [2, [1 / 10, 9 / 10]],
-    "bimodal": [2, [1 / 2] * 2],
-    "separated_bimodal": [2, [1 / 2] * 2],
-    "skewed_bimodal": [2, [3 / 4, 1 / 4]],
-    "trimodal": [3, [9 / 20, 9 / 20, 1 / 10]],
-    "claw": [6, [1 / 2, *[1 / 10] * 5]],
-    "double_claw": [9, [49 / 100, 49 / 100, *[1 / 350] * 7]],
-    "asymmetric_claw": [6, [1 / 2, *[2 ** (1 - i) / 31 for i in range(-2, 3)]]],
-    "asymmetric_double_claw": [8, [*[46 / 100] * 2, *[1 / 300] * 3, *[7 / 300] * 3]],
-    "smooth_comb": [6, [2 ** (5 - i) / 63 for i in range(6)]],
-    "discrete_comb": [6, [*[2 / 7] * 3, *[1 / 21] * 3]],
+    "gaussian": [1],
+    "skewed_unimodal": [1/5, 1/5, 3/5],
+    "strongly_skewed": [1/8] * 8,
+    "kurtotic_unimodal": [2/3, 1/3],
+    "outlier": [1/10, 9/10],
+    "bimodal": [1/2] * 2,
+    "separated_bimodal": [1/2] * 2,
+    "skewed_bimodal": [3/4, 1/4],
+    "trimodal": [9/20, 9/20, 1/10],
+    "claw": [1/2, *[1/10] * 5],
+    "double_claw": [49/100, 49/100, *[1/350] * 7],
+    "asymmetric_claw": [1/2, *[2 ** (1 - i) / 31 for i in range(-2, 3)]],
+    "asymmetric_double_claw": [*[46/100] * 2, *[1/300] * 3, *[7/300] * 3],
+    "smooth_comb": [2 ** (5 - i) / 63 for i in range(6)],
+    "discrete_comb": [*[2/7] * 3, *[1/21] * 3],
 }
 
 
 def make_trunk_classification(
     n_samples,
-    n_dim=10,
+    n_dim=4096,
+    n_informative=256,
     m_factor: int = -1,
     rho: int = 0,
     band_type: str = "ma",
     return_params: bool = False,
     simulation: str = "trunk",
+    mix: int = 0.5,
     seed=None,
 ):
     """Generate trunk dataset.
@@ -94,7 +100,10 @@ def make_trunk_classification(
         Number of sample to generate.
     n_dim : int, optional
         The dimensionality of the dataset and the number of
-        unique labels, by default 10.
+        unique labels, by default 4096.
+    n_informative : int, optional
+        The informative dimensions. All others for ``n_dim - n_informative``
+        are uniform noise. Default is 256.
     m_factor : int, optional
         The multiplicative factor to apply to the mean-vector of the first
         distribution to obtain the mean-vector of the second distribution.
@@ -112,6 +121,9 @@ def make_trunk_classification(
         'kurtotic_unimodal', 'outlier', 'bimodal', 'separated_bimodal', 'skewed_bimodal',
         'trimodal', 'claw', 'double_claw', 'asymmetric_claw', 'asymmetric_double_claw',
         'smooth_comb', 'discrete_comb'.
+    mix : int, optional
+        The probabilities associated with the mixture of Gaussians in the trunk-mix simulation.
+        By default 0.5.
     seed : int, optional
         Random seed, by default None.
 
@@ -131,23 +143,32 @@ def make_trunk_classification(
     ----------
     .. footbibliography::
     """
+    if n_dim < n_informative:
+        raise ValueError(
+            f"Number of informative dimensions {n_informative} must be less than number "
+            f"of dimensions, {n_dim}"
+        )
     rng = np.random.default_rng(seed=seed)
 
-    mu_1 = np.array([1 / np.sqrt(i) if i <= 256 else 0 for i in range(1, n_dim + 1)])
+    mu_1 = np.array([1 / np.sqrt(i) for i in range(1, n_informative + 1)])
     mu_0 = m_factor * mu_1
-    w = np.array([1 / np.sqrt(i) if i <= 256 else 0 for i in range(1, n_dim + 1)])
+    w = mu_1
 
     if rho != 0:
         if band_type == "ma":
-            cov = _moving_avg_cov(n_dim, rho)
+            cov = _moving_avg_cov(n_informative, rho)
         elif band_type == "ar":
-            cov = _autoregressive_cov(n_dim, rho)
+            cov = _autoregressive_cov(n_informative, rho)
         else:
             raise ValueError(f'Band type {band_type} must be one of "ma", or "ar".')
     else:
-        cov = np.identity(n_dim)
+        cov = np.identity(n_informative)
 
-    if n_dim > 1000:
+    if mix < 0 or mix > 1:
+        raise ValueError("Mix must be between 0 and 1.")
+
+    # speed up computations for large multivariate normal matrix with SVD approximation
+    if n_informative > 1000:
         method = "cholesky"
     else:
         method = "svd"
@@ -162,44 +183,47 @@ def make_trunk_classification(
     elif simulation == "trunk_overlap":
         X = np.vstack(
             (
-                rng.multivariate_normal(np.zeros(n_dim), cov, n_samples // 2, method=method),
-                rng.multivariate_normal(np.zeros(n_dim), cov, n_samples // 2, method=method),
+                rng.multivariate_normal(np.zeros(n_informative), cov, n_samples // 2, method=method),
+                rng.multivariate_normal(np.zeros(n_informative), cov, n_samples // 2, method=method),
             )
         )
     elif simulation == "trunk_mix":
         mixture_idx = rng.choice(
-            2, n_samples // 2, replace=True, shuffle=True, p=None
+            2, n_samples // 2, replace=True, shuffle=True, p=[mix, 1 - mix]
         )
         norm_params = [[mu_0, cov * (2/3) ** 2], [mu_1, cov * (2/3) ** 2]]
         X_mixture = np.fromiter(
             (rng.multivariate_normal(*(norm_params[i]), size=1, method=method) for i in mixture_idx),
-            dtype=np.dtype((float, n_dim))
+            dtype=np.dtype((float, n_informative))
 
         X = np.vstack(
             (
-                rng.multivariate_normal(np.zeros(n_dim), cov*(2/3)**2, n_samples // 2, method=method),
-                X_mixture.reshape(n_samples // 2, n_dim),
+                rng.multivariate_normal(np.zeros(n_informative), cov*(2/3)**2, n_samples // 2, method=method),
+                X_mixture.reshape(n_samples // 2, n_informative),
             )
         )
     elif simulation in MARRON_WAND_SIMS.keys():
         mixture_idx = rng.choice(
-            MARRON_WAND_SIMS[simulation][0], size=n_samples // 2, replace=True, p=MARRON_WAND_SIMS[simulation][1]
+            len(MARRON_WAND_SIMS[simulation]) size=n_samples // 2, replace=True, p=MARRON_WAND_SIMS[simulation]
         )
-        norm_params = MarronWandSims(n_dim=n_dim, cov=cov)(simulation)
+        norm_params = MarronWandSims(n_dim=n_informative, cov=cov)(simulation)
         G = np.fromiter(
             (rng.multivariate_normal(*(norm_params[i]), size=1, method=method) for i in mixture_idx),
-            dtype=np.dtype((float, n_dim))
+            dtype=np.dtype((float, n_informative))
         )
     
         X = np.vstack(
             (
-                rng.multivariate_normal(np.zeros(n_dim), cov, n_samples // 2, method=method),
-                (1 - w) * rng.multivariate_normal(np.zeros(n_dim), cov, n_samples // 2, method=method)
-                + w * G.reshape(n_samples // 2, n_dim),
+                rng.multivariate_normal(np.zeros(n_informative), cov, n_samples // 2, method=method),
+                (1 - w) * rng.multivariate_normal(np.zeros(n_informative), cov, n_samples // 2, method=method)
+                + w * G.reshape(n_samples // 2, n_informative),
             )
         )
     else:
         raise ValueError(f"Simulation must be trunk, trunk_overlap, trunk_mix, {MARRON_WAND_SIMS.keys()}")
+
+    if n_dim > n_informative:
+        X = np.hstack((X, rng.uniform(low=0, high=1, size=(X.shape[0], n_dim - n_informative))))
 
     y = np.concatenate((np.zeros(n_samples // 2), np.ones(n_samples // 2)))
 
@@ -372,19 +396,19 @@ def approximate_clf_mutual_information(
     # this implicitly assumes that the signal of interest is between -10 and 10
     scale = 10
     n_dims = [cov.shape[1] for cov in covs]
-    lims = [[-scale, scale]] * n_dims
+    lims = [[-scale, scale]] * max(n_dims)
 
     # Compute entropy and X and Y.
     def func(*args):
         x = np.array(args)
         p = 0
         for k in range(len(means)):
-            p += class_probs[k] * multivariate_normal(seed=seed).pdf(x, means[k], covs[k])
+            p += class_probs[k] * multivariate_normal.pdf(x, means[k], covs[k])
         return -p * np.log(p) / np.log(base)
 
     # numerically integrate H(X)
-    opts = dict(limit=1000)
-    H_X, int_err = nquad(func, lims, opts=opts)
+    # opts = dict(limit=1000)
+    H_X, int_err = nquad(func, lims)
 
     # Compute MI.
     H_XY = 0

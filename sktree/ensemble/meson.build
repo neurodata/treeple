@@ -5,6 +5,7 @@ python_sources = [
   '_honest_forest.py',
   '_eiforest.py',
   '_multiview.py',
+  '_extensions.py',
 ]
 
 py3.install_sources(

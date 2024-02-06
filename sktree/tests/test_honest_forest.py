@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from numpy.testing import assert_allclose, assert_array_almost_equal
+from numpy.testing import assert_allclose, assert_array_almost_equal, assert_array_equal
 from sklearn import datasets
 from sklearn.metrics import accuracy_score, r2_score, roc_auc_score
 from sklearn.model_selection import cross_val_score
@@ -133,17 +133,79 @@ def test_iris_multi(criterion, max_features, honest_prior, estimator):
 
 
 def test_max_samples():
+    """Test different max_samples argument for HonestForestClassifier."""
     max_samples_list = [8, 0.5, None]
     depths = []
     X = rng.normal(0, 1, (100, 2))
     X[:50] *= -1
     y = [0, 1] * 50
     for ms in max_samples_list:
-        uf = HonestForestClassifier(n_estimators=2, random_state=0, max_samples=ms, bootstrap=True)
+        uf = HonestForestClassifier(
+            n_estimators=2, random_state=0, max_samples=ms, bootstrap=True, n_jobs=-1
+        )
         uf = uf.fit(X, y)
         depths.append(uf.estimators_[0].get_depth())
 
-    assert all(np.diff(depths) > 0)
+    assert all(np.diff(depths) > 0), np.diff(depths)
+
+    # Should work for a float greater than 1
+    uf = HonestForestClassifier(
+        n_estimators=2, random_state=0, max_samples=1.6, bootstrap=True, n_jobs=-1
+    )
+    uf = uf.fit(X, y)
+
+
+@pytest.mark.parametrize("bootstrap", [True, False])
+@pytest.mark.parametrize("max_samples", [0.75, 1.0])
+def test_honest_forest_has_deterministic_sampling_for_oob_structure_and_leaves(
+    bootstrap, max_samples
+):
+    """Test that honest forest can produce the oob, structure and leaf-node samples.
+
+    When bootstrap is True, oob should be exclusive from structure and leaf-node samples.
+    When bootstrap is False, there is no oob.
+    """
+    n_estimators = 5
+    est = HonestForestClassifier(
+        n_estimators=n_estimators,
+        random_state=0,
+        bootstrap=bootstrap,
+        max_samples=max_samples,
+    )
+    X = rng.normal(0, 1, (100, 2))
+    X[:50] *= -1
+    y = [0, 1] * 50
+    samples = np.arange(len(y))
+
+    est.fit(X, y)
+
+    inbag_samples = est.estimators_samples_
+    oob_samples = [
+        [idx for idx in samples if idx not in inbag_samples[jdx]] for jdx in range(n_estimators)
+    ]
+    structure_samples = est.structure_indices_
+    leaf_samples = est.honest_indices_
+    if not bootstrap and max_samples == 1.0:
+        assert all(oob_list_ == [] for oob_list_ in oob_samples)
+
+        with pytest.raises(RuntimeError, match="Cannot extract out-of-bag samples"):
+            est.oob_samples_
+    else:
+        oob_samples_ = est.oob_samples_
+        for itree in range(n_estimators):
+            assert len(oob_samples[itree]) > 1, oob_samples[itree]
+            assert (
+                set(structure_samples[itree])
+                .union(set(leaf_samples[itree]))
+                .intersection(set(oob_samples_[itree]))
+                == set()
+            )
+
+            assert set(structure_samples[itree]).union(set(leaf_samples[itree])) == set(
+                inbag_samples[itree]
+            )
+            assert set(inbag_samples[itree]).intersection(set(oob_samples_[itree])) == set()
+            assert_array_equal(oob_samples_[itree], oob_samples[itree])
 
 
 @pytest.mark.parametrize(

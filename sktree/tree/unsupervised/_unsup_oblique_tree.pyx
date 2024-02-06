@@ -117,7 +117,7 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
         d["values"] = self._get_value_ndarray()
 
         proj_vecs = self.get_projection_matrix()
-        d['proj_vecs'] = proj_vecs
+        d["proj_vecs"] = proj_vecs
         return d
 
     def __setstate__(self, d):
@@ -125,12 +125,12 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
         self.max_depth = d["max_depth"]
         self.node_count = d["node_count"]
 
-        if 'nodes' not in d:
-            raise ValueError('You have loaded ObliqueTree version which '
-                             'cannot be imported')
+        if "nodes" not in d:
+            raise ValueError("You have loaded ObliqueTree version which "
+                             "cannot be imported")
 
-        node_ndarray = d['nodes']
-        value_ndarray = d['values']
+        node_ndarray = d["nodes"]
+        value_ndarray = d["values"]
 
         value_shape = (node_ndarray.shape[0],)
         if (node_ndarray.ndim != 1 or
@@ -139,14 +139,14 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
                 value_ndarray.shape != value_shape or
                 not value_ndarray.flags.c_contiguous or
                 value_ndarray.dtype != np.float64):
-            raise ValueError('Did not recognise loaded array layout')
+            raise ValueError("Did not recognise loaded array layout")
 
         self.capacity = node_ndarray.shape[0]
         if self._resize_c(self.capacity) != 0:
             raise MemoryError("resizing tree to %d" % self.capacity)
 
         # now set the projection vector weights and indices
-        proj_vecs = d['proj_vecs']
+        proj_vecs = d["proj_vecs"]
         self.n_features = proj_vecs.shape[1]
         for i in range(0, self.node_count):
             for j in range(0, self.n_features):
@@ -171,7 +171,7 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
                 proj_vecs[i, feat] = weight
         return proj_vecs
 
-    cdef intp_t _resize_c(self, intp_t capacity=SIZE_MAX) except -1 nogil:
+    cdef int _resize_c(self, intp_t capacity=SIZE_MAX) except -1 nogil:
         """Guts of _resize.
 
         Additionally resizes the projection indices and weights.
@@ -212,7 +212,7 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
         self.capacity = capacity
         return 0
 
-    cdef intp_t _set_split_node(self, SplitRecord* split_node, Node *node, intp_t node_id) except -1 nogil:
+    cdef int _set_split_node(self, SplitRecord* split_node, Node *node, intp_t node_id) except -1 nogil:
         """Set node data.
         """
         # Cython type cast split record into its inherited split record

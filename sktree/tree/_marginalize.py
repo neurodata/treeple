@@ -1,4 +1,5 @@
 """A set of mixin methods for marginalizing a random forest."""
+
 import numpy as np
 from sklearn.ensemble._forest import BaseForest
 from sklearn.utils.parallel import Parallel, delayed

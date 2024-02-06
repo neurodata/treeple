@@ -44,7 +44,7 @@ jobs:
           # - [macos-12, macosx_*, arm64]
           - [windows-2019, win, AMD64]
 
-        python: [["cp39", "3.9"], ["cp310", "3.10"], ["cp311", "3.11"]]
+        python: [["cp39", "3.9"], ["cp310", "3.10"], ["cp311", "3.11"], ["cp312", "3.12"]]
         # python[0] is used to specify the python versions made by cibuildwheel
 
     env:
@@ -56,7 +56,7 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: 3.9
+          python-version: "3.10"
 
       - name: Setup submodule
         run: |
@@ -71,7 +71,7 @@ jobs:
         if: ${{ runner.os == 'Windows' && env.IS_32_BIT == 'false' }}
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.16.2
+        uses: pypa/cibuildwheel@v2.16.5
         # Build all wheels here, apart from macosx_arm64, linux_aarch64
         # cibuildwheel is currently unable to pass configuration flags to
         # CIBW_BUILD_FRONTEND https://github.com/pypa/cibuildwheel/issues/1227
@@ -100,7 +100,7 @@ jobs:
       # Ensure that a wheel builder finishes even if another fails
       fail-fast: false
       matrix:
-        python: [["cp39", "3.9"], ["cp310", "3.10"], ["cp311", "3.11"]]
+        python: [["cp39", "3.9"], ["cp310", "3.10"], ["cp311", "3.11"], ["cp312", "3.12"]]
         # python[0] is used to specify the python versions made by cibuildwheel
 
     steps:
@@ -110,7 +110,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.9  # Replace with the desired Python version
+          python-version: "3.10"  # Replace with the desired Python version
 
       - name: Install cibuildwheel dependencies
         run: |
@@ -120,7 +120,7 @@ jobs:
           python spin setup-submodule
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.16.2
+        uses: pypa/cibuildwheel@v2.16.5
         env:
           CIBW_BUILD: ${{ matrix.python[0] }}-macosx_arm64
           CIBW_ARCHS_MACOS: arm64
@@ -142,7 +142,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.9"  # update once build dependencies are available
+          python-version: "3.10"  # update once build dependencies are available
 
       - name: Build source distribution
         run: |

@@ -3,9 +3,12 @@ from sklearn.utils._param_validation import StrOptions
 from .._lib.sklearn.ensemble._forest import ForestClassifier
 from ..tree import MultiViewDecisionTreeClassifier
 from ..tree._neighbors import SimMatrixMixin
+from ._extensions import ForestClassifierMixin, ForestMixin
 
 
-class MultiViewRandomForestClassifier(SimMatrixMixin, ForestClassifier):
+class MultiViewRandomForestClassifier(
+    SimMatrixMixin, ForestClassifierMixin, ForestMixin, ForestClassifier
+):
     """
     A multi-view axis-aligned random forest classifier.
 
@@ -179,10 +182,6 @@ class MultiViewRandomForestClassifier(SimMatrixMixin, ForestClassifier):
 
     Attributes
     ----------
-    base_estimator_ : sktree.tree.ObliqueDecisionTreeClassifier
-        The child estimator template used to create the collection of fitted
-        sub-estimators.
-
     estimators_ : list of sktree.tree.ObliqueDecisionTreeClassifier
         The collection of fitted sub-estimators.
 

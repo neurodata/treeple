@@ -10,9 +10,12 @@ from ..tree import (
     PatchObliqueDecisionTreeRegressor,
 )
 from ..tree._neighbors import SimMatrixMixin
+from ._extensions import ForestClassifierMixin, ForestMixin
 
 
-class ObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
+class ObliqueRandomForestClassifier(
+    SimMatrixMixin, ForestClassifierMixin, ForestMixin, ForestClassifier
+):
     """
     An oblique random forest classifier.
 
@@ -181,10 +184,6 @@ class ObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
 
     Attributes
     ----------
-    base_estimator_ : sktree.tree.ObliqueDecisionTreeClassifier
-        The child estimator template used to create the collection of fitted
-        sub-estimators.
-
     estimators_ : list of sktree.tree.ObliqueDecisionTreeClassifier
         The collection of fitted sub-estimators.
 
@@ -344,7 +343,7 @@ class ObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
         self.min_impurity_decrease = min_impurity_decrease
 
 
-class ObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
+class ObliqueRandomForestRegressor(SimMatrixMixin, ForestMixin, ForestRegressor):
     """An oblique random forest regressor.
 
     A oblique random forest is a meta estimator similar to a random
@@ -495,10 +494,6 @@ class ObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
 
     Attributes
     ----------
-    base_estimator_ : ObliqueDecisionTreeRegressor
-        The child estimator template used to create the collection of fitted
-        sub-estimators.
-
     estimators_ : list of ObliqueDecisionTreeRegressor
         The collection of fitted sub-estimators.
 
@@ -647,7 +642,9 @@ class ObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
         self.min_impurity_decrease = min_impurity_decrease
 
 
-class PatchObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
+class PatchObliqueRandomForestClassifier(
+    SimMatrixMixin, ForestClassifierMixin, ForestMixin, ForestClassifier
+):
     """A patch-oblique random forest classifier.
 
     A patch-oblique random forest is a meta estimator similar to a random
@@ -824,10 +821,6 @@ class PatchObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
 
     Attributes
     ----------
-    base_estimator_ : PatchObliqueDecisionTreeClassifier
-        The child estimator template used to create the collection of fitted
-        sub-estimators.
-
     estimators_ : list of PatchObliqueDecisionTreeClassifier
         The collection of fitted sub-estimators.
 
@@ -990,7 +983,7 @@ class PatchObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
         self.min_impurity_decrease = min_impurity_decrease
 
 
-class PatchObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
+class PatchObliqueRandomForestRegressor(SimMatrixMixin, ForestMixin, ForestRegressor):
     """A patch-oblique random forest regressor.
 
     A patch-oblique random forest is a meta estimator similar to a random
@@ -1150,10 +1143,6 @@ class PatchObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
 
     Attributes
     ----------
-    base_estimator_ : PatchObliqueDecisionTreeRegressor
-        The child estimator template used to create the collection of fitted
-        sub-estimators.
-
     estimators_ : list of PatchObliqueDecisionTreeRegressor
         The collection of fitted sub-estimators.
 
@@ -1307,7 +1296,9 @@ class PatchObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
         self.min_impurity_decrease = min_impurity_decrease
 
 
-class ExtraObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
+class ExtraObliqueRandomForestClassifier(
+    SimMatrixMixin, ForestClassifierMixin, ForestMixin, ForestClassifier
+):
     """
     An extra oblique random forest classifier.
 
@@ -1476,10 +1467,6 @@ class ExtraObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
 
     Attributes
     ----------
-    base_estimator_ : sktree.tree.ExtraObliqueDecisionTreeClassifier
-        The child estimator template used to create the collection of fitted
-        sub-estimators.
-
     estimators_ : list of sktree.tree.ExtraObliqueDecisionTreeClassifier
         The collection of fitted sub-estimators.
 
@@ -1641,7 +1628,7 @@ class ExtraObliqueRandomForestClassifier(SimMatrixMixin, ForestClassifier):
         self.min_impurity_decrease = min_impurity_decrease
 
 
-class ExtraObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
+class ExtraObliqueRandomForestRegressor(SimMatrixMixin, ForestMixin, ForestRegressor):
     """An extra oblique random forest regressor.
 
     An extra oblique random forest is a meta estimator similar to a random
@@ -1792,10 +1779,6 @@ class ExtraObliqueRandomForestRegressor(SimMatrixMixin, ForestRegressor):
 
     Attributes
     ----------
-    base_estimator_ : ExtraObliqueDecisionTreeRegressor
-        The child estimator template used to create the collection of fitted
-        sub-estimators.
-
     estimators_ : list of ExtraObliqueDecisionTreeRegressor
         The collection of fitted sub-estimators.
 

@@ -149,7 +149,11 @@ tree models.
    FeatureImportanceForestClassifier
    PermutationForestClassifier
    PermutationForestRegressor
-
+   build_coleman_forest
+   build_hyppo_oob_forest
+   build_hyppo_cv_forest
+   PermutationHonestForestClassifier
+   
 Datasets
 ------------------------------
 We provide some convenience functions for simulating datasets beyond

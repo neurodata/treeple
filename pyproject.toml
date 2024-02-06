@@ -10,14 +10,14 @@ requires = [
   "setuptools<=65.5",
   "packaging",
   "Cython>=0.29.24",
-  "scikit-learn>=1.3",
+  "scikit-learn>=1.4",
   "scipy>=1.5.0",
   "numpy>=1.25; python_version>='3.9'"
 ]
 
 [project]
 name = "scikit-tree"
-version = "0.6.0dev0"
+version = "0.7.0dev0"
 description = "Modern decision trees in Python"
 maintainers = [
   {name = "Neurodata", email = "adam.li@columbia.edu"}
@@ -193,46 +193,6 @@ exclude = [
   'benchmarks_nonasv/'
 ]
 
-[tool.poe.tasks]
-_flake8 = 'flake8'
-_bandit = 'bandit -r sktree -c pyproject.toml'
-_black = 'black .'
-_isort = 'isort .'
-_cythonlint = 'cython-lint sktree/ --exclude "sktree/_lib/*"'
-_black_check = 'black --check sktree examples'
-_isort_check = 'isort --check .'
-_pydocstyle = 'pydocstyle ./sktree'
-_codespell = 'codespell sktree/ doc/ examples/ --ignore-words=.codespellignore --skip "**/_build/*,**/_lib/*,doc/_build/*,doc/auto_examples/*,doc/tutorials/*,doc/generated/*"'
-_changelog = 'semversioner changelog > CHANGELOG.md'
-_apply_version = 'semversioner release'
-type_check = 'mypy -p sktree --config-file pyproject.toml'
-unit_test = 'pytest ./sktree --cov=sktree --cov-report=xml --cov-config=pyproject.toml'
-build_docs = 'make -C doc/ clean html'
-build_docs_noplot = 'make -C doc/ clean html-noplot'
-clean = {shell = 'rm -rf builddir; rm -rf clean; rm -rf build; rm -rf _build; rm -rf dist;'}
-
-[[tool.poe.tasks.format]]
-sequence = ['_black', '_isort']
-ignore_fail = 'return_non_zero'
-
-[[tool.poe.tasks.format_check]]
-sequence = ['_black_check', '_isort_check']
-ignore_fail = 'return_non_zero'
-
-[[tool.poe.tasks.lint]]
-sequence = ['_flake8', '_bandit', '_codespell', '_pydocstyle', '_cythonlint']
-ignore_fail = 'return_non_zero'
-
-[[tool.poe.tasks.release]]
-sequence = ['_changelog', '_apply_version']
-
-#
-# a standard verification sequence for use in pull requests
-#
-[[tool.poe.tasks.verify]]
-sequence = ['format', 'lint', 'type_check', 'unit_test']
-ignore_fail = "return_non_zero"
-
 [tool.pydocstyle]
 convention = 'numpy'
 ignore-decorators = '(copy_doc|property|.*setter|.*getter)'
@@ -293,7 +253,6 @@ ignore_roles = [
 ]
 report_level = "WARNING"
 ignore = ["SEVERE/4"]
-paths = ["doc/use.rst"]
 
 [tool.ruff]
 extend-exclude = [

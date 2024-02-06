@@ -3,12 +3,13 @@
 .. include:: _contributors.rst
 .. currentmodule:: sktree
 
-.. _current:
+.. _v0_6:
 
 Version 0.6
 ===========
 
-**In Development**
+This release includes an enhancement mainly in the MultiViewDecisionTreeClassifier
+and HonestForestClassifier, and a new generative model for the make_trunk_classification.
 
 Changelog
 ---------
@@ -29,7 +30,15 @@ Changelog
   has a generative model based on Trunk and banded covariance, :func:`sktree.datasets.approximate_clf_mutual_information` and
   :func:`sktree.datasets.approximate_clf_mutual_information_with_monte_carlo` to
   approximate mutual information either numerically or via Monte-Carlo, by `Adam Li`_ and `Haoyin Xu`_ (:pr:`#199`).
-
+- |Enhancement| :class:`sktree.HonestForestClassifier` now has a fitted
+  property ``oob_samples_``, which reproduces the sample indices per tree that is out
+  of bag, by `Adam Li`_ (:pr:`#200`).
+- |Enhancement| :class:`sktree.HonestForestClassifier` will allow one to bootstrap sample higher
+  than the number of samples, controlled by the ``max_samples`` keyword argument by `Adam Li`_ (:pr:`#206`).
+- |Feature| :class:`sktree.HonestForestClassifier` now allows one to specify
+  the number of sub-samples to use for the honest trees without having
+  to bootstrap sample. This is specified by the ``max_samples`` parameter.
+  By `Adam Li`_ (:pr:`#210`)
 
 Code and Documentation Contributors
 -----------------------------------

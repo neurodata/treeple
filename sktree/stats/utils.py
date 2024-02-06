@@ -3,15 +3,17 @@ from typing import Optional, Tuple
 import numpy as np
 from numpy.typing import ArrayLike
 from scipy.stats import entropy
+from sklearn.ensemble._forest import _generate_unsampled_indices, _get_n_samples_bootstrap
 from sklearn.metrics import (
     balanced_accuracy_score,
     mean_absolute_error,
     mean_squared_error,
     roc_auc_score,
+    roc_curve,
 )
-from sklearn.utils.validation import check_X_y
+from sklearn.utils.validation import check_is_fitted, check_X_y
 
-from sktree._lib.sklearn.ensemble._forest import ForestClassifier
+from sktree._lib.sklearn.ensemble._forest import BaseForest, ForestClassifier
 
 
 def _mutual_information(y_true: ArrayLike, y_pred_proba: ArrayLike) -> float:
@@ -65,6 +67,37 @@ def _cond_entropy(y_true: ArrayLike, y_pred_proba: ArrayLike) -> float:
     return H_YX
 
 
+# Define function to compute the sensitivity at 98% specificity
+def _SAS98(y_true: ArrayLike, y_pred_proba: ArrayLike, max_fpr=0.02) -> float:
+    """Compute the sensitivity at 98% specificity.
+
+    Parameters
+    ----------
+    y_true : ArrayLike of shape (n_samples,)
+        The true labels.
+    y_pred_proba : ArrayLike of shape (n_samples, n_outputs)
+        Posterior probabilities.
+    max_fpr : float, optional. Default=0.02.
+
+    Returns
+    -------
+    float :
+        The estimated SAS98.
+    """
+    if y_true.squeeze().ndim != 1:
+        raise ValueError(f"y_true must be 1d, not {y_true.shape}")
+    if 0 in y_true or -1 in y_true:
+        fpr, tpr, thresholds = roc_curve(
+            y_true, y_pred_proba[:, 1], pos_label=1, drop_intermediate=False
+        )
+    else:
+        fpr, tpr, thresholds = roc_curve(
+            y_true, y_pred_proba[:, 1], pos_label=2, drop_intermediate=False
+        )
+    s98 = max([tpr for (fpr, tpr) in zip(fpr, tpr) if fpr <= max_fpr])
+    return s98
+
+
 METRIC_FUNCTIONS = {
     "mse": mean_squared_error,
     "mae": mean_absolute_error,
@@ -72,11 +105,12 @@ METRIC_FUNCTIONS = {
     "auc": roc_auc_score,
     "mi": _mutual_information,
     "cond_entropy": _cond_entropy,
+    "s@s98": _SAS98,
 }
 
-POSTERIOR_FUNCTIONS = ("mi", "auc", "cond_entropy")
+POSTERIOR_FUNCTIONS = ("mi", "auc", "cond_entropy", "s@s98")
 
-POSITIVE_METRICS = ("mi", "auc", "balanced_accuracy")
+POSITIVE_METRICS = ("mi", "auc", "balanced_accuracy", "s@s98")
 
 REGRESSOR_METRICS = ("mse", "mae")
 
@@ -136,22 +170,17 @@ def _compute_null_distribution_perm(
     """
     rng = np.random.default_rng(seed)
     X_test, y_test = check_X_y(X_test, y_test, ensure_2d=True, multi_output=True)
-    n_samples_test = len(y_test)
+    # n_samples_test = len(y_test)
     n_samples_train = len(y_train)
     metric_func = METRIC_FUNCTIONS[metric]
 
     # pre-allocate memory for the index array
     train_index_arr = np.arange(n_samples_train, dtype=int).reshape(-1, 1)
-    test_index_arr = np.arange(n_samples_test, dtype=int).reshape(-1, 1)
+    # test_index_arr = np.arange(n_samples_test, dtype=int).reshape(-1, 1)
 
     null_metrics = np.zeros((n_repeats,))
 
     for idx in range(n_repeats):
-        # permute the covariates inplace
-        rng.shuffle(test_index_arr)
-        perm_X_cov = X_test[test_index_arr, covariate_index]
-        X_test[:, covariate_index] = perm_X_cov
-
         rng.shuffle(train_index_arr)
         perm_X_cov = X_train[train_index_arr, covariate_index]
         X_train[:, covariate_index] = perm_X_cov
@@ -272,3 +301,27 @@ def _compute_null_distribution_coleman(
         metric_star_pi[idx] = second_half_metric
 
     return metric_star, metric_star_pi
+
+
+def get_per_tree_oob_samples(est: BaseForest):
+    """The sample indices that are out-of-bag.
+
+    Only utilized if ``bootstrap=True``, otherwise, all samples are "in-bag".
+    """
+    check_is_fitted(est)
+    if est.bootstrap is False:
+        raise RuntimeError("Cannot extract out-of-bag samples when bootstrap is False.")
+    est._n_samples
+    oob_samples = []
+    n_samples_bootstrap = _get_n_samples_bootstrap(
+        est._n_samples,
+        est.max_samples,
+    )
+    for estimator in est.estimators_:
+        unsampled_indices = _generate_unsampled_indices(
+            estimator.random_state,
+            est._n_samples,
+            n_samples_bootstrap,
+        )
+        oob_samples.append(unsampled_indices)
+    return oob_samples
