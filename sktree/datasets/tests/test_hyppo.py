@@ -7,8 +7,8 @@ from sktree.datasets import (
     approximate_clf_mutual_information_with_monte_carlo,
     make_quadratic_classification,
     make_trunk_classification,
-    MARRON_WAND_SIMS,
 )
+from sktree.datasets.hyppo import MARRON_WAND_SIMS
 
 
 def test_make_quadratic_classification_v():
