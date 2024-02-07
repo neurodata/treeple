@@ -73,11 +73,11 @@ def make_trunk_classification(
     n_samples,
     n_dim=4096,
     n_informative=256,
+    simulation: str = "trunk",
     m_factor: int = -1,
     rho: int = 0,
     band_type: str = "ma",
     return_params: bool = False,
-    simulation: str = "trunk",
     mix: float = 0.5,
     seed=None,
 ):
@@ -105,9 +105,19 @@ def make_trunk_classification(
     n_informative : int, optional
         The informative dimensions. All others for ``n_dim - n_informative``
         are uniform noise. Default is 256.
+    simulation : str, optional
+        Which simulation to run. Must be: 'trunk', 'trunk_overlap', 'trunk_mix', or one of the
+        following Marron-Wand simulations: 'gaussian', 'skewed_unimodal', 'strongly_skewed',
+        'kurtotic_unimodal', 'outlier', 'bimodal', 'separated_bimodal', 'skewed_bimodal',
+        'trimodal', 'claw', 'double_claw', 'asymmetric_claw', 'asymmetric_double_claw',
+        'smooth_comb', 'discrete_comb'.
+        When calling the Marron-Wand simulations, only the covariance parameters are considered
+        (`rho` and `band_type`). Means are taken from :footcite:`marron1992exact`.
+        By default 'trunk'.
     m_factor : int, optional
         The multiplicative factor to apply to the mean-vector of the first
         distribution to obtain the mean-vector of the second distribution.
+        This is only used when ``simulation = trunk``.
         By default -1.
     rho : float, optional
         The covariance value of the bands. By default 0 indicating, an identity matrix is used.
@@ -116,14 +126,8 @@ def make_trunk_classification(
         Either 'ma', or 'ar'.
     return_params : bool, optional
         Whether or not to return the distribution parameters of the classes normal distributions.
-    simulation : str, optional
-        Which simulation to run. Must be: 'trunk', 'trunk_overlap', 'trunk_mix', or one of the
-        following Marron-Wand simulations: 'gaussian', 'skewed_unimodal', 'strongly_skewed',
-        'kurtotic_unimodal', 'outlier', 'bimodal', 'separated_bimodal', 'skewed_bimodal',
-        'trimodal', 'claw', 'double_claw', 'asymmetric_claw', 'asymmetric_double_claw',
-        'smooth_comb', 'discrete_comb'.
     mix : int, optional
-        The probabilities associated with the mixture of Gaussians in the trunk-mix simulation.
+        The probabilities associated with the mixture of Gaussians in the ``trunk-mix`` simulation.
         By default 0.5.
     seed : int, optional
         Random seed, by default None.
@@ -153,7 +157,6 @@ def make_trunk_classification(
 
     mu_1 = np.array([1 / np.sqrt(i) for i in range(1, n_informative + 1)])
     mu_0 = m_factor * mu_1
-    w = mu_1
 
     if rho != 0:
         if band_type == "ma":
@@ -227,6 +230,9 @@ def make_trunk_classification(
             dtype=np.dtype((float, n_informative)),
         )
 
+        # as the dimensionality of the simulations increasing, we are adding more and
+        # more noise to the data using the w parameter
+        w = mu_1
         X = np.vstack(
             (
                 rng.multivariate_normal(
