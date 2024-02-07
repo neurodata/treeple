@@ -266,6 +266,9 @@ extend-exclude = [
 line-length = 88
 lint.ignore = ['E731']
 
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]
+
 [tool.spin]
 package = 'sktree'
 
