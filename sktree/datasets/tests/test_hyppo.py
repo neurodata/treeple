@@ -113,7 +113,7 @@ def test_make_trunk_classification_simulations(simulation):
         simulation=simulation,
     )
     assert X.shape == (n_samples, n_dim)
-    assert y.shape == (n_samples, n_dim)
+    assert y.shape == (n_samples,)
 
 
 def test_approximate_clf_mutual_information_numerically_close():
