@@ -143,6 +143,15 @@ def make_trunk_classification(
         Returned if ``return_params`` is True.
     covs : list of ArrayLike of shape (n_dim, n_dim), dtype=np.float64
         The covariance for each class. Returned if ``return_params`` is True.
+    X_mixture : np.ndarray of shape (n_samples, n_dim), dtype=np.float64
+        The mixture of Gaussians for the ``trunk_mix`` simulation.
+        Returned if ``return_params`` is True.
+    G : np.ndarray of shape (n_samples, n_dim), dtype=np.float64
+        The mixture of Gaussians for the Marron-Wand simulations.
+        Returned if ``return_params`` is True.
+    w : np.ndarray of shape (n_dim,), dtype=np.float64
+        The weight vector for the Marron-Wand simulations.
+        Returned if ``return_params`` is True.
 
     References
     ----------
@@ -256,7 +265,16 @@ def make_trunk_classification(
     y = np.concatenate((np.zeros(n_samples // 2), np.ones(n_samples // 2)))
 
     if return_params:
-        return X, y, [mu_0, mu_1], [cov, cov]
+        returns = [X, y]
+        if simulation == "trunk":
+            returns += [[mu_0, mu_1], [cov, cov]]
+        elif simulation == "trunk-overlap":
+            returns += [[np.zeros(n_informative), np.zeros(n_informative)], [cov, cov]]
+        elif simulation == "trunk-overlap":
+            returns += [*list(zip(*norm_params)), X_mixture]
+        else:
+            returns += [*list(zip(*norm_params)), G, w]
+        return returns
     return X, y
 
 
