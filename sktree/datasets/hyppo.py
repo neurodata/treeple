@@ -79,17 +79,19 @@ def make_trunk_classification(
     band_type: str = "ma",
     return_params: bool = False,
     simulation: str = "trunk",
-    mix: int = 0.5,
+    mix: float = 0.5,
     seed=None,
 ):
-    """Generate trunk dataset.
+    """Generate trunk and/or Marron-Wand datasets.
 
     For each dimension in the first distribution, there is a mean of :math:`1 / d`, where
     ``d`` is the dimensionality. The covariance is the identity matrix.
     The second distribution has a mean vector that is the negative of the first.
     As ``d`` increases, the two distributions become closer and closer.
 
-    See full details in :footcite:`trunk1982`.
+    Full details for the trunk simulation can be found in :footcite:`trunk1982`.
+
+    Full details for the Marron-Wand simulations can be found in :footcite:`marron1992exact`.
 
     Instead of the identity covariance matrix, one can implement a banded covariance matrix
     that follows :footcite:`Bickel_2008`.
