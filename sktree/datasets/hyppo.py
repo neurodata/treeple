@@ -270,7 +270,7 @@ def make_trunk_classification(
             returns += [[mu_0, mu_1], [cov, cov]]
         elif simulation == "trunk-overlap":
             returns += [[np.zeros(n_informative), np.zeros(n_informative)], [cov, cov]]
-        elif simulation == "trunk-overlap":
+        elif simulation == "trunk-mix":
             returns += [*list(zip(*norm_params)), X_mixture]
         else:
             returns += [*list(zip(*norm_params)), G, w]
