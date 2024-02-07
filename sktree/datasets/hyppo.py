@@ -53,20 +53,20 @@ def make_quadratic_classification(n_samples: int, n_features: int, noise=False, 
 # values: probabilities associated with the mixture of Gaussians
 MARRON_WAND_SIMS = {
     "gaussian": [1],
-    "skewed_unimodal": [1/5, 1/5, 3/5],
-    "strongly_skewed": [1/8] * 8,
-    "kurtotic_unimodal": [2/3, 1/3],
-    "outlier": [1/10, 9/10],
-    "bimodal": [1/2] * 2,
-    "separated_bimodal": [1/2] * 2,
-    "skewed_bimodal": [3/4, 1/4],
-    "trimodal": [9/20, 9/20, 1/10],
-    "claw": [1/2, *[1/10] * 5],
-    "double_claw": [49/100, 49/100, *[1/350] * 7],
-    "asymmetric_claw": [1/2, *[2 ** (1 - i) / 31 for i in range(-2, 3)]],
-    "asymmetric_double_claw": [*[46/100] * 2, *[1/300] * 3, *[7/300] * 3],
+    "skewed_unimodal": [1 / 5, 1 / 5, 3 / 5],
+    "strongly_skewed": [1 / 8] * 8,
+    "kurtotic_unimodal": [2 / 3, 1 / 3],
+    "outlier": [1 / 10, 9 / 10],
+    "bimodal": [1 / 2] * 2,
+    "separated_bimodal": [1 / 2] * 2,
+    "skewed_bimodal": [3 / 4, 1 / 4],
+    "trimodal": [9 / 20, 9 / 20, 1 / 10],
+    "claw": [1 / 2, *[1 / 10] * 5],
+    "double_claw": [49 / 100, 49 / 100, *[1 / 350] * 7],
+    "asymmetric_claw": [1 / 2, *[2 ** (1 - i) / 31 for i in range(-2, 3)]],
+    "asymmetric_double_claw": [*[46 / 100] * 2, *[1 / 300] * 3, *[7 / 300] * 3],
     "smooth_comb": [2 ** (5 - i) / 63 for i in range(6)],
-    "discrete_comb": [*[2/7] * 3, *[1/21] * 3],
+    "discrete_comb": [*[2 / 7] * 3, *[1 / 21] * 3],
 }
 
 
@@ -183,44 +183,65 @@ def make_trunk_classification(
     elif simulation == "trunk_overlap":
         X = np.vstack(
             (
-                rng.multivariate_normal(np.zeros(n_informative), cov, n_samples // 2, method=method),
-                rng.multivariate_normal(np.zeros(n_informative), cov, n_samples // 2, method=method),
+                rng.multivariate_normal(
+                    np.zeros(n_informative), cov, n_samples // 2, method=method
+                ),
+                rng.multivariate_normal(
+                    np.zeros(n_informative), cov, n_samples // 2, method=method
+                ),
             )
         )
     elif simulation == "trunk_mix":
-        mixture_idx = rng.choice(
-            2, n_samples // 2, replace=True, shuffle=True, p=[mix, 1 - mix]
-        )
-        norm_params = [[mu_0, cov * (2/3) ** 2], [mu_1, cov * (2/3) ** 2]]
+        mixture_idx = rng.choice(2, n_samples // 2, replace=True, shuffle=True, p=[mix, 1 - mix])
+        norm_params = [[mu_0, cov * (2 / 3) ** 2], [mu_1, cov * (2 / 3) ** 2]]
         X_mixture = np.fromiter(
-            (rng.multivariate_normal(*(norm_params[i]), size=1, method=method) for i in mixture_idx),
-            dtype=np.dtype((float, n_informative))
+            (
+                rng.multivariate_normal(*(norm_params[i]), size=1, method=method)
+                for i in mixture_idx
+            ),
+            dtype=np.dtype((float, n_informative)),
+        )
 
         X = np.vstack(
             (
-                rng.multivariate_normal(np.zeros(n_informative), cov*(2/3)**2, n_samples // 2, method=method),
+                rng.multivariate_normal(
+                    np.zeros(n_informative), cov * (2 / 3) ** 2, n_samples // 2, method=method
+                ),
                 X_mixture.reshape(n_samples // 2, n_informative),
             )
         )
     elif simulation in MARRON_WAND_SIMS.keys():
         mixture_idx = rng.choice(
-            len(MARRON_WAND_SIMS[simulation]) size=n_samples // 2, replace=True, p=MARRON_WAND_SIMS[simulation]
+            len(MARRON_WAND_SIMS[simulation]),
+            size=n_samples // 2,
+            replace=True,
+            p=MARRON_WAND_SIMS[simulation],
         )
         norm_params = MarronWandSims(n_dim=n_informative, cov=cov)(simulation)
         G = np.fromiter(
-            (rng.multivariate_normal(*(norm_params[i]), size=1, method=method) for i in mixture_idx),
-            dtype=np.dtype((float, n_informative))
+            (
+                rng.multivariate_normal(*(norm_params[i]), size=1, method=method)
+                for i in mixture_idx
+            ),
+            dtype=np.dtype((float, n_informative)),
         )
-    
+
         X = np.vstack(
             (
-                rng.multivariate_normal(np.zeros(n_informative), cov, n_samples // 2, method=method),
-                (1 - w) * rng.multivariate_normal(np.zeros(n_informative), cov, n_samples // 2, method=method)
+                rng.multivariate_normal(
+                    np.zeros(n_informative), cov, n_samples // 2, method=method
+                ),
+                (1 - w)
+                * rng.multivariate_normal(
+                    np.zeros(n_informative), cov, n_samples // 2, method=method
+                )
                 + w * G.reshape(n_samples // 2, n_informative),
             )
         )
     else:
-        raise ValueError(f"Simulation must be trunk, trunk_overlap, trunk_mix, {MARRON_WAND_SIMS.keys()}")
+        raise ValueError(
+            f"Simulation must be: trunk, trunk_overlap, trunk_mix, {MARRON_WAND_SIMS.keys()}"
+        )
 
     if n_dim > n_informative:
         X = np.hstack((X, rng.uniform(low=0, high=1, size=(X.shape[0], n_dim - n_informative))))

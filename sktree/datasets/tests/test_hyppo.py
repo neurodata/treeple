@@ -7,6 +7,7 @@ from sktree.datasets import (
     approximate_clf_mutual_information_with_monte_carlo,
     make_quadratic_classification,
     make_trunk_classification,
+    MARRON_WAND_SIMS,
 )
 
 
@@ -89,6 +90,30 @@ def test_make_trunk_classification_invalid_n_informative():
     # Test with an invalid band type
     with pytest.raises(ValueError, match="Number of informative dimensions"):
         make_trunk_classification(n_samples=50, n_dim=10, n_informative=11, rho=0.5, mix=2)
+
+
+def test_make_trunk_classification_invalid_simulation_name():
+    # Test with an invalid band type
+    with pytest.raises(ValueError, match="Simulation must be"):
+        make_trunk_classification(n_samples=50, rho=0.5, simulation=None)
+
+
+@pytest.mark.parametrize(
+    "simulation", ["trunk", "trunk_overlap", "trunk_mix", *MARRON_WAND_SIMS.keys()]
+)
+def test_make_trunk_classification_simulations(simulation):
+    # Test with default parameters
+    n_samples = 100
+    n_dim = 10
+    n_informative = 10
+    X, y = make_trunk_classification(
+        n_samples=n_samples,
+        n_dim=n_dim,
+        n_informative=n_informative,
+        simulation=simulation,
+    )
+    assert X.shape == (n_samples, n_dim)
+    assert y.shape == (n_samples, n_dim)
 
 
 def test_approximate_clf_mutual_information_numerically_close():
