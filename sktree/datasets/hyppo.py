@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.stats import multivariate_normal, entropy, norm
 from scipy.integrate import nquad
 from scipy.stats import entropy, multivariate_normal
 
@@ -214,7 +213,7 @@ def make_trunk_classification(
         )
     elif simulation in MARRON_WAND_SIMS.keys():
         mixture_idx = rng.choice(
-            len(MARRON_WAND_SIMS[simulation]),
+            len(MARRON_WAND_SIMS[simulation]),  # type: ignore
             size=n_samples // 2,
             replace=True,
             p=MARRON_WAND_SIMS[simulation],
@@ -284,8 +283,8 @@ class MarronWandSims:
 
     def strongly_skewed(self):
         return [
-            [np.full(self.n_dim, 3 * ((2 / 3) ** l - 1)), self.cov * (2 / 3) ** (2 * l)]
-            for l in range(8)
+            [np.full(self.n_dim, 3 * ((2 / 3) ** l_mix - 1)), self.cov * (2 / 3) ** (2 * l_mix)]
+            for l_mix in range(8)
         ]
 
     def kurtotic_unimodal(self):
@@ -322,45 +321,60 @@ class MarronWandSims:
     def claw(self):
         return [
             [np.zeros(self.n_dim), self.cov],
-            *[[np.full(self.n_dim, (l / 2) - 1), self.cov * (1 / 10) ** 2] for l in range(5)],
+            *[
+                [np.full(self.n_dim, (l_mix / 2) - 1), self.cov * (1 / 10) ** 2]
+                for l_mix in range(5)
+            ],
         ]
 
     def double_claw(self):
         return [
             [-np.ones(self.n_dim), self.cov * (2 / 3) ** 2],
             [np.ones(self.n_dim), self.cov * (2 / 3) ** 2],
-            *[[np.full(self.n_dim, (l - 3) / 2), self.cov * (1 / 100) ** 2] for l in range(7)],
+            *[
+                [np.full(self.n_dim, (l_mix - 3) / 2), self.cov * (1 / 100) ** 2]
+                for l_mix in range(7)
+            ],
         ]
 
     def asymmetric_claw(self):
         return [
             [np.zeros(self.n_dim), self.cov],
             *[
-                [np.full(self.n_dim, l + 1 / 2), self.cov * (1 / ((2**l) * 10)) ** 2]
-                for l in range(-2, 3)
+                [np.full(self.n_dim, l_mix + 1 / 2), self.cov * (1 / ((2**l_mix) * 10)) ** 2]
+                for l_mix in range(-2, 3)
             ],
         ]
 
     def asymmetric_double_claw(self):
         return [
-            *[[np.full(self.n_dim, 2 * l - 1), self.cov * (2 / 3) ** 2] for l in range(2)],
-            *[[-np.full(self.n_dim, l / 2), self.cov * (1 / 100) ** 2] for l in range(1, 4)],
-            *[[np.full(self.n_dim, l / 2), self.cov * (7 / 100) ** 2] for l in range(1, 4)],
+            *[[np.full(self.n_dim, 2 * l_mix - 1), self.cov * (2 / 3) ** 2] for l_mix in range(2)],
+            *[
+                [-np.full(self.n_dim, l_mix / 2), self.cov * (1 / 100) ** 2]
+                for l_mix in range(1, 4)
+            ],
+            *[[np.full(self.n_dim, l_mix / 2), self.cov * (7 / 100) ** 2] for l_mix in range(1, 4)],
         ]
 
     def smooth_comb(self):
         return [
             [
-                np.full(self.n_dim, (65 - 96 * ((1 / 2) ** l)) / 21),
-                self.cov * (32 / 63) ** 2 / (2 ** (2 * l)),
+                np.full(self.n_dim, (65 - 96 * ((1 / 2) ** l_mix)) / 21),
+                self.cov * (32 / 63) ** 2 / (2 ** (2 * l_mix)),
             ]
-            for l in range(6)
+            for l_mix in range(6)
         ]
 
     def discrete_comb(self):
         return [
-            *[[np.full(self.n_dim, (12 * l - 15) / 7), self.cov * (2 / 7) ** 2] for l in range(3)],
-            *[[np.full(self.n_dim, (2 * l) / 7), self.cov * (1 / 21) ** 2] for l in range(8, 11)],
+            *[
+                [np.full(self.n_dim, (12 * l_mix - 15) / 7), self.cov * (2 / 7) ** 2]
+                for l_mix in range(3)
+            ],
+            *[
+                [np.full(self.n_dim, (2 * l_mix) / 7), self.cov * (1 / 21) ** 2]
+                for l_mix in range(8, 11)
+            ],
         ]
 
 
