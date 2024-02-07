@@ -230,7 +230,7 @@ jobs:
           ls ./
 
       - name: Upload coverage stats to codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           # python spin goes into the INSTALLED path in order to run pytest
           files: ./coverage.xml
