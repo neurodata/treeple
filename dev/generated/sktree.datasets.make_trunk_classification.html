@@ -547,15 +547,16 @@ document.write(`
 <h1>sktree.datasets.make_trunk_classification<a class="headerlink" href="#sktree-datasets-make-trunk-classification" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="sktree.datasets.make_trunk_classification">
-<span class="sig-prename descclassname"><span class="pre">sktree.datasets.</span></span><span class="sig-name descname"><span class="pre">make_trunk_classification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4096</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_informative</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">band_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ma'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sktree/datasets/hyppo.html#make_trunk_classification"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sktree.datasets.make_trunk_classification" title="Link to this definition">#</a></dt>
-<dd><p>Generate trunk dataset.</p>
+<span class="sig-prename descclassname"><span class="pre">sktree.datasets.</span></span><span class="sig-name descname"><span class="pre">make_trunk_classification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4096</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_informative</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'trunk'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">band_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ma'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sktree/datasets/hyppo.html#make_trunk_classification"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sktree.datasets.make_trunk_classification" title="Link to this definition">#</a></dt>
+<dd><p>Generate trunk and/or Marron-Wand datasets.</p>
 <p>For each dimension in the first distribution, there is a mean of <span class="math notranslate nohighlight">\(1 / d\)</span>, where
 <code class="docutils literal notranslate"><span class="pre">d</span></code> is the dimensionality. The covariance is the identity matrix.
 The second distribution has a mean vector that is the negative of the first.
 As <code class="docutils literal notranslate"><span class="pre">d</span></code> increases, the two distributions become closer and closer.</p>
-<p>See full details in <a class="footnote-reference brackets" href="#footcite-trunk1982" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
+<p>Full details for the trunk simulation can be found in <a class="footnote-reference brackets" href="#footcite-trunk1982" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
+<p>Full details for the Marron-Wand simulations can be found in <a class="footnote-reference brackets" href="#footcite-marron1992exact" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
 <p>Instead of the identity covariance matrix, one can implement a banded covariance matrix
-that follows <a class="footnote-reference brackets" href="#footcite-bickel-2008" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
+that follows <a class="footnote-reference brackets" href="#footcite-bickel-2008" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
@@ -567,18 +568,29 @@ unique labels, by default 4096.</p>
 <dt><strong>n_informative</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>The informative dimensions. All others for <code class="docutils literal notranslate"><span class="pre">n_dim</span> <span class="pre">-</span> <span class="pre">n_informative</span></code>
 are uniform noise. Default is 256.</p>
 </dd>
+<dt><strong>simulation</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>Which simulation to run. Must be: ‘trunk’, ‘trunk_overlap’, ‘trunk_mix’, or one of the
+following Marron-Wand simulations: ‘gaussian’, ‘skewed_unimodal’, ‘strongly_skewed’,
+‘kurtotic_unimodal’, ‘outlier’, ‘bimodal’, ‘separated_bimodal’, ‘skewed_bimodal’,
+‘trimodal’, ‘claw’, ‘double_claw’, ‘asymmetric_claw’, ‘asymmetric_double_claw’,
+‘smooth_comb’, ‘discrete_comb’.
+When calling the Marron-Wand simulations, only the covariance parameters are considered
+(<code class="docutils literal notranslate"><span class="pre">rho</span></code> and <code class="docutils literal notranslate"><span class="pre">band_type</span></code>). Means are taken from <a class="footnote-reference brackets" href="#footcite-marron1992exact" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.
+By default ‘trunk’.</p>
+</dd>
 <dt><strong>m_factor</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>The multiplicative factor to apply to the mean-vector of the first
 distribution to obtain the mean-vector of the second distribution.
+This is only used when <code class="docutils literal notranslate"><span class="pre">simulation</span> <span class="pre">=</span> <span class="pre">trunk</span></code>.
 By default -1.</p>
 </dd>
 <dt><strong>rho</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, optional</span></dt><dd><p>The covariance value of the bands. By default 0 indicating, an identity matrix is used.</p>
 </dd>
-<dt><strong>band_type</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>The band type to use. For details, see Example 1 and 2 in <a class="footnote-reference brackets" href="#footcite-bickel-2008" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.
+<dt><strong>band_type</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>The band type to use. For details, see Example 1 and 2 in <a class="footnote-reference brackets" href="#footcite-bickel-2008" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.
 Either ‘ma’, or ‘ar’.</p>
 </dd>
 <dt><strong>return_params</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>Whether or not to return the distribution parameters of the classes normal distributions.</p>
 </dd>
-<dt><strong>mix</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, optional</span></dt><dd><p>Whether or not to mix the Gaussians. Should be a value between 0 and 1.</p>
+<dt><strong>mix</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>The probabilities associated with the mixture of Gaussians in the <code class="docutils literal notranslate"><span class="pre">trunk-mix</span></code> simulation.
+By default 0.5.</p>
 </dd>
 <dt><strong>seed</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>Random seed, by default None.</p>
 </dd>
@@ -595,19 +607,33 @@ Returned if <code class="docutils literal notranslate"><span class="pre">return_
 </dd>
 <dt><strong>covs</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of ArrayLike of shape (n_dim, n_dim), dtype=np.float64</span></dt><dd><p>The covariance for each class. Returned if <code class="docutils literal notranslate"><span class="pre">return_params</span></code> is True.</p>
 </dd>
+<dt><strong>X_mixture</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a> of shape (n_samples, n_dim), dtype=np.float64</span></dt><dd><p>The mixture of Gaussians for the <code class="docutils literal notranslate"><span class="pre">trunk_mix</span></code> simulation.
+Returned if <code class="docutils literal notranslate"><span class="pre">return_params</span></code> is True.</p>
+</dd>
+<dt><strong>G</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a> of shape (n_samples, n_dim), dtype=np.float64</span></dt><dd><p>The mixture of Gaussians for the Marron-Wand simulations.
+Returned if <code class="docutils literal notranslate"><span class="pre">return_params</span></code> is True.</p>
+</dd>
+<dt><strong>w</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a> of shape (n_dim,), dtype=np.float64</span></dt><dd><p>The weight vector for the Marron-Wand simulations.
+Returned if <code class="docutils literal notranslate"><span class="pre">return_params</span></code> is True.</p>
+</dd>
 </dl>
 </dd>
 </dl>
 <p class="rubric">References</p>
-<div class="docutils container" id="id4">
+<div class="docutils container" id="id6">
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="footcite-trunk1982" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
 <p>Gerard V. Trunk and J. O. Coleman. Repeated hypothesis testing on a growing data set. <em>IEEE Trans. Pattern Anal. Mach. Intell.</em>, 4(3):343–345, 1982. URL: <a class="reference external" href="https://doi.org/10.1109/TPAMI.1982.4767256">https://doi.org/10.1109/TPAMI.1982.4767256</a>, <a class="reference external" href="https://doi.org/10.1109/TPAMI.1982.4767256">doi:10.1109/TPAMI.1982.4767256</a>.</p>
 </aside>
-<aside class="footnote brackets" id="footcite-bickel-2008" role="doc-footnote">
+<aside class="footnote brackets" id="footcite-marron1992exact" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></span>
-<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id3">2</a>)</span>
+<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id4">2</a>)</span>
+<p>J Steve Marron and Matt P Wand. Exact mean integrated squared error. <em>The Annals of Statistics</em>, 20(2):712–736, 1992.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-bickel-2008" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id3">1</a>,<a role="doc-backlink" href="#id5">2</a>)</span>
 <p>Peter J. Bickel and Elizaveta Levina. Regularized estimation of large covariance matrices. <em>The Annals of Statistics</em>, February 2008. URL: <a class="reference external" href="http://dx.doi.org/10.1214/009053607000000758">http://dx.doi.org/10.1214/009053607000000758</a>, <a class="reference external" href="https://doi.org/10.1214/009053607000000758">doi:10.1214/009053607000000758</a>.</p>
 </aside>
 </aside>
@@ -691,7 +717,7 @@ Returned if <code class="docutils literal notranslate"><span class="pre">return_
 
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-07.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-08.
       <br/>
     
   </p>
