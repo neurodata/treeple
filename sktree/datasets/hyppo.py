@@ -230,6 +230,7 @@ def make_trunk_classification(
             replace=True,
             p=MARRON_WAND_SIMS[simulation],
         )
+        # the parameters used for each Gaussian in the mixture for each Marron Wand simulation
         norm_params = MarronWandSims(n_dim=n_informative, cov=cov)(simulation)
         G = np.fromiter(
             (
