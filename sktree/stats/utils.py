@@ -68,7 +68,7 @@ def _cond_entropy(y_true: ArrayLike, y_pred_proba: ArrayLike) -> float:
 
 
 # Define function to compute the sensitivity at 98% specificity
-def _SAS98(y_true: ArrayLike, y_pred_proba: ArrayLike, max_fpr=0.02) -> float:
+def _SA98(y_true: ArrayLike, y_pred_proba: ArrayLike, max_fpr=0.02) -> float:
     """Compute the sensitivity at 98% specificity.
 
     Parameters
@@ -82,7 +82,7 @@ def _SAS98(y_true: ArrayLike, y_pred_proba: ArrayLike, max_fpr=0.02) -> float:
     Returns
     -------
     float :
-        The estimated SAS98.
+        The estimated SA98.
     """
     if y_true.squeeze().ndim != 1:
         raise ValueError(f"y_true must be 1d, not {y_true.shape}")
@@ -105,12 +105,12 @@ METRIC_FUNCTIONS = {
     "auc": roc_auc_score,
     "mi": _mutual_information,
     "cond_entropy": _cond_entropy,
-    "s@s98": _SAS98,
+    "s@98": _SA98,
 }
 
-POSTERIOR_FUNCTIONS = ("mi", "auc", "cond_entropy", "s@s98")
+POSTERIOR_FUNCTIONS = ("mi", "auc", "cond_entropy", "s@98")
 
-POSITIVE_METRICS = ("mi", "auc", "balanced_accuracy", "s@s98")
+POSITIVE_METRICS = ("mi", "auc", "balanced_accuracy", "s@98")
 
 REGRESSOR_METRICS = ("mse", "mae")
 
