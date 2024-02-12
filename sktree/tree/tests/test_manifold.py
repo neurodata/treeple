@@ -10,14 +10,16 @@ def test_contiguous_and_discontiguous_patch():
     x = np.random.normal(size=(n, a, b))
     y = np.random.binomial(1, 0.5, size=(n))
 
-    est = PatchObliqueDecisionTreeClassifier(
-        min_patch_dims=[1, 1],
-        max_patch_dims=[4, 4],
-        dim_contiguous=(False, True),
-        data_dims=(a, b),
-    )
+    for seed in range(1000):
+        est = PatchObliqueDecisionTreeClassifier(
+            min_patch_dims=[1, 1],
+            max_patch_dims=[4, 4],
+            dim_contiguous=(True, False),
+            data_dims=(a, b),
+            random_state=seed,
+        )
 
-    est.fit(x.reshape(100, -1), y)
+        est.fit(x.reshape(100, -1), y)
 
 
 def test_contiguous_and_discontiguous_patch_forest():
