@@ -10,6 +10,7 @@ import numpy as np
 cimport numpy as cnp
 
 cnp.import_array()
+from libcpp.vector cimport vector
 
 from .._lib.sklearn.tree._utils cimport rand_uniform
 
@@ -145,3 +146,21 @@ cdef intp_t ravel_multi_index_cython(intp_t[:] coords, const intp_t[:] shape) no
             flat_index *= shape[i + 1]
 
     return flat_index
+
+
+cdef vector[vector[intp_t]] cartesian_cython(vector[vector[intp_t]]& sequences) noexcept nogil:
+    cdef vector[vector[intp_t]] results = vector[vector[intp_t]](1)
+    cdef vector[vector[intp_t]] next_results
+    for new_values in sequences:
+        for result in results:
+            for value in new_values:
+                result_copy = result
+                result_copy.push_back(value)
+                next_results.push_back(result_copy)
+        results = next_results
+        next_results.clear()
+    return results
+
+
+cpdef cartesian_python(vector[vector[intp_t]]& sequences):
+    return cartesian_cython(sequences)
