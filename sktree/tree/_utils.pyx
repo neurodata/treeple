@@ -54,8 +54,7 @@ cpdef unravel_index(
     """
     index = np.intp(index)
     shape = np.array(shape)
-    coords = np.empty(shape.shape[0], dtype=np.intp)
-    unravel_index_cython(index, shape, coords)
+    coords = unravel_index_cython(index, shape)
     return coords
 
 
@@ -84,7 +83,7 @@ cpdef ravel_multi_index(vector[intp_t] coords, const intp_t[:] shape):
     return ravel_multi_index_cython(coords, shape)
 
 
-cdef void unravel_index_cython(intp_t index, const intp_t[:] shape, intp_t[:] coords) noexcept nogil:
+cdef vector[intp_t] unravel_index_cython(intp_t index, const intp_t[:] shape) noexcept nogil:
     """Converts a flat index into a tuple of coordinate arrays.
 
     Parameters
@@ -103,11 +102,14 @@ cdef void unravel_index_cython(intp_t index, const intp_t[:] shape, intp_t[:] co
     """
     cdef intp_t ndim = shape.shape[0]
     cdef intp_t j, size
+    cdef vector[intp_t] coords = vector[intp_t](ndim)
 
     for j in range(ndim - 1, -1, -1):
         size = shape[j]
         coords[j] = index % size
         index //= size
+
+    return coords
 
 
 cdef intp_t ravel_multi_index_cython(vector[intp_t] coords, const intp_t[:] shape) noexcept nogil:

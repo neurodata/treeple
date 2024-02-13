@@ -18,7 +18,7 @@ cpdef unravel_index(
 
 cpdef ravel_multi_index(vector[intp_t] coords, const intp_t[:] shape)
 
-cdef void unravel_index_cython(intp_t index, const intp_t[:] shape, intp_t[:] coords) noexcept nogil
+cdef vector[intp_t] unravel_index_cython(intp_t index, const intp_t[:] shape) noexcept nogil
 
 cdef intp_t ravel_multi_index_cython(vector[intp_t] coords, const intp_t[:] shape) noexcept nogil
 
