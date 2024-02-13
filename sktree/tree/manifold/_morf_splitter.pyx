@@ -301,7 +301,6 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
                 self.patch_dims_buff
             )
 
-
     cdef void sample_proj_vec(
         self,
         vector[vector[float32_t]]& proj_mat_weights,
@@ -336,7 +335,6 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
         cdef intp_t num_rows
         cdef int ndim = self.ndim
         cdef vector[vector[intp_t]] points = vector[vector[intp_t]](ndim)
-        cdef vector[intp_t] temp = vector[intp_t](ndim)
         cdef intp_t patch_dim
         cdef intp_t idx
         cdef intp_t i
@@ -363,17 +361,16 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
                     _index_data_buffer[i], _index_data_buffer[j] = \
                         _index_data_buffer[j], _index_data_buffer[i]
 
-                for i in range(0, patch_dims[dim_idx]): # populate
+                for i in range(0, patch_dims[dim_idx]):  # populate
                     points[dim_idx].push_back(_index_data_buffer[i])
                 _index_data_buffer.clear()
 
         # make cartesian product of the points, ravel, then add to proj_mat_indices
-        cdef vector[vector[intp_t]] products =  cartesian_cython(points)
+        cdef vector[vector[intp_t]] products = cartesian_cython(points)
         for point in products:
             vectorized_point = ravel_multi_index_cython(point, self.data_dims)
             proj_mat_indices[proj_i].push_back(vectorized_point)
             proj_mat_weights[proj_i].push_back(weight)
-
 
     cdef void compute_features_over_samples(
         self,
