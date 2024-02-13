@@ -325,14 +325,13 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
         proj_i : intp_t
             The index of feature.
         patch_size : intp_t
-            The size of the patch.
+            The total size of the patch.
         top_left_patch_seed : intp_t
-            The top-left seed of the patch.
+            The top-left seed of the patch raveled.
         patch_dims : array-like, shape (n_dims,)
             The dimensions of the patch.
         """
         # initialize a buffer to allow for Fisher-Yates
-        cdef vector[intp_t] _index_patch_buffer
         cdef vector[intp_t] _index_data_buffer
 
         cdef UINT32_t* random_state = &self.rand_r_state
@@ -341,23 +340,20 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
         cdef vector[vector[intp_t]] points = vector[vector[intp_t]](ndim)
         cdef vector[intp_t] temp = vector[intp_t](ndim)
         cdef intp_t patch_dim
-        cdef intp_t patch_idx
         cdef intp_t idx
         cdef intp_t i
 
-        cdef intp_t[:] unraveled_patch_point
         # weights are default to 1
         cdef float32_t weight = 1.
 
-        unravel_index_cython(top_left_patch_seed, self.data_dims, unraveled_patch_point)
+        cdef vector[intp_t] unraveled_patch_point = vector[intp_t](self.ndim)
+        unraveled_patch_point = unravel_index_cython(top_left_patch_seed, self.data_dims)
 
-        # # TODO
         for dim_idx in range(ndim):
             if self.dim_contiguous[dim_idx]:
                 patch_dim = patch_dims[dim_idx]
-                patch_idx = unraveled_patch_point[dim_idx]
-                idx = patch_dim + patch_idx
-                for i in range(patch_idx, idx):
+                idx = patch_dim + unraveled_patch_point[dim_idx]
+                for i in range(unraveled_patch_point[dim_idx], idx):
                     points[dim_idx].push_back(i)
             else:
                 num_rows = self.data_dims[dim_idx]
@@ -368,17 +364,12 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
                     j = rand_int(0, num_rows - i, random_state)
                     _index_data_buffer[i], _index_data_buffer[j] = \
                         _index_data_buffer[j], _index_data_buffer[i]
-                for i in range(num_rows):
-                    _index_patch_buffer.push_back(_index_data_buffer[i])
 
-                for i in range(0, patch_dims[dim_idx]): #populate
-                    points[dim_idx].push_back(_index_patch_buffer[i])
+                for i in range(0, patch_dims[dim_idx]): # populate
+                    points[dim_idx].push_back(_index_data_buffer[i])
                 _index_data_buffer.clear()
-                _index_patch_buffer.clear()
 
-        # make cartesian product of the points, ravel then to proj_mat
-
-        cdef intp_t[:] tmp
+        # make cartesian product of the points, ravel, then add to proj_mat_indices
         cdef vector[vector[intp_t]] products =  cartesian_cython(points)
         for point in products:
             vectorized_point = ravel_multi_index_cython(point, self.data_dims)
@@ -457,7 +448,6 @@ cdef class BestPatchSplitterTester(BestPatchSplitter):
         # convert the projection matrix to something that can be used in Python
         proj_vecs = np.zeros((1, self.n_features), dtype=np.float64)
         for i in range(0, 1):
-            print(i)
             for j in range(0, proj_mat_weights[i].size()):
                 weight = proj_mat_weights[i][j]
                 feat = proj_mat_indices[i][j]
