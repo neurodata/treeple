@@ -16,7 +16,7 @@ from libcpp.vector cimport vector
 
 from ..._lib.sklearn.tree._criterion cimport Criterion
 from ..._lib.sklearn.tree._utils cimport rand_int
-from .._utils cimport ravel_multi_index_cython, unravel_index_cython, cartesian_cython
+from .._utils cimport cartesian_cython, ravel_multi_index_cython, unravel_index_cython
 
 
 cdef class PatchSplitter(BestObliqueSplitter):

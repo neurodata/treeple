@@ -7,7 +7,7 @@ from numpy.testing import assert_equal
 from sktree._lib.sklearn.tree._criterion import Gini
 from sktree._lib.sklearn.tree._utils import _any_isnan_axis0
 
-from .._utils import ravel_multi_index, unravel_index, cartesian_python
+from .._utils import cartesian_python, ravel_multi_index, unravel_index
 from ..manifold._morf_splitter import BestPatchSplitterTester
 
 
