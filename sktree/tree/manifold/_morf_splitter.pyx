@@ -228,8 +228,6 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
                 self.max_patch_dims[idx] + 1,
                 random_state
             )
-            # samples patch size for a dimension
-
             # sample the top-left index and patch size for this dimension based on boundary effects
             if self.boundary is None:
                 # compute the difference between the image dimensions and the current
