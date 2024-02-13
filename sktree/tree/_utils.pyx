@@ -59,7 +59,7 @@ cpdef unravel_index(
     return coords
 
 
-cpdef ravel_multi_index(intp_t[:] coords, const intp_t[:] shape):
+cpdef ravel_multi_index(vector[intp_t] coords, const intp_t[:] shape):
     """Converts a tuple of coordinate arrays into a flat index.
 
     Purely used for testing purposes.
@@ -110,7 +110,7 @@ cdef void unravel_index_cython(intp_t index, const intp_t[:] shape, intp_t[:] co
         index //= size
 
 
-cdef intp_t ravel_multi_index_cython(intp_t[:] coords, const intp_t[:] shape) noexcept nogil:
+cdef intp_t ravel_multi_index_cython(vector[intp_t] coords, const intp_t[:] shape) noexcept nogil:
     """Converts a tuple of coordinate arrays into a flat index.
 
     Parameters
@@ -148,7 +148,7 @@ cdef intp_t ravel_multi_index_cython(intp_t[:] coords, const intp_t[:] shape) no
     return flat_index
 
 
-cdef vector[vector[intp_t]] cartesian_cython(vector[vector[intp_t]]& sequences) noexcept nogil:
+cdef vector[vector[intp_t]] cartesian_cython(vector[vector[intp_t]] sequences) noexcept nogil:
     cdef vector[vector[intp_t]] results = vector[vector[intp_t]](1)
     cdef vector[vector[intp_t]] next_results
     for new_values in sequences:
