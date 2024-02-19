@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Quantile regression vs. standard and oblique regression forest &#8212; scikit-tree 0.7.0dev0 documentation</title>
+    <title>Quantile regression with oblique regression forest &#8212; scikit-tree 0.7.0dev0 documentation</title>
   
   
   
@@ -435,7 +435,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="plot_quantile_interpolation_with_RF.html">Predicting with different quantile interpolation methods</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_quantile_regression_intervals_with_RF.html">Quantile prediction intervals with Random Forest Regressor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_quantile_toy_example_with_RF.html">Quantile prediction with Random Forest Regressor class</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Quantile regression vs. standard and oblique regression forest</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Quantile regression with oblique regression forest</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../sklearn_vs_sktree/index.html">Comparing sklearn and sktree decision trees</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -521,10 +521,12 @@ document.write(`
 <p><a class="reference internal" href="#sphx-glr-download-auto-examples-quantile-predictions-plot-quantile-vs-standard-oblique-forest-py"><span class="std std-ref">Go to the end</span></a>
 to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="quantile-regression-vs-standard-and-oblique-regression-forest">
-<span id="sphx-glr-auto-examples-quantile-predictions-plot-quantile-vs-standard-oblique-forest-py"></span><h1>Quantile regression vs. standard and oblique regression forest<a class="headerlink" href="#quantile-regression-vs-standard-and-oblique-regression-forest" title="Link to this heading">#</a></h1>
+<section class="sphx-glr-example-title" id="quantile-regression-with-oblique-regression-forest">
+<span id="sphx-glr-auto-examples-quantile-predictions-plot-quantile-vs-standard-oblique-forest-py"></span><h1>Quantile regression with oblique regression forest<a class="headerlink" href="#quantile-regression-with-oblique-regression-forest" title="Link to this heading">#</a></h1>
 <p>An example to generate quantile predictions using an oblique random forest
 instance on a synthetic, right-skewed dataset.</p>
+<p>This example was heavily inspired by <a class="reference external" href="https://github.com/zillow/quantile-forest">quantile-forest</a>
+package. See their package <a class="reference external" href="https://zillow.github.io/quantile-forest/">here</a>.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <a href="https://docs.python.org/3/library/collections.html#collections.defaultdict" title="collections.defaultdict" class="sphx-glr-backref-module-collections sphx-glr-backref-type-py-class"><span class="n">defaultdict</span></a>
 
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -608,7 +610,7 @@ predicting the off-centered target distribution than the regular mean prediction
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_plot_quantile_vs_standard_oblique_forest_001.png" srcset="../../_images/sphx_glr_plot_quantile_vs_standard_oblique_forest_001.png" alt="plot quantile vs standard oblique forest" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.785 seconds)</p>
+<img src="../../_images/sphx_glr_plot_quantile_vs_standard_oblique_forest_001.png" srcset="../../_images/sphx_glr_plot_quantile_vs_standard_oblique_forest_001.png" alt="plot quantile vs standard oblique forest" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.556 seconds)</p>
 <p><strong>Estimated memory usage:</strong>  9 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-quantile-predictions-plot-quantile-vs-standard-oblique-forest-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
@@ -699,7 +701,7 @@ predicting the off-centered target distribution than the regular mean prediction
 
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-12.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-19.
       <br/>
     
   </p>

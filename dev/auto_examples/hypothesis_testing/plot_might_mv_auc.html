@@ -435,7 +435,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../quantile_predictions/plot_quantile_interpolation_with_RF.html">Predicting with different quantile interpolation methods</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../quantile_predictions/plot_quantile_regression_intervals_with_RF.html">Quantile prediction intervals with Random Forest Regressor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../quantile_predictions/plot_quantile_toy_example_with_RF.html">Quantile prediction with Random Forest Regressor class</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../quantile_predictions/plot_quantile_vs_standard_oblique_forest.html">Quantile regression vs. standard and oblique regression forest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quantile_predictions/plot_quantile_vs_standard_oblique_forest.html">Quantile regression with oblique regression forest</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../sklearn_vs_sktree/index.html">Comparing sklearn and sktree decision trees</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -855,7 +855,7 @@ into a single dataset to perform hypothesis testing.</p>
 22 None
 22 None
 22 None
-ASH-90 / Partial AUC: 0.5566188197767146
+ASH-90 / Partial AUC: 0.6596541859699754
 Shape of Observed Samples: (1000,)
 Shape of Tree Posteriors for the positive class: (125, 1000, 1)
 </pre></div>
@@ -891,7 +891,7 @@ Shape of Tree Posteriors for the positive class: (125, 1000, 1)
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Shape of Tree Posteriors for the positive class: </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">posterior_arr</span><span class="o">.</span><span class="n">shape</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ASH-90 / Partial AUC: 0.5137844611528822
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ASH-90 / Partial AUC: 0.5525682894103947
 Shape of Observed Samples: (1000,)
 Shape of Tree Posteriors for the positive class: (125, 1000, 1)
 </pre></div>
@@ -905,8 +905,8 @@ Shape of Tree Posteriors for the positive class: (125, 1000, 1)
 <p>Tree Posteriors for the positive class: <code class="docutils literal notranslate"><span class="pre">est_mv.observe_posteriors_</span></code>
 (n_trees, n_samples_test, 1)</p>
 <p>True Labels: <code class="docutils literal notranslate"><span class="pre">est_mv.y_true_final_</span></code></p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 8.243 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  371 MB</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 8.946 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  391 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-hypothesis-testing-plot-might-mv-auc-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/bc0f3c3d39ef186c93e85f59521ebd8d/plot_might_mv_auc.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_might_mv_auc.ipynb</span></code></a></p>
@@ -997,7 +997,7 @@ Shape of Tree Posteriors for the positive class: (125, 1000, 1)
 
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-12.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-19.
       <br/>
     
   </p>
