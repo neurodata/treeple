@@ -9,6 +9,8 @@ The plot compares the conditional median with the quantile prediction intervals,
 quantile parameter being 0.025, 0.5 and 0.975. This allows us to generate predictions at 95%
 intervals with upper and lower bounds.
 
+This example was heavily inspired by `quantile-forest <https://github.com/zillow/quantile-forest>`_
+package. See their package `here <https://zillow.github.io/quantile-forest/>`_.
 """
 
 from collections import defaultdict
