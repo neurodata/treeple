@@ -104,7 +104,7 @@ def make_trunk_classification(
         unique labels, by default 4096.
     n_informative : int, optional
         The informative dimensions. All others for ``n_dim - n_informative``
-        are uniform noise. Default is 256.
+        are Gaussian noise. Default is 256.
     simulation : str, optional
         Which simulation to run. Must be: 'trunk', 'trunk_overlap', 'trunk_mix', or one of the
         following Marron-Wand simulations: 'gaussian', 'skewed_unimodal', 'strongly_skewed',
@@ -261,7 +261,7 @@ def make_trunk_classification(
         )
 
     if n_dim > n_informative:
-        X = np.hstack((X, rng.uniform(low=0, high=1, size=(X.shape[0], n_dim - n_informative))))
+        X = np.hstack((X, rng.normal(loc=0, scale=1, size=(X.shape[0], n_dim - n_informative))))
 
     y = np.concatenate((np.zeros(n_samples // 2), np.ones(n_samples // 2)))
 
