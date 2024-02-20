@@ -1,4 +1,5 @@
 import threading
+from collections import namedtuple
 from typing import Callable, Optional, Tuple, Union
 
 import numpy as np
@@ -1213,6 +1214,11 @@ def _parallel_predict_proba_oob(predict_proba, X, out, idx, test_idx, lock):
     return prediction
 
 
+ForestTestResult = namedtuple(
+    "ForestTestResult", ["observe_test_stat", "permuted_stat", "observe_stat", "pvalue"]
+)
+
+
 def build_coleman_forest(
     est,
     perm_est,
@@ -1291,17 +1297,6 @@ def build_coleman_forest(
         raise RuntimeError(
             f"Permutation forest must be a PermutationHonestForestClassifier, got {type(perm_est)}"
         )
-    # perform permutation of covariates
-    # TODO: refactor permutations into the HonestForest(?)
-    # n_samples_train = X.shape[0]
-    # index_arr = rng.choice(
-    #     np.arange(n_samples_train, dtype=int),
-    #     size=(n_samples_train, 1),
-    #     replace=False,
-    #     shuffle=True,
-    # )
-    # X_permute = X.copy()
-    # X_permute[:, covariate_index] = X_permute[index_arr, covariate_index]
 
     # build two sets of forests
     est, orig_forest_proba = build_hyppo_oob_forest(est, X, y, verbose=verbose)
@@ -1341,10 +1336,11 @@ def build_coleman_forest(
     else:
         pvalue = (1 + (null_dist >= observe_test_stat).sum()) / (1 + n_repeats)
 
+    forest_result = ForestTestResult(observe_test_stat, permute_stat, observe_stat, pvalue)
     if return_posteriors:
-        return observe_test_stat, pvalue, orig_forest_proba, perm_forest_proba
+        return forest_result, orig_forest_proba, perm_forest_proba
     else:
-        return observe_test_stat, pvalue
+        return forest_result
 
 
 def build_permutation_forest(
@@ -1416,6 +1412,7 @@ def build_permutation_forest(
     ----------
     .. footbibliography::
     """
+    rng = np.random.default_rng(seed)
     metric_func: Callable[[ArrayLike, ArrayLike], float] = METRIC_FUNCTIONS[metric]
 
     if covariate_index is None:
@@ -1425,60 +1422,47 @@ def build_permutation_forest(
         raise RuntimeError(
             f"Permutation forest must be a PermutationHonestForestClassifier, got {type(perm_est)}"
         )
-    # perform permutation of covariates
-    # TODO: refactor permutations into the HonestForest(?)
-    # n_samples_train = X.shape[0]
-    # index_arr = rng.choice(
-    #     np.arange(n_samples_train, dtype=int),
-    #     size=(n_samples_train, 1),
-    #     replace=False,
-    #     shuffle=True,
-    # )
-    # X_permute = X.copy()
-    # X_permute[:, covariate_index] = X_permute[index_arr, covariate_index]
 
-    # build two sets of forests
+    # train the original forest on unpermuted data
     est, orig_forest_proba = build_hyppo_oob_forest(est, X, y, verbose=verbose)
-    perm_est, perm_forest_proba = build_hyppo_oob_forest(
-        perm_est, X, y, verbose=verbose, covariate_index=covariate_index
-    )
+    y_pred_proba_orig = np.nanmean(orig_forest_proba, axis=0)
+    observe_test_stat = metric_func(y, y_pred_proba_orig, **metric_kwargs)
 
     # get the number of jobs
-    n_jobs = est.n_jobs
+    index_arr = np.arange(X.shape[0], dtype=int).reshape(-1, 1)
 
-    metric_star, metric_star_pi = _compute_null_distribution_coleman(
-        y,
-        orig_forest_proba,
-        perm_forest_proba,
-        metric,
-        n_repeats=n_repeats,
-        seed=seed,
-        n_jobs=n_jobs,
-        **metric_kwargs,
-    )
+    # train many null forests
+    X_perm = X.copy()
+    null_dist = []
+    for _ in range(n_repeats):
+        rng.shuffle(index_arr)
+        perm_X_cov = X_perm[index_arr, covariate_index]
+        X_perm[:, covariate_index] = perm_X_cov
 
-    y_pred_proba_orig = np.nanmean(orig_forest_proba, axis=0)
-    y_pred_proba_perm = np.nanmean(perm_forest_proba, axis=0)
-    observe_stat = metric_func(y, y_pred_proba_orig, **metric_kwargs)
-    permute_stat = metric_func(y, y_pred_proba_perm, **metric_kwargs)
+        #
+        perm_est = clone(perm_est)
+        perm_est.set_params(random_state=rng.integers(0, np.iinfo(np.int32).max))
 
-    # metric^\pi - metric = observed test statistic, which under the
-    # null is normally distributed around 0
-    observe_test_stat = permute_stat - observe_stat
+        perm_est, perm_forest_proba = build_hyppo_oob_forest(
+            perm_est, X_perm, y, verbose=verbose, covariate_index=covariate_index
+        )
 
-    # metric^\pi_j - metric_j, which is centered at 0
-    null_dist = metric_star_pi - metric_star
+        y_pred_proba_perm = np.nanmean(perm_forest_proba, axis=0)
+        permute_stat = metric_func(y, y_pred_proba_perm, **metric_kwargs)
+        null_dist.append(permute_stat)
 
-    # compute pvalue
+    # compute pvalue, which note is opposite that of the Coleman approach, since
+    # we are testing if the null distribution results in a test statistic greater
     if metric in POSITIVE_METRICS:
-        pvalue = (1 + (null_dist <= observe_test_stat).sum()) / (1 + n_repeats)
-    else:
         pvalue = (1 + (null_dist >= observe_test_stat).sum()) / (1 + n_repeats)
-
-    if return_posteriors:
-        return observe_test_stat, pvalue, orig_forest_proba, perm_forest_proba
     else:
-        return observe_test_stat, pvalue
+        pvalue = (1 + (null_dist <= observe_test_stat).sum()) / (1 + n_repeats)
+
+    forest_result = ForestTestResult(observe_test_stat, permute_stat, None, pvalue)
+    if return_posteriors:
+        return forest_result, orig_forest_proba, perm_forest_proba
+    else:
+        return forest_result
 
 
 def build_hyppo_oob_forest(est, X, y, verbose=False, **est_kwargs):
@@ -1629,37 +1613,3 @@ def build_hyppo_cv_forest(
         est_list.append(est)
 
     return est_list, all_proba_list
-
-
-# XXX: can delete?
-def predict_oob_proba(est, X, verbose=False):
-    """Predict out of bag posterior probabilities."""
-    from sklearn.utils.validation import check_is_fitted
-
-    check_is_fitted(est)
-
-    # now evaluate
-    X = est._validate_X_predict(X)
-
-    # if we trained a binning tree, then we should re-bin the data
-    # XXX: this is inefficient and should be improved to be in line with what
-    # the Histogram Gradient Boosting Tree does, where the binning thresholds
-    # are passed into the tree itself, thus allowing us to set the node feature
-    # value thresholds within the tree itself.
-    if est.max_bins is not None:
-        X = est._bin_data(X, is_training_data=False).astype(DTYPE)
-
-    # Assign chunk of trees to jobs
-    n_jobs, _, _ = _partition_estimators(est.n_estimators, est.n_jobs)
-
-    # avoid storing the output of every estimator by summing them here
-    lock = threading.Lock()
-    # accumulate the predictions across all trees
-    all_proba = np.full(
-        (len(est.estimators_), X.shape[0], est.n_classes_), np.nan, dtype=np.float64
-    )
-    Parallel(n_jobs=n_jobs, verbose=verbose, require="sharedmem")(
-        delayed(_parallel_predict_proba_oob)(e.predict_proba, X, all_proba, idx, test_idx, lock)
-        for idx, (e, test_idx) in enumerate(zip(est.estimators_, est.oob_samples_))
-    )
-    return all_proba
