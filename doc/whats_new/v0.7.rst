@@ -25,6 +25,8 @@ Changelog
     by `Adam Li`_ (:pr:`#211`)
 - |Feature| Introduce a new set of simulations based on Marron and Wand 1992.
     by `Sambit Panda`_ (:pr:`#203`)
+- |Feature| :func:`sktree.stats.build_coleman_forest` and :func:`sktree.stats.build_permutation_forest`
+    are added to compute p-values given an estimator and permutation-estimator, `Adam Li`_ (:pr:`#203`)
 
 Code and Documentation Contributors
 -----------------------------------
