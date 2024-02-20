@@ -12,8 +12,6 @@ from sklearn.model_selection import StratifiedKFold, train_test_split
 from sklearn.utils.multiclass import type_of_target
 from sklearn.utils.validation import _is_fitted, check_X_y
 
-from sktree.stats import PermutationHonestForestClassifier
-
 from .._lib.sklearn.ensemble._forest import (
     ForestClassifier,
     ForestRegressor,
@@ -26,6 +24,7 @@ from ..ensemble._honest_forest import HonestForestClassifier
 from ..experimental import conditional_resample
 from ..tree import DecisionTreeClassifier, DecisionTreeRegressor
 from ..tree._classes import DTYPE
+from .permuteforest import PermutationHonestForestClassifier
 from .utils import (
     METRIC_FUNCTIONS,
     POSITIVE_METRICS,
