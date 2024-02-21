@@ -56,7 +56,7 @@
         </script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sktree.stats.build_hyppo_oob_forest" href="sktree.stats.build_hyppo_oob_forest.html" />
+    <link rel="next" title="sktree.stats.build_permutation_forest" href="sktree.stats.build_permutation_forest.html" />
     <link rel="prev" title="sktree.stats.PermutationForestRegressor" href="sktree.stats.PermutationForestRegressor.html" />
     <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
     <script type="text/javascript" src="../_static/copybutton.js"></script>
@@ -460,6 +460,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="sktree.stats.PermutationForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.PermutationForestClassifier</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sktree.stats.PermutationForestRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.PermutationForestRegressor</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">sktree.stats.build_coleman_forest</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.stats.build_permutation_forest.html">sktree.stats.build_permutation_forest</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sktree.stats.build_hyppo_oob_forest.html">sktree.stats.build_hyppo_oob_forest</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sktree.stats.build_hyppo_cv_forest.html">sktree.stats.build_hyppo_cv_forest</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sktree.stats.PermutationHonestForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.PermutationHonestForestClassifier</a></li>
@@ -546,8 +547,14 @@ document.write(`
 <h1>sktree.stats.build_coleman_forest<a class="headerlink" href="#sktree-stats-build-coleman-forest" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="sktree.stats.build_coleman_forest">
-<span class="sig-prename descclassname"><span class="pre">sktree.stats.</span></span><span class="sig-name descname"><span class="pre">build_coleman_forest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">est</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perm_est</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariate_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'s&#64;98'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_repeats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_posteriors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">metric_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sktree/stats/forestht.html#build_coleman_forest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sktree.stats.build_coleman_forest" title="Link to this definition">#</a></dt>
-<dd><p>Build a hypothesis testing forest using oob samples.</p>
+<span class="sig-prename descclassname"><span class="pre">sktree.stats.</span></span><span class="sig-name descname"><span class="pre">build_coleman_forest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">est</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perm_est</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariate_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'s&#64;98'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_repeats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_posteriors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">metric_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sktree/stats/forestht.html#build_coleman_forest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sktree.stats.build_coleman_forest" title="Link to this definition">#</a></dt>
+<dd><p>Build a hypothesis testing forest using a two-forest approach.</p>
+<p>The two-forest approach stems from the Coleman et al. 2022 paper, where
+two forests are trained: one on the original dataset, and one on the
+permuted dataset. The dataset is either permuted once, or independently for
+each tree in the permuted forest. The original test statistic is computed by
+comparing the metric on both forests <code class="docutils literal notranslate"><span class="pre">(metric_forest</span> <span class="pre">-</span> <span class="pre">metric_perm_forest)</span></code>.
+For full details, see <a class="footnote-reference brackets" href="#footcite-coleman2022scalable" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
@@ -565,7 +572,9 @@ document.write(`
 98% specificity.</p>
 </dd>
 <dt><strong>n_repeats</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>Number of times to bootstrap sample the two forests to construct
-the null distribution, by default 1000.</p>
+the null distribution, by default 10000. The construction of the
+null forests will be parallelized according to the <code class="docutils literal notranslate"><span class="pre">n_jobs</span></code>
+argument of the <code class="docutils literal notranslate"><span class="pre">est</span></code> forest.</p>
 </dd>
 <dt><strong>verbose</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>Verbosity, by default False.</p>
 </dd>
@@ -593,6 +602,15 @@ on their out of bag samples.</p>
 </dl>
 </dd>
 </dl>
+<p class="rubric">References</p>
+<div class="docutils container" id="id2">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-coleman2022scalable" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Tim Coleman, Wei Peng, and Lucas Mentch. Scalable and efficient hypothesis testing with random forests. <em>The Journal of Machine Learning Research</em>, 23(1):7679–7713, 2022.</p>
+</aside>
+</aside>
+</div>
 </dd></dl>
 
 <span class="target" id="sphx-glr-backreferences-sktree-stats-build-coleman-forest"></span></section>
@@ -617,11 +635,11 @@ on their out of bag samples.</p>
       </div>
     </a>
     <a class="right-next"
-       href="sktree.stats.build_hyppo_oob_forest.html"
+       href="sktree.stats.build_permutation_forest.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">sktree.stats.build_hyppo_oob_forest</p>
+        <p class="prev-next-title">sktree.stats.build_permutation_forest</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -672,7 +690,7 @@ on their out of bag samples.</p>
 
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-20.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-21.
       <br/>
     
   </p>

@@ -460,6 +460,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="generated/sktree.stats.PermutationForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.PermutationForestClassifier</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sktree.stats.PermutationForestRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.PermutationForestRegressor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sktree.stats.build_coleman_forest.html">sktree.stats.build_coleman_forest</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/sktree.stats.build_permutation_forest.html">sktree.stats.build_permutation_forest</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sktree.stats.build_hyppo_oob_forest.html">sktree.stats.build_hyppo_oob_forest</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sktree.stats.build_hyppo_cv_forest.html">sktree.stats.build_hyppo_cv_forest</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/sktree.stats.PermutationHonestForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.PermutationHonestForestClassifier</a></li>
@@ -727,15 +728,18 @@ tree models.</p>
 <td><p>Hypothesis testing of covariates with a permutation forest regressor.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.stats.build_coleman_forest.html#sktree.stats.build_coleman_forest" title="sktree.stats.build_coleman_forest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_coleman_forest</span></code></a>(est, perm_est, X, y[, ...])</p></td>
+<td><p>Build a hypothesis testing forest using a two-forest approach.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.stats.build_permutation_forest.html#sktree.stats.build_permutation_forest" title="sktree.stats.build_permutation_forest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_permutation_forest</span></code></a>(est, perm_est, X, y)</p></td>
+<td><p>Build a hypothesis testing forest using a permutation-forest approach.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.stats.build_hyppo_oob_forest.html#sktree.stats.build_hyppo_oob_forest" title="sktree.stats.build_hyppo_oob_forest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_hyppo_oob_forest</span></code></a>(est, X, y[, verbose])</p></td>
 <td><p>Build a hypothesis testing forest using oob samples.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.stats.build_hyppo_oob_forest.html#sktree.stats.build_hyppo_oob_forest" title="sktree.stats.build_hyppo_oob_forest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_hyppo_oob_forest</span></code></a>(est, X, y[, verbose])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.stats.build_hyppo_cv_forest.html#sktree.stats.build_hyppo_cv_forest" title="sktree.stats.build_hyppo_cv_forest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_hyppo_cv_forest</span></code></a>(est, X, y[, cv, ...])</p></td>
 <td><p>Build a hypothesis testing forest using oob samples.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.stats.build_hyppo_cv_forest.html#sktree.stats.build_hyppo_cv_forest" title="sktree.stats.build_hyppo_cv_forest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_hyppo_cv_forest</span></code></a>(est, X, y[, cv, ...])</p></td>
-<td><p>Build a hypothesis testing forest using oob samples.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sktree.stats.PermutationHonestForestClassifier.html#sktree.stats.PermutationHonestForestClassifier" title="sktree.stats.PermutationHonestForestClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PermutationHonestForestClassifier</span></code></a>([...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sktree.stats.PermutationHonestForestClassifier.html#sktree.stats.PermutationHonestForestClassifier" title="sktree.stats.PermutationHonestForestClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PermutationHonestForestClassifier</span></code></a>([...])</p></td>
 <td><p>A forest classifier with a permutation over the dataset.</p></td>
 </tr>
 </tbody>
@@ -906,7 +910,7 @@ for the entropy, MI and CMI of the Gaussian distributions.</p>
 
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-20.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-21.
       <br/>
     
   </p>

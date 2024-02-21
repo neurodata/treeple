@@ -453,6 +453,7 @@ document.write(`
                   
   <h1>Source code for sktree.stats.forestht</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -478,6 +479,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">..experimental</span> <span class="kn">import</span> <span class="n">conditional_resample</span>
 <span class="kn">from</span> <span class="nn">..tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span><span class="p">,</span> <span class="n">DecisionTreeRegressor</span>
 <span class="kn">from</span> <span class="nn">..tree._classes</span> <span class="kn">import</span> <span class="n">DTYPE</span>
+<span class="kn">from</span> <span class="nn">.permuteforest</span> <span class="kn">import</span> <span class="n">PermutationHonestForestClassifier</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">METRIC_FUNCTIONS</span><span class="p">,</span>
     <span class="n">POSITIVE_METRICS</span><span class="p">,</span>
@@ -1675,6 +1677,11 @@ document.write(`
     <span class="k">return</span> <span class="n">prediction</span>
 
 
+<span class="n">ForestTestResult</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span>
+    <span class="s2">&quot;ForestTestResult&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;observe_test_stat&quot;</span><span class="p">,</span> <span class="s2">&quot;permuted_stat&quot;</span><span class="p">,</span> <span class="s2">&quot;observe_stat&quot;</span><span class="p">,</span> <span class="s2">&quot;pvalue&quot;</span><span class="p">]</span>
+<span class="p">)</span>
+
+
 <div class="viewcode-block" id="build_coleman_forest">
 <a class="viewcode-back" href="../../../generated/sktree.stats.build_coleman_forest.html#sktree.stats.build_coleman_forest">[docs]</a>
 <span class="k">def</span> <span class="nf">build_coleman_forest</span><span class="p">(</span>
@@ -1684,13 +1691,20 @@ document.write(`
     <span class="n">y</span><span class="p">,</span>
     <span class="n">covariate_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;s@98&quot;</span><span class="p">,</span>
-    <span class="n">n_repeats</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="n">n_repeats</span><span class="o">=</span><span class="mi">10_000</span><span class="p">,</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">return_posteriors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a hypothesis testing forest using oob samples.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a hypothesis testing forest using a two-forest approach.</span>
+
+<span class="sd">    The two-forest approach stems from the Coleman et al. 2022 paper, where</span>
+<span class="sd">    two forests are trained: one on the original dataset, and one on the</span>
+<span class="sd">    permuted dataset. The dataset is either permuted once, or independently for</span>
+<span class="sd">    each tree in the permuted forest. The original test statistic is computed by</span>
+<span class="sd">    comparing the metric on both forests ``(metric_forest - metric_perm_forest)``.</span>
+<span class="sd">    For full details, see :footcite:`coleman2022scalable`.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1709,7 +1723,9 @@ document.write(`
 <span class="sd">        98% specificity.</span>
 <span class="sd">    n_repeats : int, optional</span>
 <span class="sd">        Number of times to bootstrap sample the two forests to construct</span>
-<span class="sd">        the null distribution, by default 1000.</span>
+<span class="sd">        the null distribution, by default 10000. The construction of the</span>
+<span class="sd">        null forests will be parallelized according to the ``n_jobs``</span>
+<span class="sd">        argument of the ``est`` forest.</span>
 <span class="sd">    verbose : bool, optional</span>
 <span class="sd">        Verbosity, by default False.</span>
 <span class="sd">    seed : int, optional</span>
@@ -1732,30 +1748,29 @@ document.write(`
 <span class="sd">    perm_forest_proba : ArrayLike of shape (n_estimators, n_samples, n_outputs)</span>
 <span class="sd">        The predicted posterior probabilities for each of the permuted estimators</span>
 <span class="sd">        on their out of bag samples.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. footbibliography::</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
     <span class="n">metric_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">ArrayLike</span><span class="p">,</span> <span class="n">ArrayLike</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">METRIC_FUNCTIONS</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="n">covariate_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">covariate_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
 
-    <span class="c1"># perform permutation of covariates</span>
-    <span class="c1"># TODO: refactor permutations into the HonestForest(?)</span>
-    <span class="n">n_samples_train</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">index_arr</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_samples_train</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
-        <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n_samples_train</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-        <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">X_permute</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">X_permute</span><span class="p">[:,</span> <span class="n">covariate_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">X_permute</span><span class="p">[</span><span class="n">index_arr</span><span class="p">,</span> <span class="n">covariate_index</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">perm_est</span><span class="p">,</span> <span class="n">PermutationHonestForestClassifier</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Permutation forest must be a PermutationHonestForestClassifier, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">perm_est</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
 
     <span class="c1"># build two sets of forests</span>
     <span class="n">est</span><span class="p">,</span> <span class="n">orig_forest_proba</span> <span class="o">=</span> <span class="n">build_hyppo_oob_forest</span><span class="p">(</span><span class="n">est</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
     <span class="n">perm_est</span><span class="p">,</span> <span class="n">perm_forest_proba</span> <span class="o">=</span> <span class="n">build_hyppo_oob_forest</span><span class="p">(</span>
-        <span class="n">perm_est</span><span class="p">,</span> <span class="n">X_permute</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">covariate_index</span><span class="o">=</span><span class="n">covariate_index</span>
+        <span class="n">perm_est</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">covariate_index</span><span class="o">=</span><span class="n">covariate_index</span>
     <span class="p">)</span>
+
+    <span class="c1"># get the number of jobs</span>
+    <span class="n">n_jobs</span> <span class="o">=</span> <span class="n">est</span><span class="o">.</span><span class="n">n_jobs</span>
 
     <span class="n">metric_star</span><span class="p">,</span> <span class="n">metric_star_pi</span> <span class="o">=</span> <span class="n">_compute_null_distribution_coleman</span><span class="p">(</span>
         <span class="n">y</span><span class="p">,</span>
@@ -1764,6 +1779,7 @@ document.write(`
         <span class="n">metric</span><span class="p">,</span>
         <span class="n">n_repeats</span><span class="o">=</span><span class="n">n_repeats</span><span class="p">,</span>
         <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+        <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span>
         <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -1785,10 +1801,136 @@ document.write(`
     <span class="k">else</span><span class="p">:</span>
         <span class="n">pvalue</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">null_dist</span> <span class="o">&gt;=</span> <span class="n">observe_test_stat</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">n_repeats</span><span class="p">)</span>
 
+    <span class="n">forest_result</span> <span class="o">=</span> <span class="n">ForestTestResult</span><span class="p">(</span><span class="n">observe_test_stat</span><span class="p">,</span> <span class="n">permute_stat</span><span class="p">,</span> <span class="n">observe_stat</span><span class="p">,</span> <span class="n">pvalue</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">return_posteriors</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">observe_test_stat</span><span class="p">,</span> <span class="n">pvalue</span><span class="p">,</span> <span class="n">orig_forest_proba</span><span class="p">,</span> <span class="n">perm_forest_proba</span>
+        <span class="k">return</span> <span class="n">forest_result</span><span class="p">,</span> <span class="n">orig_forest_proba</span><span class="p">,</span> <span class="n">perm_forest_proba</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">observe_test_stat</span><span class="p">,</span> <span class="n">pvalue</span></div>
+        <span class="k">return</span> <span class="n">forest_result</span></div>
+
+
+
+<div class="viewcode-block" id="build_permutation_forest">
+<a class="viewcode-back" href="../../../generated/sktree.stats.build_permutation_forest.html#sktree.stats.build_permutation_forest">[docs]</a>
+<span class="k">def</span> <span class="nf">build_permutation_forest</span><span class="p">(</span>
+    <span class="n">est</span><span class="p">,</span>
+    <span class="n">perm_est</span><span class="p">,</span>
+    <span class="n">X</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">,</span>
+    <span class="n">covariate_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;s@98&quot;</span><span class="p">,</span>
+    <span class="n">n_repeats</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">return_posteriors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a hypothesis testing forest using a permutation-forest approach.</span>
+
+<span class="sd">    The permutation-forest approach stems from standard permutaiton-testing, where</span>
+<span class="sd">    each forest is trained on a new permutation of the dataset. The original test</span>
+<span class="sd">    statistic is computed on the original data. Then the pvalue is computed</span>
+<span class="sd">    by comparing the original test statistic to the null distribution of the</span>
+<span class="sd">    test statistic computed from the permuted forests.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    est : Forest</span>
+<span class="sd">        The type of forest to use. Must be enabled with ``bootstrap=True``.</span>
+<span class="sd">    perm_est : Forest</span>
+<span class="sd">        The forest to use for the permuted dataset. Should be</span>
+<span class="sd">        ``PermutationHonestForestClassifier``.</span>
+<span class="sd">    X : ArrayLike of shape (n_samples, n_features)</span>
+<span class="sd">        Data.</span>
+<span class="sd">    y : ArrayLike of shape (n_samples, n_outputs)</span>
+<span class="sd">        Binary target, so ``n_outputs`` should be at most 1.</span>
+<span class="sd">    covariate_index : ArrayLike, optional of shape (n_covariates,)</span>
+<span class="sd">        The index array of covariates to shuffle, by default None.</span>
+<span class="sd">    metric : str, optional</span>
+<span class="sd">        The metric to compute, by default &quot;s@98&quot;, for sensitivity at</span>
+<span class="sd">        98% specificity.</span>
+<span class="sd">    n_repeats : int, optional</span>
+<span class="sd">        Number of times to bootstrap sample the two forests to construct</span>
+<span class="sd">        the null distribution, by default 10000. The construction of the</span>
+<span class="sd">        null forests will be parallelized according to the ``n_jobs``</span>
+<span class="sd">        argument of the ``est`` forest.</span>
+<span class="sd">    verbose : bool, optional</span>
+<span class="sd">        Verbosity, by default False.</span>
+<span class="sd">    seed : int, optional</span>
+<span class="sd">        Random seed, by default None.</span>
+<span class="sd">    return_posteriors : bool, optional</span>
+<span class="sd">        Whether or not to return the posteriors, by default False.</span>
+<span class="sd">    **metric_kwargs : dict, optional</span>
+<span class="sd">        Additional keyword arguments to pass to the metric function.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    observe_stat : float</span>
+<span class="sd">        The test statistic. To compute the test statistic, take</span>
+<span class="sd">        ``permute_stat_`` and subtract ``observe_stat_``.</span>
+<span class="sd">    pvalue : float</span>
+<span class="sd">        The p-value of the test statistic.</span>
+<span class="sd">    orig_forest_proba : ArrayLike of shape (n_estimators, n_samples, n_outputs)</span>
+<span class="sd">        The predicted posterior probabilities for each estimator on their</span>
+<span class="sd">        out of bag samples.</span>
+<span class="sd">    perm_forest_proba : ArrayLike of shape (n_estimators, n_samples, n_outputs)</span>
+<span class="sd">        The predicted posterior probabilities for each of the permuted estimators</span>
+<span class="sd">        on their out of bag samples.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. footbibliography::</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">metric_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">ArrayLike</span><span class="p">,</span> <span class="n">ArrayLike</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">METRIC_FUNCTIONS</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">covariate_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">covariate_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">perm_est</span><span class="p">,</span> <span class="n">PermutationHonestForestClassifier</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Permutation forest must be a PermutationHonestForestClassifier, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">perm_est</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># train the original forest on unpermuted data</span>
+    <span class="n">est</span><span class="p">,</span> <span class="n">orig_forest_proba</span> <span class="o">=</span> <span class="n">build_hyppo_oob_forest</span><span class="p">(</span><span class="n">est</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="n">y_pred_proba_orig</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">orig_forest_proba</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">observe_test_stat</span> <span class="o">=</span> <span class="n">metric_func</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_pred_proba_orig</span><span class="p">,</span> <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">)</span>
+
+    <span class="c1"># get the number of jobs</span>
+    <span class="n">index_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># train many null forests</span>
+    <span class="n">X_perm</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">null_dist</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_repeats</span><span class="p">):</span>
+        <span class="n">rng</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">index_arr</span><span class="p">)</span>
+        <span class="n">perm_X_cov</span> <span class="o">=</span> <span class="n">X_perm</span><span class="p">[</span><span class="n">index_arr</span><span class="p">,</span> <span class="n">covariate_index</span><span class="p">]</span>
+        <span class="n">X_perm</span><span class="p">[:,</span> <span class="n">covariate_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">perm_X_cov</span>
+
+        <span class="c1">#</span>
+        <span class="n">perm_est</span> <span class="o">=</span> <span class="n">clone</span><span class="p">(</span><span class="n">perm_est</span><span class="p">)</span>
+        <span class="n">perm_est</span><span class="o">.</span><span class="n">set_params</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">))</span>
+
+        <span class="n">perm_est</span><span class="p">,</span> <span class="n">perm_forest_proba</span> <span class="o">=</span> <span class="n">build_hyppo_oob_forest</span><span class="p">(</span>
+            <span class="n">perm_est</span><span class="p">,</span> <span class="n">X_perm</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">covariate_index</span><span class="o">=</span><span class="n">covariate_index</span>
+        <span class="p">)</span>
+
+        <span class="n">y_pred_proba_perm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">perm_forest_proba</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">permute_stat</span> <span class="o">=</span> <span class="n">metric_func</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_pred_proba_perm</span><span class="p">,</span> <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">)</span>
+        <span class="n">null_dist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">permute_stat</span><span class="p">)</span>
+
+    <span class="c1"># compute pvalue, which note is opposite that of the Coleman approach, since</span>
+    <span class="c1"># we are testing if the null distribution results in a test statistic greater</span>
+    <span class="k">if</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">POSITIVE_METRICS</span><span class="p">:</span>
+        <span class="n">pvalue</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">null_dist</span> <span class="o">&gt;=</span> <span class="n">observe_test_stat</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">n_repeats</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pvalue</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">null_dist</span> <span class="o">&lt;=</span> <span class="n">observe_test_stat</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">n_repeats</span><span class="p">)</span>
+
+    <span class="n">forest_result</span> <span class="o">=</span> <span class="n">ForestTestResult</span><span class="p">(</span><span class="n">observe_test_stat</span><span class="p">,</span> <span class="n">permute_stat</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">pvalue</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">return_posteriors</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">forest_result</span><span class="p">,</span> <span class="n">orig_forest_proba</span><span class="p">,</span> <span class="n">perm_forest_proba</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">forest_result</span></div>
 
 
 
@@ -1946,39 +2088,6 @@ document.write(`
 
     <span class="k">return</span> <span class="n">est_list</span><span class="p">,</span> <span class="n">all_proba_list</span></div>
 
-
-
-<span class="k">def</span> <span class="nf">predict_oob_proba</span><span class="p">(</span><span class="n">est</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Predict out of bag posterior probabilities.&quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">check_is_fitted</span>
-
-    <span class="n">check_is_fitted</span><span class="p">(</span><span class="n">est</span><span class="p">)</span>
-
-    <span class="c1"># now evaluate</span>
-    <span class="n">X</span> <span class="o">=</span> <span class="n">est</span><span class="o">.</span><span class="n">_validate_X_predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-
-    <span class="c1"># if we trained a binning tree, then we should re-bin the data</span>
-    <span class="c1"># XXX: this is inefficient and should be improved to be in line with what</span>
-    <span class="c1"># the Histogram Gradient Boosting Tree does, where the binning thresholds</span>
-    <span class="c1"># are passed into the tree itself, thus allowing us to set the node feature</span>
-    <span class="c1"># value thresholds within the tree itself.</span>
-    <span class="k">if</span> <span class="n">est</span><span class="o">.</span><span class="n">max_bins</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="n">est</span><span class="o">.</span><span class="n">_bin_data</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">is_training_data</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">DTYPE</span><span class="p">)</span>
-
-    <span class="c1"># Assign chunk of trees to jobs</span>
-    <span class="n">n_jobs</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_partition_estimators</span><span class="p">(</span><span class="n">est</span><span class="o">.</span><span class="n">n_estimators</span><span class="p">,</span> <span class="n">est</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">)</span>
-
-    <span class="c1"># avoid storing the output of every estimator by summing them here</span>
-    <span class="n">lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
-    <span class="c1"># accumulate the predictions across all trees</span>
-    <span class="n">all_proba</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
-        <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">est</span><span class="o">.</span><span class="n">estimators_</span><span class="p">),</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">est</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span>
-    <span class="p">)</span>
-    <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">require</span><span class="o">=</span><span class="s2">&quot;sharedmem&quot;</span><span class="p">)(</span>
-        <span class="n">delayed</span><span class="p">(</span><span class="n">_parallel_predict_proba_oob</span><span class="p">)(</span><span class="n">e</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">all_proba</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">test_idx</span><span class="p">,</span> <span class="n">lock</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">test_idx</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">est</span><span class="o">.</span><span class="n">estimators_</span><span class="p">,</span> <span class="n">est</span><span class="o">.</span><span class="n">oob_samples_</span><span class="p">))</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="n">all_proba</span>
 </pre></div>
 
                 </article>
@@ -2022,7 +2131,7 @@ document.write(`
 
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-20.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-21.
       <br/>
     
   </p>
