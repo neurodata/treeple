@@ -26,7 +26,7 @@ def test_make_trunk_classification_custom_parameters():
         n_samples=50,
         n_dim=5,
         n_informative=2,
-        m_factor=2,
+        mu_0=0,
         rho=0.5,
         band_type="ma",
         return_params=False,
@@ -55,8 +55,13 @@ def test_make_trunk_classification_autoregressive_cov():
 
 def test_make_trunk_classification_mixture():
     # Test with default parameters
-    X, y, _, _ = make_trunk_classification(
-        n_samples=100, n_dim=10, n_informative=5, mix=0.5, return_params=True
+    [X, y, _, _, _] = make_trunk_classification(
+        n_samples=100,
+        n_dim=10,
+        n_informative=5,
+        simulation="trunk_mix",
+        mix=0.5,
+        return_params=True,
     )
     assert X.shape == (100, 10), X.shape
     assert y.shape == (100,)
@@ -83,7 +88,7 @@ def test_make_trunk_classification_invalid_band_type():
 def test_make_trunk_classification_invalid_mix():
     # Test with an invalid band type
     with pytest.raises(ValueError, match="Mix must be between 0 and 1."):
-        make_trunk_classification(n_samples=50, rho=0.5, mix=2)
+        make_trunk_classification(n_samples=50, simulation="trunk_mix", rho=0.5, mix=2)
 
 
 def test_make_trunk_classification_invalid_n_informative():
@@ -119,11 +124,16 @@ def test_make_trunk_classification_simulations(simulation):
     n_samples = 100
     n_dim = 10
     n_informative = 10
+    if simulation == "trunk_mix":
+        mix = 0.5
+    else:
+        mix = None
     X, y = make_trunk_classification(
         n_samples=n_samples,
         n_dim=n_dim,
         n_informative=n_informative,
         simulation=simulation,
+        mix=mix,
     )
     assert X.shape == (n_samples, n_dim)
     assert y.shape == (n_samples,)

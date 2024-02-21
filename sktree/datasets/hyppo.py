@@ -76,7 +76,8 @@ def make_trunk_classification(
     n_dim=4096,
     n_informative=256,
     simulation: str = "trunk",
-    m_factor: int = -1,
+    mu_0: int = 0,
+    mu_1: int = 1,
     rho: int = 0,
     band_type: str = "ma",
     return_params: bool = False,
@@ -116,11 +117,14 @@ def make_trunk_classification(
         When calling the Marron-Wand simulations, only the covariance parameters are considered
         (`rho` and `band_type`). Means are taken from :footcite:`marron1992exact`.
         By default 'trunk'.
-    m_factor : int, optional
-        The multiplicative factor to apply to the mean-vector of the first
-        distribution to obtain the mean-vector of the second distribution.
-        This is only used when ``simulation = trunk``.
-        By default -1.
+    mu_0 : int, optional
+        The mean of the first distribution. By default -1. The mean of the distribution will decrease
+        by a factor of ``sqrt(i)`` for each dimension ``i``. Not used if simulation is
+        one of the Marron-Wand simulations, or 'trunk_overlap'.
+    mu_1 : int, optional
+        The mean of the second distribution. By default 1. The mean of the distribution will decrease
+        by a factor of ``sqrt(i)`` for each dimension ``i``. Not used if simulation is
+        one of the Marron-Wand simulations, or 'trunk_overlap'.
     rho : float, optional
         The covariance value of the bands. By default 0 indicating, an identity matrix is used.
     band_type : str
@@ -130,7 +134,7 @@ def make_trunk_classification(
         Whether or not to return the distribution parameters of the classes normal distributions.
     mix : int, optional
         The probabilities associated with the mixture of Gaussians in the ``trunk-mix`` simulation.
-        By default None. Must be specified if ``simulation = trunk_mix``.
+        By default None. Must be specified if ``simulation = trunk_mix``. Otherwise, it is ignored.
     seed : int, optional
         Random seed, by default None.
 
@@ -155,6 +159,31 @@ def make_trunk_classification(
         The weight vector for the Marron-Wand simulations.
         Returned if ``return_params`` is True.
 
+    Notes
+    -----
+    **Trunk**: The trunk simulation decreases the signal-to-noise ratio as the dimensionality
+    increases. This is implemented by decreasing the mean of the distribution by a factor of
+    ``sqrt(i)`` for each dimension ``i``. Thus for instance if the means of distribution one
+    and two are 1 and -1 respectively, the means for the first dimension will be 1 and -1,
+    for the second dimension will be 1/sqrt(2) and -1/sqrt(2), and so on.
+
+    **Trunk Overlap**: The trunk overlap simulation generates two classes of data with the same
+    covariance matrix and mean vector of zeros.
+
+    **Trunk Mix**: The trunk mix simulation generates two classes of data with the same covariance
+    matrix. The first class (label 0) is generated from a multivariate-Gaussians with mean vector of
+    zeros and the second class is generated from a mixture of Gaussians with mean vectors
+    specified by ``mu_0`` and ``mu_1``. The mixture is specified by the ``mix`` parameter, which
+    is the probability of the first Gaussian in the mixture.
+
+    **Marron-Wand Simulations**: The Marron-Wand simulations generate two classes of data with the
+    setup specified in the paper.
+
+    Covariance: The covariance matrix among different dimensions is controlled by the ``rho`` parameter
+    and the ``band_type`` parameter. The ``band_type`` parameter controls the type of band to use, while
+    the ``rho`` parameter controls the specific scaling factor for the covariance matrix while going
+    from one dimension to the next.
+
     References
     ----------
     .. footbibliography::
@@ -172,8 +201,8 @@ def make_trunk_classification(
         raise ValueError("Mix must be specified when simulation is 'trunk_mix'.")
     rng = np.random.default_rng(seed=seed)
 
-    mu_1 = np.array([1 / np.sqrt(i) for i in range(1, n_informative + 1)])
-    mu_0 = m_factor * mu_1
+    mu_1_vec = np.array([mu_1 / np.sqrt(i) for i in range(1, n_informative + 1)])
+    mu_0_vec = np.array([mu_0 / np.sqrt(i) for i in range(1, n_informative + 1)])
 
     if rho != 0:
         if band_type == "ma":
@@ -185,7 +214,7 @@ def make_trunk_classification(
     else:
         cov = np.identity(n_informative)
 
-    if mix is not None and mix < 0 or mix > 1:  # type: ignore
+    if mix is not None and (mix < 0 or mix > 1):  # type: ignore
         raise ValueError("Mix must be between 0 and 1.")
 
     # speed up computations for large multivariate normal matrix with SVD approximation
@@ -197,8 +226,8 @@ def make_trunk_classification(
     if simulation == "trunk":
         X = np.vstack(
             (
-                rng.multivariate_normal(mu_1, cov, n_samples // 2, method=method),
-                rng.multivariate_normal(mu_0, cov, n_samples // 2, method=method),
+                rng.multivariate_normal(mu_1_vec, cov, n_samples // 2, method=method),
+                rng.multivariate_normal(mu_0_vec, cov, n_samples // 2, method=method),
             )
         )
     elif simulation == "trunk_overlap":
@@ -214,7 +243,10 @@ def make_trunk_classification(
         )
     elif simulation == "trunk_mix":
         mixture_idx = rng.choice(2, n_samples // 2, replace=True, shuffle=True, p=[mix, 1 - mix])  # type: ignore
-        norm_params = [[mu_0, cov * (2 / 3) ** 2], [mu_1, cov * (2 / 3) ** 2]]
+
+        # When variance is 1, trunk-mix does not look bimodal at low dimensions.
+        # It is set it to (2/3)**2 since that is consistent with Marron and Wand bimodal
+        norm_params = [[mu_0_vec, cov * (2 / 3) ** 2], [mu_1_vec, cov * (2 / 3) ** 2]]
         X_mixture = np.fromiter(
             (
                 rng.multivariate_normal(*(norm_params[i]), size=1, method=method)
@@ -276,10 +308,10 @@ def make_trunk_classification(
     if return_params:
         returns = [X, y]
         if simulation == "trunk":
-            returns += [[mu_0, mu_1], [cov, cov]]
-        elif simulation == "trunk-overlap":
+            returns += [[mu_0_vec, mu_1_vec], [cov, cov]]
+        elif simulation == "trunk_overlap":
             returns += [[np.zeros(n_informative), np.zeros(n_informative)], [cov, cov]]
-        elif simulation == "trunk-mix":
+        elif simulation == "trunk_mix":
             returns += [*list(zip(*norm_params)), X_mixture]
         else:
             returns += [*list(zip(*norm_params)), G, w]
