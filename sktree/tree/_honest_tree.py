@@ -4,6 +4,7 @@
 import numpy as np
 from sklearn.base import ClassifierMixin, MetaEstimatorMixin, _fit_context, clone
 from sklearn.model_selection import StratifiedShuffleSplit
+from sklearn.utils._param_validation import Interval, RealNotInt, StrOptions
 from sklearn.utils.multiclass import _check_partial_fit_first_call, check_classification_targets
 from sklearn.utils.validation import check_is_fitted, check_X_y
 
@@ -268,6 +269,13 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
     array([0.93333333, 0.93333333, 1.        , 1.        , 0.93333333,
            0.8       , 0.8       , 0.93333333, 1.        , 1.        ])
     """
+
+    _parameter_constraints: dict = {
+        **BaseDecisionTree._parameter_constraints,
+        "honest_fraction": [Interval(RealNotInt, 0.0, 1.0, closed="neither")],
+        "honest_prior": [StrOptions({"empirical", "uniform", "ignore"})],
+        "stratify": ["boolean"],
+    }
 
     def __init__(
         self,
