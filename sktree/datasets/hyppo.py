@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 from scipy.integrate import nquad
 from scipy.stats import entropy, multivariate_normal
@@ -78,7 +80,7 @@ def make_trunk_classification(
     rho: int = 0,
     band_type: str = "ma",
     return_params: bool = False,
-    mix: float = 0.5,
+    mix: Optional[float] = None,
     seed=None,
 ):
     """Generate trunk and/or Marron-Wand datasets.
@@ -128,7 +130,7 @@ def make_trunk_classification(
         Whether or not to return the distribution parameters of the classes normal distributions.
     mix : int, optional
         The probabilities associated with the mixture of Gaussians in the ``trunk-mix`` simulation.
-        By default 0.5.
+        By default None. Must be specified if ``simulation = trunk_mix``.
     seed : int, optional
         Random seed, by default None.
 
@@ -162,6 +164,12 @@ def make_trunk_classification(
             f"Number of informative dimensions {n_informative} must be less than number "
             f"of dimensions, {n_dim}"
         )
+    if mix is not None and simulation != "trunk_mix":
+        raise ValueError(
+            f"Mix should not be specified when simulation is not 'trunk_mix'. Simulation is {simulation}."
+        )
+    if mix is None and simulation == "trunk_mix":
+        raise ValueError("Mix must be specified when simulation is 'trunk_mix'.")
     rng = np.random.default_rng(seed=seed)
 
     mu_1 = np.array([1 / np.sqrt(i) for i in range(1, n_informative + 1)])
@@ -177,7 +185,7 @@ def make_trunk_classification(
     else:
         cov = np.identity(n_informative)
 
-    if mix < 0 or mix > 1:
+    if mix is not None and mix < 0 or mix > 1:  # type: ignore
         raise ValueError("Mix must be between 0 and 1.")
 
     # speed up computations for large multivariate normal matrix with SVD approximation
@@ -205,7 +213,7 @@ def make_trunk_classification(
             )
         )
     elif simulation == "trunk_mix":
-        mixture_idx = rng.choice(2, n_samples // 2, replace=True, shuffle=True, p=[mix, 1 - mix])
+        mixture_idx = rng.choice(2, n_samples // 2, replace=True, shuffle=True, p=[mix, 1 - mix])  # type: ignore
         norm_params = [[mu_0, cov * (2 / 3) ** 2], [mu_1, cov * (2 / 3) ** 2]]
         X_mixture = np.fromiter(
             (

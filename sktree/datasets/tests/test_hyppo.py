@@ -98,6 +98,19 @@ def test_make_trunk_classification_invalid_simulation_name():
         make_trunk_classification(n_samples=50, rho=0.5, simulation=None)
 
 
+def test_make_trunk_classification_errors_trunk_mix():
+    # test with mix but not trunk_mix
+    with pytest.raises(
+        ValueError,
+        match="Mix should not be specified when simulation is not 'trunk_mix'. Simulation is trunk.",
+    ):
+        make_trunk_classification(n_samples=2, simulation="trunk", mix=0.5)
+
+    # test without mix but trunk_mix
+    with pytest.raises(ValueError, match="Mix must be specified when simulation is 'trunk_mix'."):
+        make_trunk_classification(n_samples=2, simulation="trunk_mix")
+
+
 @pytest.mark.parametrize(
     "simulation", ["trunk", "trunk_overlap", "trunk_mix", *MARRON_WAND_SIMS.keys()]
 )
