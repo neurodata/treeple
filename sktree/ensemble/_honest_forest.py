@@ -246,14 +246,19 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
         fraction creates shallower trees with lower variance estimates.
 
     tree_estimator : object, default=None
-        Type of decision tree classifier to use. By default `None`, which
-        defaults to `sktree.tree.DecisionTreeClassifier`. Note
-        that one MUST use trees imported from the `sktree.tree`
-        API namespace rather than from `sklearn.tree`.
+        Instantiated tree of type BaseDecisionTree from sktree.
+        If None, then sklearn's DecisionTreeClassifier with default parameters will
+        be used. Note that none of the parameters in ``tree_estimator`` need
+        to be set. The parameters of the ``tree_estimator`` can be set using
+        the ``tree_estimator_params`` keyword argument.
 
     stratify : bool
         Whether or not to stratify sample when considering structure and leaf indices.
         By default False.
+
+    **tree_estimator_params : dict
+        Parameters to pass to the underlying base tree estimators.
+        These must be parameters for ``tree_estimator``.
 
     Attributes
     ----------

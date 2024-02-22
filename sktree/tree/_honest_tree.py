@@ -21,7 +21,9 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
     tree_estimator : object, default=None
         Instantiated tree of type BaseDecisionTree from sktree.
         If None, then sklearn's DecisionTreeClassifier with default parameters will
-        be used.
+        be used. Note that none of the parameters in ``tree_estimator`` need
+        to be set. The parameters of the ``tree_estimator`` can be set using
+        the ``tree_estimator_params`` keyword argument.
 
     criterion : {"gini", "entropy"}, default="gini"
         The function to measure the quality of a split. Supported criteria are
@@ -170,6 +172,10 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
     stratify : bool
         Whether or not to stratify sample when considering structure and leaf indices.
         By default False.
+
+    **tree_estimator_params : dict
+        Parameters to pass to the underlying base tree estimators.
+        These must be parameters for ``tree_estimator``.
 
     Attributes
     ----------
