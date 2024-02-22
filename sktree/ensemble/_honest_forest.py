@@ -663,7 +663,9 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
 
         Only utilized if ``bootstrap=True``, otherwise, all samples are "in-bag".
         """
-        if self.bootstrap is False and self._n_samples_bootstrap == self._n_samples:
+        if self.bootstrap is False and (
+            self._n_samples_bootstrap is None or self._n_samples_bootstrap == self._n_samples
+        ):
             raise RuntimeError(
                 "Cannot extract out-of-bag samples when bootstrap is False and "
                 "n_samples == n_samples_bootstrap"
@@ -767,13 +769,16 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
     def _get_estimators_indices(self):
         # Get drawn indices along both sample and feature axes
         for tree in self.estimators_:
-            if not self.bootstrap and self._n_samples_bootstrap == self._n_samples:
+            if not self.bootstrap and (
+                self._n_samples_bootstrap is None or (self._n_samples_bootstrap == self._n_samples)
+            ):
                 yield np.arange(self._n_samples, dtype=np.int32)
             else:
                 # tree.random_state is actually an immutable integer seed rather
                 # than a mutable RandomState instance, so it's safe to use it
                 # repeatedly when calling this property.
                 seed = tree.random_state
+
                 # Operations accessing random_state must be performed identically
                 # to those in `_parallel_build_trees()`
                 yield _generate_sample_indices(

@@ -47,11 +47,11 @@ def _generate_sample_indices(random_state, n_samples, n_samples_bootstrap, boots
     XXX: this is copied over from scikit-learn and modified to allow sampling with
     and without replacement given ``bootstrap``.
     """
-
     random_instance = check_random_state(random_state)
     n_sample_idx = np.arange(0, n_samples, dtype=np.int32)
-    sample_indices = random_instance.choice(n_sample_idx, n_samples_bootstrap, replace=bootstrap)
-
+    sample_indices = np.atleast_1d(
+        random_instance.choice(n_sample_idx, n_samples_bootstrap, replace=bootstrap)
+    )
     return sample_indices
 
 
@@ -65,7 +65,7 @@ class ForestMixin:
         Only utilized if ``bootstrap=True``, otherwise, all samples are "in-bag".
         """
         if self.bootstrap is False and (
-            self._n_samples_bootstrap == self._n_samples or self._n_samples_bootstrap is None
+            self._n_samples_bootstrap is None or (self._n_samples_bootstrap == self._n_samples)
         ):
             raise RuntimeError(
                 "Cannot extract out-of-bag samples when bootstrap is False and "
