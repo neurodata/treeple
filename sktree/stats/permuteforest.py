@@ -470,4 +470,4 @@ class PermutationHonestForestClassifier(HonestForestClassifier):
                 for i, t in enumerate(trees)
             )
 
-        return trees
+        self.estimators_.extend(trees)
