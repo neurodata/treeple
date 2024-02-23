@@ -201,18 +201,17 @@ def make_marron_wand_classification(
 
     # as the dimensionality of the simulations increasing, we are adding more and
     # more noise to the data using the w parameter
-    # TODO: SAMBIT I am not sure what the role of w is here.
-    w = mu_1
+    w_vec = np.array([1.0 / np.sqrt(i) for i in range(1, n_informative + 1)])
     X = np.vstack(
         (
             rng.multivariate_normal(
                 np.zeros(n_informative), cov, n_samples // 2, method=mvg_sampling_method
             ),
-            (1 - w)
+            (1 - w_vec)
             * rng.multivariate_normal(
                 np.zeros(n_informative), cov, n_samples // 2, method=mvg_sampling_method
             )
-            + w * G.reshape(n_samples // 2, n_informative),
+            + w_vec * G.reshape(n_samples // 2, n_informative),
         )
     )
     if n_dim > n_informative:
@@ -222,7 +221,7 @@ def make_marron_wand_classification(
 
     if return_params:
         returns = [X, y]
-        returns += [*list(zip(*norm_params)), G, w]
+        returns += [*list(zip(*norm_params)), G, w_vec]
         return returns
     return X, y
 
