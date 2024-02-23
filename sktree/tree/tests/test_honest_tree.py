@@ -93,6 +93,9 @@ def test_honest_tree_with_tree_estimator_params():
         feature_set_ends=[10, 20],
     )
     clf.fit(X, y)
+    # for attr_name in dir(clf.estimators_[0]):
+    #     if not attr_name.startswith("_") and attr_name.endswith("_"):
+    #         assert hasattr(clf, attr_name, getattr(clf.estimators_[0], attr_name))
 
 
 @pytest.mark.parametrize(

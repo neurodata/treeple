@@ -168,6 +168,8 @@ those offered in scikit-learn.
    make_joint_factor_model
    make_quadratic_classification
    make_trunk_classification
+   make_trunk_mixture_classification
+   make_marron_wand_classification
    approximate_clf_mutual_information
    approximate_clf_mutual_information_with_monte_carlo
 

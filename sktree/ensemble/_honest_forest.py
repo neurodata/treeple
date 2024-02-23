@@ -156,7 +156,7 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
         ``N``, ``N_t``, ``N_t_R`` and ``N_t_L`` all refer to the weighted sum,
         if ``sample_weight`` is passed.
 
-    bootstrap : bool, default=True
+    bootstrap : bool, default=False
         Whether bootstrap samples are used when building trees. If False, the
         whole dataset is used to build each tree.
 

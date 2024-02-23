@@ -192,6 +192,10 @@ class PermutationHonestForestClassifier(HonestForestClassifier):
     permute_per_tree : bool
         Whether or not to permute the dataset per tree. By default False.
 
+    **tree_estimator_params : dict
+        Parameters to pass to the underlying base tree estimators.
+        These must be parameters for ``tree_estimator``.
+        
     Attributes
     ----------
     estimator : sktree.tree.HonestTreeClassifier

@@ -456,7 +456,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
             check_input=check_input,
             classes=classes,
         )
-        self._inherit_estimator_attributes()
+        # self._inherit_estimator_attributes()
 
         # update the number of classes, unsplit
         if y.ndim == 1:
@@ -652,7 +652,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
                 check_input=check_input,
                 missing_values_in_feature_mask=missing_values_in_feature_mask,
             )
-        self._inherit_estimator_attributes()
+        # self._inherit_estimator_attributes()
 
         # fit the leaves on the non-structure indices
         not_honest_mask = np.ones(len(y), dtype=bool)
@@ -730,9 +730,16 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
 
     def _inherit_estimator_attributes(self):
         """Initialize necessary attributes from the provided tree estimator"""
-        for attr_name in dir(self.estimator_):
-            if not attr_name.startswith("_") and attr_name.endswith("_"):
-                setattr(self, attr_name, getattr(self.estimator_, attr_name))
+        # basic_inherited_attrs = [
+        #     "tree_",
+        #     "n_classes_",
+        #     "classes_",
+        #     "n_outputs_",
+        # ]
+
+        if hasattr(self.estimator_, "_inheritable_fitted_attribute"):
+            for attr in self.estimator_._inheritable_fitted_attribute:
+                setattr(self, attr, getattr(self.estimator_, attr))
 
     def _empty_leaf_correction(self, proba, pos=0):
         """Leaves with empty posteriors are assigned values.
