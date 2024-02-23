@@ -730,12 +730,9 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
 
     def _inherit_estimator_attributes(self):
         """Initialize necessary attributes from the provided tree estimator"""
-        self.classes_ = self.estimator_.classes_
-        self.max_features_ = self.estimator_.max_features_
-        self.n_classes_ = self.estimator_.n_classes_
-        self.n_features_in_ = self.estimator_.n_features_in_
-        self.n_outputs_ = self.estimator_.n_outputs_
-        self.tree_ = self.estimator_.tree_
+        for attr_name in dir(self.estimator_):
+            if not attr_name.startswith("_") and attr_name.endswith("_"):
+                setattr(self, attr_name, getattr(self.estimator_, attr_name))
 
     def _empty_leaf_correction(self, proba, pos=0):
         """Leaves with empty posteriors are assigned values.

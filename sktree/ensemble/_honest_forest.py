@@ -536,6 +536,12 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
 
         return estimator
 
+    def _inherit_estimator_attributes(self):
+        """Initialize necessary attributes from the provided tree estimator"""
+        for attr_name in dir(self.estimator_[0]):
+            if not attr_name.startswith("_") and attr_name.endswith("_"):
+                setattr(self, attr_name, getattr(self.estimator_, attr_name))
+
     def predict_proba(self, X):
         """
         Predict class probabilities for X.

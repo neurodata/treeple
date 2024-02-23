@@ -838,6 +838,70 @@ def test_build_coleman_forest():
     assert forest_result.observe_stat < 0.05, f"{forest_result.observe_stat}"
 
 
+def test_build_coleman_forest_multiview():
+    """Simple test for building a Coleman forest.
+
+    Test the function under alternative and null hypothesis for a very simple dataset.
+    """
+    n_estimators = 40
+    n_samples = 30
+    n_features = 5
+    rng = np.random.default_rng(seed)
+
+    _X = rng.uniform(size=(n_samples, n_features))
+    _X = rng.uniform(size=(n_samples // 2, n_features))
+    X2 = _X + 3
+    X = np.vstack([_X, X2])
+    y = np.vstack(
+        [np.zeros((n_samples // 2, 1)), np.ones((n_samples // 2, 1))]
+    )  # Binary classification
+
+    clf = HonestForestClassifier(
+        n_estimators=n_estimators,
+        random_state=seed,
+        n_jobs=-1,
+        honest_fraction=0.5,
+        bootstrap=True,
+        max_samples=1.6,
+        max_features=[1, 2],
+        tree_estimator=MultiViewDecisionTreeClassifier(),
+        feature_set_ends=[2, 5],
+    )
+    perm_clf = PermutationHonestForestClassifier(
+        n_estimators=n_estimators,
+        random_state=seed,
+        n_jobs=-1,
+        honest_fraction=0.5,
+        bootstrap=True,
+        max_samples=1.6,
+        max_features=[1, 2],
+        tree_estimator=MultiViewDecisionTreeClassifier(),
+        feature_set_ends=[2, 5],
+    )
+    with pytest.raises(
+        RuntimeError, match="Permutation forest must be a PermutationHonestForestClassifier"
+    ):
+        build_coleman_forest(clf, clf, X, y)
+
+    forest_result, orig_forest_proba, perm_forest_proba, clf_fitted, perm_clf_fitted = (
+        build_coleman_forest(clf, perm_clf, X, y, metric="s@98", n_repeats=1000, seed=seed)
+    )
+    assert clf_fitted._n_samples_bootstrap == round(n_samples * 1.6)
+    assert perm_clf_fitted._n_samples_bootstrap == round(n_samples * 1.6)
+    assert_array_equal(perm_clf_fitted.permutation_indices_.shape, (n_samples, 1))
+
+    assert forest_result.pvalue <= 0.05, f"{forest_result.pvalue}"
+    assert forest_result.observe_stat > 0.1, f"{forest_result.observe_stat}"
+    assert_array_equal(orig_forest_proba.shape, perm_forest_proba.shape)
+
+    X = np.vstack([_X, _X])
+    forest_result, _, _, clf_fitted, perm_clf_fitted = build_coleman_forest(
+        clf, perm_clf, X, y, metric="s@98"
+    )
+    assert forest_result.pvalue > 0.05, f"{forest_result.pvalue}"
+    assert forest_result.observe_stat < 0.05, f"{forest_result.observe_stat}"
+
+
 def test_build_permutation_forest():
     """Simple test for building a permutation forest."""
     n_estimators = 30
