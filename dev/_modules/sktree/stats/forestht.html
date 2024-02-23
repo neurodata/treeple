@@ -1803,7 +1803,7 @@ document.write(`
 
     <span class="n">forest_result</span> <span class="o">=</span> <span class="n">ForestTestResult</span><span class="p">(</span><span class="n">observe_test_stat</span><span class="p">,</span> <span class="n">permute_stat</span><span class="p">,</span> <span class="n">observe_stat</span><span class="p">,</span> <span class="n">pvalue</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">return_posteriors</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">forest_result</span><span class="p">,</span> <span class="n">orig_forest_proba</span><span class="p">,</span> <span class="n">perm_forest_proba</span>
+        <span class="k">return</span> <span class="n">forest_result</span><span class="p">,</span> <span class="n">orig_forest_proba</span><span class="p">,</span> <span class="n">perm_forest_proba</span><span class="p">,</span> <span class="n">est</span><span class="p">,</span> <span class="n">perm_est</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">forest_result</span></div>
 
@@ -2131,7 +2131,7 @@ document.write(`
 
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-21.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-23.
       <br/>
     
   </p>

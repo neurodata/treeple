@@ -458,7 +458,7 @@ document.write(`
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">ClassifierMixin</span><span class="p">,</span> <span class="n">MetaEstimatorMixin</span><span class="p">,</span> <span class="n">_fit_context</span><span class="p">,</span> <span class="n">clone</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">StratifiedShuffleSplit</span>
-<span class="kn">from</span> <span class="nn">sklearn.utils._param_validation</span> <span class="kn">import</span> <span class="n">Interval</span><span class="p">,</span> <span class="n">RealNotInt</span><span class="p">,</span> <span class="n">StrOptions</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils._param_validation</span> <span class="kn">import</span> <span class="n">HasMethods</span><span class="p">,</span> <span class="n">Interval</span><span class="p">,</span> <span class="n">RealNotInt</span><span class="p">,</span> <span class="n">StrOptions</span>
 <span class="kn">from</span> <span class="nn">sklearn.utils.multiclass</span> <span class="kn">import</span> <span class="n">_check_partial_fit_first_call</span><span class="p">,</span> <span class="n">check_classification_targets</span>
 <span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">check_is_fitted</span><span class="p">,</span> <span class="n">check_X_y</span>
 
@@ -474,6 +474,13 @@ document.write(`
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
+<span class="sd">    tree_estimator : object, default=None</span>
+<span class="sd">        Instantiated tree of type BaseDecisionTree from sktree.</span>
+<span class="sd">        If None, then sklearn&#39;s DecisionTreeClassifier with default parameters will</span>
+<span class="sd">        be used. Note that none of the parameters in ``tree_estimator`` need</span>
+<span class="sd">        to be set. The parameters of the ``tree_estimator`` can be set using</span>
+<span class="sd">        the ``tree_estimator_params`` keyword argument.</span>
+
 <span class="sd">    criterion : {&quot;gini&quot;, &quot;entropy&quot;}, default=&quot;gini&quot;</span>
 <span class="sd">        The function to measure the quality of a split. Supported criteria are</span>
 <span class="sd">        &quot;gini&quot; for the Gini impurity and &quot;entropy&quot; for the information gain.</span>
@@ -606,12 +613,6 @@ document.write(`
 
 <span class="sd">        Read more in the :ref:`User Guide &lt;monotonic_cst_gbdt&gt;`.</span>
 
-<span class="sd">    tree_estimator : object, default=None</span>
-<span class="sd">        Instantiated tree of type BaseDecisionTree from sktree.</span>
-<span class="sd">        If None, then DecisionTreeClassifier with default parameters will</span>
-<span class="sd">        be used. Note that one MUST use trees imported from the `sktree.tree`</span>
-<span class="sd">        API namespace rather than from `sklearn.tree`.</span>
-
 <span class="sd">    honest_fraction : float, default=0.5</span>
 <span class="sd">        Fraction of training samples used for estimates in the leaves. The</span>
 <span class="sd">        remaining samples will be used to learn the tree structure. A larger</span>
@@ -627,6 +628,10 @@ document.write(`
 <span class="sd">    stratify : bool</span>
 <span class="sd">        Whether or not to stratify sample when considering structure and leaf indices.</span>
 <span class="sd">        By default False.</span>
+
+<span class="sd">    **tree_estimator_params : dict</span>
+<span class="sd">        Parameters to pass to the underlying base tree estimators.</span>
+<span class="sd">        These must be parameters for ``tree_estimator``.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -728,6 +733,10 @@ document.write(`
 
     <span class="n">_parameter_constraints</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span>
         <span class="o">**</span><span class="n">BaseDecisionTree</span><span class="o">.</span><span class="n">_parameter_constraints</span><span class="p">,</span>
+        <span class="s2">&quot;tree_estimator&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="n">HasMethods</span><span class="p">([</span><span class="s2">&quot;fit&quot;</span><span class="p">,</span> <span class="s2">&quot;predict&quot;</span><span class="p">,</span> <span class="s2">&quot;predict_proba&quot;</span><span class="p">,</span> <span class="s2">&quot;apply&quot;</span><span class="p">]),</span>
+            <span class="kc">None</span><span class="p">,</span>
+        <span class="p">],</span>
         <span class="s2">&quot;honest_fraction&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">Interval</span><span class="p">(</span><span class="n">RealNotInt</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s2">&quot;neither&quot;</span><span class="p">)],</span>
         <span class="s2">&quot;honest_prior&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">StrOptions</span><span class="p">({</span><span class="s2">&quot;empirical&quot;</span><span class="p">,</span> <span class="s2">&quot;uniform&quot;</span><span class="p">,</span> <span class="s2">&quot;ignore&quot;</span><span class="p">})],</span>
         <span class="s2">&quot;stratify&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;boolean&quot;</span><span class="p">],</span>
@@ -735,6 +744,7 @@ document.write(`
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
+        <span class="n">tree_estimator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">criterion</span><span class="o">=</span><span class="s2">&quot;gini&quot;</span><span class="p">,</span>
         <span class="n">splitter</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">,</span>
         <span class="n">max_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -748,10 +758,10 @@ document.write(`
         <span class="n">class_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">ccp_alpha</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
         <span class="n">monotonic_cst</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">tree_estimator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">honest_fraction</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
         <span class="n">honest_prior</span><span class="o">=</span><span class="s2">&quot;empirical&quot;</span><span class="p">,</span>
         <span class="n">stratify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">tree_estimator_params</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tree_estimator</span> <span class="o">=</span> <span class="n">tree_estimator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span> <span class="o">=</span> <span class="n">criterion</span>
@@ -766,13 +776,15 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span> <span class="o">=</span> <span class="n">min_impurity_decrease</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ccp_alpha</span> <span class="o">=</span> <span class="n">ccp_alpha</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">monotonic_cst</span> <span class="o">=</span> <span class="n">monotonic_cst</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">honest_fraction</span> <span class="o">=</span> <span class="n">honest_fraction</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">honest_prior</span> <span class="o">=</span> <span class="n">honest_prior</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">monotonic_cst</span> <span class="o">=</span> <span class="n">monotonic_cst</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stratify</span> <span class="o">=</span> <span class="n">stratify</span>
 
         <span class="c1"># XXX: to enable this, we need to also reset the leaf node samples during `_set_leaf_nodes`</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">store_leaf_values</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tree_estimator_params</span> <span class="o">=</span> <span class="n">tree_estimator_params</span>
 
 <div class="viewcode-block" id="HonestTreeClassifier.fit">
 <a class="viewcode-back" href="../../../generated/sktree.tree.HonestTreeClassifier.html#sktree.tree.HonestTreeClassifier.fit">[docs]</a>
@@ -983,6 +995,15 @@ document.write(`
 
         <span class="k">return</span> <span class="n">_sample_weight</span>
 
+    <span class="k">def</span> <span class="nf">_get_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve which estimator to return (default is DecisionTreeClassifier)&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree_estimator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span> <span class="o">=</span> <span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># XXX: maybe error out if the base tree estimator is already fitted</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span> <span class="o">=</span> <span class="n">clone</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_estimator</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span>
+
     <span class="k">def</span> <span class="nf">_fit</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">X</span><span class="p">,</span>
@@ -1026,14 +1047,21 @@ document.write(`
         <span class="k">if</span> <span class="n">check_input</span><span class="p">:</span>
             <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">check_X_y</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">multi_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree_estimator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span> <span class="o">=</span> <span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># XXX: maybe error out if the tree_estimator is already fitted</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span> <span class="o">=</span> <span class="n">clone</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_estimator</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_estimator</span><span class="p">()</span>
 
-        <span class="c1"># obtain the structure sample weights</span>
-        <span class="n">sample_weights_structure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partition_honest_indices</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">)</span>
+        <span class="c1"># check that all of tree_estimator_params are valid</span>
+        <span class="n">init_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="fm">__init__</span><span class="o">.</span><span class="vm">__code__</span><span class="o">.</span><span class="n">co_varnames</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>  <span class="c1"># exclude &#39;self&#39;</span>
+        <span class="n">honest_tree_init_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="o">.</span><span class="vm">__code__</span><span class="o">.</span><span class="n">co_varnames</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>  <span class="c1"># exclude &#39;self&#39;</span>
+        <span class="n">invalid_params</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tree_estimator_params</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">param</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">init_params</span> <span class="ow">or</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">honest_tree_init_params</span><span class="p">:</span>
+                <span class="n">invalid_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">invalid_params</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Invalid parameter(s) for estimator </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: &quot;</span>
+                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">invalid_params</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">set_params</span><span class="p">(</span>
             <span class="o">**</span><span class="nb">dict</span><span class="p">(</span>
@@ -1063,6 +1091,9 @@ document.write(`
             <span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
 
             <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Using sklearn tree so store_leaf_values cannot be set.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># obtain the structure sample weights</span>
+        <span class="n">sample_weights_structure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partition_honest_indices</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">)</span>
 
         <span class="c1"># Learn structure on subsample</span>
         <span class="c1"># XXX: this allows us to use BaseDecisionTree without partial_fit API</span>
@@ -1323,7 +1354,7 @@ document.write(`
 
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-21.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-23.
       <br/>
     
   </p>

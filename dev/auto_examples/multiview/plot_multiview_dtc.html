@@ -593,16 +593,6 @@ structure is known, then one can pass this to the multi-view random forest via t
     <span class="k">return</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/circleci/project/examples/multiview/plot_multiview_dtc.py:26: DeprecationWarning:
-Pyarrow will become a required dependency of pandas in the next major release of pandas (pandas 3.0),
-(to allow more performant data types, such as the Arrow string type, and better interoperability with other libraries)
-but was not found to be installed on your system.
-If this would cause problems for you,
-please provide us feedback at https://github.com/pandas-dev/pandas/issues/54466
-
-  import pandas as pd
-</pre></div>
-</div>
 <section id="simulate-data">
 <h2>Simulate data<a class="headerlink" href="#simulate-data" title="Link to this heading">#</a></h2>
 <p>We simulate a 2-view dataset with both views containing informative low-dimensional features.
@@ -2205,8 +2195,8 @@ regular Random forests with Multi-view Random Forests.</p>
 as the number of features in the second view increases. This is because the multi-view
 random forest samples from each feature-set uniformly, while the regular random forest
 samples from all features uniformly. This is a key difference between the two forests.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 39.587 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  699 MB</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 41.775 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  688 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-multiview-plot-multiview-dtc-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/a48189389fb2a3065aa5f8a8eb0b2736/plot_multiview_dtc.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_multiview_dtc.ipynb</span></code></a></p>
@@ -2296,7 +2286,7 @@ samples from all features uniformly. This is a key difference between the two fo
 
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-21.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-23.
       <br/>
     
   </p>

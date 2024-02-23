@@ -867,7 +867,7 @@ document.write(`
             <span class="n">min_weight_leaf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_weight_fraction_leaf</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">sample_weight</span><span class="p">)</span>
 
         <span class="c1"># build the actual tree now with the parameters</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_build_tree</span><span class="p">(</span>
+        <span class="bp">self</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_tree</span><span class="p">(</span>
             <span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span>
             <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
             <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">,</span>
@@ -1027,6 +1027,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_prune_tree</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">_validate_X_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">check_input</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate the training data on predict (probabilities).&quot;&quot;&quot;</span>
@@ -2887,7 +2888,7 @@ document.write(`
 
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-21.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-23.
       <br/>
     
   </p>

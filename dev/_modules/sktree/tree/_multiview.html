@@ -1032,9 +1032,7 @@ document.write(`
         <span class="c1">#  - self.max_features_arr contains a possible array-like setting of max_features</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_max_features_arr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_features</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_features</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_fit</span><span class="p">(</span>
-            <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">,</span> <span class="n">check_input</span><span class="p">,</span> <span class="n">missing_values_in_feature_mask</span><span class="p">,</span> <span class="n">classes</span>
-        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">,</span> <span class="n">check_input</span><span class="p">,</span> <span class="n">missing_values_in_feature_mask</span><span class="p">,</span> <span class="n">classes</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_features_arr</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
@@ -1081,7 +1079,7 @@ document.write(`
 
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-21.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-23.
       <br/>
     
   </p>
