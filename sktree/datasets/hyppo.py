@@ -74,8 +74,6 @@ def make_marron_wand_classification(
     n_dim=4096,
     n_informative=256,
     simulation: str = "gaussian",
-    mu_0: int = 0,
-    mu_1: int = 1,
     rho: int = 0,
     band_type: str = "ma",
     return_params: bool = False,
@@ -107,10 +105,6 @@ def make_marron_wand_classification(
         When calling the Marron-Wand simulations, only the covariance parameters are considered
         (`rho` and `band_type`). Means are taken from :footcite:`marron1992exact`.
         By default 'gaussian'.
-    mu_1 : int, optional
-        The mean of the second distribution. By default 1. The mean of the distribution will decrease
-        by a factor of ``sqrt(i)`` for each dimension ``i``. Not used if simulation is
-        one of the Marron-Wand simulations, or 'trunk_overlap'.
     rho : float, optional
         The covariance value of the bands. By default 0 indicating, an identity matrix is used.
     band_type : str
