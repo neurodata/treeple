@@ -526,28 +526,25 @@ document.write(`
 <span class="p">}</span>
 
 
-<div class="viewcode-block" id="make_trunk_classification">
-<a class="viewcode-back" href="../../../generated/sktree.datasets.make_trunk_classification.html#sktree.datasets.make_trunk_classification">[docs]</a>
-<span class="k">def</span> <span class="nf">make_trunk_classification</span><span class="p">(</span>
+<div class="viewcode-block" id="make_marron_wand_classification">
+<a class="viewcode-back" href="../../../generated/sktree.datasets.make_marron_wand_classification.html#sktree.datasets.make_marron_wand_classification">[docs]</a>
+<span class="k">def</span> <span class="nf">make_marron_wand_classification</span><span class="p">(</span>
     <span class="n">n_samples</span><span class="p">,</span>
     <span class="n">n_dim</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span>
     <span class="n">n_informative</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
-    <span class="n">simulation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;trunk&quot;</span><span class="p">,</span>
-    <span class="n">m_factor</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">simulation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gaussian&quot;</span><span class="p">,</span>
     <span class="n">rho</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">band_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ma&quot;</span><span class="p">,</span>
     <span class="n">return_params</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">mix</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
     <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate trunk and/or Marron-Wand datasets.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate Marron-Wand binary classification dataset.</span>
 
-<span class="sd">    For each dimension in the first distribution, there is a mean of :math:`1 / d`, where</span>
-<span class="sd">    ``d`` is the dimensionality. The covariance is the identity matrix.</span>
-<span class="sd">    The second distribution has a mean vector that is the negative of the first.</span>
-<span class="sd">    As ``d`` increases, the two distributions become closer and closer.</span>
-
-<span class="sd">    Full details for the trunk simulation can be found in :footcite:`trunk1982`.</span>
+<span class="sd">    The simulation is similar to that of :func:`sktree.datasets.make_trunk_classification`</span>
+<span class="sd">    where the first class is generated from a multivariate-Gaussians with mean vector of</span>
+<span class="sd">    0&#39;s. The second class is generated from a mixture of Gaussians with mean vectors</span>
+<span class="sd">    specified by the Marron-Wand simulations, but as the dimensionality increases, the second</span>
+<span class="sd">    class distribution approaches the first class distribution by a factor of :math:`1 / sqrt(d)`.</span>
 
 <span class="sd">    Full details for the Marron-Wand simulations can be found in :footcite:`marron1992exact`.</span>
 
@@ -565,19 +562,177 @@ document.write(`
 <span class="sd">        The informative dimensions. All others for ``n_dim - n_informative``</span>
 <span class="sd">        are Gaussian noise. Default is 256.</span>
 <span class="sd">    simulation : str, optional</span>
-<span class="sd">        Which simulation to run. Must be: &#39;trunk&#39;, &#39;trunk_overlap&#39;, &#39;trunk_mix&#39;, or one of the</span>
+<span class="sd">        Which simulation to run. Must be one of the</span>
 <span class="sd">        following Marron-Wand simulations: &#39;gaussian&#39;, &#39;skewed_unimodal&#39;, &#39;strongly_skewed&#39;,</span>
 <span class="sd">        &#39;kurtotic_unimodal&#39;, &#39;outlier&#39;, &#39;bimodal&#39;, &#39;separated_bimodal&#39;, &#39;skewed_bimodal&#39;,</span>
 <span class="sd">        &#39;trimodal&#39;, &#39;claw&#39;, &#39;double_claw&#39;, &#39;asymmetric_claw&#39;, &#39;asymmetric_double_claw&#39;,</span>
 <span class="sd">        &#39;smooth_comb&#39;, &#39;discrete_comb&#39;.</span>
 <span class="sd">        When calling the Marron-Wand simulations, only the covariance parameters are considered</span>
 <span class="sd">        (`rho` and `band_type`). Means are taken from :footcite:`marron1992exact`.</span>
-<span class="sd">        By default &#39;trunk&#39;.</span>
-<span class="sd">    m_factor : int, optional</span>
-<span class="sd">        The multiplicative factor to apply to the mean-vector of the first</span>
-<span class="sd">        distribution to obtain the mean-vector of the second distribution.</span>
-<span class="sd">        This is only used when ``simulation = trunk``.</span>
-<span class="sd">        By default -1.</span>
+<span class="sd">        By default &#39;gaussian&#39;.</span>
+<span class="sd">    rho : float, optional</span>
+<span class="sd">        The covariance value of the bands. By default 0 indicating, an identity matrix is used.</span>
+<span class="sd">    band_type : str</span>
+<span class="sd">        The band type to use. For details, see Example 1 and 2 in :footcite:`Bickel_2008`.</span>
+<span class="sd">        Either &#39;ma&#39;, or &#39;ar&#39;.</span>
+<span class="sd">    return_params : bool, optional</span>
+<span class="sd">        Whether or not to return the distribution parameters of the classes normal distributions.</span>
+<span class="sd">    seed : int, optional</span>
+<span class="sd">        Random seed, by default None.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    X : np.ndarray of shape (n_samples, n_dim), dtype=np.float64</span>
+<span class="sd">        Trunk dataset as a dense array.</span>
+<span class="sd">    y : np.ndarray of shape (n_samples,), dtype=np.intp</span>
+<span class="sd">        Labels of the dataset.</span>
+<span class="sd">    G : np.ndarray of shape (n_samples, n_dim), dtype=np.float64</span>
+<span class="sd">        The mixture of Gaussians for the Marron-Wand simulations.</span>
+<span class="sd">        Returned if ``return_params`` is True.</span>
+<span class="sd">    w : np.ndarray of shape (n_dim,), dtype=np.float64</span>
+<span class="sd">        The weight vector for the Marron-Wand simulations.</span>
+<span class="sd">        Returned if ``return_params`` is True.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    **Marron-Wand Simulations**: The Marron-Wand simulations generate two classes of data with the</span>
+<span class="sd">    setup specified in the paper.</span>
+
+<span class="sd">    Covariance: The covariance matrix among different dimensions is controlled by the ``rho`` parameter</span>
+<span class="sd">    and the ``band_type`` parameter. The ``band_type`` parameter controls the type of band to use, while</span>
+<span class="sd">    the ``rho`` parameter controls the specific scaling factor for the covariance matrix while going</span>
+<span class="sd">    from one dimension to the next.</span>
+
+<span class="sd">    For each dimension in the first distribution, there is a mean of :math:`1 / d`, where</span>
+<span class="sd">    ``d`` is the dimensionality. The covariance is the identity matrix.</span>
+
+<span class="sd">    The second distribution has a mean vector that is the negative of the first.</span>
+<span class="sd">    As ``d`` increases, the two distributions become closer and closer.</span>
+<span class="sd">    Full details for the trunk simulation can be found in :footcite:`trunk1982`.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. footbibliography::</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">n_dim</span> <span class="o">&lt;</span> <span class="n">n_informative</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Number of informative dimensions </span><span class="si">{</span><span class="n">n_informative</span><span class="si">}</span><span class="s2"> must be less than number &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;of dimensions, </span><span class="si">{</span><span class="n">n_dim</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">simulation</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">MARRON_WAND_SIMS</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Simulation must be: trunk, trunk_overlap, trunk_mix, </span><span class="si">{</span><span class="n">MARRON_WAND_SIMS</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">rho</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">band_type</span> <span class="o">==</span> <span class="s2">&quot;ma&quot;</span><span class="p">:</span>
+            <span class="n">cov</span> <span class="o">=</span> <span class="n">_moving_avg_cov</span><span class="p">(</span><span class="n">n_informative</span><span class="p">,</span> <span class="n">rho</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">band_type</span> <span class="o">==</span> <span class="s2">&quot;ar&quot;</span><span class="p">:</span>
+            <span class="n">cov</span> <span class="o">=</span> <span class="n">_autoregressive_cov</span><span class="p">(</span><span class="n">n_informative</span><span class="p">,</span> <span class="n">rho</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Band type </span><span class="si">{</span><span class="n">band_type</span><span class="si">}</span><span class="s1"> must be one of &quot;ma&quot;, or &quot;ar&quot;.&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">cov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">n_informative</span><span class="p">)</span>
+
+    <span class="c1"># speed up computations for large multivariate normal matrix with SVD approximation</span>
+    <span class="k">if</span> <span class="n">n_informative</span> <span class="o">&gt;</span> <span class="mi">1000</span><span class="p">:</span>
+        <span class="n">mvg_sampling_method</span> <span class="o">=</span> <span class="s2">&quot;cholesky&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">mvg_sampling_method</span> <span class="o">=</span> <span class="s2">&quot;svd&quot;</span>
+
+    <span class="n">mixture_idx</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+        <span class="nb">len</span><span class="p">(</span><span class="n">MARRON_WAND_SIMS</span><span class="p">[</span><span class="n">simulation</span><span class="p">]),</span>  <span class="c1"># type: ignore</span>
+        <span class="n">size</span><span class="o">=</span><span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">p</span><span class="o">=</span><span class="n">MARRON_WAND_SIMS</span><span class="p">[</span><span class="n">simulation</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="c1"># the parameters used for each Gaussian in the mixture for each Marron Wand simulation</span>
+    <span class="n">norm_params</span> <span class="o">=</span> <span class="n">MarronWandSims</span><span class="p">(</span><span class="n">n_dim</span><span class="o">=</span><span class="n">n_informative</span><span class="p">,</span> <span class="n">cov</span><span class="o">=</span><span class="n">cov</span><span class="p">)(</span><span class="n">simulation</span><span class="p">)</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromiter</span><span class="p">(</span>
+        <span class="p">(</span>
+            <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">norm_params</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">mvg_sampling_method</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">mixture_idx</span>
+        <span class="p">),</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">((</span><span class="nb">float</span><span class="p">,</span> <span class="n">n_informative</span><span class="p">)),</span>
+    <span class="p">)</span>
+
+    <span class="c1"># as the dimensionality of the simulations increasing, we are adding more and</span>
+    <span class="c1"># more noise to the data using the w parameter</span>
+    <span class="n">w_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_informative</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)])</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
+        <span class="p">(</span>
+            <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_informative</span><span class="p">),</span> <span class="n">cov</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">mvg_sampling_method</span>
+            <span class="p">),</span>
+            <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">w_vec</span><span class="p">)</span>
+            <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_informative</span><span class="p">),</span> <span class="n">cov</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">mvg_sampling_method</span>
+            <span class="p">)</span>
+            <span class="o">+</span> <span class="n">w_vec</span> <span class="o">*</span> <span class="n">G</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">n_informative</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">n_dim</span> <span class="o">&gt;</span> <span class="n">n_informative</span><span class="p">:</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">X</span><span class="p">,</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">n_dim</span> <span class="o">-</span> <span class="n">n_informative</span><span class="p">))))</span>
+
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)))</span>
+
+    <span class="k">if</span> <span class="n">return_params</span><span class="p">:</span>
+        <span class="n">returns</span> <span class="o">=</span> <span class="p">[</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">]</span>
+        <span class="n">returns</span> <span class="o">+=</span> <span class="p">[</span><span class="o">*</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">norm_params</span><span class="p">)),</span> <span class="n">G</span><span class="p">,</span> <span class="n">w_vec</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">returns</span>
+    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span></div>
+
+
+
+<div class="viewcode-block" id="make_trunk_mixture_classification">
+<a class="viewcode-back" href="../../../generated/sktree.datasets.make_trunk_mixture_classification.html#sktree.datasets.make_trunk_mixture_classification">[docs]</a>
+<span class="k">def</span> <span class="nf">make_trunk_mixture_classification</span><span class="p">(</span>
+    <span class="n">n_samples</span><span class="p">,</span>
+    <span class="n">n_dim</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span>
+    <span class="n">n_informative</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+    <span class="n">mu_0</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">mu_1</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">rho</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">band_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ma&quot;</span><span class="p">,</span>
+    <span class="n">return_params</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">mix</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate trunk mixture binary classification dataset.</span>
+
+<span class="sd">    The first class is generated from a multivariate-Gaussians with mean vector of</span>
+<span class="sd">    0&#39;s. The second class is generated from a mixture of Gaussians with mean vectors</span>
+<span class="sd">    specified by ``mu_0`` and ``mu_1``. The mixture is specified by the ``mix`` parameter,</span>
+<span class="sd">    which is the probability of the first Gaussian in the mixture.</span>
+
+<span class="sd">    For each dimension in the first distribution, there is a mean of :math:`1 / d`, where</span>
+<span class="sd">    ``d`` is the dimensionality. The covariance is the identity matrix.</span>
+<span class="sd">    The second distribution has a mean vector that is the negative of the first.</span>
+<span class="sd">    As ``d`` increases, the two distributions become closer and closer.</span>
+
+<span class="sd">    Full details for the trunk simulation can be found in :footcite:`trunk1982`.</span>
+
+<span class="sd">    Instead of the identity covariance matrix, one can implement a banded covariance matrix</span>
+<span class="sd">    that follows :footcite:`Bickel_2008`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_samples : int</span>
+<span class="sd">        Number of sample to generate.</span>
+<span class="sd">    n_dim : int, optional</span>
+<span class="sd">        The dimensionality of the dataset and the number of</span>
+<span class="sd">        unique labels, by default 4096.</span>
+<span class="sd">    n_informative : int, optional</span>
+<span class="sd">        The informative dimensions. All others for ``n_dim - n_informative``</span>
+<span class="sd">        are Gaussian noise. Default is 256.</span>
+<span class="sd">    mu_0 : int, optional</span>
+<span class="sd">        The mean of the first distribution. By default -1. The mean of the distribution will decrease</span>
+<span class="sd">        by a factor of ``sqrt(i)`` for each dimension ``i``.</span>
+<span class="sd">    mu_1 : int, optional</span>
+<span class="sd">        The mean of the second distribution. By default 1. The mean of the distribution will decrease</span>
+<span class="sd">        by a factor of ``sqrt(i)`` for each dimension ``i``.</span>
 <span class="sd">    rho : float, optional</span>
 <span class="sd">        The covariance value of the bands. By default 0 indicating, an identity matrix is used.</span>
 <span class="sd">    band_type : str</span>
@@ -603,14 +758,171 @@ document.write(`
 <span class="sd">    covs : list of ArrayLike of shape (n_dim, n_dim), dtype=np.float64</span>
 <span class="sd">        The covariance for each class. Returned if ``return_params`` is True.</span>
 <span class="sd">    X_mixture : np.ndarray of shape (n_samples, n_dim), dtype=np.float64</span>
-<span class="sd">        The mixture of Gaussians for the ``trunk_mix`` simulation.</span>
+<span class="sd">        The mixture of Gaussians.</span>
 <span class="sd">        Returned if ``return_params`` is True.</span>
-<span class="sd">    G : np.ndarray of shape (n_samples, n_dim), dtype=np.float64</span>
-<span class="sd">        The mixture of Gaussians for the Marron-Wand simulations.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    **Trunk**: The trunk simulation decreases the signal-to-noise ratio as the dimensionality</span>
+<span class="sd">    increases. This is implemented by decreasing the mean of the distribution by a factor of</span>
+<span class="sd">    ``sqrt(i)`` for each dimension ``i``. Thus for instance if the means of distribution one</span>
+<span class="sd">    and two are 1 and -1 respectively, the means for the first dimension will be 1 and -1,</span>
+<span class="sd">    for the second dimension will be 1/sqrt(2) and -1/sqrt(2), and so on.</span>
+
+<span class="sd">    **Trunk Mix**: The trunk mix simulation generates two classes of data with the same covariance</span>
+<span class="sd">    matrix. The first class (label 0) is generated from a multivariate-Gaussians with mean vector of</span>
+<span class="sd">    zeros and the second class is generated from a mixture of Gaussians with mean vectors</span>
+<span class="sd">    specified by ``mu_0`` and ``mu_1``. The mixture is specified by the ``mix`` parameter, which</span>
+<span class="sd">    is the probability of the first Gaussian in the mixture.</span>
+
+<span class="sd">    Covariance: The covariance matrix among different dimensions is controlled by the ``rho`` parameter</span>
+<span class="sd">    and the ``band_type`` parameter. The ``band_type`` parameter controls the type of band to use, while</span>
+<span class="sd">    the ``rho`` parameter controls the specific scaling factor for the covariance matrix while going</span>
+<span class="sd">    from one dimension to the next.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. footbibliography::</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">n_dim</span> <span class="o">&lt;</span> <span class="n">n_informative</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Number of informative dimensions </span><span class="si">{</span><span class="n">n_informative</span><span class="si">}</span><span class="s2"> must be less than number &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;of dimensions, </span><span class="si">{</span><span class="n">n_dim</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">mix</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">mix</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Mix must be between 0 and 1.&quot;</span><span class="p">)</span>
+
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+
+    <span class="n">mu_1_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mu_1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_informative</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)])</span>
+    <span class="n">mu_0_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mu_0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_informative</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)])</span>
+
+    <span class="k">if</span> <span class="n">rho</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">band_type</span> <span class="o">==</span> <span class="s2">&quot;ma&quot;</span><span class="p">:</span>
+            <span class="n">cov</span> <span class="o">=</span> <span class="n">_moving_avg_cov</span><span class="p">(</span><span class="n">n_informative</span><span class="p">,</span> <span class="n">rho</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">band_type</span> <span class="o">==</span> <span class="s2">&quot;ar&quot;</span><span class="p">:</span>
+            <span class="n">cov</span> <span class="o">=</span> <span class="n">_autoregressive_cov</span><span class="p">(</span><span class="n">n_informative</span><span class="p">,</span> <span class="n">rho</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Band type </span><span class="si">{</span><span class="n">band_type</span><span class="si">}</span><span class="s1"> must be one of &quot;ma&quot;, or &quot;ar&quot;.&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">cov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">n_informative</span><span class="p">)</span>
+
+    <span class="c1"># speed up computations for large multivariate normal matrix with SVD approximation</span>
+    <span class="k">if</span> <span class="n">n_informative</span> <span class="o">&gt;</span> <span class="mi">1000</span><span class="p">:</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="s2">&quot;cholesky&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="s2">&quot;svd&quot;</span>
+
+    <span class="n">mixture_idx</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="n">mix</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">mix</span><span class="p">])</span>  <span class="c1"># type: ignore</span>
+
+    <span class="c1"># When variance is 1, trunk-mix does not look bimodal at low dimensions.</span>
+    <span class="c1"># It is set it to (2/3)**2 since that is consistent with Marron and Wand bimodal</span>
+    <span class="n">norm_params</span> <span class="o">=</span> <span class="p">[[</span><span class="n">mu_0_vec</span><span class="p">,</span> <span class="n">cov</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="n">mu_1_vec</span><span class="p">,</span> <span class="n">cov</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">]]</span>
+    <span class="n">X_mixture</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromiter</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">norm_params</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">mixture_idx</span><span class="p">),</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">((</span><span class="nb">float</span><span class="p">,</span> <span class="n">n_informative</span><span class="p">)),</span>
+    <span class="p">)</span>
+
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
+        <span class="p">(</span>
+            <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_informative</span><span class="p">),</span> <span class="n">cov</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span>
+            <span class="p">),</span>
+            <span class="n">X_mixture</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">n_informative</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">n_dim</span> <span class="o">&gt;</span> <span class="n">n_informative</span><span class="p">:</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">X</span><span class="p">,</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">n_dim</span> <span class="o">-</span> <span class="n">n_informative</span><span class="p">))))</span>
+
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)))</span>
+
+    <span class="k">if</span> <span class="n">return_params</span><span class="p">:</span>
+        <span class="n">returns</span> <span class="o">=</span> <span class="p">[</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">]</span>
+        <span class="n">returns</span> <span class="o">+=</span> <span class="p">[</span><span class="o">*</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">norm_params</span><span class="p">)),</span> <span class="n">X_mixture</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">returns</span>
+    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span></div>
+
+
+
+<div class="viewcode-block" id="make_trunk_classification">
+<a class="viewcode-back" href="../../../generated/sktree.datasets.make_trunk_classification.html#sktree.datasets.make_trunk_classification">[docs]</a>
+<span class="k">def</span> <span class="nf">make_trunk_classification</span><span class="p">(</span>
+    <span class="n">n_samples</span><span class="p">,</span>
+    <span class="n">n_dim</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span>
+    <span class="n">n_informative</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+    <span class="n">mu_0</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">mu_1</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">rho</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">band_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ma&quot;</span><span class="p">,</span>
+    <span class="n">return_params</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate trunk binary classification dataset.</span>
+
+<span class="sd">    For each dimension in the first distribution, there is a mean of :math:`1 / d`, where</span>
+<span class="sd">    ``d`` is the dimensionality. The covariance is the identity matrix.</span>
+<span class="sd">    The second distribution has a mean vector that is the negative of the first.</span>
+<span class="sd">    As ``d`` increases, the two distributions become closer and closer.</span>
+
+<span class="sd">    Full details for the trunk simulation can be found in :footcite:`trunk1982`.</span>
+
+<span class="sd">    Instead of the identity covariance matrix, one can implement a banded covariance matrix</span>
+<span class="sd">    that follows :footcite:`Bickel_2008`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_samples : int</span>
+<span class="sd">        Number of sample to generate.</span>
+<span class="sd">    n_dim : int, optional</span>
+<span class="sd">        The dimensionality of the dataset and the number of</span>
+<span class="sd">        unique labels, by default 4096.</span>
+<span class="sd">    n_informative : int, optional</span>
+<span class="sd">        The informative dimensions. All others for ``n_dim - n_informative``</span>
+<span class="sd">        are Gaussian noise. Default is 256.</span>
+<span class="sd">    mu_0 : int, optional</span>
+<span class="sd">        The mean of the first distribution. By default -1. The mean of the distribution will decrease</span>
+<span class="sd">        by a factor of ``sqrt(i)`` for each dimension ``i``.</span>
+<span class="sd">    mu_1 : int, optional</span>
+<span class="sd">        The mean of the second distribution. By default 1. The mean of the distribution will decrease</span>
+<span class="sd">        by a factor of ``sqrt(i)`` for each dimension ``i``.</span>
+<span class="sd">    rho : float, optional</span>
+<span class="sd">        The covariance value of the bands. By default 0 indicating, an identity matrix is used.</span>
+<span class="sd">    band_type : str</span>
+<span class="sd">        The band type to use. For details, see Example 1 and 2 in :footcite:`Bickel_2008`.</span>
+<span class="sd">        Either &#39;ma&#39;, or &#39;ar&#39;.</span>
+<span class="sd">    return_params : bool, optional</span>
+<span class="sd">        Whether or not to return the distribution parameters of the classes normal distributions.</span>
+<span class="sd">    seed : int, optional</span>
+<span class="sd">        Random seed, by default None.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    X : np.ndarray of shape (n_samples, n_dim), dtype=np.float64</span>
+<span class="sd">        Trunk dataset as a dense array.</span>
+<span class="sd">    y : np.ndarray of shape (n_samples,), dtype=np.intp</span>
+<span class="sd">        Labels of the dataset.</span>
+<span class="sd">    means : list of ArrayLike of shape (n_dim,), dtype=np.float64</span>
+<span class="sd">        The mean vector for each class starting with class 0.</span>
 <span class="sd">        Returned if ``return_params`` is True.</span>
-<span class="sd">    w : np.ndarray of shape (n_dim,), dtype=np.float64</span>
-<span class="sd">        The weight vector for the Marron-Wand simulations.</span>
-<span class="sd">        Returned if ``return_params`` is True.</span>
+<span class="sd">    covs : list of ArrayLike of shape (n_dim, n_dim), dtype=np.float64</span>
+<span class="sd">        The covariance for each class. Returned if ``return_params`` is True.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    **Trunk**: The trunk simulation decreases the signal-to-noise ratio as the dimensionality</span>
+<span class="sd">    increases. This is implemented by decreasing the mean of the distribution by a factor of</span>
+<span class="sd">    ``sqrt(i)`` for each dimension ``i``. Thus for instance if the means of distribution one</span>
+<span class="sd">    and two are 1 and -1 respectively, the means for the first dimension will be 1 and -1,</span>
+<span class="sd">    for the second dimension will be 1/sqrt(2) and -1/sqrt(2), and so on.</span>
+
+<span class="sd">    **Trunk Overlap**: The trunk overlap simulation generates two classes of data with the same</span>
+<span class="sd">    covariance matrix and mean vector of zeros.</span>
+
+<span class="sd">    Covariance: The covariance matrix among different dimensions is controlled by the ``rho`` parameter</span>
+<span class="sd">    and the ``band_type`` parameter. The ``band_type`` parameter controls the type of band to use, while</span>
+<span class="sd">    the ``rho`` parameter controls the specific scaling factor for the covariance matrix while going</span>
+<span class="sd">    from one dimension to the next.</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
@@ -623,8 +935,8 @@ document.write(`
         <span class="p">)</span>
     <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
 
-    <span class="n">mu_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_informative</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)])</span>
-    <span class="n">mu_0</span> <span class="o">=</span> <span class="n">m_factor</span> <span class="o">*</span> <span class="n">mu_1</span>
+    <span class="n">mu_1_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mu_1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_informative</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)])</span>
+    <span class="n">mu_0_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mu_0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_informative</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)])</span>
 
     <span class="k">if</span> <span class="n">rho</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">band_type</span> <span class="o">==</span> <span class="s2">&quot;ma&quot;</span><span class="p">:</span>
@@ -636,88 +948,18 @@ document.write(`
     <span class="k">else</span><span class="p">:</span>
         <span class="n">cov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">n_informative</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">mix</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">mix</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Mix must be between 0 and 1.&quot;</span><span class="p">)</span>
-
     <span class="c1"># speed up computations for large multivariate normal matrix with SVD approximation</span>
     <span class="k">if</span> <span class="n">n_informative</span> <span class="o">&gt;</span> <span class="mi">1000</span><span class="p">:</span>
         <span class="n">method</span> <span class="o">=</span> <span class="s2">&quot;cholesky&quot;</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">method</span> <span class="o">=</span> <span class="s2">&quot;svd&quot;</span>
 
-    <span class="k">if</span> <span class="n">simulation</span> <span class="o">==</span> <span class="s2">&quot;trunk&quot;</span><span class="p">:</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
-            <span class="p">(</span>
-                <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">mu_1</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">),</span>
-                <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">mu_0</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">),</span>
-            <span class="p">)</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
+        <span class="p">(</span>
+            <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">mu_1_vec</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">),</span>
+            <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">mu_0_vec</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">),</span>
         <span class="p">)</span>
-    <span class="k">elif</span> <span class="n">simulation</span> <span class="o">==</span> <span class="s2">&quot;trunk_overlap&quot;</span><span class="p">:</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
-            <span class="p">(</span>
-                <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span>
-                    <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_informative</span><span class="p">),</span> <span class="n">cov</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span>
-                <span class="p">),</span>
-                <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span>
-                    <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_informative</span><span class="p">),</span> <span class="n">cov</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span>
-                <span class="p">),</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
-    <span class="k">elif</span> <span class="n">simulation</span> <span class="o">==</span> <span class="s2">&quot;trunk_mix&quot;</span><span class="p">:</span>
-        <span class="n">mixture_idx</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="n">mix</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">mix</span><span class="p">])</span>
-        <span class="n">norm_params</span> <span class="o">=</span> <span class="p">[[</span><span class="n">mu_0</span><span class="p">,</span> <span class="n">cov</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="n">mu_1</span><span class="p">,</span> <span class="n">cov</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">]]</span>
-        <span class="n">X_mixture</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromiter</span><span class="p">(</span>
-            <span class="p">(</span>
-                <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">norm_params</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">mixture_idx</span>
-            <span class="p">),</span>
-            <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">((</span><span class="nb">float</span><span class="p">,</span> <span class="n">n_informative</span><span class="p">)),</span>
-        <span class="p">)</span>
-
-        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
-            <span class="p">(</span>
-                <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span>
-                    <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_informative</span><span class="p">),</span> <span class="n">cov</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span>
-                <span class="p">),</span>
-                <span class="n">X_mixture</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">n_informative</span><span class="p">),</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
-    <span class="k">elif</span> <span class="n">simulation</span> <span class="ow">in</span> <span class="n">MARRON_WAND_SIMS</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-        <span class="n">mixture_idx</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
-            <span class="nb">len</span><span class="p">(</span><span class="n">MARRON_WAND_SIMS</span><span class="p">[</span><span class="n">simulation</span><span class="p">]),</span>  <span class="c1"># type: ignore</span>
-            <span class="n">size</span><span class="o">=</span><span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
-            <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">p</span><span class="o">=</span><span class="n">MARRON_WAND_SIMS</span><span class="p">[</span><span class="n">simulation</span><span class="p">],</span>
-        <span class="p">)</span>
-        <span class="c1"># the parameters used for each Gaussian in the mixture for each Marron Wand simulation</span>
-        <span class="n">norm_params</span> <span class="o">=</span> <span class="n">MarronWandSims</span><span class="p">(</span><span class="n">n_dim</span><span class="o">=</span><span class="n">n_informative</span><span class="p">,</span> <span class="n">cov</span><span class="o">=</span><span class="n">cov</span><span class="p">)(</span><span class="n">simulation</span><span class="p">)</span>
-        <span class="n">G</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromiter</span><span class="p">(</span>
-            <span class="p">(</span>
-                <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">norm_params</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">mixture_idx</span>
-            <span class="p">),</span>
-            <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">((</span><span class="nb">float</span><span class="p">,</span> <span class="n">n_informative</span><span class="p">)),</span>
-        <span class="p">)</span>
-
-        <span class="c1"># as the dimensionality of the simulations increasing, we are adding more and</span>
-        <span class="c1"># more noise to the data using the w parameter</span>
-        <span class="n">w</span> <span class="o">=</span> <span class="n">mu_1</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
-            <span class="p">(</span>
-                <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span>
-                    <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_informative</span><span class="p">),</span> <span class="n">cov</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span>
-                <span class="p">),</span>
-                <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">w</span><span class="p">)</span>
-                <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span>
-                    <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_informative</span><span class="p">),</span> <span class="n">cov</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span>
-                <span class="p">)</span>
-                <span class="o">+</span> <span class="n">w</span> <span class="o">*</span> <span class="n">G</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">n_informative</span><span class="p">),</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Simulation must be: trunk, trunk_overlap, trunk_mix, </span><span class="si">{</span><span class="n">MARRON_WAND_SIMS</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
+    <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">n_dim</span> <span class="o">&gt;</span> <span class="n">n_informative</span><span class="p">:</span>
         <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">X</span><span class="p">,</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">n_dim</span> <span class="o">-</span> <span class="n">n_informative</span><span class="p">))))</span>
@@ -726,14 +968,7 @@ document.write(`
 
     <span class="k">if</span> <span class="n">return_params</span><span class="p">:</span>
         <span class="n">returns</span> <span class="o">=</span> <span class="p">[</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">simulation</span> <span class="o">==</span> <span class="s2">&quot;trunk&quot;</span><span class="p">:</span>
-            <span class="n">returns</span> <span class="o">+=</span> <span class="p">[[</span><span class="n">mu_0</span><span class="p">,</span> <span class="n">mu_1</span><span class="p">],</span> <span class="p">[</span><span class="n">cov</span><span class="p">,</span> <span class="n">cov</span><span class="p">]]</span>
-        <span class="k">elif</span> <span class="n">simulation</span> <span class="o">==</span> <span class="s2">&quot;trunk-overlap&quot;</span><span class="p">:</span>
-            <span class="n">returns</span> <span class="o">+=</span> <span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_informative</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_informative</span><span class="p">)],</span> <span class="p">[</span><span class="n">cov</span><span class="p">,</span> <span class="n">cov</span><span class="p">]]</span>
-        <span class="k">elif</span> <span class="n">simulation</span> <span class="o">==</span> <span class="s2">&quot;trunk-mix&quot;</span><span class="p">:</span>
-            <span class="n">returns</span> <span class="o">+=</span> <span class="p">[</span><span class="o">*</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">norm_params</span><span class="p">)),</span> <span class="n">X_mixture</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">returns</span> <span class="o">+=</span> <span class="p">[</span><span class="o">*</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">norm_params</span><span class="p">)),</span> <span class="n">G</span><span class="p">,</span> <span class="n">w</span><span class="p">]</span>
+        <span class="n">returns</span> <span class="o">+=</span> <span class="p">[[</span><span class="n">mu_0_vec</span><span class="p">,</span> <span class="n">mu_1_vec</span><span class="p">],</span> <span class="p">[</span><span class="n">cov</span><span class="p">,</span> <span class="n">cov</span><span class="p">]]</span>
         <span class="k">return</span> <span class="n">returns</span>
     <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span></div>
 

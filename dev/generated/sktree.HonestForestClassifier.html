@@ -470,6 +470,8 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="sktree.datasets.make_joint_factor_model.html">sktree.datasets.make_joint_factor_model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sktree.datasets.make_quadratic_classification.html">sktree.datasets.make_quadratic_classification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sktree.datasets.make_trunk_classification.html">sktree.datasets.make_trunk_classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.datasets.make_trunk_mixture_classification.html">sktree.datasets.make_trunk_mixture_classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.datasets.make_marron_wand_classification.html">sktree.datasets.make_marron_wand_classification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sktree.datasets.approximate_clf_mutual_information.html">sktree.datasets.approximate_clf_mutual_information</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sktree.datasets.approximate_clf_mutual_information_with_monte_carlo.html">sktree.datasets.approximate_clf_mutual_information_with_monte_carlo</a></li>
 </ul>
@@ -622,7 +624,7 @@ left child, and <code class="docutils literal notranslate"><span class="pre">N_t
 <p><code class="docutils literal notranslate"><span class="pre">N</span></code>, <code class="docutils literal notranslate"><span class="pre">N_t</span></code>, <code class="docutils literal notranslate"><span class="pre">N_t_R</span></code> and <code class="docutils literal notranslate"><span class="pre">N_t_L</span></code> all refer to the weighted sum,
 if <code class="docutils literal notranslate"><span class="pre">sample_weight</span></code> is passed.</p>
 </dd>
-<dt><strong>bootstrap</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=True</span></dt><dd><p>Whether bootstrap samples are used when building trees. If False, the
+<dt><strong>bootstrap</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=False</span></dt><dd><p>Whether bootstrap samples are used when building trees. If False, the
 whole dataset is used to build each tree.</p>
 <p>When bootstrap is True, each tree bootstrap samples the dataset, and then
 the unique indices are split in half, where one half is used to train
