@@ -81,6 +81,12 @@ def make_marron_wand_classification(
 ):
     """Generate Marron-Wand binary classification dataset.
 
+    The simulation is similar to that of :func:`sktree.datasets.make_trunk_classification`
+    where the first class is generated from a multivariate-Gaussians with mean vector of
+    0's. The second class is generated from a mixture of Gaussians with mean vectors
+    specified by the Marron-Wand simulations, but as the dimensionality increases, the second
+    class distribution approaches the first class distribution by a factor of :math:`1 / sqrt(d)`.
+
     Full details for the Marron-Wand simulations can be found in :footcite:`marron1992exact`.
 
     Instead of the identity covariance matrix, one can implement a banded covariance matrix
