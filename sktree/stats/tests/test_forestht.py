@@ -786,7 +786,7 @@ def test_build_coleman_forest():
     Test the function under alternative and null hypothesis for a very simple dataset.
     """
     n_estimators = 40
-    n_samples = 20
+    n_samples = 30
     n_features = 5
     rng = np.random.default_rng(seed)
 
@@ -819,17 +819,21 @@ def test_build_coleman_forest():
     ):
         build_coleman_forest(clf, clf, X, y)
 
-    forest_result, orig_forest_proba, perm_forest_proba, clf, perm_clf = build_coleman_forest(
-        clf, perm_clf, X, y, metric="s@98", n_repeats=1000, seed=seed
+    forest_result, orig_forest_proba, perm_forest_proba, clf_fitted, perm_clf_fitted = (
+        build_coleman_forest(clf, perm_clf, X, y, metric="s@98", n_repeats=1000, seed=seed)
     )
-    assert clf._n_samples_bootstrap == round(20 * 1.6)
+    assert clf_fitted._n_samples_bootstrap == round(n_samples * 1.6)
+    assert perm_clf_fitted._n_samples_bootstrap == round(n_samples * 1.6)
+    assert_array_equal(perm_clf_fitted.permutation_indices_.shape, (n_samples, 1))
 
     assert forest_result.pvalue <= 0.05, f"{forest_result.pvalue}"
     assert forest_result.observe_stat > 0.1, f"{forest_result.observe_stat}"
     assert_array_equal(orig_forest_proba.shape, perm_forest_proba.shape)
 
     X = np.vstack([_X, _X])
-    forest_result, _, _ = build_coleman_forest(clf, perm_clf, X, y, metric="s@98")
+    forest_result, _, _, clf_fitted, perm_clf_fitted = build_coleman_forest(
+        clf, perm_clf, X, y, metric="s@98"
+    )
     assert forest_result.pvalue > 0.05, f"{forest_result.pvalue}"
     assert forest_result.observe_stat < 0.05, f"{forest_result.observe_stat}"
 

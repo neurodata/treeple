@@ -442,8 +442,8 @@ class PermutationHonestForestClassifier(HonestForestClassifier):
                 )
             )
         else:
-            perm_idx = random_state.choice(
-                self._n_samples, size=(self._n_samples, 1), replace=False
+            perm_idx = np.array(
+                random_state.choice(self._n_samples, size=(self._n_samples, 1), replace=False)
             )
             X[:, self.covariate_index_] = X[perm_idx, self.covariate_index_]
             self.permutation_indices_ = perm_idx
