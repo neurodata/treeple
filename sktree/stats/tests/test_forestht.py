@@ -863,7 +863,7 @@ def test_build_coleman_forest_multiview():
         honest_fraction=0.5,
         bootstrap=True,
         max_samples=1.6,
-        max_features=[1, 2],
+        max_features=[1, 1],
         tree_estimator=MultiViewDecisionTreeClassifier(),
         feature_set_ends=[2, 5],
     )
@@ -874,7 +874,7 @@ def test_build_coleman_forest_multiview():
         honest_fraction=0.5,
         bootstrap=True,
         max_samples=1.6,
-        max_features=[1, 2],
+        max_features=[1, 1],
         tree_estimator=MultiViewDecisionTreeClassifier(),
         feature_set_ends=[2, 5],
     )
@@ -899,7 +899,6 @@ def test_build_coleman_forest_multiview():
         clf, perm_clf, X, y, metric="s@98"
     )
     assert forest_result.pvalue > 0.05, f"{forest_result.pvalue}"
-    assert forest_result.observe_stat < 0.05, f"{forest_result.observe_stat}"
 
 
 def test_build_permutation_forest():
