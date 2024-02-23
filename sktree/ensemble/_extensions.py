@@ -49,9 +49,7 @@ def _generate_sample_indices(random_state, n_samples, n_samples_bootstrap, boots
     """
     random_instance = check_random_state(random_state)
     n_sample_idx = np.arange(0, n_samples, dtype=np.int32)
-    sample_indices = np.atleast_1d(
-        random_instance.choice(n_sample_idx, n_samples_bootstrap, replace=bootstrap)
-    )
+    sample_indices = random_instance.choice(n_sample_idx, n_samples_bootstrap, replace=bootstrap)
     return sample_indices
 
 

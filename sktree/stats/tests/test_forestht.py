@@ -785,9 +785,9 @@ def test_build_coleman_forest():
 
     Test the function under alternative and null hypothesis for a very simple dataset.
     """
-    n_estimators = 10
+    n_estimators = 40
     n_samples = 20
-    n_features = 3
+    n_features = 5
     rng = np.random.default_rng(seed)
 
     _X = rng.uniform(size=(n_samples, n_features))
@@ -799,19 +799,31 @@ def test_build_coleman_forest():
     )  # Binary classification
 
     clf = HonestForestClassifier(
-        n_estimators=n_estimators, random_state=seed, n_jobs=-1, honest_fraction=0.5, bootstrap=True
+        n_estimators=n_estimators,
+        random_state=seed,
+        n_jobs=-1,
+        honest_fraction=0.5,
+        bootstrap=True,
+        max_samples=1.6,
     )
     perm_clf = PermutationHonestForestClassifier(
-        n_estimators=n_estimators, random_state=seed, n_jobs=-1, honest_fraction=0.5, bootstrap=True
+        n_estimators=n_estimators,
+        random_state=seed,
+        n_jobs=-1,
+        honest_fraction=0.5,
+        bootstrap=True,
+        max_samples=1.6,
     )
     with pytest.raises(
         RuntimeError, match="Permutation forest must be a PermutationHonestForestClassifier"
     ):
         build_coleman_forest(clf, clf, X, y)
 
-    forest_result, orig_forest_proba, perm_forest_proba = build_coleman_forest(
-        clf, perm_clf, X, y, metric="s@98"
+    forest_result, orig_forest_proba, perm_forest_proba, clf, perm_clf = build_coleman_forest(
+        clf, perm_clf, X, y, metric="s@98", n_repeats=1000, seed=seed
     )
+    assert clf._n_samples_bootstrap == round(20 * 1.6)
+
     assert forest_result.pvalue <= 0.05, f"{forest_result.pvalue}"
     assert forest_result.observe_stat > 0.1, f"{forest_result.observe_stat}"
     assert_array_equal(orig_forest_proba.shape, perm_forest_proba.shape)

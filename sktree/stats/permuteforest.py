@@ -297,6 +297,7 @@ class PermutationHonestForestClassifier(HonestForestClassifier):
         tree_estimator=None,
         stratify=False,
         permute_per_tree=False,
+        **tree_estimator_params,
     ):
         super().__init__(
             n_estimators,
@@ -322,6 +323,7 @@ class PermutationHonestForestClassifier(HonestForestClassifier):
             honest_fraction,
             tree_estimator,
             stratify,
+            **tree_estimator_params,
         )
         self.permute_per_tree = permute_per_tree
 
