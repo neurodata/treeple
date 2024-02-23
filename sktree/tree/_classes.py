@@ -990,6 +990,12 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
 
         return self
 
+    @property
+    def _inheritable_fitted_attribute(self):
+        return {
+            "feature_combinations_",
+        }
+
 
 class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
     """An oblique decision tree Regressor.
@@ -1851,6 +1857,16 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
         # However, for MORF it is not supported
         allow_nan = False
         return {"multilabel": True, "allow_nan": allow_nan}
+
+    @property
+    def _inheritable_fitted_attribute(self):
+        return {
+            "feature_combinations_",
+            "min_patch_dims_",
+            "max_patch_dims_",
+            "dim_contiguous_",
+            "data_dims_",
+        }
 
 
 class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
@@ -2746,6 +2762,12 @@ class ExtraObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
             self.n_classes_ = self.n_classes_[0]
             self.classes_ = self.classes_[0]
         return self
+
+    @property
+    def _inheritable_fitted_attribute(self):
+        return {
+            "feature_combinations_",
+        }
 
 
 class ExtraObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):

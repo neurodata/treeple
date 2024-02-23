@@ -277,9 +277,6 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
         The number of classes (single output problem), or a list containing the
         number of classes for each output (multi-output problem).
 
-    n_features_ : int
-        The number of features when ``fit`` is performed.
-
     n_features_in_ : int
         Number of features seen during :term:`fit`.
 
@@ -508,6 +505,9 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
 
         super().fit(X, y, sample_weight=sample_weight, classes=classes, **fit_params)
 
+        # Inherit attributes from the tree estimator
+        self._inherit_estimator_attributes()
+
         # Compute honest decision function
         self.honest_decision_function_ = self._predict_proba(
             X, indices=self.honest_indices_, impute_missing=np.nan
@@ -538,9 +538,15 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
 
     def _inherit_estimator_attributes(self):
         """Initialize necessary attributes from the provided tree estimator"""
-        for attr_name in dir(self.estimator_[0]):
-            if not attr_name.startswith("_") and attr_name.endswith("_"):
-                setattr(self, attr_name, getattr(self.estimator_, attr_name))
+        if hasattr(self.estimators_[0], "_inheritable_fitted_attribute"):
+            for attr in self.estimators_[0]._inheritable_fitted_attribute:
+                setattr(self, attr, getattr(self.estimators_[0], attr))
+
+        self.classes_ = self.estimators_[0].classes_
+        self.max_features_ = self.estimators_[0].max_features_
+        self.n_classes_ = self.estimators_[0].n_classes_
+        self.n_features_in_ = self.estimators_[0].n_features_in_
+        self.n_outputs_ = self.estimators_[0].n_outputs_
 
     def predict_proba(self, X):
         """
@@ -643,25 +649,6 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
 
     def _more_tags(self):
         return {"multioutput": False}
-
-    def apply(self, X):
-        """
-        Apply trees in the forest to X, return leaf indices.
-
-        Parameters
-        ----------
-        X : {array-like, sparse matrix} of shape (n_samples, n_features)
-            The input samples. Internally, its dtype will be converted to
-            ``dtype=np.float32``. If a sparse matrix is provided, it will be
-            converted into a sparse ``csr_matrix``.
-
-        Returns
-        -------
-        X_leaves : ndarray of shape (n_samples, n_estimators)
-            For each datapoint x in X and for each tree in the forest,
-            return the index of the leaf x ends up in.
-        """
-        return self.estimator_.apply(X)
 
     def decision_path(self, X):
         """
