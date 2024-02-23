@@ -6,6 +6,8 @@ Predicting with different quantile interpolation methods
 An example comparison of interpolation methods that can be applied during
 prediction when the desired quantile lies between two data points.
 
+This example was heavily inspired by `quantile-forest <https://github.com/zillow/quantile-forest>`_
+package. See their package `here <https://zillow.github.io/quantile-forest/>`_.
 """
 
 from collections import defaultdict

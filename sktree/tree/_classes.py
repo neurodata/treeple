@@ -302,6 +302,7 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
             )
 
         builder.build(self.tree_, X, sample_weight)
+        return self
 
     def predict(self, X, check_input=True):
         """Assign labels based on clustering the affinity matrix.
@@ -573,6 +574,7 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
             )
 
         builder.build(self.tree_, X, sample_weight)
+        return self
 
 
 class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
@@ -986,6 +988,8 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
             self.n_classes_ = self.n_classes_[0]
             self.classes_ = self.classes_[0]
 
+        return self
+
 
 class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
     """An oblique decision tree Regressor.
@@ -1364,6 +1368,7 @@ class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
             )
 
         builder.build(self.tree_, X, y, sample_weight, None)
+        return self
 
 
 class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
@@ -1839,6 +1844,8 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
             self.n_classes_ = self.n_classes_[0]
             self.classes_ = self.classes_[0]
 
+        return self
+
     def _more_tags(self):
         # XXX: nans should be supportable in SPORF by just using RF-like splits on missing values
         # However, for MORF it is not supported
@@ -2306,6 +2313,8 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
 
         builder.build(self.tree_, X, y, sample_weight, None)
 
+        return self
+
     def _more_tags(self):
         # XXX: nans should be supportable in SPORF by just using RF-like splits on missing values
         # However, for MORF it is not supported
@@ -2736,6 +2745,7 @@ class ExtraObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
         if self.n_outputs_ == 1:
             self.n_classes_ = self.n_classes_[0]
             self.classes_ = self.classes_[0]
+        return self
 
 
 class ExtraObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
@@ -3125,3 +3135,5 @@ class ExtraObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
             )
 
         builder.build(self.tree_, X, y, sample_weight)
+
+        return self

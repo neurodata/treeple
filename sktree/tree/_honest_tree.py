@@ -3,9 +3,10 @@
 
 import numpy as np
 from sklearn.base import ClassifierMixin, MetaEstimatorMixin, _fit_context, clone
+from sklearn.model_selection import StratifiedShuffleSplit
+from sklearn.utils._param_validation import HasMethods, Interval, RealNotInt, StrOptions
 from sklearn.utils.multiclass import _check_partial_fit_first_call, check_classification_targets
 from sklearn.utils.validation import check_is_fitted, check_X_y
-from sklearn.model_selection import StratifiedShuffleSplit
 
 from .._lib.sklearn.tree import DecisionTreeClassifier
 from .._lib.sklearn.tree._classes import BaseDecisionTree
@@ -17,6 +18,13 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
 
     Parameters
     ----------
+    tree_estimator : object, default=None
+        Instantiated tree of type BaseDecisionTree from sktree.
+        If None, then sklearn's DecisionTreeClassifier with default parameters will
+        be used. Note that none of the parameters in ``tree_estimator`` need
+        to be set. The parameters of the ``tree_estimator`` can be set using
+        the ``tree_estimator_params`` keyword argument.
+
     criterion : {"gini", "entropy"}, default="gini"
         The function to measure the quality of a split. Supported criteria are
         "gini" for the Gini impurity and "entropy" for the information gain.
@@ -149,12 +157,6 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
 
         Read more in the :ref:`User Guide <monotonic_cst_gbdt>`.
 
-    tree_estimator : object, default=None
-        Instantiated tree of type BaseDecisionTree from sktree.
-        If None, then DecisionTreeClassifier with default parameters will
-        be used. Note that one MUST use trees imported from the `sktree.tree`
-        API namespace rather than from `sklearn.tree`.
-
     honest_fraction : float, default=0.5
         Fraction of training samples used for estimates in the leaves. The
         remaining samples will be used to learn the tree structure. A larger
@@ -170,6 +172,10 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
     stratify : bool
         Whether or not to stratify sample when considering structure and leaf indices.
         By default False.
+
+    **tree_estimator_params : dict
+        Parameters to pass to the underlying base tree estimators.
+        These must be parameters for ``tree_estimator``.
 
     Attributes
     ----------
@@ -269,8 +275,20 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
            0.8       , 0.8       , 0.93333333, 1.        , 1.        ])
     """
 
+    _parameter_constraints: dict = {
+        **BaseDecisionTree._parameter_constraints,
+        "tree_estimator": [
+            HasMethods(["fit", "predict", "predict_proba", "apply"]),
+            None,
+        ],
+        "honest_fraction": [Interval(RealNotInt, 0.0, 1.0, closed="neither")],
+        "honest_prior": [StrOptions({"empirical", "uniform", "ignore"})],
+        "stratify": ["boolean"],
+    }
+
     def __init__(
         self,
+        tree_estimator=None,
         criterion="gini",
         splitter="best",
         max_depth=None,
@@ -284,10 +302,10 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         class_weight=None,
         ccp_alpha=0.0,
         monotonic_cst=None,
-        tree_estimator=None,
         honest_fraction=0.5,
         honest_prior="empirical",
         stratify=False,
+        **tree_estimator_params,
     ):
         self.tree_estimator = tree_estimator
         self.criterion = criterion
@@ -302,13 +320,15 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         self.random_state = random_state
         self.min_impurity_decrease = min_impurity_decrease
         self.ccp_alpha = ccp_alpha
+        self.monotonic_cst = monotonic_cst
+
         self.honest_fraction = honest_fraction
         self.honest_prior = honest_prior
-        self.monotonic_cst = monotonic_cst
         self.stratify = stratify
 
         # XXX: to enable this, we need to also reset the leaf node samples during `_set_leaf_nodes`
         self.store_leaf_values = False
+        self._tree_estimator_params = tree_estimator_params
 
     @_fit_context(prefer_skip_nested_validation=True)
     def fit(
@@ -513,6 +533,15 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
 
         return _sample_weight
 
+    def _get_estimator(self):
+        """Resolve which estimator to return (default is DecisionTreeClassifier)"""
+        if self.tree_estimator is None:
+            self.estimator_ = DecisionTreeClassifier(random_state=self.random_state)
+        else:
+            # XXX: maybe error out if the base tree estimator is already fitted
+            self.estimator_ = clone(self.tree_estimator)
+        return self.estimator_
+
     def _fit(
         self,
         X,
@@ -556,14 +585,21 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         if check_input:
             X, y = check_X_y(X, y, multi_output=True)
 
-        if self.tree_estimator is None:
-            self.estimator_ = DecisionTreeClassifier(random_state=self.random_state)
-        else:
-            # XXX: maybe error out if the tree_estimator is already fitted
-            self.estimator_ = clone(self.tree_estimator)
+        self.estimator_ = self._get_estimator()
 
-        # obtain the structure sample weights
-        sample_weights_structure = self._partition_honest_indices(y, sample_weight)
+        # check that all of tree_estimator_params are valid
+        init_params = self.estimator_.__init__.__code__.co_varnames[1:]  # exclude 'self'
+        honest_tree_init_params = self.__init__.__code__.co_varnames[1:]  # exclude 'self'
+        invalid_params = []
+        for param in self._tree_estimator_params.keys():
+            if param not in init_params or param in honest_tree_init_params:
+                invalid_params.append(param)
+
+        if invalid_params:
+            raise ValueError(
+                f"Invalid parameter(s) for estimator {self.estimator_.__class__.__name__}: "
+                f'{", ".join(invalid_params)}'
+            )
 
         self.estimator_.set_params(
             **dict(
@@ -593,6 +629,9 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
             from warnings import warn
 
             warn("Using sklearn tree so store_leaf_values cannot be set.")
+
+        # obtain the structure sample weights
+        sample_weights_structure = self._partition_honest_indices(y, sample_weight)
 
         # Learn structure on subsample
         # XXX: this allows us to use BaseDecisionTree without partial_fit API

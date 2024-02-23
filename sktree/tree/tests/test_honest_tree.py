@@ -9,6 +9,7 @@ from sklearn.utils.estimator_checks import parametrize_with_checks
 from sktree._lib.sklearn.tree import DecisionTreeClassifier
 from sktree.tree import (
     HonestTreeClassifier,
+    MultiViewDecisionTreeClassifier,
     ObliqueDecisionTreeClassifier,
     PatchObliqueDecisionTreeClassifier,
 )
@@ -60,6 +61,38 @@ def test_toy_accuracy():
     y = [0] * 10 + [1] * 10
     clf = clf.fit(X, y)
     np.testing.assert_array_equal(clf.predict(X), y)
+
+
+def test_honest_tree_with_tree_estimator_params():
+    X = np.ones((20, 4))
+    X[10:] *= -1
+    y = [0] * 10 + [1] * 10
+
+    # test with a parameter that is a repeat of an init parameter
+    clf = HonestTreeClassifier(
+        tree_estimator=DecisionTreeClassifier(),
+        random_state=0,
+        feature_set_ends=[10, 20],
+    )
+    with pytest.raises(ValueError, match=r"Invalid parameter\(s\)"):
+        clf.fit(X, y)
+
+    # test with a parameter that is not in any init signature
+    clf = HonestTreeClassifier(
+        tree_estimator=MultiViewDecisionTreeClassifier(),
+        random_state=0,
+        blah=0,
+    )
+    with pytest.raises(ValueError, match=r"Invalid parameter\(s\)"):
+        clf.fit(X, y)
+
+    # passing in a valid argument to the tree_estimator should work
+    clf = HonestTreeClassifier(
+        tree_estimator=MultiViewDecisionTreeClassifier(),
+        random_state=0,
+        feature_set_ends=[10, 20],
+    )
+    clf.fit(X, y)
 
 
 @pytest.mark.parametrize(

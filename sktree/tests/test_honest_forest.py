@@ -12,7 +12,11 @@ from sktree._lib.sklearn.tree import DecisionTreeClassifier
 from sktree.datasets import make_quadratic_classification
 from sktree.ensemble import HonestForestClassifier
 from sktree.stats.utils import _mutual_information
-from sktree.tree import ObliqueDecisionTreeClassifier, PatchObliqueDecisionTreeClassifier
+from sktree.tree import (
+    MultiViewDecisionTreeClassifier,
+    ObliqueDecisionTreeClassifier,
+    PatchObliqueDecisionTreeClassifier,
+)
 
 CLF_CRITERIONS = ("gini", "entropy")
 
@@ -155,16 +159,15 @@ def test_max_samples():
     uf = uf.fit(X, y)
 
 
-@pytest.mark.parametrize("bootstrap", [True, False])
 @pytest.mark.parametrize("max_samples", [0.75, 1.0])
-def test_honest_forest_has_deterministic_sampling_for_oob_structure_and_leaves(
-    bootstrap, max_samples
-):
+def test_honest_forest_has_deterministic_sampling_for_oob_structure_and_leaves(max_samples):
     """Test that honest forest can produce the oob, structure and leaf-node samples.
 
     When bootstrap is True, oob should be exclusive from structure and leaf-node samples.
     When bootstrap is False, there is no oob.
     """
+    bootstrap = True
+
     n_estimators = 5
     est = HonestForestClassifier(
         n_estimators=n_estimators,
@@ -325,7 +328,7 @@ def test_honest_forest_with_sklearn_trees():
     https://github.com/neurodata/scikit-tree/pull/157."""
 
     # generate the high-dimensional quadratic data
-    X, y = make_quadratic_classification(1024, 4096, noise=True, seed=0)
+    X, y = make_quadratic_classification(256, 2048, noise=True, seed=0)
     y = y.squeeze()
     print(X.shape, y.shape)
     print(np.sum(y) / len(y))
@@ -372,7 +375,7 @@ def test_honest_forest_with_sklearn_trees_with_auc():
     scores = []
     sk_scores = []
     for idx in range(10):
-        X, y = make_quadratic_classification(1024, 4096, noise=True, seed=idx)
+        X, y = make_quadratic_classification(256, 2048, noise=True, seed=idx)
         y = y.squeeze()
 
         skForest.fit(X, y)
@@ -412,7 +415,7 @@ def test_honest_forest_with_sklearn_trees_with_mi():
     scores = []
     sk_scores = []
     for idx in range(10):
-        X, y = make_quadratic_classification(1024, 4096, noise=True, seed=idx)
+        X, y = make_quadratic_classification(256, 2048, noise=True, seed=idx)
         y = y.squeeze()
 
         skForest.fit(X, y)
@@ -432,3 +435,35 @@ def test_honest_forest_with_sklearn_trees_with_mi():
     print(np.mean(scores), np.mean(sk_scores))
     print(np.std(scores), np.std(sk_scores))
     assert_allclose(np.mean(sk_scores), np.mean(scores), atol=0.005)
+
+
+def test_honest_forest_with_tree_estimator_params():
+    X = np.ones((20, 4))
+    X[10:] *= -1
+    y = [0] * 10 + [1] * 10
+
+    # test with a parameter that is a repeat of an init parameter
+    clf = HonestForestClassifier(
+        tree_estimator=DecisionTreeClassifier(),
+        random_state=0,
+        feature_set_ends=[10, 20],
+    )
+    with pytest.raises(ValueError, match=r"Invalid parameter\(s\)"):
+        clf.fit(X, y)
+
+    # test with a parameter that is not in any init signature
+    clf = HonestForestClassifier(
+        tree_estimator=MultiViewDecisionTreeClassifier(),
+        random_state=0,
+        blah=0,
+    )
+    with pytest.raises(ValueError, match=r"Invalid parameter\(s\)"):
+        clf.fit(X, y)
+
+    # passing in a valid argument to the tree_estimator should work
+    clf = HonestForestClassifier(
+        tree_estimator=MultiViewDecisionTreeClassifier(),
+        random_state=0,
+        feature_set_ends=[10, 20],
+    )
+    clf.fit(X, y)

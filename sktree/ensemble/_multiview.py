@@ -3,9 +3,12 @@ from sklearn.utils._param_validation import StrOptions
 from .._lib.sklearn.ensemble._forest import ForestClassifier
 from ..tree import MultiViewDecisionTreeClassifier
 from ..tree._neighbors import SimMatrixMixin
+from ._extensions import ForestClassifierMixin, ForestMixin
 
 
-class MultiViewRandomForestClassifier(SimMatrixMixin, ForestClassifier):
+class MultiViewRandomForestClassifier(
+    SimMatrixMixin, ForestClassifierMixin, ForestMixin, ForestClassifier
+):
     """
     A multi-view axis-aligned random forest classifier.
 

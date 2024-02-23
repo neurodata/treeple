@@ -1,8 +1,10 @@
 from typing import Optional, Tuple
 
 import numpy as np
+from joblib import Parallel, delayed
 from numpy.typing import ArrayLike
 from scipy.stats import entropy
+from sklearn.ensemble._forest import _generate_unsampled_indices, _get_n_samples_bootstrap
 from sklearn.metrics import (
     balanced_accuracy_score,
     mean_absolute_error,
@@ -10,9 +12,9 @@ from sklearn.metrics import (
     roc_auc_score,
     roc_curve,
 )
-from sklearn.utils.validation import check_X_y, check_is_fitted
-from sklearn.ensemble._forest import _generate_unsampled_indices, _get_n_samples_bootstrap
-from sktree._lib.sklearn.ensemble._forest import ForestClassifier, BaseForest
+from sklearn.utils.validation import check_is_fitted, check_X_y
+
+from sktree._lib.sklearn.ensemble._forest import BaseForest, ForestClassifier
 
 
 def _mutual_information(y_true: ArrayLike, y_pred_proba: ArrayLike) -> float:
@@ -67,7 +69,7 @@ def _cond_entropy(y_true: ArrayLike, y_pred_proba: ArrayLike) -> float:
 
 
 # Define function to compute the sensitivity at 98% specificity
-def _SAS98(y_true: ArrayLike, y_pred_proba: ArrayLike, max_fpr=0.02) -> float:
+def _SA98(y_true: ArrayLike, y_pred_proba: ArrayLike, max_fpr=0.02) -> float:
     """Compute the sensitivity at 98% specificity.
 
     Parameters
@@ -81,7 +83,7 @@ def _SAS98(y_true: ArrayLike, y_pred_proba: ArrayLike, max_fpr=0.02) -> float:
     Returns
     -------
     float :
-        The estimated SAS98.
+        The estimated SA98.
     """
     if y_true.squeeze().ndim != 1:
         raise ValueError(f"y_true must be 1d, not {y_true.shape}")
@@ -104,12 +106,12 @@ METRIC_FUNCTIONS = {
     "auc": roc_auc_score,
     "mi": _mutual_information,
     "cond_entropy": _cond_entropy,
-    "s@s98": _SAS98,
+    "s@98": _SA98,
 }
 
-POSTERIOR_FUNCTIONS = ("mi", "auc", "cond_entropy", "s@s98")
+POSTERIOR_FUNCTIONS = ("mi", "auc", "cond_entropy", "s@98")
 
-POSITIVE_METRICS = ("mi", "auc", "balanced_accuracy", "s@s98")
+POSITIVE_METRICS = ("mi", "auc", "balanced_accuracy", "s@98")
 
 REGRESSOR_METRICS = ("mse", "mae")
 
@@ -203,6 +205,7 @@ def _compute_null_distribution_coleman(
     metric: str = "mse",
     n_repeats: int = 1000,
     seed: Optional[int] = None,
+    n_jobs: Optional[int] = None,
     **metric_kwargs,
 ) -> Tuple[ArrayLike, ArrayLike]:
     """Compute null distribution using Coleman method.
@@ -237,9 +240,6 @@ def _compute_null_distribution_coleman(
     metric_star_pi : ArrayLike of shape (n_samples,)
         An array of the metrics computed on the other half of the trees.
     """
-    rng = np.random.default_rng(seed)
-    metric_func = METRIC_FUNCTIONS[metric]
-
     # sample two sets of equal number of trees from the combined forest these are the posteriors
     # (n_estimators * 2, n_samples, n_outputs)
     all_y_pred = np.concatenate((y_pred_proba_normal, y_pred_proba_perm), axis=0)
@@ -257,49 +257,80 @@ def _compute_null_distribution_coleman(
 
     metric_star = np.zeros((n_repeats,))
     metric_star_pi = np.zeros((n_repeats,))
-    for idx in range(n_repeats):
-        # two sets of random indices from 1 : 2N are sampled using Fisher-Yates
-        rng.shuffle(y_pred_ind_arr)
 
-        # get random half of the posteriors from two sets of trees
-        first_forest_inds = y_pred_ind_arr[: n_estimators // 2]
-        second_forest_inds = y_pred_ind_arr[n_estimators // 2 :]
-
-        # get random half of the posteriors as one forest
-        first_forest_pred = all_y_pred[first_forest_inds, ...]
-        second_forest_pred = all_y_pred[second_forest_inds, ...]
-
-        # determine if there are any nans in the final posterior array, when
-        # averaged over the trees
-        first_forest_samples = _non_nan_samples(first_forest_pred)
-        second_forest_samples = _non_nan_samples(second_forest_pred)
-
-        # todo: is this step necessary?
-        # non_nan_samples = np.intersect1d(
-        #     first_forest_samples, second_forest_samples, assume_unique=True
-        # )
-        # now average the posteriors over the trees for the non-nan samples
-        # y_pred_first_half = np.nanmean(first_forest_pred[:, non_nan_samples, :], axis=0)
-        # y_pred_second_half = np.nanmean(second_forest_pred[:, non_nan_samples, :], axis=0)
-        # # compute two instances of the metric from the sampled trees
-        # first_half_metric = metric_func(y_test[non_nan_samples, :], y_pred_first_half)
-        # second_half_metric = metric_func(y_test[non_nan_samples, :], y_pred_second_half)
-
-        y_pred_first_half = np.nanmean(first_forest_pred[:, first_forest_samples, :], axis=0)
-        y_pred_second_half = np.nanmean(second_forest_pred[:, second_forest_samples, :], axis=0)
-
-        # compute two instances of the metric from the sampled trees
-        first_half_metric = metric_func(
-            y_test[first_forest_samples, :], y_pred_first_half, **metric_kwargs
+    # generate the random seeds for the parallel jobs
+    ss = np.random.SeedSequence(seed)
+    out = Parallel(n_jobs=n_jobs)(
+        delayed(_parallel_build_null_forests)(
+            y_pred_ind_arr,
+            n_estimators,
+            all_y_pred,
+            y_test,
+            seed,
+            metric,
+            **metric_kwargs,
         )
-        second_half_metric = metric_func(
-            y_test[second_forest_samples, :], y_pred_second_half, **metric_kwargs
-        )
+        for i, seed in zip(range(n_repeats), ss.spawn(n_repeats))
+    )
 
+    for idx, (first_half_metric, second_half_metric) in enumerate(out):
         metric_star[idx] = first_half_metric
         metric_star_pi[idx] = second_half_metric
 
     return metric_star, metric_star_pi
+
+
+def _parallel_build_null_forests(
+    index_arr: ArrayLike,
+    n_estimators: int,
+    all_y_pred: ArrayLike,
+    y_test: ArrayLike,
+    seed: int,
+    metric: str,
+    **metric_kwargs: dict,
+):
+    """Randomly sample two sets of forests and compute the metric on each."""
+    rng = np.random.default_rng(seed)
+    metric_func = METRIC_FUNCTIONS[metric]
+
+    # two sets of random indices from 1 : 2N are sampled using Fisher-Yates
+    rng.shuffle(index_arr)
+
+    # get random half of the posteriors from two sets of trees
+    first_forest_inds = index_arr[: n_estimators // 2]
+    second_forest_inds = index_arr[n_estimators // 2 :]
+
+    # get random half of the posteriors as one forest
+    first_forest_pred = all_y_pred[first_forest_inds, ...]
+    second_forest_pred = all_y_pred[second_forest_inds, ...]
+
+    # determine if there are any nans in the final posterior array, when
+    # averaged over the trees
+    first_forest_samples = _non_nan_samples(first_forest_pred)
+    second_forest_samples = _non_nan_samples(second_forest_pred)
+
+    # todo: is this step necessary?
+    # non_nan_samples = np.intersect1d(
+    #     first_forest_samples, second_forest_samples, assume_unique=True
+    # )
+    # now average the posteriors over the trees for the non-nan samples
+    # y_pred_first_half = np.nanmean(first_forest_pred[:, non_nan_samples, :], axis=0)
+    # y_pred_second_half = np.nanmean(second_forest_pred[:, non_nan_samples, :], axis=0)
+    # # compute two instances of the metric from the sampled trees
+    # first_half_metric = metric_func(y_test[non_nan_samples, :], y_pred_first_half)
+    # second_half_metric = metric_func(y_test[non_nan_samples, :], y_pred_second_half)
+
+    y_pred_first_half = np.nanmean(first_forest_pred[:, first_forest_samples, :], axis=0)
+    y_pred_second_half = np.nanmean(second_forest_pred[:, second_forest_samples, :], axis=0)
+
+    # compute two instances of the metric from the sampled trees
+    first_half_metric = metric_func(
+        y_test[first_forest_samples, :], y_pred_first_half, **metric_kwargs
+    )
+    second_half_metric = metric_func(
+        y_test[second_forest_samples, :], y_pred_second_half, **metric_kwargs
+    )
+    return first_half_metric, second_half_metric
 
 
 def get_per_tree_oob_samples(est: BaseForest):

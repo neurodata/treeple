@@ -1,16 +1,15 @@
-from typing import Callable, Optional, Tuple, Union
-
-
 import threading
-from sklearn.ensemble._base import _partition_estimators
+from collections import namedtuple
+from typing import Callable, Optional, Tuple, Union
 
 import numpy as np
 from joblib import Parallel, delayed
 from numpy.typing import ArrayLike
 from sklearn.base import MetaEstimatorMixin, clone, is_classifier
+from sklearn.ensemble._base import _partition_estimators
 from sklearn.ensemble._forest import ForestClassifier as sklearnForestClassifier
 from sklearn.ensemble._forest import ForestRegressor as sklearnForestRegressor
-from sklearn.model_selection import train_test_split, StratifiedKFold
+from sklearn.model_selection import StratifiedKFold, train_test_split
 from sklearn.utils.multiclass import type_of_target
 from sklearn.utils.validation import _is_fitted, check_X_y
 
@@ -26,7 +25,7 @@ from ..ensemble._honest_forest import HonestForestClassifier
 from ..experimental import conditional_resample
 from ..tree import DecisionTreeClassifier, DecisionTreeRegressor
 from ..tree._classes import DTYPE
-
+from .permuteforest import PermutationHonestForestClassifier
 from .utils import (
     METRIC_FUNCTIONS,
     POSITIVE_METRICS,
@@ -1215,24 +1214,39 @@ def _parallel_predict_proba_oob(predict_proba, X, out, idx, test_idx, lock):
     return prediction
 
 
+ForestTestResult = namedtuple(
+    "ForestTestResult", ["observe_test_stat", "permuted_stat", "observe_stat", "pvalue"]
+)
+
+
 def build_coleman_forest(
     est,
+    perm_est,
     X,
     y,
     covariate_index=None,
-    metric="s@s98",
-    n_repeats=1000,
+    metric="s@98",
+    n_repeats=10_000,
     verbose=False,
     seed=None,
     return_posteriors=True,
     **metric_kwargs,
 ):
-    """Build a hypothesis testing forest using oob samples.
+    """Build a hypothesis testing forest using a two-forest approach.
+
+    The two-forest approach stems from the Coleman et al. 2022 paper, where
+    two forests are trained: one on the original dataset, and one on the
+    permuted dataset. The dataset is either permuted once, or independently for
+    each tree in the permuted forest. The original test statistic is computed by
+    comparing the metric on both forests ``(metric_forest - metric_perm_forest)``.
+    For full details, see :footcite:`coleman2022scalable`.
 
     Parameters
     ----------
     est : Forest
         The type of forest to use. Must be enabled with ``bootstrap=True``.
+    perm_est : Forest
+        The forest to use for the permuted dataset.
     X : ArrayLike of shape (n_samples, n_features)
         Data.
     y : ArrayLike of shape (n_samples, n_outputs)
@@ -1240,11 +1254,13 @@ def build_coleman_forest(
     covariate_index : ArrayLike, optional of shape (n_covariates,)
         The index array of covariates to shuffle, by default None.
     metric : str, optional
-        The metric to compute, by default "s@s98", for sensitivity at
+        The metric to compute, by default "s@98", for sensitivity at
         98% specificity.
     n_repeats : int, optional
         Number of times to bootstrap sample the two forests to construct
-        the null distribution, by default 1000.
+        the null distribution, by default 10000. The construction of the
+        null forests will be parallelized according to the ``n_jobs``
+        argument of the ``est`` forest.
     verbose : bool, optional
         Verbosity, by default False.
     seed : int, optional
@@ -1267,28 +1283,29 @@ def build_coleman_forest(
     perm_forest_proba : ArrayLike of shape (n_estimators, n_samples, n_outputs)
         The predicted posterior probabilities for each of the permuted estimators
         on their out of bag samples.
+
+    References
+    ----------
+    .. footbibliography::
     """
-    rng = np.random.default_rng(seed)
     metric_func: Callable[[ArrayLike, ArrayLike], float] = METRIC_FUNCTIONS[metric]
 
     if covariate_index is None:
         covariate_index = np.arange(X.shape[1], dtype=int)
 
-    # perform permutation of covariates
-    # TODO: refactor permutations into the HonestForest(?)
-    n_samples_train = X.shape[0]
-    index_arr = rng.choice(
-        np.arange(n_samples_train, dtype=int),
-        size=(n_samples_train, 1),
-        replace=False,
-        shuffle=True,
-    )
-    X_permute = X.copy()
-    X_permute[:, covariate_index] = X_permute[index_arr, covariate_index]
+    if not isinstance(perm_est, PermutationHonestForestClassifier):
+        raise RuntimeError(
+            f"Permutation forest must be a PermutationHonestForestClassifier, got {type(perm_est)}"
+        )
 
     # build two sets of forests
-    orig_est, orig_forest_proba = build_hyppo_oob_forest(est, X, y, verbose=verbose)
-    perm_est, perm_forest_proba = build_hyppo_oob_forest(est, X_permute, y, verbose=verbose)
+    est, orig_forest_proba = build_hyppo_oob_forest(est, X, y, verbose=verbose)
+    perm_est, perm_forest_proba = build_hyppo_oob_forest(
+        perm_est, X, y, verbose=verbose, covariate_index=covariate_index
+    )
+
+    # get the number of jobs
+    n_jobs = est.n_jobs
 
     metric_star, metric_star_pi = _compute_null_distribution_coleman(
         y,
@@ -1297,6 +1314,7 @@ def build_coleman_forest(
         metric,
         n_repeats=n_repeats,
         seed=seed,
+        n_jobs=n_jobs,
         **metric_kwargs,
     )
 
@@ -1318,18 +1336,136 @@ def build_coleman_forest(
     else:
         pvalue = (1 + (null_dist >= observe_test_stat).sum()) / (1 + n_repeats)
 
+    forest_result = ForestTestResult(observe_test_stat, permute_stat, observe_stat, pvalue)
     if return_posteriors:
-        return observe_test_stat, pvalue, orig_forest_proba, perm_forest_proba
+        return forest_result, orig_forest_proba, perm_forest_proba, est, perm_est
     else:
-        return observe_test_stat, pvalue
+        return forest_result
 
 
-def build_hyppo_oob_forest(
+def build_permutation_forest(
     est,
+    perm_est,
     X,
     y,
+    covariate_index=None,
+    metric="s@98",
+    n_repeats=500,
     verbose=False,
+    seed=None,
+    return_posteriors=True,
+    **metric_kwargs,
 ):
+    """Build a hypothesis testing forest using a permutation-forest approach.
+
+    The permutation-forest approach stems from standard permutaiton-testing, where
+    each forest is trained on a new permutation of the dataset. The original test
+    statistic is computed on the original data. Then the pvalue is computed
+    by comparing the original test statistic to the null distribution of the
+    test statistic computed from the permuted forests.
+
+    Parameters
+    ----------
+    est : Forest
+        The type of forest to use. Must be enabled with ``bootstrap=True``.
+    perm_est : Forest
+        The forest to use for the permuted dataset. Should be
+        ``PermutationHonestForestClassifier``.
+    X : ArrayLike of shape (n_samples, n_features)
+        Data.
+    y : ArrayLike of shape (n_samples, n_outputs)
+        Binary target, so ``n_outputs`` should be at most 1.
+    covariate_index : ArrayLike, optional of shape (n_covariates,)
+        The index array of covariates to shuffle, by default None.
+    metric : str, optional
+        The metric to compute, by default "s@98", for sensitivity at
+        98% specificity.
+    n_repeats : int, optional
+        Number of times to bootstrap sample the two forests to construct
+        the null distribution, by default 10000. The construction of the
+        null forests will be parallelized according to the ``n_jobs``
+        argument of the ``est`` forest.
+    verbose : bool, optional
+        Verbosity, by default False.
+    seed : int, optional
+        Random seed, by default None.
+    return_posteriors : bool, optional
+        Whether or not to return the posteriors, by default False.
+    **metric_kwargs : dict, optional
+        Additional keyword arguments to pass to the metric function.
+
+    Returns
+    -------
+    observe_stat : float
+        The test statistic. To compute the test statistic, take
+        ``permute_stat_`` and subtract ``observe_stat_``.
+    pvalue : float
+        The p-value of the test statistic.
+    orig_forest_proba : ArrayLike of shape (n_estimators, n_samples, n_outputs)
+        The predicted posterior probabilities for each estimator on their
+        out of bag samples.
+    perm_forest_proba : ArrayLike of shape (n_estimators, n_samples, n_outputs)
+        The predicted posterior probabilities for each of the permuted estimators
+        on their out of bag samples.
+
+    References
+    ----------
+    .. footbibliography::
+    """
+    rng = np.random.default_rng(seed)
+    metric_func: Callable[[ArrayLike, ArrayLike], float] = METRIC_FUNCTIONS[metric]
+
+    if covariate_index is None:
+        covariate_index = np.arange(X.shape[1], dtype=int)
+
+    if not isinstance(perm_est, PermutationHonestForestClassifier):
+        raise RuntimeError(
+            f"Permutation forest must be a PermutationHonestForestClassifier, got {type(perm_est)}"
+        )
+
+    # train the original forest on unpermuted data
+    est, orig_forest_proba = build_hyppo_oob_forest(est, X, y, verbose=verbose)
+    y_pred_proba_orig = np.nanmean(orig_forest_proba, axis=0)
+    observe_test_stat = metric_func(y, y_pred_proba_orig, **metric_kwargs)
+
+    # get the number of jobs
+    index_arr = np.arange(X.shape[0], dtype=int).reshape(-1, 1)
+
+    # train many null forests
+    X_perm = X.copy()
+    null_dist = []
+    for _ in range(n_repeats):
+        rng.shuffle(index_arr)
+        perm_X_cov = X_perm[index_arr, covariate_index]
+        X_perm[:, covariate_index] = perm_X_cov
+
+        #
+        perm_est = clone(perm_est)
+        perm_est.set_params(random_state=rng.integers(0, np.iinfo(np.int32).max))
+
+        perm_est, perm_forest_proba = build_hyppo_oob_forest(
+            perm_est, X_perm, y, verbose=verbose, covariate_index=covariate_index
+        )
+
+        y_pred_proba_perm = np.nanmean(perm_forest_proba, axis=0)
+        permute_stat = metric_func(y, y_pred_proba_perm, **metric_kwargs)
+        null_dist.append(permute_stat)
+
+    # compute pvalue, which note is opposite that of the Coleman approach, since
+    # we are testing if the null distribution results in a test statistic greater
+    if metric in POSITIVE_METRICS:
+        pvalue = (1 + (null_dist >= observe_test_stat).sum()) / (1 + n_repeats)
+    else:
+        pvalue = (1 + (null_dist <= observe_test_stat).sum()) / (1 + n_repeats)
+
+    forest_result = ForestTestResult(observe_test_stat, permute_stat, None, pvalue)
+    if return_posteriors:
+        return forest_result, orig_forest_proba, perm_forest_proba
+    else:
+        return forest_result
+
+
+def build_hyppo_oob_forest(est, X, y, verbose=False, **est_kwargs):
     """Build a hypothesis testing forest using oob samples.
 
     Parameters
@@ -1342,6 +1478,8 @@ def build_hyppo_oob_forest(
         Binary target, so ``n_outputs`` should be at most 1.
     verbose : bool, optional
         Verbosity, by default False.
+    **est_kwargs : dict, optional
+        Additional keyword arguments to pass to the forest estimator.
 
     Returns
     -------
@@ -1352,11 +1490,11 @@ def build_hyppo_oob_forest(
         out of bag samples.
     """
     assert est.bootstrap
-
+    assert type_of_target(y) in ("binary")
     est = clone(est)
 
     # build forest
-    est.fit(X, y)
+    est.fit(X, y.ravel(), **est_kwargs)
 
     # now evaluate
     X = est._validate_X_predict(X)

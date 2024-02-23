@@ -150,9 +150,11 @@ tree models.
    PermutationForestClassifier
    PermutationForestRegressor
    build_coleman_forest
+   build_permutation_forest
    build_hyppo_oob_forest
    build_hyppo_cv_forest
-
+   PermutationHonestForestClassifier
+   
 Datasets
 ------------------------------
 We provide some convenience functions for simulating datasets beyond
@@ -166,6 +168,8 @@ those offered in scikit-learn.
    make_joint_factor_model
    make_quadratic_classification
    make_trunk_classification
+   make_trunk_mixture_classification
+   make_marron_wand_classification
    approximate_clf_mutual_information
    approximate_clf_mutual_information_with_monte_carlo
 

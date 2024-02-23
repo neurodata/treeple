@@ -1,8 +1,9 @@
-import pytest
 import numpy as np
+import pytest
 from numpy.testing import assert_array_equal
-from sktree.stats.utils import get_per_tree_oob_samples
+
 from sktree import HonestForestClassifier
+from sktree.stats.utils import get_per_tree_oob_samples
 
 seed = 1234
 rng = np.random.default_rng(seed)

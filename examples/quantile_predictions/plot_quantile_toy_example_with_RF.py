@@ -8,6 +8,8 @@ quantile predictions such as conditional median and prediction intervals.
 The example compares the predictions to a ground truth function used
 to generate noisy samples.
 
+This example was heavily inspired by `quantile-forest <https://github.com/zillow/quantile-forest>`_
+package. See their package `here <https://zillow.github.io/quantile-forest/>`_.
 """
 
 from collections import defaultdict

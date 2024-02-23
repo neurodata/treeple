@@ -1,11 +1,13 @@
 """
 ==============================================================
-Quantile regression vs. standard and oblique regression forest
+Quantile regression with oblique regression forest
 ==============================================================
 
 An example to generate quantile predictions using an oblique random forest
 instance on a synthetic, right-skewed dataset.
 
+This example was heavily inspired by `quantile-forest <https://github.com/zillow/quantile-forest>`_
+package. See their package `here <https://zillow.github.io/quantile-forest/>`_.
 """
 
 from collections import defaultdict
