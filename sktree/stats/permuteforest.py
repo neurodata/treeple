@@ -192,6 +192,10 @@ class PermutationHonestForestClassifier(HonestForestClassifier):
     permute_per_tree : bool
         Whether or not to permute the dataset per tree. By default False.
 
+    **tree_estimator_params : dict
+        Parameters to pass to the underlying base tree estimators.
+        These must be parameters for ``tree_estimator``.
+        
     Attributes
     ----------
     estimator : sktree.tree.HonestTreeClassifier
@@ -297,6 +301,7 @@ class PermutationHonestForestClassifier(HonestForestClassifier):
         tree_estimator=None,
         stratify=False,
         permute_per_tree=False,
+        **tree_estimator_params,
     ):
         super().__init__(
             n_estimators,
@@ -322,6 +327,7 @@ class PermutationHonestForestClassifier(HonestForestClassifier):
             honest_fraction,
             tree_estimator,
             stratify,
+            **tree_estimator_params,
         )
         self.permute_per_tree = permute_per_tree
 
@@ -440,8 +446,8 @@ class PermutationHonestForestClassifier(HonestForestClassifier):
                 )
             )
         else:
-            perm_idx = random_state.choice(
-                self._n_samples, size=(self._n_samples, 1), replace=False
+            perm_idx = np.array(
+                random_state.choice(self._n_samples, size=(self._n_samples, 1), replace=False)
             )
             X[:, self.covariate_index_] = X[perm_idx, self.covariate_index_]
             self.permutation_indices_ = perm_idx
@@ -468,4 +474,4 @@ class PermutationHonestForestClassifier(HonestForestClassifier):
                 for i, t in enumerate(trees)
             )
 
-        return trees
+        self.estimators_.extend(trees)

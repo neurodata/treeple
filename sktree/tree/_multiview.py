@@ -573,8 +573,6 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         #  - self.max_features_arr contains a possible array-like setting of max_features
         self._max_features_arr = self.max_features
         self.max_features = None
-        self = super()._fit(
-            X, y, sample_weight, check_input, missing_values_in_feature_mask, classes
-        )
+        super()._fit(X, y, sample_weight, check_input, missing_values_in_feature_mask, classes)
         self.max_features = self._max_features_arr
         return self

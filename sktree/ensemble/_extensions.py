@@ -1,5 +1,4 @@
 import threading
-from numbers import Integral, Real
 
 import numpy as np
 from joblib import Parallel, delayed
@@ -7,6 +6,7 @@ from sklearn.ensemble._base import _partition_estimators
 from sklearn.utils import check_random_state
 from sklearn.utils.validation import check_is_fitted
 
+from .._lib.sklearn.ensemble._forest import _get_n_samples_bootstrap
 from ..tree._classes import DTYPE
 
 
@@ -47,45 +47,10 @@ def _generate_sample_indices(random_state, n_samples, n_samples_bootstrap, boots
     XXX: this is copied over from scikit-learn and modified to allow sampling with
     and without replacement given ``bootstrap``.
     """
-
     random_instance = check_random_state(random_state)
     n_sample_idx = np.arange(0, n_samples, dtype=np.int32)
     sample_indices = random_instance.choice(n_sample_idx, n_samples_bootstrap, replace=bootstrap)
-
     return sample_indices
-
-
-def _get_n_samples_bootstrap(n_samples, max_samples):
-    """
-    Get the number of samples in a bootstrap sample.
-
-    XXX: Note this is copied from sklearn. We override the ability
-    to sample a higher number of bootstrap samples to enable sampling
-    closer to 80% unique training data points for in-bag computation.
-
-    Parameters
-    ----------
-    n_samples : int
-        Number of samples in the dataset.
-    max_samples : int or float
-        The maximum number of samples to draw from the total available:
-            - if float, this indicates a fraction of the total;
-            - if int, this indicates the exact number of samples;
-            - if None, this indicates the total number of samples.
-
-    Returns
-    -------
-    n_samples_bootstrap : int
-        The total number of samples to draw for the bootstrap sample.
-    """
-    if max_samples is None:
-        return n_samples
-
-    if isinstance(max_samples, Integral):
-        return max_samples
-
-    if isinstance(max_samples, Real):
-        return round(n_samples * max_samples)
 
 
 class ForestMixin:
@@ -98,7 +63,7 @@ class ForestMixin:
         Only utilized if ``bootstrap=True``, otherwise, all samples are "in-bag".
         """
         if self.bootstrap is False and (
-            self._n_samples_bootstrap == self._n_samples or self._n_samples_bootstrap is None
+            self._n_samples_bootstrap is None or (self._n_samples_bootstrap == self._n_samples)
         ):
             raise RuntimeError(
                 "Cannot extract out-of-bag samples when bootstrap is False and "

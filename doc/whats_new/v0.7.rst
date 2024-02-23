@@ -30,6 +30,10 @@ Changelog
 - |API| :func:`sktree.datasets.make_trunk_classification` for generating trunk mixture and Marron-Wand
     simulations are separated out into :func:`sktree.datasets.make_marron_wand_classification` and
     :func:`sktree.datasets.make_trunk_mixture_classification`, `Adam Li`_ (:pr:`#227`)
+- |API| :class:`sktree.HonestForestClassifier` and :class:`sktree.tree.HonestTreeClassifier`
+    now overwrite all parameters set by the underlying ``tree_estimator`` and allow you to directly
+    pass any extra parameters that ``tree_estimator`` has compared to the original
+    :class:`~sklearn.tree.DecisionTreeClassifier`, `Adam Li`_ (:pr:`#228`)
 
 Code and Documentation Contributors
 -----------------------------------
