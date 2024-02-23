@@ -542,12 +542,6 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
             for attr in self.estimators_[0]._inheritable_fitted_attribute:
                 setattr(self, attr, getattr(self.estimators_[0], attr))
 
-        self.classes_ = self.estimators_[0].classes_
-        self.max_features_ = self.estimators_[0].max_features_
-        self.n_classes_ = self.estimators_[0].n_classes_
-        self.n_features_in_ = self.estimators_[0].n_features_in_
-        self.n_outputs_ = self.estimators_[0].n_outputs_
-
     def predict_proba(self, X):
         """
         Predict class probabilities for X.
