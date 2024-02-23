@@ -69,26 +69,23 @@ MARRON_WAND_SIMS = {
 }
 
 
-def make_trunk_classification(
+def make_marron_wand_classification(
     n_samples,
     n_dim=4096,
     n_informative=256,
-    simulation: str = "trunk",
-    m_factor: int = -1,
+    simulation: str = "gaussian",
     rho: int = 0,
     band_type: str = "ma",
     return_params: bool = False,
-    mix: float = 0.5,
     seed=None,
 ):
-    """Generate trunk and/or Marron-Wand datasets.
+    """Generate Marron-Wand binary classification dataset.
 
-    For each dimension in the first distribution, there is a mean of :math:`1 / d`, where
-    ``d`` is the dimensionality. The covariance is the identity matrix.
-    The second distribution has a mean vector that is the negative of the first.
-    As ``d`` increases, the two distributions become closer and closer.
-
-    Full details for the trunk simulation can be found in :footcite:`trunk1982`.
+    The simulation is similar to that of :func:`sktree.datasets.make_trunk_classification`
+    where the first class is generated from a multivariate-Gaussians with mean vector of
+    0's. The second class is generated from a mixture of Gaussians with mean vectors
+    specified by the Marron-Wand simulations, but as the dimensionality increases, the second
+    class distribution approaches the first class distribution by a factor of :math:`1 / sqrt(d)`.
 
     Full details for the Marron-Wand simulations can be found in :footcite:`marron1992exact`.
 
@@ -106,19 +103,174 @@ def make_trunk_classification(
         The informative dimensions. All others for ``n_dim - n_informative``
         are Gaussian noise. Default is 256.
     simulation : str, optional
-        Which simulation to run. Must be: 'trunk', 'trunk_overlap', 'trunk_mix', or one of the
+        Which simulation to run. Must be one of the
         following Marron-Wand simulations: 'gaussian', 'skewed_unimodal', 'strongly_skewed',
         'kurtotic_unimodal', 'outlier', 'bimodal', 'separated_bimodal', 'skewed_bimodal',
         'trimodal', 'claw', 'double_claw', 'asymmetric_claw', 'asymmetric_double_claw',
         'smooth_comb', 'discrete_comb'.
         When calling the Marron-Wand simulations, only the covariance parameters are considered
         (`rho` and `band_type`). Means are taken from :footcite:`marron1992exact`.
-        By default 'trunk'.
-    m_factor : int, optional
-        The multiplicative factor to apply to the mean-vector of the first
-        distribution to obtain the mean-vector of the second distribution.
-        This is only used when ``simulation = trunk``.
-        By default -1.
+        By default 'gaussian'.
+    rho : float, optional
+        The covariance value of the bands. By default 0 indicating, an identity matrix is used.
+    band_type : str
+        The band type to use. For details, see Example 1 and 2 in :footcite:`Bickel_2008`.
+        Either 'ma', or 'ar'.
+    return_params : bool, optional
+        Whether or not to return the distribution parameters of the classes normal distributions.
+    seed : int, optional
+        Random seed, by default None.
+
+    Returns
+    -------
+    X : np.ndarray of shape (n_samples, n_dim), dtype=np.float64
+        Trunk dataset as a dense array.
+    y : np.ndarray of shape (n_samples,), dtype=np.intp
+        Labels of the dataset.
+    G : np.ndarray of shape (n_samples, n_dim), dtype=np.float64
+        The mixture of Gaussians for the Marron-Wand simulations.
+        Returned if ``return_params`` is True.
+    w : np.ndarray of shape (n_dim,), dtype=np.float64
+        The weight vector for the Marron-Wand simulations.
+        Returned if ``return_params`` is True.
+
+    Notes
+    -----
+    **Marron-Wand Simulations**: The Marron-Wand simulations generate two classes of data with the
+    setup specified in the paper.
+
+    Covariance: The covariance matrix among different dimensions is controlled by the ``rho`` parameter
+    and the ``band_type`` parameter. The ``band_type`` parameter controls the type of band to use, while
+    the ``rho`` parameter controls the specific scaling factor for the covariance matrix while going
+    from one dimension to the next.
+
+    For each dimension in the first distribution, there is a mean of :math:`1 / d`, where
+    ``d`` is the dimensionality. The covariance is the identity matrix.
+
+    The second distribution has a mean vector that is the negative of the first.
+    As ``d`` increases, the two distributions become closer and closer.
+    Full details for the trunk simulation can be found in :footcite:`trunk1982`.
+
+    References
+    ----------
+    .. footbibliography::
+    """
+    if n_dim < n_informative:
+        raise ValueError(
+            f"Number of informative dimensions {n_informative} must be less than number "
+            f"of dimensions, {n_dim}"
+        )
+    if simulation not in MARRON_WAND_SIMS.keys():
+        raise ValueError(
+            f"Simulation must be: trunk, trunk_overlap, trunk_mix, {MARRON_WAND_SIMS.keys()}"
+        )
+
+    rng = np.random.default_rng(seed=seed)
+
+    if rho != 0:
+        if band_type == "ma":
+            cov = _moving_avg_cov(n_informative, rho)
+        elif band_type == "ar":
+            cov = _autoregressive_cov(n_informative, rho)
+        else:
+            raise ValueError(f'Band type {band_type} must be one of "ma", or "ar".')
+    else:
+        cov = np.identity(n_informative)
+
+    # speed up computations for large multivariate normal matrix with SVD approximation
+    if n_informative > 1000:
+        mvg_sampling_method = "cholesky"
+    else:
+        mvg_sampling_method = "svd"
+
+    mixture_idx = rng.choice(
+        len(MARRON_WAND_SIMS[simulation]),  # type: ignore
+        size=n_samples // 2,
+        replace=True,
+        p=MARRON_WAND_SIMS[simulation],
+    )
+    # the parameters used for each Gaussian in the mixture for each Marron Wand simulation
+    norm_params = MarronWandSims(n_dim=n_informative, cov=cov)(simulation)
+    G = np.fromiter(
+        (
+            rng.multivariate_normal(*(norm_params[i]), size=1, method=mvg_sampling_method)
+            for i in mixture_idx
+        ),
+        dtype=np.dtype((float, n_informative)),
+    )
+
+    # as the dimensionality of the simulations increasing, we are adding more and
+    # more noise to the data using the w parameter
+    w_vec = np.array([1.0 / np.sqrt(i) for i in range(1, n_informative + 1)])
+    X = np.vstack(
+        (
+            rng.multivariate_normal(
+                np.zeros(n_informative), cov, n_samples // 2, method=mvg_sampling_method
+            ),
+            (1 - w_vec)
+            * rng.multivariate_normal(
+                np.zeros(n_informative), cov, n_samples // 2, method=mvg_sampling_method
+            )
+            + w_vec * G.reshape(n_samples // 2, n_informative),
+        )
+    )
+    if n_dim > n_informative:
+        X = np.hstack((X, rng.normal(loc=0, scale=1, size=(X.shape[0], n_dim - n_informative))))
+
+    y = np.concatenate((np.zeros(n_samples // 2), np.ones(n_samples // 2)))
+
+    if return_params:
+        returns = [X, y]
+        returns += [*list(zip(*norm_params)), G, w_vec]
+        return returns
+    return X, y
+
+
+def make_trunk_mixture_classification(
+    n_samples,
+    n_dim=4096,
+    n_informative=256,
+    mu_0: int = 0,
+    mu_1: int = 1,
+    rho: int = 0,
+    band_type: str = "ma",
+    return_params: bool = False,
+    mix: float = 0.5,
+    seed=None,
+):
+    """Generate trunk mixture binary classification dataset.
+
+    The first class is generated from a multivariate-Gaussians with mean vector of
+    0's. The second class is generated from a mixture of Gaussians with mean vectors
+    specified by ``mu_0`` and ``mu_1``. The mixture is specified by the ``mix`` parameter,
+    which is the probability of the first Gaussian in the mixture.
+
+    For each dimension in the first distribution, there is a mean of :math:`1 / d`, where
+    ``d`` is the dimensionality. The covariance is the identity matrix.
+    The second distribution has a mean vector that is the negative of the first.
+    As ``d`` increases, the two distributions become closer and closer.
+
+    Full details for the trunk simulation can be found in :footcite:`trunk1982`.
+
+    Instead of the identity covariance matrix, one can implement a banded covariance matrix
+    that follows :footcite:`Bickel_2008`.
+
+    Parameters
+    ----------
+    n_samples : int
+        Number of sample to generate.
+    n_dim : int, optional
+        The dimensionality of the dataset and the number of
+        unique labels, by default 4096.
+    n_informative : int, optional
+        The informative dimensions. All others for ``n_dim - n_informative``
+        are Gaussian noise. Default is 256.
+    mu_0 : int, optional
+        The mean of the first distribution. By default -1. The mean of the distribution will decrease
+        by a factor of ``sqrt(i)`` for each dimension ``i``.
+    mu_1 : int, optional
+        The mean of the second distribution. By default 1. The mean of the distribution will decrease
+        by a factor of ``sqrt(i)`` for each dimension ``i``.
     rho : float, optional
         The covariance value of the bands. By default 0 indicating, an identity matrix is used.
     band_type : str
@@ -144,14 +296,168 @@ def make_trunk_classification(
     covs : list of ArrayLike of shape (n_dim, n_dim), dtype=np.float64
         The covariance for each class. Returned if ``return_params`` is True.
     X_mixture : np.ndarray of shape (n_samples, n_dim), dtype=np.float64
-        The mixture of Gaussians for the ``trunk_mix`` simulation.
+        The mixture of Gaussians.
         Returned if ``return_params`` is True.
-    G : np.ndarray of shape (n_samples, n_dim), dtype=np.float64
-        The mixture of Gaussians for the Marron-Wand simulations.
+
+    Notes
+    -----
+    **Trunk**: The trunk simulation decreases the signal-to-noise ratio as the dimensionality
+    increases. This is implemented by decreasing the mean of the distribution by a factor of
+    ``sqrt(i)`` for each dimension ``i``. Thus for instance if the means of distribution one
+    and two are 1 and -1 respectively, the means for the first dimension will be 1 and -1,
+    for the second dimension will be 1/sqrt(2) and -1/sqrt(2), and so on.
+
+    **Trunk Mix**: The trunk mix simulation generates two classes of data with the same covariance
+    matrix. The first class (label 0) is generated from a multivariate-Gaussians with mean vector of
+    zeros and the second class is generated from a mixture of Gaussians with mean vectors
+    specified by ``mu_0`` and ``mu_1``. The mixture is specified by the ``mix`` parameter, which
+    is the probability of the first Gaussian in the mixture.
+
+    Covariance: The covariance matrix among different dimensions is controlled by the ``rho`` parameter
+    and the ``band_type`` parameter. The ``band_type`` parameter controls the type of band to use, while
+    the ``rho`` parameter controls the specific scaling factor for the covariance matrix while going
+    from one dimension to the next.
+
+    References
+    ----------
+    .. footbibliography::
+    """
+    if n_dim < n_informative:
+        raise ValueError(
+            f"Number of informative dimensions {n_informative} must be less than number "
+            f"of dimensions, {n_dim}"
+        )
+    if mix < 0 or mix > 1:  # type: ignore
+        raise ValueError("Mix must be between 0 and 1.")
+
+    rng = np.random.default_rng(seed=seed)
+
+    mu_1_vec = np.array([mu_1 / np.sqrt(i) for i in range(1, n_informative + 1)])
+    mu_0_vec = np.array([mu_0 / np.sqrt(i) for i in range(1, n_informative + 1)])
+
+    if rho != 0:
+        if band_type == "ma":
+            cov = _moving_avg_cov(n_informative, rho)
+        elif band_type == "ar":
+            cov = _autoregressive_cov(n_informative, rho)
+        else:
+            raise ValueError(f'Band type {band_type} must be one of "ma", or "ar".')
+    else:
+        cov = np.identity(n_informative)
+
+    # speed up computations for large multivariate normal matrix with SVD approximation
+    if n_informative > 1000:
+        method = "cholesky"
+    else:
+        method = "svd"
+
+    mixture_idx = rng.choice(2, n_samples // 2, replace=True, shuffle=True, p=[mix, 1 - mix])  # type: ignore
+
+    # When variance is 1, trunk-mix does not look bimodal at low dimensions.
+    # It is set it to (2/3)**2 since that is consistent with Marron and Wand bimodal
+    norm_params = [[mu_0_vec, cov * (2 / 3) ** 2], [mu_1_vec, cov * (2 / 3) ** 2]]
+    X_mixture = np.fromiter(
+        (rng.multivariate_normal(*(norm_params[i]), size=1, method=method) for i in mixture_idx),
+        dtype=np.dtype((float, n_informative)),
+    )
+
+    X = np.vstack(
+        (
+            rng.multivariate_normal(
+                np.zeros(n_informative), cov * (2 / 3) ** 2, n_samples // 2, method=method
+            ),
+            X_mixture.reshape(n_samples // 2, n_informative),
+        )
+    )
+
+    if n_dim > n_informative:
+        X = np.hstack((X, rng.normal(loc=0, scale=1, size=(X.shape[0], n_dim - n_informative))))
+
+    y = np.concatenate((np.zeros(n_samples // 2), np.ones(n_samples // 2)))
+
+    if return_params:
+        returns = [X, y]
+        returns += [*list(zip(*norm_params)), X_mixture]
+        return returns
+    return X, y
+
+
+def make_trunk_classification(
+    n_samples,
+    n_dim=4096,
+    n_informative=256,
+    mu_0: int = 0,
+    mu_1: int = 1,
+    rho: int = 0,
+    band_type: str = "ma",
+    return_params: bool = False,
+    seed=None,
+):
+    """Generate trunk binary classification dataset.
+
+    For each dimension in the first distribution, there is a mean of :math:`1 / d`, where
+    ``d`` is the dimensionality. The covariance is the identity matrix.
+    The second distribution has a mean vector that is the negative of the first.
+    As ``d`` increases, the two distributions become closer and closer.
+
+    Full details for the trunk simulation can be found in :footcite:`trunk1982`.
+
+    Instead of the identity covariance matrix, one can implement a banded covariance matrix
+    that follows :footcite:`Bickel_2008`.
+
+    Parameters
+    ----------
+    n_samples : int
+        Number of sample to generate.
+    n_dim : int, optional
+        The dimensionality of the dataset and the number of
+        unique labels, by default 4096.
+    n_informative : int, optional
+        The informative dimensions. All others for ``n_dim - n_informative``
+        are Gaussian noise. Default is 256.
+    mu_0 : int, optional
+        The mean of the first distribution. By default -1. The mean of the distribution will decrease
+        by a factor of ``sqrt(i)`` for each dimension ``i``.
+    mu_1 : int, optional
+        The mean of the second distribution. By default 1. The mean of the distribution will decrease
+        by a factor of ``sqrt(i)`` for each dimension ``i``.
+    rho : float, optional
+        The covariance value of the bands. By default 0 indicating, an identity matrix is used.
+    band_type : str
+        The band type to use. For details, see Example 1 and 2 in :footcite:`Bickel_2008`.
+        Either 'ma', or 'ar'.
+    return_params : bool, optional
+        Whether or not to return the distribution parameters of the classes normal distributions.
+    seed : int, optional
+        Random seed, by default None.
+
+    Returns
+    -------
+    X : np.ndarray of shape (n_samples, n_dim), dtype=np.float64
+        Trunk dataset as a dense array.
+    y : np.ndarray of shape (n_samples,), dtype=np.intp
+        Labels of the dataset.
+    means : list of ArrayLike of shape (n_dim,), dtype=np.float64
+        The mean vector for each class starting with class 0.
         Returned if ``return_params`` is True.
-    w : np.ndarray of shape (n_dim,), dtype=np.float64
-        The weight vector for the Marron-Wand simulations.
-        Returned if ``return_params`` is True.
+    covs : list of ArrayLike of shape (n_dim, n_dim), dtype=np.float64
+        The covariance for each class. Returned if ``return_params`` is True.
+
+    Notes
+    -----
+    **Trunk**: The trunk simulation decreases the signal-to-noise ratio as the dimensionality
+    increases. This is implemented by decreasing the mean of the distribution by a factor of
+    ``sqrt(i)`` for each dimension ``i``. Thus for instance if the means of distribution one
+    and two are 1 and -1 respectively, the means for the first dimension will be 1 and -1,
+    for the second dimension will be 1/sqrt(2) and -1/sqrt(2), and so on.
+
+    **Trunk Overlap**: The trunk overlap simulation generates two classes of data with the same
+    covariance matrix and mean vector of zeros.
+
+    Covariance: The covariance matrix among different dimensions is controlled by the ``rho`` parameter
+    and the ``band_type`` parameter. The ``band_type`` parameter controls the type of band to use, while
+    the ``rho`` parameter controls the specific scaling factor for the covariance matrix while going
+    from one dimension to the next.
 
     References
     ----------
@@ -164,8 +470,8 @@ def make_trunk_classification(
         )
     rng = np.random.default_rng(seed=seed)
 
-    mu_1 = np.array([1 / np.sqrt(i) for i in range(1, n_informative + 1)])
-    mu_0 = m_factor * mu_1
+    mu_1_vec = np.array([mu_1 / np.sqrt(i) for i in range(1, n_informative + 1)])
+    mu_0_vec = np.array([mu_0 / np.sqrt(i) for i in range(1, n_informative + 1)])
 
     if rho != 0:
         if band_type == "ma":
@@ -177,88 +483,18 @@ def make_trunk_classification(
     else:
         cov = np.identity(n_informative)
 
-    if mix < 0 or mix > 1:
-        raise ValueError("Mix must be between 0 and 1.")
-
     # speed up computations for large multivariate normal matrix with SVD approximation
     if n_informative > 1000:
         method = "cholesky"
     else:
         method = "svd"
 
-    if simulation == "trunk":
-        X = np.vstack(
-            (
-                rng.multivariate_normal(mu_1, cov, n_samples // 2, method=method),
-                rng.multivariate_normal(mu_0, cov, n_samples // 2, method=method),
-            )
+    X = np.vstack(
+        (
+            rng.multivariate_normal(mu_1_vec, cov, n_samples // 2, method=method),
+            rng.multivariate_normal(mu_0_vec, cov, n_samples // 2, method=method),
         )
-    elif simulation == "trunk_overlap":
-        X = np.vstack(
-            (
-                rng.multivariate_normal(
-                    np.zeros(n_informative), cov, n_samples // 2, method=method
-                ),
-                rng.multivariate_normal(
-                    np.zeros(n_informative), cov, n_samples // 2, method=method
-                ),
-            )
-        )
-    elif simulation == "trunk_mix":
-        mixture_idx = rng.choice(2, n_samples // 2, replace=True, shuffle=True, p=[mix, 1 - mix])
-        norm_params = [[mu_0, cov * (2 / 3) ** 2], [mu_1, cov * (2 / 3) ** 2]]
-        X_mixture = np.fromiter(
-            (
-                rng.multivariate_normal(*(norm_params[i]), size=1, method=method)
-                for i in mixture_idx
-            ),
-            dtype=np.dtype((float, n_informative)),
-        )
-
-        X = np.vstack(
-            (
-                rng.multivariate_normal(
-                    np.zeros(n_informative), cov * (2 / 3) ** 2, n_samples // 2, method=method
-                ),
-                X_mixture.reshape(n_samples // 2, n_informative),
-            )
-        )
-    elif simulation in MARRON_WAND_SIMS.keys():
-        mixture_idx = rng.choice(
-            len(MARRON_WAND_SIMS[simulation]),  # type: ignore
-            size=n_samples // 2,
-            replace=True,
-            p=MARRON_WAND_SIMS[simulation],
-        )
-        # the parameters used for each Gaussian in the mixture for each Marron Wand simulation
-        norm_params = MarronWandSims(n_dim=n_informative, cov=cov)(simulation)
-        G = np.fromiter(
-            (
-                rng.multivariate_normal(*(norm_params[i]), size=1, method=method)
-                for i in mixture_idx
-            ),
-            dtype=np.dtype((float, n_informative)),
-        )
-
-        # as the dimensionality of the simulations increasing, we are adding more and
-        # more noise to the data using the w parameter
-        w = mu_1
-        X = np.vstack(
-            (
-                rng.multivariate_normal(
-                    np.zeros(n_informative), cov, n_samples // 2, method=method
-                ),
-                (1 - w)
-                * rng.multivariate_normal(
-                    np.zeros(n_informative), cov, n_samples // 2, method=method
-                )
-                + w * G.reshape(n_samples // 2, n_informative),
-            )
-        )
-    else:
-        raise ValueError(
-            f"Simulation must be: trunk, trunk_overlap, trunk_mix, {MARRON_WAND_SIMS.keys()}"
-        )
+    )
 
     if n_dim > n_informative:
         X = np.hstack((X, rng.normal(loc=0, scale=1, size=(X.shape[0], n_dim - n_informative))))
@@ -267,14 +503,7 @@ def make_trunk_classification(
 
     if return_params:
         returns = [X, y]
-        if simulation == "trunk":
-            returns += [[mu_0, mu_1], [cov, cov]]
-        elif simulation == "trunk-overlap":
-            returns += [[np.zeros(n_informative), np.zeros(n_informative)], [cov, cov]]
-        elif simulation == "trunk-mix":
-            returns += [*list(zip(*norm_params)), X_mixture]
-        else:
-            returns += [*list(zip(*norm_params)), G, w]
+        returns += [[mu_0_vec, mu_1_vec], [cov, cov]]
         return returns
     return X, y
 
