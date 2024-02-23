@@ -63,6 +63,7 @@ repos:
     hooks:
       - id: toml-sort
         files: ^pyproject\.toml$
+        args: ['-i']
 
   # mypy
   - repo: https://github.com/pre-commit/mirrors-mypy

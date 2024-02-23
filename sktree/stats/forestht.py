@@ -1338,7 +1338,7 @@ def build_coleman_forest(
 
     forest_result = ForestTestResult(observe_test_stat, permute_stat, observe_stat, pvalue)
     if return_posteriors:
-        return forest_result, orig_forest_proba, perm_forest_proba
+        return forest_result, orig_forest_proba, perm_forest_proba, est, perm_est
     else:
         return forest_result
 
