@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Compute partial AUC using multi-view MIGHT (MV-MIGHT) &#8212; scikit-tree 0.7.0 documentation</title>
+    <title>Compute partial AUC using multi-view MIGHT (MV-MIGHT) &#8212; scikit-tree 0.8.0dev0 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../_static/documentation_options.js?v=423e15eb"></script>
+    <script src="../../_static/documentation_options.js?v=286c8373"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -51,7 +51,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.2';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/scikit-tree/main/doc/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.7.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -135,7 +135,7 @@
   
   
   
-    <p class="title logo__title">scikit-tree 0.7.0 documentation</p>
+    <p class="title logo__title">scikit-tree 0.8.0dev0 documentation</p>
   
 </a></div>
     
@@ -605,7 +605,7 @@ into a single dataset to perform hypothesis testing.</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Shape of Tree Posteriors for the positive class: </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">posterior_arr</span><span class="o">.</span><span class="n">shape</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ASH-90 / Partial AUC: 0.5239107870686818
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ASH-90 / Partial AUC: 0.5636059846586162
 Shape of Observed Samples: (1000,)
 Shape of Tree Posteriors for the positive class: (125, 1000, 1)
 </pre></div>
@@ -641,7 +641,7 @@ Shape of Tree Posteriors for the positive class: (125, 1000, 1)
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Shape of Tree Posteriors for the positive class: </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">posterior_arr</span><span class="o">.</span><span class="n">shape</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ASH-90 / Partial AUC: 0.5724665198349409
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ASH-90 / Partial AUC: 0.5495303916356548
 Shape of Observed Samples: (1000,)
 Shape of Tree Posteriors for the positive class: (125, 1000, 1)
 </pre></div>
@@ -655,8 +655,8 @@ Shape of Tree Posteriors for the positive class: (125, 1000, 1)
 <p>Tree Posteriors for the positive class: <code class="docutils literal notranslate"><span class="pre">est_mv.observe_posteriors_</span></code>
 (n_trees, n_samples_test, 1)</p>
 <p>True Labels: <code class="docutils literal notranslate"><span class="pre">est_mv.y_true_final_</span></code></p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 7.715 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  386 MB</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 7.471 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  389 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-hypothesis-testing-plot-might-mv-auc-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/bc0f3c3d39ef186c93e85f59521ebd8d/plot_might_mv_auc.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_might_mv_auc.ipynb</span></code></a></p>
