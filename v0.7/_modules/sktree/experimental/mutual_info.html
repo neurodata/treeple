@@ -1,0 +1,977 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-theme="auto">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sktree.experimental.mutual_info &#8212; scikit-tree 0.7.0dev0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "auto";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/style.css?v=42c02ab7" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=c5ced968eda925caa686" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=c5ced968eda925caa686" />
+  <script src="../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=c5ced968eda925caa686"></script>
+
+    <script src="../../../_static/documentation_options.js?v=d5fd8865"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=fd10adb8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sktree/experimental/mutual_info';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.14.2';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/scikit-tree/main/doc/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
+    <script type="text/javascript" src="../../../_static/copybutton.js"></script>
+    <script type="text/javascript" src="../../../_static/scrollfix.js"></script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="auto">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">scikit-tree 0.7.0dev0 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api.html">
+                        API Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user_guide.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../whats_new.html">
+                        Release History
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../install.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../use.html">
+                        Examples using scikit-tree
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api.html">
+                        API Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user_guide.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../whats_new.html">
+                        Release History
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../install.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../use.html">
+                        Examples using scikit-tree
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-3"
+      type="button"
+      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-3"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-3"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-3">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">sktree.exper...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for sktree.experimental.mutual_info</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.linalg</span>
+<span class="kn">import</span> <span class="nn">scipy.special</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span>
+<span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">ArrayLike</span>
+<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">NearestNeighbors</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+
+<span class="kn">from</span> <span class="nn">sktree.ensemble</span> <span class="kn">import</span> <span class="n">UnsupervisedObliqueRandomForest</span>
+<span class="kn">from</span> <span class="nn">sktree.tree</span> <span class="kn">import</span> <span class="n">compute_forest_similarity_matrix</span>
+
+
+<div class="viewcode-block" id="entropy_gaussian">
+<a class="viewcode-back" href="../../../generated/sktree.experimental.mutual_info.entropy_gaussian.html#sktree.experimental.mutual_info.entropy_gaussian">[docs]</a>
+<span class="k">def</span> <span class="nf">entropy_gaussian</span><span class="p">(</span><span class="n">cov</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute entropy of a multivariate Gaussian.</span>
+
+<span class="sd">    Computes the analytical solution due to :footcite:`Darbellay1999Entropy`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cov : array-like of shape (d,d)</span>
+<span class="sd">        The covariance matrix of the distribution.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    true_mi : float</span>
+<span class="sd">        The true analytical mutual information of the generated multivariate Gaussian distribution.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The analytical solution for the true mutual information, ``I(X; Y)`` is given by::</span>
+
+<span class="sd">        I(X; Y) = H(X) + H(Y) - H(X, Y) = -\\frac{1}{2} log(det(C))</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. footbibliography::</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">cov</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">true_entropy</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">d</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">cov</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">true_entropy</span></div>
+
+
+
+<div class="viewcode-block" id="mi_gaussian">
+<a class="viewcode-back" href="../../../generated/sktree.experimental.mutual_info.mi_gaussian.html#sktree.experimental.mutual_info.mi_gaussian">[docs]</a>
+<span class="k">def</span> <span class="nf">mi_gaussian</span><span class="p">(</span><span class="n">cov</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute mutual information of a multivariate Gaussian.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cov : array-like of shape (d,d)</span>
+<span class="sd">        The covariance matrix of the distribution.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    true_mi : float</span>
+<span class="sd">        The true analytical entropy of the generated multivariate Gaussian distribution.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Analytical solution for entropy, :math:`H(X)` of a multivariate Gaussian is given by::</span>
+
+<span class="sd">        H(X) = \\frac{d}{2} (1 + log(2\\pi)) + \\frac{1}{2} log(det(C))</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># computes the true MI</span>
+    <span class="n">true_mi</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">cov</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">true_mi</span></div>
+
+
+
+<div class="viewcode-block" id="cmi_gaussian">
+<a class="viewcode-back" href="../../../generated/sktree.experimental.mutual_info.cmi_gaussian.html#sktree.experimental.mutual_info.cmi_gaussian">[docs]</a>
+<span class="k">def</span> <span class="nf">cmi_gaussian</span><span class="p">(</span><span class="n">cov</span><span class="p">,</span> <span class="n">x_index</span><span class="p">,</span> <span class="n">y_index</span><span class="p">,</span> <span class="n">z_index</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the analytical CMI for a multivariate Gaussian distribution.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cov : array-like of shape (d,d)</span>
+<span class="sd">        The covariance matrix of the distribution.</span>
+<span class="sd">    x_index : list or int</span>
+<span class="sd">        List of indices in ``cov`` that are for the X variable.</span>
+<span class="sd">    y_index : list or int</span>
+<span class="sd">        List of indices in ``cov`` that are for the Y variable.</span>
+<span class="sd">    z_index : list or int</span>
+<span class="sd">        List of indices in ``cov`` that are for the Z variable.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    true_mi : float</span>
+<span class="sd">        The true analytical mutual information of the generated multivariate Gaussian distribution.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Analytical solution for conditional mutual information, :math:`I(X;Y|Z)` of a</span>
+<span class="sd">    multivariate Gaussian is given by::</span>
+
+<span class="sd">        I(X;Y | Z) = H(X, Z) + H(Y, Z) - H(Z) - H(X, Y, Z)</span>
+
+<span class="sd">    where we plug in the analytical solutions for entropy as shown in :func:`entropy_gaussian`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">x_index</span><span class="p">)</span>
+    <span class="n">y_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">y_index</span><span class="p">)</span>
+    <span class="n">z_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">z_index</span><span class="p">)</span>
+
+    <span class="n">xz_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">x_index</span><span class="p">,</span> <span class="n">z_index</span><span class="p">))</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+    <span class="n">yz_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">y_index</span><span class="p">,</span> <span class="n">z_index</span><span class="p">))</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+
+    <span class="n">cov_xz</span> <span class="o">=</span> <span class="n">cov</span><span class="p">[</span><span class="n">xz_index</span><span class="p">,</span> <span class="n">xz_index</span><span class="p">]</span>
+    <span class="n">cov_yz</span> <span class="o">=</span> <span class="n">cov</span><span class="p">[</span><span class="n">yz_index</span><span class="p">,</span> <span class="n">yz_index</span><span class="p">]</span>
+    <span class="n">cov_z</span> <span class="o">=</span> <span class="n">cov</span><span class="p">[</span><span class="n">z_index</span><span class="p">,</span> <span class="n">z_index</span><span class="p">]</span>
+
+    <span class="n">cmi</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">entropy_gaussian</span><span class="p">(</span><span class="n">cov_xz</span><span class="p">)</span>
+        <span class="o">+</span> <span class="n">entropy_gaussian</span><span class="p">(</span><span class="n">cov_yz</span><span class="p">)</span>
+        <span class="o">-</span> <span class="n">entropy_gaussian</span><span class="p">(</span><span class="n">cov_z</span><span class="p">)</span>
+        <span class="o">-</span> <span class="n">entropy_gaussian</span><span class="p">(</span><span class="n">cov</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">cmi</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">entropy_weibull</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Analytical solution for entropy of Weibull distribution.</span>
+
+<span class="sd">    https://en.wikipedia.org/wiki/Weibull_distribution</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">euler_gamma</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">alpha</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+
+
+<span class="k">def</span> <span class="nf">mi_gamma</span><span class="p">(</span><span class="n">theta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Analytical solution for&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">digamma</span><span class="p">(</span><span class="n">theta</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">mi_from_entropy</span><span class="p">(</span><span class="n">hx</span><span class="p">,</span> <span class="n">hy</span><span class="p">,</span> <span class="n">hxy</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Analytic formula for MI given plug-in estimates of entropies.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">hx</span> <span class="o">+</span> <span class="n">hy</span> <span class="o">-</span> <span class="n">hxy</span>
+
+
+<span class="k">def</span> <span class="nf">cmi_from_entropy</span><span class="p">(</span><span class="n">hxz</span><span class="p">,</span> <span class="n">hyz</span><span class="p">,</span> <span class="n">hz</span><span class="p">,</span> <span class="n">hxyz</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Analytic formula for CMI given plug-in estimates of entropies.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">hxz</span> <span class="o">+</span> <span class="n">hyz</span> <span class="o">-</span> <span class="n">hz</span> <span class="o">-</span> <span class="n">hxyz</span>
+
+
+<div class="viewcode-block" id="mutual_info_ksg">
+<a class="viewcode-back" href="../../../generated/sktree.experimental.mutual_info_ksg.html#sktree.experimental.mutual_info.mutual_info_ksg">[docs]</a>
+<span class="k">def</span> <span class="nf">mutual_info_ksg</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span>
+    <span class="n">Y</span><span class="p">,</span>
+    <span class="n">Z</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">k</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span>
+    <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;forest&quot;</span><span class="p">,</span>
+    <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;kd_tree&quot;</span><span class="p">,</span>
+    <span class="n">n_jobs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">transform</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rank&quot;</span><span class="p">,</span>
+    <span class="n">random_seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the generalized (conditional) mutual information KSG estimate.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : ArrayLike of shape (n_samples, n_features_x)</span>
+<span class="sd">        The X covariate space.</span>
+<span class="sd">    Y : ArrayLike of shape (n_samples, n_features_y)</span>
+<span class="sd">        The Y covariate space.</span>
+<span class="sd">    Z : ArrayLike of shape (n_samples, n_features_z), optional</span>
+<span class="sd">        The Z covariate space, by default None. If None, then the MI is computed.</span>
+<span class="sd">        If Z is defined, then the CMI is computed.</span>
+<span class="sd">    k : float, optional</span>
+<span class="sd">        The number of neighbors to use in defining the radius, by default 0.2.</span>
+<span class="sd">    metric : str</span>
+<span class="sd">        Any distance metric accepted by :class:`sklearn.neighbors.NearestNeighbors`.</span>
+<span class="sd">        If &#39;forest&#39; (default), then uses an</span>
+<span class="sd">        :class:`sktree.UnsupervisedObliqueRandomForest` to compute geodesic distances.</span>
+<span class="sd">    algorithm : str, optional</span>
+<span class="sd">        Method to use, by default &#39;knn&#39;. Can be (&#39;ball_tree&#39;, &#39;kd_tree&#39;, &#39;brute&#39;).</span>
+<span class="sd">    n_jobs : int, optional</span>
+<span class="sd">        Number of parallel jobs, by default -1.</span>
+<span class="sd">    transform : one of {&#39;rank&#39;, &#39;standardize&#39;, &#39;uniform&#39;}</span>
+<span class="sd">        Preprocessing, by default &quot;rank&quot;.</span>
+<span class="sd">    random_seed : int, optional</span>
+<span class="sd">        Random seed, by default None.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    val : float</span>
+<span class="sd">        The estimated MI, or CMI value.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Given a dataset with ``n`` samples, the KSG estimator proceeds by:</span>
+
+<span class="sd">    1. For fixed k, get the distance to the kth nearest-nbr in XYZ subspace, call it &#39;r&#39;</span>
+<span class="sd">    2. Get the number of NN in XZ subspace within radius &#39;r&#39;</span>
+<span class="sd">    3. Get the number of NN in YZ subspace within radius &#39;r&#39;</span>
+<span class="sd">    4. Get the number of NN in Z subspace within radius &#39;r&#39;</span>
+<span class="sd">    5. Apply analytic solution for KSG estimate</span>
+
+<span class="sd">    For MI, the analytical solution is:</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \\psi(k) - E[(\\psi(n_x) + \\psi(n_y))] + \\psi(n)</span>
+
+<span class="sd">    For CMI, the analytical solution is:</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \\psi(k) - E[(\\psi(n_{xz}) + \\psi(n_{yz}) - \\psi(n_{z}))]</span>
+
+<span class="sd">    where :math:`\\psi` is the DiGamma function, and each expectation term</span>
+<span class="sd">    is estimated by taking the sample average.</span>
+
+<span class="sd">    Note that the :math:`n_i` terms denote the number of neighbors within</span>
+<span class="sd">    radius &#39;r&#39; in the subspace of &#39;i&#39;, where &#39;i&#39; could be for example the</span>
+<span class="sd">    X, Y, XZ, etc. subspaces. This term does not include the sample itself.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">random_seed</span><span class="p">)</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">Z</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">data</span><span class="p">,</span> <span class="n">Z</span><span class="p">))</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">_preprocess_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">transform</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span>
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">knn_here</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">n_samples</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">knn_here</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">Z</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">_cmi_ksg</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">,</span> <span class="n">knn_here</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">_mi_ksg</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">,</span> <span class="n">knn_here</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">val</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">_preprocess_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">transform</span><span class="p">,</span> <span class="n">rng</span><span class="p">):</span>
+    <span class="n">n_samples</span><span class="p">,</span> <span class="n">n_features</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+
+    <span class="c1"># add minor noise to make sure there are no ties</span>
+    <span class="n">random_noise</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">n_features</span><span class="p">))</span>
+    <span class="n">data</span> <span class="o">+=</span> <span class="mf">1e-5</span> <span class="o">*</span> <span class="n">random_noise</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_features</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">transform</span> <span class="o">==</span> <span class="s2">&quot;standardize&quot;</span><span class="p">:</span>
+        <span class="c1"># standardize with standard scaling</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">scaler</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">scaler</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">transform</span> <span class="o">==</span> <span class="s2">&quot;uniform&quot;</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">_trafo2uniform</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">transform</span> <span class="o">==</span> <span class="s2">&quot;rank&quot;</span><span class="p">:</span>
+        <span class="c1"># rank transform each column</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">rankdata</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span>
+
+
+<span class="k">def</span> <span class="nf">_mi_ksg</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">,</span> <span class="n">knn_here</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute KSG estimate of MI.&quot;&quot;&quot;</span>
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># estimate distance to the kth NN in XYZ subspace for each sample</span>
+    <span class="c1"># - get the radius we want to use per sample as the distance to the kth neighbor</span>
+    <span class="c1">#   in the joint distribution space</span>
+    <span class="n">neigh</span> <span class="o">=</span> <span class="n">_compute_nn</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithm</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">knn_here</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">)</span>
+    <span class="n">dists</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">neigh</span><span class="o">.</span><span class="n">kneighbors</span><span class="p">()</span>
+    <span class="n">radius_per_sample</span> <span class="o">=</span> <span class="n">dists</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># compute on the subspace of X</span>
+    <span class="n">num_nn_x</span> <span class="o">=</span> <span class="n">_compute_radius_nbrs</span><span class="p">(</span>
+        <span class="n">X</span><span class="p">,</span>
+        <span class="n">radius_per_sample</span><span class="p">,</span>
+        <span class="n">knn_here</span><span class="p">,</span>
+        <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithm</span><span class="p">,</span>
+        <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+        <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># compute on the subspace of Y</span>
+    <span class="n">num_nn_y</span> <span class="o">=</span> <span class="n">_compute_radius_nbrs</span><span class="p">(</span>
+        <span class="n">Y</span><span class="p">,</span>
+        <span class="n">radius_per_sample</span><span class="p">,</span>
+        <span class="n">knn_here</span><span class="p">,</span>
+        <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithm</span><span class="p">,</span>
+        <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+        <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># compute the final MI value</span>
+    <span class="c1"># \\psi(k) - E[(\\psi(n_x) + \\psi(n_y))] + \\psi(n)</span>
+    <span class="n">hxy</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">digamma</span><span class="p">(</span><span class="n">knn_here</span><span class="p">)</span>
+    <span class="n">hx</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">digamma</span><span class="p">(</span><span class="n">num_nn_x</span><span class="p">)</span>
+    <span class="n">hy</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">digamma</span><span class="p">(</span><span class="n">num_nn_y</span><span class="p">)</span>
+    <span class="n">hn</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">digamma</span><span class="p">(</span><span class="n">n_samples</span><span class="p">)</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="n">hxy</span> <span class="o">-</span> <span class="p">(</span><span class="n">hx</span> <span class="o">+</span> <span class="n">hy</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">+</span> <span class="n">hn</span>
+    <span class="k">return</span> <span class="n">val</span>
+
+
+<span class="k">def</span> <span class="nf">_cmi_ksg</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">,</span> <span class="n">knn_here</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute KSG estimate of CMI.&quot;&quot;&quot;</span>
+    <span class="c1"># estimate distance to the kth NN in XYZ subspace for each sample</span>
+    <span class="n">neigh</span> <span class="o">=</span> <span class="n">_compute_nn</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithm</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">knn_here</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">)</span>
+
+    <span class="c1"># get the radius we want to use per sample as the distance to the kth neighbor</span>
+    <span class="c1"># in the joint distribution space</span>
+    <span class="n">dists</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">neigh</span><span class="o">.</span><span class="n">kneighbors</span><span class="p">()</span>
+    <span class="n">radius_per_sample</span> <span class="o">=</span> <span class="n">dists</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># compute on the subspace of XZ</span>
+    <span class="n">xz_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">X</span><span class="p">,</span> <span class="n">Z</span><span class="p">))</span>
+    <span class="n">num_nn_xz</span> <span class="o">=</span> <span class="n">_compute_radius_nbrs</span><span class="p">(</span>
+        <span class="n">xz_data</span><span class="p">,</span>
+        <span class="n">radius_per_sample</span><span class="p">,</span>
+        <span class="n">knn_here</span><span class="p">,</span>
+        <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithm</span><span class="p">,</span>
+        <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+        <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># compute on the subspace of YZ</span>
+    <span class="n">yz_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">))</span>
+    <span class="n">num_nn_yz</span> <span class="o">=</span> <span class="n">_compute_radius_nbrs</span><span class="p">(</span>
+        <span class="n">yz_data</span><span class="p">,</span>
+        <span class="n">radius_per_sample</span><span class="p">,</span>
+        <span class="n">knn_here</span><span class="p">,</span>
+        <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithm</span><span class="p">,</span>
+        <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+        <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># compute on the subspace of XZ</span>
+    <span class="n">num_nn_z</span> <span class="o">=</span> <span class="n">_compute_radius_nbrs</span><span class="p">(</span>
+        <span class="n">Z</span><span class="p">,</span>
+        <span class="n">radius_per_sample</span><span class="p">,</span>
+        <span class="n">knn_here</span><span class="p">,</span>
+        <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithm</span><span class="p">,</span>
+        <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+        <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># compute the final CMI value</span>
+    <span class="n">hxyz</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">digamma</span><span class="p">(</span><span class="n">knn_here</span><span class="p">)</span>
+    <span class="n">hxz</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">digamma</span><span class="p">(</span><span class="n">num_nn_xz</span><span class="p">)</span>
+    <span class="n">hyz</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">digamma</span><span class="p">(</span><span class="n">num_nn_yz</span><span class="p">)</span>
+    <span class="n">hz</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">digamma</span><span class="p">(</span><span class="n">num_nn_z</span><span class="p">)</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="n">hxyz</span> <span class="o">-</span> <span class="p">(</span><span class="n">hxz</span> <span class="o">+</span> <span class="n">hyz</span> <span class="o">-</span> <span class="n">hz</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">val</span>
+
+
+<span class="k">def</span> <span class="nf">_compute_radius_nbrs</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">,</span>
+    <span class="n">radius_per_sample</span><span class="p">,</span>
+    <span class="n">k</span><span class="p">,</span>
+    <span class="n">algorithm</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;kd_tree&quot;</span><span class="p">,</span>
+    <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;l2&quot;</span><span class="p">,</span>
+    <span class="n">n_jobs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">neigh</span> <span class="o">=</span> <span class="n">_compute_nn</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithm</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">)</span>
+
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="n">radius_per_sample</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">num_nn_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,))</span>
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_samples</span><span class="p">):</span>
+        <span class="n">nn</span> <span class="o">=</span> <span class="n">neigh</span><span class="o">.</span><span class="n">radius_neighbors</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="n">radius_per_sample</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">return_distance</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">num_nn_data</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">nn</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">num_nn_data</span>
+
+
+<span class="k">def</span> <span class="nf">_compute_nn</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;kd_tree&quot;</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;l2&quot;</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NearestNeighbors</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute kNN in subspace.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : ArrayLike of shape (n_samples, n_features)</span>
+<span class="sd">        The covariate space.</span>
+<span class="sd">    algorithm : str, optional</span>
+<span class="sd">        Method to use, by default &#39;knn&#39;. Can be (&#39;ball_tree&#39;, &#39;kd_tree&#39;, &#39;brute&#39;).</span>
+<span class="sd">    metric : str</span>
+<span class="sd">        Any distance metric accepted by :class:`sklearn.neighbors.NearestNeighbors`.</span>
+<span class="sd">        If &#39;forest&#39;, then uses an :class:`sktree.UnsupervisedObliqueRandomForest`</span>
+<span class="sd">        to compute geodesic distances.</span>
+<span class="sd">    k : int, optional</span>
+<span class="sd">        The number of k-nearest neighbors to query, by default 1.</span>
+<span class="sd">    n_jobs : int,</span>
+<span class="sd">        The number of CPUs to use for joblib. By default, None.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    neigh : instance of sklearn.neighbors.NearestNeighbor</span>
+<span class="sd">        A fitted instance of the nearest-neighbor algorithm on ``X`` input.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Can query for the following, using the ``neigh.kneighbors(X)`` function, which would</span>
+<span class="sd">    return:</span>
+
+<span class="sd">    dists : ArrayLike of shape (n_samples, k)</span>
+<span class="sd">        The distance array of every sample with its k-nearest neighbors. The columns</span>
+<span class="sd">        are ordered from closest to furthest neighbors.</span>
+<span class="sd">    indices : ArrayLike of shape (n_samples, k)</span>
+<span class="sd">        The sample indices of the k-nearest-neighbors for each sample. These</span>
+<span class="sd">        contain the row indices of ``X`` for each sample. The columns</span>
+<span class="sd">        are ordered from closest to furthest neighbors.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">metric</span> <span class="o">==</span> <span class="s2">&quot;forest&quot;</span><span class="p">:</span>
+        <span class="n">est</span> <span class="o">=</span> <span class="n">UnsupervisedObliqueRandomForest</span><span class="p">()</span>
+        <span class="n">dists</span> <span class="o">=</span> <span class="n">compute_forest_similarity_matrix</span><span class="p">(</span><span class="n">est</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+
+        <span class="c1"># we have a precomputed distance matrix, so we can use the NearestNeighbor</span>
+        <span class="c1"># implementation of sklearn</span>
+        <span class="n">metric</span> <span class="o">=</span> <span class="s2">&quot;precomputed&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dists</span> <span class="o">=</span> <span class="n">X</span>
+
+    <span class="c1"># compute the nearest neighbors in the space using specified NN algorithm</span>
+    <span class="c1"># then get the K nearest nbrs and their distances</span>
+    <span class="n">neigh</span> <span class="o">=</span> <span class="n">NearestNeighbors</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithm</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+        <span class="n">dists</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">neigh</span>
+
+
+<span class="k">def</span> <span class="nf">_trafo2uniform</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Transforms input array to uniform marginals.</span>
+
+<span class="sd">    Assumes x.shape = (dim, T)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : arraylike</span>
+<span class="sd">        The input data with (n_samples,) rows and (n_features,) columns.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    u : array-like</span>
+<span class="sd">        array with uniform marginals.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">trafo</span><span class="p">(</span><span class="n">xi</span><span class="p">):</span>
+        <span class="n">xisorted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+        <span class="n">yi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">xi</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">xi</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">xi</span><span class="p">,</span> <span class="n">xisorted</span><span class="p">,</span> <span class="n">yi</span><span class="p">)</span>
+
+    <span class="n">_</span><span class="p">,</span> <span class="n">n_features</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+
+    <span class="c1"># apply a uniform transformation for each feature</span>
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_features</span><span class="p">):</span>
+        <span class="n">marginalized_feature</span> <span class="o">=</span> <span class="n">trafo</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span> <span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">squeeze</span><span class="p">())</span>
+        <span class="n">X</span><span class="p">[:,</span> <span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">marginalized_feature</span>
+    <span class="k">return</span> <span class="n">X</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=c5ced968eda925caa686"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=c5ced968eda925caa686"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-01-31.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

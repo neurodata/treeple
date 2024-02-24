@@ -1,0 +1,1716 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-theme="auto">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sklearn.base &#8212; scikit-tree 0.7.0dev0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "auto";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css?v=7f9a90b1" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/style.css?v=42c02ab7" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=c5ced968eda925caa686" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=c5ced968eda925caa686" />
+  <script src="../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=c5ced968eda925caa686"></script>
+
+    <script src="../../_static/documentation_options.js?v=d5fd8865"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=fd10adb8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sklearn/base';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.14.2';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/scikit-tree/main/doc/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
+    <script type="text/javascript" src="../../_static/copybutton.js"></script>
+    <script type="text/javascript" src="../../_static/scrollfix.js"></script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="auto">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">scikit-tree 0.7.0dev0 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api.html">
+                        API Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../user_guide.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../whats_new.html">
+                        Release History
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../install.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../use.html">
+                        Examples using scikit-tree
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api.html">
+                        API Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../user_guide.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../whats_new.html">
+                        Release History
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../install.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../use.html">
+                        Examples using scikit-tree
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-3"
+      type="button"
+      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-3"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-3"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-3">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">sklearn.base</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for sklearn.base</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Base classes for all estimators.&quot;&quot;&quot;</span>
+
+<span class="c1"># Author: Gael Varoquaux &lt;gael.varoquaux@normalesup.org&gt;</span>
+<span class="c1"># License: BSD 3 clause</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">platform</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">__version__</span>
+<span class="kn">from</span> <span class="nn">._config</span> <span class="kn">import</span> <span class="n">config_context</span><span class="p">,</span> <span class="n">get_config</span>
+<span class="kn">from</span> <span class="nn">.exceptions</span> <span class="kn">import</span> <span class="n">InconsistentVersionWarning</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">_IS_32BIT</span>
+<span class="kn">from</span> <span class="nn">.utils._estimator_html_repr</span> <span class="kn">import</span> <span class="n">_HTMLDocumentationLinkMixin</span><span class="p">,</span> <span class="n">estimator_html_repr</span>
+<span class="kn">from</span> <span class="nn">.utils._metadata_requests</span> <span class="kn">import</span> <span class="n">_MetadataRequester</span><span class="p">,</span> <span class="n">_routing_enabled</span>
+<span class="kn">from</span> <span class="nn">.utils._param_validation</span> <span class="kn">import</span> <span class="n">validate_parameter_constraints</span>
+<span class="kn">from</span> <span class="nn">.utils._set_output</span> <span class="kn">import</span> <span class="n">_SetOutputMixin</span>
+<span class="kn">from</span> <span class="nn">.utils._tags</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_DEFAULT_TAGS</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.utils.validation</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_check_feature_names_in</span><span class="p">,</span>
+    <span class="n">_check_y</span><span class="p">,</span>
+    <span class="n">_generate_get_feature_names_out</span><span class="p">,</span>
+    <span class="n">_get_feature_names</span><span class="p">,</span>
+    <span class="n">_is_fitted</span><span class="p">,</span>
+    <span class="n">_num_features</span><span class="p">,</span>
+    <span class="n">check_array</span><span class="p">,</span>
+    <span class="n">check_is_fitted</span><span class="p">,</span>
+    <span class="n">check_X_y</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Construct a new unfitted estimator with the same parameters.</span>
+
+<span class="sd">    Clone does a deep copy of the model in an estimator</span>
+<span class="sd">    without actually copying attached data. It returns a new estimator</span>
+<span class="sd">    with the same parameters that has not been fitted on any data.</span>
+
+<span class="sd">    .. versionchanged:: 1.3</span>
+<span class="sd">        Delegates to `estimator.__sklearn_clone__` if the method exists.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    estimator : {list, tuple, set} of estimator instance or a single \</span>
+<span class="sd">            estimator instance</span>
+<span class="sd">        The estimator or group of estimators to be cloned.</span>
+<span class="sd">    safe : bool, default=True</span>
+<span class="sd">        If safe is False, clone will fall back to a deep copy on objects</span>
+<span class="sd">        that are not estimators. Ignored if `estimator.__sklearn_clone__`</span>
+<span class="sd">        exists.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    estimator : object</span>
+<span class="sd">        The deep copy of the input, an estimator if input is an estimator.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    If the estimator&#39;s `random_state` parameter is an integer (or if the</span>
+<span class="sd">    estimator doesn&#39;t have a `random_state` parameter), an *exact clone* is</span>
+<span class="sd">    returned: the clone and the original estimator will give the exact same</span>
+<span class="sd">    results. Otherwise, *statistical clone* is returned: the clone might</span>
+<span class="sd">    return different results from the original estimator. More details can be</span>
+<span class="sd">    found in :ref:`randomness`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="s2">&quot;__sklearn_clone__&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">estimator</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">estimator</span><span class="o">.</span><span class="n">__sklearn_clone__</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">_clone_parametrized</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="n">safe</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_clone_parametrized</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Default implementation of clone. See :func:`sklearn.base.clone` for details.&quot;&quot;&quot;</span>
+
+    <span class="n">estimator_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">estimator</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">estimator_type</span> <span class="ow">is</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">clone</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="n">safe</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">estimator</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="k">elif</span> <span class="n">estimator_type</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">set</span><span class="p">,</span> <span class="nb">frozenset</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">estimator_type</span><span class="p">([</span><span class="n">clone</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="n">safe</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">estimator</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="s2">&quot;get_params&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">safe</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">estimator</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="s2">&quot;Cannot clone object. &quot;</span>
+                    <span class="o">+</span> <span class="s2">&quot;You should provide an instance of &quot;</span>
+                    <span class="o">+</span> <span class="s2">&quot;scikit-learn estimator instead of a class.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="s2">&quot;Cannot clone object &#39;</span><span class="si">%s</span><span class="s2">&#39; (type </span><span class="si">%s</span><span class="s2">): &quot;</span>
+                    <span class="s2">&quot;it does not seem to be a scikit-learn &quot;</span>
+                    <span class="s2">&quot;estimator as it does not implement a &quot;</span>
+                    <span class="s2">&quot;&#39;get_params&#39; method.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">estimator</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">estimator</span><span class="p">))</span>
+                <span class="p">)</span>
+
+    <span class="n">klass</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="vm">__class__</span>
+    <span class="n">new_object_params</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">get_params</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">new_object_params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">new_object_params</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">clone</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">new_object</span> <span class="o">=</span> <span class="n">klass</span><span class="p">(</span><span class="o">**</span><span class="n">new_object_params</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">new_object</span><span class="o">.</span><span class="n">_metadata_request</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">estimator</span><span class="o">.</span><span class="n">_metadata_request</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="n">params_set</span> <span class="o">=</span> <span class="n">new_object</span><span class="o">.</span><span class="n">get_params</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1"># quick sanity check of the parameters of the clone</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">new_object_params</span><span class="p">:</span>
+        <span class="n">param1</span> <span class="o">=</span> <span class="n">new_object_params</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="n">param2</span> <span class="o">=</span> <span class="n">params_set</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">param1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">param2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Cannot clone object </span><span class="si">%s</span><span class="s2">, as the constructor &quot;</span>
+                <span class="s2">&quot;either does not set or modifies parameter </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+            <span class="p">)</span>
+
+    <span class="c1"># _sklearn_output_config is used by `set_output` to configure the output</span>
+    <span class="c1"># container of an estimator.</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="s2">&quot;_sklearn_output_config&quot;</span><span class="p">):</span>
+        <span class="n">new_object</span><span class="o">.</span><span class="n">_sklearn_output_config</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span>
+            <span class="n">estimator</span><span class="o">.</span><span class="n">_sklearn_output_config</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">new_object</span>
+
+
+<span class="k">class</span> <span class="nc">BaseEstimator</span><span class="p">(</span><span class="n">_HTMLDocumentationLinkMixin</span><span class="p">,</span> <span class="n">_MetadataRequester</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for all estimators in scikit-learn.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    All estimators should specify all the parameters that can be set</span>
+<span class="sd">    at the class level in their ``__init__`` as explicit keyword</span>
+<span class="sd">    arguments (no ``*args`` or ``**kwargs``).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_get_param_names</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get parameter names for the estimator&quot;&quot;&quot;</span>
+        <span class="c1"># fetch the constructor or the original constructor before</span>
+        <span class="c1"># deprecation wrapping if any</span>
+        <span class="n">init</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="fm">__init__</span><span class="p">,</span> <span class="s2">&quot;deprecated_original&quot;</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="fm">__init__</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">init</span> <span class="ow">is</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__init__</span><span class="p">:</span>
+            <span class="c1"># No explicit constructor to introspect</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="c1"># introspect the constructor arguments to find the model parameters</span>
+        <span class="c1"># to represent</span>
+        <span class="n">init_signature</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>
+        <span class="c1"># Consider the constructor parameters excluding &#39;self&#39;</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">p</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">init_signature</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;self&quot;</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">kind</span> <span class="o">!=</span> <span class="n">p</span><span class="o">.</span><span class="n">VAR_KEYWORD</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="n">p</span><span class="o">.</span><span class="n">VAR_POSITIONAL</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="s2">&quot;scikit-learn estimators should always &quot;</span>
+                    <span class="s2">&quot;specify their parameters in the signature&quot;</span>
+                    <span class="s2">&quot; of their __init__ (no varargs).&quot;</span>
+                    <span class="s2">&quot; </span><span class="si">%s</span><span class="s2"> with constructor </span><span class="si">%s</span><span class="s2"> doesn&#39;t &quot;</span>
+                    <span class="s2">&quot; follow this convention.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">init_signature</span><span class="p">)</span>
+                <span class="p">)</span>
+        <span class="c1"># Extract and sort argument names excluding &#39;self&#39;</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get parameters for this estimator.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        deep : bool, default=True</span>
+<span class="sd">            If True, will return the parameters for this estimator and</span>
+<span class="sd">            contained subobjects that are estimators.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        params : dict</span>
+<span class="sd">            Parameter names mapped to their values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_param_names</span><span class="p">():</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">deep</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s2">&quot;get_params&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+                <span class="n">deep_items</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">get_params</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">((</span><span class="n">key</span> <span class="o">+</span> <span class="s2">&quot;__&quot;</span> <span class="o">+</span> <span class="n">k</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">deep_items</span><span class="p">)</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the parameters of this estimator.</span>
+
+<span class="sd">        The method works on simple estimators as well as on nested objects</span>
+<span class="sd">        (such as :class:`~sklearn.pipeline.Pipeline`). The latter have</span>
+<span class="sd">        parameters of the form ``&lt;component&gt;__&lt;parameter&gt;`` so that it&#39;s</span>
+<span class="sd">        possible to update each component of a nested object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        **params : dict</span>
+<span class="sd">            Estimator parameters.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self : estimator instance</span>
+<span class="sd">            Estimator instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">params</span><span class="p">:</span>
+            <span class="c1"># Simple optimization to gain speed (inspect is slow)</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="n">valid_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_params</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">nested_params</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>  <span class="c1"># grouped by prefix</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">key</span><span class="p">,</span> <span class="n">delim</span><span class="p">,</span> <span class="n">sub_key</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="s2">&quot;__&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_params</span><span class="p">:</span>
+                <span class="n">local_valid_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_param_names</span><span class="p">()</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Invalid parameter </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> for estimator </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Valid parameters are: </span><span class="si">{</span><span class="n">local_valid_params</span><span class="si">!r}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">delim</span><span class="p">:</span>
+                <span class="n">nested_params</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">sub_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                <span class="n">valid_params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">sub_params</span> <span class="ow">in</span> <span class="n">nested_params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">valid_params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">set_params</span><span class="p">(</span><span class="o">**</span><span class="n">sub_params</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__sklearn_clone__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_clone_parametrized</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N_CHAR_MAX</span><span class="o">=</span><span class="mi">700</span><span class="p">):</span>
+        <span class="c1"># N_CHAR_MAX is the (approximate) maximum number of non-blank</span>
+        <span class="c1"># characters to render. We pass it as an optional parameter to ease</span>
+        <span class="c1"># the tests.</span>
+
+        <span class="kn">from</span> <span class="nn">.utils._pprint</span> <span class="kn">import</span> <span class="n">_EstimatorPrettyPrinter</span>
+
+        <span class="n">N_MAX_ELEMENTS_TO_SHOW</span> <span class="o">=</span> <span class="mi">30</span>  <span class="c1"># number of elements to show in sequences</span>
+
+        <span class="c1"># use ellipsis for sequences with a lot of elements</span>
+        <span class="n">pp</span> <span class="o">=</span> <span class="n">_EstimatorPrettyPrinter</span><span class="p">(</span>
+            <span class="n">compact</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">indent</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">indent_at_name</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">n_max_elements_to_show</span><span class="o">=</span><span class="n">N_MAX_ELEMENTS_TO_SHOW</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">repr_</span> <span class="o">=</span> <span class="n">pp</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="c1"># Use bruteforce ellipsis when there are a lot of non-blank characters</span>
+        <span class="n">n_nonblank</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">repr_</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
+        <span class="k">if</span> <span class="n">n_nonblank</span> <span class="o">&gt;</span> <span class="n">N_CHAR_MAX</span><span class="p">:</span>
+            <span class="n">lim</span> <span class="o">=</span> <span class="n">N_CHAR_MAX</span> <span class="o">//</span> <span class="mi">2</span>  <span class="c1"># apprx number of chars to keep on both ends</span>
+            <span class="n">regex</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;^(\s*\S){</span><span class="si">%d</span><span class="s2">}&quot;</span> <span class="o">%</span> <span class="n">lim</span>
+            <span class="c1"># The regex &#39;^(\s*\S){%d}&#39; % n</span>
+            <span class="c1"># matches from the start of the string until the nth non-blank</span>
+            <span class="c1"># character:</span>
+            <span class="c1"># - ^ matches the start of string</span>
+            <span class="c1"># - (pattern){n} matches n repetitions of pattern</span>
+            <span class="c1"># - \s*\S matches a non-blank char following zero or more blanks</span>
+            <span class="n">left_lim</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="n">repr_</span><span class="p">)</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+            <span class="n">right_lim</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="n">repr_</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="ow">in</span> <span class="n">repr_</span><span class="p">[</span><span class="n">left_lim</span><span class="p">:</span><span class="o">-</span><span class="n">right_lim</span><span class="p">]:</span>
+                <span class="c1"># The left side and right side aren&#39;t on the same line.</span>
+                <span class="c1"># To avoid weird cuts, e.g.:</span>
+                <span class="c1"># categoric...ore&#39;,</span>
+                <span class="c1"># we need to start the right side with an appropriate newline</span>
+                <span class="c1"># character so that it renders properly as:</span>
+                <span class="c1"># categoric...</span>
+                <span class="c1"># handle_unknown=&#39;ignore&#39;,</span>
+                <span class="c1"># so we add [^\n]*\n which matches until the next \n</span>
+                <span class="n">regex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s2">&quot;[^\n]*\n&quot;</span>
+                <span class="n">right_lim</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="n">repr_</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+
+            <span class="n">ellipsis</span> <span class="o">=</span> <span class="s2">&quot;...&quot;</span>
+            <span class="k">if</span> <span class="n">left_lim</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">ellipsis</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">repr_</span><span class="p">)</span> <span class="o">-</span> <span class="n">right_lim</span><span class="p">:</span>
+                <span class="c1"># Only add ellipsis if it results in a shorter repr</span>
+                <span class="n">repr_</span> <span class="o">=</span> <span class="n">repr_</span><span class="p">[:</span><span class="n">left_lim</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;...&quot;</span> <span class="o">+</span> <span class="n">repr_</span><span class="p">[</span><span class="o">-</span><span class="n">right_lim</span><span class="p">:]</span>
+
+        <span class="k">return</span> <span class="n">repr_</span>
+
+    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;__slots__&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;You cannot use `__slots__` in objects inheriting from &quot;</span>
+                <span class="s2">&quot;`sklearn.base.BaseEstimator`.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">state</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__getstate__</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">state</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># For Python 3.11+, empty instance (no `__slots__`,</span>
+                <span class="c1"># and `__dict__`) will return a state equal to `None`.</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="c1"># Python &lt; 3.11</span>
+            <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__module__</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;sklearn.&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">_sklearn_version</span><span class="o">=</span><span class="n">__version__</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">state</span>
+
+    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__module__</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;sklearn.&quot;</span><span class="p">):</span>
+            <span class="n">pickle_version</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;_sklearn_version&quot;</span><span class="p">,</span> <span class="s2">&quot;pre-0.18&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pickle_version</span> <span class="o">!=</span> <span class="n">__version__</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="n">InconsistentVersionWarning</span><span class="p">(</span>
+                        <span class="n">estimator_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                        <span class="n">current_sklearn_version</span><span class="o">=</span><span class="n">__version__</span><span class="p">,</span>
+                        <span class="n">original_sklearn_version</span><span class="o">=</span><span class="n">pickle_version</span><span class="p">,</span>
+                    <span class="p">),</span>
+                <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__setstate__</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_more_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_DEFAULT_TAGS</span>
+
+    <span class="k">def</span> <span class="nf">_get_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">collected_tags</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">base_class</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getmro</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">base_class</span><span class="p">,</span> <span class="s2">&quot;_more_tags&quot;</span><span class="p">):</span>
+                <span class="c1"># need the if because mixins might not have _more_tags</span>
+                <span class="c1"># but might do redundant work in estimators</span>
+                <span class="c1"># (i.e. calling more tags on BaseEstimator multiple times)</span>
+                <span class="n">more_tags</span> <span class="o">=</span> <span class="n">base_class</span><span class="o">.</span><span class="n">_more_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="n">collected_tags</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">more_tags</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">collected_tags</span>
+
+    <span class="k">def</span> <span class="nf">_check_n_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">reset</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the `n_features_in_` attribute, or check against it.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : {ndarray, sparse matrix} of shape (n_samples, n_features)</span>
+<span class="sd">            The input samples.</span>
+<span class="sd">        reset : bool</span>
+<span class="sd">            If True, the `n_features_in_` attribute is set to `X.shape[1]`.</span>
+<span class="sd">            If False and the attribute exists, then check that it is equal to</span>
+<span class="sd">            `X.shape[1]`. If False and the attribute does *not* exist, then</span>
+<span class="sd">            the check is skipped.</span>
+<span class="sd">            .. note::</span>
+<span class="sd">               It is recommended to call reset=True in `fit` and in the first</span>
+<span class="sd">               call to `partial_fit`. All other methods that validate `X`</span>
+<span class="sd">               should set `reset=False`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">n_features</span> <span class="o">=</span> <span class="n">_num_features</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">reset</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;n_features_in_&quot;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;X does not contain any features, but &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> is expecting &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span><span class="si">}</span><span class="s2"> features&quot;</span>
+                <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="c1"># If the number of features is not defined and reset=True,</span>
+            <span class="c1"># then we skip this check</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">reset</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span> <span class="o">=</span> <span class="n">n_features</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;n_features_in_&quot;</span><span class="p">):</span>
+            <span class="c1"># Skip this check if the expected number of expected input features</span>
+            <span class="c1"># was not recorded by calling fit first. This is typically the case</span>
+            <span class="c1"># for stateless transformers.</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">n_features</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;X has </span><span class="si">{</span><span class="n">n_features</span><span class="si">}</span><span class="s2"> features, but </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;is expecting </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span><span class="si">}</span><span class="s2"> features as input.&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_check_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">reset</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set or check the `feature_names_in_` attribute.</span>
+
+<span class="sd">        .. versionadded:: 1.0</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : {ndarray, dataframe} of shape (n_samples, n_features)</span>
+<span class="sd">            The input samples.</span>
+
+<span class="sd">        reset : bool</span>
+<span class="sd">            Whether to reset the `feature_names_in_` attribute.</span>
+<span class="sd">            If False, the input will be checked for consistency with</span>
+<span class="sd">            feature names of data provided when reset was last True.</span>
+<span class="sd">            .. note::</span>
+<span class="sd">               It is recommended to call `reset=True` in `fit` and in the first</span>
+<span class="sd">               call to `partial_fit`. All other methods that validate `X`</span>
+<span class="sd">               should set `reset=False`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">reset</span><span class="p">:</span>
+            <span class="n">feature_names_in</span> <span class="o">=</span> <span class="n">_get_feature_names</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">feature_names_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">feature_names_in_</span> <span class="o">=</span> <span class="n">feature_names_in</span>
+            <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;feature_names_in_&quot;</span><span class="p">):</span>
+                <span class="c1"># Delete the attribute when the estimator is fitted on a new dataset</span>
+                <span class="c1"># that has no feature names.</span>
+                <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;feature_names_in_&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">fitted_feature_names</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;feature_names_in_&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">X_feature_names</span> <span class="o">=</span> <span class="n">_get_feature_names</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">fitted_feature_names</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">X_feature_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># no feature names seen in fit and in X</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">X_feature_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">fitted_feature_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;X has feature names, but </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> was fitted without&quot;</span>
+                <span class="s2">&quot; feature names&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">X_feature_names</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">fitted_feature_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;X does not have valid feature names, but&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> was fitted with feature names&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># validate the feature names against the `feature_names_in_` attribute</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fitted_feature_names</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_feature_names</span><span class="p">)</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span>
+            <span class="n">fitted_feature_names</span> <span class="o">!=</span> <span class="n">X_feature_names</span>
+        <span class="p">):</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;The feature names should match those that were passed during fit.</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="n">fitted_feature_names_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">fitted_feature_names</span><span class="p">)</span>
+            <span class="n">X_feature_names_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">X_feature_names</span><span class="p">)</span>
+
+            <span class="n">unexpected_names</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">X_feature_names_set</span> <span class="o">-</span> <span class="n">fitted_feature_names_set</span><span class="p">)</span>
+            <span class="n">missing_names</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">fitted_feature_names_set</span> <span class="o">-</span> <span class="n">X_feature_names_set</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">add_names</span><span class="p">(</span><span class="n">names</span><span class="p">):</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">max_n_names</span> <span class="o">=</span> <span class="mi">5</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">names</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="n">max_n_names</span><span class="p">:</span>
+                        <span class="n">output</span> <span class="o">+=</span> <span class="s2">&quot;- ...</span><span class="se">\n</span><span class="s2">&quot;</span>
+                        <span class="k">break</span>
+                    <span class="n">output</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;- </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="k">return</span> <span class="n">output</span>
+
+            <span class="k">if</span> <span class="n">unexpected_names</span><span class="p">:</span>
+                <span class="n">message</span> <span class="o">+=</span> <span class="s2">&quot;Feature names unseen at fit time:</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="n">message</span> <span class="o">+=</span> <span class="n">add_names</span><span class="p">(</span><span class="n">unexpected_names</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">missing_names</span><span class="p">:</span>
+                <span class="n">message</span> <span class="o">+=</span> <span class="s2">&quot;Feature names seen at fit time, yet now missing:</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="n">message</span> <span class="o">+=</span> <span class="n">add_names</span><span class="p">(</span><span class="n">missing_names</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">missing_names</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">unexpected_names</span><span class="p">:</span>
+                <span class="n">message</span> <span class="o">+=</span> <span class="p">(</span>
+                    <span class="s2">&quot;Feature names must be in the same order as they were in fit.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_validate_data</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">X</span><span class="o">=</span><span class="s2">&quot;no_validation&quot;</span><span class="p">,</span>
+        <span class="n">y</span><span class="o">=</span><span class="s2">&quot;no_validation&quot;</span><span class="p">,</span>
+        <span class="n">reset</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">validate_separately</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">cast_to_ndarray</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">check_params</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate input data and set or check the `n_features_in_` attribute.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : {array-like, sparse matrix, dataframe} of shape \</span>
+<span class="sd">                (n_samples, n_features), default=&#39;no validation&#39;</span>
+<span class="sd">            The input samples.</span>
+<span class="sd">            If `&#39;no_validation&#39;`, no validation is performed on `X`. This is</span>
+<span class="sd">            useful for meta-estimator which can delegate input validation to</span>
+<span class="sd">            their underlying estimator(s). In that case `y` must be passed and</span>
+<span class="sd">            the only accepted `check_params` are `multi_output` and</span>
+<span class="sd">            `y_numeric`.</span>
+
+<span class="sd">        y : array-like of shape (n_samples,), default=&#39;no_validation&#39;</span>
+<span class="sd">            The targets.</span>
+
+<span class="sd">            - If `None`, `check_array` is called on `X`. If the estimator&#39;s</span>
+<span class="sd">              requires_y tag is True, then an error will be raised.</span>
+<span class="sd">            - If `&#39;no_validation&#39;`, `check_array` is called on `X` and the</span>
+<span class="sd">              estimator&#39;s requires_y tag is ignored. This is a default</span>
+<span class="sd">              placeholder and is never meant to be explicitly set. In that case</span>
+<span class="sd">              `X` must be passed.</span>
+<span class="sd">            - Otherwise, only `y` with `_check_y` or both `X` and `y` are</span>
+<span class="sd">              checked with either `check_array` or `check_X_y` depending on</span>
+<span class="sd">              `validate_separately`.</span>
+
+<span class="sd">        reset : bool, default=True</span>
+<span class="sd">            Whether to reset the `n_features_in_` attribute.</span>
+<span class="sd">            If False, the input will be checked for consistency with data</span>
+<span class="sd">            provided when reset was last True.</span>
+<span class="sd">            .. note::</span>
+<span class="sd">               It is recommended to call reset=True in `fit` and in the first</span>
+<span class="sd">               call to `partial_fit`. All other methods that validate `X`</span>
+<span class="sd">               should set `reset=False`.</span>
+
+<span class="sd">        validate_separately : False or tuple of dicts, default=False</span>
+<span class="sd">            Only used if y is not None.</span>
+<span class="sd">            If False, call validate_X_y(). Else, it must be a tuple of kwargs</span>
+<span class="sd">            to be used for calling check_array() on X and y respectively.</span>
+
+<span class="sd">            `estimator=self` is automatically added to these dicts to generate</span>
+<span class="sd">            more informative error message in case of invalid input data.</span>
+
+<span class="sd">        cast_to_ndarray : bool, default=True</span>
+<span class="sd">            Cast `X` and `y` to ndarray with checks in `check_params`. If</span>
+<span class="sd">            `False`, `X` and `y` are unchanged and only `feature_names_in_` and</span>
+<span class="sd">            `n_features_in_` are checked.</span>
+
+<span class="sd">        **check_params : kwargs</span>
+<span class="sd">            Parameters passed to :func:`sklearn.utils.check_array` or</span>
+<span class="sd">            :func:`sklearn.utils.check_X_y`. Ignored if validate_separately</span>
+<span class="sd">            is not False.</span>
+
+<span class="sd">            `estimator=self` is automatically added to these params to generate</span>
+<span class="sd">            more informative error message in case of invalid input data.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        out : {ndarray, sparse matrix} or tuple of these</span>
+<span class="sd">            The validated input. A tuple is returned if both `X` and `y` are</span>
+<span class="sd">            validated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_feature_names</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="n">reset</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tags</span><span class="p">()[</span><span class="s2">&quot;requires_y&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;This </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> estimator &quot;</span>
+                <span class="s2">&quot;requires y to be passed, but the target y is None.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">no_val_X</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">X</span> <span class="o">==</span> <span class="s2">&quot;no_validation&quot;</span>
+        <span class="n">no_val_y</span> <span class="o">=</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">y</span> <span class="o">==</span> <span class="s2">&quot;no_validation&quot;</span>
+
+        <span class="k">if</span> <span class="n">no_val_X</span> <span class="ow">and</span> <span class="n">no_val_y</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Validation should be done on X, y or both.&quot;</span><span class="p">)</span>
+
+        <span class="n">default_check_params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;estimator&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="p">}</span>
+        <span class="n">check_params</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">default_check_params</span><span class="p">,</span> <span class="o">**</span><span class="n">check_params</span><span class="p">}</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cast_to_ndarray</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">no_val_X</span> <span class="ow">and</span> <span class="n">no_val_y</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">X</span>
+            <span class="k">elif</span> <span class="n">no_val_X</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">no_val_y</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">y</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">no_val_X</span> <span class="ow">and</span> <span class="n">no_val_y</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">check_array</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">input_name</span><span class="o">=</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">check_params</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">no_val_X</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">no_val_y</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">_check_y</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">check_params</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">validate_separately</span><span class="p">:</span>
+                <span class="c1"># We need this because some estimators validate X and y</span>
+                <span class="c1"># separately, and in general, separately calling check_array()</span>
+                <span class="c1"># on X and y isn&#39;t equivalent to just calling check_X_y()</span>
+                <span class="c1"># :(</span>
+                <span class="n">check_X_params</span><span class="p">,</span> <span class="n">check_y_params</span> <span class="o">=</span> <span class="n">validate_separately</span>
+                <span class="k">if</span> <span class="s2">&quot;estimator&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">check_X_params</span><span class="p">:</span>
+                    <span class="n">check_X_params</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">default_check_params</span><span class="p">,</span> <span class="o">**</span><span class="n">check_X_params</span><span class="p">}</span>
+                <span class="n">X</span> <span class="o">=</span> <span class="n">check_array</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">input_name</span><span class="o">=</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">check_X_params</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s2">&quot;estimator&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">check_y_params</span><span class="p">:</span>
+                    <span class="n">check_y_params</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">default_check_params</span><span class="p">,</span> <span class="o">**</span><span class="n">check_y_params</span><span class="p">}</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">check_array</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">input_name</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">check_y_params</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">check_X_y</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">check_params</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">no_val_X</span> <span class="ow">and</span> <span class="n">check_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ensure_2d&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_n_features</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="n">reset</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="k">def</span> <span class="nf">_validate_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate types and values of constructor parameters</span>
+
+<span class="sd">        The expected type and values must be defined in the `_parameter_constraints`</span>
+<span class="sd">        class attribute, which is a dictionary `param_name: list of constraints`. See</span>
+<span class="sd">        the docstring of `validate_parameter_constraints` for a description of the</span>
+<span class="sd">        accepted constraints.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">validate_parameter_constraints</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_parameter_constraints</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_params</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+            <span class="n">caller_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_repr_html_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;HTML representation of estimator.</span>
+
+<span class="sd">        This is redundant with the logic of `_repr_mimebundle_`. The latter</span>
+<span class="sd">        should be favorted in the long term, `_repr_html_` is only</span>
+<span class="sd">        implemented for consumers who do not interpret `_repr_mimbundle_`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">get_config</span><span class="p">()[</span><span class="s2">&quot;display&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;diagram&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                <span class="s2">&quot;_repr_html_ is only defined when the &quot;</span>
+                <span class="s2">&quot;&#39;display&#39; configuration option is set to &quot;</span>
+                <span class="s2">&quot;&#39;diagram&#39;&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_repr_html_inner</span>
+
+    <span class="k">def</span> <span class="nf">_repr_html_inner</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This function is returned by the @property `_repr_html_` to make</span>
+<span class="sd">        `hasattr(estimator, &quot;_repr_html_&quot;) return `True` or `False` depending</span>
+<span class="sd">        on `get_config()[&quot;display&quot;]`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">estimator_html_repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_repr_mimebundle_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Mime bundle used by jupyter kernels to display estimator&quot;&quot;&quot;</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;text/plain&quot;</span><span class="p">:</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)}</span>
+        <span class="k">if</span> <span class="n">get_config</span><span class="p">()[</span><span class="s2">&quot;display&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;diagram&quot;</span><span class="p">:</span>
+            <span class="n">output</span><span class="p">[</span><span class="s2">&quot;text/html&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">estimator_html_repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span>
+
+
+<span class="k">class</span> <span class="nc">ClassifierMixin</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mixin class for all classifiers in scikit-learn.&quot;&quot;&quot;</span>
+
+    <span class="n">_estimator_type</span> <span class="o">=</span> <span class="s2">&quot;classifier&quot;</span>
+
+    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the mean accuracy on the given test data and labels.</span>
+
+<span class="sd">        In multi-label classification, this is the subset accuracy</span>
+<span class="sd">        which is a harsh metric since you require for each sample that</span>
+<span class="sd">        each label set be correctly predicted.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : array-like of shape (n_samples, n_features)</span>
+<span class="sd">            Test samples.</span>
+
+<span class="sd">        y : array-like of shape (n_samples,) or (n_samples, n_outputs)</span>
+<span class="sd">            True labels for `X`.</span>
+
+<span class="sd">        sample_weight : array-like of shape (n_samples,), default=None</span>
+<span class="sd">            Sample weights.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        score : float</span>
+<span class="sd">            Mean accuracy of ``self.predict(X)`` w.r.t. `y`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span>
+
+        <span class="k">return</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_more_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;requires_y&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">RegressorMixin</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mixin class for all regression estimators in scikit-learn.&quot;&quot;&quot;</span>
+
+    <span class="n">_estimator_type</span> <span class="o">=</span> <span class="s2">&quot;regressor&quot;</span>
+
+    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the coefficient of determination of the prediction.</span>
+
+<span class="sd">        The coefficient of determination :math:`R^2` is defined as</span>
+<span class="sd">        :math:`(1 - \\frac{u}{v})`, where :math:`u` is the residual</span>
+<span class="sd">        sum of squares ``((y_true - y_pred)** 2).sum()`` and :math:`v`</span>
+<span class="sd">        is the total sum of squares ``((y_true - y_true.mean()) ** 2).sum()``.</span>
+<span class="sd">        The best possible score is 1.0 and it can be negative (because the</span>
+<span class="sd">        model can be arbitrarily worse). A constant model that always predicts</span>
+<span class="sd">        the expected value of `y`, disregarding the input features, would get</span>
+<span class="sd">        a :math:`R^2` score of 0.0.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : array-like of shape (n_samples, n_features)</span>
+<span class="sd">            Test samples. For some estimators this may be a precomputed</span>
+<span class="sd">            kernel matrix or a list of generic objects instead with shape</span>
+<span class="sd">            ``(n_samples, n_samples_fitted)``, where ``n_samples_fitted``</span>
+<span class="sd">            is the number of samples used in the fitting for the estimator.</span>
+
+<span class="sd">        y : array-like of shape (n_samples,) or (n_samples, n_outputs)</span>
+<span class="sd">            True values for `X`.</span>
+
+<span class="sd">        sample_weight : array-like of shape (n_samples,), default=None</span>
+<span class="sd">            Sample weights.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        score : float</span>
+<span class="sd">            :math:`R^2` of ``self.predict(X)`` w.r.t. `y`.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The :math:`R^2` score used when calling ``score`` on a regressor uses</span>
+<span class="sd">        ``multioutput=&#39;uniform_average&#39;`` from version 0.23 to keep consistent</span>
+<span class="sd">        with default value of :func:`~sklearn.metrics.r2_score`.</span>
+<span class="sd">        This influences the ``score`` method of all the multioutput</span>
+<span class="sd">        regressors (except for</span>
+<span class="sd">        :class:`~sklearn.multioutput.MultiOutputRegressor`).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">from</span> <span class="nn">.metrics</span> <span class="kn">import</span> <span class="n">r2_score</span>
+
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">r2_score</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_more_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;requires_y&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">ClusterMixin</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mixin class for all cluster estimators in scikit-learn.&quot;&quot;&quot;</span>
+
+    <span class="n">_estimator_type</span> <span class="o">=</span> <span class="s2">&quot;clusterer&quot;</span>
+
+    <span class="k">def</span> <span class="nf">fit_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform clustering on `X` and returns cluster labels.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : array-like of shape (n_samples, n_features)</span>
+<span class="sd">            Input data.</span>
+
+<span class="sd">        y : Ignored</span>
+<span class="sd">            Not used, present for API consistency by convention.</span>
+
+<span class="sd">        **kwargs : dict</span>
+<span class="sd">            Arguments to be passed to ``fit``.</span>
+
+<span class="sd">            .. versionadded:: 1.4</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        labels : ndarray of shape (n_samples,), dtype=np.int64</span>
+<span class="sd">            Cluster labels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># non-optimized default implementation; override when a better</span>
+        <span class="c1"># method is possible for a given clustering algorithm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels_</span>
+
+    <span class="k">def</span> <span class="nf">_more_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;preserves_dtype&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+
+
+<span class="k">class</span> <span class="nc">BiclusterMixin</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mixin class for all bicluster estimators in scikit-learn.&quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">biclusters_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convenient way to get row and column indicators together.</span>
+
+<span class="sd">        Returns the ``rows_`` and ``columns_`` members.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rows_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_</span>
+
+    <span class="k">def</span> <span class="nf">get_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Row and column indices of the `i`&#39;th bicluster.</span>
+
+<span class="sd">        Only works if ``rows_`` and ``columns_`` attributes exist.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        i : int</span>
+<span class="sd">            The index of the cluster.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        row_ind : ndarray, dtype=np.intp</span>
+<span class="sd">            Indices of rows in the dataset that belong to the bicluster.</span>
+<span class="sd">        col_ind : ndarray, dtype=np.intp</span>
+<span class="sd">            Indices of columns in the dataset that belong to the bicluster.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rows_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">rows</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">columns</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">get_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Shape of the `i`&#39;th bicluster.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        i : int</span>
+<span class="sd">            The index of the cluster.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        n_rows : int</span>
+<span class="sd">            Number of rows in the bicluster.</span>
+
+<span class="sd">        n_cols : int</span>
+<span class="sd">            Number of columns in the bicluster.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_indices</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_submatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the submatrix corresponding to bicluster `i`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        i : int</span>
+<span class="sd">            The index of the cluster.</span>
+<span class="sd">        data : array-like of shape (n_samples, n_features)</span>
+<span class="sd">            The data.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        submatrix : ndarray of shape (n_rows, n_cols)</span>
+<span class="sd">            The submatrix corresponding to bicluster `i`.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Works with sparse matrices. Only works if ``rows_`` and</span>
+<span class="sd">        ``columns_`` attributes exist.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">.utils.validation</span> <span class="kn">import</span> <span class="n">check_array</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">check_array</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">accept_sparse</span><span class="o">=</span><span class="s2">&quot;csr&quot;</span><span class="p">)</span>
+        <span class="n">row_ind</span><span class="p">,</span> <span class="n">col_ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_indices</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="n">row_ind</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span> <span class="n">col_ind</span><span class="p">]</span>
+
+
+<span class="k">class</span> <span class="nc">TransformerMixin</span><span class="p">(</span><span class="n">_SetOutputMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mixin class for all transformers in scikit-learn.</span>
+
+<span class="sd">    If :term:`get_feature_names_out` is defined, then :class:`BaseEstimator` will</span>
+<span class="sd">    automatically wrap `transform` and `fit_transform` to follow the `set_output`</span>
+<span class="sd">    API. See the :ref:`developer_api_set_output` for details.</span>
+
+<span class="sd">    :class:`OneToOneFeatureMixin` and</span>
+<span class="sd">    :class:`ClassNamePrefixFeaturesOutMixin` are helpful mixins for</span>
+<span class="sd">    defining :term:`get_feature_names_out`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">fit_params</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit to data, then transform it.</span>
+
+<span class="sd">        Fits transformer to `X` and `y` with optional parameters `fit_params`</span>
+<span class="sd">        and returns a transformed version of `X`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : array-like of shape (n_samples, n_features)</span>
+<span class="sd">            Input samples.</span>
+
+<span class="sd">        y :  array-like of shape (n_samples,) or (n_samples, n_outputs), \</span>
+<span class="sd">                default=None</span>
+<span class="sd">            Target values (None for unsupervised transformations).</span>
+
+<span class="sd">        **fit_params : dict</span>
+<span class="sd">            Additional fit parameters.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        X_new : ndarray array of shape (n_samples, n_features_new)</span>
+<span class="sd">            Transformed array.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># non-optimized default implementation; override when a better</span>
+        <span class="c1"># method is possible for a given clustering algorithm</span>
+
+        <span class="c1"># we do not route parameters here, since consumers don&#39;t route. But</span>
+        <span class="c1"># since it&#39;s possible for a `transform` method to also consume</span>
+        <span class="c1"># metadata, we check if that&#39;s the case, and we raise a warning telling</span>
+        <span class="c1"># users that they should implement a custom `fit_transform` method</span>
+        <span class="c1"># to forward metadata to `transform` as well.</span>
+        <span class="c1">#</span>
+        <span class="c1"># For that, we calculate routing and check if anything would be routed</span>
+        <span class="c1"># to `transform` if we were to route them.</span>
+        <span class="k">if</span> <span class="n">_routing_enabled</span><span class="p">():</span>
+            <span class="n">transform_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_metadata_routing</span><span class="p">()</span><span class="o">.</span><span class="n">consumes</span><span class="p">(</span>
+                <span class="n">method</span><span class="o">=</span><span class="s2">&quot;transform&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">fit_params</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">transform_params</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;This object (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">) has a `transform`&quot;</span>
+                        <span class="s2">&quot; method which consumes metadata, but `fit_transform` does not&quot;</span>
+                        <span class="s2">&quot; forward metadata to `transform`. Please implement a custom&quot;</span>
+                        <span class="s2">&quot; `fit_transform` method to forward metadata to `transform` as&quot;</span>
+                        <span class="s2">&quot; well. Alternatively, you can explicitly do&quot;</span>
+                        <span class="s2">&quot; `set_transform_request`and set all values to `False` to&quot;</span>
+                        <span class="s2">&quot; disable metadata routed to `transform`, if that&#39;s an option.&quot;</span>
+                    <span class="p">),</span>
+                    <span class="ne">UserWarning</span><span class="p">,</span>
+                <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># fit method of arity 1 (unsupervised transformation)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="o">**</span><span class="n">fit_params</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># fit method of arity 2 (supervised transformation)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">fit_params</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">OneToOneFeatureMixin</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Provides `get_feature_names_out` for simple transformers.</span>
+
+<span class="sd">    This mixin assumes there&#39;s a 1-to-1 correspondence between input features</span>
+<span class="sd">    and output features, such as :class:`~sklearn.preprocessing.StandardScaler`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">get_feature_names_out</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get output feature names for transformation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        input_features : array-like of str or None, default=None</span>
+<span class="sd">            Input features.</span>
+
+<span class="sd">            - If `input_features` is `None`, then `feature_names_in_` is</span>
+<span class="sd">              used as feature names in. If `feature_names_in_` is not defined,</span>
+<span class="sd">              then the following input feature names are generated:</span>
+<span class="sd">              `[&quot;x0&quot;, &quot;x1&quot;, ..., &quot;x(n_features_in_ - 1)&quot;]`.</span>
+<span class="sd">            - If `input_features` is an array-like, then `input_features` must</span>
+<span class="sd">              match `feature_names_in_` if `feature_names_in_` is defined.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        feature_names_out : ndarray of str objects</span>
+<span class="sd">            Same as input features.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;n_features_in_&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_check_feature_names_in</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_features</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">ClassNamePrefixFeaturesOutMixin</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mixin class for transformers that generate their own names by prefixing.</span>
+
+<span class="sd">    This mixin is useful when the transformer needs to generate its own feature</span>
+<span class="sd">    names out, such as :class:`~sklearn.decomposition.PCA`. For example, if</span>
+<span class="sd">    :class:`~sklearn.decomposition.PCA` outputs 3 features, then the generated feature</span>
+<span class="sd">    names out are: `[&quot;pca0&quot;, &quot;pca1&quot;, &quot;pca2&quot;]`.</span>
+
+<span class="sd">    This mixin assumes that a `_n_features_out` attribute is defined when the</span>
+<span class="sd">    transformer is fitted. `_n_features_out` is the number of output features</span>
+<span class="sd">    that the transformer will return in `transform` of `fit_transform`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">get_feature_names_out</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get output feature names for transformation.</span>
+
+<span class="sd">        The feature names out will prefixed by the lowercased class name. For</span>
+<span class="sd">        example, if the transformer outputs 3 features, then the feature names</span>
+<span class="sd">        out are: `[&quot;class_name0&quot;, &quot;class_name1&quot;, &quot;class_name2&quot;]`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        input_features : array-like of str or None, default=None</span>
+<span class="sd">            Only used to validate feature names with the names seen in `fit`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        feature_names_out : ndarray of str objects</span>
+<span class="sd">            Transformed feature names.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_n_features_out&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_generate_get_feature_names_out</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_features_out</span><span class="p">,</span> <span class="n">input_features</span><span class="o">=</span><span class="n">input_features</span>
+        <span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">DensityMixin</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mixin class for all density estimators in scikit-learn.&quot;&quot;&quot;</span>
+
+    <span class="n">_estimator_type</span> <span class="o">=</span> <span class="s2">&quot;DensityEstimator&quot;</span>
+
+    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the score of the model on the data `X`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : array-like of shape (n_samples, n_features)</span>
+<span class="sd">            Test samples.</span>
+
+<span class="sd">        y : Ignored</span>
+<span class="sd">            Not used, present for API consistency by convention.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        score : float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+
+<span class="k">class</span> <span class="nc">OutlierMixin</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mixin class for all outlier detection estimators in scikit-learn.&quot;&quot;&quot;</span>
+
+    <span class="n">_estimator_type</span> <span class="o">=</span> <span class="s2">&quot;outlier_detector&quot;</span>
+
+    <span class="k">def</span> <span class="nf">fit_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform fit on X and returns labels for X.</span>
+
+<span class="sd">        Returns -1 for outliers and 1 for inliers.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : {array-like, sparse matrix} of shape (n_samples, n_features)</span>
+<span class="sd">            The input samples.</span>
+
+<span class="sd">        y : Ignored</span>
+<span class="sd">            Not used, present for API consistency by convention.</span>
+
+<span class="sd">        **kwargs : dict</span>
+<span class="sd">            Arguments to be passed to ``fit``.</span>
+
+<span class="sd">            .. versionadded:: 1.4</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        y : ndarray of shape (n_samples,)</span>
+<span class="sd">            1 for inliers, -1 for outliers.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># we do not route parameters here, since consumers don&#39;t route. But</span>
+        <span class="c1"># since it&#39;s possible for a `predict` method to also consume</span>
+        <span class="c1"># metadata, we check if that&#39;s the case, and we raise a warning telling</span>
+        <span class="c1"># users that they should implement a custom `fit_predict` method</span>
+        <span class="c1"># to forward metadata to `predict` as well.</span>
+        <span class="c1">#</span>
+        <span class="c1"># For that, we calculate routing and check if anything would be routed</span>
+        <span class="c1"># to `predict` if we were to route them.</span>
+        <span class="k">if</span> <span class="n">_routing_enabled</span><span class="p">():</span>
+            <span class="n">transform_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_metadata_routing</span><span class="p">()</span><span class="o">.</span><span class="n">consumes</span><span class="p">(</span>
+                <span class="n">method</span><span class="o">=</span><span class="s2">&quot;predict&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">transform_params</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;This object (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">) has a `predict` &quot;</span>
+                        <span class="s2">&quot;method which consumes metadata, but `fit_predict` does not &quot;</span>
+                        <span class="s2">&quot;forward metadata to `predict`. Please implement a custom &quot;</span>
+                        <span class="s2">&quot;`fit_predict` method to forward metadata to `predict` as well.&quot;</span>
+                        <span class="s2">&quot;Alternatively, you can explicitly do `set_predict_request`&quot;</span>
+                        <span class="s2">&quot;and set all values to `False` to disable metadata routed to &quot;</span>
+                        <span class="s2">&quot;`predict`, if that&#39;s an option.&quot;</span>
+                    <span class="p">),</span>
+                    <span class="ne">UserWarning</span><span class="p">,</span>
+                <span class="p">)</span>
+
+        <span class="c1"># override for transductive outlier detectors like LocalOulierFactor</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">MetaEstimatorMixin</span><span class="p">:</span>
+    <span class="n">_required_parameters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;estimator&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mixin class for all meta estimators in scikit-learn.&quot;&quot;&quot;</span>
+
+
+<span class="k">class</span> <span class="nc">MultiOutputMixin</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mixin to mark estimators that support multioutput.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_more_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;multioutput&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">_UnstableArchMixin</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mark estimators that are non-determinstic on 32bit or PowerPC&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_more_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;non_deterministic&quot;</span><span class="p">:</span> <span class="n">_IS_32BIT</span> <span class="ow">or</span> <span class="n">platform</span><span class="o">.</span><span class="n">machine</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span>
+                <span class="p">(</span><span class="s2">&quot;ppc&quot;</span><span class="p">,</span> <span class="s2">&quot;powerpc&quot;</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">}</span>
+
+
+<span class="k">def</span> <span class="nf">is_classifier</span><span class="p">(</span><span class="n">estimator</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return True if the given estimator is (probably) a classifier.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    estimator : object</span>
+<span class="sd">        Estimator object to test.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    out : bool</span>
+<span class="sd">        True if estimator is a classifier and False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="s2">&quot;_estimator_type&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;classifier&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">is_regressor</span><span class="p">(</span><span class="n">estimator</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return True if the given estimator is (probably) a regressor.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    estimator : estimator instance</span>
+<span class="sd">        Estimator object to test.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    out : bool</span>
+<span class="sd">        True if estimator is a regressor and False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="s2">&quot;_estimator_type&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;regressor&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">is_outlier_detector</span><span class="p">(</span><span class="n">estimator</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return True if the given estimator is (probably) an outlier detector.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    estimator : estimator instance</span>
+<span class="sd">        Estimator object to test.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    out : bool</span>
+<span class="sd">        True if estimator is an outlier detector and False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="s2">&quot;_estimator_type&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;outlier_detector&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">_fit_context</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">prefer_skip_nested_validation</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator to run the fit methods of estimators within context managers.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    prefer_skip_nested_validation : bool</span>
+<span class="sd">        If True, the validation of parameters of inner estimators or functions</span>
+<span class="sd">        called during fit will be skipped.</span>
+
+<span class="sd">        This is useful to avoid validating many times the parameters passed by the</span>
+<span class="sd">        user from the public facing API. It&#39;s also useful to avoid validating</span>
+<span class="sd">        parameters that we pass internally to inner functions that are guaranteed to</span>
+<span class="sd">        be valid by the test suite.</span>
+
+<span class="sd">        It should be set to True for most estimators, except for those that receive</span>
+<span class="sd">        non-validated objects as parameters, such as meta-estimators that are given</span>
+<span class="sd">        estimator objects.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    decorated_fit : method</span>
+<span class="sd">        The decorated fit method.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">fit_method</span><span class="p">):</span>
+        <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">fit_method</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">global_skip_validation</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">()[</span><span class="s2">&quot;skip_parameter_validation&quot;</span><span class="p">]</span>
+
+            <span class="c1"># we don&#39;t want to validate again for each call to partial_fit</span>
+            <span class="n">partial_fit_and_fitted</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">fit_method</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;partial_fit&quot;</span> <span class="ow">and</span> <span class="n">_is_fitted</span><span class="p">(</span><span class="n">estimator</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">global_skip_validation</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">partial_fit_and_fitted</span><span class="p">:</span>
+                <span class="n">estimator</span><span class="o">.</span><span class="n">_validate_params</span><span class="p">()</span>
+
+            <span class="k">with</span> <span class="n">config_context</span><span class="p">(</span>
+                <span class="n">skip_parameter_validation</span><span class="o">=</span><span class="p">(</span>
+                    <span class="n">prefer_skip_nested_validation</span> <span class="ow">or</span> <span class="n">global_skip_validation</span>
+                <span class="p">)</span>
+            <span class="p">):</span>
+                <span class="k">return</span> <span class="n">fit_method</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">wrapper</span>
+
+    <span class="k">return</span> <span class="n">decorator</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=c5ced968eda925caa686"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=c5ced968eda925caa686"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-02.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
