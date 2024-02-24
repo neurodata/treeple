@@ -992,9 +992,9 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
 
     @property
     def _inheritable_fitted_attribute(self):
-        return {
+        return [
             "feature_combinations_",
-        }
+        ]
 
 
 class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
@@ -1860,13 +1860,13 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
 
     @property
     def _inheritable_fitted_attribute(self):
-        return {
+        return [
             "feature_combinations_",
             "min_patch_dims_",
             "max_patch_dims_",
             "dim_contiguous_",
             "data_dims_",
-        }
+        ]
 
 
 class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
@@ -2765,9 +2765,9 @@ class ExtraObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
 
     @property
     def _inheritable_fitted_attribute(self):
-        return {
+        return [
             "feature_combinations_",
-        }
+        ]
 
 
 class ExtraObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):

@@ -538,8 +538,8 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
 
     def _inherit_estimator_attributes(self):
         """Initialize necessary attributes from the provided tree estimator"""
-        if hasattr(self.estimators_[0], "_inheritable_fitted_attribute"):
-            for attr in self.estimators_[0]._inheritable_fitted_attribute:
+        if hasattr(self.tree_estimator, "_inheritable_fitted_attribute"):
+            for attr in self.tree_estimator._inheritable_fitted_attribute:
                 setattr(self, attr, getattr(self.estimators_[0], attr))
 
     def predict_proba(self, X):

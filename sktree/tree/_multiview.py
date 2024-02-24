@@ -582,11 +582,11 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
 
         Used for passing parameters to HonestTreeClassifier.
         """
-        return {
+        return [
             "max_features_",
             "feature_combinations_",
             "feature_set_ends_",
             "n_feature_sets_",
             "n_features_in_set_",
             "max_features_per_set_",
-        }
+        ]

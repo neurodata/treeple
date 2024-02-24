@@ -476,7 +476,7 @@ def test_honest_forest_with_tree_estimator_params(tree, tree_kwargs):
         "n_features_in_",
         "n_outputs_",
     ]
-    checked_attrs + getattr(clf.estimator_, "_inheritable_fitted_attribute", [])
+    checked_attrs + getattr(tree, "_inheritable_fitted_attribute", [])
     for attr_name in checked_attrs:
         if not attr_name.startswith("_") and attr_name.endswith("_"):
             if isinstance(getattr(clf, attr_name), np.ndarray):
