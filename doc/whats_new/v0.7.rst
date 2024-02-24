@@ -3,12 +3,17 @@
 .. include:: _contributors.rst
 .. currentmodule:: sktree
 
-.. _current:
+.. _v0_7:
 
 Version 0.7
 ===========
 
-**In Development**
+This release adds the ability to separate in-bag and out-of-bag samples for
+any forest model. We also introduce a new class for fitting honest forests while
+permuting the covariate index, and a new set of simulations based on Marron and Wand 1992.
+
+In addition, various patches were made in terms of how to use scikit-tree for hypothesis
+testing of feature sets.
 
 Changelog
 ---------
