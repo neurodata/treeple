@@ -1,0 +1,23 @@
+:orphan:
+
+.. include:: _contributors.rst
+.. currentmodule:: sktree
+
+.. _current:
+
+Version 0.8
+===========
+
+**In Development**
+
+Changelog
+---------
+
+Code and Documentation Contributors
+-----------------------------------
+
+Thanks to everyone who has contributed to the maintenance and improvement of
+the project since version inception, including:
+
+* `Adam Li`_
+
