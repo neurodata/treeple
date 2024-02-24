@@ -437,23 +437,30 @@ def test_honest_forest_with_sklearn_trees_with_mi():
     assert_allclose(np.mean(sk_scores), np.mean(scores), atol=0.005)
 
 
-def test_honest_forest_with_tree_estimator_params():
+@pytest.mark.parametrize(
+    "tree, tree_kwargs",
+    [
+        (MultiViewDecisionTreeClassifier(), {"feature_set_ends": [10, 20]}),
+        (ObliqueDecisionTreeClassifier(), {"feature_combinations": 2}),
+        (PatchObliqueDecisionTreeClassifier(), {"max_patch_dims": 5}),
+    ],
+)
+def test_honest_forest_with_tree_estimator_params(tree, tree_kwargs):
+    """Test that honest forest inherits all the fitted parameters of the tree estimator."""
     X = np.ones((20, 4))
     X[10:] *= -1
     y = [0] * 10 + [1] * 10
 
     # test with a parameter that is a repeat of an init parameter
     clf = HonestForestClassifier(
-        tree_estimator=DecisionTreeClassifier(),
-        random_state=0,
-        feature_set_ends=[10, 20],
+        tree_estimator=DecisionTreeClassifier(), random_state=0, **tree_kwargs
     )
     with pytest.raises(ValueError, match=r"Invalid parameter\(s\)"):
         clf.fit(X, y)
 
     # test with a parameter that is not in any init signature
     clf = HonestForestClassifier(
-        tree_estimator=MultiViewDecisionTreeClassifier(),
+        tree_estimator=tree,
         random_state=0,
         blah=0,
     )
@@ -461,9 +468,20 @@ def test_honest_forest_with_tree_estimator_params():
         clf.fit(X, y)
 
     # passing in a valid argument to the tree_estimator should work
-    clf = HonestForestClassifier(
-        tree_estimator=MultiViewDecisionTreeClassifier(),
-        random_state=0,
-        feature_set_ends=[10, 20],
-    )
+    clf = HonestForestClassifier(tree_estimator=tree, random_state=0, **tree_kwargs)
     clf.fit(X, y)
+    checked_attrs = [
+        "classes_",
+        "n_classes_",
+        "n_features_in_",
+        "n_outputs_",
+    ]
+    checked_attrs + getattr(tree, "_inheritable_fitted_attribute", [])
+    for attr_name in checked_attrs:
+        if not attr_name.startswith("_") and attr_name.endswith("_"):
+            if isinstance(getattr(clf, attr_name), np.ndarray):
+                np.testing.assert_array_equal(
+                    getattr(clf, attr_name), getattr(clf.estimators_[0], attr_name)
+                )
+            else:
+                assert getattr(clf, attr_name) == getattr(clf.estimators_[0], attr_name)

@@ -15,9 +15,6 @@ requires = [
   "numpy>=1.25; python_version>='3.9'"
 ]
 
-[lint.per-file-ignores]
-'__init__.py' = ['F401']
-
 [project]
 name = "scikit-tree"
 version = "0.7.0dev0"
@@ -266,10 +263,12 @@ extend-exclude = [
   'validation'
 ]
 line-length = 88
-lint.ignore = ['E731']
 
-[tool.ruff.per-file-ignores]
-"__init__.py" = ["F401"]
+[tool.ruff.lint]
+ignore = ['E731']
+
+[tool.ruff.lint.per-file-ignores]
+'__init__.py' = ['F401']
 
 [tool.spin]
 package = 'sktree'

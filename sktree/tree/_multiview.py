@@ -476,7 +476,6 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                     max_features = 0
 
             self.max_features_ = max_features
-            print(self.max_features_, self.max_features_per_set_)
 
         if not isinstance(self.splitter, ObliqueSplitter):
             splitter = SPLITTERS[self.splitter](
@@ -576,3 +575,18 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         super()._fit(X, y, sample_weight, check_input, missing_values_in_feature_mask, classes)
         self.max_features = self._max_features_arr
         return self
+
+    @property
+    def _inheritable_fitted_attribute(self):
+        """Define additional attributes to pass onto a parent meta tree-estimator.
+
+        Used for passing parameters to HonestTreeClassifier.
+        """
+        return [
+            "max_features_",
+            "feature_combinations_",
+            "feature_set_ends_",
+            "n_feature_sets_",
+            "n_features_in_set_",
+            "max_features_per_set_",
+        ]

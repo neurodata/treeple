@@ -63,23 +63,30 @@ def test_toy_accuracy():
     np.testing.assert_array_equal(clf.predict(X), y)
 
 
-def test_honest_tree_with_tree_estimator_params():
+@pytest.mark.parametrize(
+    "tree, tree_kwargs",
+    [
+        (MultiViewDecisionTreeClassifier(), {"feature_set_ends": [10, 20]}),
+        (ObliqueDecisionTreeClassifier(), {"feature_combinations": 2}),
+        (PatchObliqueDecisionTreeClassifier(), {"max_patch_dims": 5}),
+    ],
+)
+def test_honest_tree_with_tree_estimator_params(tree, tree_kwargs):
+    """Test that honest tree inherits all the fitted parameters of the tree estimator."""
     X = np.ones((20, 4))
     X[10:] *= -1
     y = [0] * 10 + [1] * 10
 
     # test with a parameter that is a repeat of an init parameter
     clf = HonestTreeClassifier(
-        tree_estimator=DecisionTreeClassifier(),
-        random_state=0,
-        feature_set_ends=[10, 20],
+        tree_estimator=DecisionTreeClassifier(), random_state=0, **tree_kwargs
     )
     with pytest.raises(ValueError, match=r"Invalid parameter\(s\)"):
         clf.fit(X, y)
 
     # test with a parameter that is not in any init signature
     clf = HonestTreeClassifier(
-        tree_estimator=MultiViewDecisionTreeClassifier(),
+        tree_estimator=tree,
         random_state=0,
         blah=0,
     )
@@ -87,12 +94,16 @@ def test_honest_tree_with_tree_estimator_params():
         clf.fit(X, y)
 
     # passing in a valid argument to the tree_estimator should work
-    clf = HonestTreeClassifier(
-        tree_estimator=MultiViewDecisionTreeClassifier(),
-        random_state=0,
-        feature_set_ends=[10, 20],
-    )
+    clf = HonestTreeClassifier(tree_estimator=tree, random_state=0, **tree_kwargs)
     clf.fit(X, y)
+    for attr_name in dir(clf.estimator_):
+        if not attr_name.startswith("_") and attr_name.endswith("_"):
+            if isinstance(getattr(clf, attr_name), np.ndarray):
+                np.testing.assert_array_equal(
+                    getattr(clf, attr_name), getattr(clf.estimator_, attr_name)
+                )
+            else:
+                assert getattr(clf, attr_name) == getattr(clf.estimator_, attr_name)
 
 
 @pytest.mark.parametrize(
