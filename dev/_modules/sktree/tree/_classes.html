@@ -1456,7 +1456,13 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="bp">self</span></div>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_inheritable_fitted_attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="s2">&quot;feature_combinations_&quot;</span><span class="p">,</span>
+        <span class="p">]</span></div>
 
 
 
@@ -2324,7 +2330,17 @@ document.write(`
         <span class="c1"># XXX: nans should be supportable in SPORF by just using RF-like splits on missing values</span>
         <span class="c1"># However, for MORF it is not supported</span>
         <span class="n">allow_nan</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;multilabel&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;allow_nan&quot;</span><span class="p">:</span> <span class="n">allow_nan</span><span class="p">}</span></div>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;multilabel&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;allow_nan&quot;</span><span class="p">:</span> <span class="n">allow_nan</span><span class="p">}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_inheritable_fitted_attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="s2">&quot;feature_combinations_&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;min_patch_dims_&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;max_patch_dims_&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;dim_contiguous_&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;data_dims_&quot;</span><span class="p">,</span>
+        <span class="p">]</span></div>
 
 
 
@@ -3225,6 +3241,12 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">return</span> <span class="bp">self</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_inheritable_fitted_attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="s2">&quot;feature_combinations_&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+
 
 <span class="k">class</span> <span class="nc">ExtraObliqueDecisionTreeRegressor</span><span class="p">(</span><span class="n">SimMatrixMixin</span><span class="p">,</span> <span class="n">DecisionTreeRegressor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;An oblique decision tree Regressor.</span>
@@ -3658,7 +3680,7 @@ document.write(`
 
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-23.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-24.
       <br/>
     
   </p>

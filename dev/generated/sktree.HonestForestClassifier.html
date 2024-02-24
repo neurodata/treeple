@@ -778,8 +778,6 @@ class labels (multi-output problem).</p>
 <dt><strong>n_classes_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a></span></dt><dd><p>The number of classes (single output problem), or a list containing the
 number of classes for each output (multi-output problem).</p>
 </dd>
-<dt><strong>n_features_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>The number of features when <code class="docutils literal notranslate"><span class="pre">fit</span></code> is performed.</p>
-</dd>
 <dt><strong>n_features_in_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>Number of features seen during <a class="reference external" href="https://scikit-learn.org/dev/glossary.html#term-fit" title="(in scikit-learn v1.5)"><span class="xref std std-term">fit</span></a>.</p>
 </dd>
 <dt><strong>feature_names_in_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (<code class="docutils literal notranslate"><span class="pre">n_features_in_</span></code>,)</span></dt><dd><p>Names of features seen during <a class="reference external" href="https://scikit-learn.org/dev/glossary.html#term-fit" title="(in scikit-learn v1.5)"><span class="xref std std-term">fit</span></a>. Defined only when <code class="docutils literal notranslate"><span class="pre">X</span></code>
@@ -870,7 +868,7 @@ might contain NaN.</p>
 </table>
 <dl class="py method">
 <dt class="sig sig-object py" id="sktree.HonestForestClassifier.apply">
-<span class="sig-name descname"><span class="pre">apply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sktree/ensemble/_honest_forest.html#HonestForestClassifier.apply"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sktree.HonestForestClassifier.apply" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">apply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sktree.HonestForestClassifier.apply" title="Link to this definition">#</a></dt>
 <dd><p>Apply trees in the forest to X, return leaf indices.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1525,7 +1523,7 @@ array of zeros.</p>
 
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-23.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-24.
       <br/>
     
   </p>

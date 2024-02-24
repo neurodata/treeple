@@ -932,7 +932,6 @@ document.write(`
                     <span class="n">max_features</span> <span class="o">=</span> <span class="mi">0</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">max_features_</span> <span class="o">=</span> <span class="n">max_features</span>
-            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_features_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_features_per_set_</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splitter</span><span class="p">,</span> <span class="n">ObliqueSplitter</span><span class="p">):</span>
             <span class="n">splitter</span> <span class="o">=</span> <span class="n">SPLITTERS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">splitter</span><span class="p">](</span>
@@ -1034,7 +1033,22 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">max_features</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">,</span> <span class="n">check_input</span><span class="p">,</span> <span class="n">missing_values_in_feature_mask</span><span class="p">,</span> <span class="n">classes</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_features_arr</span>
-        <span class="k">return</span> <span class="bp">self</span></div>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_inheritable_fitted_attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Define additional attributes to pass onto a parent meta tree-estimator.</span>
+
+<span class="sd">        Used for passing parameters to HonestTreeClassifier.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="s2">&quot;max_features_&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;feature_combinations_&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;feature_set_ends_&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;n_feature_sets_&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;n_features_in_set_&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;max_features_per_set_&quot;</span><span class="p">,</span>
+        <span class="p">]</span></div>
 
 </pre></div>
 
@@ -1079,7 +1093,7 @@ document.write(`
 
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-23.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-24.
       <br/>
     
   </p>

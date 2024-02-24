@@ -733,9 +733,6 @@ document.write(`
 <span class="sd">        The number of classes (single output problem), or a list containing the</span>
 <span class="sd">        number of classes for each output (multi-output problem).</span>
 
-<span class="sd">    n_features_ : int</span>
-<span class="sd">        The number of features when ``fit`` is performed.</span>
-
 <span class="sd">    n_features_in_ : int</span>
 <span class="sd">        Number of features seen during :term:`fit`.</span>
 
@@ -966,6 +963,9 @@ document.write(`
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span> <span class="o">**</span><span class="n">fit_params</span><span class="p">)</span>
 
+        <span class="c1"># Inherit attributes from the tree estimator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_inherit_estimator_attributes</span><span class="p">()</span>
+
         <span class="c1"># Compute honest decision function</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">honest_decision_function_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_proba</span><span class="p">(</span>
             <span class="n">X</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span><span class="p">,</span> <span class="n">impute_missing</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
@@ -994,6 +994,12 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">estimators_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">estimator</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">estimator</span>
+
+    <span class="k">def</span> <span class="nf">_inherit_estimator_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize necessary attributes from the provided tree estimator&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_estimator</span><span class="p">,</span> <span class="s2">&quot;_inheritable_fitted_attribute&quot;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree_estimator</span><span class="o">.</span><span class="n">_inheritable_fitted_attribute</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimators_</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">attr</span><span class="p">))</span>
 
 <div class="viewcode-block" id="HonestForestClassifier.predict_proba">
 <a class="viewcode-back" href="../../../generated/sktree.HonestForestClassifier.html#sktree.HonestForestClassifier.predict_proba">[docs]</a>
@@ -1099,28 +1105,6 @@ document.write(`
 
     <span class="k">def</span> <span class="nf">_more_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;multioutput&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
-
-<div class="viewcode-block" id="HonestForestClassifier.apply">
-<a class="viewcode-back" href="../../../generated/sktree.HonestForestClassifier.html#sktree.HonestForestClassifier.apply">[docs]</a>
-    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Apply trees in the forest to X, return leaf indices.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        X : {array-like, sparse matrix} of shape (n_samples, n_features)</span>
-<span class="sd">            The input samples. Internally, its dtype will be converted to</span>
-<span class="sd">            ``dtype=np.float32``. If a sparse matrix is provided, it will be</span>
-<span class="sd">            converted into a sparse ``csr_matrix``.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        X_leaves : ndarray of shape (n_samples, n_estimators)</span>
-<span class="sd">            For each datapoint x in X and for each tree in the forest,</span>
-<span class="sd">            return the index of the leaf x ends up in.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">X</span><span class="p">)</span></div>
-
 
 <div class="viewcode-block" id="HonestForestClassifier.decision_path">
 <a class="viewcode-back" href="../../../generated/sktree.HonestForestClassifier.html#sktree.HonestForestClassifier.decision_path">[docs]</a>
@@ -1276,7 +1260,7 @@ document.write(`
 
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-23.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-24.
       <br/>
     
   </p>
