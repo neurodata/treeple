@@ -106,7 +106,7 @@ class ForestClassifierMixin:
 
         Returns
         -------
-        proba_per_tree : array-like of shape (n_samples, n_estimators, n_classes)
+        proba_per_tree : array-like of shape (n_estimators, n_samples, n_classes)
             The probability estimates for each tree in the forest.
         """
         # now evaluate

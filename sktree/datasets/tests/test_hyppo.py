@@ -64,7 +64,7 @@ def test_make_trunk_classification_autoregressive_cov(trunk_gen):
         assert_array_equal(cov_list[0][0, :], [rho**idx for idx in range(n_dim)])
     elif trunk_gen == make_trunk_mixture_classification:
         assert len(data) == 5
-        assert_array_equal(cov_list[0][0, :], [rho**idx * (2.0 / 3) ** 2 for idx in range(n_dim)])
+        assert_array_equal(cov_list[0][0, :], [rho**idx for idx in range(n_dim)])
     assert_array_equal(cov_list[0], cov_list[1])
     assert cov_list[0].shape == (n_dim, n_dim)
 
