@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 from scipy.integrate import nquad
 from scipy.stats import entropy, multivariate_normal
@@ -236,6 +238,7 @@ def make_trunk_mixture_classification(
     band_type: str = "ma",
     return_params: bool = False,
     mix: float = 0.5,
+    scaling_factor: Optional[float] = None,
     seed=None,
 ):
     """Generate trunk mixture binary classification dataset.
@@ -281,6 +284,9 @@ def make_trunk_mixture_classification(
     mix : int, optional
         The probabilities associated with the mixture of Gaussians in the ``trunk-mix`` simulation.
         By default 0.5.
+    scaling_factor : float, optional
+        The scaling factor for the covariance matrix. By default None, which
+        defaults to (2/3)**2.
     seed : int, optional
         Random seed, by default None.
 
@@ -355,7 +361,9 @@ def make_trunk_mixture_classification(
 
     # When variance is 1, trunk-mix does not look bimodal at low dimensions.
     # It is set it to (2/3)**2 since that is consistent with Marron and Wand bimodal
-    norm_params = [[mu_0_vec, cov * (2 / 3) ** 2], [mu_1_vec, cov * (2 / 3) ** 2]]
+    if scaling_factor is None:
+        scaling_factor = (2 / 3) ** 2
+    norm_params = [[mu_0_vec, cov * scaling_factor], [mu_1_vec, cov * scaling_factor]]
     X_mixture = np.fromiter(
         (rng.multivariate_normal(*(norm_params[i]), size=1, method=method) for i in mixture_idx),
         dtype=np.dtype((float, n_informative)),
@@ -364,7 +372,7 @@ def make_trunk_mixture_classification(
     X = np.vstack(
         (
             rng.multivariate_normal(
-                np.zeros(n_informative), cov * (2 / 3) ** 2, n_samples // 2, method=method
+                np.zeros(n_informative), cov * scaling_factor, n_samples // 2, method=method
             ),
             X_mixture.reshape(n_samples // 2, n_informative),
         )

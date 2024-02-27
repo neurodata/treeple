@@ -1465,7 +1465,7 @@ def build_permutation_forest(
         return forest_result
 
 
-def build_hyppo_oob_forest(est, X, y, verbose=False, **est_kwargs):
+def build_hyppo_oob_forest(est: ForestClassifier, X, y, verbose=False, **est_kwargs):
     """Build a hypothesis testing forest using oob samples.
 
     Parameters
