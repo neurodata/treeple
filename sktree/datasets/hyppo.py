@@ -1,5 +1,3 @@
-from typing import Optional
-
 import numpy as np
 from scipy.integrate import nquad
 from scipy.stats import entropy, multivariate_normal
@@ -79,6 +77,7 @@ def make_marron_wand_classification(
     rho: int = 0,
     band_type: str = "ma",
     return_params: bool = False,
+    scaling_factor: float = 1.0,
     seed=None,
 ):
     """Generate Marron-Wand binary classification dataset.
@@ -120,6 +119,8 @@ def make_marron_wand_classification(
         Either 'ma', or 'ar'.
     return_params : bool, optional
         Whether or not to return the distribution parameters of the classes normal distributions.
+    scaling_factor : float, optional
+        The scaling factor for the covariance matrix. By default 1.
     seed : int, optional
         Random seed, by default None.
 
@@ -178,6 +179,9 @@ def make_marron_wand_classification(
             raise ValueError(f'Band type {band_type} must be one of "ma", or "ar".')
     else:
         cov = np.identity(n_informative)
+
+    # allow arbitrary uniform scaling of the covariance matrix
+    cov = scaling_factor * cov
 
     # speed up computations for large multivariate normal matrix with SVD approximation
     if n_informative > 1000:
@@ -238,7 +242,7 @@ def make_trunk_mixture_classification(
     band_type: str = "ma",
     return_params: bool = False,
     mix: float = 0.5,
-    scaling_factor: Optional[float] = None,
+    scaling_factor: float = 1.0,
     seed=None,
 ):
     """Generate trunk mixture binary classification dataset.
@@ -285,8 +289,7 @@ def make_trunk_mixture_classification(
         The probabilities associated with the mixture of Gaussians in the ``trunk-mix`` simulation.
         By default 0.5.
     scaling_factor : float, optional
-        The scaling factor for the covariance matrix. By default None, which
-        defaults to (2/3)**2.
+        The scaling factor for the covariance matrix. By default 1.
     seed : int, optional
         Random seed, by default None.
 
@@ -351,6 +354,10 @@ def make_trunk_mixture_classification(
     else:
         cov = np.identity(n_informative)
 
+    # Note: When variance is 1, trunk-mix does not look bimodal at low dimensions.
+    # It is set it to (2/3)**2 since that is consistent with Marron and Wand bimodal
+    cov = scaling_factor * cov
+
     # speed up computations for large multivariate normal matrix with SVD approximation
     if n_informative > 1000:
         method = "cholesky"
@@ -359,11 +366,7 @@ def make_trunk_mixture_classification(
 
     mixture_idx = rng.choice(2, n_samples // 2, replace=True, shuffle=True, p=[mix, 1 - mix])  # type: ignore
 
-    # When variance is 1, trunk-mix does not look bimodal at low dimensions.
-    # It is set it to (2/3)**2 since that is consistent with Marron and Wand bimodal
-    if scaling_factor is None:
-        scaling_factor = (2 / 3) ** 2
-    norm_params = [[mu_0_vec, cov * scaling_factor], [mu_1_vec, cov * scaling_factor]]
+    norm_params = [[mu_0_vec, cov], [mu_1_vec, cov]]
     X_mixture = np.fromiter(
         (rng.multivariate_normal(*(norm_params[i]), size=1, method=method) for i in mixture_idx),
         dtype=np.dtype((float, n_informative)),
@@ -371,9 +374,7 @@ def make_trunk_mixture_classification(
 
     X = np.vstack(
         (
-            rng.multivariate_normal(
-                np.zeros(n_informative), cov * scaling_factor, n_samples // 2, method=method
-            ),
+            rng.multivariate_normal(np.zeros(n_informative), cov, n_samples // 2, method=method),
             X_mixture.reshape(n_samples // 2, n_informative),
         )
     )
@@ -399,6 +400,7 @@ def make_trunk_classification(
     rho: int = 0,
     band_type: str = "ma",
     return_params: bool = False,
+    scaling_factor: float = 1.0,
     seed=None,
 ):
     """Generate trunk binary classification dataset.
@@ -436,6 +438,8 @@ def make_trunk_classification(
         Either 'ma', or 'ar'.
     return_params : bool, optional
         Whether or not to return the distribution parameters of the classes normal distributions.
+    scaling_factor : float, optional
+        The scaling factor for the covariance matrix. By default 1.
     seed : int, optional
         Random seed, by default None.
 
@@ -490,6 +494,9 @@ def make_trunk_classification(
             raise ValueError(f'Band type {band_type} must be one of "ma", or "ar".')
     else:
         cov = np.identity(n_informative)
+
+    # allow arbitrary uniform scaling of the covariance matrix
+    cov = scaling_factor * cov
 
     # speed up computations for large multivariate normal matrix with SVD approximation
     if n_informative > 1000:
