@@ -138,3 +138,19 @@ def test_approximate_clf_mutual_information_numerically_close():
     assert np.isclose(
         result_approximate[0], result_monte_carlo[0], atol=5e-2
     ), f"{result_approximate[0]}, {result_monte_carlo[0]}"
+
+
+@pytest.mark.parametrize(
+    "method",
+    [make_trunk_classification, make_trunk_mixture_classification, make_marron_wand_classification],
+)
+def test_consistent_fixed_seed(method):
+    seed = 0
+    n_samples = 10
+    n_dim = 5
+    n_informative = 3
+    X1, _ = method(n_samples=n_samples, n_dim=n_dim, n_informative=n_informative, random_state=seed)
+    X2, _ = method(
+        n_samples=n_samples + 1, n_dim=n_dim + 1, n_informative=n_informative, random_state=seed
+    )
+    assert_array_equal(X1, X2[:n_samples, :n_dim])

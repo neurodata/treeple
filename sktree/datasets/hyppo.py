@@ -96,7 +96,7 @@ def make_marron_wand_classification(
     Parameters
     ----------
     n_samples : int
-        Number of sample to generate.
+        Number of sample to generate. Must be an even number.
     n_dim : int, optional
         The dimensionality of the dataset and the number of
         unique labels, by default 4096.
@@ -197,10 +197,13 @@ def make_marron_wand_classification(
     )
     # the parameters used for each Gaussian in the mixture for each Marron Wand simulation
     norm_params = MarronWandSims(n_dim=n_informative, cov=cov)(simulation)
+    rngs = [np.random.default_rng(seed=seed + i) for i in range(n_samples // 2)]
     G = np.fromiter(
         (
-            rng.multivariate_normal(*(norm_params[i]), size=1, method=mvg_sampling_method)
-            for i in mixture_idx
+            rngs[i].multivariate_normal(
+                *(norm_params[mixture_idx[i]]), size=1, method=mvg_sampling_method
+            )
+            for i in range(len(mixture_idx))
         ),
         dtype=np.dtype((float, n_informative)),
     )
@@ -208,20 +211,21 @@ def make_marron_wand_classification(
     # as the dimensionality of the simulations increasing, we are adding more and
     # more noise to the data using the w parameter
     w_vec = np.array([1.0 / np.sqrt(i) for i in range(1, n_informative + 1)])
+    rngs_F = [np.random.default_rng(seed=seed + i) for i in range(2)]
     X = np.vstack(
         (
-            rng.multivariate_normal(
+            rngs_F[0].multivariate_normal(
                 np.zeros(n_informative), cov, n_samples // 2, method=mvg_sampling_method
             ),
             (1 - w_vec)
-            * rng.multivariate_normal(
+            * rngs_F[1].multivariate_normal(
                 np.zeros(n_informative), cov, n_samples // 2, method=mvg_sampling_method
             )
             + w_vec * G.reshape(n_samples // 2, n_informative),
         )
     )
     if n_dim > n_informative:
-        X = np.hstack((X, rng.normal(loc=0, scale=1, size=(X.shape[0], n_dim - n_informative))))
+        X = np.hstack((X, rng.normal(loc=0, scale=1, size=(n_dim - n_informative, X.shape[0])).T))
 
     y = np.concatenate((np.zeros(n_samples // 2), np.ones(n_samples // 2)))
 
@@ -265,7 +269,7 @@ def make_trunk_mixture_classification(
     Parameters
     ----------
     n_samples : int
-        Number of sample to generate.
+        Number of sample to generate. Must be an even number.
     n_dim : int, optional
         The dimensionality of the dataset and the number of
         unique labels, by default 4096.
@@ -365,22 +369,28 @@ def make_trunk_mixture_classification(
         method = "svd"
 
     mixture_idx = rng.choice(2, n_samples // 2, replace=True, shuffle=True, p=[mix, 1 - mix])  # type: ignore
+    rngs = [np.random.default_rng(seed=seed + i) for i in range(n_samples // 2)]
 
     norm_params = [[mu_0_vec, cov], [mu_1_vec, cov]]
     X_mixture = np.fromiter(
-        (rng.multivariate_normal(*(norm_params[i]), size=1, method=method) for i in mixture_idx),
+        (
+            rngs[i].multivariate_normal(*(norm_params[mixture_idx[i]]), size=1, method=method)
+            for i in range(len(mixture_idx))
+        ),
         dtype=np.dtype((float, n_informative)),
     )
 
     X = np.vstack(
         (
-            rng.multivariate_normal(np.zeros(n_informative), cov, n_samples // 2, method=method),
+            rngs[0].multivariate_normal(
+                np.zeros(n_informative), cov, n_samples // 2, method=method
+            ),
             X_mixture.reshape(n_samples // 2, n_informative),
         )
     )
 
     if n_dim > n_informative:
-        X = np.hstack((X, rng.normal(loc=0, scale=1, size=(X.shape[0], n_dim - n_informative))))
+        X = np.hstack((X, rng.normal(loc=0, scale=1, size=(n_dim - n_informative, X.shape[0])).T))
 
     y = np.concatenate((np.zeros(n_samples // 2), np.ones(n_samples // 2)))
 
@@ -418,7 +428,7 @@ def make_trunk_classification(
     Parameters
     ----------
     n_samples : int
-        Number of sample to generate.
+        Number of sample to generate. Must be an even number.
     n_dim : int, optional
         The dimensionality of the dataset and the number of
         unique labels, by default 4096.
@@ -481,6 +491,7 @@ def make_trunk_classification(
             f"of dimensions, {n_dim}"
         )
     rng = np.random.default_rng(seed=seed)
+    rng1 = np.random.default_rng(seed=seed)
 
     mu_1_vec = np.array([mu_1 / np.sqrt(i) for i in range(1, n_informative + 1)])
     mu_0_vec = np.array([mu_0 / np.sqrt(i) for i in range(1, n_informative + 1)])
@@ -507,12 +518,12 @@ def make_trunk_classification(
     X = np.vstack(
         (
             rng.multivariate_normal(mu_1_vec, cov, n_samples // 2, method=method),
-            rng.multivariate_normal(mu_0_vec, cov, n_samples // 2, method=method),
+            rng1.multivariate_normal(mu_0_vec, cov, n_samples // 2, method=method),
         )
     )
 
     if n_dim > n_informative:
-        X = np.hstack((X, rng.normal(loc=0, scale=1, size=(X.shape[0], n_dim - n_informative))))
+        X = np.hstack((X, rng.normal(loc=0, scale=1, size=(n_dim - n_informative, X.shape[0])).T))
 
     y = np.concatenate((np.zeros(n_samples // 2), np.ones(n_samples // 2)))
 
