@@ -96,7 +96,7 @@ def make_marron_wand_classification(
     Parameters
     ----------
     n_samples : int
-        Number of sample to generate. Must be an even number, else the total number of samples generated will be ``n_samples - 1``
+        Number of sample to generate. Must be an even number, else the total number of samples generated will be ``n_samples - 1``.
     n_dim : int, optional
         The dimensionality of the dataset and the number of
         unique labels, by default 4096.
@@ -275,7 +275,7 @@ def make_trunk_mixture_classification(
     Parameters
     ----------
     n_samples : int
-        Number of sample to generate. Must be an even number.
+        Number of sample to generate. Must be an even number, else the total number of samples generated will be ``n_samples - 1``.
     n_dim : int, optional
         The dimensionality of the dataset and the number of
         unique labels, by default 4096.
@@ -437,7 +437,7 @@ def make_trunk_classification(
     Parameters
     ----------
     n_samples : int
-        Number of sample to generate. Must be an even number.
+        Number of sample to generate. Must be an even number, else the total number of samples generated will be ``n_samples - 1``.
     n_dim : int, optional
         The dimensionality of the dataset and the number of
         unique labels, by default 4096.
