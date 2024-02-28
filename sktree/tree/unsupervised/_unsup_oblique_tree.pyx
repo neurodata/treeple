@@ -225,12 +225,8 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
 
         # oblique trees store the projection indices and weights
         # inside the tree itself
-        self.proj_vec_weights[node_id] = deref(
-            deref(oblique_split_node).proj_vec_weights
-        )
-        self.proj_vec_indices[node_id] = deref(
-            deref(oblique_split_node).proj_vec_indices
-        )
+        self.proj_vec_weights[node_id] = deref(oblique_split_node).proj_vec_weights
+        self.proj_vec_indices[node_id] = deref(oblique_split_node).proj_vec_indices
         return 1
 
     cdef float32_t _compute_feature(
