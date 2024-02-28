@@ -197,7 +197,10 @@ def make_marron_wand_classification(
     )
     # the parameters used for each Gaussian in the mixture for each Marron Wand simulation
     norm_params = MarronWandSims(n_dim=n_informative, cov=cov)(simulation)
-    rngs = [np.random.default_rng(seed=seed + i) for i in range(n_samples // 2)]
+    if seed:
+        rngs = [np.random.default_rng(seed=seed + i) for i in range(n_samples // 2)]
+    else:
+        rngs = [rng for _ in range(n_samples // 2)]
     G = np.fromiter(
         (
             rngs[i].multivariate_normal(
@@ -211,7 +214,10 @@ def make_marron_wand_classification(
     # as the dimensionality of the simulations increasing, we are adding more and
     # more noise to the data using the w parameter
     w_vec = np.array([1.0 / np.sqrt(i) for i in range(1, n_informative + 1)])
-    rngs_F = [np.random.default_rng(seed=seed + i) for i in range(2)]
+    if seed:
+        rngs_F = [np.random.default_rng(seed=seed + i) for i in range(2)]
+    else:
+        rngs_F = [rng, rng]
     X = np.vstack(
         (
             rngs_F[0].multivariate_normal(
@@ -369,7 +375,10 @@ def make_trunk_mixture_classification(
         method = "svd"
 
     mixture_idx = rng.choice(2, n_samples // 2, replace=True, shuffle=True, p=[mix, 1 - mix])  # type: ignore
-    rngs = [np.random.default_rng(seed=seed + i) for i in range(n_samples // 2)]
+    if seed:
+        rngs = [np.random.default_rng(seed=seed + i) for i in range(n_samples // 2)]
+    else:
+        rngs = [rng for _ in range(n_samples // 2)]
 
     norm_params = [[mu_0_vec, cov], [mu_1_vec, cov]]
     X_mixture = np.fromiter(
