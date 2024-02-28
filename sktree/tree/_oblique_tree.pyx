@@ -245,12 +245,10 @@ cdef class ObliqueTree(Tree):
 
         # oblique trees store the projection indices and weights
         # inside the tree itself
-        self.proj_vec_weights[node_id] = deref(
-            deref(oblique_split_node).proj_vec_weights
-        )
-        self.proj_vec_indices[node_id] = deref(
-            deref(oblique_split_node).proj_vec_indices
-        )
+        # Note: this makes a copy of the projection indices and weights by
+        # dereferencing the pointer to the split record to get the actual values
+        self.proj_vec_weights[node_id] = deref(oblique_split_node).proj_vec_weights
+        self.proj_vec_indices[node_id] = deref(oblique_split_node).proj_vec_indices
         return 1
 
     cdef float32_t _compute_feature(
