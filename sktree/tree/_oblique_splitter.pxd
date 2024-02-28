@@ -31,6 +31,10 @@ cdef struct ObliqueSplitRecord:
     float64_t impurity_left        # Impurity of the left split.
     float64_t impurity_right       # Impurity of the right split.
 
+    # XXX: By storing the values, they will have to be copied into the split record
+    #     which may be inefficient.
+    # Inside the tree, they will also again be copied into a Node, which will
+    # in total incur two copies, whereas we ideally only need one copy.
     vector[float32_t] proj_vec_weights  # weights of the vector (max_features,)
     vector[intp_t] proj_vec_indices     # indices of the features (max_features,)
 
@@ -43,7 +47,7 @@ cdef class BaseObliqueSplitter(Splitter):
     cdef vector[vector[float32_t]] proj_mat_weights       # nonzero weights of sparse proj_mat matrix
     cdef vector[vector[intp_t]] proj_mat_indices        # nonzero indices of sparse proj_mat matrix
 
-    # TODO: assumes all oblique splitters only work with dense data
+    # TODO: assumes all oblique splitters only work with dense data; make work with sparse arrays too
     cdef const float32_t[:, :] X
 
     # feature weights across (n_dims,)

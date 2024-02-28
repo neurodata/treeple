@@ -322,7 +322,7 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
 
         cdef intp_t feat_i, p       # index over computed features and start/end
         cdef intp_t partition_end
-        cdef float32_t temp_d         # to compute a projection feature value
+        cdef float32_t temp_d       # to compute a projection feature value
 
         # instantiate the split records
         _init_split(&best_split, end)
@@ -337,8 +337,8 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
             if self.proj_mat_weights[feat_i].empty():
                 continue
 
-            # XXX: 'feature' is not actually used in oblique split records
-            # Just indicates which split was sampled
+            # Note: 'feature' is not actually used in oblique split records
+            # Just indicates which index was sampled in the sampled projection matrix
             current_split.feature = feat_i
 
             # Compute linear combination of features and then
@@ -395,14 +395,12 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
                         best_split = current_split  # copy
 
                         # Note: we do not make a copy above if we are not going to use it
-                        # as the candidate best split
-                        # create a copy of the projection vectors
-                        with gil:
-                            print("here....")
-                        best_split.proj_vec_weights = self.proj_mat_weights[feat_i]
-                        best_split.proj_vec_indices = self.proj_mat_indices[feat_i]
-                        with gil:
-                            print("finished copying...")
+                        # as the candidate best split, so here we create a pointer to the
+                        # copy of the projection vectors
+                        # best_split.proj_vec_weights = self.proj_mat_weights[feat_i]
+                        # best_split.proj_vec_indices = self.proj_mat_indices[feat_i]
+                        # best_proj_vec_weights = &self.proj_mat_weights[feat_i]
+                        # best_proj_vec_indices = &self.proj_mat_indices[feat_i]
 
         # Reorganize into samples[start:best_split.pos] + samples[best_split.pos:end]
         if best_split.pos < end:
@@ -412,9 +410,12 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
             while p < partition_end:
                 # Account for projection vector
                 temp_d = 0.0
-                for j in range(best_split.proj_vec_indices.size()):
-                    temp_d += self.X[samples[p], best_split.proj_vec_indices[j]] *\
-                                best_split.proj_vec_weights[j]
+                # for j in range(best_split.proj_vec_indices.size()):
+                #    # temp_d += self.X[samples[p], best_split.proj_vec_indices[j]] *\
+                #    #             best_split.proj_vec_weights[j]
+                for j in range(self.proj_mat_weights[best_split.feature].size()):
+                    temp_d += self.X[samples[p], self.proj_mat_indices[best_split.feature][j]] *\
+                                self.proj_mat_weights[best_split.feature][j]
 
                 if temp_d <= best_split.threshold:
                     p += 1
@@ -431,11 +432,14 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
             best_split.improvement = self.criterion.impurity_improvement(
                 impurity, best_split.impurity_left, best_split.impurity_right)
 
-        # Return values
-        with gil:
-            print("about to return...")
-        deref(oblique_split).proj_vec_indices = best_split.proj_vec_indices
-        deref(oblique_split).proj_vec_weights = best_split.proj_vec_weights
+        # Ensure that the projection vectors are copied into the underlying split record that is
+        # seen by the tree builder
+        # deref(oblique_split).proj_vec_indices = deref(best_proj_vec_indices) # best_split.proj_vec_indices
+        # deref(oblique_split).proj_vec_weights = deref(best_proj_vec_weights) # best_split.proj_vec_weights
+        deref(oblique_split).proj_vec_indices = self.proj_mat_indices[best_split.feature]
+        deref(oblique_split).proj_vec_weights = self.proj_mat_weights[best_split.feature]
+
+        # Dereference the pointer to the split record and set the values here
         deref(oblique_split).feature = best_split.feature
         deref(oblique_split).pos = best_split.pos
         deref(oblique_split).threshold = best_split.threshold
@@ -571,8 +575,8 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
             if self.proj_mat_weights[feat_i].empty():
                 continue
 
-            # XXX: 'feature' is not actually used in oblique split records
-            # Just indicates which split was sampled
+            # Note: 'feature' is not actually used in oblique split records
+            # Just indicates which index was sampled in the sampled projection matrix
             current_split.feature = feat_i
 
             # Compute linear combination of features
@@ -629,8 +633,12 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
 
                 # Note: we do not make a copy above if we are not going to use it
                 # as the candidate best split
-                best_split.proj_vec_weights = self.proj_mat_weights[feat_i]
-                best_split.proj_vec_indices = self.proj_mat_indices[feat_i]
+                # The self.proj_mat_weights and self.proj_mat_indices already contain
+                # the best projection vector found at `best_split.feature` (i.e. feat_i).
+                # best_split.proj_vec_weights = self.proj_mat_weights[feat_i]
+                # best_split.proj_vec_indices = self.proj_mat_indices[feat_i]
+                # best_proj_vec_indices = &self.proj_mat_indices[feat_i]
+                # best_proj_vec_weights = &self.proj_mat_weights[feat_i]
 
             n_visited_features += 1
 
@@ -642,9 +650,12 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
             while p < partition_end:
                 # Account for projection vector
                 temp_d = 0.0
-                for j in range(best_split.proj_vec_indices.size()):
-                    temp_d += self.X[samples[p], best_split.proj_vec_indices[j]] *\
-                                best_split.proj_vec_weights[j]
+                # for j in range(best_split.proj_vec_indices.size()):
+                #     temp_d += self.X[samples[p], best_split.proj_vec_indices[j]] *\
+                #                 best_split.proj_vec_weights[j]
+                for j in range(self.proj_mat_indices[best_split.feature].size()):
+                    temp_d += self.X[samples[p], self.proj_mat_indices[best_split.feature][j]] *\
+                                self.proj_mat_weights[best_split.feature][j]
 
                 if temp_d <= best_split.threshold:
                     p += 1
@@ -661,9 +672,12 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
             best_split.improvement = self.criterion.impurity_improvement(
                 impurity, best_split.impurity_left, best_split.impurity_right)
 
+        # deref(oblique_split).proj_vec_indices = deref(best_proj_vec_indices) # best_split.proj_vec_indices
+        # deref(oblique_split).proj_vec_weights = deref(best_proj_vec_weights) # best_split.proj_vec_weights
+        deref(oblique_split).proj_vec_indices = self.proj_mat_indices[best_split.feature]
+        deref(oblique_split).proj_vec_weights = self.proj_mat_weights[best_split.feature]
+
         # Return values
-        deref(oblique_split).proj_vec_indices = best_split.proj_vec_indices
-        deref(oblique_split).proj_vec_weights = best_split.proj_vec_weights
         deref(oblique_split).feature = best_split.feature
         deref(oblique_split).pos = best_split.pos
         deref(oblique_split).threshold = best_split.threshold
