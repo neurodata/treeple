@@ -225,6 +225,9 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
         # https://www.codementor.io/@arpitbhayani/powering-inheritance-in-c-using-structure-composition-176sygr724
         cdef ObliqueSplitRecord* oblique_split_node = <ObliqueSplitRecord*>(split_node)
         node_id = self.node_count
+        with gil:
+            print("Trying to set split nodes...")
+
         node.feature = deref(oblique_split_node).feature
         node.threshold = deref(oblique_split_node).threshold
 
@@ -232,6 +235,9 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
         # inside the tree itself
         self.proj_vec_weights[node_id] = deref(oblique_split_node).proj_vec_weights
         self.proj_vec_indices[node_id] = deref(oblique_split_node).proj_vec_indices
+
+        with gil:
+            print("Finished setting for ", node_id)
         return 1
 
     cdef float32_t _compute_feature(
