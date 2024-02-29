@@ -81,8 +81,8 @@ jobs:
       - run:
           name: setup Python venv
           command: |
-            pip install -r build_requirements.txt
-            pip install -r doc_requirements.txt
+            pip install .[build]
+            pip install .[doc]
       - run:
           name: build scikit-tree
           command: |
