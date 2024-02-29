@@ -393,6 +393,7 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
             print("About to set weights")
             print(best_split.feature)
             print(self.proj_mat_weights.size(), self.proj_mat_indices.size())
+            print(self.proj_mat_indices[best_split.feature].size(), self.proj_mat_weights[best_split.feature].size())
         with gil:
             print(deref(oblique_split).proj_vec_indices.size(), deref(oblique_split).proj_vec_weights.size())
 
