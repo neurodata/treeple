@@ -283,6 +283,9 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
         # instantiate the split records
         _init_split(&best_split, end)
 
+        with gil:
+            print("Splitting...")
+
         # Sample the projection matrix
         self.sample_proj_mat(self.proj_mat_weights, self.proj_mat_indices)
 
@@ -355,6 +358,8 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
 
                         best_split = current_split  # copy
 
+        with gil:
+            print("Trying to reorg...")
         # Reorganize into samples[start:best_split.pos] + samples[best_split.pos:end]
         if best_split.pos < end:
             partition_end = end
