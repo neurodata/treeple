@@ -65,10 +65,10 @@ jobs:
 
       - name: Install Python packages
         run: |
-          pip install spin
-          spin setup-submodule
-          pip install .[build]
-          pip install .[test]
+          python -m pip install spin
+          python -m spin setup-submodule
+          python -m pip install .[build]
+          python -m pip install .[test]
 
       - name: Prepare compiler cache
         id: prep-ccache
@@ -173,10 +173,10 @@ jobs:
 
       - name: Install Python packages
         run: |
-          pip install spin
-          spin setup-submodule
-          pip install .[build]
-          pip install .[test]
+          python -m pip install spin
+          python -m spin setup-submodule
+          python -m pip install .[build]
+          python -m pip install .[test]
 
       - name: Prepare compiler cache
         id: prep-ccache
