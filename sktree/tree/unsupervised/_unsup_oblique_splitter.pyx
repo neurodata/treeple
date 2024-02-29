@@ -172,8 +172,8 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
         intp_t end,
         const intp_t[:] samples,
         float32_t[:] feature_values,
-        vector[float32_t]* proj_vec_weights,  # weights of the vector (max_features,)
-        vector[intp_t]* proj_vec_indices    # indices of the features (max_features,)
+        vector[float32_t]& proj_vec_weights,  # weights of the vector (max_features,)
+        vector[intp_t]& proj_vec_indices    # indices of the features (max_features,)
     ) noexcept nogil:
         """Compute the feature values for the samples[start:end] range.
 
@@ -187,8 +187,8 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
         # Compute linear combination of features and then
         # sort samples according to the feature values.
         for jdx in range(0, proj_vec_indices.size()):
-            col_idx = deref(proj_vec_indices)[jdx]
-            col_weight = deref(proj_vec_weights)[jdx]
+            col_idx = proj_vec_indices[jdx]
+            col_weight = proj_vec_weights[jdx]
 
             for idx in range(start, end):
                 # initialize the feature value to 0
@@ -294,8 +294,8 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
             # XXX: 'feature' is not actually used in oblique split records because it normally indicates the column
             # Just indicates which split was sampled
             current_split.feature = feat_i
-            current_split.proj_vec_weights = &self.proj_mat_weights[feat_i]
-            current_split.proj_vec_indices = &self.proj_mat_indices[feat_i]
+            # current_split.proj_vec_weights = &self.proj_mat_weights[feat_i]
+            # current_split.proj_vec_indices = &self.proj_mat_indices[feat_i]
 
             # Compute linear combination of features and then
             # sort samples according to the feature values.
@@ -304,8 +304,8 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
                 end,
                 samples,
                 feature_values,
-                &self.proj_mat_weights[feat_i],
-                &self.proj_mat_indices[feat_i]
+                self.proj_mat_weights[feat_i],
+                self.proj_mat_indices[feat_i]
             )
 
             # Sort the samples
@@ -362,9 +362,9 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
             while p < partition_end:
                 # Account for projection vector
                 temp_d = 0.0
-                for j in range(best_split.proj_vec_indices.size()):
-                    temp_d += self.X[samples[p], deref(best_split.proj_vec_indices)[j]] *\
-                                deref(best_split.proj_vec_weights)[j]
+                for j in range(self.proj_mat_weights[best_split.feature].size()):
+                    temp_d += self.X[samples[p], self.proj_mat_indices[best_split.feature][j]] *\
+                                self.proj_mat_weights[best_split.feature][j]
 
                 if temp_d <= best_split.threshold:
                     p += 1
@@ -381,9 +381,12 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
             best_split.improvement = self.criterion.impurity_improvement(
                 impurity, best_split.impurity_left, best_split.impurity_right)
 
+        # deref(oblique_split).proj_vec_weights = best_split.proj_vec_weights
+        # deref(oblique_split).proj_vec_indices = best_split.proj_vec_indices
+        deref(oblique_split).proj_vec_indices = self.proj_mat_indices[best_split.feature]
+        deref(oblique_split).proj_vec_weights = self.proj_mat_weights[best_split.feature]
+
         # Return values
-        deref(oblique_split).proj_vec_indices = best_split.proj_vec_indices
-        deref(oblique_split).proj_vec_weights = best_split.proj_vec_weights
         deref(oblique_split).feature = best_split.feature
         deref(oblique_split).pos = best_split.pos
         deref(oblique_split).threshold = best_split.threshold

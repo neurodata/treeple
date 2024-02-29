@@ -136,8 +136,11 @@ cdef class ObliqueTree(Tree):
         d["nodes"] = self._get_node_ndarray()
         d["values"] = self._get_value_ndarray()
 
+        print("getting state")
         proj_vecs = self.get_projection_matrix()
         d["proj_vecs"] = proj_vecs
+
+        print("got state...")
         return d
 
     def __setstate__(self, d):
@@ -145,6 +148,7 @@ cdef class ObliqueTree(Tree):
         self.max_depth = d["max_depth"]
         self.node_count = d["node_count"]
 
+        print("settin gstate...")
         if "nodes" not in d:
             raise ValueError("You have loaded ObliqueTree version which "
                              "cannot be imported")
@@ -165,6 +169,7 @@ cdef class ObliqueTree(Tree):
         if self._resize_c(self.capacity) != 0:
             raise MemoryError("resizing tree to %d" % self.capacity)
 
+        print("about to set proj vec...")
         # now set the projection vector weights and indices
         proj_vecs = d["proj_vecs"]
         self.n_features = proj_vecs.shape[1]
@@ -184,11 +189,13 @@ cdef class ObliqueTree(Tree):
     cpdef cnp.ndarray get_projection_matrix(self):
         """Get the projection matrix of shape (node_count, n_features)."""
         proj_vecs = np.zeros((self.node_count, self.n_features), dtype=np.float64)
+        print("geting projection matrix...")
         for i in range(0, self.node_count):
             for j in range(0, self.proj_vec_weights[i].size()):
                 weight = self.proj_vec_weights[i][j]
                 feat = self.proj_vec_indices[i][j]
                 proj_vecs[i, feat] = weight
+        print("got projection matrix")
         return proj_vecs
 
     cdef int _resize_c(self, intp_t capacity=INTPTR_MAX) except -1 nogil:
