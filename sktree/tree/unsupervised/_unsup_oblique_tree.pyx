@@ -110,6 +110,7 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
     def __getstate__(self):
         """Getstate re-implementation, for pickling."""
         d = {}
+        print("Setting state...")
         # capacity is inferred during the __setstate__ using nodes
         d["max_depth"] = self.max_depth
         d["node_count"] = self.node_count
@@ -118,6 +119,7 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
 
         proj_vecs = self.get_projection_matrix()
         d["proj_vecs"] = proj_vecs
+        print("Finished Setting state...")
         return d
 
     def __setstate__(self, d):
@@ -128,7 +130,7 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
         if "nodes" not in d:
             raise ValueError("You have loaded ObliqueTree version which "
                              "cannot be imported")
-
+        print("Getting state...")
         node_ndarray = d["nodes"]
         value_ndarray = d["values"]
 
@@ -156,6 +158,7 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
                 self.proj_vec_weights[i].push_back(weight)
                 self.proj_vec_indices[i].push_back(j)
 
+        print("Finsihed getting state...")
         memcpy(self.nodes, cnp.PyArray_DATA(node_ndarray),
                self.capacity * sizeof(Node))
         memcpy(self.value, cnp.PyArray_DATA(value_ndarray),
@@ -163,12 +166,14 @@ cdef class UnsupervisedObliqueTree(UnsupervisedTree):
 
     cpdef cnp.ndarray get_projection_matrix(self):
         """Get the projection matrix of shape (node_count, n_features)."""
+        print("getting proj.")
         proj_vecs = np.zeros((self.node_count, self.n_features), dtype=np.float64)
         for i in range(0, self.node_count):
             for j in range(0, self.proj_vec_weights[i].size()):
                 weight = self.proj_vec_weights[i][j]
                 feat = self.proj_vec_indices[i][j]
                 proj_vecs[i, feat] = weight
+        print("finished getting proj.")
         return proj_vecs
 
     cdef int _resize_c(self, intp_t capacity=SIZE_MAX) except -1 nogil:
