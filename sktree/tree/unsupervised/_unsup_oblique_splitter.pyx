@@ -389,9 +389,10 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
 
         # deref(oblique_split).proj_vec_weights = best_split.proj_vec_weights
         # deref(oblique_split).proj_vec_indices = best_split.proj_vec_indices
+        print("About to set weights")
         deref(oblique_split).proj_vec_indices = self.proj_mat_indices[best_split.feature]
         deref(oblique_split).proj_vec_weights = self.proj_mat_weights[best_split.feature]
-
+        print("Finished setting everything")
         # Return values
         deref(oblique_split).feature = best_split.feature
         deref(oblique_split).pos = best_split.pos
