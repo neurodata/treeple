@@ -12,7 +12,7 @@ Version 0.8
 
 Changelog
 ---------
-- |Bug| Trunk simulators now correctly generate random values with a fixed seed,
+- |Fix| Trunk simulators now correctly generate random values with a fixed seed,
     by `Sambit Panda`_ (:pr:`#236`)
 
 Code and Documentation Contributors
