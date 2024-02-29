@@ -147,7 +147,7 @@ jobs:
 
       - name: Build source distribution
         run: |
-          pip install spin
+          pip install spin build
           spin setup-submodule
           pip install .[build]
           build
