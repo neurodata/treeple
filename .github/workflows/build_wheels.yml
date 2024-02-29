@@ -60,9 +60,10 @@ jobs:
 
       - name: Setup submodule
         run: |
-          pip install .[build] --only-extras
+          pip install --upgrade pip
           pip install spin
           spin setup-submodule
+          pip install .[build]
 
       - name: win_amd64 - install rtools
         run: |
@@ -115,9 +116,9 @@ jobs:
       - name: Install cibuildwheel dependencies
         run: |
           pip install cibuildwheel
-          pip install .[build] --only-extras
           pip install spin
           spin setup-submodule
+          pip install .[build]
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.16.5
@@ -146,9 +147,9 @@ jobs:
 
       - name: Build source distribution
         run: |
-          pip install .[build] --only-extras
           pip install spin
           spin setup-submodule
+          pip install .[build]
           build
 
       - name: Store artifacts
