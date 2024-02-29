@@ -65,9 +65,10 @@ jobs:
 
       - name: Install Python packages
         run: |
-          python -m pip install .[build]
-          python -m pip install spin
-          python -m pip install .[test]
+          pip install .[build]
+          pip install spin
+          pip install .[test]
+          spin setup-submodule
 
       - name: Prepare compiler cache
         id: prep-ccache
@@ -172,9 +173,9 @@ jobs:
 
       - name: Install Python packages
         run: |
-          python -m pip install .[build]
-          python -m pip install spin
-          python -m pip install .[test]
+          pip install .[build]
+          pip install spin
+          pip install .[test]
 
       - name: Prepare compiler cache
         id: prep-ccache
@@ -232,7 +233,7 @@ jobs:
       - name: Upload coverage stats to codecov
         uses: codecov/codecov-action@v4
         with:
-          # python spin goes into the INSTALLED path in order to run pytest
+          # spin goes into the INSTALLED path in order to run pytest
           files: ./coverage.xml
           fail_ci_if_error: true
           verbose: true
@@ -319,8 +320,8 @@ jobs:
 #       run: |
 #         echo "SCIPY_USE_PROPACK=1" >> $env:GITHUB_ENV
 #         echo "FORCE_SUBMODULE=True" >> $env:GITHUB_ENV
-#         python spin setup_submodule --forcesubmodule
-#         python spin build -j 2
+#         spin setup_submodule --forcesubmodule
+#         spin build -j 2
 #         # Necessary because GitHub Actions checks out the repo to D:\ while OpenBLAS
 #         # got installed to C:\ higher up. The copying with `--win-cp-openblas` fails
 #         # when things are split over drives.
@@ -329,4 +330,4 @@ jobs:
 
 #     - name: test
 #       run: |
-#         python spin test
+#         spin test

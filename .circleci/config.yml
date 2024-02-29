@@ -86,7 +86,7 @@ jobs:
       - run:
           name: build scikit-tree
           command: |
-            python spin build -j2
+            spin build -j2
 
       - save_cache:
           key: deps_ccache-{{ .Branch }}
