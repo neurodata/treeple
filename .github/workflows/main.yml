@@ -54,6 +54,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libopenblas-dev libatlas-base-dev liblapack-dev gfortran libgmp-dev libmpfr-dev libsuitesparse-dev ccache libmpc-dev
           sudo apt-get install -y gcc
+          sudo apt-get update
 
       - name: Install Ccache for MacOSX
         if: ${{ matrix.os == 'macos-latest'}}

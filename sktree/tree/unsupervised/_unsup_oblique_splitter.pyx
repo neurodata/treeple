@@ -146,6 +146,7 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
         """
         # call parent reset
         UnsupervisedSplitter.node_reset(self, start, end, weighted_n_node_samples)
+        cdef intp_t i
 
         # Clear all projection vectors
         for i in range(self.max_features):
