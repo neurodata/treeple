@@ -60,10 +60,10 @@ jobs:
 
       - name: Setup submodule
         run: |
-          pip install --upgrade pip
-          pip install spin
-          spin setup-submodule
-          pip install .[build]
+          python -m pip install --upgrade pip
+          python -m pip install spin
+          python -m spin setup-submodule
+          python -m pip install .[build]
 
       - name: win_amd64 - install rtools
         run: |
@@ -150,7 +150,7 @@ jobs:
           pip install spin build
           spin setup-submodule
           pip install .[build]
-          build
+          python -m build
 
       - name: Store artifacts
         uses: actions/upload-artifact@v4
