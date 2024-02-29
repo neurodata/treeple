@@ -208,7 +208,10 @@ def make_marron_wand_classification(
     # as the dimensionality of the simulations increasing, we are adding more and
     # more noise to the data using the w parameter
     w_vec = np.array([1.0 / np.sqrt(i) for i in range(1, n_informative + 1)])
+
+    # create new generator instance to ensure reproducibility with multiple runs with the same seed
     rng_F = np.random.default_rng(seed=seed).spawn(2)
+
     X = np.vstack(
         (
             rng_F[0].multivariate_normal(
@@ -223,6 +226,7 @@ def make_marron_wand_classification(
     )
 
     if n_dim > n_informative:
+        # create new generator instance to ensure reproducibility with multiple runs with the same seed
         rng_noise = np.random.default_rng(seed=seed)
         X = np.hstack(
             (
@@ -386,6 +390,7 @@ def make_trunk_mixture_classification(
         dtype=np.dtype((float, n_informative)),
     )
 
+    # create new generator instance to ensure reproducibility with multiple runs with the same seed
     rng_F = np.random.default_rng(seed=seed)
     X = np.vstack(
         (
@@ -395,6 +400,7 @@ def make_trunk_mixture_classification(
     )
 
     if n_dim > n_informative:
+        # create new generator instance to ensure reproducibility with multiple runs with the same seed
         rng_noise = np.random.default_rng(seed=seed)
         X = np.hstack(
             (
