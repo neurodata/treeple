@@ -77,6 +77,7 @@ def make_marron_wand_classification(
     rho: int = 0,
     band_type: str = "ma",
     return_params: bool = False,
+    scaling_factor: float = 1.0,
     seed=None,
 ):
     """Generate Marron-Wand binary classification dataset.
@@ -95,7 +96,7 @@ def make_marron_wand_classification(
     Parameters
     ----------
     n_samples : int
-        Number of sample to generate.
+        Number of sample to generate. Must be an even number, else the total number of samples generated will be ``n_samples - 1``.
     n_dim : int, optional
         The dimensionality of the dataset and the number of
         unique labels, by default 4096.
@@ -118,6 +119,8 @@ def make_marron_wand_classification(
         Either 'ma', or 'ar'.
     return_params : bool, optional
         Whether or not to return the distribution parameters of the classes normal distributions.
+    scaling_factor : float, optional
+        The scaling factor for the covariance matrix. By default 1.
     seed : int, optional
         Random seed, by default None.
 
@@ -177,6 +180,9 @@ def make_marron_wand_classification(
     else:
         cov = np.identity(n_informative)
 
+    # allow arbitrary uniform scaling of the covariance matrix
+    cov = scaling_factor * cov
+
     # speed up computations for large multivariate normal matrix with SVD approximation
     if n_informative > 1000:
         mvg_sampling_method = "cholesky"
@@ -193,8 +199,8 @@ def make_marron_wand_classification(
     norm_params = MarronWandSims(n_dim=n_informative, cov=cov)(simulation)
     G = np.fromiter(
         (
-            rng.multivariate_normal(*(norm_params[i]), size=1, method=mvg_sampling_method)
-            for i in mixture_idx
+            rng_children.multivariate_normal(*(norm_params[i]), size=1, method=mvg_sampling_method)
+            for i, rng_children in zip(mixture_idx, rng.spawn(n_samples // 2))
         ),
         dtype=np.dtype((float, n_informative)),
     )
@@ -202,27 +208,42 @@ def make_marron_wand_classification(
     # as the dimensionality of the simulations increasing, we are adding more and
     # more noise to the data using the w parameter
     w_vec = np.array([1.0 / np.sqrt(i) for i in range(1, n_informative + 1)])
+
+    # create new generator instance to ensure reproducibility with multiple runs with the same seed
+    rng_F = np.random.default_rng(seed=seed).spawn(2)
+
     X = np.vstack(
         (
-            rng.multivariate_normal(
+            rng_F[0].multivariate_normal(
                 np.zeros(n_informative), cov, n_samples // 2, method=mvg_sampling_method
             ),
             (1 - w_vec)
-            * rng.multivariate_normal(
+            * rng_F[1].multivariate_normal(
                 np.zeros(n_informative), cov, n_samples // 2, method=mvg_sampling_method
             )
             + w_vec * G.reshape(n_samples // 2, n_informative),
         )
     )
+
     if n_dim > n_informative:
-        X = np.hstack((X, rng.normal(loc=0, scale=1, size=(X.shape[0], n_dim - n_informative))))
+        # create new generator instance to ensure reproducibility with multiple runs with the same seed
+        rng_noise = np.random.default_rng(seed=seed)
+        X = np.hstack(
+            (
+                X,
+                np.hstack(
+                    [
+                        rng_children.normal(loc=0, scale=1, size=(X.shape[0], 1))
+                        for rng_children in rng_noise.spawn(n_dim - n_informative)
+                    ]
+                ),
+            )
+        )
 
     y = np.concatenate((np.zeros(n_samples // 2), np.ones(n_samples // 2)))
 
     if return_params:
-        returns = [X, y]
-        returns += [*list(zip(*norm_params)), G, w_vec]
-        return returns
+        return [X, y, *list(zip(*norm_params)), G, w_vec]
     return X, y
 
 
@@ -236,6 +257,7 @@ def make_trunk_mixture_classification(
     band_type: str = "ma",
     return_params: bool = False,
     mix: float = 0.5,
+    scaling_factor: float = 1.0,
     seed=None,
 ):
     """Generate trunk mixture binary classification dataset.
@@ -258,7 +280,7 @@ def make_trunk_mixture_classification(
     Parameters
     ----------
     n_samples : int
-        Number of sample to generate.
+        Number of sample to generate. Must be an even number, else the total number of samples generated will be ``n_samples - 1``.
     n_dim : int, optional
         The dimensionality of the dataset and the number of
         unique labels, by default 4096.
@@ -281,6 +303,8 @@ def make_trunk_mixture_classification(
     mix : int, optional
         The probabilities associated with the mixture of Gaussians in the ``trunk-mix`` simulation.
         By default 0.5.
+    scaling_factor : float, optional
+        The scaling factor for the covariance matrix. By default 1.
     seed : int, optional
         Random seed, by default None.
 
@@ -345,6 +369,10 @@ def make_trunk_mixture_classification(
     else:
         cov = np.identity(n_informative)
 
+    # Note: When variance is 1, trunk-mix does not look bimodal at low dimensions.
+    # It is set it to (2/3)**2 since that is consistent with Marron and Wand bimodal
+    cov = scaling_factor * cov
+
     # speed up computations for large multivariate normal matrix with SVD approximation
     if n_informative > 1000:
         method = "cholesky"
@@ -353,32 +381,43 @@ def make_trunk_mixture_classification(
 
     mixture_idx = rng.choice(2, n_samples // 2, replace=True, shuffle=True, p=[mix, 1 - mix])  # type: ignore
 
-    # When variance is 1, trunk-mix does not look bimodal at low dimensions.
-    # It is set it to (2/3)**2 since that is consistent with Marron and Wand bimodal
-    norm_params = [[mu_0_vec, cov * (2 / 3) ** 2], [mu_1_vec, cov * (2 / 3) ** 2]]
+    norm_params = [[mu_0_vec, cov], [mu_1_vec, cov]]
     X_mixture = np.fromiter(
-        (rng.multivariate_normal(*(norm_params[i]), size=1, method=method) for i in mixture_idx),
+        (
+            rng_children.multivariate_normal(*(norm_params[i]), size=1, method=method)
+            for i, rng_children in zip(mixture_idx, rng.spawn(n_samples // 2))
+        ),
         dtype=np.dtype((float, n_informative)),
     )
 
+    # create new generator instance to ensure reproducibility with multiple runs with the same seed
+    rng_F = np.random.default_rng(seed=seed)
     X = np.vstack(
         (
-            rng.multivariate_normal(
-                np.zeros(n_informative), cov * (2 / 3) ** 2, n_samples // 2, method=method
-            ),
+            rng_F.multivariate_normal(np.zeros(n_informative), cov, n_samples // 2, method=method),
             X_mixture.reshape(n_samples // 2, n_informative),
         )
     )
 
     if n_dim > n_informative:
-        X = np.hstack((X, rng.normal(loc=0, scale=1, size=(X.shape[0], n_dim - n_informative))))
+        # create new generator instance to ensure reproducibility with multiple runs with the same seed
+        rng_noise = np.random.default_rng(seed=seed)
+        X = np.hstack(
+            (
+                X,
+                np.hstack(
+                    [
+                        rng_children.normal(loc=0, scale=1, size=(X.shape[0], 1))
+                        for rng_children in rng_noise.spawn(n_dim - n_informative)
+                    ]
+                ),
+            )
+        )
 
     y = np.concatenate((np.zeros(n_samples // 2), np.ones(n_samples // 2)))
 
     if return_params:
-        returns = [X, y]
-        returns += [*list(zip(*norm_params)), X_mixture]
-        return returns
+        return [X, y, *list(zip(*norm_params)), X_mixture]
     return X, y
 
 
@@ -391,6 +430,7 @@ def make_trunk_classification(
     rho: int = 0,
     band_type: str = "ma",
     return_params: bool = False,
+    scaling_factor: float = 1.0,
     seed=None,
 ):
     """Generate trunk binary classification dataset.
@@ -408,7 +448,7 @@ def make_trunk_classification(
     Parameters
     ----------
     n_samples : int
-        Number of sample to generate.
+        Number of sample to generate. Must be an even number, else the total number of samples generated will be ``n_samples - 1``.
     n_dim : int, optional
         The dimensionality of the dataset and the number of
         unique labels, by default 4096.
@@ -428,6 +468,8 @@ def make_trunk_classification(
         Either 'ma', or 'ar'.
     return_params : bool, optional
         Whether or not to return the distribution parameters of the classes normal distributions.
+    scaling_factor : float, optional
+        The scaling factor for the covariance matrix. By default 1.
     seed : int, optional
         Random seed, by default None.
 
@@ -483,6 +525,9 @@ def make_trunk_classification(
     else:
         cov = np.identity(n_informative)
 
+    # allow arbitrary uniform scaling of the covariance matrix
+    cov = scaling_factor * cov
+
     # speed up computations for large multivariate normal matrix with SVD approximation
     if n_informative > 1000:
         method = "cholesky"
@@ -490,21 +535,29 @@ def make_trunk_classification(
         method = "svd"
 
     X = np.vstack(
-        (
-            rng.multivariate_normal(mu_1_vec, cov, n_samples // 2, method=method),
-            rng.multivariate_normal(mu_0_vec, cov, n_samples // 2, method=method),
-        )
+        [
+            rng_children.multivariate_normal(mu_vec, cov, n_samples // 2, method=method)
+            for rng_children, mu_vec in zip(rng.spawn(2), [mu_1_vec, mu_0_vec])
+        ]
     )
 
     if n_dim > n_informative:
-        X = np.hstack((X, rng.normal(loc=0, scale=1, size=(X.shape[0], n_dim - n_informative))))
+        X = np.hstack(
+            (
+                X,
+                np.hstack(
+                    [
+                        rng_children.normal(loc=0, scale=1, size=(X.shape[0], 1))
+                        for rng_children in rng.spawn(n_dim - n_informative)
+                    ]
+                ),
+            )
+        )
 
     y = np.concatenate((np.zeros(n_samples // 2), np.ones(n_samples // 2)))
 
     if return_params:
-        returns = [X, y]
-        returns += [[mu_0_vec, mu_1_vec], [cov, cov]]
-        return returns
+        return [X, y, [mu_0_vec, mu_1_vec], [cov, cov]]
     return X, y
 
 

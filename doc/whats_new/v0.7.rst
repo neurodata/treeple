@@ -39,7 +39,9 @@ Changelog
     now overwrite all parameters set by the underlying ``tree_estimator`` and allow you to directly
     pass any extra parameters that ``tree_estimator`` has compared to the original
     :class:`~sklearn.tree.DecisionTreeClassifier`, `Adam Li`_ (:pr:`#228`)
-
+- |Fix| Trunk simulators now correctly generate random values with a fixed seed,
+    by `Sambit Panda`_ (:pr:`#236`)
+    
 Code and Documentation Contributors
 -----------------------------------
 
