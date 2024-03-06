@@ -49,7 +49,7 @@ include = [
   {path = "meson.build", format = "sdist"}
 ]
 dependencies = [
-  'numpy',
+  'numpy>=1.25.0',
   'scipy>=1.5.0',
   'scikit-learn>=1.4.1'
 ]
@@ -71,7 +71,7 @@ build = [
   'scikit-learn>=1.4.1',
   'Cython>=3.0.8',
   'ninja',
-  'numpy',
+  'numpy>=1.25.0',
   'rich-click',
   'pydevtool'
 ]
