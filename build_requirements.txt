@@ -1,9 +1,9 @@
 meson
 meson-python
-cython==0.29.36
+cython>=3.0.8
 ninja
 numpy
-scikit-learn>=1.3.1
+scikit-learn>=1.4.1
 click
 rich-click
 doit
