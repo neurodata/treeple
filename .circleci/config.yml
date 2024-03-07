@@ -81,8 +81,11 @@ jobs:
       - run:
           name: setup Python venv
           command: |
-            pip install -r build_requirements.txt
-            pip install -r doc_requirements.txt
+            python pip install --upgrade pip spin
+            python spin setup-submodule
+            python pip install .[build]
+            python pip install .[doc]
+
       - run:
           name: build scikit-tree
           command: |
