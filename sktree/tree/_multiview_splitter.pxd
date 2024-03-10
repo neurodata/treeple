@@ -46,6 +46,8 @@ cdef class MultiViewSplitter(Splitter):
     cdef intp_t[:] vec_n_drawn_constants
 
     # XXX: moved from partitioner to this class
+    cdef const float32_t[:, :] X
+    cdef const unsigned char[::1] missing_values_in_feature_mask
     cdef intp_t n_missing
     cdef void sort_samples_and_feature_values(
         self, intp_t current_feature

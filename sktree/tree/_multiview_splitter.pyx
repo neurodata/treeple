@@ -1,5 +1,12 @@
+# distutils: language=c++
+# cython: language_level=3
+# cython: boundscheck=False
+# cython: wraparound=False
+# cython: initializedcheck=False
 
+from cython.operator cimport dereference as deref
 from libc.math cimport isnan
+from libc.string cimport memcpy
 from libcpp.numeric cimport accumulate
 
 from .._lib.sklearn.tree._splitter cimport shift_missing_values_to_left_if_required
@@ -94,6 +101,17 @@ cdef class MultiViewSplitter(Splitter):
                     self.n_feature_sets,
                     self.max_features_per_set.base if self.max_features_per_set is not None else None,
                 ), self.__getstate__())
+
+    cdef int init(
+        self,
+        object X,
+        const float64_t[:, ::1] y,
+        const float64_t[:] sample_weight,
+        const unsigned char[::1] missing_values_in_feature_mask,
+    ) except -1:
+        Splitter.init(self, X, y, sample_weight, missing_values_in_feature_mask)
+        self.X = X
+        self.missing_values_in_feature_mask = missing_values_in_feature_mask
 
     cdef inline void sort_samples_and_feature_values(
         self, intp_t current_feature
@@ -555,12 +573,12 @@ cdef class BestMultiViewSplitter(MultiViewSplitter):
             feature_set_begin = self.feature_set_ends[ifeature]
 
         # Return values
-        split[0] = best_split
-        split.n_total_constants = accumulate(
-            vec_n_constant_features.begin(),
-            vec_n_constant_features.end(),
+        best_split.n_constant_features = accumulate(
+            n_known_constants_vec.begin(),
+            n_known_constants_vec.end(),
             0
         )
-        deref(multiview_split).vec_n_constant_features = vec_n_constant_features
+        split[0] = best_split
+        deref(multiview_split).vec_n_constant_features = n_known_constants_vec
         # n_constant_features[0] = n_total_constants
         return 0
