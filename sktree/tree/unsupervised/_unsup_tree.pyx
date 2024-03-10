@@ -307,7 +307,8 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
 
         cdef intp_t node_id
         cdef intp_t n_node_samples
-        cdef intp_t n_constant_features = 0
+        # cdef intp_t n_constant_features = 0
+        split_ptr.n_constant_features = 0
         cdef float64_t min_impurity_decrease = self.min_impurity_decrease
         cdef float64_t weighted_n_node_samples
         cdef bint is_leaf
@@ -326,7 +327,7 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
                    )
 
         if not is_leaf:
-            splitter.node_split(impurity, split_ptr, &n_constant_features, 0., 0.)
+            splitter.node_split(impurity, split_ptr, 0., 0.)
 
             # assign local copy of SplitRecord to assign
             # pos, improvement, and impurity scores
@@ -443,7 +444,6 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
         cdef SplitRecord* split_ptr = <SplitRecord *>malloc(splitter.pointer_size())
 
         cdef float64_t impurity = INFINITY
-        cdef intp_t n_constant_features
         cdef bint is_leaf
         cdef bint first = 1
         cdef intp_t max_depth_seen = -1
@@ -473,7 +473,7 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
                 parent = stack_record.parent
                 is_left = stack_record.is_left
                 impurity = stack_record.impurity
-                n_constant_features = stack_record.n_constant_features
+                split_ptr.n_constant_features = stack_record.n_constant_features
 
                 n_node_samples = end - start
                 splitter.node_reset(start, end, &weighted_n_node_samples)
@@ -492,7 +492,7 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
                 is_leaf = is_leaf or impurity <= EPSILON
 
                 if not is_leaf:
-                    splitter.node_split(impurity, split_ptr, &n_constant_features, 0., 0.)
+                    splitter.node_split(impurity, split_ptr, 0., 0.)
 
                     # assign local copy of SplitRecord to assign
                     # pos, improvement, and impurity scores
@@ -525,7 +525,7 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
                         "parent": node_id,
                         "is_left": 0,
                         "impurity": split.impurity_right,
-                        "n_constant_features": n_constant_features})
+                        "n_constant_features": split.n_constant_features})
 
                     # Push left child on stack
                     builder_stack.push({
@@ -535,7 +535,7 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
                         "parent": node_id,
                         "is_left": 1,
                         "impurity": split.impurity_left,
-                        "n_constant_features": n_constant_features})
+                        "n_constant_features": split.n_constant_features})
 
                 if depth > max_depth_seen:
                     max_depth_seen = depth

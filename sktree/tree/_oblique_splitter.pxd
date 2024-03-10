@@ -80,7 +80,6 @@ cdef class BaseObliqueSplitter(Splitter):
         self,
         float64_t impurity,   # Impurity of the node
         SplitRecord* split,
-        intp_t* n_constant_features,
         float64_t lower_bound,
         float64_t upper_bound,
     ) except -1 nogil
@@ -116,7 +115,6 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
         self,
         float64_t impurity,   # Impurity of the node
         SplitRecord* split,
-        intp_t* n_constant_features,
         float64_t lower_bound,
         float64_t upper_bound,
     ) except -1 nogil
@@ -139,7 +137,6 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
         self,
         float64_t impurity,   # Impurity of the node
         SplitRecord* split,
-        intp_t* n_constant_features,
         float64_t lower_bound,
         float64_t upper_bound,
     ) except -1 nogil

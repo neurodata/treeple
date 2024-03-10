@@ -178,7 +178,6 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
         self,
         float64_t impurity,
         SplitRecord* split,
-        intp_t* n_constant_features,
         float64_t lower_bound,
         float64_t upper_bound
     ) except -1 nogil:
@@ -225,7 +224,8 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
         cdef intp_t n_found_constants = 0
         # Number of features known to be constant and drawn without replacement
         cdef intp_t n_drawn_constants = 0
-        cdef intp_t n_known_constants = n_constant_features[0]
+        cdef intp_t n_known_constants = split.n_constant_features
+        # n_constant_features[0]
         # n_total_constants = n_known_constants + n_found_constants
         cdef intp_t n_total_constants = n_known_constants
         cdef intp_t partition_end
@@ -381,5 +381,6 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
 
         # Return values
         split[0] = best_split
-        n_constant_features[0] = n_total_constants
+        split.n_constant_features = n_total_constants
+        # n_constant_features[0] = n_total_constants
         return 0

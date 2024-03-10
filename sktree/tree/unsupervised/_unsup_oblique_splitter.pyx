@@ -246,7 +246,6 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
         self,
         float64_t impurity,
         SplitRecord* split,
-        intp_t* n_constant_features,
         float64_t lower_bound,
         float64_t upper_bound,
     ) except -1 nogil:
