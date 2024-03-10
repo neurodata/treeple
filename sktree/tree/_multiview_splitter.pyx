@@ -1,4 +1,31 @@
+
+from libc.math cimport isnan
 from libcpp.numeric cimport accumulate
+
+from .._lib.sklearn.tree._splitter cimport shift_missing_values_to_left_if_required
+from .._lib.sklearn.tree._utils cimport rand_int
+
+
+cdef float64_t INFINITY = np.inf
+
+# Mitigate precision differences between 32 bit and 64 bit
+cdef float32_t FEATURE_THRESHOLD = 1e-7
+
+# Constant to switch between algorithm non zero value extract algorithm
+# in SparseSplitter
+cdef float32_t EXTRACT_NNZ_SWITCH = 0.1
+
+
+cdef inline void _init_split(SplitRecord* self, intp_t start_pos) noexcept nogil:
+    self.impurity_left = INFINITY
+    self.impurity_right = INFINITY
+    self.pos = start_pos
+    self.feature = 0
+    self.threshold = 0.
+    self.improvement = -INFINITY
+    self.missing_go_to_left = False
+    self.n_missing = 0
+    self.n_constant_features = 0
 
 
 cdef class MultiViewSplitter(Splitter):
@@ -52,6 +79,7 @@ cdef class MultiViewSplitter(Splitter):
         self.vec_n_visited_features = np.zeros(n_feature_sets, dtype=np.intp)
         self.vec_n_drawn_constants = np.zeros(n_feature_sets, dtype=np.intp)
         self.vec_n_found_constants = np.zeros(n_feature_sets, dtype=np.intp)
+        self.n_missing = 0
 
     def __reduce__(self):
         return (type(self),
@@ -67,23 +95,157 @@ cdef class MultiViewSplitter(Splitter):
                     self.max_features_per_set.base if self.max_features_per_set is not None else None,
                 ), self.__getstate__())
 
+    cdef inline void sort_samples_and_feature_values(
+        self, intp_t current_feature
+    ) noexcept nogil:
+        """Simultaneously sort based on the feature_values.
+
+        Missing values are stored at the end of feature_values.
+        The number of missing values observed in feature_values is stored
+        in self.n_missing.
+        """
+        cdef:
+            intp_t i, current_end
+            float32_t[::1] feature_values = self.feature_values
+            const float32_t[:, :] X = self.X
+            intp_t[::1] samples = self.samples
+            intp_t n_missing = 0
+            const unsigned char[::1] missing_values_in_feature_mask = self.missing_values_in_feature_mask
+
+        # Sort samples along that feature; by
+        # copying the values into an array and
+        # sorting the array in a manner which utilizes the cache more
+        # effectively.
+        if missing_values_in_feature_mask is not None and missing_values_in_feature_mask[current_feature]:
+            i, current_end = self.start, self.end - 1
+            # Missing values are placed at the end and do not participate in the sorting.
+            while i <= current_end:
+                # Finds the right-most value that is not missing so that
+                # it can be swapped with missing values at its left.
+                if isnan(X[samples[current_end], current_feature]):
+                    n_missing += 1
+                    current_end -= 1
+                    continue
+
+                # X[samples[current_end], current_feature] is a non-missing value
+                if isnan(X[samples[i], current_feature]):
+                    samples[i], samples[current_end] = samples[current_end], samples[i]
+                    n_missing += 1
+                    current_end -= 1
+
+                feature_values[i] = X[samples[i], current_feature]
+                i += 1
+        else:
+            # When there are no missing values, we only need to copy the data into
+            # feature_values
+            for i in range(self.start, self.end):
+                feature_values[i] = X[samples[i], current_feature]
+
+        sort(&feature_values[self.start], &samples[self.start], self.end - self.start - n_missing)
+        self.n_missing = n_missing
+
+    cdef inline void next_p(self, intp_t* p_prev, intp_t* p) noexcept nogil:
+        """Compute the next p_prev and p for iteratiing over feature values.
+
+        The missing values are not included when iterating through the feature values.
+        """
+        cdef:
+            float32_t[::1] feature_values = self.feature_values
+            intp_t end_non_missing = self.end - self.n_missing
+
+        while (
+            p[0] + 1 < end_non_missing and
+            feature_values[p[0] + 1] <= feature_values[p[0]] + FEATURE_THRESHOLD
+        ):
+            p[0] += 1
+
+        p_prev[0] = p[0]
+
+        # By adding 1, we have
+        # (feature_values[p] >= end) or (feature_values[p] > feature_values[p - 1])
+        p[0] += 1
+
+    cdef inline intp_t partition_samples(self, float64_t current_threshold) noexcept nogil:
+        """Partition samples for feature_values at the current_threshold."""
+        cdef:
+            intp_t p = self.start
+            intp_t partition_end = self.end
+            intp_t[::1] samples = self.samples
+            float32_t[::1] feature_values = self.feature_values
+
+        while p < partition_end:
+            if feature_values[p] <= current_threshold:
+                p += 1
+            else:
+                partition_end -= 1
+
+                feature_values[p], feature_values[partition_end] = (
+                    feature_values[partition_end], feature_values[p]
+                )
+                samples[p], samples[partition_end] = samples[partition_end], samples[p]
+
+        return partition_end
+
+    cdef inline void partition_samples_final(
+        self,
+        intp_t best_pos,
+        float64_t best_threshold,
+        intp_t best_feature,
+        intp_t best_n_missing,
+    ) noexcept nogil:
+        """Partition samples for X at the best_threshold and best_feature.
+
+        If missing values are present, this method partitions `samples`
+        so that the `best_n_missing` missing values' indices are in the
+        right-most end of `samples`, that is `samples[end_non_missing:end]`.
+        """
+        cdef:
+            # Local invariance: start <= p <= partition_end <= end
+            intp_t start = self.start
+            intp_t p = start
+            intp_t end = self.end - 1
+            intp_t partition_end = end - best_n_missing
+            intp_t[::1] samples = self.samples
+            const float32_t[:, :] X = self.X
+            float32_t current_value
+
+        if best_n_missing != 0:
+            # Move samples with missing values to the end while partitioning the
+            # non-missing samples
+            while p < partition_end:
+                # Keep samples with missing values at the end
+                if isnan(X[samples[end], best_feature]):
+                    end -= 1
+                    continue
+
+                # Swap sample with missing values with the sample at the end
+                current_value = X[samples[p], best_feature]
+                if isnan(current_value):
+                    samples[p], samples[end] = samples[end], samples[p]
+                    end -= 1
+
+                    # The swapped sample at the end is always a non-missing value, so
+                    # we can continue the algorithm without checking for missingness.
+                    current_value = X[samples[p], best_feature]
+
+                # Partition the non-missing samples
+                if current_value <= best_threshold:
+                    p += 1
+                else:
+                    samples[p], samples[partition_end] = samples[partition_end], samples[p]
+                    partition_end -= 1
+        else:
+            # Partitioning routine when there are no missing values
+            while p < partition_end:
+                if X[samples[p], best_feature] <= best_threshold:
+                    p += 1
+                else:
+                    samples[p], samples[partition_end] = samples[partition_end], samples[p]
+                    partition_end -= 1
+
 
 cdef class BestMultiViewSplitter(MultiViewSplitter):
     """Splitter for finding the best split on dense data."""
-
-    cdef DensePartitioner partitioner
-    cdef int init(
-        self,
-        object X,
-        const float64_t[:, ::1] y,
-        const float64_t[:] sample_weight,
-        const unsigned char[::1] missing_values_in_feature_mask,
-    ) except -1:
-        Splitter.init(self, X, y, sample_weight, missing_values_in_feature_mask)
-        self.partitioner = DensePartitioner(
-            X, self.samples, self.feature_values, missing_values_in_feature_mask
-        )
-
     cdef int node_split(
         self,
         float64_t impurity,   # Impurity of the node
@@ -99,11 +261,11 @@ cdef class BestMultiViewSplitter(MultiViewSplitter):
         or 0 otherwise.
         """
         # typecast the pointer to an ObliqueSplitRecord
-        cdef MultiViewSplitRecord* split = <MultiViewSplitRecord*>(split)
+        cdef MultiViewSplitRecord* multiview_split = <MultiViewSplitRecord*>(split)
 
         # Find the best split
-        cdef intp_t start = splitter.start
-        cdef intp_t end = splitter.end
+        cdef intp_t start = self.start
+        cdef intp_t end = self.end
         cdef intp_t end_non_missing
         cdef intp_t n_missing = 0
         cdef bint has_missing = 0
@@ -111,15 +273,15 @@ cdef class BestMultiViewSplitter(MultiViewSplitter):
         cdef intp_t n_left, n_right
         cdef bint missing_go_to_left
 
-        cdef intp_t[::1] samples = splitter.samples
-        cdef intp_t[::1] features = splitter.features
-        cdef intp_t[::1] constant_features = splitter.constant_features
+        cdef intp_t[::1] samples = self.samples
+        cdef intp_t[::1] features = self.features
+        cdef intp_t[::1] constant_features = self.constant_features
 
-        cdef float32_t[::1] feature_values = splitter.feature_values
-        cdef intp_t max_features = splitter.max_features
-        cdef intp_t min_samples_leaf = splitter.min_samples_leaf
-        cdef float64_t min_weight_leaf = splitter.min_weight_leaf
-        cdef UINT32_t* random_state = &splitter.rand_r_state
+        cdef float32_t[::1] feature_values = self.feature_values
+        cdef intp_t max_features = self.max_features
+        cdef intp_t min_samples_leaf = self.min_samples_leaf
+        cdef float64_t min_weight_leaf = self.min_weight_leaf
+        cdef UINT32_t* random_state = &self.rand_r_state
 
         cdef SplitRecord best_split, current_split
         cdef float64_t current_proxy_improvement = -INFINITY
@@ -148,7 +310,7 @@ cdef class BestMultiViewSplitter(MultiViewSplitter):
             vec_n_drawn_constants[ifeature] = 0
             vec_n_visited_features[ifeature] = 0
 
-        cdef vector[intp_t] n_known_constants_vec = split.vec_n_constant_features
+        cdef vector[intp_t] n_known_constants_vec = multiview_split.vec_n_constant_features
         if n_known_constants_vec.size() != self.n_feature_sets:
             with gil:
                 raise ValueError(
@@ -159,8 +321,6 @@ cdef class BestMultiViewSplitter(MultiViewSplitter):
         cdef vector[intp_t] n_total_constants_vec = n_known_constants_vec
 
         _init_split(&best_split, end)
-
-        partitioner.init_node_split(start, end)
 
         for ifeature in range(self.n_feature_sets):
             # get the max-features for this feature-set
@@ -216,8 +376,8 @@ cdef class BestMultiViewSplitter(MultiViewSplitter):
                 f_j += vec_n_found_constants[ifeature]
                 # f_j in the interval [n_total_constants, f_i[
                 current_split.feature = features[f_j]
-                partitioner.sort_samples_and_feature_values(current_split.feature)
-                n_missing = partitioner.n_missing
+                self.sort_samples_and_feature_values(current_split.feature)
+                n_missing = self.n_missing
                 end_non_missing = end - n_missing
 
                 if (
@@ -238,7 +398,7 @@ cdef class BestMultiViewSplitter(MultiViewSplitter):
                 f_i -= 1
                 features[f_i], features[f_j] = features[f_j], features[f_i]
                 has_missing = n_missing != 0
-                criterion.init_missing(n_missing)  # initialize even when n_missing == 0
+                self.criterion.init_missing(n_missing)  # initialize even when n_missing == 0
 
                 # Evaluate all splits
                 # If there are missing values, then we search twice for the most optimal split.
@@ -250,13 +410,13 @@ cdef class BestMultiViewSplitter(MultiViewSplitter):
 
                 for i in range(n_searches):
                     missing_go_to_left = i == 1
-                    criterion.missing_go_to_left = missing_go_to_left
-                    criterion.reset()
+                    self.criterion.missing_go_to_left = missing_go_to_left
+                    self.criterion.reset()
 
                     p = start
 
                     while p < end_non_missing:
-                        partitioner.next_p(&p_prev, &p)
+                        self.next_p(&p_prev, &p)
 
                         if p >= end_non_missing:
                             continue
@@ -265,10 +425,10 @@ cdef class BestMultiViewSplitter(MultiViewSplitter):
 
                         # Reject if monotonicity constraints are not satisfied
                         if (
-                            with_monotonic_cst and
-                            monotonic_cst[current_split.feature] != 0 and
-                            not criterion.check_monotonicity(
-                                monotonic_cst[current_split.feature],
+                            self.with_monotonic_cst and
+                            self.monotonic_cst[current_split.feature] != 0 and
+                            not self.criterion.check_monotonicity(
+                                self.monotonic_cst[current_split.feature],
                                 lower_bound,
                                 upper_bound,
                             )
@@ -277,22 +437,22 @@ cdef class BestMultiViewSplitter(MultiViewSplitter):
 
                         # Reject if min_samples_leaf is not guaranteed
                         if missing_go_to_left:
-                            n_left = current_split.pos - splitter.start + n_missing
+                            n_left = current_split.pos - self.start + n_missing
                             n_right = end_non_missing - current_split.pos
                         else:
-                            n_left = current_split.pos - splitter.start
+                            n_left = current_split.pos - self.start
                             n_right = end_non_missing - current_split.pos + n_missing
-                        if splitter.check_presplit_conditions(&current_split, n_missing, missing_go_to_left) == 1:
+                        if self.check_presplit_conditions(&current_split, n_missing, missing_go_to_left) == 1:
                             continue
 
-                        criterion.update(current_split.pos)
+                        self.criterion.update(current_split.pos)
 
                         # Reject if monotonicity constraints are not satisfied
                         if (
-                            with_monotonic_cst and
-                            monotonic_cst[current_split.feature] != 0 and
-                            not criterion.check_monotonicity(
-                                monotonic_cst[current_split.feature],
+                            self.with_monotonic_cst and
+                            self.monotonic_cst[current_split.feature] != 0 and
+                            not self.criterion.check_monotonicity(
+                                self.monotonic_cst[current_split.feature],
                                 lower_bound,
                                 upper_bound,
                             )
@@ -300,10 +460,10 @@ cdef class BestMultiViewSplitter(MultiViewSplitter):
                             continue
 
                         # Reject if min_weight_leaf is not satisfied
-                        if splitter.check_postsplit_conditions() == 1:
+                        if self.check_postsplit_conditions() == 1:
                             continue
 
-                        current_proxy_improvement = criterion.proxy_impurity_improvement()
+                        current_proxy_improvement = self.criterion.proxy_impurity_improvement()
 
                         if current_proxy_improvement > best_proxy_improvement:
                             best_proxy_improvement = current_proxy_improvement
@@ -335,12 +495,12 @@ cdef class BestMultiViewSplitter(MultiViewSplitter):
                     missing_go_to_left = 0
 
                     if not (n_left < min_samples_leaf or n_right < min_samples_leaf):
-                        criterion.missing_go_to_left = missing_go_to_left
-                        criterion.update(p)
+                        self.criterion.missing_go_to_left = missing_go_to_left
+                        self.criterion.update(p)
 
-                        if not ((criterion.weighted_n_left < min_weight_leaf) or
-                                (criterion.weighted_n_right < min_weight_leaf)):
-                            current_proxy_improvement = criterion.proxy_impurity_improvement()
+                        if not ((self.criterion.weighted_n_left < min_weight_leaf) or
+                                (self.criterion.weighted_n_right < min_weight_leaf)):
+                            current_proxy_improvement = self.criterion.proxy_impurity_improvement()
 
                             if current_proxy_improvement > best_proxy_improvement:
                                 best_proxy_improvement = current_proxy_improvement
@@ -351,25 +511,25 @@ cdef class BestMultiViewSplitter(MultiViewSplitter):
                                 best_split = current_split
 
             # update the feature_set_begin for the next iteration
-            feature_set_begin = self.feature_set_ends[i_feature]
+            feature_set_begin = self.feature_set_ends[ifeature]
 
         # Reorganize into samples[start:best_split.pos] + samples[best_split.pos:end]
         if best_split.pos < end:
-            partitioner.partition_samples_final(
+            self.partition_samples_final(
                 best_split.pos,
                 best_split.threshold,
                 best_split.feature,
                 best_split.n_missing
             )
-            criterion.init_missing(best_split.n_missing)
-            criterion.missing_go_to_left = best_split.missing_go_to_left
+            self.criterion.init_missing(best_split.n_missing)
+            self.criterion.missing_go_to_left = best_split.missing_go_to_left
 
-            criterion.reset()
-            criterion.update(best_split.pos)
-            criterion.children_impurity(
+            self.criterion.reset()
+            self.criterion.update(best_split.pos)
+            self.criterion.children_impurity(
                 &best_split.impurity_left, &best_split.impurity_right
             )
-            best_split.improvement = criterion.impurity_improvement(
+            best_split.improvement = self.criterion.impurity_improvement(
                 impurity,
                 best_split.impurity_left,
                 best_split.impurity_right
@@ -401,6 +561,6 @@ cdef class BestMultiViewSplitter(MultiViewSplitter):
             vec_n_constant_features.end(),
             0
         )
-        split.vec_n_constant_features = vec_n_constant_features
+        deref(multiview_split).vec_n_constant_features = vec_n_constant_features
         # n_constant_features[0] = n_total_constants
         return 0

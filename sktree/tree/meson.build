@@ -4,7 +4,7 @@ extensions = [
   '_oblique_tree',
   '_utils',
   '_marginal',
-  # '_multiview_splitter',
+  '_multiview_splitter',
 ]
 
 foreach ext: extensions

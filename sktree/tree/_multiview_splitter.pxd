@@ -20,7 +20,11 @@ cdef struct MultiViewSplitRecord:
     float64_t improvement          # Impurity improvement given parent node.
     float64_t impurity_left        # Impurity of the left split.
     float64_t impurity_right       # Impurity of the right split.
-    intp_t n_constant_features     # Number of constant features in the split.
+    float64_t lower_bound       # Lower bound on value of both children for monotonicity
+    float64_t upper_bound       # Upper bound on value of both children for monotonicity
+    unsigned char missing_go_to_left  # Controls if missing values go to the left node.
+    intp_t n_missing            # Number of missing values for the feature being split on
+    intp_t n_constant_features  # Number of constant features in the split
 
     # could maybe be optimized
     vector[intp_t] vec_n_constant_features     # Number of constant features in the split for each feature view
@@ -40,3 +44,19 @@ cdef class MultiViewSplitter(Splitter):
     cdef intp_t[:] vec_n_visited_features
     cdef intp_t[:] vec_n_found_constants
     cdef intp_t[:] vec_n_drawn_constants
+
+    # XXX: moved from partitioner to this class
+    cdef intp_t n_missing
+    cdef void sort_samples_and_feature_values(
+        self, intp_t current_feature
+    ) noexcept nogil
+
+    cdef void next_p(self, intp_t* p_prev, intp_t* p) noexcept nogil
+    cdef intp_t partition_samples(self, float64_t current_threshold) noexcept nogil
+    cdef void partition_samples_final(
+        self,
+        intp_t best_pos,
+        float64_t best_threshold,
+        intp_t best_feature,
+        intp_t best_n_missing,
+    ) noexcept nogil

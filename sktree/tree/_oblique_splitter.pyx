@@ -430,6 +430,7 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
         deref(oblique_split).improvement = best_split.improvement
         deref(oblique_split).impurity_left = best_split.impurity_left
         deref(oblique_split).impurity_right = best_split.impurity_right
+        deref(oblique_split).n_constant_features = 0
         return 0
 
 cdef class RandomObliqueSplitter(ObliqueSplitter):

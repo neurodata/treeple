@@ -6,22 +6,23 @@ from libcpp.vector cimport vector
 from ..._lib.sklearn.tree._splitter cimport SplitRecord
 from ..._lib.sklearn.tree._utils cimport UINT32_t
 from ..._lib.sklearn.utils._typedefs cimport float32_t, float64_t, intp_t
+from .._oblique_splitter cimport ObliqueSplitRecord
 from ._unsup_splitter cimport UnsupervisedSplitter
 
+# cdef struct ObliqueSplitRecord:
+#     # Data to track sample split
+#     intp_t feature              # Which feature to split on.
+#     intp_t pos                  # Split samples array at the given position,
+#     #                           # i.e. count of samples below threshold for feature.
+#     #                           # pos is >= end if the node is a leaf.
+#     float64_t threshold            # Threshold to split at.
+#     float64_t improvement          # Impurity improvement given parent node.
+#     float64_t impurity_left        # Impurity of the left split.
+#     float64_t impurity_right       # Impurity of the right split.
+#     intp_t n_constant_features   # Number of constant features in the split.
 
-cdef struct ObliqueSplitRecord:
-    # Data to track sample split
-    intp_t feature              # Which feature to split on.
-    intp_t pos                  # Split samples array at the given position,
-    #                           # i.e. count of samples below threshold for feature.
-    #                           # pos is >= end if the node is a leaf.
-    float64_t threshold            # Threshold to split at.
-    float64_t improvement          # Impurity improvement given parent node.
-    float64_t impurity_left        # Impurity of the left split.
-    float64_t impurity_right       # Impurity of the right split.
-
-    vector[float32_t]* proj_vec_weights   # weights of the vector (max_features,)
-    vector[intp_t]* proj_vec_indices    # indices of the features (max_features,)
+#     vector[float32_t]* proj_vec_weights   # weights of the vector (max_features,)
+#     vector[intp_t]* proj_vec_indices    # indices of the features (max_features,)
 
 
 cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):

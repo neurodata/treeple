@@ -30,6 +30,11 @@ cdef struct ObliqueSplitRecord:
     float64_t improvement          # Impurity improvement given parent node.
     float64_t impurity_left        # Impurity of the left split.
     float64_t impurity_right       # Impurity of the right split.
+    float64_t lower_bound       # Lower bound on value of both children for monotonicity
+    float64_t upper_bound       # Upper bound on value of both children for monotonicity
+    unsigned char missing_go_to_left  # Controls if missing values go to the left node.
+    intp_t n_missing            # Number of missing values for the feature being split on
+    intp_t n_constant_features  # Number of constant features in the split
 
     vector[float32_t]* proj_vec_weights  # weights of the vector (max_features,)
     vector[intp_t]* proj_vec_indices     # indices of the features (max_features,)
