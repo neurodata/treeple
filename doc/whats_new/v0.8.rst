@@ -14,6 +14,8 @@ Changelog
 ---------
 - |Fix| Trunk simulators now correctly generate random values with a fixed seed,
     by `Sambit Panda`_ (:pr:`#236`)
+- |API| :class:`sktree.tree.MultiViewDecisionTreeClassifier` has removed the ``apply_max_features_per_feature_set`` parameter,
+    by `Adam Li`_ (:pr:`#241`)
 
 Code and Documentation Contributors
 -----------------------------------
