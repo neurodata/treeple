@@ -1,12 +1,12 @@
 project(
   'scikit-tree',
-  'c', 'cpp',
+  'c', 'cpp', 'cython',
   # Note that the git commit hash cannot be added dynamically here
   # That only happens when importing from a git repository.
   # See `sktree/__init__.py`
   version: '0.8.0dev0',
   license: 'BSD-3',
-  meson_version: '>= 0.64.0',
+  meson_version: '>= 1.1.0',
   default_options: [
     'buildtype=debugoptimized',
     'c_std=c99',
@@ -28,6 +28,14 @@ elif cc.get_id() == 'msvc'
           'when building with MSVC')
   endif
 endif
+
+_global_c_args = cc.get_supported_arguments(
+  '-Wno-unused-but-set-variable',
+  '-Wno-unused-function',
+  '-Wno-conversion',
+  '-Wno-misleading-indentation',
+)
+add_project_arguments(_global_c_args, language : 'c')
 
 # We need -lm for all C code (assuming it uses math functions, which is safe to
 # assume for scikit-tree). For C++ it isn't needed, because libstdc++/libc++ is

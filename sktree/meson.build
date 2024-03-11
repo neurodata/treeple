@@ -29,6 +29,35 @@ if is_windows
   endif
 endif
 
+openmp_dep = dependency('OpenMP', language: 'c', required: false)
+
+if not openmp_dep.found()
+    warning(
+'''
+                ***********
+                * WARNING *
+                ***********
+
+It seems that scikit-tree cannot be built with OpenMP.
+
+- Make sure you have followed the installation instructions:
+
+    https://scikit-learn.org/dev/developers/advanced_installation.html
+
+- If your compiler supports OpenMP but you still see this
+  message, please submit a bug report at:
+
+    https://github.com/scikit-tree/scikit-tree/issues
+
+- The build will continue with OpenMP-based parallelism
+  disabled. Note however that some estimators will run in
+  sequential mode instead of leveraging thread-based
+  parallelism.
+
+                    ***
+''')
+endif
+
 # NumPy include directory - needed in all submodules
 incdir_numpy = run_command(py3,
   [
@@ -49,6 +78,20 @@ cc = meson.get_compiler('c')
 #   'source_fname',
 #   numpy_nodepr_api)
 numpy_nodepr_api = '-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION'
+
+# XXX: ENABLE WHEN DEBUGGING
+boundscheck = 'False'
+
+scikit_learn_cython_args = [
+  '-X language_level=3', '-X boundscheck=' + boundscheck, '-X wraparound=False',
+  '-X initializedcheck=False', '-X nonecheck=False', '-X cdivision=True',
+  '-X profile=False',
+  # Needed for cython imports across subpackages, e.g. cluster pyx that
+  # cimports metrics pxd
+  '--include-dir', meson.global_build_root(),
+]
+cython_c_args += scikit_learn_cython_args
+
 cython_c_args += numpy_nodepr_api
 
 python_sources = [
