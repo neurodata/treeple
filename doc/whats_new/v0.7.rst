@@ -41,7 +41,14 @@ Changelog
     :class:`~sklearn.tree.DecisionTreeClassifier`, `Adam Li`_ (:pr:`#228`)
 - |Fix| Trunk simulators now correctly generate random values with a fixed seed,
     by `Sambit Panda`_ (:pr:`#236`)
-    
+- |Fix| Trunk simulators now correctly generate random values with a fixed seed,
+    by `Sambit Panda`_ (:pr:`#236`)
+- |Efficiency| All scikit-tree estimators are now at least 2X faster than they were
+    in previous versions. This was due to adding in compiler-directives to turn on 
+    optimizations '-03' when compiling the C++ generated code from Cython. In addition,
+    we explicitly turned off bounds-checking and related runtime checks in the Cython code,
+    which would lead to performance degradation during runtime. by `Adam Li`_ (:pr:`#242`)
+
 Code and Documentation Contributors
 -----------------------------------
 

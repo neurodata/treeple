@@ -292,7 +292,6 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
         self,
         float64_t impurity,
         SplitRecord* split,
-        intp_t* n_constant_features,
         float64_t lower_bound,
         float64_t upper_bound,
     ) except -1 nogil:
@@ -431,6 +430,7 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
         deref(oblique_split).improvement = best_split.improvement
         deref(oblique_split).impurity_left = best_split.impurity_left
         deref(oblique_split).impurity_right = best_split.impurity_right
+        deref(oblique_split).n_constant_features = 0
         return 0
 
 cdef class RandomObliqueSplitter(ObliqueSplitter):
@@ -498,7 +498,6 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
         self,
         float64_t impurity,
         SplitRecord* split,
-        intp_t* n_constant_features,
         float64_t lower_bound,
         float64_t upper_bound,
     ) except -1 nogil:
@@ -656,6 +655,7 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
         deref(oblique_split).improvement = best_split.improvement
         deref(oblique_split).impurity_left = best_split.impurity_left
         deref(oblique_split).impurity_right = best_split.impurity_right
+        # deref(oblique_split).n_constant_features = 0
         return 0
 
 

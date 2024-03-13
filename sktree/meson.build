@@ -2,6 +2,7 @@
 is_windows = host_machine.system() == 'windows'
 is_mingw = is_windows and cc.get_id() == 'gcc'
 
+c_args = []
 cython_c_args = []
 if is_windows
   # For mingw-w64, link statically against the UCRT.
@@ -25,19 +26,61 @@ if is_windows
     # Silence warnings emitted by PyOS_snprintf for (%zd), see
     # https://github.com/rgommers/scipy/issues/118.
     # Use as c_args for extensions containing Cython code
-    cython_c_args += ['-Wno-format-extra-args', '-Wno-format']
+    c_args += ['-Wno-format-extra-args', '-Wno-format']
   endif
 endif
 
+openmp_dep = dependency('OpenMP', language: 'c', required: false)
+
+if not openmp_dep.found()
+    warning(
+'''
+                ***********
+                * WARNING *
+                ***********
+
+It seems that scikit-tree cannot be built with OpenMP.
+
+- Make sure you have followed the installation instructions:
+
+    https://scikit-learn.org/dev/developers/advanced_installation.html
+
+- If your compiler supports OpenMP but you still see this
+  message, please submit a bug report at:
+
+    https://github.com/scikit-tree/scikit-tree/issues
+
+- The build will continue with OpenMP-based parallelism
+  disabled. Note however that some estimators will run in
+  sequential mode instead of leveraging thread-based
+  parallelism.
+
+                    ***
+''')
+endif
+
 # NumPy include directory - needed in all submodules
-incdir_numpy = run_command(py3,
-  [
-    '-c',
-    'import os; os.chdir(".."); import numpy; print(numpy.get_include())'
-  ],
-  check: true
-).stdout().strip()
-# inc_np = include_directories(incdir_numpy)
+incdir_numpy = meson.get_external_property('numpy-include-dir', 'not-given')
+if incdir_numpy == 'not-given'
+  incdir_numpy = run_command(py,
+    [
+      '-c',
+      '''
+import os
+import numpy as np
+try:
+  incdir = os.path.relpath(np.get_include())
+except Exception:
+  incdir = np.get_include()
+print(incdir)
+'''
+    ],
+    check: true
+  ).stdout().strip()
+endif
+
+inc_np = include_directories(incdir_numpy)
+np_dep = declare_dependency(include_directories: inc_np)
 
 cc = meson.get_compiler('c')
 
@@ -45,11 +88,25 @@ cc = meson.get_compiler('c')
 # NPY_API_VERSION in order not to break compilation for released versions
 # when NumPy introduces a new deprecation. Use in a meson.build file::
 #
-# py3.extension_module('_name',
+# py.extension_module('_name',
 #   'source_fname',
 #   numpy_nodepr_api)
 numpy_nodepr_api = '-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION'
-cython_c_args += numpy_nodepr_api
+
+# XXX: ENABLE WHEN DEBUGGING
+boundscheck = 'False'
+
+scikit_learn_cython_args = [
+  '-X language_level=3', '-X boundscheck=' + boundscheck, '-X wraparound=False',
+  '-X initializedcheck=False', '-X nonecheck=False', '-X cdivision=True',
+  '-X profile=False',
+  # Needed for cython imports across subpackages, e.g. cluster pyx that
+  # cimports metrics pxd
+  '--include-dir', meson.global_build_root(),
+]
+cython_c_args += scikit_learn_cython_args
+
+c_args += numpy_nodepr_api
 
 python_sources = [
   '__init__.py',
@@ -57,28 +114,10 @@ python_sources = [
   'conftest.py',
 ]
 
-py3.install_sources(
+py.install_sources(
   python_sources,
   subdir: 'sktree'
 )
-
-cython_cli = find_program('_build_utils/cythoner.py')
-
-cython_gen = generator(cython_cli,
-  arguments : ['@INPUT@', '@OUTPUT@'],
-  output : '@BASENAME@.c')
-
-cython_gen_cpp = generator(cython_cli,
-  arguments : ['@INPUT@', '@OUTPUT@', '--cplus'],
-  output : '@BASENAME@.cpp')
-
-c_undefined_ok = ['-Wno-maybe-uninitialized']
-
-# Suppress warning for deprecated Numpy API.
-# (Suppress warning messages emitted by #warning directives).
-# Replace with numpy_nodepr_api after Cython 3.0 is out
-cython_c_args += ['-Wno-cpp']
-cython_cpp_args = cython_c_args
 
 subdir('_lib')
 subdir('ensemble')

@@ -33,7 +33,7 @@ cdef class ObliqueTree(Tree):
         SplitRecord* split_node,
         Node *node,
         intp_t node_id
-    )  nogil except -1
+    )  except -1 nogil
     cdef float32_t _compute_feature(
         self,
         const float32_t[:, :] X_ndarray,

@@ -1,18 +1,31 @@
-extensions = [
-  '_sklearn_splitter',
-  '_oblique_splitter',
-  '_oblique_tree',
-  '_utils',
-  '_marginal',
-]
+tree_extension_metadata = {
+  '_sklearn_splitter':
+    {'sources': ['_sklearn_splitter.pyx'],
+     'override_options': ['cython_language=cpp', 'optimization=3']},
+  '_oblique_splitter':
+    {'sources': ['_oblique_splitter.pyx'],
+     'override_options': ['cython_language=cpp', 'optimization=3']},
+  '_oblique_tree':
+    {'sources': ['_oblique_tree.pyx'],
+     'override_options': ['cython_language=cpp', 'optimization=3']},
+  '_utils':
+    {'sources': ['_utils.pyx'],
+     'override_options': ['cython_language=cpp', 'optimization=3']},
+  '_marginal':
+    {'sources': ['_marginal.pyx'],
+     'override_options': ['cython_language=cpp', 'optimization=3']},
+}
 
-foreach ext: extensions
-  py3.extension_module(ext,
-    cython_gen_cpp.process(ext + '.pyx'),
-    c_args: cython_c_args,
-    include_directories: [incdir_numpy],
-    install: true,
+foreach ext_name, ext_dict : tree_extension_metadata
+  py.extension_module(
+    ext_name,
+    ext_dict.get('sources'),
+    dependencies: [np_dep],
+    override_options : ext_dict.get('override_options', []),
+    c_args: c_args,
+    cython_args: cython_c_args,
     subdir: 'sktree/tree',
+    install: true,
   )
 endforeach
 
@@ -25,7 +38,7 @@ python_sources = [
   '_marginalize.py',
 ]
 
-py3.install_sources(
+py.install_sources(
   python_sources,
   subdir: 'sktree/tree'   # Folder relative to site-packages to install to
 )

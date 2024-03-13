@@ -1,22 +1,35 @@
-extensions = [
-  '_unsup_criterion',
-  '_unsup_splitter',
-  '_unsup_tree',
-  '_unsup_oblique_splitter',
-  '_unsup_oblique_tree',
-]
+tree_extension_metadata = {
+  '_unsup_criterion':
+    {'sources': ['_unsup_criterion.pyx'],
+     'override_options': ['cython_language=cpp', 'optimization=3']},
+  '_unsup_splitter':
+    {'sources': ['_unsup_splitter.pyx'],
+     'override_options': ['cython_language=cpp', 'optimization=3']},
+  '_unsup_tree':
+    {'sources': ['_unsup_tree.pyx'],
+     'override_options': ['cython_language=cpp', 'optimization=3']},
+  '_unsup_oblique_splitter':
+    {'sources': ['_unsup_oblique_splitter.pyx'],
+     'override_options': ['cython_language=cpp', 'optimization=3']},
+  '_unsup_oblique_tree':
+    {'sources': ['_unsup_oblique_tree.pyx'],
+     'override_options': ['cython_language=cpp', 'optimization=3']},
+}
 
-foreach ext: extensions
-  py3.extension_module(ext,
-    cython_gen_cpp.process(ext + '.pyx'),
-    c_args: cython_c_args,
-    include_directories: [incdir_numpy],
-    install: true,
+foreach ext_name, ext_dict : tree_extension_metadata
+  py.extension_module(
+    ext_name,
+    ext_dict.get('sources'),
+    dependencies: [np_dep],
+    override_options : ext_dict.get('override_options', []),
+    c_args: c_args,
+    cython_args: cython_c_args,
     subdir: 'sktree/tree/unsupervised',
+    install: true,
   )
 endforeach
 
 
-py3.install_sources(
+py.install_sources(
   subdir: 'sktree/tree/unsupervised'   # Folder relative to site-packages to install to
 )

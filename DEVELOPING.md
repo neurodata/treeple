@@ -43,10 +43,10 @@ If you are developing locally, you will need the build dependencies to compile t
 
 Other requirements can be installed as such:
 
-    pip install -r requirements.txt
-    pip install -r style_requirements.txt
-    pip install -r test_requirements.txt
-    pip install -r doc_requirements.txt
+    pip install .
+    pip install .[style]
+    pip install .[test]
+    pip install .[doc]
 
 # Building the project from source
 
