@@ -8,7 +8,7 @@ python_sources = [
   '_extensions.py',
 ]
 
-py3.install_sources(
+py.install_sources(
   python_sources,
   pure: false,
   subdir: 'sktree/ensemble'

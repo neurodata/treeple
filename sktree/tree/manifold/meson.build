@@ -1,18 +1,23 @@
-extensions = [
-    '_morf_splitter',
-]
+tree_extension_metadata = {
+  '_morf_splitter':
+    {'sources': ['_morf_splitter.pyx'],
+     'override_options': ['cython_language=cpp', 'optimization=3']},
+}
 
-foreach ext: extensions
-  py3.extension_module(ext,
-    cython_gen_cpp.process(ext + '.pyx'),
-    c_args: cython_c_args,
-    include_directories: [incdir_numpy],
-    install: true,
+foreach ext_name, ext_dict : tree_extension_metadata
+  py.extension_module(
+    ext_name,
+    ext_dict.get('sources'),
+    dependencies: [np_dep],
+    override_options : ext_dict.get('override_options', []),
+    c_args: c_args,
+    cython_args: cython_c_args,
     subdir: 'sktree/tree/manifold',
+    install: true,
   )
 endforeach
 
 
-py3.install_sources(
+py.install_sources(
   subdir: 'sktree/tree/manifold'   # Folder relative to site-packages to install to
 )

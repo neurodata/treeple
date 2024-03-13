@@ -2,6 +2,7 @@
 is_windows = host_machine.system() == 'windows'
 is_mingw = is_windows and cc.get_id() == 'gcc'
 
+c_args = []
 cython_c_args = []
 if is_windows
   # For mingw-w64, link statically against the UCRT.
@@ -59,14 +60,27 @@ It seems that scikit-tree cannot be built with OpenMP.
 endif
 
 # NumPy include directory - needed in all submodules
-incdir_numpy = run_command(py3,
-  [
-    '-c',
-    'import os; os.chdir(".."); import numpy; print(numpy.get_include())'
-  ],
-  check: true
-).stdout().strip()
-# inc_np = include_directories(incdir_numpy)
+incdir_numpy = meson.get_external_property('numpy-include-dir', 'not-given')
+if incdir_numpy == 'not-given'
+  incdir_numpy = run_command(py,
+    [
+      '-c',
+      '''
+import os
+import numpy as np
+try:
+  incdir = os.path.relpath(np.get_include())
+except Exception:
+  incdir = np.get_include()
+print(incdir)
+'''
+    ],
+    check: true
+  ).stdout().strip()
+endif
+
+inc_np = include_directories(incdir_numpy)
+np_dep = declare_dependency(include_directories: inc_np)
 
 cc = meson.get_compiler('c')
 
@@ -74,7 +88,7 @@ cc = meson.get_compiler('c')
 # NPY_API_VERSION in order not to break compilation for released versions
 # when NumPy introduces a new deprecation. Use in a meson.build file::
 #
-# py3.extension_module('_name',
+# py.extension_module('_name',
 #   'source_fname',
 #   numpy_nodepr_api)
 numpy_nodepr_api = '-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION'
@@ -92,7 +106,7 @@ scikit_learn_cython_args = [
 ]
 cython_c_args += scikit_learn_cython_args
 
-cython_c_args += numpy_nodepr_api
+c_args += numpy_nodepr_api
 
 python_sources = [
   '__init__.py',
@@ -100,28 +114,10 @@ python_sources = [
   'conftest.py',
 ]
 
-py3.install_sources(
+py.install_sources(
   python_sources,
   subdir: 'sktree'
 )
-
-cython_cli = find_program('_build_utils/cythoner.py')
-
-cython_gen = generator(cython_cli,
-  arguments : ['@INPUT@', '@OUTPUT@'],
-  output : '@BASENAME@.c')
-
-cython_gen_cpp = generator(cython_cli,
-  arguments : ['@INPUT@', '@OUTPUT@', '--cplus'],
-  output : '@BASENAME@.cpp')
-
-c_undefined_ok = ['-Wno-maybe-uninitialized']
-
-# Suppress warning for deprecated Numpy API.
-# (Suppress warning messages emitted by #warning directives).
-# Replace with numpy_nodepr_api after Cython 3.0 is out
-cython_c_args += ['-Wno-cpp']
-cython_cpp_args = cython_c_args
 
 subdir('_lib')
 subdir('ensemble')
