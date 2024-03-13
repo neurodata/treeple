@@ -4,6 +4,7 @@ import logging
 import os
 import sys
 
+print("using current cython branch.")
 __version__ = "0.8.0dev0"
 logger = logging.getLogger(__name__)
 

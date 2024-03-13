@@ -1,12 +1,12 @@
 project(
   'scikit-tree',
-  'c', 'cpp',
+  'c', 'cpp', 'cython',
   # Note that the git commit hash cannot be added dynamically here
   # That only happens when importing from a git repository.
   # See `sktree/__init__.py`
   version: '0.8.0dev0',
   license: 'BSD-3',
-  meson_version: '>= 0.64.0',
+  meson_version: '>= 1.1.0',
   default_options: [
     'buildtype=debugoptimized',
     'c_std=c99',
@@ -29,6 +29,21 @@ elif cc.get_id() == 'msvc'
   endif
 endif
 
+# Suppress warning for deprecated Numpy API.
+# Replace with numpy_nodepr_api after Cython 3.0 is out
+# '-Wno-maybe-uninitialized'
+# numpy_nodepr_api = '-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION'
+
+# (Suppress warning messages emitted by #warning directives).
+_global_c_args = cc.get_supported_arguments(
+  '-Wno-unused-but-set-variable',
+  '-Wno-unused-function',
+  '-Wno-conversion',
+  '-Wno-misleading-indentation',
+  '-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION',
+)
+add_project_arguments(_global_c_args, language : 'c')
+
 # We need -lm for all C code (assuming it uses math functions, which is safe to
 # assume for scikit-tree). For C++ it isn't needed, because libstdc++/libc++ is
 # guaranteed to depend on it. For Fortran code, Meson already adds `-lm`.
@@ -50,22 +65,13 @@ r = run_command('mv', 'sktree/_lib/sklearn_fork/sklearn', 'sktree/_lib/sklearn',
 
 # Setup Python:
 # https://mesonbuild.com/Python-module.html
-py3_mod = import('python')
-
-# NOTE: with Meson >=0.64.0 we can add `pure: false` here and remove that line
-# everywhere else, see https://github.com/mesonbuild/meson/pull/10783.
-py3 = py3_mod.find_installation(
-  'python3',
-  pure: false  # Will be installed next to binaries
-)
-# py3.install_env('venv')
+py = import('python').find_installation(pure: false)
 
 # print some debugging output
-message(py3.full_path())
-message(py3.get_install_dir())
-if py3.language_version().version_compare('<3.9')
+message(py.full_path())
+message(py.get_install_dir())
+if py.language_version().version_compare('<3.9')
     error('At least Python 3.9 is required.')
 endif
-py3_dep = py3.dependency()
 
 subdir('sktree')
