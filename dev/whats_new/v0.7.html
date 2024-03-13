@@ -510,6 +510,24 @@ pass any extra parameters that <code class="docutils literal notranslate"><span 
 </dd>
 </dl>
 </li>
+<li><dl class="simple">
+<dt><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  Trunk simulators now correctly generate random values with a fixed seed,</dt><dd><p>by <a class="reference external" href="https://sampan.me">Sambit Panda</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/#236">##236</a>)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  Trunk simulators now correctly generate random values with a fixed seed,</dt><dd><p>by <a class="reference external" href="https://sampan.me">Sambit Panda</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/#236">##236</a>)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><span class="raw-html"><span class="badge badge-info">Efficiency</span></span>  All scikit-tree estimators are now at least 2X faster than they were</dt><dd><p>in previous versions. This was due to adding in compiler-directives to turn on
+optimizations ‘-03’ when compiling the C++ generated code from Cython. In addition,
+we explicitly turned off bounds-checking and related runtime checks in the Cython code,
+which would lead to performance degradation during runtime. by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/#242">##242</a>)</p>
+</dd>
+</dl>
+</li>
 </ul>
 </section>
 <section id="code-and-documentation-contributors">
