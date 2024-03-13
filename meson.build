@@ -30,10 +30,11 @@ elif cc.get_id() == 'msvc'
 endif
 
 # Suppress warning for deprecated Numpy API.
-# (Suppress warning messages emitted by #warning directives).
 # Replace with numpy_nodepr_api after Cython 3.0 is out
 # '-Wno-maybe-uninitialized'
 # numpy_nodepr_api = '-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION'
+
+# (Suppress warning messages emitted by #warning directives).
 _global_c_args = cc.get_supported_arguments(
   '-Wno-unused-but-set-variable',
   '-Wno-unused-function',
@@ -65,15 +66,6 @@ r = run_command('mv', 'sktree/_lib/sklearn_fork/sklearn', 'sktree/_lib/sklearn',
 # Setup Python:
 # https://mesonbuild.com/Python-module.html
 py = import('python').find_installation(pure: false)
-# py3_mod = import('python')
-
-# # NOTE: with Meson >=0.64.0 we can add `pure: false` here and remove that line
-# # everywhere else, see https://github.com/mesonbuild/meson/pull/10783.
-# py3 = py3_mod.find_installation(
-#   'python3',
-#   pure: false  # Will be installed next to binaries
-# )
-# py.install_env('venv')
 
 # print some debugging output
 message(py.full_path())
