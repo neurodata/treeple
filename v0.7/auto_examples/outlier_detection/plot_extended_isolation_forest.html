@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>ExtendedIsolationForest example &#8212; scikit-tree 0.7.0 documentation</title>
+    <title>ExtendedIsolationForest example &#8212; scikit-tree 0.7.2 documentation</title>
   
   
   
@@ -30,7 +30,7 @@
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css?v=7f9a90b1" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
@@ -42,7 +42,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=c5ced968eda925caa686" />
   <script src="../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=c5ced968eda925caa686"></script>
 
-    <script src="../../_static/documentation_options.js?v=423e15eb"></script>
+    <script src="../../_static/documentation_options.js?v=8ba1b563"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -51,7 +51,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.14.2';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/scikit-tree/main/doc/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.7.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.7.2';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -135,7 +135,7 @@
   
   
   
-    <p class="title logo__title">scikit-tree 0.7.0 documentation</p>
+    <p class="title logo__title">scikit-tree 0.7.2 documentation</p>
   
 </a></div>
     
@@ -534,11 +534,11 @@ Extended Isolation Forest trained on a toy dataset.</p>
 <h2>Data generation<a class="headerlink" href="#data-generation" title="Link to this heading">#</a></h2>
 <p>We generate two clusters (each one containing <code class="docutils literal notranslate"><span class="pre">n_samples</span></code>) by randomly
 sampling the standard normal distribution as returned by
-<a class="reference external" href="https://numpy.org/devdocs/reference/random/generated/numpy.random.randn.html#numpy.random.randn" title="(in NumPy v2.0.dev0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.random.randn()</span></code></a>. One of them is spherical and the other one is
+<a class="reference external" href="https://numpy.org/devdocs/reference/random/generated/numpy.random.randn.html#numpy.random.randn" title="(in NumPy v2.1.dev0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.random.randn()</span></code></a>. One of them is spherical and the other one is
 slightly deformed.</p>
 <p>For consistency with the <a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.ensemble.IsolationForest.html#sklearn.ensemble.IsolationForest" title="(in scikit-learn v1.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">IsolationForest</span></code></a> notation,
 the inliers (i.e. the gaussian clusters) are assigned a ground truth label <code class="docutils literal notranslate"><span class="pre">1</span></code>
-whereas the outliers (created with <a class="reference external" href="https://numpy.org/devdocs/reference/random/generated/numpy.random.uniform.html#numpy.random.uniform" title="(in NumPy v2.0.dev0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.random.uniform()</span></code></a>) are assigned
+whereas the outliers (created with <a class="reference external" href="https://numpy.org/devdocs/reference/random/generated/numpy.random.uniform.html#numpy.random.uniform" title="(in NumPy v2.1.dev0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.random.uniform()</span></code></a>) are assigned
 the label <code class="docutils literal notranslate"><span class="pre">-1</span></code>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <a href="https://docs.python.org/3/library/copy.html#copy.copy" title="copy.copy" class="sphx-glr-backref-module-copy sphx-glr-backref-type-py-function"><span class="n">copy</span></a>
 
@@ -987,7 +987,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-3);
 }
-</style><div id="sk-container-id-1" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>IsolationForest(max_samples=100, random_state=0)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-1" type="checkbox" checked><label for="sk-estimator-id-1" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;&nbsp;IsolationForest<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/dev/modules/generated/sklearn.ensemble.IsolationForest.html">?<span>Documentation for IsolationForest</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></label><div class="sk-toggleable__content fitted"><pre>IsolationForest(max_samples=100, random_state=0)</pre></div> </div></div></div></div>
+</style><div id="sk-container-id-1" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>IsolationForest(max_samples=100, random_state=0)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-1" type="checkbox" checked><label for="sk-estimator-id-1" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;&nbsp;IsolationForest<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.4/modules/generated/sklearn.ensemble.IsolationForest.html">?<span>Documentation for IsolationForest</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></label><div class="sk-toggleable__content fitted"><pre>IsolationForest(max_samples=100, random_state=0)</pre></div> </div></div></div></div>
 </div>
 <br />
 <br /></section>
@@ -1477,7 +1477,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-3);
 }
-</style><div id="sk-container-id-2" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>IsolationForest(max_samples=100, n_estimators=200, random_state=0)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-2" type="checkbox" checked><label for="sk-estimator-id-2" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;&nbsp;IsolationForest<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/dev/modules/generated/sklearn.ensemble.IsolationForest.html">?<span>Documentation for IsolationForest</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></label><div class="sk-toggleable__content fitted"><pre>IsolationForest(max_samples=100, n_estimators=200, random_state=0)</pre></div> </div></div></div></div>
+</style><div id="sk-container-id-2" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>IsolationForest(max_samples=100, n_estimators=200, random_state=0)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-2" type="checkbox" checked><label for="sk-estimator-id-2" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;&nbsp;IsolationForest<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.4/modules/generated/sklearn.ensemble.IsolationForest.html">?<span>Documentation for IsolationForest</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></label><div class="sk-toggleable__content fitted"><pre>IsolationForest(max_samples=100, n_estimators=200, random_state=0)</pre></div> </div></div></div></div>
 </div>
 <br />
 <br /><p>Plot discrete decision boundary</p>
@@ -1556,8 +1556,8 @@ is located at the bottom right corner of the plot.</p>
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
-<li><img src="../../_images/sphx_glr_plot_extended_isolation_forest_009.png" srcset="../../_images/sphx_glr_plot_extended_isolation_forest_009.png" alt="IsoForest Nominal: Mean=1.099, Var=0.009 Anomaly: Mean=0.801, Var=0.058" class = "sphx-glr-multi-img"/></li>
-<li><img src="../../_images/sphx_glr_plot_extended_isolation_forest_010.png" srcset="../../_images/sphx_glr_plot_extended_isolation_forest_010.png" alt="ExtendedIsoForest Nominal: Mean=1.079, Var=0.017 Anomaly: Mean=0.837, Var=0.049" class = "sphx-glr-multi-img"/></li>
+<li><img src="../../_images/sphx_glr_plot_extended_isolation_forest_009.png" srcset="../../_images/sphx_glr_plot_extended_isolation_forest_009.png" alt="IsoForest Nominal: Mean=1.098, Var=0.011 Anomaly: Mean=0.794, Var=0.059" class = "sphx-glr-multi-img"/></li>
+<li><img src="../../_images/sphx_glr_plot_extended_isolation_forest_010.png" srcset="../../_images/sphx_glr_plot_extended_isolation_forest_010.png" alt="ExtendedIsoForest Nominal: Mean=1.074, Var=0.014 Anomaly: Mean=0.832, Var=0.052" class = "sphx-glr-multi-img"/></li>
 </ul>
 </section>
 <section id="references">
@@ -1570,7 +1570,7 @@ is located at the bottom right corner of the plot.</p>
 </aside>
 </aside>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 4.563 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 6.842 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-outlier-detection-plot-extended-isolation-forest-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/350036b41dece1cef3eba8f9e25af2d9/plot_extended_isolation_forest.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_extended_isolation_forest.py</span></code></a></p>
@@ -1659,7 +1659,7 @@ is located at the bottom right corner of the plot.</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-24.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-03-13.
       <br/>
     
   </p>

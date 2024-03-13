@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>sktree.datasets.hyppo &#8212; scikit-tree 0.7.0 documentation</title>
+    <title>sktree.datasets.hyppo &#8212; scikit-tree 0.7.2 documentation</title>
   
   
   
@@ -29,7 +29,7 @@
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css?v=7f9a90b1" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=61a4c737" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
@@ -41,7 +41,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=c5ced968eda925caa686" />
   <script src="../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=c5ced968eda925caa686"></script>
 
-    <script src="../../../_static/documentation_options.js?v=423e15eb"></script>
+    <script src="../../../_static/documentation_options.js?v=8ba1b563"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.14.2';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/scikit-tree/main/doc/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.7.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.7.2';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -132,7 +132,7 @@
   
   
   
-    <p class="title logo__title">scikit-tree 0.7.0 documentation</p>
+    <p class="title logo__title">scikit-tree 0.7.2 documentation</p>
   
 </a></div>
     
@@ -537,6 +537,7 @@ document.write(`
     <span class="n">rho</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">band_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ma&quot;</span><span class="p">,</span>
     <span class="n">return_params</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">scaling_factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate Marron-Wand binary classification dataset.</span>
@@ -555,7 +556,7 @@ document.write(`
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    n_samples : int</span>
-<span class="sd">        Number of sample to generate.</span>
+<span class="sd">        Number of sample to generate. Must be an even number, else the total number of samples generated will be ``n_samples - 1``.</span>
 <span class="sd">    n_dim : int, optional</span>
 <span class="sd">        The dimensionality of the dataset and the number of</span>
 <span class="sd">        unique labels, by default 4096.</span>
@@ -578,6 +579,8 @@ document.write(`
 <span class="sd">        Either &#39;ma&#39;, or &#39;ar&#39;.</span>
 <span class="sd">    return_params : bool, optional</span>
 <span class="sd">        Whether or not to return the distribution parameters of the classes normal distributions.</span>
+<span class="sd">    scaling_factor : float, optional</span>
+<span class="sd">        The scaling factor for the covariance matrix. By default 1.</span>
 <span class="sd">    seed : int, optional</span>
 <span class="sd">        Random seed, by default None.</span>
 
@@ -637,6 +640,9 @@ document.write(`
     <span class="k">else</span><span class="p">:</span>
         <span class="n">cov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">n_informative</span><span class="p">)</span>
 
+    <span class="c1"># allow arbitrary uniform scaling of the covariance matrix</span>
+    <span class="n">cov</span> <span class="o">=</span> <span class="n">scaling_factor</span> <span class="o">*</span> <span class="n">cov</span>
+
     <span class="c1"># speed up computations for large multivariate normal matrix with SVD approximation</span>
     <span class="k">if</span> <span class="n">n_informative</span> <span class="o">&gt;</span> <span class="mi">1000</span><span class="p">:</span>
         <span class="n">mvg_sampling_method</span> <span class="o">=</span> <span class="s2">&quot;cholesky&quot;</span>
@@ -653,8 +659,8 @@ document.write(`
     <span class="n">norm_params</span> <span class="o">=</span> <span class="n">MarronWandSims</span><span class="p">(</span><span class="n">n_dim</span><span class="o">=</span><span class="n">n_informative</span><span class="p">,</span> <span class="n">cov</span><span class="o">=</span><span class="n">cov</span><span class="p">)(</span><span class="n">simulation</span><span class="p">)</span>
     <span class="n">G</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromiter</span><span class="p">(</span>
         <span class="p">(</span>
-            <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">norm_params</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">mvg_sampling_method</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">mixture_idx</span>
+            <span class="n">rng_children</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">norm_params</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">mvg_sampling_method</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">rng_children</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">mixture_idx</span><span class="p">,</span> <span class="n">rng</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span><span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">))</span>
         <span class="p">),</span>
         <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">((</span><span class="nb">float</span><span class="p">,</span> <span class="n">n_informative</span><span class="p">)),</span>
     <span class="p">)</span>
@@ -662,27 +668,42 @@ document.write(`
     <span class="c1"># as the dimensionality of the simulations increasing, we are adding more and</span>
     <span class="c1"># more noise to the data using the w parameter</span>
     <span class="n">w_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_informative</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)])</span>
+
+    <span class="c1"># create new generator instance to ensure reproducibility with multiple runs with the same seed</span>
+    <span class="n">rng_F</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
     <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
         <span class="p">(</span>
-            <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span>
+            <span class="n">rng_F</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_informative</span><span class="p">),</span> <span class="n">cov</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">mvg_sampling_method</span>
             <span class="p">),</span>
             <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">w_vec</span><span class="p">)</span>
-            <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span>
+            <span class="o">*</span> <span class="n">rng_F</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_informative</span><span class="p">),</span> <span class="n">cov</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">mvg_sampling_method</span>
             <span class="p">)</span>
             <span class="o">+</span> <span class="n">w_vec</span> <span class="o">*</span> <span class="n">G</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">n_informative</span><span class="p">),</span>
         <span class="p">)</span>
     <span class="p">)</span>
+
     <span class="k">if</span> <span class="n">n_dim</span> <span class="o">&gt;</span> <span class="n">n_informative</span><span class="p">:</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">X</span><span class="p">,</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">n_dim</span> <span class="o">-</span> <span class="n">n_informative</span><span class="p">))))</span>
+        <span class="c1"># create new generator instance to ensure reproducibility with multiple runs with the same seed</span>
+        <span class="n">rng_noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="n">X</span><span class="p">,</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="n">rng_children</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span>
+                        <span class="k">for</span> <span class="n">rng_children</span> <span class="ow">in</span> <span class="n">rng_noise</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span><span class="n">n_dim</span> <span class="o">-</span> <span class="n">n_informative</span><span class="p">)</span>
+                    <span class="p">]</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)))</span>
 
     <span class="k">if</span> <span class="n">return_params</span><span class="p">:</span>
-        <span class="n">returns</span> <span class="o">=</span> <span class="p">[</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">]</span>
-        <span class="n">returns</span> <span class="o">+=</span> <span class="p">[</span><span class="o">*</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">norm_params</span><span class="p">)),</span> <span class="n">G</span><span class="p">,</span> <span class="n">w_vec</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">returns</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">*</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">norm_params</span><span class="p">)),</span> <span class="n">G</span><span class="p">,</span> <span class="n">w_vec</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span></div>
 
 
@@ -699,6 +720,7 @@ document.write(`
     <span class="n">band_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ma&quot;</span><span class="p">,</span>
     <span class="n">return_params</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">mix</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">scaling_factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate trunk mixture binary classification dataset.</span>
@@ -721,7 +743,7 @@ document.write(`
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    n_samples : int</span>
-<span class="sd">        Number of sample to generate.</span>
+<span class="sd">        Number of sample to generate. Must be an even number, else the total number of samples generated will be ``n_samples - 1``.</span>
 <span class="sd">    n_dim : int, optional</span>
 <span class="sd">        The dimensionality of the dataset and the number of</span>
 <span class="sd">        unique labels, by default 4096.</span>
@@ -744,6 +766,8 @@ document.write(`
 <span class="sd">    mix : int, optional</span>
 <span class="sd">        The probabilities associated with the mixture of Gaussians in the ``trunk-mix`` simulation.</span>
 <span class="sd">        By default 0.5.</span>
+<span class="sd">    scaling_factor : float, optional</span>
+<span class="sd">        The scaling factor for the covariance matrix. By default 1.</span>
 <span class="sd">    seed : int, optional</span>
 <span class="sd">        Random seed, by default None.</span>
 
@@ -808,6 +832,10 @@ document.write(`
     <span class="k">else</span><span class="p">:</span>
         <span class="n">cov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">n_informative</span><span class="p">)</span>
 
+    <span class="c1"># Note: When variance is 1, trunk-mix does not look bimodal at low dimensions.</span>
+    <span class="c1"># It is set it to (2/3)**2 since that is consistent with Marron and Wand bimodal</span>
+    <span class="n">cov</span> <span class="o">=</span> <span class="n">scaling_factor</span> <span class="o">*</span> <span class="n">cov</span>
+
     <span class="c1"># speed up computations for large multivariate normal matrix with SVD approximation</span>
     <span class="k">if</span> <span class="n">n_informative</span> <span class="o">&gt;</span> <span class="mi">1000</span><span class="p">:</span>
         <span class="n">method</span> <span class="o">=</span> <span class="s2">&quot;cholesky&quot;</span>
@@ -816,32 +844,43 @@ document.write(`
 
     <span class="n">mixture_idx</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="n">mix</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">mix</span><span class="p">])</span>  <span class="c1"># type: ignore</span>
 
-    <span class="c1"># When variance is 1, trunk-mix does not look bimodal at low dimensions.</span>
-    <span class="c1"># It is set it to (2/3)**2 since that is consistent with Marron and Wand bimodal</span>
-    <span class="n">norm_params</span> <span class="o">=</span> <span class="p">[[</span><span class="n">mu_0_vec</span><span class="p">,</span> <span class="n">cov</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="n">mu_1_vec</span><span class="p">,</span> <span class="n">cov</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">]]</span>
+    <span class="n">norm_params</span> <span class="o">=</span> <span class="p">[[</span><span class="n">mu_0_vec</span><span class="p">,</span> <span class="n">cov</span><span class="p">],</span> <span class="p">[</span><span class="n">mu_1_vec</span><span class="p">,</span> <span class="n">cov</span><span class="p">]]</span>
     <span class="n">X_mixture</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromiter</span><span class="p">(</span>
-        <span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">norm_params</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">mixture_idx</span><span class="p">),</span>
+        <span class="p">(</span>
+            <span class="n">rng_children</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">norm_params</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">rng_children</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">mixture_idx</span><span class="p">,</span> <span class="n">rng</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span><span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="p">),</span>
         <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">((</span><span class="nb">float</span><span class="p">,</span> <span class="n">n_informative</span><span class="p">)),</span>
     <span class="p">)</span>
 
+    <span class="c1"># create new generator instance to ensure reproducibility with multiple runs with the same seed</span>
+    <span class="n">rng_F</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
     <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
         <span class="p">(</span>
-            <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span>
-                <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_informative</span><span class="p">),</span> <span class="n">cov</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span>
-            <span class="p">),</span>
+            <span class="n">rng_F</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_informative</span><span class="p">),</span> <span class="n">cov</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">),</span>
             <span class="n">X_mixture</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">n_informative</span><span class="p">),</span>
         <span class="p">)</span>
     <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">n_dim</span> <span class="o">&gt;</span> <span class="n">n_informative</span><span class="p">:</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">X</span><span class="p">,</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">n_dim</span> <span class="o">-</span> <span class="n">n_informative</span><span class="p">))))</span>
+        <span class="c1"># create new generator instance to ensure reproducibility with multiple runs with the same seed</span>
+        <span class="n">rng_noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="n">X</span><span class="p">,</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="n">rng_children</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span>
+                        <span class="k">for</span> <span class="n">rng_children</span> <span class="ow">in</span> <span class="n">rng_noise</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span><span class="n">n_dim</span> <span class="o">-</span> <span class="n">n_informative</span><span class="p">)</span>
+                    <span class="p">]</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)))</span>
 
     <span class="k">if</span> <span class="n">return_params</span><span class="p">:</span>
-        <span class="n">returns</span> <span class="o">=</span> <span class="p">[</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">]</span>
-        <span class="n">returns</span> <span class="o">+=</span> <span class="p">[</span><span class="o">*</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">norm_params</span><span class="p">)),</span> <span class="n">X_mixture</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">returns</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">*</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">norm_params</span><span class="p">)),</span> <span class="n">X_mixture</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span></div>
 
 
@@ -857,6 +896,7 @@ document.write(`
     <span class="n">rho</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">band_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ma&quot;</span><span class="p">,</span>
     <span class="n">return_params</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">scaling_factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate trunk binary classification dataset.</span>
@@ -874,7 +914,7 @@ document.write(`
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    n_samples : int</span>
-<span class="sd">        Number of sample to generate.</span>
+<span class="sd">        Number of sample to generate. Must be an even number, else the total number of samples generated will be ``n_samples - 1``.</span>
 <span class="sd">    n_dim : int, optional</span>
 <span class="sd">        The dimensionality of the dataset and the number of</span>
 <span class="sd">        unique labels, by default 4096.</span>
@@ -894,6 +934,8 @@ document.write(`
 <span class="sd">        Either &#39;ma&#39;, or &#39;ar&#39;.</span>
 <span class="sd">    return_params : bool, optional</span>
 <span class="sd">        Whether or not to return the distribution parameters of the classes normal distributions.</span>
+<span class="sd">    scaling_factor : float, optional</span>
+<span class="sd">        The scaling factor for the covariance matrix. By default 1.</span>
 <span class="sd">    seed : int, optional</span>
 <span class="sd">        Random seed, by default None.</span>
 
@@ -949,6 +991,9 @@ document.write(`
     <span class="k">else</span><span class="p">:</span>
         <span class="n">cov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">n_informative</span><span class="p">)</span>
 
+    <span class="c1"># allow arbitrary uniform scaling of the covariance matrix</span>
+    <span class="n">cov</span> <span class="o">=</span> <span class="n">scaling_factor</span> <span class="o">*</span> <span class="n">cov</span>
+
     <span class="c1"># speed up computations for large multivariate normal matrix with SVD approximation</span>
     <span class="k">if</span> <span class="n">n_informative</span> <span class="o">&gt;</span> <span class="mi">1000</span><span class="p">:</span>
         <span class="n">method</span> <span class="o">=</span> <span class="s2">&quot;cholesky&quot;</span>
@@ -956,21 +1001,29 @@ document.write(`
         <span class="n">method</span> <span class="o">=</span> <span class="s2">&quot;svd&quot;</span>
 
     <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
-        <span class="p">(</span>
-            <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">mu_1_vec</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">),</span>
-            <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">mu_0_vec</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">),</span>
-        <span class="p">)</span>
+        <span class="p">[</span>
+            <span class="n">rng_children</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">mu_vec</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">rng_children</span><span class="p">,</span> <span class="n">mu_vec</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="p">[</span><span class="n">mu_1_vec</span><span class="p">,</span> <span class="n">mu_0_vec</span><span class="p">])</span>
+        <span class="p">]</span>
     <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">n_dim</span> <span class="o">&gt;</span> <span class="n">n_informative</span><span class="p">:</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">X</span><span class="p">,</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">n_dim</span> <span class="o">-</span> <span class="n">n_informative</span><span class="p">))))</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="n">X</span><span class="p">,</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="n">rng_children</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span>
+                        <span class="k">for</span> <span class="n">rng_children</span> <span class="ow">in</span> <span class="n">rng</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span><span class="n">n_dim</span> <span class="o">-</span> <span class="n">n_informative</span><span class="p">)</span>
+                    <span class="p">]</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)))</span>
 
     <span class="k">if</span> <span class="n">return_params</span><span class="p">:</span>
-        <span class="n">returns</span> <span class="o">=</span> <span class="p">[</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">]</span>
-        <span class="n">returns</span> <span class="o">+=</span> <span class="p">[[</span><span class="n">mu_0_vec</span><span class="p">,</span> <span class="n">mu_1_vec</span><span class="p">],</span> <span class="p">[</span><span class="n">cov</span><span class="p">,</span> <span class="n">cov</span><span class="p">]]</span>
-        <span class="k">return</span> <span class="n">returns</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="p">[</span><span class="n">mu_0_vec</span><span class="p">,</span> <span class="n">mu_1_vec</span><span class="p">],</span> <span class="p">[</span><span class="n">cov</span><span class="p">,</span> <span class="n">cov</span><span class="p">]]</span>
     <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span></div>
 
 
@@ -1333,7 +1386,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-02-24.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-03-13.
       <br/>
     
   </p>
