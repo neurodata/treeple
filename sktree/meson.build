@@ -26,7 +26,7 @@ if is_windows
     # Silence warnings emitted by PyOS_snprintf for (%zd), see
     # https://github.com/rgommers/scipy/issues/118.
     # Use as c_args for extensions containing Cython code
-    cython_c_args += ['-Wno-format-extra-args', '-Wno-format']
+    c_args += ['-Wno-format-extra-args', '-Wno-format']
   endif
 endif
 
