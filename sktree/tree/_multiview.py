@@ -178,11 +178,6 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         next 20 features, then ``feature_set_ends = [10, 30]``. If ``None``,
         then this will assume that there is only one feature set.
 
-    apply_max_features_per_feature_set : bool, default=False
-        Whether to apply sampling per feature set, where ``max_features`` is applied
-        to each feature-set. If ``False``, then sampling
-        is applied over the entire feature space.
-
     Attributes
     ----------
     classes_ : ndarray of shape (n_classes,) or list of ndarray
@@ -243,7 +238,6 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
     _parameter_constraints = {
         **DecisionTreeClassifier._parameter_constraints,
         "feature_set_ends": ["array-like", None],
-        "apply_max_features_per_feature_set": ["boolean"],
     }
     _parameter_constraints.pop("max_features")
     _parameter_constraints["max_features"] = [
@@ -272,7 +266,6 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         store_leaf_values=False,
         monotonic_cst=None,
         feature_set_ends=None,
-        apply_max_features_per_feature_set=False,
     ):
         super().__init__(
             criterion=criterion,
@@ -292,7 +285,6 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         )
 
         self.feature_set_ends = feature_set_ends
-        self.apply_max_features_per_feature_set = apply_max_features_per_feature_set
         self._max_features_arr = None
 
     def _build_tree(
@@ -383,7 +375,6 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
 
         if isinstance(self._max_features_arr, (Integral, Real, str, type(None))):
             max_features_arr_ = [self._max_features_arr] * self.n_feature_sets_
-            stratify_mtry_per_view = self.apply_max_features_per_feature_set
         else:
             if not isinstance(self._max_features_arr, (list, np.ndarray)):
                 raise ValueError(
@@ -396,74 +387,53 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                     f"got {len(self.max_features)}"
                 )
             max_features_arr_ = self._max_features_arr
-            stratify_mtry_per_view = True
 
         self.n_features_in_set_ = []
-        if stratify_mtry_per_view:
-            # XXX: experimental
-            # we can replace max_features_ here based on whether or not uniform logic over
-            # feature sets
-            max_features_per_set = []
-            n_features_in_prev = 0
-            for idx in range(self.n_feature_sets_):
-                max_features = max_features_arr_[idx]
+        # XXX: experimental
+        # we can replace max_features_ here based on whether or not uniform logic over
+        # feature sets
+        max_features_per_set = []
+        n_features_in_prev = 0
+        for idx in range(self.n_feature_sets_):
+            max_features = max_features_arr_[idx]
 
-                n_features_in_ = self.feature_set_ends_[idx] - n_features_in_prev
-                n_features_in_prev += n_features_in_
-                self.n_features_in_set_.append(n_features_in_)
-                if isinstance(max_features, str):
-                    if max_features == "sqrt":
-                        max_features = max(1, math.ceil(np.sqrt(n_features_in_)))
-                    elif max_features == "log2":
-                        max_features = max(1, math.ceil(np.log2(n_features_in_)))
-                elif max_features is None:
-                    max_features = n_features_in_
-                elif isinstance(max_features, numbers.Integral):
-                    max_features = max_features
-                else:  # float
-                    if max_features > 0.0:
-                        max_features = max(1, math.ceil(max_features * n_features_in_))
-                    else:
-                        max_features = 0
-
-                if max_features > n_features_in_:
-                    raise ValueError(
-                        f"max_features must be less than or equal to "
-                        f"the number of features in feature set {idx}: {n_features_in_}, but "
-                        f"max_features = {max_features} when applying sampling"
-                        f"per feature set."
-                    )
-
-                max_features_per_set.append(max_features)
-            self.max_features_ = np.sum(max_features_per_set)
-            if self.max_features_ > n_features:
-                raise ValueError(
-                    "max_features is greater than the number of features: "
-                    f"{max_features} > {n_features}."
-                    "This should not be possible. Please submit a bug report."
-                )
-            self.max_features_per_set_ = np.asarray(max_features_per_set, dtype=np.intp)
-            # the total number of features to sample per split
-            self.max_features_ = np.sum(self.max_features_per_set_)
-        else:
-            self.max_features_per_set_ = None
-            self.max_features = self._max_features_arr
-            if isinstance(self.max_features, str):
-                if self.max_features == "sqrt":
-                    max_features = max(1, int(np.sqrt(self.n_features_in_)))
-                elif self.max_features == "log2":
-                    max_features = max(1, int(np.log2(self.n_features_in_)))
-            elif self.max_features is None:
-                max_features = self.n_features_in_
-            elif isinstance(self.max_features, numbers.Integral):
-                max_features = self.max_features
+            n_features_in_ = self.feature_set_ends_[idx] - n_features_in_prev
+            n_features_in_prev += n_features_in_
+            self.n_features_in_set_.append(n_features_in_)
+            if isinstance(max_features, str):
+                if max_features == "sqrt":
+                    max_features = max(1, math.ceil(np.sqrt(n_features_in_)))
+                elif max_features == "log2":
+                    max_features = max(1, math.ceil(np.log2(n_features_in_)))
+            elif max_features is None:
+                max_features = n_features_in_
+            elif isinstance(max_features, numbers.Integral):
+                max_features = max_features
             else:  # float
-                if self.max_features > 0.0:
-                    max_features = max(1, int(self.max_features * self.n_features_in_))
+                if max_features > 0.0:
+                    max_features = max(1, math.ceil(max_features * n_features_in_))
                 else:
                     max_features = 0
 
-            self.max_features_ = max_features
+            if max_features > n_features_in_:
+                raise ValueError(
+                    f"max_features must be less than or equal to "
+                    f"the number of features in feature set {idx}: {n_features_in_}, but "
+                    f"max_features = {max_features} when applying sampling"
+                    f"per feature set."
+                )
+
+            max_features_per_set.append(max_features)
+        self.max_features_ = np.sum(max_features_per_set)
+        if self.max_features_ > n_features:
+            raise ValueError(
+                "max_features is greater than the number of features: "
+                f"{max_features} > {n_features}."
+                "This should not be possible. Please submit a bug report."
+            )
+        self.max_features_per_set_ = np.asarray(max_features_per_set, dtype=np.intp)
+        # the total number of features to sample per split
+        self.max_features_ = np.sum(self.max_features_per_set_)
 
         if not isinstance(self.splitter, ObliqueSplitter):
             splitter = SPLITTERS[self.splitter](
