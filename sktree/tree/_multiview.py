@@ -158,9 +158,6 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         Note that these weights will be multiplied with sample_weight (passed
         through the fit method) if sample_weight is specified.
 
-    feature_combinations : float, default=None
-        Not used.
-
     ccp_alpha : non-negative float, default=0.0
         Not used.
 
@@ -226,9 +223,6 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         ``help(sklearn.tree._tree.Tree)`` for
         attributes of Tree object.
 
-    feature_combinations_ : float
-        The number of feature combinations on average taken to fit the tree.
-
     feature_set_ends_ : array-like of int of shape (n_feature_sets,)
         The indices of the end of each feature set.
 
@@ -248,10 +242,6 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
 
     _parameter_constraints = {
         **DecisionTreeClassifier._parameter_constraints,
-        "feature_combinations": [
-            Interval(Real, 1.0, None, closed="left"),
-            None,
-        ],
         "feature_set_ends": ["array-like", None],
         "apply_max_features_per_feature_set": ["boolean"],
     }
@@ -278,7 +268,6 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         max_leaf_nodes=None,
         min_impurity_decrease=0.0,
         class_weight=None,
-        feature_combinations=None,
         ccp_alpha=0.0,
         store_leaf_values=False,
         monotonic_cst=None,
@@ -302,7 +291,6 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
             monotonic_cst=monotonic_cst,
         )
 
-        self.feature_combinations = feature_combinations
         self.feature_set_ends = feature_set_ends
         self.apply_max_features_per_feature_set = apply_max_features_per_feature_set
         self._max_features_arr = None
@@ -362,7 +350,7 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         monotonic_cst = None
         _, n_features = X.shape
 
-        self.feature_combinations_ = 1
+        self._feature_combinations_ = 1
 
         # Build tree
         criterion = self.criterion
@@ -485,7 +473,7 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                 min_weight_leaf,
                 random_state,
                 monotonic_cst,
-                self.feature_combinations_,
+                self._feature_combinations_,
                 self.feature_set_ends_,
                 self.n_feature_sets_,
                 self.max_features_per_set_,
@@ -584,7 +572,6 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         """
         return [
             "max_features_",
-            "feature_combinations_",
             "feature_set_ends_",
             "n_feature_sets_",
             "n_features_in_set_",
