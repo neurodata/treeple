@@ -315,6 +315,8 @@ cdef class BestMultiViewSplitter(MultiViewSplitter):
         cdef float64_t current_proxy_improvement = -INFINITY
         cdef float64_t best_proxy_improvement = -INFINITY
 
+        cdef bint found_new_constants = False
+
         # pointer in the feature set
         cdef intp_t f_i
 
@@ -349,18 +351,10 @@ cdef class BestMultiViewSplitter(MultiViewSplitter):
 
         _init_split(&best_split, end)
 
-        # with gil:
-        #     print('ABout to start search for split.')
-
         for ifeature in range(self.n_feature_sets):
             # get the max-features for this feature-set
             max_features = self.max_features_per_set[ifeature]
             f_i = self.feature_set_ends[ifeature]
-
-            # with gil:
-            #     print('Starting search for feature set...', ifeature)
-            #     print('Max features:', max_features)
-            #     print('Feature set begin:', feature_set_begin, f_i)
 
             # Sample up to max_features without replacement using a
             # Fisher-Yates-based algorithm (using the local variables `f_i` and
@@ -398,10 +392,6 @@ cdef class BestMultiViewSplitter(MultiViewSplitter):
                 f_j = rand_int(vec_n_drawn_constants[ifeature] + feature_set_begin, f_i - vec_n_found_constants[ifeature],
                                random_state)
 
-                # with gil:
-                #     print('Feature drawn:', f_j, f_i)
-                #     print(vec_n_drawn_constants[ifeature], vec_n_found_constants[ifeature])
-
                 # If the drawn feature is known to be constant, swap it with the
                 # last known constant feature and update the number of drawn constant features
                 if f_j < n_known_constants_vec[ifeature]:
@@ -409,6 +399,7 @@ cdef class BestMultiViewSplitter(MultiViewSplitter):
                     features[vec_n_drawn_constants[ifeature]], features[f_j] = features[f_j], features[vec_n_drawn_constants[ifeature]]
 
                     vec_n_drawn_constants[ifeature] += 1
+                    found_new_constants = True
                     continue
 
                 # f_j in the interval [n_known_constants, f_i - n_found_constants[
@@ -432,6 +423,7 @@ cdef class BestMultiViewSplitter(MultiViewSplitter):
 
                     vec_n_found_constants[ifeature] += 1
                     n_total_constants_vec[ifeature] += 1
+                    found_new_constants = True
                     continue
 
                 f_i -= 1
@@ -552,8 +544,6 @@ cdef class BestMultiViewSplitter(MultiViewSplitter):
             # update the feature_set_begin for the next iteration
             feature_set_begin = self.feature_set_ends[ifeature]
 
-        # with gil:s
-
         # Reorganize into samples[start:best_split.pos] + samples[best_split.pos:end]
         if best_split.pos < end:
             self.partition_samples_final(
@@ -578,36 +568,30 @@ cdef class BestMultiViewSplitter(MultiViewSplitter):
 
             shift_missing_values_to_left_if_required(&best_split, samples, end)
 
-        # with gil:
-        #     print('Reorgnizing constants...')
-
         # Reorganize constant features per feature view
-        feature_set_begin = 0
-        for ifeature in range(self.n_feature_sets):
-            # Respect invariant for constant features: the original order of
-            # element in features[:n_known_constants] must be preserved for sibling
-            # and child nodes
-            memcpy(&features[feature_set_begin], &constant_features[feature_set_begin], sizeof(intp_t) * n_known_constants_vec[ifeature])
+        if found_new_constants:
+            feature_set_begin = 0
+            for ifeature in range(self.n_feature_sets):
+                # Respect invariant for constant features: the original order of
+                # element in features[:n_known_constants] must be preserved for sibling
+                # and child nodes
+                memcpy(&features[feature_set_begin], &constant_features[feature_set_begin], sizeof(intp_t) * n_known_constants_vec[ifeature])
 
-            # Copy newly found constant features starting from [n_known_constants:n_found_constants]
-            # for ifeature in range(self.n_feature_sets):
-            #     n_known_constants = n_known_constants_vec[ifeature]
-            memcpy(&constant_features[n_known_constants_vec[ifeature]],
-                   &features[n_known_constants_vec[ifeature]],
-                   sizeof(intp_t) * vec_n_found_constants[ifeature])
+                # Copy newly found constant features starting from [n_known_constants:n_found_constants]
+                memcpy(&constant_features[n_known_constants_vec[ifeature]],
+                       &features[n_known_constants_vec[ifeature]],
+                       sizeof(intp_t) * vec_n_found_constants[ifeature])
 
-            feature_set_begin = self.feature_set_ends[ifeature]
-
-        # with gil:
-        #     print('Setting the values...')
+                feature_set_begin = self.feature_set_ends[ifeature]
 
         # Return values
-        deref(multiview_split).n_constant_features = accumulate(
-            n_known_constants_vec.begin(),
-            n_known_constants_vec.end(),
-            0
-        )
-        deref(multiview_split).vec_n_constant_features = n_known_constants_vec
+        if found_new_constants:
+            deref(multiview_split).n_constant_features = accumulate(
+                n_known_constants_vec.begin(),
+                n_known_constants_vec.end(),
+                0
+            )
+            deref(multiview_split).vec_n_constant_features = n_known_constants_vec
 
         deref(multiview_split).feature = best_split.feature
         deref(multiview_split).pos = best_split.pos
@@ -616,10 +600,5 @@ cdef class BestMultiViewSplitter(MultiViewSplitter):
         deref(multiview_split).impurity_left = best_split.impurity_left
         deref(multiview_split).impurity_right = best_split.impurity_right
         # multiview_split[0] = best_split
-        # with gil:
-        #     print('Got to end...', n_known_constants_vec.size())
-        #     print(deref(multiview_split).vec_n_constant_features.size())
-        # with gil:
-        #     print('End.')
         # n_constant_features[0] = n_total_constants
         return 0
