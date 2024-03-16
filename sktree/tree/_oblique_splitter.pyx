@@ -789,6 +789,8 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
                     break
 
 
+# TODO: need to check segfault for multiview oblique splitter
+# REBUILD WITH BOUNDS CHECK
 cdef class MultiViewObliqueSplitter(MultiViewSplitter):
     def __cinit__(
         self,

@@ -112,7 +112,6 @@ est = FeatureImportanceForestClassifier(
         max_features=max_features,
         tree_estimator=MultiViewDecisionTreeClassifier(
             feature_set_ends=n_features_ends,
-            apply_max_features_per_feature_set=True,
         ),
         random_state=seed,
         honest_fraction=0.5,
