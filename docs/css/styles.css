@@ -10945,16 +10945,16 @@ p {
   }
 }
 header.masthead {
-  padding-top: 20.5rem;
-  padding-bottom: 20rem;
+  padding-top: 25.5rem;
+  padding-bottom: 25rem;
   text-align: center;
   color: #fff;
-  background-image: url("../assets/img/bitree.png");
+  /* background-image: url("../assets/img/bitree.png"); */
   background-repeat: no-repeat;
-  background-attachment: fixed;
+  background-attachment: scroll;
   background-position: center center;
   background-size: cover;
-  background-color: cadetblue;
+  background-color: #0f5132
 }
 header.masthead .masthead-subheading {
   font-size: 1.5rem;
