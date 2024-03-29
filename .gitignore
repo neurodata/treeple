@@ -12,7 +12,7 @@ coverage
 commit.txt
 sktree/_lib/sklearn/
 
-*.png
+.png
 _data
 
 # Sphinx documentation
