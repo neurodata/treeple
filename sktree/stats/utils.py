@@ -203,7 +203,7 @@ def _compute_null_distribution_coleman(
     y_pred_proba_normal: ArrayLike,
     y_pred_proba_perm: ArrayLike,
     metric: str = "mse",
-    n_repeats: int = 1000,
+    n_repeats: int = 10_000,
     seed: Optional[int] = None,
     n_jobs: Optional[int] = None,
     **metric_kwargs,
@@ -304,32 +304,19 @@ def _parallel_build_null_forests(
     first_forest_pred = all_y_pred[first_forest_inds, ...]
     second_forest_pred = all_y_pred[second_forest_inds, ...]
 
-    # determine if there are any nans in the final posterior array, when
-    # averaged over the trees
-    first_forest_samples = _non_nan_samples(first_forest_pred)
-    second_forest_samples = _non_nan_samples(second_forest_pred)
+    # (n_samples, n_outputs) and (n_samples, n_outputs)
+    y_pred_first_half = np.nanmean(first_forest_pred[:, :, :], axis=0)
+    y_pred_second_half = np.nanmean(second_forest_pred[:, :, :], axis=0)
 
-    # todo: is this step necessary?
-    # non_nan_samples = np.intersect1d(
-    #     first_forest_samples, second_forest_samples, assume_unique=True
-    # )
-    # now average the posteriors over the trees for the non-nan samples
-    # y_pred_first_half = np.nanmean(first_forest_pred[:, non_nan_samples, :], axis=0)
-    # y_pred_second_half = np.nanmean(second_forest_pred[:, non_nan_samples, :], axis=0)
-    # # compute two instances of the metric from the sampled trees
-    # first_half_metric = metric_func(y_test[non_nan_samples, :], y_pred_first_half)
-    # second_half_metric = metric_func(y_test[non_nan_samples, :], y_pred_second_half)
+    if any(np.isnan(y_pred_first_half).any()) or any(np.isnan(y_pred_second_half).any()):
+        raise RuntimeError("NaNs in the first half of the posteriors.")
 
-    y_pred_first_half = np.nanmean(first_forest_pred[:, first_forest_samples, :], axis=0)
-    y_pred_second_half = np.nanmean(second_forest_pred[:, second_forest_samples, :], axis=0)
+    # Or... figure out if any sample indices have nans after averaging over trees
+    # and just slice them out in both y_test and y_pred.
 
     # compute two instances of the metric from the sampled trees
-    first_half_metric = metric_func(
-        y_test[first_forest_samples, :], y_pred_first_half, **metric_kwargs
-    )
-    second_half_metric = metric_func(
-        y_test[second_forest_samples, :], y_pred_second_half, **metric_kwargs
-    )
+    first_half_metric = metric_func(y_test, y_pred_first_half, **metric_kwargs)
+    second_half_metric = metric_func(y_test, y_pred_second_half, **metric_kwargs)
     return first_half_metric, second_half_metric
 
 
