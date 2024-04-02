@@ -30,6 +30,8 @@ cdef inline void _init_split(ObliqueSplitRecord* self, intp_t start_pos) noexcep
     self.feature = 0
     self.threshold = 0.
     self.improvement = -INFINITY
+    self.missing_go_to_left = False
+    self.n_missing = 0
 
 
 cdef class BaseObliqueSplitter(Splitter):
@@ -128,7 +130,7 @@ cdef class BaseObliqueSplitter(Splitter):
         self,
         intp_t[::1] indices_to_sample,
         intp_t grid_size,
-        UINT32_t* random_state,
+        uint32_t* random_state,
     ) noexcept nogil:
         cdef intp_t i, j
 
@@ -245,7 +247,7 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         """
         cdef intp_t n_features = self.n_features
         cdef intp_t n_non_zeros = self.n_non_zeros
-        cdef UINT32_t* random_state = &self.rand_r_state
+        cdef uint32_t* random_state = &self.rand_r_state
 
         cdef intp_t i, feat_i, proj_i, rand_vec_index
         cdef float32_t weight
@@ -290,10 +292,8 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
 
     cdef int node_split(
         self,
-        float64_t impurity,
+        ParentInfo* parent_record,
         SplitRecord* split,
-        float64_t lower_bound,
-        float64_t upper_bound,
     ) except -1 nogil:
         """Find the best_split split on node samples[start:end]
 
@@ -318,6 +318,11 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
         cdef ObliqueSplitRecord best_split, current_split
         cdef float64_t current_proxy_improvement = -INFINITY
         cdef float64_t best_proxy_improvement = -INFINITY
+
+        with gil:
+            print("Accessing parent record")
+
+        cdef float64_t impurity = parent_record.impurity
 
         cdef intp_t feat_i, p       # index over computed features and start/end
         cdef intp_t partition_end
@@ -430,7 +435,14 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
         deref(oblique_split).improvement = best_split.improvement
         deref(oblique_split).impurity_left = best_split.impurity_left
         deref(oblique_split).impurity_right = best_split.impurity_right
-        deref(oblique_split).n_constant_features = 0
+
+        with gil:
+            print("Segfaulting here...")
+        # XXX: Fix
+        parent_record.n_constant_features = 0
+
+        with gil:
+            print("Got past")
         return 0
 
 cdef class RandomObliqueSplitter(ObliqueSplitter):
@@ -496,10 +508,8 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
     # overwrite the node_split method with random threshold selection
     cdef int node_split(
         self,
-        float64_t impurity,
+        ParentInfo* parent_record,
         SplitRecord* split,
-        float64_t lower_bound,
-        float64_t upper_bound,
     ) except -1 nogil:
         """Find the best_split split on node samples[start:end]
 
@@ -513,7 +523,7 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
         cdef intp_t[::1] samples = self.samples
         cdef intp_t start = self.start
         cdef intp_t end = self.end
-        cdef UINT32_t* random_state = &self.rand_r_state
+        cdef uint32_t* random_state = &self.rand_r_state
 
         # pointer array to store feature values to split on
         cdef float32_t[::1] feature_values = self.feature_values
@@ -533,6 +543,8 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
         cdef float32_t temp_d         # to compute a projection feature value
         cdef float32_t min_feature_value
         cdef float32_t max_feature_value
+
+        cdef float64_t impurity = parent_record.impurity
 
         # Number of features discovered to be constant during the split search
         # cdef intp_t n_found_constants = 0
@@ -655,7 +667,9 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
         deref(oblique_split).improvement = best_split.improvement
         deref(oblique_split).impurity_left = best_split.impurity_left
         deref(oblique_split).impurity_right = best_split.impurity_right
-        # deref(oblique_split).n_constant_features = 0
+
+        # XXX: Fix
+        parent_record.n_constant_features = 0
         return 0
 
 
@@ -740,7 +754,7 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
         This proceeds as a normal sampling projection matrix,
         but now also uniformly samples features from each feature set.
         """
-        cdef UINT32_t* random_state = &self.rand_r_state
+        cdef uint32_t* random_state = &self.rand_r_state
         cdef intp_t feat_i, proj_i
         cdef float32_t weight
 
@@ -914,7 +928,7 @@ cdef class MultiViewObliqueSplitter(BestObliqueSplitter):
         """
         cdef intp_t n_features = self.n_features
         cdef intp_t n_non_zeros = self.n_non_zeros
-        cdef UINT32_t* random_state = &self.rand_r_state
+        cdef uint32_t* random_state = &self.rand_r_state
 
         cdef intp_t i, j, feat_i, proj_i, rand_vec_index
         cdef float32_t weight

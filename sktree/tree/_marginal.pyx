@@ -65,7 +65,7 @@ cpdef apply_marginal_tree(
     cdef intp_t n_marginals = marginal_indices.shape[0]
 
     # sklearn_rand_r random number state
-    cdef UINT32_t rand_r_state = random_state.randint(0, RAND_R_MAX)
+    cdef uint32_t rand_r_state = random_state.randint(0, RAND_R_MAX)
 
     # define a set of all marginal indices
     cdef unordered_set[intp_t] marginal_indices_map
@@ -108,7 +108,7 @@ cdef inline cnp.ndarray _apply_dense_marginal(
     unordered_set[intp_t] marginal_indices_map,
     intp_t traversal_method,
     unsigned char use_sample_weight,
-    UINT32_t* rand_r_state
+    uint32_t* rand_r_state
 ):
     """Finds the terminal region (=leaf node) for each sample in X.
 
@@ -131,7 +131,7 @@ cdef inline cnp.ndarray _apply_dense_marginal(
     use_sample_weight : unsigned char
         Whether or not to use the weighted number of samples
         in each node.
-    rand_r_state : UINT32_t
+    rand_r_state : uint32_t
         The random number state.
     """
     # Extract input

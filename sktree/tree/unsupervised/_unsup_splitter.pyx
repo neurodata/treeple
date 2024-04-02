@@ -172,10 +172,8 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
     """
     cdef int node_split(
         self,
-        float64_t impurity,
+        ParentInfo* parent_record,
         SplitRecord* split,
-        float64_t lower_bound,
-        float64_t upper_bound
     ) except -1 nogil:
         """Find the best_split split on node samples[start:end].
 
@@ -201,7 +199,7 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
         cdef float32_t[::1] feature_values = self.feature_values
         cdef intp_t max_features = self.max_features
         cdef intp_t min_samples_leaf = self.min_samples_leaf
-        cdef UINT32_t* random_state = &self.rand_r_state
+        cdef uint32_t* random_state = &self.rand_r_state
 
         # XXX: maybe need to rename to something else
         cdef float64_t min_weight_leaf = self.min_weight_leaf
@@ -209,6 +207,8 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
         cdef SplitRecord best_split, current_split
         cdef float64_t current_proxy_improvement = -INFINITY
         cdef float64_t best_proxy_improvement = -INFINITY
+
+        cdef float64_t impurity = parent_record.impurity
 
         cdef intp_t f_i = n_features
         cdef intp_t f_j
@@ -220,7 +220,7 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
         cdef intp_t n_found_constants = 0
         # Number of features known to be constant and drawn without replacement
         cdef intp_t n_drawn_constants = 0
-        cdef intp_t n_known_constants = split.n_constant_features
+        cdef intp_t n_known_constants = parent_record.n_constant_features
         # n_constant_features[0]
         # n_total_constants = n_known_constants + n_found_constants
         cdef intp_t n_total_constants = n_known_constants
@@ -377,6 +377,5 @@ cdef class BestUnsupervisedSplitter(UnsupervisedSplitter):
 
         # Return values
         split[0] = best_split
-        split.n_constant_features = n_total_constants
-        # n_constant_features[0] = n_total_constants
+        parent_record.n_constant_features = n_total_constants
         return 0

@@ -3,8 +3,8 @@ import numpy as np
 from libcpp.vector cimport vector
 
 from ..._lib.sklearn.tree._splitter cimport SplitRecord
-from ..._lib.sklearn.tree._utils cimport UINT32_t
-from ..._lib.sklearn.utils._typedefs cimport float32_t, float64_t, intp_t
+from ..._lib.sklearn.tree._tree cimport ParentInfo
+from ..._lib.sklearn.utils._typedefs cimport float32_t, float64_t, intp_t, uint32_t
 from .._oblique_splitter cimport ObliqueSplitRecord
 from ._unsup_splitter cimport UnsupervisedSplitter
 
@@ -54,10 +54,8 @@ cdef class UnsupervisedObliqueSplitter(UnsupervisedSplitter):
 
     cdef int node_split(
         self,
-        float64_t impurity,   # Impurity of the node
+        ParentInfo* parent,
         SplitRecord* split,
-        float64_t lower_bound,
-        float64_t upper_bound
     ) except -1 nogil
     cdef int init(
         self,

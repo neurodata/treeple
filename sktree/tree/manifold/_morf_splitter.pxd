@@ -13,8 +13,7 @@ import numpy as np
 from libcpp.vector cimport vector
 
 from ..._lib.sklearn.tree._splitter cimport SplitRecord
-from ..._lib.sklearn.tree._utils cimport UINT32_t
-from ..._lib.sklearn.utils._typedefs cimport float32_t, float64_t, int8_t, intp_t, uint8_t
+from ..._lib.sklearn.utils._typedefs cimport float32_t, float64_t, int8_t, intp_t, uint8_t, uint32_t
 from .._oblique_splitter cimport BestObliqueSplitter, ObliqueSplitRecord
 
 # https://github.com/cython/cython/blob/master/Cython/Includes/libcpp/algorithm.pxd
@@ -27,12 +26,6 @@ from .._oblique_splitter cimport BestObliqueSplitter, ObliqueSplitRecord
 #         ctypedef G generator_type
 #         discrete_distribution(T first, T last) except +
 #         operator()(&G) except +
-
-# XXX: replace with from libcpp.algorithm cimport swap
-# when Cython 3.0 is released
-cdef extern from "<algorithm>" namespace "std" nogil:
-    void swap[T](T& a, T& b) except +  # array overload also works
-
 
 cdef class PatchSplitter(BestObliqueSplitter):
     # The PatchSplitter creates candidate feature values by sampling 2D patches from
