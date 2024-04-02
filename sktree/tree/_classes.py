@@ -963,7 +963,7 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
 
         # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
         if max_leaf_nodes < 0:
-            self.builder_ = DepthFirstTreeBuilder(
+            builder = DepthFirstTreeBuilder(
                 splitter,
                 min_samples_split,
                 min_samples_leaf,
@@ -972,7 +972,7 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                 self.min_impurity_decrease,
             )
         else:
-            self.builder_ = BestFirstTreeBuilder(
+            builder = BestFirstTreeBuilder(
                 splitter,
                 min_samples_split,
                 min_samples_leaf,
@@ -982,7 +982,7 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                 self.min_impurity_decrease,
             )
 
-        self.builder_.build(self.tree_, X, y, sample_weight, None)
+        builder.build(self.tree_, X, y, sample_weight, None)
 
         if self.n_outputs_ == 1:
             self.n_classes_ = self.n_classes_[0]
@@ -1825,7 +1825,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
 
         # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
         if max_leaf_nodes < 0:
-            self.builder_ = DepthFirstTreeBuilder(
+            builder = DepthFirstTreeBuilder(
                 splitter,
                 min_samples_split,
                 min_samples_leaf,
@@ -1834,7 +1834,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
                 self.min_impurity_decrease,
             )
         else:
-            self.builder_ = BestFirstTreeBuilder(
+            builder = BestFirstTreeBuilder(
                 splitter,
                 min_samples_split,
                 min_samples_leaf,
@@ -1844,7 +1844,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
                 self.min_impurity_decrease,
             )
 
-        self.builder_.build(self.tree_, X, y, sample_weight, None)
+        builder.build(self.tree_, X, y, sample_weight, None)
 
         if self.n_outputs_ == 1:
             self.n_classes_ = self.n_classes_[0]
@@ -2737,7 +2737,7 @@ class ExtraObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
 
         # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
         if max_leaf_nodes < 0:
-            self.builder_ = DepthFirstTreeBuilder(
+            builder = DepthFirstTreeBuilder(
                 splitter,
                 min_samples_split,
                 min_samples_leaf,
@@ -2746,7 +2746,7 @@ class ExtraObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
                 self.min_impurity_decrease,
             )
         else:
-            self.builder_ = BestFirstTreeBuilder(
+            builder = BestFirstTreeBuilder(
                 splitter,
                 min_samples_split,
                 min_samples_leaf,
@@ -2756,7 +2756,7 @@ class ExtraObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
                 self.min_impurity_decrease,
             )
 
-        self.builder_.build(self.tree_, X, y, sample_weight, None)
+        builder.build(self.tree_, X, y, sample_weight, None)
 
         if self.n_outputs_ == 1:
             self.n_classes_ = self.n_classes_[0]
