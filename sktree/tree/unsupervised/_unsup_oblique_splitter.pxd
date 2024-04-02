@@ -1,6 +1,5 @@
 import numpy as np
 
-cimport numpy as cnp
 from libcpp.vector cimport vector
 
 from ..._lib.sklearn.tree._splitter cimport SplitRecord

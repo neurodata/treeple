@@ -7,10 +7,6 @@
 
 import numpy as np
 
-cimport numpy as cnp
-
-cnp.import_array()
-
 from cython.operator cimport dereference as deref
 from libcpp.vector cimport vector
 
@@ -124,11 +120,11 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
         intp_t min_samples_leaf,
         float64_t min_weight_leaf,
         object random_state,
-        const cnp.int8_t[:] monotonic_cst,
+        const int8_t[:] monotonic_cst,
         float64_t feature_combinations,
         const intp_t[:] min_patch_dims,
         const intp_t[:] max_patch_dims,
-        const cnp.uint8_t[:] dim_contiguous,
+        const uint8_t[:] dim_contiguous,
         const intp_t[:] data_dims,
         bytes boundary,
         const float32_t[:, :] feature_weight,

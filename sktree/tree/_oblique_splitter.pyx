@@ -146,7 +146,7 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         intp_t min_samples_leaf,
         float64_t min_weight_leaf,
         object random_state,
-        const cnp.int8_t[:] monotonic_cst,
+        const int8_t[:] monotonic_cst,
         float64_t feature_combinations,
         *argv
     ):
@@ -667,7 +667,7 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
         intp_t min_samples_leaf,
         float64_t min_weight_leaf,
         object random_state,
-        const cnp.int8_t[:] monotonic_cst,
+        const int8_t[:] monotonic_cst,
         float64_t feature_combinations,
         const intp_t[:] feature_set_ends,
         intp_t n_feature_sets,
@@ -839,7 +839,7 @@ cdef class MultiViewObliqueSplitter(BestObliqueSplitter):
         intp_t min_samples_leaf,
         float64_t min_weight_leaf,
         object random_state,
-        const cnp.int8_t[:] monotonic_cst,
+        const int8_t[:] monotonic_cst,
         float64_t feature_combinations,
         const intp_t[:] feature_set_ends,
         intp_t n_feature_sets,

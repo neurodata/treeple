@@ -6,10 +6,6 @@
 
 import numpy as np
 
-cimport numpy as cnp
-
-cnp.import_array()
-
 from cython.operator cimport dereference as deref
 from libcpp.vector cimport vector
 

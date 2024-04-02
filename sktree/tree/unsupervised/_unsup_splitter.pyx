@@ -6,10 +6,6 @@
 
 import numpy as np
 
-cimport numpy as cnp
-
-cnp.import_array()
-
 from libc.string cimport memcpy
 
 from ..._lib.sklearn.tree._utils cimport RAND_R_MAX, rand_int
