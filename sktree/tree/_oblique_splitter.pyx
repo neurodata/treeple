@@ -319,9 +319,6 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
         cdef float64_t current_proxy_improvement = -INFINITY
         cdef float64_t best_proxy_improvement = -INFINITY
 
-        with gil:
-            print("Accessing parent record")
-
         cdef float64_t impurity = parent_record.impurity
 
         cdef intp_t feat_i, p       # index over computed features and start/end
@@ -436,13 +433,8 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
         deref(oblique_split).impurity_left = best_split.impurity_left
         deref(oblique_split).impurity_right = best_split.impurity_right
 
-        with gil:
-            print("Segfaulting here...")
-        # XXX: Fix
+        # XXX: Fix when we can track constants
         parent_record.n_constant_features = 0
-
-        with gil:
-            print("Got past")
         return 0
 
 cdef class RandomObliqueSplitter(ObliqueSplitter):
@@ -668,7 +660,7 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
         deref(oblique_split).impurity_left = best_split.impurity_left
         deref(oblique_split).impurity_right = best_split.impurity_right
 
-        # XXX: Fix
+        # XXX: Fix when we can track constants
         parent_record.n_constant_features = 0
         return 0
 
