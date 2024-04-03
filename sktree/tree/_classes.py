@@ -918,6 +918,7 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
             Controls the randomness of the estimator.
         """
         monotonic_cst = None
+        self.monotonic_cst_ = monotonic_cst
         _, n_features = X.shape
 
         if self.feature_combinations is None:
@@ -1785,6 +1786,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
                 )
 
         monotonic_cst = None
+        self.monotonic_cst_ = monotonic_cst
 
         # Build tree
         criterion = self.criterion
@@ -2263,6 +2265,7 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
                 )
 
         monotonic_cst = None
+        self.monotonic_cst_ = monotonic_cst
         n_samples = X.shape[0]
 
         # Build tree
@@ -2692,6 +2695,7 @@ class ExtraObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
             Controls the randomness of the estimator.
         """
         monotonic_cst = None
+        self.monotonic_cst_ = monotonic_cst
         _, n_features = X.shape
 
         if self.feature_combinations is None:
@@ -3088,6 +3092,7 @@ class ExtraObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
             Controls the randomness of the estimator.
         """
         monotonic_cst = None
+        self.monotonic_cst_ = monotonic_cst
         n_samples, n_features = X.shape
 
         if self.feature_combinations is None:

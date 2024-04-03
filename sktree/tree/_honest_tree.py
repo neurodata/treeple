@@ -742,8 +742,10 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         self.tree_ = self.estimator_.tree_
 
         # XXX: scikit-learn trees do not store their builder, or min_samples_split_
-        self.builder_ = getattr(self.estimator_, "builder_", None)
         self.min_samples_split_ = getattr(self.estimator_, "min_samples_split_", None)
+        self.min_samples_leaf_ = getattr(self.estimator_, "min_samples_leaf_", None)
+        self.min_weight_leaf_ = getattr(self.estimator_, "min_weight_leaf_", None)
+        self.monotonic_cst_ = getattr(self.estimator_, "monotonic_cst_", None)
 
     def _empty_leaf_correction(self, proba, pos=0):
         """Leaves with empty posteriors are assigned values.

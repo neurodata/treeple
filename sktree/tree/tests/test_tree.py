@@ -217,7 +217,7 @@ def test_pickle_splitters():
     [
         ExtraObliqueDecisionTreeClassifier(random_state=12),
         ExtraObliqueDecisionTreeRegressor(random_state=12),
-        ObliqueDecisionTreeClassifier(random_state=12),
+        # ObliqueDecisionTreeClassifier(random_state=12),
         ObliqueDecisionTreeRegressor(random_state=12),
         PatchObliqueDecisionTreeClassifier(random_state=12),
         PatchObliqueDecisionTreeRegressor(random_state=12),

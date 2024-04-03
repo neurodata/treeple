@@ -360,6 +360,7 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
             Controls the randomness of the estimator.
         """
         monotonic_cst = None
+        self.monotonic_cst_ = monotonic_cst
         _, n_features = X.shape
 
         self.feature_combinations_ = 1
@@ -495,7 +496,7 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
 
         # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
         if max_leaf_nodes < 0:
-            self.builder_ = DepthFirstTreeBuilder(
+            builder = DepthFirstTreeBuilder(
                 splitter,
                 min_samples_split,
                 min_samples_leaf,
@@ -504,7 +505,7 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                 self.min_impurity_decrease,
             )
         else:
-            self.builder_ = BestFirstTreeBuilder(
+            builder = BestFirstTreeBuilder(
                 splitter,
                 min_samples_split,
                 min_samples_leaf,
@@ -514,7 +515,7 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                 self.min_impurity_decrease,
             )
 
-        self.builder_.build(self.tree_, X, y, sample_weight, None)
+        builder.build(self.tree_, X, y, sample_weight, None)
 
         if self.n_outputs_ == 1:
             self.n_classes_ = self.n_classes_[0]
