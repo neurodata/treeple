@@ -9,6 +9,7 @@ from .forestht import (
 from .monte_carlo import PermutationTest
 from .permutationforest import PermutationForestClassifier, PermutationForestRegressor
 from .permuteforest import PermutationHonestForestClassifier
+from .feature_importance import *
 
 __all__ = [
     "FeatureImportanceForestClassifier",
