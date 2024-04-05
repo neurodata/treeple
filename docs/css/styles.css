@@ -2785,6 +2785,7 @@ textarea.form-control-lg {
   --bs-btn-disabled-opacity: 0.65;
   --bs-btn-focus-box-shadow: 0 0 0 0.25rem rgba(var(--bs-btn-focus-shadow-rgb), .5);
   display: inline-block;
+  margin: 5px;
   padding: var(--bs-btn-padding-y) var(--bs-btn-padding-x);
   font-family: var(--bs-btn-font-family);
   font-size: var(--bs-btn-font-size);
@@ -2848,15 +2849,15 @@ textarea.form-control-lg {
 
 .btn-primary {
   --bs-btn-color: #fff;
-  --bs-btn-bg: #0fa07e;
-  --bs-btn-border-color: #0fa07e;
+  --bs-btn-bg: #49a00f;
+  --bs-btn-border-color: #49a00f;
   --bs-btn-hover-color: #fff;
-  --bs-btn-hover-bg: #12d3a6;
-  --bs-btn-hover-border-color: #12d3a6;
+  --bs-btn-hover-bg: #7ed31c;
+  --bs-btn-hover-border-color: #7ed31c;
   --bs-btn-focus-shadow-rgb: 255, 208, 38;
   --bs-btn-active-color: #fff;
-  --bs-btn-active-bg: #12d3a6;
-  --bs-btn-active-border-color: #12d3a6;
+  --bs-btn-active-bg: #49a00f;
+  --bs-btn-active-border-color: #49a00f;
   --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
   --bs-btn-disabled-color: #fff;
   --bs-btn-disabled-bg: #0fa07e;
@@ -10945,17 +10946,17 @@ p {
   }
 }
 header.masthead {
-  /* padding-top: 25.5rem; */
-  /* padding-bottom: 25rem; */
+  padding-top: 50%;
+  padding-bottom: 10%;
   background-size: 80%;
   text-align: center;
-  color: #fff;
+  color: #13653f;
   /* background-image: url("../assets/img/bitree.png"); */
   background-repeat: repeat-y;
   background-attachment: scroll;
   background-position: center;
   background-size: cover;
-  background-color: #0f5132
+  background-color: #ffff;
 }
 header.masthead .masthead-subheading {
   font-size: 1.5rem;
