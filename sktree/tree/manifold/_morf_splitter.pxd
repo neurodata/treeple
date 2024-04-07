@@ -60,7 +60,7 @@ cdef class PatchSplitter(BestObliqueSplitter):
     cdef bint _discontiguous
 
     cdef bytes boundary                               # how to sample the patch with boundary in mind
-    cdef const float32_t[:, :] feature_weight               # Whether or not to normalize each column of X when adding in a patch
+    cdef const float32_t[:, :] feature_weight         # Whether or not to normalize each column of X when adding in a patch
 
     cdef intp_t[::1] _index_data_buffer
     cdef intp_t[::1] _index_patch_buffer
@@ -79,11 +79,6 @@ cdef class PatchSplitter(BestObliqueSplitter):
         vector[vector[float32_t]]& proj_mat_weights,
         vector[vector[intp_t]]& proj_mat_indices
     ) noexcept nogil
-
-
-# cdef class UserKernelSplitter(PatchSplitter):
-#     """A class to hold user-specified kernels."""
-#     cdef vector[float32_t[:, ::1]] kernel_dictionary  # A list of C-contiguous 2D kernels
 
 
 cdef class GaussianKernelSplitter(PatchSplitter):
