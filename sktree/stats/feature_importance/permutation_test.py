@@ -98,6 +98,9 @@ class PermutationTest(FeatureImportanceTest):
     ):
         r"""
         Calculates p values for fearture imprtance test.
+        
+        Parameters
+        ----------
         X : ArrayLike of shape (n_samples, n_features)
             The data matrix.
         y : ArrayLike of shape (n_samples, n_outputs)
@@ -106,16 +109,23 @@ class PermutationTest(FeatureImportanceTest):
             Number of times to sample the null distribution, by default 1000.
         n_jobs : int, optional
             Number of workers to use, by default 1000.
+
+        Returns
+        -------
+        stat : float
+            The computed discriminability statistic.
+        pvalue : float
+            The computed one sample test p-value.
             """
         
         self._fit(X, y)
         stat = self._statistics(list(range(2*self.n_estimators)))
         null_stat = Parallel(n_jobs=n_jobs)(
-                delayed(self._perm_stat)() \
-                for _ in range(n_repeats)
-            ) 
+                                delayed(self._perm_stat)() \
+                                    for _ in range(n_repeats)
+                    ) 
         count = np.sum((null_stat>=stat)*1,axis=0)
         p_val = (1 + count)/(1+n_repeats) 
 
-        return p_val
+        return stat, p_val
         
