@@ -10,8 +10,10 @@ class FeatureImportanceTest(ABC):
         super().__init__()
     
     @abstractmethod
-    def fit(self, X, y):
+    def _fit(self, X, y):
        r"""
+       Helper function that is used to fit a particular random 
+       forest.
         X : ArrayLike of shape (n_samples, n_features)
            The data matrix.
         y : ArrayLike of shape (n_samples, n_outputs)
@@ -21,7 +23,7 @@ class FeatureImportanceTest(ABC):
     @abstractmethod
     def _statistics(self, idx):
         r"""
-        Calulates the feature importance test statistic.
+        Helper function that calulates the feature importance test statistic.
         """
 
     def _perm_stat(self):
@@ -36,7 +38,7 @@ class FeatureImportanceTest(ABC):
         """
     
     @abstractmethod
-    def test(self, reps, n_jobs):
+    def testtest(self, X, y, n_repeats, n_jobs):
         r"""
         Calculates the feature importance test statistic and p-value.
         """
