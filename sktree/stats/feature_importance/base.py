@@ -10,45 +10,33 @@ class FeatureImportanceTest(ABC):
         super().__init__()
     
     @abstractmethod
-    def statistics(self, F1, F2):
+    def fit(self, X, y):
+       r"""
+        X : ArrayLike of shape (n_samples, n_features)
+           The data matrix.
+        y : ArrayLike of shape (n_samples, n_outputs)
+           The target matrix.
+        """
+
+    @abstractmethod
+    def _statistics(self, idx):
         r"""
         Calulates the feature importance test statistic.
-
-        Parameters
-        ----------
-        F1 : ndarray of float
-             Feature importance matrix from the unshuffled 
-             trees. It must have shape ``(T, P)`` where `T` 
-             is the number of trees and `P` is the number of 
-             features.
-        F2 : ndarray of float
-             Feature importance matrix from the shuffled 
-             trees. It must have shape ``(T, P)`` where `T` 
-             is the number of trees and `P` is the number of 
-             features.
         """
-        pass
 
-    def _perm_stat(self, index):
+    def _perm_stat(self):
         r"""
         Helper function that is used to calculate parallel permuted test
         statistics.
-
-        Parameters
-        ----------
-        index : int
-            Iterator used for parallel statistic calculation
 
         Returns
         -------
         perm_stat : float
             Test statistic for each value in the null distribution.
         """
-        pass
     
     @abstractmethod
-    def test(self, *args, **kwargs):
+    def test(self, reps, n_jobs):
         r"""
         Calculates the feature importance test statistic and p-value.
         """
-        pass
