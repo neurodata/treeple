@@ -72,6 +72,12 @@ cdef intp_t _TREE_UNDEFINED = TREE_UNDEFINED
 cdef Node dummy
 NODE_DTYPE = np.asarray(<Node[:1]>(&dummy)).dtype
 
+cdef inline void _init_parent_record(ParentInfo* self) noexcept nogil:
+    self.n_constant_features = 0
+    self.impurity = INFINITY
+    self.lower_bound = -INFINITY
+    self.upper_bound = INFINITY
+
 # =============================================================================
 # Unsupervised TreeBuilder
 # =============================================================================
@@ -213,15 +219,27 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
         cdef intp_t rc = 0
         cdef Node* node
 
+        cdef ParentInfo parent_record
+        _init_parent_record(&parent_record)
+
         # Initial capacity
         cdef intp_t init_capacity = max_split_nodes + max_leaf_nodes
         tree._resize(init_capacity)
 
         with nogil:
             # add root to frontier
-            rc = self._add_split_node(splitter, tree, 0, n_node_samples,
-                                      INFINITY, IS_FIRST, IS_LEFT, NULL, 0,
-                                      &split_node_left)
+            rc = self._add_split_node(
+                splitter=splitter,
+                tree=tree,
+                start=0,
+                end=n_node_samples,
+                is_first=IS_FIRST,
+                is_left=IS_LEFT,
+                parent=NULL,
+                depth=0,
+                parent_record=&parent_record,
+                res=&split_node_left,
+            )
             if rc >= 0:
                 _add_to_frontier(split_node_left, frontier)
 
@@ -247,12 +265,18 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
                     max_split_nodes -= 1
 
                     # Compute left split node
-                    rc = self._add_split_node(splitter, tree,
-                                              record.start, record.pos,
-                                              record.impurity_left,
-                                              IS_NOT_FIRST, IS_LEFT, node,
-                                              record.depth + 1,
-                                              &split_node_left)
+                    rc = self._add_split_node(
+                        splitter=splitter,
+                        tree=tree,
+                        start=record.start,
+                        end=record.pos,
+                        is_first=IS_NOT_FIRST,
+                        is_left=IS_LEFT,
+                        parent=node,
+                        depth=record.depth + 1,
+                        parent_record=&parent_record,
+                        res=&split_node_left,
+                    )
                     if rc == -1:
                         break
 
@@ -260,12 +284,19 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
                     node = &tree.nodes[record.node_id]
 
                     # Compute right split node
-                    rc = self._add_split_node(splitter, tree, record.pos,
-                                              record.end,
-                                              record.impurity_right,
-                                              IS_NOT_FIRST, IS_NOT_LEFT, node,
-                                              record.depth + 1,
-                                              &split_node_right)
+                    parent_record.impurity = record.impurity_right
+                    rc = self._add_split_node(
+                        splitter=splitter,
+                        tree=tree,
+                        start=record.pos,
+                        end=record.end,
+                        is_first=IS_NOT_FIRST,
+                        is_left=IS_NOT_LEFT,
+                        parent=node,
+                        depth=record.depth + 1,
+                        parent_record=&parent_record,
+                        res=&split_node_right,
+                    )
                     if rc == -1:
                         break
 
@@ -291,11 +322,11 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
         UnsupervisedTree tree,
         intp_t start,
         intp_t end,
-        float64_t impurity,
         bint is_first,
         bint is_left,
         Node* parent,
         intp_t depth,
+        ParentInfo* parent_record,
         FrontierRecord* res
     ) except -1 nogil:
         """Adds node w/ partition ``[start, end)`` to the frontier. """
@@ -307,27 +338,31 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
 
         cdef intp_t node_id
         cdef intp_t n_node_samples
-        # cdef intp_t n_constant_features = 0
-        split_ptr.n_constant_features = 0
         cdef float64_t min_impurity_decrease = self.min_impurity_decrease
         cdef float64_t weighted_n_node_samples
         cdef bint is_leaf
 
         splitter.node_reset(start, end, &weighted_n_node_samples)
 
+        # reset n_constant_features for this specific split before beginning split search
+        parent_record.n_constant_features = 0
+
         if is_first:
-            impurity = splitter.node_impurity()
+            parent_record.impurity = splitter.node_impurity()
 
         n_node_samples = end - start
         is_leaf = (depth >= self.max_depth or
                    n_node_samples < self.min_samples_split or
                    n_node_samples < 2 * self.min_samples_leaf or
                    weighted_n_node_samples < 2 * self.min_weight_leaf or
-                   impurity <= EPSILON  # impurity == 0 with tolerance
+                   parent_record.impurity <= EPSILON  # impurity == 0 with tolerance
                    )
 
         if not is_leaf:
-            splitter.node_split(impurity, split_ptr, 0., 0.)
+            splitter.node_split(
+                parent_record,
+                split_ptr
+            )
 
             # assign local copy of SplitRecord to assign
             # pos, improvement, and impurity scores
@@ -343,7 +378,7 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
                                  else _TREE_UNDEFINED,
                                  is_left, is_leaf,
                                  split_ptr,
-                                 impurity, n_node_samples,
+                                 parent_record.impurity, n_node_samples,
                                  weighted_n_node_samples, 0)
         if node_id == INTPTR_MAX:
             return -1
@@ -355,7 +390,7 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
         res.start = start
         res.end = end
         res.depth = depth
-        res.impurity = impurity
+        res.impurity = parent_record.impurity
 
         if not is_leaf:
             # is split node
@@ -370,8 +405,8 @@ cdef class UnsupervisedBestFirstTreeBuilder(UnsupervisedTreeBuilder):
             res.pos = end
             res.is_leaf = 1
             res.improvement = 0.0
-            res.impurity_left = impurity
-            res.impurity_right = impurity
+            res.impurity_left = parent_record.impurity
+            res.impurity_right = parent_record.impurity
 
         # free up memory containing the pointer to the split record
         free(split_ptr)
@@ -452,6 +487,9 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
         cdef stack[StackRecord] builder_stack
         cdef StackRecord stack_record
 
+        cdef ParentInfo parent_record
+        _init_parent_record(&parent_record)
+
         with nogil:
             # push root node onto stack
             builder_stack.push({
@@ -472,8 +510,8 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
                 depth = stack_record.depth
                 parent = stack_record.parent
                 is_left = stack_record.is_left
-                impurity = stack_record.impurity
-                split_ptr.n_constant_features = stack_record.n_constant_features
+                parent_record.impurity = stack_record.impurity
+                parent_record.n_constant_features = stack_record.n_constant_features
 
                 n_node_samples = end - start
                 splitter.node_reset(start, end, &weighted_n_node_samples)
@@ -492,7 +530,7 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
                 is_leaf = is_leaf or impurity <= EPSILON
 
                 if not is_leaf:
-                    splitter.node_split(impurity, split_ptr, 0., 0.)
+                    splitter.node_split(&parent_record, split_ptr)
 
                     # assign local copy of SplitRecord to assign
                     # pos, improvement, and impurity scores
@@ -506,7 +544,7 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
                                 min_impurity_decrease))
 
                 node_id = tree._add_node(parent, is_left, is_leaf, split_ptr,
-                                         impurity, n_node_samples,
+                                         parent_record.impurity, n_node_samples,
                                          weighted_n_node_samples, 0)
                 if node_id == INTPTR_MAX:
                     rc = -1
@@ -525,7 +563,7 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
                         "parent": node_id,
                         "is_left": 0,
                         "impurity": split.impurity_right,
-                        "n_constant_features": split.n_constant_features})
+                        "n_constant_features": parent_record.n_constant_features})
 
                     # Push left child on stack
                     builder_stack.push({
@@ -535,7 +573,7 @@ cdef class UnsupervisedDepthFirstTreeBuilder(UnsupervisedTreeBuilder):
                         "parent": node_id,
                         "is_left": 1,
                         "impurity": split.impurity_left,
-                        "n_constant_features": split.n_constant_features})
+                        "n_constant_features": parent_record.n_constant_features})
 
                 if depth > max_depth_seen:
                     max_depth_seen = depth
