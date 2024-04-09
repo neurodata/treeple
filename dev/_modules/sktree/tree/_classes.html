@@ -442,6 +442,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">issparse</span>
 <span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">ClusterMixin</span><span class="p">,</span> <span class="n">TransformerMixin</span>
 <span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">AgglomerativeClustering</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils</span> <span class="kn">import</span> <span class="n">check_random_state</span>
 <span class="kn">from</span> <span class="nn">sklearn.utils._param_validation</span> <span class="kn">import</span> <span class="n">Interval</span>
 <span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">check_is_fitted</span>
 
@@ -1368,6 +1369,7 @@ document.write(`
 <span class="sd">            Controls the randomness of the estimator.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">monotonic_cst</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">monotonic_cst_</span> <span class="o">=</span> <span class="n">monotonic_cst</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">n_features</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_combinations</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1413,7 +1415,7 @@ document.write(`
 
         <span class="c1"># Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise</span>
         <span class="k">if</span> <span class="n">max_leaf_nodes</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">builder_</span> <span class="o">=</span> <span class="n">DepthFirstTreeBuilder</span><span class="p">(</span>
+            <span class="n">builder</span> <span class="o">=</span> <span class="n">DepthFirstTreeBuilder</span><span class="p">(</span>
                 <span class="n">splitter</span><span class="p">,</span>
                 <span class="n">min_samples_split</span><span class="p">,</span>
                 <span class="n">min_samples_leaf</span><span class="p">,</span>
@@ -1422,7 +1424,7 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">builder_</span> <span class="o">=</span> <span class="n">BestFirstTreeBuilder</span><span class="p">(</span>
+            <span class="n">builder</span> <span class="o">=</span> <span class="n">BestFirstTreeBuilder</span><span class="p">(</span>
                 <span class="n">splitter</span><span class="p">,</span>
                 <span class="n">min_samples_split</span><span class="p">,</span>
                 <span class="n">min_samples_leaf</span><span class="p">,</span>
@@ -1432,7 +1434,7 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">builder_</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -1444,7 +1446,79 @@ document.write(`
     <span class="k">def</span> <span class="nf">_inheritable_fitted_attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span>
             <span class="s2">&quot;feature_combinations_&quot;</span><span class="p">,</span>
-        <span class="p">]</span></div>
+        <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_update_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">):</span>
+        <span class="c1"># Update tree</span>
+        <span class="n">max_leaf_nodes</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_leaf_nodes</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_leaf_nodes</span>
+        <span class="n">min_samples_split</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_samples_split_</span>
+        <span class="n">min_samples_leaf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_samples_leaf_</span>
+        <span class="n">min_weight_leaf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_weight_leaf_</span>
+        <span class="c1"># set decision-tree model parameters</span>
+        <span class="n">max_depth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span><span class="o">.</span><span class="n">max</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_depth</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_depth</span>
+
+        <span class="n">monotonic_cst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">monotonic_cst_</span>
+
+        <span class="c1"># Build tree</span>
+        <span class="c1"># Note: this reconstructs the builder with the same state it had during the</span>
+        <span class="c1"># initial fit. This is necessary because the builder is not saved as part</span>
+        <span class="c1"># of the class, and thus the state may be lost if pickled/unpickled.</span>
+        <span class="n">criterion</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">criterion</span><span class="p">,</span> <span class="n">BaseCriterion</span><span class="p">):</span>
+            <span class="n">criterion</span> <span class="o">=</span> <span class="n">CRITERIA_CLF</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_classes_</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Make a deepcopy in case the criterion has mutable attributes that</span>
+            <span class="c1"># might be shared and modified concurrently during parallel fitting</span>
+            <span class="n">criterion</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">criterion</span><span class="p">)</span>
+
+        <span class="n">random_state</span> <span class="o">=</span> <span class="n">check_random_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+
+        <span class="n">splitter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splitter</span>
+        <span class="k">if</span> <span class="n">issparse</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Sparse input is not supported for oblique trees. &quot;</span>
+                <span class="s2">&quot;Please convert your data to a dense array.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">SPLITTERS</span> <span class="o">=</span> <span class="n">OBLIQUE_DENSE_SPLITTERS</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splitter</span><span class="p">,</span> <span class="n">ObliqueSplitter</span><span class="p">):</span>
+            <span class="n">splitter</span> <span class="o">=</span> <span class="n">SPLITTERS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">splitter</span><span class="p">](</span>
+                <span class="n">criterion</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">max_features_</span><span class="p">,</span>
+                <span class="n">min_samples_leaf</span><span class="p">,</span>
+                <span class="n">min_weight_leaf</span><span class="p">,</span>
+                <span class="n">random_state</span><span class="p">,</span>
+                <span class="n">monotonic_cst</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">feature_combinations_</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise</span>
+        <span class="k">if</span> <span class="n">max_leaf_nodes</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">builder</span> <span class="o">=</span> <span class="n">DepthFirstTreeBuilder</span><span class="p">(</span>
+                <span class="n">splitter</span><span class="p">,</span>
+                <span class="n">min_samples_split</span><span class="p">,</span>
+                <span class="n">min_samples_leaf</span><span class="p">,</span>
+                <span class="n">min_weight_leaf</span><span class="p">,</span>
+                <span class="n">max_depth</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">store_leaf_values</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">builder</span> <span class="o">=</span> <span class="n">BestFirstTreeBuilder</span><span class="p">(</span>
+                <span class="n">splitter</span><span class="p">,</span>
+                <span class="n">min_samples_split</span><span class="p">,</span>
+                <span class="n">min_samples_leaf</span><span class="p">,</span>
+                <span class="n">min_weight_leaf</span><span class="p">,</span>
+                <span class="n">max_depth</span><span class="p">,</span>
+                <span class="n">max_leaf_nodes</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">store_leaf_values</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="n">builder</span><span class="o">.</span><span class="n">initialize_node_queue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">)</span>
+        <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prune_tree</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
 
 
 
@@ -2241,6 +2315,7 @@ document.write(`
                 <span class="p">)</span>
 
         <span class="n">monotonic_cst</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">monotonic_cst_</span> <span class="o">=</span> <span class="n">monotonic_cst</span>
 
         <span class="c1"># Build tree</span>
         <span class="n">criterion</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span>
@@ -2281,7 +2356,7 @@ document.write(`
 
         <span class="c1"># Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise</span>
         <span class="k">if</span> <span class="n">max_leaf_nodes</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">builder_</span> <span class="o">=</span> <span class="n">DepthFirstTreeBuilder</span><span class="p">(</span>
+            <span class="n">builder</span> <span class="o">=</span> <span class="n">DepthFirstTreeBuilder</span><span class="p">(</span>
                 <span class="n">splitter</span><span class="p">,</span>
                 <span class="n">min_samples_split</span><span class="p">,</span>
                 <span class="n">min_samples_leaf</span><span class="p">,</span>
@@ -2290,7 +2365,7 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">builder_</span> <span class="o">=</span> <span class="n">BestFirstTreeBuilder</span><span class="p">(</span>
+            <span class="n">builder</span> <span class="o">=</span> <span class="n">BestFirstTreeBuilder</span><span class="p">(</span>
                 <span class="n">splitter</span><span class="p">,</span>
                 <span class="n">min_samples_split</span><span class="p">,</span>
                 <span class="n">min_samples_leaf</span><span class="p">,</span>
@@ -2300,7 +2375,7 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">builder_</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -2722,6 +2797,7 @@ document.write(`
                 <span class="p">)</span>
 
         <span class="n">monotonic_cst</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">monotonic_cst_</span> <span class="o">=</span> <span class="n">monotonic_cst</span>
         <span class="n">n_samples</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="c1"># Build tree</span>
@@ -3152,6 +3228,7 @@ document.write(`
 <span class="sd">            Controls the randomness of the estimator.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">monotonic_cst</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">monotonic_cst_</span> <span class="o">=</span> <span class="n">monotonic_cst</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">n_features</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_combinations</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -3197,7 +3274,7 @@ document.write(`
 
         <span class="c1"># Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise</span>
         <span class="k">if</span> <span class="n">max_leaf_nodes</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">builder_</span> <span class="o">=</span> <span class="n">DepthFirstTreeBuilder</span><span class="p">(</span>
+            <span class="n">builder</span> <span class="o">=</span> <span class="n">DepthFirstTreeBuilder</span><span class="p">(</span>
                 <span class="n">splitter</span><span class="p">,</span>
                 <span class="n">min_samples_split</span><span class="p">,</span>
                 <span class="n">min_samples_leaf</span><span class="p">,</span>
@@ -3206,7 +3283,7 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">builder_</span> <span class="o">=</span> <span class="n">BestFirstTreeBuilder</span><span class="p">(</span>
+            <span class="n">builder</span> <span class="o">=</span> <span class="n">BestFirstTreeBuilder</span><span class="p">(</span>
                 <span class="n">splitter</span><span class="p">,</span>
                 <span class="n">min_samples_split</span><span class="p">,</span>
                 <span class="n">min_samples_leaf</span><span class="p">,</span>
@@ -3216,7 +3293,7 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">builder_</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -3548,6 +3625,7 @@ document.write(`
 <span class="sd">            Controls the randomness of the estimator.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">monotonic_cst</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">monotonic_cst_</span> <span class="o">=</span> <span class="n">monotonic_cst</span>
         <span class="n">n_samples</span><span class="p">,</span> <span class="n">n_features</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_combinations</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -3659,7 +3737,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-04-05.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-04-09.
       <br/>
     
   </p>

@@ -1186,8 +1186,10 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">tree_</span>
 
         <span class="c1"># XXX: scikit-learn trees do not store their builder, or min_samples_split_</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">builder_</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="p">,</span> <span class="s2">&quot;builder_&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_samples_split_</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="p">,</span> <span class="s2">&quot;min_samples_split_&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_samples_leaf_</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="p">,</span> <span class="s2">&quot;min_samples_leaf_&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_weight_leaf_</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="p">,</span> <span class="s2">&quot;min_weight_leaf_&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">monotonic_cst_</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="p">,</span> <span class="s2">&quot;monotonic_cst_&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_empty_leaf_correction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">proba</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Leaves with empty posteriors are assigned values.</span>
@@ -1341,7 +1343,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-04-05.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-04-09.
       <br/>
     
   </p>

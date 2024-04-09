@@ -769,9 +769,13 @@ has feature names that are all strings.</p>
 <a class="reference external" href="https://scikit-learn.org/dev/auto_examples/tree/plot_unveil_tree_structure.html#sphx-glr-auto-examples-tree-plot-unveil-tree-structure-py" title="(in scikit-learn v1.5)"><span>Understanding the decision tree structure</span></a>
 for basic usage of these attributes.</p>
 </dd>
-<dt><strong>builder_</strong><span class="classifier">TreeBuilder instance</span></dt><dd><p>The underlying TreeBuilder object.</p>
-</dd>
 <dt><strong>min_samples_split_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>The minimum number of samples needed to split a node in the tree building.</p>
+</dd>
+<dt><strong>min_weight_leaf_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>The minimum number of weighted samples in a leaf.</p>
+</dd>
+<dt><strong>min_samples_leaf_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>The minimum number of samples needed for a leaf node.</p>
+</dd>
+<dt><strong>monotonic_cst_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a> of shape (n_features,)</span></dt><dd><p>The monotonicity constraints enforced on each feature.</p>
 </dd>
 </dl>
 </dd>
@@ -1608,7 +1612,7 @@ high cardinality features (many unique values). See
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-04-05.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-04-09.
       <br/>
     
   </p>
