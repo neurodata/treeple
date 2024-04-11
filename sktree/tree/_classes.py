@@ -6,6 +6,7 @@ import numpy as np
 from scipy.sparse import issparse
 from sklearn.base import ClusterMixin, TransformerMixin
 from sklearn.cluster import AgglomerativeClustering
+from sklearn.utils import check_random_state
 from sklearn.utils._param_validation import Interval
 from sklearn.utils.validation import check_is_fitted
 
@@ -918,6 +919,7 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
             Controls the randomness of the estimator.
         """
         monotonic_cst = None
+        self.monotonic_cst_ = monotonic_cst
         _, n_features = X.shape
 
         if self.feature_combinations is None:
@@ -963,7 +965,7 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
 
         # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
         if max_leaf_nodes < 0:
-            self.builder_ = DepthFirstTreeBuilder(
+            builder = DepthFirstTreeBuilder(
                 splitter,
                 min_samples_split,
                 min_samples_leaf,
@@ -972,7 +974,7 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                 self.min_impurity_decrease,
             )
         else:
-            self.builder_ = BestFirstTreeBuilder(
+            builder = BestFirstTreeBuilder(
                 splitter,
                 min_samples_split,
                 min_samples_leaf,
@@ -982,7 +984,7 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                 self.min_impurity_decrease,
             )
 
-        self.builder_.build(self.tree_, X, y, sample_weight, None)
+        builder.build(self.tree_, X, y, sample_weight, None)
 
         if self.n_outputs_ == 1:
             self.n_classes_ = self.n_classes_[0]
@@ -995,6 +997,78 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         return [
             "feature_combinations_",
         ]
+
+    def _update_tree(self, X, y, sample_weight):
+        # Update tree
+        max_leaf_nodes = -1 if self.max_leaf_nodes is None else self.max_leaf_nodes
+        min_samples_split = self.min_samples_split_
+        min_samples_leaf = self.min_samples_leaf_
+        min_weight_leaf = self.min_weight_leaf_
+        # set decision-tree model parameters
+        max_depth = np.iinfo(np.int32).max if self.max_depth is None else self.max_depth
+
+        monotonic_cst = self.monotonic_cst_
+
+        # Build tree
+        # Note: this reconstructs the builder with the same state it had during the
+        # initial fit. This is necessary because the builder is not saved as part
+        # of the class, and thus the state may be lost if pickled/unpickled.
+        criterion = self.criterion
+        if not isinstance(criterion, BaseCriterion):
+            criterion = CRITERIA_CLF[self.criterion](self.n_outputs_, self._n_classes_)
+        else:
+            # Make a deepcopy in case the criterion has mutable attributes that
+            # might be shared and modified concurrently during parallel fitting
+            criterion = copy.deepcopy(criterion)
+
+        random_state = check_random_state(self.random_state)
+
+        splitter = self.splitter
+        if issparse(X):
+            raise ValueError(
+                "Sparse input is not supported for oblique trees. "
+                "Please convert your data to a dense array."
+            )
+        else:
+            SPLITTERS = OBLIQUE_DENSE_SPLITTERS
+        if not isinstance(self.splitter, ObliqueSplitter):
+            splitter = SPLITTERS[self.splitter](
+                criterion,
+                self.max_features_,
+                min_samples_leaf,
+                min_weight_leaf,
+                random_state,
+                monotonic_cst,
+                self.feature_combinations_,
+            )
+
+        # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
+        if max_leaf_nodes < 0:
+            builder = DepthFirstTreeBuilder(
+                splitter,
+                min_samples_split,
+                min_samples_leaf,
+                min_weight_leaf,
+                max_depth,
+                self.min_impurity_decrease,
+                self.store_leaf_values,
+            )
+        else:
+            builder = BestFirstTreeBuilder(
+                splitter,
+                min_samples_split,
+                min_samples_leaf,
+                min_weight_leaf,
+                max_depth,
+                max_leaf_nodes,
+                self.min_impurity_decrease,
+                self.store_leaf_values,
+            )
+        builder.initialize_node_queue(self.tree_, X, y, sample_weight)
+        builder.build(self.tree_, X, y, sample_weight)
+
+        self._prune_tree()
+        return self
 
 
 class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
@@ -1785,6 +1859,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
                 )
 
         monotonic_cst = None
+        self.monotonic_cst_ = monotonic_cst
 
         # Build tree
         criterion = self.criterion
@@ -1825,7 +1900,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
 
         # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
         if max_leaf_nodes < 0:
-            self.builder_ = DepthFirstTreeBuilder(
+            builder = DepthFirstTreeBuilder(
                 splitter,
                 min_samples_split,
                 min_samples_leaf,
@@ -1834,7 +1909,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
                 self.min_impurity_decrease,
             )
         else:
-            self.builder_ = BestFirstTreeBuilder(
+            builder = BestFirstTreeBuilder(
                 splitter,
                 min_samples_split,
                 min_samples_leaf,
@@ -1844,7 +1919,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
                 self.min_impurity_decrease,
             )
 
-        self.builder_.build(self.tree_, X, y, sample_weight, None)
+        builder.build(self.tree_, X, y, sample_weight, None)
 
         if self.n_outputs_ == 1:
             self.n_classes_ = self.n_classes_[0]
@@ -2263,6 +2338,7 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
                 )
 
         monotonic_cst = None
+        self.monotonic_cst_ = monotonic_cst
         n_samples = X.shape[0]
 
         # Build tree
@@ -2692,6 +2768,7 @@ class ExtraObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
             Controls the randomness of the estimator.
         """
         monotonic_cst = None
+        self.monotonic_cst_ = monotonic_cst
         _, n_features = X.shape
 
         if self.feature_combinations is None:
@@ -2737,7 +2814,7 @@ class ExtraObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
 
         # Use BestFirst if max_leaf_nodes given; use DepthFirst otherwise
         if max_leaf_nodes < 0:
-            self.builder_ = DepthFirstTreeBuilder(
+            builder = DepthFirstTreeBuilder(
                 splitter,
                 min_samples_split,
                 min_samples_leaf,
@@ -2746,7 +2823,7 @@ class ExtraObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
                 self.min_impurity_decrease,
             )
         else:
-            self.builder_ = BestFirstTreeBuilder(
+            builder = BestFirstTreeBuilder(
                 splitter,
                 min_samples_split,
                 min_samples_leaf,
@@ -2756,7 +2833,7 @@ class ExtraObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
                 self.min_impurity_decrease,
             )
 
-        self.builder_.build(self.tree_, X, y, sample_weight, None)
+        builder.build(self.tree_, X, y, sample_weight, None)
 
         if self.n_outputs_ == 1:
             self.n_classes_ = self.n_classes_[0]
@@ -3088,6 +3165,7 @@ class ExtraObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
             Controls the randomness of the estimator.
         """
         monotonic_cst = None
+        self.monotonic_cst_ = monotonic_cst
         n_samples, n_features = X.shape
 
         if self.feature_combinations is None:

@@ -6,10 +6,6 @@
 
 import numpy as np
 
-cimport numpy as cnp
-
-cnp.import_array()
-
 from cython.operator cimport dereference as deref
 from libcpp.vector cimport vector
 
@@ -211,7 +207,7 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
         """
         cdef intp_t n_features = self.n_features
         cdef intp_t n_non_zeros = self.n_non_zeros
-        cdef UINT32_t* random_state = &self.rand_r_state
+        cdef uint32_t* random_state = &self.rand_r_state
 
         cdef intp_t i, feat_i, proj_i, rand_vec_index
         cdef float32_t weight
@@ -244,10 +240,8 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
 
     cdef int node_split(
         self,
-        float64_t impurity,
+        ParentInfo* parent_record,
         SplitRecord* split,
-        float64_t lower_bound,
-        float64_t upper_bound,
     ) except -1 nogil:
         """Find the best_split split on node samples[start:end]
 
@@ -277,6 +271,8 @@ cdef class BestObliqueUnsupervisedSplitter(UnsupervisedObliqueSplitter):
         cdef intp_t feat_i, p       # index over computed features and start/end
         cdef intp_t partition_end
         cdef float32_t temp_d         # to compute a projection feature value
+
+        cdef float64_t impurity = parent_record.impurity
 
         # instantiate the split records
         _init_split(&best_split, end)

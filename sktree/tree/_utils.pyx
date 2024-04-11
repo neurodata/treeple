@@ -14,14 +14,14 @@ cnp.import_array()
 from .._lib.sklearn.tree._utils cimport rand_uniform
 
 
-cdef inline int rand_weighted_binary(float64_t p0, UINT32_t* random_state) noexcept nogil:
+cdef inline int rand_weighted_binary(float64_t p0, uint32_t* random_state) noexcept nogil:
     """Sample from integers 0 and 1 with different probabilities.
 
     Parameters
     ----------
     p0 : float64_t
         The probability of sampling 0.
-    random_state : UINT32_t*
+    random_state : uint32_t*
         The random state.
     """
     cdef float64_t random_value = rand_uniform(0.0, 1.0, random_state)
