@@ -671,12 +671,6 @@ has feature names that are all strings.</p>
 </dd>
 <dt><strong>labels_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_samples,)</span></dt><dd><p>Labels of each point.</p>
 </dd>
-<dt><strong>similarity_matrix_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_samples, n_samples)</span></dt><dd><p>Stores the affinity/similarity matrix used in fit. Note this matrix
-is computed from within-bag and OOB samples.</p>
-</dd>
-<dt><strong>dissimilarity_matrix_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_samples, n_samples)</span></dt><dd><p>Stores the dissimilarity matrix used in fit. Note this matrix
-is computed from within-bag and OOB samples.</p>
-</dd>
 <dt><strong>oob_score_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>Score of the training dataset obtained using an out-of-bag estimate.
 This attribute exists only when <code class="docutils literal notranslate"><span class="pre">oob_score</span></code> is True.</p>
 </dd>
@@ -1258,7 +1252,7 @@ array of zeros.</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-04-09.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-04-15.
       <br/>
     
   </p>
