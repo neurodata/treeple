@@ -4,7 +4,6 @@ Treeple tutorial for calculating S@98
 =====================================
 """
 
-
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.metrics import RocCurveDisplay, roc_curve

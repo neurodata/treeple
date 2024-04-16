@@ -4,7 +4,6 @@ Treeple tutorial for calculating pAUC
 =====================================
 """
 
-
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.metrics import RocCurveDisplay, roc_auc_score, roc_curve

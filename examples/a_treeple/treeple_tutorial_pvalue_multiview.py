@@ -4,7 +4,6 @@ Treeple tutorial for calculating p-value with multiview data
 ============================================================
 """
 
-
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import entropy
@@ -175,6 +174,7 @@ plt.hist(null_proba[:500][:, 1], bins=30, alpha=0.6, color="blue", label="negati
 plt.hist(null_proba[500:][:, 1], bins=30, alpha=0.6, color="red", label="positive")
 plt.legend()
 plt.show()
+
 
 # %%
 # Find the observed statistic difference

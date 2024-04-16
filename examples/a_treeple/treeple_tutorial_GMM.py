@@ -4,7 +4,6 @@ Treeple tutorial for estimating true posteriors & statistics
 ============================================================
 """
 
-
 import warnings
 
 import matplotlib.pyplot as plt
