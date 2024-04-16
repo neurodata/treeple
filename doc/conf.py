@@ -76,7 +76,6 @@ extensions = [
     "allow_nan_estimators",
     "matplotlib.sphinxext.plot_directive",
     "numpydoc",
-    "nbsphinx",
 ]
 
 templates_path = ["_templates"]
