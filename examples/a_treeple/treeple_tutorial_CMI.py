@@ -8,6 +8,7 @@ Treeple tutorial for calculating CMI
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import entropy
+
 from sktree.datasets import make_trunk_classification
 from sktree.ensemble import HonestForestClassifier
 from sktree.stats import build_hyppo_oob_forest
