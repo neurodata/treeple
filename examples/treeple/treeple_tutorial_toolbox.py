@@ -1,7 +1,7 @@
-import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.metrics import RocCurveDisplay, roc_curve, roc_auc_score
+import numpy as np
 from scipy.stats import entropy
+from sklearn.metrics import RocCurveDisplay, roc_auc_score, roc_curve
 
 
 def Calculate_SA(y_true, y_pred_proba, max_fpr=0.02) -> float:
