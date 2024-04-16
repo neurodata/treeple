@@ -7,6 +7,7 @@ Treeple tutorial for calculating p-value with multiview data
 
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.stats import entropy
 
 from sktree.datasets import make_trunk_classification
 from sktree.ensemble import HonestForestClassifier
@@ -178,6 +179,16 @@ plt.show()
 # %%
 # Find the observed statistic difference
 # --------------------------------------
+def Calculate_MI(y_true, y_pred_proba):
+    # calculate the conditional entropy
+    H_YX = np.mean(entropy(y_pred_proba, base=np.exp(1), axis=1))
+
+    # empirical count of each class (n_classes)
+    _, counts = np.unique(y_true, return_counts=True)
+    # calculate the entropy of labels
+    H_Y = entropy(counts, base=np.exp(1))
+    return H_Y - H_YX
+
 
 joint_mi = Calculate_MI(y, observe_proba)
 mi = Calculate_MI(y, single_proba)
