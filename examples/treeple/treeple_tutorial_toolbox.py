@@ -5,7 +5,7 @@ from sklearn.metrics import RocCurveDisplay, roc_auc_score, roc_curve
 
 
 def Calculate_SA(y_true, y_pred_proba, max_fpr=0.02) -> float:
-    """Calculate the sensitivity at a specfic specificity"""
+    """Calculate the sensitivity at a specific specificity"""
     # check the shape of true labels
     if y_true.squeeze().ndim != 1:
         raise ValueError(f"y_true must be 1d, not {y_true.shape}")
