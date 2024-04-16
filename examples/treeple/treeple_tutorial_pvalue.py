@@ -4,12 +4,13 @@ Treeple tutorial for calculating p-value
 ========================================
 """
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+from scipy.stats import entropy
+
 from sktree.datasets import make_trunk_classification
 from sktree.ensemble import HonestForestClassifier
 from sktree.stats import build_hyppo_oob_forest
-from scipy.stats import entropy
 
 # Independence Testing
 # --------------------
@@ -55,8 +56,6 @@ X, y = make_trunk_classification(
 )
 
 
-
-
 # scatter plot the samples
 plt.hist(X[500:], bins=15, alpha=0.6, color="blue", label="negative")
 plt.hist(X[:500], bins=15, alpha=0.6, color="red", label="positive")
@@ -66,7 +65,6 @@ plt.show()
 
 # Generate observed posteriors
 # ----------------------------
-
 
 
 # initialize the forest with 100 trees
@@ -86,8 +84,6 @@ _, observe_proba = build_hyppo_oob_forest(est, X, y)
 observe_proba = np.nanmean(observe_proba, axis=0)
 
 
-
-
 # scatter plot the posterior probabilities for class one
 plt.hist(observe_proba[:500][:, 1], bins=30, alpha=0.6, color="blue", label="negative")
 plt.hist(observe_proba[500:][:, 1], bins=30, alpha=0.6, color="red", label="positive")
@@ -97,7 +93,6 @@ plt.show()
 
 # Generate null posteriors
 # ------------------------
-
 
 
 # shuffle the labels
@@ -122,8 +117,6 @@ _, null_proba = build_hyppo_oob_forest(est, X_null, y_null)
 null_proba = np.nanmean(null_proba, axis=0)
 
 
-
-
 # scatter plot the posterior probabilities for class one
 plt.hist(null_proba[:500][:, 1], bins=30, alpha=0.6, color="blue", label="negative")
 plt.hist(null_proba[500:][:, 1], bins=30, alpha=0.6, color="red", label="positive")
@@ -134,6 +127,7 @@ plt.show()
 # Find the observed statistic difference
 # --------------------------------------
 
+
 def Calculate_MI(y_true, y_pred_proba):
     # calculate the conditional entropy
     H_YX = np.mean(entropy(y_pred_proba, base=np.exp(1), axis=1))
@@ -143,6 +137,7 @@ def Calculate_MI(y_true, y_pred_proba):
     # calculate the entropy of labels
     H_Y = entropy(counts, base=np.exp(1))
     return H_Y - H_YX
+
 
 mi = Calculate_MI(y, observe_proba)
 mi_null = Calculate_MI(y, null_proba)
@@ -156,7 +151,6 @@ print("Observed statistic difference =", round(observed_diff, 2))
 #
 # In this case, permuting the tree posteriors is equivalent to permuting
 # the trees in the two forests.
-
 
 
 PERMUTE = 10000
@@ -178,7 +172,6 @@ for i in range(PERMUTE):
 
 # Calculate the p-value
 # ---------------------
-
 
 
 pvalue = (1 + (mix_diff >= observed_diff).sum()) / (1 + PERMUTE)
