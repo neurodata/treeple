@@ -5,6 +5,7 @@ from sklearn.metrics import RocCurveDisplay, roc_auc_score, roc_curve
 
 
 def Calculate_SA(y_true, y_pred_proba, max_fpr=0.02) -> float:
+    """Calculate the sensitivity at a specfic specificity"""
     # check the shape of true labels
     if y_true.squeeze().ndim != 1:
         raise ValueError(f"y_true must be 1d, not {y_true.shape}")
@@ -37,6 +38,7 @@ def Calculate_SA(y_true, y_pred_proba, max_fpr=0.02) -> float:
 
 
 def Calculate_MI(y_true, y_pred_proba):
+    """Calculate the mutual information"""
     # calculate the conditional entropy
     H_YX = np.mean(entropy(y_pred_proba, base=np.exp(1), axis=1))
 
@@ -48,6 +50,7 @@ def Calculate_MI(y_true, y_pred_proba):
 
 
 def Calculate_pAUC(y_true, y_pred_proba, max_fpr=0.1) -> float:
+    """Calculate the partial AUC"""
     # check the shape of true labels
     if y_true.squeeze().ndim != 1:
         raise ValueError(f"y_true must be 1d, not {y_true.shape}")
