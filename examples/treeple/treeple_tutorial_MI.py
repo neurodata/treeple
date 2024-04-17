@@ -44,8 +44,8 @@ X, y = make_trunk_classification(
 
 
 # scatter plot the samples
-plt.hist(X[500:], bins=15, alpha=0.6, color="blue", label="negative")
-plt.hist(X[:500], bins=15, alpha=0.6, color="red", label="positive")
+plt.hist(X[:500], bins=15, alpha=0.6, color="blue", label="negative")
+plt.hist(X[500:], bins=15, alpha=0.6, color="red", label="positive")
 plt.legend()
 plt.show()
 
