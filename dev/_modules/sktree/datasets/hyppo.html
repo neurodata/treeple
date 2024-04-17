@@ -984,7 +984,7 @@ document.write(`
     <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
         <span class="p">[</span>
             <span class="n">rng_children</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">mu_vec</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">rng_children</span><span class="p">,</span> <span class="n">mu_vec</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="p">[</span><span class="n">mu_1_vec</span><span class="p">,</span> <span class="n">mu_0_vec</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">rng_children</span><span class="p">,</span> <span class="n">mu_vec</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="p">[</span><span class="n">mu_0_vec</span><span class="p">,</span> <span class="n">mu_1_vec</span><span class="p">])</span>
         <span class="p">]</span>
     <span class="p">)</span>
 
@@ -1367,7 +1367,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-04-15.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-04-17.
       <br/>
     
   </p>
