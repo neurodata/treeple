@@ -537,7 +537,7 @@ def make_trunk_classification(
     X = np.vstack(
         [
             rng_children.multivariate_normal(mu_vec, cov, n_samples // 2, method=method)
-            for rng_children, mu_vec in zip(rng.spawn(2), [mu_1_vec, mu_0_vec])
+            for rng_children, mu_vec in zip(rng.spawn(2), [mu_0_vec, mu_1_vec])
         ]
     )
 
