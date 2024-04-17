@@ -84,10 +84,10 @@ est = HonestForestClassifier(
 )
 
 # fit the model and obtain the tree posteriors
-_, observe_proba = build_hyppo_oob_forest(est, X, y)
+_, observe_proba_tree = build_hyppo_oob_forest(est, X, y)
 
 # generate forest posteriors for the two classes
-observe_proba = np.nanmean(observe_proba, axis=0)
+observe_proba = np.nanmean(observe_proba_tree, axis=0)
 
 
 # scatter plot the posterior probabilities for class one
@@ -117,10 +117,10 @@ est_null = HonestForestClassifier(
 )
 
 # fit the model and obtain the tree posteriors
-_, null_proba = build_hyppo_oob_forest(est, X_null, y_null)
+_, null_proba_tree = build_hyppo_oob_forest(est, X_null, y_null)
 
 # generate forest posteriors for the two classes
-null_proba = np.nanmean(null_proba, axis=0)
+null_proba = np.nanmean(null_proba_tree, axis=0)
 
 
 # scatter plot the posterior probabilities for class one
@@ -163,7 +163,7 @@ PERMUTE = 10000
 mix_diff = []
 
 # Collect all the tree posteriors
-proba = np.vstack((observe_proba, null_proba))
+proba = np.vstack((observe_proba_tree, null_proba_tree))
 for i in range(PERMUTE):
 
     # permute the posteriors
@@ -171,8 +171,8 @@ for i in range(PERMUTE):
 
     # calculate the statistic for
     # the two mixed forest posteriors
-    mi_mix_one = Calculate_MI(y, proba[:100])
-    mi_mix_two = Calculate_MI(y, proba[100:])
+    mi_mix_one = Calculate_MI(y, np.nanmean(proba[:100], axis=0))
+    mi_mix_two = Calculate_MI(y, np.nanmean(proba[100:], axis=0))
     mix_diff.append(mi_mix_one - mi_mix_two)
 
 # %%
