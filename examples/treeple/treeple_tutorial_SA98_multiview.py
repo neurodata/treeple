@@ -47,15 +47,15 @@ X = X_Z[:, 1].reshape(-1, 1)
 
 
 # scatter plot the samples for Z
-plt.hist(Z[500:], bins=15, alpha=0.6, color="blue", label="negative")
-plt.hist(Z[:500], bins=15, alpha=0.6, color="red", label="positive")
+plt.hist(Z[:500], bins=15, alpha=0.6, color="blue", label="negative")
+plt.hist(Z[500:], bins=15, alpha=0.6, color="red", label="positive")
 plt.legend()
 plt.show()
 
 
 # scatter plot the samples for X
-plt.hist(X[500:], bins=15, alpha=0.6, color="blue", label="negative")
-plt.hist(X[:500], bins=15, alpha=0.6, color="red", label="positive")
+plt.hist(X[:500], bins=15, alpha=0.6, color="blue", label="negative")
+plt.hist(X[500:], bins=15, alpha=0.6, color="red", label="positive")
 plt.legend()
 plt.show()
 
