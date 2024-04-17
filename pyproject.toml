@@ -80,7 +80,7 @@ doc = [
   'numpydoc',
   'pooch',
   'pydata-sphinx-theme==0.14.1',
-  'sphinx',
+  'sphinx==7.2.6',
   'sphinx-copybutton',
   'sphinx-design',
   'sphinx-gallery',
