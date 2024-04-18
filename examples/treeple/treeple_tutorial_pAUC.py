@@ -6,12 +6,16 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
 from sklearn.metrics import RocCurveDisplay, roc_auc_score, roc_curve
 
 from sktree.datasets import make_trunk_classification
 from sktree.ensemble import HonestForestClassifier
 from sktree.stats import build_hyppo_oob_forest
 
+sns.set(color_codes=True, style="white", context="talk", font_scale=1.5)
+PALETTE = sns.color_palette("Set1")
+sns.set_palette(PALETTE[1:5] + PALETTE[6:], n_colors=9)
 # %%
 # pAUC@r
 # ------
@@ -44,10 +48,20 @@ X, y = make_trunk_classification(
 )
 
 
+fig, ax = plt.subplots(figsize=(5, 5))
+ax.tick_params(labelsize=15)
+
+ax.spines["left"].set_color("#dddddd")
+ax.spines["right"].set_color("#dddddd")
+ax.spines["top"].set_color("#dddddd")
+ax.spines["bottom"].set_color("#dddddd")
+
 # scatter plot the samples
-plt.hist(X[:500], bins=15, alpha=0.6, color="blue", label="negative")
-plt.hist(X[500:], bins=15, alpha=0.6, color="red", label="positive")
-plt.legend()
+ax.hist(X[:500], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
+ax.hist(X[500:], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
+ax.set_xlabel("X", fontsize=15)
+ax.set_ylabel("Likelihood", fontsize=15)
+plt.legend(fontsize=15)
 plt.show()
 
 
@@ -73,10 +87,20 @@ _, observe_proba = build_hyppo_oob_forest(est, X, y)
 observe_proba = np.nanmean(observe_proba, axis=0)
 
 
+fig, ax = plt.subplots(figsize=(5, 5))
+ax.tick_params(labelsize=15)
+
+ax.spines["left"].set_color("#dddddd")
+ax.spines["right"].set_color("#dddddd")
+ax.spines["top"].set_color("#dddddd")
+ax.spines["bottom"].set_color("#dddddd")
+
 # scatter plot the posterior probabilities for class one
-plt.hist(observe_proba[:500][:, 1], bins=30, alpha=0.6, color="blue", label="negative")
-plt.hist(observe_proba[500:][:, 1], bins=30, alpha=0.6, color="red", label="positive")
-plt.legend()
+ax.hist(observe_proba[:500][:, 1], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
+ax.hist(observe_proba[500:][:, 1], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
+ax.set_xlabel("X", fontsize=15)
+ax.set_ylabel("Class One Posterior", fontsize=15)
+plt.legend(fontsize=15)
 plt.show()
 
 
