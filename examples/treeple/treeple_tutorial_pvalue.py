@@ -1,7 +1,7 @@
 """
-========================================
-Treeple tutorial for calculating p-value
-========================================
+================================
+1-2: Calculating p-value (MIGHT)
+================================
 """
 
 import matplotlib.pyplot as plt

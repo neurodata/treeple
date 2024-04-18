@@ -1,7 +1,7 @@
 """
-====================================
-Treeple tutorial for calculating CMI
-====================================
+=====================
+2-1b: Calculating CMI
+=====================
 """
 
 import matplotlib.pyplot as plt

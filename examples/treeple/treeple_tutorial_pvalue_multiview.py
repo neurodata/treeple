@@ -1,7 +1,7 @@
 """
-============================================================
-Treeple tutorial for calculating p-value with multiview data
-============================================================
+======================================================
+2-2: Calculating p-value with multiview data (CoMIGHT)
+======================================================
 """
 
 import matplotlib.pyplot as plt

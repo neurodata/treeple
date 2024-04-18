@@ -1,7 +1,7 @@
 """
-=====================================
-Treeple tutorial for calculating pAUC
-=====================================
+======================
+1-1c: Calculating pAUC
+======================
 """
 
 import matplotlib.pyplot as plt
@@ -117,3 +117,4 @@ def Calculate_pAUC(y_true, y_pred_proba, max_fpr=0.1) -> float:
 
 
 pAUC = Calculate_pAUC(y, observe_proba)
+print("pAUC@90 =", round(pAUC, 2))

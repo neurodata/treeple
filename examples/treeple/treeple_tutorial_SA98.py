@@ -1,7 +1,7 @@
 """
-=====================================
-Treeple tutorial for calculating S@98
-=====================================
+======================
+1-1a: Calculating S@98
+======================
 """
 
 import matplotlib.pyplot as plt
@@ -113,3 +113,4 @@ def Calculate_SA(y_true, y_pred_proba, max_fpr=0.02) -> float:
 
 
 sa98 = Calculate_SA(y, observe_proba, max_fpr=0.02)
+print("S@98 =", round(sa98, 2))

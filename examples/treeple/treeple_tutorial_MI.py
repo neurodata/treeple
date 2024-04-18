@@ -1,7 +1,7 @@
 """
-===================================
-Treeple tutorial for calculating MI
-===================================
+====================
+1-1b: Calculating MI
+====================
 """
 
 import matplotlib.pyplot as plt

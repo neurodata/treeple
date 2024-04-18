@@ -1,7 +1,7 @@
 """
-============================================================
-Treeple tutorial for estimating true posteriors & statistics
-============================================================
+==========================================
+0: Estimating true posteriors & statistics
+==========================================
 """
 
 import warnings
@@ -117,6 +117,7 @@ def Calculate_SA(y_true, y_pred_proba, max_fpr=0.02) -> float:
 
 
 sa98 = Calculate_SA(y, pos, max_fpr=0.02)
+print("S@98 =", round(sa98, 2))
 
 # %%
 # Generate true statistic estimates: MI
@@ -175,3 +176,4 @@ def Calculate_pAUC(y_true, y_pred_proba, max_fpr=0.1) -> float:
 
 
 pAUC = Calculate_pAUC(y, pos, max_fpr=0.1)
+print("pAUC@90 =", round(pAUC, 2))
