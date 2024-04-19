@@ -6,6 +6,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import seaborn as sns
 from scipy.stats import entropy
 
@@ -17,6 +18,7 @@ from sktree.tree import MultiViewDecisionTreeClassifier
 sns.set(color_codes=True, style="white", context="talk", font_scale=1.5)
 PALETTE = sns.color_palette("Set1")
 sns.set_palette(PALETTE[1:5] + PALETTE[6:], n_colors=9)
+sns.set_style("white", {"axes.edgecolor": "#dddddd"})
 # %%
 # Independence Testing
 # --------------------
@@ -72,22 +74,24 @@ X, y = make_trunk_classification(
     mu_0=0,
     mu_1=2,
     n_informative=1,
-    seed=1,
+    seed=2,
 )
 
-
-# histogram plot the samples for Z
-plt.hist(Z[:500], bins=15, alpha=0.6, color="blue", label="negative")
-plt.hist(Z[500:], bins=15, alpha=0.6, color="red", label="positive")
-plt.legend()
-plt.show()
+Z_X = np.hstack((Z, X))
 
 
-# histogram plot the samples for X
-plt.hist(X[:500], bins=15, alpha=0.6, color="blue", label="negative")
-plt.hist(X[500:], bins=15, alpha=0.6, color="red", label="positive")
-plt.legend()
-plt.show()
+Z_X_y = np.hstack((Z_X, y.reshape(-1, 1)))
+Z_X_y = pd.DataFrame(Z_X_y, columns=["Z", "X", "y"])
+Z_X_y = Z_X_y.replace({"y": 0.0}, "Class Zero")
+Z_X_y = Z_X_y.replace({"y": 1.0}, "Class One")
+
+fig, ax = plt.subplots(figsize=(5, 5))
+ax.tick_params(labelsize=15)
+sns.scatterplot(data=Z_X_y, x="Z", y="X", hue="y", palette=PALETTE[:2], alpha=0.2)
+sns.kdeplot(data=Z_X_y, x="Z", y="X", hue="y", palette=PALETTE[:2], alpha=0.6)
+ax.set_ylabel("X", fontsize=15)
+ax.set_xlabel("Z", fontsize=15)
+plt.legend(frameon=False, fontsize=15)
 
 # %%
 # Generate observed posteriors with X and Z
@@ -106,7 +110,7 @@ est = HonestForestClassifier(
 )
 
 # fit the model and obtain the tree posteriors
-_, observe_proba_tree = build_hyppo_oob_forest(est, np.hstack((X, Z)), y)
+_, observe_proba_tree = build_hyppo_oob_forest(est, Z_X, y)
 
 # generate forest posteriors for the two classes
 observe_proba = np.nanmean(observe_proba_tree, axis=0)
@@ -114,11 +118,6 @@ observe_proba = np.nanmean(observe_proba_tree, axis=0)
 
 fig, ax = plt.subplots(figsize=(5, 5))
 ax.tick_params(labelsize=15)
-
-ax.spines["left"].set_color("#dddddd")
-ax.spines["right"].set_color("#dddddd")
-ax.spines["top"].set_color("#dddddd")
-ax.spines["bottom"].set_color("#dddddd")
 
 # histogram plot the posterior probabilities for class one
 ax.hist(observe_proba[:500][:, 1], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
@@ -153,11 +152,6 @@ single_proba = np.nanmean(single_proba_tree, axis=0)
 fig, ax = plt.subplots(figsize=(5, 5))
 ax.tick_params(labelsize=15)
 
-ax.spines["left"].set_color("#dddddd")
-ax.spines["right"].set_color("#dddddd")
-ax.spines["top"].set_color("#dddddd")
-ax.spines["bottom"].set_color("#dddddd")
-
 # histogram plot the posterior probabilities for class one
 ax.hist(single_proba[:500][:, 1], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
 ax.hist(single_proba[500:][:, 1], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
@@ -187,7 +181,7 @@ est_null = HonestForestClassifier(
 )
 
 # fit the model and obtain the tree posteriors
-_, null_proba_tree = build_hyppo_oob_forest(est, np.hstack((X_null, Z)), y)
+_, null_proba_tree = build_hyppo_oob_forest(est, np.hstack((Z, X_null)), y)
 
 # generate forest posteriors for the two classes
 null_proba = np.nanmean(null_proba_tree, axis=0)
@@ -195,11 +189,6 @@ null_proba = np.nanmean(null_proba_tree, axis=0)
 
 fig, ax = plt.subplots(figsize=(5, 5))
 ax.tick_params(labelsize=15)
-
-ax.spines["left"].set_color("#dddddd")
-ax.spines["right"].set_color("#dddddd")
-ax.spines["top"].set_color("#dddddd")
-ax.spines["bottom"].set_color("#dddddd")
 
 # histogram plot the posterior probabilities for class one
 ax.hist(null_proba[:500][:, 1], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
@@ -232,7 +221,7 @@ joint_mi_null = Calculate_MI(y, null_proba)
 cmi_null = joint_mi_null - mi
 
 observed_diff = cmi - cmi_null
-print("Observed statistic difference =", round(observed_diff, 2))
+print("Observed conditional mutual information difference =", round(observed_diff, 2))
 
 # %%
 # Permute the trees
@@ -263,11 +252,6 @@ for i in range(PERMUTE):
 # ---------------------
 fig, ax = plt.subplots(figsize=(5, 5))
 ax.tick_params(labelsize=15)
-
-ax.spines["left"].set_color("#dddddd")
-ax.spines["right"].set_color("#dddddd")
-ax.spines["top"].set_color("#dddddd")
-ax.spines["bottom"].set_color("#dddddd")
 
 # histogram plot the statistic differences
 ax.hist(mix_diff, bins=50, alpha=0.6, color=PALETTE[1], label="null")

@@ -17,6 +17,7 @@ from sktree.datasets import make_trunk_mixture_classification
 sns.set(color_codes=True, style="white", context="talk", font_scale=1.5)
 PALETTE = sns.color_palette("Set1")
 sns.set_palette(PALETTE[1:5] + PALETTE[6:], n_colors=9)
+sns.set_style("white", {"axes.edgecolor": "#dddddd"})
 warnings.filterwarnings("ignore")
 
 
@@ -47,11 +48,6 @@ X, y = make_trunk_mixture_classification(
 
 fig, ax = plt.subplots(figsize=(5, 5))
 ax.tick_params(labelsize=15)
-
-ax.spines["left"].set_color("#dddddd")
-ax.spines["right"].set_color("#dddddd")
-ax.spines["top"].set_color("#dddddd")
-ax.spines["bottom"].set_color("#dddddd")
 
 # histogram plot the samples
 ax.hist(X[:5000], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
@@ -120,10 +116,6 @@ def Calculate_SA(y_true, y_pred_proba, max_fpr=0.02) -> float:
     ax.tick_params(labelsize=15)
     ax.set_xlim([-0.005, 1.005])
     ax.set_ylim([-0.005, 1.005])
-    ax.spines["left"].set_color("#dddddd")
-    ax.spines["right"].set_color("#dddddd")
-    ax.spines["top"].set_color("#dddddd")
-    ax.spines["bottom"].set_color("#dddddd")
     ax.set_xlabel("False Positive Rate", fontsize=15)
     ax.set_ylabel("True Positive Rate", fontsize=15)
 
@@ -191,10 +183,6 @@ def Calculate_pAUC(y_true, y_pred_proba, max_fpr=0.1) -> float:
     ax.tick_params(labelsize=15)
     ax.set_xlim([-0.005, 1.005])
     ax.set_ylim([-0.005, 1.005])
-    ax.spines["left"].set_color("#dddddd")
-    ax.spines["right"].set_color("#dddddd")
-    ax.spines["top"].set_color("#dddddd")
-    ax.spines["bottom"].set_color("#dddddd")
     ax.set_xlabel("False Positive Rate", fontsize=15)
     ax.set_ylabel("True Positive Rate", fontsize=15)
 

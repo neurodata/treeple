@@ -16,6 +16,7 @@ from sktree.stats import build_hyppo_oob_forest
 sns.set(color_codes=True, style="white", context="talk", font_scale=1.5)
 PALETTE = sns.color_palette("Set1")
 sns.set_palette(PALETTE[1:5] + PALETTE[6:], n_colors=9)
+sns.set_style("white", {"axes.edgecolor": "#dddddd"})
 # %%
 # pAUC@r
 # ------
@@ -51,11 +52,6 @@ X, y = make_trunk_classification(
 fig, ax = plt.subplots(figsize=(5, 5))
 ax.tick_params(labelsize=15)
 
-ax.spines["left"].set_color("#dddddd")
-ax.spines["right"].set_color("#dddddd")
-ax.spines["top"].set_color("#dddddd")
-ax.spines["bottom"].set_color("#dddddd")
-
 # histogram plot the samples
 ax.hist(X[:500], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
 ax.hist(X[500:], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
@@ -90,11 +86,6 @@ observe_proba = np.nanmean(observe_proba, axis=0)
 fig, ax = plt.subplots(figsize=(5, 5))
 ax.tick_params(labelsize=15)
 
-ax.spines["left"].set_color("#dddddd")
-ax.spines["right"].set_color("#dddddd")
-ax.spines["top"].set_color("#dddddd")
-ax.spines["bottom"].set_color("#dddddd")
-
 # histogram plot the posterior probabilities for class one
 ax.hist(observe_proba[:500][:, 1], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
 ax.hist(observe_proba[500:][:, 1], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
@@ -128,10 +119,6 @@ def Calculate_pAUC(y_true, y_pred_proba, max_fpr=0.1) -> float:
     ax.tick_params(labelsize=15)
     ax.set_xlim([-0.005, 1.005])
     ax.set_ylim([-0.005, 1.005])
-    ax.spines["left"].set_color("#dddddd")
-    ax.spines["right"].set_color("#dddddd")
-    ax.spines["top"].set_color("#dddddd")
-    ax.spines["bottom"].set_color("#dddddd")
     ax.set_xlabel("False Positive Rate", fontsize=15)
     ax.set_ylabel("True Positive Rate", fontsize=15)
 

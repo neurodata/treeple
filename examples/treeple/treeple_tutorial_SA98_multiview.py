@@ -6,6 +6,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import seaborn as sns
 from sklearn.metrics import roc_curve
 
@@ -17,6 +18,7 @@ from sktree.tree import MultiViewDecisionTreeClassifier
 sns.set(color_codes=True, style="white", context="talk", font_scale=1.5)
 PALETTE = sns.color_palette("Set1")
 sns.set_palette(PALETTE[1:5] + PALETTE[6:], n_colors=9)
+sns.set_style("white", {"axes.edgecolor": "#dddddd"})
 # %%
 # S@98 with multiview data
 # ------------------------
@@ -37,31 +39,41 @@ sns.set_palette(PALETTE[1:5] + PALETTE[6:], n_colors=9)
 # create a binary class simulation with two gaussians
 # 500 samples for each class, class zero is standard
 # gaussian, and class one has a mean at one
-X_Z, y = make_trunk_classification(
+Z, y = make_trunk_classification(
     n_samples=1000,
-    n_dim=2,
+    n_dim=1,
     mu_0=0,
     mu_1=1,
-    n_informative=2,
+    n_informative=1,
     seed=1,
 )
 
-Z = X_Z[:, 0].reshape(-1, 1)
-X = X_Z[:, 1].reshape(-1, 1)
+
+X, y = make_trunk_classification(
+    n_samples=1000,
+    n_dim=1,
+    mu_0=0,
+    mu_1=2,
+    n_informative=1,
+    seed=2,
+)
+
+Z_X = np.hstack((Z, X))
 
 
-# histogram plot the samples for Z
-plt.hist(Z[:500], bins=15, alpha=0.6, color="blue", label="negative")
-plt.hist(Z[500:], bins=15, alpha=0.6, color="red", label="positive")
-plt.legend()
-plt.show()
+Z_X_y = np.hstack((Z_X, y.reshape(-1, 1)))
+Z_X_y = pd.DataFrame(Z_X_y, columns=["Z", "X", "y"])
+Z_X_y = Z_X_y.replace({"y": 0.0}, "Class Zero")
+Z_X_y = Z_X_y.replace({"y": 1.0}, "Class One")
 
+fig, ax = plt.subplots(figsize=(5, 5))
+ax.tick_params(labelsize=15)
+sns.scatterplot(data=Z_X_y, x="Z", y="X", hue="y", palette=PALETTE[:2], alpha=0.2)
+sns.kdeplot(data=Z_X_y, x="Z", y="X", hue="y", palette=PALETTE[:2], alpha=0.6)
+ax.set_ylabel("X", fontsize=15)
+ax.set_xlabel("Z", fontsize=15)
+plt.legend(frameon=False, fontsize=15)
 
-# histogram plot the samples for X
-plt.hist(X[:500], bins=15, alpha=0.6, color="blue", label="negative")
-plt.hist(X[500:], bins=15, alpha=0.6, color="red", label="positive")
-plt.legend()
-plt.show()
 
 # %%
 # Fit the model with X and Z
@@ -80,7 +92,7 @@ est = HonestForestClassifier(
 )
 
 # fit the model and obtain the tree posteriors
-_, observe_proba = build_hyppo_oob_forest(est, X_Z, y)
+_, observe_proba = build_hyppo_oob_forest(est, Z_X, y)
 
 # generate forest posteriors for the two classes
 observe_proba = np.nanmean(observe_proba, axis=0)
@@ -89,17 +101,12 @@ observe_proba = np.nanmean(observe_proba, axis=0)
 fig, ax = plt.subplots(figsize=(5, 5))
 ax.tick_params(labelsize=15)
 
-ax.spines["left"].set_color("#dddddd")
-ax.spines["right"].set_color("#dddddd")
-ax.spines["top"].set_color("#dddddd")
-ax.spines["bottom"].set_color("#dddddd")
-
 # histogram plot the posterior probabilities for class one
 ax.hist(observe_proba[:500][:, 1], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
 ax.hist(observe_proba[500:][:, 1], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
 ax.set_ylabel("# of Samples", fontsize=15)
 ax.set_xlabel("Class One Posterior", fontsize=15)
-plt.legend(fontsize=15)
+plt.legend(frameon=False, fontsize=15)
 plt.show()
 
 # %%
@@ -128,10 +135,6 @@ def Calculate_SA(y_true, y_pred_proba, max_fpr=0.02) -> float:
     ax.tick_params(labelsize=15)
     ax.set_xlim([-0.005, 1.005])
     ax.set_ylim([-0.005, 1.005])
-    ax.spines["left"].set_color("#dddddd")
-    ax.spines["right"].set_color("#dddddd")
-    ax.spines["top"].set_color("#dddddd")
-    ax.spines["bottom"].set_color("#dddddd")
     ax.set_xlabel("False Positive Rate", fontsize=15)
     ax.set_ylabel("True Positive Rate", fontsize=15)
 
