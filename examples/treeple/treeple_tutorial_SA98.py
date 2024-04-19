@@ -52,7 +52,7 @@ ax.spines["right"].set_color("#dddddd")
 ax.spines["top"].set_color("#dddddd")
 ax.spines["bottom"].set_color("#dddddd")
 
-# scatter plot the samples
+# histogram plot the samples
 ax.hist(X[:500], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
 ax.hist(X[500:], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
 ax.set_xlabel("X", fontsize=15)
@@ -90,7 +90,7 @@ ax.spines["right"].set_color("#dddddd")
 ax.spines["top"].set_color("#dddddd")
 ax.spines["bottom"].set_color("#dddddd")
 
-# scatter plot the posterior probabilities for class one
+# histogram plot the posterior probabilities for class one
 ax.hist(observe_proba[:500][:, 1], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
 ax.hist(observe_proba[500:][:, 1], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
 ax.set_xlabel("X", fontsize=15)
@@ -119,19 +119,31 @@ def Calculate_SA(y_true, y_pred_proba, max_fpr=0.02) -> float:
             y_true, y_pred_proba[:, 1], pos_label=2, drop_intermediate=False
         )
     sa98 = max([tpr for (fpr, tpr) in zip(fpr, tpr) if fpr <= max_fpr])
-    RocCurveDisplay(fpr=fpr, tpr=tpr).plot(label="ROC Curve")
+
+    fig, ax = plt.subplots(figsize=(5, 5))
+    ax.tick_params(labelsize=15)
+    ax.set_xlim([-0.005, 1.005])
+    ax.set_ylim([-0.005, 1.005])
+    ax.spines["left"].set_color("#dddddd")
+    ax.spines["right"].set_color("#dddddd")
+    ax.spines["top"].set_color("#dddddd")
+    ax.spines["bottom"].set_color("#dddddd")
+    ax.set_xlabel("False Positive Rate", fontsize=15)
+    ax.set_ylabel("True Positive Rate", fontsize=15)
+
+    ax.plot(fpr, tpr, label="ROC curve", color=PALETTE[1])
 
     spec = int((1 - max_fpr) * 100)
-    plt.axvline(
+    ax.axvline(
         x=max_fpr,
-        color="r",
+        color=PALETTE[0],
         ymin=0,
         ymax=sa98,
         label="S@" + str(spec) + " = " + str(round(sa98, 2)),
         linestyle="--",
     )
-    plt.axhline(y=sa98, xmin=0, xmax=max_fpr, color="r", linestyle="--")
-    plt.legend()
+    ax.axhline(y=sa98, xmin=0, xmax=max_fpr, color="r", linestyle="--")
+    ax.legend(frameon=False, fontsize=15)
 
     return sa98
 

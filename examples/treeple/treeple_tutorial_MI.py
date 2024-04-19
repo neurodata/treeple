@@ -55,7 +55,7 @@ ax.spines["right"].set_color("#dddddd")
 ax.spines["top"].set_color("#dddddd")
 ax.spines["bottom"].set_color("#dddddd")
 
-# scatter plot the samples
+# histogram plot the samples
 ax.hist(X[:500], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
 ax.hist(X[500:], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
 ax.set_xlabel("X", fontsize=15)
@@ -94,7 +94,7 @@ ax.spines["right"].set_color("#dddddd")
 ax.spines["top"].set_color("#dddddd")
 ax.spines["bottom"].set_color("#dddddd")
 
-# scatter plot the posterior probabilities for class one
+# histogram plot the posterior probabilities for class one
 ax.hist(observe_proba[:500][:, 1], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
 ax.hist(observe_proba[500:][:, 1], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
 ax.set_xlabel("X", fontsize=15)

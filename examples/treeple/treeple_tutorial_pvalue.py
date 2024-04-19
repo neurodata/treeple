@@ -72,12 +72,12 @@ ax.spines["right"].set_color("#dddddd")
 ax.spines["top"].set_color("#dddddd")
 ax.spines["bottom"].set_color("#dddddd")
 
-# scatter plot the samples
+# histogram plot the samples
 ax.hist(X[:500], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
 ax.hist(X[500:], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
 ax.set_xlabel("X", fontsize=15)
 ax.set_ylabel("Likelihood", fontsize=15)
-plt.legend(fontsize=15)
+plt.legend(frameon=False, fontsize=15)
 plt.show()
 
 # %%
@@ -111,12 +111,12 @@ ax.spines["right"].set_color("#dddddd")
 ax.spines["top"].set_color("#dddddd")
 ax.spines["bottom"].set_color("#dddddd")
 
-# scatter plot the posterior probabilities for class one
+# histogram plot the posterior probabilities for class one
 ax.hist(observe_proba[:500][:, 1], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
 ax.hist(observe_proba[500:][:, 1], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
 ax.set_xlabel("X", fontsize=15)
 ax.set_ylabel("Class One Posterior", fontsize=15)
-plt.legend(fontsize=15)
+plt.legend(frameon=False, fontsize=15)
 plt.show()
 # %%
 # Generate null posteriors
@@ -152,12 +152,12 @@ ax.spines["right"].set_color("#dddddd")
 ax.spines["top"].set_color("#dddddd")
 ax.spines["bottom"].set_color("#dddddd")
 
-# scatter plot the posterior probabilities for class one
+# histogram plot the posterior probabilities for class one
 ax.hist(null_proba[:500][:, 1], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
 ax.hist(null_proba[500:][:, 1], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
 ax.set_xlabel("X", fontsize=15)
 ax.set_ylabel("Class One Posterior", fontsize=15)
-plt.legend(fontsize=15)
+plt.legend(frameon=False, fontsize=15)
 plt.show()
 
 # %%
@@ -210,6 +210,21 @@ for i in range(PERMUTE):
 # Calculate the p-value
 # ---------------------
 
+fig, ax = plt.subplots(figsize=(5, 5))
+ax.tick_params(labelsize=15)
+
+ax.spines["left"].set_color("#dddddd")
+ax.spines["right"].set_color("#dddddd")
+ax.spines["top"].set_color("#dddddd")
+ax.spines["bottom"].set_color("#dddddd")
+
+# histogram plot the statistic differences
+ax.hist(mix_diff, bins=50, alpha=0.6, color=PALETTE[1], label="null")
+ax.axvline(x=observed_diff, color=PALETTE[0], linestyle="--", label="observed")
+ax.set_xlabel("Mutual Information Difference", fontsize=15)
+ax.set_ylabel("# of Samples", fontsize=15)
+plt.legend(frameon=False, fontsize=15)
+plt.show()
 
 pvalue = (1 + (mix_diff >= observed_diff).sum()) / (1 + PERMUTE)
 
