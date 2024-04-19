@@ -50,7 +50,7 @@ Z, y = make_trunk_classification(
     seed=1,
 )
 
-
+# class one has a mean at two for X
 X, y = make_trunk_classification(
     n_samples=1000,
     n_dim=1,

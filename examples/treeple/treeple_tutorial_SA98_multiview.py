@@ -26,6 +26,8 @@ sns.set_style("white", {"axes.edgecolor": "#dddddd"})
 # Sensitivity at 98% specificity (*S@98*) measures, namely, the true
 # positive rate (*TPR*) when the false positive rate (*FPR*) is at 98%.
 #
+# .. math:: S@r = \mathbb{P}[\eta(X) > T_r \mid Y=1]
+#
 # With a multiview binary class simulation as an example, this tutorial
 # will show how to use ``treeple`` to calculate the statistic with
 # multiview data. For data with a single feature set, you can check out
@@ -48,7 +50,7 @@ Z, y = make_trunk_classification(
     seed=1,
 )
 
-
+# class one has a mean at two for X
 X, y = make_trunk_classification(
     n_samples=1000,
     n_dim=1,
