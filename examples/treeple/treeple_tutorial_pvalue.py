@@ -114,8 +114,8 @@ ax.spines["bottom"].set_color("#dddddd")
 # histogram plot the posterior probabilities for class one
 ax.hist(observe_proba[:500][:, 1], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
 ax.hist(observe_proba[500:][:, 1], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
-ax.set_xlabel("X", fontsize=15)
-ax.set_ylabel("Class One Posterior", fontsize=15)
+ax.set_ylabel("# of Samples", fontsize=15)
+ax.set_xlabel("Class One Posterior", fontsize=15)
 plt.legend(frameon=False, fontsize=15)
 plt.show()
 # %%
@@ -155,8 +155,8 @@ ax.spines["bottom"].set_color("#dddddd")
 # histogram plot the posterior probabilities for class one
 ax.hist(null_proba[:500][:, 1], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
 ax.hist(null_proba[500:][:, 1], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
-ax.set_xlabel("X", fontsize=15)
-ax.set_ylabel("Class One Posterior", fontsize=15)
+ax.set_ylabel("# of Samples", fontsize=15)
+ax.set_xlabel("Class One Posterior", fontsize=15)
 plt.legend(frameon=False, fontsize=15)
 plt.show()
 
@@ -180,7 +180,7 @@ mi = Calculate_MI(y, observe_proba)
 mi_null = Calculate_MI(y, null_proba)
 
 observed_diff = mi - mi_null
-print("Observed statistic difference =", round(observed_diff, 2))
+print("Observed mutual information difference =", round(observed_diff, 2))
 
 # %%
 # Permute the trees
@@ -221,7 +221,7 @@ ax.spines["bottom"].set_color("#dddddd")
 # histogram plot the statistic differences
 ax.hist(mix_diff, bins=50, alpha=0.6, color=PALETTE[1], label="null")
 ax.axvline(x=observed_diff, color=PALETTE[0], linestyle="--", label="observed")
-ax.set_xlabel("Mutual Information Difference", fontsize=15)
+ax.set_xlabel("Mutual Information Diff", fontsize=15)
 ax.set_ylabel("# of Samples", fontsize=15)
 plt.legend(frameon=False, fontsize=15)
 plt.show()

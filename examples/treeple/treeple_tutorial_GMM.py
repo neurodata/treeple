@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 from scipy.stats import entropy, multivariate_normal
-from sklearn.metrics import RocCurveDisplay, roc_auc_score, roc_curve
+from sklearn.metrics import roc_auc_score, roc_curve
 
 from sktree.datasets import make_trunk_mixture_classification
 

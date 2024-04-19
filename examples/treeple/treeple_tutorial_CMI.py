@@ -6,6 +6,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
 from scipy.stats import entropy
 
 from sktree.datasets import make_trunk_classification
@@ -13,6 +14,9 @@ from sktree.ensemble import HonestForestClassifier
 from sktree.stats import build_hyppo_oob_forest
 from sktree.tree import MultiViewDecisionTreeClassifier
 
+sns.set(color_codes=True, style="white", context="talk", font_scale=1.5)
+PALETTE = sns.color_palette("Set1")
+sns.set_palette(PALETTE[1:5] + PALETTE[6:], n_colors=9)
 # %%
 # CMI
 # ---
@@ -55,14 +59,14 @@ X, y = make_trunk_classification(
 )
 
 
-# scatter plot the samples for Z
+# histogram plot the samples for Z
 plt.hist(Z[:500], bins=15, alpha=0.6, color="blue", label="negative")
 plt.hist(Z[500:], bins=15, alpha=0.6, color="red", label="positive")
 plt.legend()
 plt.show()
 
 
-# scatter plot the samples for X
+# histogram plot the samples for X
 plt.hist(X[:500], bins=15, alpha=0.6, color="blue", label="negative")
 plt.hist(X[500:], bins=15, alpha=0.6, color="red", label="positive")
 plt.legend()
@@ -92,10 +96,20 @@ _, observe_proba = build_hyppo_oob_forest(est, np.hstack((X, Z)), y)
 observe_proba = np.nanmean(observe_proba, axis=0)
 
 
-# scatter plot the posterior probabilities for class one
-plt.hist(observe_proba[:500][:, 1], bins=30, alpha=0.6, color="blue", label="negative")
-plt.hist(observe_proba[500:][:, 1], bins=30, alpha=0.6, color="red", label="positive")
-plt.legend()
+fig, ax = plt.subplots(figsize=(5, 5))
+ax.tick_params(labelsize=15)
+
+ax.spines["left"].set_color("#dddddd")
+ax.spines["right"].set_color("#dddddd")
+ax.spines["top"].set_color("#dddddd")
+ax.spines["bottom"].set_color("#dddddd")
+
+# histogram plot the posterior probabilities for class one
+ax.hist(observe_proba[:500][:, 1], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
+ax.hist(observe_proba[500:][:, 1], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
+ax.set_ylabel("# of Samples", fontsize=15)
+ax.set_xlabel("Class One Posterior", fontsize=15)
+plt.legend(fontsize=15)
 plt.show()
 
 # %%
@@ -120,12 +134,21 @@ _, single_proba = build_hyppo_oob_forest(est, Z, y)
 single_proba = np.nanmean(single_proba, axis=0)
 
 
-# scatter plot the posterior probabilities for class one
-plt.hist(single_proba[:500][:, 1], bins=30, alpha=0.6, color="blue", label="negative")
-plt.hist(single_proba[500:][:, 1], bins=30, alpha=0.6, color="red", label="positive")
-plt.legend()
-plt.show()
+fig, ax = plt.subplots(figsize=(5, 5))
+ax.tick_params(labelsize=15)
 
+ax.spines["left"].set_color("#dddddd")
+ax.spines["right"].set_color("#dddddd")
+ax.spines["top"].set_color("#dddddd")
+ax.spines["bottom"].set_color("#dddddd")
+
+# histogram plot the posterior probabilities for class one
+ax.hist(single_proba[:500][:, 1], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
+ax.hist(single_proba[500:][:, 1], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
+ax.set_xlabel("Z", fontsize=15)
+ax.set_xlabel("Class One Posterior", fontsize=15)
+plt.legend(fontsize=15)
+plt.show()
 
 # %%
 # Calculate the statistic

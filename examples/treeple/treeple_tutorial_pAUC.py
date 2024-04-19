@@ -7,7 +7,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-from sklearn.metrics import RocCurveDisplay, roc_auc_score, roc_curve
+from sklearn.metrics import roc_auc_score, roc_curve
 
 from sktree.datasets import make_trunk_classification
 from sktree.ensemble import HonestForestClassifier
@@ -98,8 +98,8 @@ ax.spines["bottom"].set_color("#dddddd")
 # histogram plot the posterior probabilities for class one
 ax.hist(observe_proba[:500][:, 1], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
 ax.hist(observe_proba[500:][:, 1], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
-ax.set_xlabel("X", fontsize=15)
-ax.set_ylabel("Class One Posterior", fontsize=15)
+ax.set_ylabel("# of Samples", fontsize=15)
+ax.set_xlabel("Class One Posterior", fontsize=15)
 plt.legend(frameon=False, fontsize=15)
 plt.show()
 
