@@ -35,7 +35,7 @@ Next, install necessary build dependencies. For more information, see <https://s
 
     conda install -c conda-forge joblib threadpoolctl pytest compilers llvm-openmp
 
-Assuming these steps have worked properly and you have read and followed any necessary scikit-learn advanced installation instructions, you can then install dependencies for scikit-tree.
+Assuming these steps have worked properly and you have read and followed any necessary scikit-learn advanced installation instructions, you can then install dependencies for treeple.
 
 If you are developing locally, you will need the build dependencies to compile the Cython / C++ code:
 
@@ -50,7 +50,7 @@ Other requirements can be installed as such:
 
 # Building the project from source
 
-We leverage meson to build scikit-tree from source. We utilize a CLI tool, called [spin](https://github.com/scientific-python/spin), which wraps certain meson commands to make building easier.
+We leverage meson to build treeple from source. We utilize a CLI tool, called [spin](https://github.com/scientific-python/spin), which wraps certain meson commands to make building easier.
 
 For example, the following command will build the project completely from scratch
 
@@ -74,7 +74,7 @@ However, after installing and building the project from source using meson, you 
 
     pip install --no-build-isolation --editable .
 
-**Note: editable installs for scikit-tree REQUIRE you to have built the project using meson already.** This will now link the meson build to your Python runtime. Now if you run
+**Note: editable installs for treeple REQUIRE you to have built the project using meson already.** This will now link the meson build to your Python runtime. Now if you run
 
     pytest ./sktree
 
@@ -90,12 +90,12 @@ This leverage pre-commit to run a series of precommit checks.
 
 # (Advanced) Updating submodules
 
-Scikit-tree relies on a submodule of a forked-version of scikit-learn for certain Python and Cython code that extends the ``DecisionTree*`` models. Usually, if a developer is making changes, they should go over to the ``submodulev3`` branch on ``https://github.com/neurodata/scikit-learn`` and
+treeple relies on a submodule of a forked-version of scikit-learn for certain Python and Cython code that extends the ``DecisionTree*`` models. Usually, if a developer is making changes, they should go over to the ``submodulev3`` branch on ``https://github.com/neurodata/scikit-learn`` and
 submit a PR to make changes to the submodule.
 
-This should **ALWAYS** be supported by some use-case in scikit-tree. We want the minimal amount of code-change in our forked version of scikit-learn to make it very easy to merge in upstream changes, bug fixes and features for tree-based code.
+This should **ALWAYS** be supported by some use-case in treeple. We want the minimal amount of code-change in our forked version of scikit-learn to make it very easy to merge in upstream changes, bug fixes and features for tree-based code.
 
-Once a PR is submitted and merged, the developer can update the submodule here in scikit-tree, so that we leverage the new commit. You **must** update the submodule commit ID and also commit this change, so that way the build leverages the new submodule commit ID.
+Once a PR is submitted and merged, the developer can update the submodule here in treeple, so that we leverage the new commit. You **must** update the submodule commit ID and also commit this change, so that way the build leverages the new submodule commit ID.
 
     git submodule update --init --recursive --remote
     git add -A
@@ -107,17 +107,17 @@ Now, you can re-build the project using the latest submodule changes.
 
 # Cython and C++
 
-The general design of scikit-tree follows that of the tree-models inside scikit-learn, where tree-based models are inherently Cythonized, or written with C++. Then the actual forest (e.g. RandomForest, or ExtraForest) is just a Python API wrapper that creates an ensemble of the trees.
+The general design of treeple follows that of the tree-models inside scikit-learn, where tree-based models are inherently Cythonized, or written with C++. Then the actual forest (e.g. RandomForest, or ExtraForest) is just a Python API wrapper that creates an ensemble of the trees.
 
 In order to develop new tree models, generally Cython and C++ code will need to be written in order to optimize the tree building process, otherwise fitting a single forest model would take very long.
 
 # Making a Release
 
-Scikit-tree is in-line with scikit-learn and thus relies on each new version released there. Moreover, scikit-tree relies on compiled code, so releases are a bit more complex than the typical Python package.
+treeple is in-line with scikit-learn and thus relies on each new version released there. Moreover, treeple relies on compiled code, so releases are a bit more complex than the typical Python package.
 
 1. Download wheels from GH Actions and put all wheels into a ``dist/`` folder
 
-<https://github.com/neurodata/scikit-tree/actions/workflows/build_wheels.yml> will have all the wheels for common OSes built for each Python version.
+<https://github.com/neurodata/treeple/actions/workflows/build_wheels.yml> will have all the wheels for common OSes built for each Python version.
 
 2. Upload wheels to test PyPi
 
@@ -135,8 +135,8 @@ twine upload dist/*
 
 or if you have two-factor authentication enabled: <https://pypi.org/help/#apitoken>
 
-    twine upload dist/* --repository scikit-tree
+    twine upload dist/* --repository treeple
 
 4. Update version number on ``meson.build`` and ``pyproject.toml`` to the relevant version.
 
-See https://github.com/neurodata/scikit-tree/pull/160 as an example.
+See https://github.com/neurodata/treeple/pull/160 as an example.

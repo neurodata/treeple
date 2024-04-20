@@ -56,7 +56,7 @@ print("The shape of our dataset is: ", X.shape, y.shape, sample_weight.shape)
 # Initialize the multi-view splitter
 # ----------------------------------
 # The multi-view splitter is a Cython class that is initialized internally
-# in scikit-tree. However, we expose a Python tester object to demonstrate
+# in treeple. However, we expose a Python tester object to demonstrate
 # how the splitter works in practice.
 #
 # .. warning:: Do not use this interface directly in practice.

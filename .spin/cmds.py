@@ -39,7 +39,7 @@ def coverage(ctx, slowtest):
 @click.command()
 @click.option("--forcesubmodule", is_flag=False, help="Force submodule pull.")
 def setup_submodule(forcesubmodule=False):
-    """Build scikit-tree using submodules.
+    """Build treeple using submodules.
 
     git submodule set-branch -b submodulev3 sktree/_lib/sklearn
 
@@ -135,7 +135,7 @@ def setup_submodule(forcesubmodule=False):
 @click.argument("meson_args", nargs=-1)
 @click.pass_context
 def build(ctx, meson_args, jobs=None, clean=False, forcesubmodule=False, verbose=False):
-    """Build scikit-tree using submodules.
+    """Build treeple using submodules.
 
         git submodule update --recursive --remote
 
@@ -169,7 +169,7 @@ def asv(asv_args):
     """
     site_path = meson._get_site_packages()
     if site_path is None:
-        print("No built scikit-tree found; run `spin build` first.")
+        print("No built treeple found; run `spin build` first.")
         sys.exit(1)
 
     os.environ["ASV_ENV_DIR"] = "/Users/adam2392/miniforge3"

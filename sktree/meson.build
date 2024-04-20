@@ -39,7 +39,7 @@ if not openmp_dep.found()
                 * WARNING *
                 ***********
 
-It seems that scikit-tree cannot be built with OpenMP.
+It seems that treeple cannot be built with OpenMP.
 
 - Make sure you have followed the installation instructions:
 
@@ -48,7 +48,7 @@ It seems that scikit-tree cannot be built with OpenMP.
 - If your compiler supports OpenMP but you still see this
   message, please submit a bug report at:
 
-    https://github.com/scikit-tree/scikit-tree/issues
+    https://github.com/treeple/treeple/issues
 
 - The build will continue with OpenMP-based parallelism
   disabled. Note however that some estimators will run in

@@ -325,7 +325,7 @@ def test_importances(dtype, criterion):
 
 def test_honest_forest_with_sklearn_trees():
     """Test against regression in power-curves discussed in:
-    https://github.com/neurodata/scikit-tree/pull/157."""
+    https://github.com/neurodata/treeple/pull/157."""
 
     # generate the high-dimensional quadratic data
     X, y = make_quadratic_classification(256, 2048, noise=True, seed=0)
@@ -358,7 +358,7 @@ def test_honest_forest_with_sklearn_trees():
 
 def test_honest_forest_with_sklearn_trees_with_auc():
     """Test against regression in power-curves discussed in:
-    https://github.com/neurodata/scikit-tree/pull/157.
+    https://github.com/neurodata/treeple/pull/157.
 
     This unit-test tests the equivalent of the AUC using sklearn's DTC
     vs our forked version of sklearn's DTC as the base tree.
@@ -399,7 +399,7 @@ def test_honest_forest_with_sklearn_trees_with_auc():
 
 def test_honest_forest_with_sklearn_trees_with_mi():
     """Test against regression in power-curves discussed in:
-    https://github.com/neurodata/scikit-tree/pull/157.
+    https://github.com/neurodata/treeple/pull/157.
 
     This unit-test tests the equivalent of the MI using sklearn's DTC
     vs our forked version of sklearn's DTC as the base tree.

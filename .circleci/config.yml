@@ -61,7 +61,7 @@ commands:
             fi
 
 jobs:
-  # Build scikit-tree from source
+  # Build treeple from source
   build_scikit_tree:
     docker:
       # CircleCI maintains a library of pre-built images
@@ -86,7 +86,7 @@ jobs:
             pip install .[build,doc]
 
       - run:
-          name: build scikit-tree
+          name: build treeple
           command: |
             spin build -j2
 

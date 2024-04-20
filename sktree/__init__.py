@@ -31,9 +31,9 @@ except NameError:
     __sktree_SETUP__ = False
 
 if __sktree_SETUP__:
-    sys.stderr.write("Running from Scikit-Tree source directory.\n")
+    sys.stderr.write("Running from treeple source directory.\n")
     sys.stderr.write("Partial import of sktree during the build process.\n")
-    # We are not importing the rest of scikit-tree during the build
+    # We are not importing the rest of treeple during the build
     # process, as it may not be compiled yet
 else:
     try:
@@ -61,8 +61,8 @@ else:
         from .ensemble._honest_forest import HonestForestClassifier
     except ImportError as e:
         print(e.msg)
-        msg = """Error importing scikit-tree: you cannot import scikit-tree while
-        being in scikit-tree source directory; please exit the scikit-tree source
+        msg = """Error importing treeple: you cannot import treeple while
+        being in treeple source directory; please exit the treeple source
         tree first and relaunch your Python interpreter."""
         raise ImportError(msg) from e
 

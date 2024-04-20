@@ -2,7 +2,7 @@
 To run this, you'll need to have installed.
 
   * scikit-learn
-  * scikit-tree
+  * treeple
 
 Does two benchmarks
 
@@ -122,7 +122,7 @@ if __name__ == "__main__":
         bench_scikitlearn_tree_regressor(X, Y)
 
     xx = range(0, n * step, step)
-    plt.figure("scikit-tree oblique tree benchmark results")
+    plt.figure("treeple oblique tree benchmark results")
     plt.subplot(211)
     plt.title("Learning with varying number of samples")
     plt.plot(xx, scikit_classifier_results, "g-", label="classification")
