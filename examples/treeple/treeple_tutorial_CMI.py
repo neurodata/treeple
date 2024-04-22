@@ -68,7 +68,7 @@ Z_X_y = pd.DataFrame(Z_X_y, columns=["Z", "X", "y"])
 Z_X_y = Z_X_y.replace({"y": 0.0}, "Class Zero")
 Z_X_y = Z_X_y.replace({"y": 1.0}, "Class One")
 
-fig, ax = plt.subplots(figsize=(5, 5))
+fig, ax = plt.subplots(figsize=(6, 6))
 fig.tight_layout()
 ax.tick_params(labelsize=15)
 sns.scatterplot(data=Z_X_y, x="Z", y="X", hue="y", palette=PALETTE[:2], alpha=0.2)
@@ -101,7 +101,7 @@ _, observe_proba = build_hyppo_oob_forest(est, Z_X, y)
 observe_proba = np.nanmean(observe_proba, axis=0)
 
 
-fig, ax = plt.subplots(figsize=(5, 5))
+fig, ax = plt.subplots(figsize=(6, 6))
 fig.tight_layout()
 ax.tick_params(labelsize=15)
 
@@ -135,7 +135,7 @@ _, single_proba = build_hyppo_oob_forest(est, Z, y)
 single_proba = np.nanmean(single_proba, axis=0)
 
 
-fig, ax = plt.subplots(figsize=(5, 5))
+fig, ax = plt.subplots(figsize=(6, 6))
 fig.tight_layout()
 ax.tick_params(labelsize=15)
 

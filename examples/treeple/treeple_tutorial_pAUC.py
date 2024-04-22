@@ -49,7 +49,7 @@ X, y = make_trunk_classification(
 )
 
 
-fig, ax = plt.subplots(figsize=(5, 5))
+fig, ax = plt.subplots(figsize=(6, 6))
 fig.tight_layout()
 ax.tick_params(labelsize=15)
 
@@ -84,7 +84,7 @@ _, observe_proba = build_hyppo_oob_forest(est, X, y)
 observe_proba = np.nanmean(observe_proba, axis=0)
 
 
-fig, ax = plt.subplots(figsize=(5, 5))
+fig, ax = plt.subplots(figsize=(6, 6))
 fig.tight_layout()
 ax.tick_params(labelsize=15)
 
@@ -117,7 +117,7 @@ def Calculate_pAUC(y_true, y_pred_proba, max_fpr=0.1) -> float:
             y_true, y_pred_proba[:, 1], pos_label=2, drop_intermediate=False
         )
 
-    fig, ax = plt.subplots(figsize=(5, 5))
+    fig, ax = plt.subplots(figsize=(6, 6))
     fig.tight_layout()
     ax.tick_params(labelsize=15)
     ax.set_xlim([-0.005, 1.005])

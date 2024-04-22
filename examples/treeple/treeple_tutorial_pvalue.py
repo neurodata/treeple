@@ -65,7 +65,7 @@ X, y = make_trunk_classification(
     seed=1,
 )
 
-fig, ax = plt.subplots(figsize=(5, 5))
+fig, ax = plt.subplots(figsize=(6, 6))
 fig.tight_layout()
 ax.tick_params(labelsize=15)
 
@@ -100,7 +100,7 @@ _, observe_proba_tree = build_hyppo_oob_forest(est, X, y)
 # generate forest posteriors for the two classes
 observe_proba = np.nanmean(observe_proba_tree, axis=0)
 
-fig, ax = plt.subplots(figsize=(5, 5))
+fig, ax = plt.subplots(figsize=(6, 6))
 fig.tight_layout()
 ax.tick_params(labelsize=15)
 
@@ -137,7 +137,7 @@ _, null_proba_tree = build_hyppo_oob_forest(est, X_null, y_null)
 # generate forest posteriors for the two classes
 null_proba = np.nanmean(null_proba_tree, axis=0)
 
-fig, ax = plt.subplots(figsize=(5, 5))
+fig, ax = plt.subplots(figsize=(6, 6))
 fig.tight_layout()
 ax.tick_params(labelsize=15)
 
@@ -199,7 +199,7 @@ for i in range(PERMUTE):
 # Calculate the p-value
 # ---------------------
 
-fig, ax = plt.subplots(figsize=(5, 5))
+fig, ax = plt.subplots(figsize=(6, 6))
 fig.tight_layout()
 ax.tick_params(labelsize=15)
 

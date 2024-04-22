@@ -46,7 +46,7 @@ X, y = make_trunk_mixture_classification(
 )
 
 
-fig, ax = plt.subplots(figsize=(5, 5))
+fig, ax = plt.subplots(figsize=(6, 6))
 fig.tight_layout()
 ax.tick_params(labelsize=15)
 
@@ -55,7 +55,7 @@ ax.hist(X[:5000], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
 ax.hist(X[5000:], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
 ax.set_xlabel("X", fontsize=15)
 ax.set_ylabel("Likelihood", fontsize=15)
-plt.legend(fontsize=15)
+plt.legend(frameon=False, fontsize=15)
 plt.show()
 
 # %%
@@ -113,7 +113,7 @@ def Calculate_SA(y_true, y_pred_proba, max_fpr=0.02) -> float:
         )
     sa98 = max([tpr for (fpr, tpr) in zip(fpr, tpr) if fpr <= max_fpr])
 
-    fig, ax = plt.subplots(figsize=(5, 5))
+    fig, ax = plt.subplots(figsize=(6, 6))
     fig.tight_layout()
     ax.tick_params(labelsize=15)
     ax.set_xlim([-0.005, 1.005])
@@ -181,7 +181,7 @@ def Calculate_pAUC(y_true, y_pred_proba, max_fpr=0.1) -> float:
             y_true, y_pred_proba[:, 1], pos_label=2, drop_intermediate=False
         )
 
-    fig, ax = plt.subplots(figsize=(5, 5))
+    fig, ax = plt.subplots(figsize=(6, 6))
     fig.tight_layout()
     ax.tick_params(labelsize=15)
     ax.set_xlim([-0.005, 1.005])

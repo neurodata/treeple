@@ -47,7 +47,7 @@ X, y = make_trunk_classification(
 )
 
 
-fig, ax = plt.subplots(figsize=(5, 5))
+fig, ax = plt.subplots(figsize=(6, 6))
 fig.tight_layout()
 ax.tick_params(labelsize=15)
 
@@ -56,7 +56,7 @@ ax.hist(X[:500], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
 ax.hist(X[500:], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
 ax.set_xlabel("X", fontsize=15)
 ax.set_ylabel("Likelihood", fontsize=15)
-plt.legend(fontsize=15)
+plt.legend(frameon=False, fontsize=15)
 plt.show()
 
 # %%
@@ -81,7 +81,7 @@ _, observe_proba = build_hyppo_oob_forest(est, X, y)
 observe_proba = np.nanmean(observe_proba, axis=0)
 
 
-fig, ax = plt.subplots(figsize=(5, 5))
+fig, ax = plt.subplots(figsize=(6, 6))
 fig.tight_layout()
 ax.tick_params(labelsize=15)
 
@@ -90,7 +90,7 @@ ax.hist(observe_proba[:500][:, 1], bins=50, alpha=0.6, color=PALETTE[1], label="
 ax.hist(observe_proba[500:][:, 1], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
 ax.set_ylabel("# of Samples", fontsize=15)
 ax.set_xlabel("Class One Posterior", fontsize=15)
-plt.legend(fontsize=15)
+plt.legend(frameon=False, fontsize=15)
 plt.show()
 
 # %%
