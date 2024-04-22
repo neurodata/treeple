@@ -69,6 +69,7 @@ Z_X_y = Z_X_y.replace({"y": 0.0}, "Class Zero")
 Z_X_y = Z_X_y.replace({"y": 1.0}, "Class One")
 
 fig, ax = plt.subplots(figsize=(5, 5))
+fig.tight_layout()
 ax.tick_params(labelsize=15)
 sns.scatterplot(data=Z_X_y, x="Z", y="X", hue="y", palette=PALETTE[:2], alpha=0.2)
 sns.kdeplot(data=Z_X_y, x="Z", y="X", hue="y", palette=PALETTE[:2], alpha=0.6)
@@ -101,6 +102,7 @@ observe_proba = np.nanmean(observe_proba, axis=0)
 
 
 fig, ax = plt.subplots(figsize=(5, 5))
+fig.tight_layout()
 ax.tick_params(labelsize=15)
 
 # histogram plot the posterior probabilities for class one
@@ -134,6 +136,7 @@ def Calculate_SA(y_true, y_pred_proba, max_fpr=0.02) -> float:
     sa98 = max([tpr for (fpr, tpr) in zip(fpr, tpr) if fpr <= max_fpr])
 
     fig, ax = plt.subplots(figsize=(5, 5))
+    fig.tight_layout()
     ax.tick_params(labelsize=15)
     ax.set_xlim([-0.005, 1.005])
     ax.set_ylim([-0.005, 1.005])

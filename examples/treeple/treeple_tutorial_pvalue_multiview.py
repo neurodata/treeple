@@ -86,6 +86,7 @@ Z_X_y = Z_X_y.replace({"y": 0.0}, "Class Zero")
 Z_X_y = Z_X_y.replace({"y": 1.0}, "Class One")
 
 fig, ax = plt.subplots(figsize=(5, 5))
+fig.tight_layout()
 ax.tick_params(labelsize=15)
 sns.scatterplot(data=Z_X_y, x="Z", y="X", hue="y", palette=PALETTE[:2], alpha=0.2)
 sns.kdeplot(data=Z_X_y, x="Z", y="X", hue="y", palette=PALETTE[:2], alpha=0.6)
@@ -117,6 +118,7 @@ observe_proba = np.nanmean(observe_proba_tree, axis=0)
 
 
 fig, ax = plt.subplots(figsize=(5, 5))
+fig.tight_layout()
 ax.tick_params(labelsize=15)
 
 # histogram plot the posterior probabilities for class one
@@ -150,6 +152,7 @@ single_proba = np.nanmean(single_proba_tree, axis=0)
 
 
 fig, ax = plt.subplots(figsize=(5, 5))
+fig.tight_layout()
 ax.tick_params(labelsize=15)
 
 # histogram plot the posterior probabilities for class one
@@ -172,6 +175,7 @@ np.random.shuffle(X_null)
 Z_X_y.insert(2, "Permuted X", X_null)
 
 fig, ax = plt.subplots(figsize=(5, 5))
+fig.tight_layout()
 ax.tick_params(labelsize=15)
 sns.scatterplot(data=Z_X_y, x="Z", y="Permuted X", hue="y", palette=PALETTE[:2], alpha=0.2)
 sns.kdeplot(data=Z_X_y, x="Z", y="Permuted X", hue="y", palette=PALETTE[:2], alpha=0.6)
@@ -198,6 +202,7 @@ null_proba = np.nanmean(null_proba_tree, axis=0)
 
 
 fig, ax = plt.subplots(figsize=(5, 5))
+fig.tight_layout()
 ax.tick_params(labelsize=15)
 
 # histogram plot the posterior probabilities for class one
@@ -261,6 +266,7 @@ for i in range(PERMUTE):
 # Calculate the p-value
 # ---------------------
 fig, ax = plt.subplots(figsize=(5, 5))
+fig.tight_layout()
 ax.tick_params(labelsize=15)
 
 # histogram plot the statistic differences

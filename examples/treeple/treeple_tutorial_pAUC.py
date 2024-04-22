@@ -50,6 +50,7 @@ X, y = make_trunk_classification(
 
 
 fig, ax = plt.subplots(figsize=(5, 5))
+fig.tight_layout()
 ax.tick_params(labelsize=15)
 
 # histogram plot the samples
@@ -84,6 +85,7 @@ observe_proba = np.nanmean(observe_proba, axis=0)
 
 
 fig, ax = plt.subplots(figsize=(5, 5))
+fig.tight_layout()
 ax.tick_params(labelsize=15)
 
 # histogram plot the posterior probabilities for class one
@@ -116,6 +118,7 @@ def Calculate_pAUC(y_true, y_pred_proba, max_fpr=0.1) -> float:
         )
 
     fig, ax = plt.subplots(figsize=(5, 5))
+    fig.tight_layout()
     ax.tick_params(labelsize=15)
     ax.set_xlim([-0.005, 1.005])
     ax.set_ylim([-0.005, 1.005])

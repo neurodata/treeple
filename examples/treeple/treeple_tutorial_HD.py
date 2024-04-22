@@ -48,6 +48,7 @@ X, y = make_trunk_classification(
 
 
 fig, ax = plt.subplots(figsize=(5, 5))
+fig.tight_layout()
 ax.tick_params(labelsize=15)
 
 # histogram plot the samples
@@ -81,6 +82,7 @@ observe_proba = np.nanmean(observe_proba, axis=0)
 
 
 fig, ax = plt.subplots(figsize=(5, 5))
+fig.tight_layout()
 ax.tick_params(labelsize=15)
 
 # histogram plot the posterior probabilities for class one

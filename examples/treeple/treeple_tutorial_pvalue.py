@@ -66,6 +66,7 @@ X, y = make_trunk_classification(
 )
 
 fig, ax = plt.subplots(figsize=(5, 5))
+fig.tight_layout()
 ax.tick_params(labelsize=15)
 
 # histogram plot the samples
@@ -100,6 +101,7 @@ _, observe_proba_tree = build_hyppo_oob_forest(est, X, y)
 observe_proba = np.nanmean(observe_proba_tree, axis=0)
 
 fig, ax = plt.subplots(figsize=(5, 5))
+fig.tight_layout()
 ax.tick_params(labelsize=15)
 
 # histogram plot the posterior probabilities for class one
@@ -136,6 +138,7 @@ _, null_proba_tree = build_hyppo_oob_forest(est, X_null, y_null)
 null_proba = np.nanmean(null_proba_tree, axis=0)
 
 fig, ax = plt.subplots(figsize=(5, 5))
+fig.tight_layout()
 ax.tick_params(labelsize=15)
 
 # histogram plot the posterior probabilities for class one
@@ -197,6 +200,7 @@ for i in range(PERMUTE):
 # ---------------------
 
 fig, ax = plt.subplots(figsize=(5, 5))
+fig.tight_layout()
 ax.tick_params(labelsize=15)
 
 # histogram plot the statistic differences
