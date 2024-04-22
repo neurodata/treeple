@@ -42,17 +42,17 @@ h4 {
 
 /* Links in the Note boxes */
 .note a {
-  color: white;
+  color: blue;
   text-decoration: underline;
 }
 
 .note a:hover {
-  color: white;
+  color: blue;
   font-weight: bold;
   text-decoration: underline;
 }
 
 /* Links in "Note" boxes */
 .alert-info a code span {
-  color: white;
+  color: blue;
 }
