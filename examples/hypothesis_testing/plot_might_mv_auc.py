@@ -17,9 +17,9 @@ We then use MV-MIGHT to calculate the partial AUC of these sets.
 import numpy as np
 from scipy.special import expit
 
-from sktree import HonestForestClassifier
-from sktree.stats import FeatureImportanceForestClassifier
-from sktree.tree import DecisionTreeClassifier, MultiViewDecisionTreeClassifier
+from treeple import HonestForestClassifier
+from treeple.stats import FeatureImportanceForestClassifier
+from treeple.tree import DecisionTreeClassifier, MultiViewDecisionTreeClassifier
 
 seed = 12345
 rng = np.random.default_rng(seed)

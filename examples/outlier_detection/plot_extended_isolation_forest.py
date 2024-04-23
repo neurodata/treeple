@@ -34,7 +34,7 @@ from sklearn.ensemble import IsolationForest
 from sklearn.inspection import DecisionBoundaryDisplay
 from sklearn.model_selection import train_test_split
 
-from sktree import ExtendedIsolationForest
+from treeple import ExtendedIsolationForest
 
 n_samples, n_outliers = 120, 40
 rng = np.random.RandomState(0)

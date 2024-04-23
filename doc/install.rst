@@ -12,12 +12,12 @@ Dependencies
 * ``joblib`` (>=1.0.0)
 * ``matplotlib`` (optional)
 
-**scikit-tree** supports Python >= 3.9.
+**treeple** supports Python >= 3.9.
 
 Installing with ``pip``
 -----------------------
 
-**scikit-tree** is available on `PyPI <https://pypi.org/project/scikit-tree/>`_. Just run
+**treeple** is available on `PyPI <https://pypi.org/project/treeple/>`_. Just run
 
 .. code-block:: bash
 
@@ -26,12 +26,12 @@ Installing with ``pip``
 Installing from source with Meson
 ---------------------------------
 
-To install **scikit-tree** from source, first clone the `repository <https://github.com/neurodata/scikit-tree>`_:
+To install **treeple** from source, first clone the `repository <https://github.com/neurodata/treeple>`_:
 
 .. code-block:: bash
 
-    git clone https://github.com/neurodata/scikit-tree.git
-    cd scikit-tree
+    git clone https://github.com/neurodata/treeple.git
+    cd treeple
 
     # ideally, you should always start within a virtual environment
     conda create -n sklearn-dev python=3.9
@@ -61,7 +61,7 @@ via pip, you will be able to install in editable mode (pending Meson-Python supp
 
 .. code-block:: bash
 
-   pip install --user -U https://api.github.com/repos/neurodata/scikit-tree/zipball/master
+   pip install --user -U https://api.github.com/repos/neurodata/treeple/zipball/master
 
 Conda (Recommended)
 -------------------
@@ -85,10 +85,10 @@ To install the package from github, clone the repository and then `cd` into the 
 
     ./spin build
 
-    # if you would like an editable install of scikit-tree for dev purposes
+    # if you would like an editable install of treeple for dev purposes
     pip install --verbose --no-build-isolation --editable .
 
-    pip install https://api.github.com/repos/neurodata/scikit-tree/zipball/main
+    pip install https://api.github.com/repos/neurodata/treeple/zipball/main
 
 
     pip install https://api.github.com/repos/neurodata/scikit-learn/zipball/obliquepr

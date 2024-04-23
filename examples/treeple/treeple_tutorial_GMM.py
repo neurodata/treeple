@@ -11,7 +11,7 @@ import numpy as np
 from scipy.stats import entropy, multivariate_normal
 from sklearn.metrics import RocCurveDisplay, roc_auc_score, roc_curve
 
-from sktree.datasets import make_trunk_mixture_classification
+from treeple.datasets import make_trunk_mixture_classification
 
 warnings.filterwarnings("ignore")
 

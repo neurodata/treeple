@@ -43,8 +43,8 @@ import matplotlib.pyplot as plt
 #           relevant tree/forests class.
 import numpy as np
 
-from sktree._lib.sklearn.tree._criterion import Gini
-from sktree.tree.manifold._morf_splitter import BestPatchSplitterTester
+from treeple._lib.sklearn.tree._criterion import Gini
+from treeple.tree.manifold._morf_splitter import BestPatchSplitterTester
 
 # %%
 # Initialize patch splitter

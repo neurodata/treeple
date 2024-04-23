@@ -271,7 +271,7 @@ ignore = ['E731']
 '__init__.py' = ['F401']
 
 [tool.spin]
-package = 'sktree'
+package = 'treeple'
 
 [tool.spin.commands]
 Build = [

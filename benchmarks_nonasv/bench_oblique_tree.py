@@ -67,7 +67,7 @@ def bench_scikitlearn_tree_regressor(X, Y):
 def bench_oblique_tree_classifier(X, Y):
     """Benchmark with scikit-learn decision tree classifier"""
 
-    from sktree.tree import ObliqueDecisionTreeClassifier
+    from treeple.tree import ObliqueDecisionTreeClassifier
 
     gc.collect()
 
@@ -84,7 +84,7 @@ def bench_oblique_tree_classifier(X, Y):
 def bench_oblique_tree_regressor(X, Y):
     """Benchmark with scikit-learn decision tree regressor"""
 
-    from sktree.tree import ObliqueDecisionTreeRegressor
+    from treeple.tree import ObliqueDecisionTreeRegressor
 
     gc.collect()
 

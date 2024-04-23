@@ -27,8 +27,8 @@ import numpy as np
 from matplotlib.cm import ScalarMappable
 from matplotlib.colors import ListedColormap
 
-from sktree._lib.sklearn.tree._criterion import Gini
-from sktree.tree._oblique_splitter import MultiViewSplitterTester
+from treeple._lib.sklearn.tree._criterion import Gini
+from treeple.tree._oblique_splitter import MultiViewSplitterTester
 
 criterion = Gini(1, np.array((0, 1)))
 max_features = 5

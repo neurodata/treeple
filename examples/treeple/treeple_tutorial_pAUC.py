@@ -8,9 +8,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.metrics import RocCurveDisplay, roc_auc_score, roc_curve
 
-from sktree.datasets import make_trunk_classification
-from sktree.ensemble import HonestForestClassifier
-from sktree.stats import build_hyppo_oob_forest
+from treeple.datasets import make_trunk_classification
+from treeple.ensemble import HonestForestClassifier
+from treeple.stats import build_hyppo_oob_forest
 
 # %%
 # pAUC@r

@@ -22,8 +22,8 @@ import numpy as np
 from sklearn.datasets import load_iris
 from sklearn.inspection import DecisionBoundaryDisplay
 
-from sktree._lib.sklearn.tree import DecisionTreeClassifier, plot_tree
-from sktree.tree import ObliqueDecisionTreeClassifier
+from treeple._lib.sklearn.tree import DecisionTreeClassifier, plot_tree
+from treeple.tree import ObliqueDecisionTreeClassifier
 
 # %%
 # First load the copy of the Iris dataset shipped with scikit-learn:

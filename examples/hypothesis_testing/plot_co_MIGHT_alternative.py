@@ -31,10 +31,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.datasets import make_spd_matrix
 
-from sktree import HonestForestClassifier
-from sktree.datasets import make_gaussian_mixture
-from sktree.stats import FeatureImportanceForestClassifier
-from sktree.tree import DecisionTreeClassifier, MultiViewDecisionTreeClassifier
+from treeple import HonestForestClassifier
+from treeple.datasets import make_gaussian_mixture
+from treeple.stats import FeatureImportanceForestClassifier
+from treeple.tree import DecisionTreeClassifier, MultiViewDecisionTreeClassifier
 
 seed = 12345
 rng = np.random.default_rng(seed)

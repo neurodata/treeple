@@ -36,9 +36,9 @@ target. We use :class:`~sktree.stats.FeatureImportanceForestClassifier`.
 import numpy as np
 from scipy.special import expit
 
-from sktree import HonestForestClassifier
-from sktree.stats import FeatureImportanceForestClassifier
-from sktree.tree import DecisionTreeClassifier
+from treeple import HonestForestClassifier
+from treeple.stats import FeatureImportanceForestClassifier
+from treeple.tree import DecisionTreeClassifier
 
 seed = 12345
 rng = np.random.default_rng(seed)

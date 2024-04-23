@@ -28,7 +28,7 @@ import seaborn as sns
 from sklearn.datasets import make_blobs
 from sklearn.model_selection import cross_val_score
 
-from sktree import MultiViewRandomForestClassifier, RandomForestClassifier
+from treeple import MultiViewRandomForestClassifier, RandomForestClassifier
 
 seed = 12345
 rng = np.random.default_rng(seed)

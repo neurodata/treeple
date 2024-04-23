@@ -28,9 +28,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.datasets import make_blobs
 
-from sktree import HonestForestClassifier
-from sktree.stats import FeatureImportanceForestClassifier
-from sktree.tree import DecisionTreeClassifier, MultiViewDecisionTreeClassifier
+from treeple import HonestForestClassifier
+from treeple.stats import FeatureImportanceForestClassifier
+from treeple.tree import DecisionTreeClassifier, MultiViewDecisionTreeClassifier
 
 # %%
 # Simulate data

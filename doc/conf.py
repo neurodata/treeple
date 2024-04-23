@@ -17,11 +17,11 @@ sys.path.append(
     os.path.abspath(os.path.join(curdir, "../build-install/usr/lib/python3.9/site-packages/"))
 )
 sys.path.insert(0, os.path.abspath("sphinxext"))
-import sktree
-from sktree._lib.sklearn.ensemble._forest import ExtraTreesClassifier  # noqa
-from sktree._lib.sklearn.ensemble._forest import ExtraTreesRegressor  # noqa
-from sktree._lib.sklearn.ensemble._forest import RandomForestClassifier  # noqa
-from sktree._lib.sklearn.ensemble._forest import RandomForestRegressor  # noqa
+import treeple
+from treeple._lib.sklearn.ensemble._forest import ExtraTreesClassifier  # noqa
+from treeple._lib.sklearn.ensemble._forest import ExtraTreesRegressor  # noqa
+from treeple._lib.sklearn.ensemble._forest import RandomForestClassifier  # noqa
+from treeple._lib.sklearn.ensemble._forest import RandomForestRegressor  # noqa
 
 sys.path.append(os.path.abspath(os.path.join(curdir, "..", "sktree")))
 sys.path.append(os.path.abspath(os.path.join(curdir, "..", "sktree/_lib")))
@@ -30,21 +30,21 @@ sys.path.append(os.path.abspath(os.path.join(curdir, "..", "sktree/_lib")))
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 # General information about the project.
-project = "scikit-tree"
+project = "treeple"
 author = "Adam Li <adam.li@columbia.edu>"
 td = date.today()
-copyright = f"2022-{td.year}, scikit-tree Developers. Last updated on {td.isoformat()}"
+copyright = f"2022-{td.year}, treeple Developers. Last updated on {td.isoformat()}"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # The short X.Y version.
-version = sktree.__version__
+version = treeple.__version__
 # The full version, including alpha/beta/rc tags.
 release = version
 
-gh_url = "https://github.com/neurodata/scikit-tree"
+gh_url = "https://github.com/neurodata/treeple"
 
 # -- general configuration ------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -128,7 +128,7 @@ html_theme_options = {
     "show_toc_level": 1,
     "navbar_end": ["theme-switcher", "version-switcher", "navbar-icon-links"],
     "switcher": {
-        "json_url": "https://raw.githubusercontent.com/neurodata/scikit-tree/main/doc/_static/versions.json",  # noqa: E501
+        "json_url": "https://raw.githubusercontent.com/neurodata/treeple/main/doc/_static/versions.json",  # noqa: E501
         "version_match": switcher_version_match,
     },
 }
@@ -338,7 +338,7 @@ bibtex_style = "unsrt"
 bibtex_footbibliography_header = ""
 
 # -- Sphinx-issues -----------------------------------------------------------
-issues_github_path = "neurodata/scikit-tree"
+issues_github_path = "neurodata/treeple"
 
 # -- sphinx.ext.linkcode -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/extensions/linkcode.html
@@ -382,8 +382,8 @@ issues_github_path = "neurodata/scikit-tree"
 #         branch = "main"
 #     else:
 #         return None  # alternatively, link to a maint/version branch
-#     fname = fname.split("/scikit-tree/")[1]
-#     url = f"{gh_url}/blob/{branch}/scikit-tree/{fname}#{lines}"
+#     fname = fname.split("/treeple/")[1]
+#     url = f"{gh_url}/blob/{branch}/treeple/{fname}#{lines}"
 #     return url
 
 

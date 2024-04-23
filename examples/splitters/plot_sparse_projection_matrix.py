@@ -29,8 +29,8 @@ import numpy as np
 from matplotlib.cm import ScalarMappable
 from matplotlib.colors import ListedColormap
 
-from sktree._lib.sklearn.tree._criterion import Gini
-from sktree.tree._oblique_splitter import BestObliqueSplitterTester
+from treeple._lib.sklearn.tree._criterion import Gini
+from treeple.tree._oblique_splitter import BestObliqueSplitterTester
 
 # %%
 # Initialize patch splitter
