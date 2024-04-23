@@ -165,7 +165,7 @@ def mutual_info_ksg(
     metric : str
         Any distance metric accepted by :class:`sklearn.neighbors.NearestNeighbors`.
         If 'forest' (default), then uses an
-        :class:`sktree.UnsupervisedObliqueRandomForest` to compute geodesic distances.
+        :class:`treeple.UnsupervisedObliqueRandomForest` to compute geodesic distances.
     algorithm : str, optional
         Method to use, by default 'knn'. Can be ('ball_tree', 'kd_tree', 'brute').
     n_jobs : int, optional
@@ -374,7 +374,7 @@ def _compute_nn(
         Method to use, by default 'knn'. Can be ('ball_tree', 'kd_tree', 'brute').
     metric : str
         Any distance metric accepted by :class:`sklearn.neighbors.NearestNeighbors`.
-        If 'forest', then uses an :class:`sktree.UnsupervisedObliqueRandomForest`
+        If 'forest', then uses an :class:`treeple.UnsupervisedObliqueRandomForest`
         to compute geodesic distances.
     k : int, optional
         The number of k-nearest neighbors to query, by default 1.

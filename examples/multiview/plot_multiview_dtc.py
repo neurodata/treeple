@@ -3,7 +3,7 @@
 Analyze a multi-view dataset with a multi-view random forest
 ============================================================
 
-An example using :class:`~sktree.MultiViewRandomForestClassifier` for high-dimensional
+An example using :class:`~treeple.MultiViewRandomForestClassifier` for high-dimensional
 classification when there are multiple feature sets that are correlated with the
 target variable, ``y``. The multi-view random forest is a variant of the random forest
 that samples from each feature set uniformly, instead of sampling from all features

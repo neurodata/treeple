@@ -20,8 +20,8 @@ def coverage(ctx, slowtest):
         pytest_args = (
             "-o",
             "python_functions=test_*",
-            "sktree",
-            "--cov=sktree",
+            "treeple",
+            "--cov=treeple",
             "--cov-report=xml",
             "-k .",
         )
@@ -29,8 +29,8 @@ def coverage(ctx, slowtest):
         pytest_args = (
             "-o",
             "python_functions=test_*",
-            "sktree",
-            "--cov=sktree",
+            "treeple",
+            "--cov=treeple",
             "--cov-report=xml",
         )
     ctx.invoke(meson.test, pytest_args=pytest_args)
@@ -41,7 +41,7 @@ def coverage(ctx, slowtest):
 def setup_submodule(forcesubmodule=False):
     """Build treeple using submodules.
 
-    git submodule set-branch -b submodulev3 sktree/_lib/sklearn
+    git submodule set-branch -b submodulev3 treeple/_lib/sklearn
 
     git submodule update --recursive --remote
 
@@ -54,13 +54,13 @@ def setup_submodule(forcesubmodule=False):
     This will update the submodule, which then must be commited so that
     git knows the submodule needs to be at a certain commit hash.
     """
-    commit_fpath = "./sktree/_lib/commit.txt"
-    submodule = "./sktree/_lib/sklearn_fork"
+    commit_fpath = "./treeple/_lib/commit.txt"
+    submodule = "./treeple/_lib/sklearn_fork"
     commit = ""
     current_hash = ""
 
     # if the forked folder does not exist, we will need to force update the submodule
-    if not os.path.exists("./sktree/_lib/sklearn/") or forcesubmodule:
+    if not os.path.exists("./treeple/_lib/sklearn/") or forcesubmodule:
         # update git submodule
         util.run(["git", "submodule", "update", "--init", "--force"])
     else:
@@ -93,7 +93,7 @@ def setup_submodule(forcesubmodule=False):
             [
                 "mkdir",
                 "-p",
-                "./sktree/_lib/sklearn/",
+                "./treeple/_lib/sklearn/",
             ],
         )
         util.run(
@@ -110,17 +110,17 @@ def setup_submodule(forcesubmodule=False):
             [
                 "rm",
                 "-rf",
-                "sktree/_lib/sklearn",
+                "treeple/_lib/sklearn",
             ]
         )
 
-        if os.path.exists("sktree/_lib/sklearn_fork/sklearn") and (commit != current_hash):
+        if os.path.exists("treeple/_lib/sklearn_fork/sklearn") and (commit != current_hash):
             util.run(
                 [
                     "cp",
                     "-r",
-                    "sktree/_lib/sklearn_fork/sklearn",
-                    "sktree/_lib/sklearn",
+                    "treeple/_lib/sklearn_fork/sklearn",
+                    "treeple/_lib/sklearn",
                 ]
             )
 

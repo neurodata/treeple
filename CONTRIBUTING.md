@@ -3,7 +3,7 @@
 Thanks for considering contributing! Please read this document to learn the various ways you can contribute to this project and how to go about doing it.
 
 **Submodule dependency on a fork of scikit-learn**
-Due to the current state of scikit-learn's internal Cython code for trees, we have to instead leverage a maintained fork of scikit-learn at <https://github.com/neurodata/scikit-learn>, where specifically, the `submodulev3` branch is used to build and install this repo. We keep that fork well-maintained and up-to-date with respect to the main sklearn repo. The only difference is the refactoring of the `tree/` submodule. This fork is used internally under the namespace ``sktree._lib.sklearn``. It is necessary to use this fork for anything related to:
+Due to the current state of scikit-learn's internal Cython code for trees, we have to instead leverage a maintained fork of scikit-learn at <https://github.com/neurodata/scikit-learn>, where specifically, the `submodulev3` branch is used to build and install this repo. We keep that fork well-maintained and up-to-date with respect to the main sklearn repo. The only difference is the refactoring of the `tree/` submodule. This fork is used internally under the namespace ``treeple._lib.sklearn``. It is necessary to use this fork for anything related to:
 
 - `RandomForest*`
 - `ExtraTrees*`
@@ -168,7 +168,7 @@ The most common errors come from the following:
 
 1. clashing sklearn: if they have scikit-learn main installed for another project in the same virtual env, then they should start with a clean virtual env. There is unfortunately no easy way around this rn. Maybe if we vendor the scikit-learn-fork changes, we can get around this in the future.
 2. not all necessary compile-time packages installed: e.g. cython, compilers, etc. See scikit-learn documentation on building and installing from source.
-3. not using spin CLI: treeple uses Meson for its build because that’s what numpy/scipy uses and it’s actually quite robust. However, it has a few limitations. We use spin CLI to run commands such as testing, shell that has sktree installed, etc.  This is because the Python PATH cannot differentiate between sktree/ in your repo directory vs the sktree/ it sees installed. So if you really want to run something in your teminal that is not using spin, then you have to change directories.
+3. not using spin CLI: treeple uses Meson for its build because that’s what numpy/scipy uses and it’s actually quite robust. However, it has a few limitations. We use spin CLI to run commands such as testing, shell that has treeple installed, etc.  This is because the Python PATH cannot differentiate between treeple/ in your repo directory vs the treeple/ it sees installed. So if you really want to run something in your teminal that is not using spin, then you have to change directories.
 4. Not having certain computer packages installed, such as gcc, etc.: treeple requires compiling Cython and C++ code. Therefore, if you have outdated C/C++ compilers, prolly can be the issue.
 
 The CI files for github actions shows how to build and install for each OS.

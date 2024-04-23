@@ -4,7 +4,7 @@ Plot the projection matrices of an oblique tree for sampling images, or time-ser
 ===================================================================================
 
 This example shows how projection matrices are generated for an oblique tree,
-specifically the :class:`sktree.tree.PatchObliqueDecisionTreeClassifier`.
+specifically the :class:`treeple.tree.PatchObliqueDecisionTreeClassifier`.
 
 For a tree, one can specify the structure of the data that it will be trained on
 (i.e. ``(X, y)``). This is done by specifying the ``data_dims`` parameter. For
@@ -29,7 +29,7 @@ is ``(5, 5)``, then the patch will only sample indices within the data.
 We also allow each dimension to be arbitrarily discontiguous.
 
 For details on how to use the hyperparameters related to the patches, see
-:class:`sktree.tree.PatchObliqueDecisionTreeClassifier`.
+:class:`treeple.tree.PatchObliqueDecisionTreeClassifier`.
 """
 
 import matplotlib.pyplot as plt

@@ -4,7 +4,7 @@ Plot the sparse projection matrices of an oblique tree
 ======================================================
 
 This example shows how projection matrices are generated for an oblique tree,
-specifically the :class:`sktree.tree.ObliqueDecisionTreeClassifier`.
+specifically the :class:`treeple.tree.ObliqueDecisionTreeClassifier`.
 
 The projection matrix here samples a subset of features from the input ``X``
 controlled by the parameter ``feature_combinations``. The projection matrix
@@ -13,7 +13,7 @@ The non-zero elements of the projection matrix are the features that are sampled
 from the input ``X`` and linearly combined to form candidate split dimensions.
 
 For details on how to use the hyperparameters related to the patches, see
-:class:`sktree.tree.ObliqueDecisionTreeClassifier`.
+:class:`treeple.tree.ObliqueDecisionTreeClassifier`.
 """
 
 import matplotlib.pyplot as plt

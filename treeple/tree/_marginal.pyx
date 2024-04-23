@@ -10,7 +10,7 @@ cnp.import_array()
 from libc.math cimport isnan
 from libcpp.unordered_set cimport unordered_set
 
-from sktree._lib.sklearn.tree._utils cimport RAND_R_MAX, rand_uniform
+from treeple._lib.sklearn.tree._utils cimport RAND_R_MAX, rand_uniform
 
 from ._utils cimport rand_weighted_binary
 

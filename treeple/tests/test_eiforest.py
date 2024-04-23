@@ -1,5 +1,5 @@
 """
-Testing for Extended Isolation Forest algorithm (sktree.ensemble._eiforest).
+Testing for Extended Isolation Forest algorithm (treeple.ensemble._eiforest).
 """
 
 # License: BSD 3 clause

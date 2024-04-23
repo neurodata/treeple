@@ -21,7 +21,7 @@ Installing with ``pip``
 
 .. code-block:: bash
 
-    pip install sktree
+    pip install treeple
 
 Installing from source with Meson
 ---------------------------------
@@ -74,7 +74,7 @@ First, create a virtual environment using Conda.
     conda activate sklearn-dev
     conda install -c conda-forge numpy scipy cython joblib threadpoolctl pytest compilers llvm-openmp
 
-Next, `sktree` from source:
+Next, `treeple` from source:
 
     pip install .[build]
 

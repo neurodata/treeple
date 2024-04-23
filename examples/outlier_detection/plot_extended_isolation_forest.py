@@ -3,7 +3,7 @@
 ExtendedIsolationForest example
 ===============================
 
-An example using :class:`~sktree.ExtendedIsolationForest` for anomaly
+An example using :class:`~treeple.ExtendedIsolationForest` for anomaly
 detection, which compares to the :class:`~sklearn.ensemble.IsolationForest` based
 on the algorithm in :footcite:`hariri2019extended`.
 

@@ -88,7 +88,7 @@ def make_gaussian_mixture(
 
     Examples
     --------
-    >>> from sktree.datasets.multiview import make_gaussian_mixture
+    >>> from treeple.datasets.multiview import make_gaussian_mixture
     >>> import numpy as np
     >>> n_samples = 10
     >>> centers = [[0,1], [0,-1]]

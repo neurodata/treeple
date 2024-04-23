@@ -292,8 +292,8 @@ class PermutationForestRegressor(BasePermutationForest):
 
     .. warning:: Permutation testing with forests is computationally expensive.
         As a result, if you are testing for the importance of feature sets, consider
-        using `sktree.FeatureImportanceForestRegressor` or
-        `sktree.FeatureImportanceForestClassifier` instead, which is
+        using `treeple.FeatureImportanceForestRegressor` or
+        `treeple.FeatureImportanceForestClassifier` instead, which is
         much more computationally efficient.
 
     .. note:: This does not allow testing on the posteriors.
@@ -371,8 +371,8 @@ class PermutationForestClassifier(BasePermutationForest):
 
     .. warning:: Permutation testing with forests is computationally expensive.
         As a result, if you are testing for the importance of feature sets, consider
-        using `sktree.FeatureImportanceForestRegressor` or
-        `sktree.FeatureImportanceForestClassifier` instead, which is
+        using `treeple.FeatureImportanceForestRegressor` or
+        `treeple.FeatureImportanceForestClassifier` instead, which is
         much more computationally efficient.
 
     .. note:: This does not allow testing on the posteriors.

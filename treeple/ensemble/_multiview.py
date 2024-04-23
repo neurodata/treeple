@@ -182,7 +182,7 @@ class MultiViewRandomForestClassifier(
 
     Attributes
     ----------
-    estimators_ : list of sktree.tree.ObliqueDecisionTreeClassifier
+    estimators_ : list of treeple.tree.ObliqueDecisionTreeClassifier
         The collection of fitted sub-estimators.
 
     classes_ : ndarray of shape (n_classes,) or a list of such arrays
@@ -231,7 +231,7 @@ class MultiViewRandomForestClassifier(
 
     See Also
     --------
-    sktree.tree.ObliqueDecisionTreeClassifier : An oblique decision
+    treeple.tree.ObliqueDecisionTreeClassifier : An oblique decision
         tree classifier.
     sklearn.ensemble.RandomForestClassifier : An axis-aligned decision
         forest classifier.

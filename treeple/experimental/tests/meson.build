@@ -9,5 +9,5 @@ python_sources = [
 py.install_sources(
   python_sources,
   pure: false,
-  subdir: 'sktree/experimental/tests'
+  subdir: 'treeple/experimental/tests'
 )

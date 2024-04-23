@@ -7,7 +7,7 @@ python_sources = [
 py.install_sources(
   python_sources,
   pure: false,
-  subdir: 'sktree/datasets'
+  subdir: 'treeple/datasets'
 )
 
 subdir('tests')

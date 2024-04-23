@@ -77,7 +77,7 @@ We use the ``spin`` CLI to abstract away build details:
     export PYTHONPATH=${PWD}/build-install/usr/lib/python3.9/site-packages
 
     # run specific unit tests
-    ./spin test -- sktree/tree/tests/test_tree.py
+    ./spin test -- treeple/tree/tests/test_tree.py
 
     # you can bring up the CLI menu
     ./spin --help
@@ -97,7 +97,7 @@ You can also do the same thing using Meson/Ninja itself. Run the following to bu
 
     # to check installation, you need to be in a different directory
     cd docs;  
-    python -c "from sktree import tree"
+    python -c "from treeple import tree"
     python -c "import sklearn; print(sklearn.__version__);"
 
 After building locally, you can use editable installs (warning: this only registers Python changes locally)

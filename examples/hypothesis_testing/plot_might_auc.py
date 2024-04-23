@@ -3,7 +3,7 @@
 Compute partial AUC using Mutual Information for Genuine Hypothesis Testing (MIGHT)
 ===================================================================================
 
-An example using :class:`~sktree.stats.FeatureImportanceForestClassifier` for nonparametric
+An example using :class:`~treeple.stats.FeatureImportanceForestClassifier` for nonparametric
 multivariate hypothesis test, on simulated datasets. Here, we present a simulation
 of how MIGHT is used to evaluate how a "feature set is important for predicting the target".
 

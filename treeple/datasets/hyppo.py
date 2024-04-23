@@ -82,7 +82,7 @@ def make_marron_wand_classification(
 ):
     """Generate Marron-Wand binary classification dataset.
 
-    The simulation is similar to that of :func:`sktree.datasets.make_trunk_classification`
+    The simulation is similar to that of :func:`treeple.datasets.make_trunk_classification`
     where the first class is generated from a multivariate-Gaussians with mean vector of
     0's. The second class is generated from a mixture of Gaussians with mean vectors
     specified by the Marron-Wand simulations, but as the dimensionality increases, the second

@@ -184,7 +184,7 @@ class ObliqueRandomForestClassifier(
 
     Attributes
     ----------
-    estimators_ : list of sktree.tree.ObliqueDecisionTreeClassifier
+    estimators_ : list of treeple.tree.ObliqueDecisionTreeClassifier
         The collection of fitted sub-estimators.
 
     classes_ : ndarray of shape (n_classes,) or a list of such arrays
@@ -233,7 +233,7 @@ class ObliqueRandomForestClassifier(
 
     See Also
     --------
-    sktree.tree.ObliqueDecisionTreeClassifier : An oblique decision
+    treeple.tree.ObliqueDecisionTreeClassifier : An oblique decision
         tree classifier.
     sklearn.ensemble.RandomForestClassifier : An axis-aligned decision
         forest classifier.
@@ -259,7 +259,7 @@ class ObliqueRandomForestClassifier(
 
     Examples
     --------
-    >>> from sktree.ensemble import ObliqueRandomForestClassifier
+    >>> from treeple.ensemble import ObliqueRandomForestClassifier
     >>> from sklearn.datasets import make_classification
     >>> X, y = make_classification(n_samples=1000, n_features=4,
     ...                            n_informative=2, n_redundant=0,
@@ -535,7 +535,7 @@ class ObliqueRandomForestRegressor(SimMatrixMixin, ForestMixin, ForestRegressor)
 
     See Also
     --------
-    sktree.tree.ObliqueDecisionTreeRegressor : An oblique decision
+    treeple.tree.ObliqueDecisionTreeRegressor : An oblique decision
         tree regressor.
     sklearn.ensemble.RandomForestRegressor : An axis-aligned decision
         forest regressor.
@@ -564,7 +564,7 @@ class ObliqueRandomForestRegressor(SimMatrixMixin, ForestMixin, ForestRegressor)
 
     Examples
     --------
-    >>> from sktree.ensemble import ObliqueRandomForestRegressor
+    >>> from treeple.ensemble import ObliqueRandomForestRegressor
     >>> from sklearn.datasets import make_regression
     >>> X, y = make_regression(n_features=4, n_informative=2,
     ...                        random_state=0, shuffle=False)
@@ -870,7 +870,7 @@ class PatchObliqueRandomForestClassifier(
 
     See Also
     --------
-    sktree.tree.ObliqueDecisionTreeClassifier : An oblique decision
+    treeple.tree.ObliqueDecisionTreeClassifier : An oblique decision
         tree classifier.
     sklearn.ensemble.RandomForestClassifier : An axis-aligned decision
         forest classifier.
@@ -1180,7 +1180,7 @@ class PatchObliqueRandomForestRegressor(SimMatrixMixin, ForestMixin, ForestRegre
 
     See Also
     --------
-    sktree.tree.ObliqueDecisionTreeRegressor : An oblique decision
+    treeple.tree.ObliqueDecisionTreeRegressor : An oblique decision
         tree regressor.
     sklearn.ensemble.RandomForestRegressor : An axis-aligned decision
         forest regressor.
@@ -1205,7 +1205,7 @@ class PatchObliqueRandomForestRegressor(SimMatrixMixin, ForestMixin, ForestRegre
 
     Examples
     --------
-    >>> from sktree.ensemble import PatchObliqueRandomForestRegressor
+    >>> from treeple.ensemble import PatchObliqueRandomForestRegressor
     >>> from sklearn.datasets import make_regression
     >>> X, y = make_regression(n_features=4, n_informative=2,
     ...                        random_state=0, shuffle=False)
@@ -1467,7 +1467,7 @@ class ExtraObliqueRandomForestClassifier(
 
     Attributes
     ----------
-    estimators_ : list of sktree.tree.ExtraObliqueDecisionTreeClassifier
+    estimators_ : list of treeple.tree.ExtraObliqueDecisionTreeClassifier
         The collection of fitted sub-estimators.
 
     classes_ : ndarray of shape (n_classes,) or a list of such arrays
@@ -1516,9 +1516,9 @@ class ExtraObliqueRandomForestClassifier(
 
     See Also
     --------
-    sktree.tree.ExtraObliqueDecisionTreeClassifier : An extremely randomized oblique decision
+    treeple.tree.ExtraObliqueDecisionTreeClassifier : An extremely randomized oblique decision
         tree classifier.
-    sktree.tree.ObliqueDecisionTreeClassifier : An oblique decision tree classifier.
+    treeple.tree.ObliqueDecisionTreeClassifier : An oblique decision tree classifier.
     sklearn.ensemble.RandomForestClassifier : An axis-aligned decision
         forest classifier.
 
@@ -1545,7 +1545,7 @@ class ExtraObliqueRandomForestClassifier(
 
     Examples
     --------
-    >>> from sktree.ensemble import ExtraObliqueRandomForestClassifier
+    >>> from treeple.ensemble import ExtraObliqueRandomForestClassifier
     >>> from sklearn.datasets import make_classification
     >>> X, y = make_classification(n_samples=1000, n_features=4,
     ...                            n_informative=2, n_redundant=0,
@@ -1820,9 +1820,9 @@ class ExtraObliqueRandomForestRegressor(SimMatrixMixin, ForestMixin, ForestRegre
 
     See Also
     --------
-    sktree.tree.ExtraObliqueDecisionTreeRegressor : An extra oblique decision
+    treeple.tree.ExtraObliqueDecisionTreeRegressor : An extra oblique decision
         tree regressor.
-    sktree.tree.ObliqueDecisionTreeRegressor : An oblique decision
+    treeple.tree.ObliqueDecisionTreeRegressor : An oblique decision
         tree regressor.
     sklearn.ensemble.RandomForestRegressor : An axis-aligned decision
         forest regressor.
@@ -1854,7 +1854,7 @@ class ExtraObliqueRandomForestRegressor(SimMatrixMixin, ForestMixin, ForestRegre
 
     Examples
     --------
-    >>> from sktree.ensemble import ExtraObliqueRandomForestRegressor
+    >>> from treeple.ensemble import ExtraObliqueRandomForestRegressor
     >>> from sklearn.datasets import make_regression
     >>> X, y = make_regression(n_features=4, n_informative=2,
     ...                        random_state=0, shuffle=False)

@@ -26,13 +26,13 @@ try:
     # This variable is injected in the __builtins__ by the build
     # process. It is used to enable importing subpackages of sklearn when
     # the binaries are not built
-    __sktree_SETUP__  # type: ignore
+    __treeple_SETUP__  # type: ignore
 except NameError:
-    __sktree_SETUP__ = False
+    __treeple_SETUP__ = False
 
-if __sktree_SETUP__:
+if __treeple_SETUP__:
     sys.stderr.write("Running from treeple source directory.\n")
-    sys.stderr.write("Partial import of sktree during the build process.\n")
+    sys.stderr.write("Partial import of treeple during the build process.\n")
     # We are not importing the rest of treeple during the build
     # process, as it may not be compiled yet
 else:

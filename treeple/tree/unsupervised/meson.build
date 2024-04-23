@@ -24,12 +24,12 @@ foreach ext_name, ext_dict : tree_extension_metadata
     override_options : ext_dict.get('override_options', []),
     c_args: c_args,
     cython_args: cython_c_args,
-    subdir: 'sktree/tree/unsupervised',
+    subdir: 'treeple/tree/unsupervised',
     install: true,
   )
 endforeach
 
 
 py.install_sources(
-  subdir: 'sktree/tree/unsupervised'   # Folder relative to site-packages to install to
+  subdir: 'treeple/tree/unsupervised'   # Folder relative to site-packages to install to
 )

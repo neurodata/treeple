@@ -128,7 +128,7 @@ jobs:
       - name: Save build
         uses: actions/upload-artifact@v4
         with:
-          name: sktree-build
+          name: treeple-build
           path: $PWD/build
 
   build_and_test_slow:
@@ -246,7 +246,7 @@ jobs:
       - name: Save build
         uses: actions/upload-artifact@v4
         with:
-          name: sktree-build
+          name: treeple-build
           path: $PWD/build
 # build-windows:
 #   name: Meson build Windows

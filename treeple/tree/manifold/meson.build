@@ -12,12 +12,12 @@ foreach ext_name, ext_dict : tree_extension_metadata
     override_options : ext_dict.get('override_options', []),
     c_args: c_args,
     cython_args: cython_c_args,
-    subdir: 'sktree/tree/manifold',
+    subdir: 'treeple/tree/manifold',
     install: true,
   )
 endforeach
 
 
 py.install_sources(
-  subdir: 'sktree/tree/manifold'   # Folder relative to site-packages to install to
+  subdir: 'treeple/tree/manifold'   # Folder relative to site-packages to install to
 )

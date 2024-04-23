@@ -184,7 +184,7 @@ jobs:
       - save_cache:
           key: website-cache
           paths:
-            - ~/sktree
+            - ~/treeple
 
 workflows:
   build-docs:

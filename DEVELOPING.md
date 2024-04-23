@@ -25,8 +25,8 @@ We recommend using miniconda, as python virtual environments may not setup prope
 
 <!-- Setup a conda env -->
 
-    conda create -n sktree
-    conda activate sktree
+    conda create -n treeple
+    conda activate treeple
 
 **Make sure you specify a Python version if your system defaults to anything less than Python 3.9.**
 
@@ -68,7 +68,7 @@ For other commands, see
 
     spin --help
 
-Note at this stage, you will be unable to run Python commands directly. For example, ``pytest ./sktree`` will not work.
+Note at this stage, you will be unable to run Python commands directly. For example, ``pytest ./treeple`` will not work.
 
 However, after installing and building the project from source using meson, you can leverage editable installs to make testing code changes much faster. For more information on meson-python's progress supporting editable installs in a better fashion, see <https://meson-python.readthedocs.io/en/latest/how-to-guides/editable-installs.html>.
 
@@ -76,7 +76,7 @@ However, after installing and building the project from source using meson, you 
 
 **Note: editable installs for treeple REQUIRE you to have built the project using meson already.** This will now link the meson build to your Python runtime. Now if you run
 
-    pytest ./sktree
+    pytest ./treeple
 
 the unit-tests should run.
 

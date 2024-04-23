@@ -19,7 +19,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
     Parameters
     ----------
     tree_estimator : object, default=None
-        Instantiated tree of type BaseDecisionTree from sktree.
+        Instantiated tree of type BaseDecisionTree from treeple.
         If None, then sklearn's DecisionTreeClassifier with default parameters will
         be used. Note that none of the parameters in ``tree_estimator`` need
         to be set. The parameters of the ``tree_estimator`` can be set using

@@ -3,7 +3,7 @@
 Oblique Random Forests
 ----------------------
 
-In oblique random forests (see :class:`~sktree.ObliqueRandomForestClassifier` and
+In oblique random forests (see :class:`~treeple.ObliqueRandomForestClassifier` and
 `ObliqueRandomForestRegressor` classes), each tree in the ensemble is built
 from a sample drawn with replacement (i.e., a bootstrap sample) from the
 training set. The oblique random forest is the same as that of a random forest,

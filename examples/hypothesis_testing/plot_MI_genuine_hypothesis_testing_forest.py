@@ -3,7 +3,7 @@
 Mutual Information for Genuine Hypothesis Testing (MIGHT)
 =========================================================
 
-An example using :class:`~sktree.stats.FeatureImportanceForestClassifier` for nonparametric
+An example using :class:`~treeple.stats.FeatureImportanceForestClassifier` for nonparametric
 multivariate hypothesis test, on simulated datasets. Here, we present a simulation
 of how MIGHT is used to test the hypothesis that a "feature set is important for
 predicting the target". This is a generalization of the framework presented in
@@ -30,7 +30,7 @@ where X is our informative feature set and W is our uninformative feature set.
 
 We then use MIGHT to test the hypothesis that the first feature set is important for
 predicting the target, and the second feature set is not important for predicting the
-target. We use :class:`~sktree.stats.FeatureImportanceForestClassifier`.
+target. We use :class:`~treeple.stats.FeatureImportanceForestClassifier`.
 """
 
 import numpy as np
@@ -80,7 +80,7 @@ y = rng.binomial(n=1, p=expit(beta * X_important[:, :10].sum(axis=1)), size=n_sa
 # %%
 # Perform hypothesis testing using Mutual Information
 # ---------------------------------------------------
-# Here, we use :class:`~sktree.stats.FeatureImportanceForestClassifier` to perform the hypothesis
+# Here, we use :class:`~treeple.stats.FeatureImportanceForestClassifier` to perform the hypothesis
 # test. The test statistic is computed by comparing the metric (i.e. mutual information) estimated
 # between two forests. One forest is trained on the original dataset, and one forest is trained
 # on a permuted dataset, where the rows of the ``covariate_index`` columns are shuffled randomly.

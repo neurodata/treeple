@@ -808,7 +808,7 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
     --------
     >>> from sklearn.datasets import load_iris
     >>> from sklearn.model_selection import cross_val_score
-    >>> from sktree.tree import ObliqueDecisionTreeClassifier
+    >>> from treeple.tree import ObliqueDecisionTreeClassifier
     >>> clf = ObliqueDecisionTreeClassifier(random_state=0)
     >>> iris = load_iris()
     >>> cross_val_score(clf, iris.data, iris.target, cv=10)
@@ -2156,7 +2156,7 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
     >>> from sklearn.datasets import load_diabetes
     >>> from sklearn.model_selection import cross_val_score
     >>> X, y = load_diabetes(return_X_y=True)
-    >>> from sktree.tree import PatchObliqueDecisionTreeRegressor as RGS
+    >>> from treeple.tree import PatchObliqueDecisionTreeRegressor as RGS
     >>> regressor = RGS(random_state=0)
     >>> cross_val_score(regressor, X, y, cv=10)
     ...                    # doctest: +SKIP
@@ -2657,7 +2657,7 @@ class ExtraObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
     --------
     >>> from sklearn.datasets import load_iris
     >>> from sklearn.model_selection import cross_val_score
-    >>> from sktree.tree import ExtraObliqueDecisionTreeClassifier
+    >>> from treeple.tree import ExtraObliqueDecisionTreeClassifier
     >>> clf = ExtraObliqueDecisionTreeClassifier(random_state=0)
     >>> iris = load_iris()
     >>> cross_val_score(clf, iris.data, iris.target, cv=10)

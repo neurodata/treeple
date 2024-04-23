@@ -4,14 +4,14 @@ Demonstrate and visualize a multi-view projection matrix for an axis-aligned tre
 =================================================================================
 
 This example shows how multi-view projection matrices are generated for a decision tree,
-specifically the :class:`sktree.tree.MultiViewDecisionTreeClassifier`.
+specifically the :class:`treeple.tree.MultiViewDecisionTreeClassifier`.
 
 Multi-view projection matrices operate under the assumption that the input ``X`` array
 consists of multiple feature-sets that are groups of features important for predicting
 ``y``.
 
 For details on how to use the hyperparameters related to the multi-view, see
-:class:`sktree.tree.MultiViewDecisionTreeClassifier`.
+:class:`treeple.tree.MultiViewDecisionTreeClassifier`.
 """
 
 # import modules
@@ -129,7 +129,7 @@ plt.show()
 # and the second feature set once.
 #
 # .. note:: In practice, this is controlled by the ``apply_max_features_per_feature_set`` parameter
-#   in :class:`sktree.tree.MultiViewDecisionTreeClassifier`.
+#   in :class:`treeple.tree.MultiViewDecisionTreeClassifier`.
 
 max_features_per_set_ = np.array([1, 2, 3], dtype=int)
 max_features = np.sum(max_features_per_set_)

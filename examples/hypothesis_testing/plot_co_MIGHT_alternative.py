@@ -89,7 +89,7 @@ print(X.shape, y.shape, n_features_ends)
 # %%
 # Perform hypothesis testing
 # --------------------------
-# Here, we use :class:`~sktree.stats.FeatureImportanceForestClassifier` to perform the hypothesis
+# Here, we use :class:`~treeple.stats.FeatureImportanceForestClassifier` to perform the hypothesis
 # test. The test statistic is computed by comparing the metric (i.e. mutual information) estimated
 # between two forests. One forest is trained on the original dataset, and one forest is trained
 # on a permuted dataset, where the rows of the ``covariate_index`` columns are shuffled randomly.

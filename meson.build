@@ -3,7 +3,7 @@ project(
   'c', 'cpp', 'cython',
   # Note that the git commit hash cannot be added dynamically here
   # That only happens when importing from a git repository.
-  # See `sktree/__init__.py`
+  # See `treeple/__init__.py`
   version: '0.8.0dev0',
   license: 'BSD-3',
   meson_version: '>= 1.1.0',
@@ -61,7 +61,7 @@ if not cython.found()
 endif
 
 # r = run_command('git', 'submodule', 'update', '--init', check: false)
-r = run_command('mv', 'sktree/_lib/sklearn_fork/sklearn', 'sktree/_lib/sklearn', check: false)
+r = run_command('mv', 'treeple/_lib/sklearn_fork/sklearn', 'treeple/_lib/sklearn', check: false)
 
 # Setup Python:
 # https://mesonbuild.com/Python-module.html
@@ -74,4 +74,4 @@ if py.language_version().version_compare('<3.9')
     error('At least Python 3.9 is required.')
 endif
 
-subdir('sktree')
+subdir('treeple')

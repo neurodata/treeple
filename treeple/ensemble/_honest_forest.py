@@ -246,7 +246,7 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
         fraction creates shallower trees with lower variance estimates.
 
     tree_estimator : object, default=None
-        Instantiated tree of type BaseDecisionTree from sktree.
+        Instantiated tree of type BaseDecisionTree from treeple.
         If None, then sklearn's DecisionTreeClassifier with default parameters will
         be used. Note that none of the parameters in ``tree_estimator`` need
         to be set. The parameters of the ``tree_estimator`` can be set using
@@ -262,11 +262,11 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
 
     Attributes
     ----------
-    estimator : sktree.tree.HonestTreeClassifier
+    estimator : treeple.tree.HonestTreeClassifier
         The child estimator template used to create the collection of fitted
         sub-estimators.
 
-    estimators_ : list of sktree.tree.HonestTreeClassifier
+    estimators_ : list of treeple.tree.HonestTreeClassifier
         The collection of fitted sub-estimators.
 
     classes_ : ndarray of shape (n_classes,) or a list of such arrays

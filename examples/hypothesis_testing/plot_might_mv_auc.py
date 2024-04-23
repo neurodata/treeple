@@ -3,7 +3,7 @@
 Compute partial AUC using multi-view MIGHT (MV-MIGHT)
 =====================================================
 
-An example using :class:`~sktree.stats.FeatureImportanceForestClassifier` for nonparametric
+An example using :class:`~treeple.stats.FeatureImportanceForestClassifier` for nonparametric
 multivariate hypothesis test, on simulated mutli-view datasets. Here, we present
 how to estimate partial AUROC from a multi-view feature set.
 

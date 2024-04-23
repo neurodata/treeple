@@ -27,7 +27,7 @@ foreach ext_name, ext_dict : tree_extension_metadata
     dependencies: [np_dep],
     override_options : ext_dict.get('override_options', []),
     cython_args: cython_c_args,
-    subdir: 'sktree/_lib/sklearn/tree/',
+    subdir: 'treeple/_lib/sklearn/tree/',
     install: true
   )
 endforeach
@@ -41,7 +41,7 @@ python_sources = [
 
 py.install_sources(
   python_sources,
-  subdir: 'sktree/_lib/sklearn/tree'   # Folder relative to site-packages to install to
+  subdir: 'treeple/_lib/sklearn/tree'   # Folder relative to site-packages to install to
 )
 
 # install ensemble/ submodule
@@ -51,7 +51,7 @@ python_sources = [
 foreach py_source: python_sources
   py.install_sources(
     './sklearn/ensemble/' + py_source,
-    subdir: 'sktree/_lib/sklearn/ensemble'
+    subdir: 'treeple/_lib/sklearn/ensemble'
   )
 endforeach
 
@@ -70,7 +70,7 @@ foreach ext: extensions
     cython_args: cython_c_args,
     override_options : ['optimization=3', 'cython_language=cpp'],
     install: true,
-    subdir: 'sktree/_lib/sklearn/neighbors/',
+    subdir: 'treeple/_lib/sklearn/neighbors/',
   )
 endforeach
 
@@ -88,6 +88,6 @@ foreach ext: extensions
     cython_args: cython_c_args,
     override_options : ['optimization=3', 'cython_language=cpp'],
     install: true,
-    subdir: 'sktree/_lib/sklearn/utils/',
+    subdir: 'treeple/_lib/sklearn/utils/',
   )
 endforeach

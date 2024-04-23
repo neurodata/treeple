@@ -23,8 +23,8 @@ from treeple._lib.sklearn.ensemble._forest import ExtraTreesRegressor  # noqa
 from treeple._lib.sklearn.ensemble._forest import RandomForestClassifier  # noqa
 from treeple._lib.sklearn.ensemble._forest import RandomForestRegressor  # noqa
 
-sys.path.append(os.path.abspath(os.path.join(curdir, "..", "sktree")))
-sys.path.append(os.path.abspath(os.path.join(curdir, "..", "sktree/_lib")))
+sys.path.append(os.path.abspath(os.path.join(curdir, "..", "treeple")))
+sys.path.append(os.path.abspath(os.path.join(curdir, "..", "treeple/_lib")))
 
 # -- project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -86,8 +86,8 @@ nitpicky = False
 
 # TODO: figure out why these are raising an error?
 nitpick_ignore = [
-    ("py:mod", "sktree.tree"),
-    ("py:mod", "sktree.stats"),
+    ("py:mod", "treeple.tree"),
+    ("py:mod", "treeple.stats"),
     ("py:class", "sklearn.utils.metadata_routing.MetadataRequest"),
 ]
 
@@ -168,13 +168,13 @@ numpydoc_xref_aliases = {
     # Python
     "Path": "pathlib.Path",
     "bool": ":class:`python:bool`",
-    "UnsupervisedDecisionTree": "sktree.tree.UnsupervisedDecisionTree",
-    "ObliqueDecisionTreeClassifier": "sktree.tree.ObliqueDecisionTreeClassifier",
-    "PatchObliqueDecisionTreeClassifier": "sktree.tree.PatchObliqueDecisionTreeClassifier",
-    "ObliqueDecisionTreeRegressor": "sktree.tree.ObliqueDecisionTreeRegressor",
-    "PatchObliqueDecisionTreeRegressor": "sktree.tree.PatchObliqueDecisionTreeRegressor",
-    "UnsupervisedObliqueRandomForest": "sktree.ensemble.UnsupervisedObliqueRandomForest",
-    "ExtraObliqueDecisionTreeRegressor": "sktree.tree.ExtraObliqueDecisionTreeRegressor",
+    "UnsupervisedDecisionTree": "treeple.tree.UnsupervisedDecisionTree",
+    "ObliqueDecisionTreeClassifier": "treeple.tree.ObliqueDecisionTreeClassifier",
+    "PatchObliqueDecisionTreeClassifier": "treeple.tree.PatchObliqueDecisionTreeClassifier",
+    "ObliqueDecisionTreeRegressor": "treeple.tree.ObliqueDecisionTreeRegressor",
+    "PatchObliqueDecisionTreeRegressor": "treeple.tree.PatchObliqueDecisionTreeRegressor",
+    "UnsupervisedObliqueRandomForest": "treeple.ensemble.UnsupervisedObliqueRandomForest",
+    "ExtraObliqueDecisionTreeRegressor": "treeple.tree.ExtraObliqueDecisionTreeRegressor",
     "DecisionTreeClassifier": "sklearn.tree.DecisionTreeClassifier",
     "DecisionTreeRegressor": "sklearn.tree.DecisionTreeRegressor",
     "ExtraTreeRegressor": "sklearn.tree.ExtraTreeRegressor",
@@ -296,7 +296,7 @@ intersphinx_mapping = {
 intersphinx_timeout = 5
 
 # -- sphinx-gallery ----------------------------------------------------------
-os.environ["_sktree_BUILDING_DOC"] = "true"
+os.environ["_treeple_BUILDING_DOC"] = "true"
 scrapers = ("matplotlib",)
 
 compress_images = ("images", "thumbnails")
@@ -309,9 +309,9 @@ if sys.platform.startswith("win"):
         compress_images = ()
 
 sphinx_gallery_conf = {
-    "doc_module": ("sktree",),
+    "doc_module": ("treeple",),
     "reference_url": {
-        "sktree": None,
+        "treeple": None,
     },
     "examples_dirs": ["../examples"],
     "gallery_dirs": ["auto_examples"],

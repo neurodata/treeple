@@ -181,8 +181,8 @@ class PermutationHonestForestClassifier(HonestForestClassifier):
 
     tree_estimator : object, default=None
         Type of decision tree classifier to use. By default `None`, which
-        defaults to `sktree.tree.DecisionTreeClassifier`. Note
-        that one MUST use trees imported from the `sktree.tree`
+        defaults to `treeple.tree.DecisionTreeClassifier`. Note
+        that one MUST use trees imported from the `treeple.tree`
         API namespace rather than from `sklearn.tree`.
 
     stratify : bool
@@ -198,11 +198,11 @@ class PermutationHonestForestClassifier(HonestForestClassifier):
         
     Attributes
     ----------
-    estimator : sktree.tree.HonestTreeClassifier
+    estimator : treeple.tree.HonestTreeClassifier
         The child estimator template used to create the collection of fitted
         sub-estimators.
 
-    estimators_ : list of sktree.tree.HonestTreeClassifier
+    estimators_ : list of treeple.tree.HonestTreeClassifier
         The collection of fitted sub-estimators.
 
     classes_ : ndarray of shape (n_classes,) or a list of such arrays

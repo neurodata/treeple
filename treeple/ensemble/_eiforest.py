@@ -152,7 +152,7 @@ class ExtendedIsolationForest(IsolationForest):
 
     Examples
     --------
-    >>> from sktree.ensemble import ExtendedIsolationForest
+    >>> from treeple.ensemble import ExtendedIsolationForest
     >>> X = [[-1.1], [0.3], [0.5], [100]]
     >>> clf = ExtendedIsolationForest(random_state=0).fit(X)
     >>> clf.predict([[0.1], [0], [90]])
