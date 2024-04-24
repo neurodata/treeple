@@ -1,16 +1,22 @@
 """
-=====================================
-Treeple tutorial for calculating S@98
-=====================================
+======================
+1-1a: Calculating S@98
+======================
 """
 
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.metrics import RocCurveDisplay, roc_curve
+import seaborn as sns
+from sklearn.metrics import roc_curve
 
 from sktree.datasets import make_trunk_classification
 from sktree.ensemble import HonestForestClassifier
 from sktree.stats import build_hyppo_oob_forest
+
+sns.set(color_codes=True, style="white", context="talk", font_scale=1.5)
+PALETTE = sns.color_palette("Set1")
+sns.set_palette(PALETTE[1:5] + PALETTE[6:], n_colors=9)
+sns.set_style("white", {"axes.edgecolor": "#dddddd"})
 
 # %%
 # S@98
@@ -18,6 +24,8 @@ from sktree.stats import build_hyppo_oob_forest
 #
 # Sensitivity at 98% specificity (*S@98*) measures, namely, the true
 # positive rate (*TPR*) when the false positive rate (*FPR*) is at 98%.
+#
+# .. math:: S@r = \mathbb{P}[\eta(X) > T_r \mid Y=1]
 #
 # With a binary class simulation as an example, this tutorial will show
 # how to use ``treeple`` to calculate the statistic.
@@ -40,10 +48,16 @@ X, y = make_trunk_classification(
 )
 
 
-# scatter plot the samples
-plt.hist(X[:500], bins=15, alpha=0.6, color="blue", label="negative")
-plt.hist(X[500:], bins=15, alpha=0.6, color="red", label="positive")
-plt.legend()
+fig, ax = plt.subplots(figsize=(6, 6))
+fig.tight_layout()
+ax.tick_params(labelsize=15)
+
+# histogram plot the samples
+ax.hist(X[:500], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
+ax.hist(X[500:], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
+ax.set_xlabel("X", fontsize=15)
+ax.set_ylabel("Likelihood", fontsize=15)
+plt.legend(frameon=False, fontsize=15)
 plt.show()
 
 # %%
@@ -68,10 +82,16 @@ _, observe_proba = build_hyppo_oob_forest(est, X, y)
 observe_proba = np.nanmean(observe_proba, axis=0)
 
 
-# scatter plot the posterior probabilities for class one
-plt.hist(observe_proba[:500][:, 1], bins=30, alpha=0.6, color="blue", label="negative")
-plt.hist(observe_proba[500:][:, 1], bins=30, alpha=0.6, color="red", label="positive")
-plt.legend()
+fig, ax = plt.subplots(figsize=(6, 6))
+fig.tight_layout()
+ax.tick_params(labelsize=15)
+
+# histogram plot the posterior probabilities for class one
+ax.hist(observe_proba[:500][:, 1], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
+ax.hist(observe_proba[500:][:, 1], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
+ax.set_ylabel("# of Samples", fontsize=15)
+ax.set_xlabel("Class One Posterior", fontsize=15)
+plt.legend(frameon=False, fontsize=15)
 plt.show()
 
 # %%
@@ -95,21 +115,32 @@ def Calculate_SA(y_true, y_pred_proba, max_fpr=0.02) -> float:
             y_true, y_pred_proba[:, 1], pos_label=2, drop_intermediate=False
         )
     sa98 = max([tpr for (fpr, tpr) in zip(fpr, tpr) if fpr <= max_fpr])
-    RocCurveDisplay(fpr=fpr, tpr=tpr).plot(label="ROC Curve")
+
+    fig, ax = plt.subplots(figsize=(6, 6))
+    fig.tight_layout()
+    ax.tick_params(labelsize=15)
+    ax.set_xlim([-0.005, 1.005])
+    ax.set_ylim([-0.005, 1.005])
+    ax.set_xlabel("False Positive Rate", fontsize=15)
+    ax.set_ylabel("True Positive Rate", fontsize=15)
+
+    ax.plot(fpr, tpr, label="ROC curve", color=PALETTE[1])
 
     spec = int((1 - max_fpr) * 100)
-    plt.axvline(
+    ax.axvline(
         x=max_fpr,
-        color="r",
+        color=PALETTE[0],
         ymin=0,
         ymax=sa98,
         label="S@" + str(spec) + " = " + str(round(sa98, 2)),
         linestyle="--",
     )
-    plt.axhline(y=sa98, xmin=0, xmax=max_fpr, color="r", linestyle="--")
-    plt.legend()
+    ax.axhline(y=sa98, xmin=0, xmax=max_fpr, color="r", linestyle="--")
+    ax.legend(frameon=False, fontsize=15)
 
     return sa98
 
 
 sa98 = Calculate_SA(y, observe_proba, max_fpr=0.02)
+print("S@98 =", round(sa98, 2))
+# sphinx_gallery_thumbnail_number = -1

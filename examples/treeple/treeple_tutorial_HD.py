@@ -1,13 +1,12 @@
 """
-====================
-1-1b: Calculating MI
-====================
+====================================
+1-1d: Calculating Hellinger Distance
+====================================
 """
 
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-from scipy.stats import entropy
 
 from sktree.datasets import make_trunk_classification
 from sktree.ensemble import HonestForestClassifier
@@ -17,15 +16,15 @@ sns.set(color_codes=True, style="white", context="talk", font_scale=1.5)
 PALETTE = sns.color_palette("Set1")
 sns.set_palette(PALETTE[1:5] + PALETTE[6:], n_colors=9)
 sns.set_style("white", {"axes.edgecolor": "#dddddd"})
+
 # %%
-# MI
-# --
+# Hellinger Distance
+# ------------------
 #
-# Mutual Information (*MI*) measures the mutual dependence between *X* and
-# *Y*. It can be calculated by the difference between the class entropy
-# (``H(Y)``) and the conditional entropy (``H(Y | X)``):
+# Hellinger distance quantifies the similarity between the two posterior
+# probability distributions (class zero and class one).
 #
-# .. math:: I(X; Y) = H(Y) - H(Y\mid X)
+# .. math:: H(\eta(X), 1-\eta(X)) = \frac{1}{\sqrt{2}} \; \bigl\|\sqrt{\eta(X)} - \sqrt{1-\eta(X)} \bigr\|_2
 #
 # With a binary class simulation as an example, this tutorial will show
 # how to use ``treeple`` to calculate the statistic.
@@ -59,7 +58,6 @@ ax.set_xlabel("X", fontsize=15)
 ax.set_ylabel("Likelihood", fontsize=15)
 plt.legend(frameon=False, fontsize=15)
 plt.show()
-
 
 # %%
 # Fit the model
@@ -95,20 +93,16 @@ ax.set_xlabel("Class One Posterior", fontsize=15)
 plt.legend(frameon=False, fontsize=15)
 plt.show()
 
-
 # %%
 # Calculate the statistic
 # -----------------------
-def Calculate_MI(y_true, y_pred_proba):
-    # calculate the conditional entropy
-    H_YX = np.mean(entropy(y_pred_proba, base=np.exp(1), axis=1))
-
-    # empirical count of each class (n_classes)
-    _, counts = np.unique(y_true, return_counts=True)
-    # calculate the entropy of labels
-    H_Y = entropy(counts, base=np.exp(1))
-    return H_Y - H_YX
 
 
-mi = Calculate_MI(y, observe_proba)
-print("MI =", round(mi, 2))
+def Calculate_hd(y_pred_proba) -> float:
+    return np.sqrt(
+        np.sum((np.sqrt(y_pred_proba[:, 1]) - np.sqrt(y_pred_proba[:, 0])) ** 2)
+    ) / np.sqrt(2)
+
+
+hd = Calculate_hd(observe_proba)
+print("Hellinger distance =", round(hd, 2))
