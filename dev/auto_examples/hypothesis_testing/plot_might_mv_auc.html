@@ -35,7 +35,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
-    <link rel="stylesheet" type="text/css" href="../../_static/style.css?v=42c02ab7" />
+    <link rel="stylesheet" type="text/css" href="../../_static/style.css?v=3035adc5" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=ac02cc09edc035673794" />
@@ -440,14 +440,15 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../treeple/index.html">Treeple for Hypothesis Testing</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_CMI.html">Treeple tutorial for calculating CMI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_MI.html">Treeple tutorial for calculating MI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_SA98.html">Treeple tutorial for calculating S@98</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_SA98_multiview.html">Treeple tutorial for calculating S@98 with multiview data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_pvalue.html">Treeple tutorial for calculating p-value</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_pvalue_multiview.html">Treeple tutorial for calculating p-value with multiview data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_pAUC.html">Treeple tutorial for calculating pAUC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_GMM.html">Treeple tutorial for estimating true posteriors &amp; statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_GMM.html">0: Estimating true posteriors &amp; statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_SA98.html">1-1a: Calculating S@98</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_MI.html">1-1b: Calculating MI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_pAUC.html">1-1c: Calculating pAUC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_HD.html">1-1d: Calculating Hellinger Distance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_pvalue.html">1-2: Calculating p-value (MIGHT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_SA98_multiview.html">2-1a: Calculating S@98 with multiview data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_CMI.html">2-1b: Calculating CMI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_pvalue_multiview.html">2-2: Calculating p-value with multiview data (CoMIGHT)</a></li>
 </ul>
 </li>
 </ul>
@@ -599,7 +600,7 @@ into a single dataset to perform hypothesis testing.</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Shape of Tree Posteriors for the positive class: </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">posterior_arr</span><span class="o">.</span><span class="n">shape</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ASH-90 / Partial AUC: 0.5905926432242222
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ASH-90 / Partial AUC: 0.5036581352370826
 Shape of Observed Samples: (1000,)
 Shape of Tree Posteriors for the positive class: (125, 1000, 1)
 </pre></div>
@@ -635,7 +636,7 @@ Shape of Tree Posteriors for the positive class: (125, 1000, 1)
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Shape of Tree Posteriors for the positive class: </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">posterior_arr</span><span class="o">.</span><span class="n">shape</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ASH-90 / Partial AUC: 0.5525682894103947
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ASH-90 / Partial AUC: 0.5476570213412318
 Shape of Observed Samples: (1000,)
 Shape of Tree Posteriors for the positive class: (125, 1000, 1)
 </pre></div>
@@ -649,7 +650,7 @@ Shape of Tree Posteriors for the positive class: (125, 1000, 1)
 <p>Tree Posteriors for the positive class: <code class="docutils literal notranslate"><span class="pre">est_mv.observe_posteriors_</span></code>
 (n_trees, n_samples_test, 1)</p>
 <p>True Labels: <code class="docutils literal notranslate"><span class="pre">est_mv.y_true_final_</span></code></p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 6.600 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 6.520 seconds)</p>
 <p><strong>Estimated memory usage:</strong>  20 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-hypothesis-testing-plot-might-mv-auc-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
@@ -737,7 +738,7 @@ Shape of Tree Posteriors for the positive class: (125, 1000, 1)
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-04-17.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-04-24.
       <br/>
     
   </p>

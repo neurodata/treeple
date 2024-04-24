@@ -1,17 +1,22 @@
 """
-===================================
-Treeple tutorial for calculating MI
-===================================
+====================
+1-1b: Calculating MI
+====================
 """
 
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
 from scipy.stats import entropy
 
 from sktree.datasets import make_trunk_classification
 from sktree.ensemble import HonestForestClassifier
 from sktree.stats import build_hyppo_oob_forest
 
+sns.set(color_codes=True, style="white", context="talk", font_scale=1.5)
+PALETTE = sns.color_palette("Set1")
+sns.set_palette(PALETTE[1:5] + PALETTE[6:], n_colors=9)
+sns.set_style("white", {"axes.edgecolor": "#dddddd"})
 # %%
 # MI
 # --
@@ -43,10 +48,16 @@ X, y = make_trunk_classification(
 )
 
 
-# scatter plot the samples
-plt.hist(X[:500], bins=15, alpha=0.6, color="blue", label="negative")
-plt.hist(X[500:], bins=15, alpha=0.6, color="red", label="positive")
-plt.legend()
+fig, ax = plt.subplots(figsize=(6, 6))
+fig.tight_layout()
+ax.tick_params(labelsize=15)
+
+# histogram plot the samples
+ax.hist(X[:500], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
+ax.hist(X[500:], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
+ax.set_xlabel("X", fontsize=15)
+ax.set_ylabel("Likelihood", fontsize=15)
+plt.legend(frameon=False, fontsize=15)
 plt.show()
 
 
@@ -72,10 +83,16 @@ _, observe_proba = build_hyppo_oob_forest(est, X, y)
 observe_proba = np.nanmean(observe_proba, axis=0)
 
 
-# scatter plot the posterior probabilities for class one
-plt.hist(observe_proba[:500][:, 1], bins=30, alpha=0.6, color="blue", label="negative")
-plt.hist(observe_proba[500:][:, 1], bins=30, alpha=0.6, color="red", label="positive")
-plt.legend()
+fig, ax = plt.subplots(figsize=(6, 6))
+fig.tight_layout()
+ax.tick_params(labelsize=15)
+
+# histogram plot the posterior probabilities for class one
+ax.hist(observe_proba[:500][:, 1], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
+ax.hist(observe_proba[500:][:, 1], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
+ax.set_ylabel("# of Samples", fontsize=15)
+ax.set_xlabel("Class One Posterior", fontsize=15)
+plt.legend(frameon=False, fontsize=15)
 plt.show()
 
 

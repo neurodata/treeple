@@ -1,11 +1,13 @@
 """
-============================================================
-Treeple tutorial for calculating p-value with multiview data
-============================================================
+======================================================
+2-2: Calculating p-value with multiview data (CoMIGHT)
+======================================================
 """
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+import seaborn as sns
 from scipy.stats import entropy
 
 from sktree.datasets import make_trunk_classification
@@ -13,6 +15,10 @@ from sktree.ensemble import HonestForestClassifier
 from sktree.stats import build_hyppo_oob_forest
 from sktree.tree import MultiViewDecisionTreeClassifier
 
+sns.set(color_codes=True, style="white", context="talk", font_scale=1.5)
+PALETTE = sns.color_palette("Set1")
+sns.set_palette(PALETTE[1:5] + PALETTE[6:], n_colors=9)
+sns.set_style("white", {"axes.edgecolor": "#dddddd"})
 # %%
 # Independence Testing
 # --------------------
@@ -61,29 +67,32 @@ Z, y = make_trunk_classification(
     seed=1,
 )
 
-
+# class one has a mean at two for X
 X, y = make_trunk_classification(
     n_samples=1000,
     n_dim=1,
     mu_0=0,
     mu_1=2,
     n_informative=1,
-    seed=1,
+    seed=2,
 )
 
-
-# scatter plot the samples for Z
-plt.hist(Z[:500], bins=15, alpha=0.6, color="blue", label="negative")
-plt.hist(Z[500:], bins=15, alpha=0.6, color="red", label="positive")
-plt.legend()
-plt.show()
+Z_X = np.hstack((Z, X))
 
 
-# scatter plot the samples for X
-plt.hist(X[:500], bins=15, alpha=0.6, color="blue", label="negative")
-plt.hist(X[500:], bins=15, alpha=0.6, color="red", label="positive")
-plt.legend()
-plt.show()
+Z_X_y = np.hstack((Z_X, y.reshape(-1, 1)))
+Z_X_y = pd.DataFrame(Z_X_y, columns=["Z", "X", "y"])
+Z_X_y = Z_X_y.replace({"y": 0.0}, "Class Zero")
+Z_X_y = Z_X_y.replace({"y": 1.0}, "Class One")
+
+fig, ax = plt.subplots(figsize=(6, 6))
+fig.tight_layout()
+ax.tick_params(labelsize=15)
+sns.scatterplot(data=Z_X_y, x="Z", y="X", hue="y", palette=PALETTE[:2], alpha=0.2)
+sns.kdeplot(data=Z_X_y, x="Z", y="X", hue="y", palette=PALETTE[:2], alpha=0.6)
+ax.set_ylabel("X", fontsize=15)
+ax.set_xlabel("Z", fontsize=15)
+plt.legend(frameon=False, fontsize=15)
 
 # %%
 # Generate observed posteriors with X and Z
@@ -102,16 +111,22 @@ est = HonestForestClassifier(
 )
 
 # fit the model and obtain the tree posteriors
-_, observe_proba_tree = build_hyppo_oob_forest(est, np.hstack((X, Z)), y)
+_, observe_proba_tree = build_hyppo_oob_forest(est, Z_X, y)
 
 # generate forest posteriors for the two classes
 observe_proba = np.nanmean(observe_proba_tree, axis=0)
 
 
-# scatter plot the posterior probabilities for class one
-plt.hist(observe_proba[:500][:, 1], bins=30, alpha=0.6, color="blue", label="negative")
-plt.hist(observe_proba[500:][:, 1], bins=30, alpha=0.6, color="red", label="positive")
-plt.legend()
+fig, ax = plt.subplots(figsize=(6, 6))
+fig.tight_layout()
+ax.tick_params(labelsize=15)
+
+# histogram plot the posterior probabilities for class one
+ax.hist(observe_proba[:500][:, 1], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
+ax.hist(observe_proba[500:][:, 1], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
+ax.set_ylabel("# of Samples", fontsize=15)
+ax.set_xlabel("Class One Posterior", fontsize=15)
+plt.legend(frameon=False, fontsize=15)
 plt.show()
 
 #
@@ -136,10 +151,16 @@ _, single_proba_tree = build_hyppo_oob_forest(est, Z, y)
 single_proba = np.nanmean(single_proba_tree, axis=0)
 
 
-# scatter plot the posterior probabilities for class one
-plt.hist(single_proba[:500][:, 1], bins=30, alpha=0.6, color="blue", label="negative")
-plt.hist(single_proba[500:][:, 1], bins=30, alpha=0.6, color="red", label="positive")
-plt.legend()
+fig, ax = plt.subplots(figsize=(6, 6))
+fig.tight_layout()
+ax.tick_params(labelsize=15)
+
+# histogram plot the posterior probabilities for class one
+ax.hist(single_proba[:500][:, 1], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
+ax.hist(single_proba[500:][:, 1], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
+ax.set_ylabel("# of Samples", fontsize=15)
+ax.set_xlabel("Class One Posterior", fontsize=15)
+plt.legend(frameon=False, fontsize=15)
 plt.show()
 
 #
@@ -150,6 +171,17 @@ plt.show()
 # shuffle the labels
 X_null = np.copy(X)
 np.random.shuffle(X_null)
+
+Z_X_y.insert(2, "Permuted X", X_null)
+
+fig, ax = plt.subplots(figsize=(6, 6))
+fig.tight_layout()
+ax.tick_params(labelsize=15)
+sns.scatterplot(data=Z_X_y, x="Z", y="Permuted X", hue="y", palette=PALETTE[:2], alpha=0.2)
+sns.kdeplot(data=Z_X_y, x="Z", y="Permuted X", hue="y", palette=PALETTE[:2], alpha=0.6)
+ax.set_ylabel("Permuted X", fontsize=15)
+ax.set_xlabel("Z", fontsize=15)
+plt.legend(frameon=False, fontsize=15)
 
 # initialize another forest with 100 trees
 est_null = HonestForestClassifier(
@@ -163,16 +195,22 @@ est_null = HonestForestClassifier(
 )
 
 # fit the model and obtain the tree posteriors
-_, null_proba_tree = build_hyppo_oob_forest(est, np.hstack((X_null, Z)), y)
+_, null_proba_tree = build_hyppo_oob_forest(est, np.hstack((Z, X_null)), y)
 
 # generate forest posteriors for the two classes
 null_proba = np.nanmean(null_proba_tree, axis=0)
 
 
-# scatter plot the posterior probabilities for class one
-plt.hist(null_proba[:500][:, 1], bins=30, alpha=0.6, color="blue", label="negative")
-plt.hist(null_proba[500:][:, 1], bins=30, alpha=0.6, color="red", label="positive")
-plt.legend()
+fig, ax = plt.subplots(figsize=(6, 6))
+fig.tight_layout()
+ax.tick_params(labelsize=15)
+
+# histogram plot the posterior probabilities for class one
+ax.hist(null_proba[:500][:, 1], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
+ax.hist(null_proba[500:][:, 1], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
+ax.set_ylabel("# of Samples", fontsize=15)
+ax.set_xlabel("Class One Posterior", fontsize=15)
+plt.legend(frameon=False, fontsize=15)
 plt.show()
 
 
@@ -198,7 +236,7 @@ joint_mi_null = Calculate_MI(y, null_proba)
 cmi_null = joint_mi_null - mi
 
 observed_diff = cmi - cmi_null
-print("Observed statistic difference =", round(observed_diff, 2))
+print("Observed conditional mutual information difference =", round(observed_diff, 2))
 
 # %%
 # Permute the trees
@@ -227,7 +265,17 @@ for i in range(PERMUTE):
 # %%
 # Calculate the p-value
 # ---------------------
+fig, ax = plt.subplots(figsize=(6, 6))
+fig.tight_layout()
+ax.tick_params(labelsize=15)
 
+# histogram plot the statistic differences
+ax.hist(mix_diff, bins=50, alpha=0.6, color=PALETTE[1], label="null")
+ax.axvline(x=observed_diff, color=PALETTE[0], linestyle="--", label="observed")
+ax.set_xlabel("Conditional Mutual Information Diff", fontsize=15)
+ax.set_ylabel("# of Samples", fontsize=15)
+plt.legend(frameon=False, fontsize=15)
+plt.show()
 
 pvalue = (1 + (mix_diff >= observed_diff).sum()) / (1 + PERMUTE)
 
@@ -236,3 +284,4 @@ if pvalue < 0.05:
     print("The null hypothesis is rejected.")
 else:
     print("The null hypothesis is not rejected.")
+# sphinx_gallery_thumbnail_number = -1

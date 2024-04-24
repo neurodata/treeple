@@ -1,19 +1,25 @@
 """
-============================================================
-Treeple tutorial for estimating true posteriors & statistics
-============================================================
+==========================================
+0: Estimating true posteriors & statistics
+==========================================
 """
 
 import warnings
 
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
 from scipy.stats import entropy, multivariate_normal
-from sklearn.metrics import RocCurveDisplay, roc_auc_score, roc_curve
+from sklearn.metrics import roc_auc_score, roc_curve
 
 from sktree.datasets import make_trunk_mixture_classification
 
+sns.set(color_codes=True, style="white", context="talk", font_scale=1.5)
+PALETTE = sns.color_palette("Set1")
+sns.set_palette(PALETTE[1:5] + PALETTE[6:], n_colors=9)
+sns.set_style("white", {"axes.edgecolor": "#dddddd"})
 warnings.filterwarnings("ignore")
+
 
 # %%
 # True posterior estimation
@@ -40,10 +46,16 @@ X, y = make_trunk_mixture_classification(
 )
 
 
-# scatter plot the samples
-plt.hist(X[:5000], bins=15, alpha=0.6, color="blue", label="negative")
-plt.hist(X[5000:], bins=25, alpha=0.6, color="red", label="positive")
-plt.legend()
+fig, ax = plt.subplots(figsize=(6, 6))
+fig.tight_layout()
+ax.tick_params(labelsize=15)
+
+# histogram plot the samples
+ax.hist(X[:5000], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
+ax.hist(X[5000:], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
+ax.set_xlabel("X", fontsize=15)
+ax.set_ylabel("Likelihood", fontsize=15)
+plt.legend(frameon=False, fontsize=15)
 plt.show()
 
 # %%
@@ -85,6 +97,7 @@ pos = np.hstack((pos_class0.reshape(-1, 1), pos_class1.reshape(-1, 1)))
 
 
 def Calculate_SA(y_true, y_pred_proba, max_fpr=0.02) -> float:
+    """Calculate the sensitivity at a specific specificity"""
     # check the shape of true labels
     if y_true.squeeze().ndim != 1:
         raise ValueError(f"y_true must be 1d, not {y_true.shape}")
@@ -99,24 +112,34 @@ def Calculate_SA(y_true, y_pred_proba, max_fpr=0.02) -> float:
             y_true, y_pred_proba[:, 1], pos_label=2, drop_intermediate=False
         )
     sa98 = max([tpr for (fpr, tpr) in zip(fpr, tpr) if fpr <= max_fpr])
-    RocCurveDisplay(fpr=fpr, tpr=tpr).plot(label="ROC Curve")
+
+    fig, ax = plt.subplots(figsize=(6, 6))
+    fig.tight_layout()
+    ax.tick_params(labelsize=15)
+    ax.set_xlim([-0.005, 1.005])
+    ax.set_ylim([-0.005, 1.005])
+    ax.set_xlabel("False Positive Rate", fontsize=15)
+    ax.set_ylabel("True Positive Rate", fontsize=15)
+
+    ax.plot(fpr, tpr, label="ROC curve", color=PALETTE[1])
 
     spec = int((1 - max_fpr) * 100)
-    plt.axvline(
+    ax.axvline(
         x=max_fpr,
-        color="r",
+        color=PALETTE[0],
         ymin=0,
         ymax=sa98,
         label="S@" + str(spec) + " = " + str(round(sa98, 2)),
         linestyle="--",
     )
-    plt.axhline(y=sa98, xmin=0, xmax=max_fpr, color="r", linestyle="--")
-    plt.legend()
+    ax.axhline(y=sa98, xmin=0, xmax=max_fpr, color="r", linestyle="--")
+    ax.legend(frameon=False, fontsize=15)
 
     return sa98
 
 
 sa98 = Calculate_SA(y, pos, max_fpr=0.02)
+print("S@98 =", round(sa98, 2))
 
 # %%
 # Generate true statistic estimates: MI
@@ -157,21 +180,31 @@ def Calculate_pAUC(y_true, y_pred_proba, max_fpr=0.1) -> float:
         fpr, tpr, thresholds = roc_curve(
             y_true, y_pred_proba[:, 1], pos_label=2, drop_intermediate=False
         )
-    RocCurveDisplay(fpr=fpr, tpr=tpr).plot(label="ROC Curve")
+
+    fig, ax = plt.subplots(figsize=(6, 6))
+    fig.tight_layout()
+    ax.tick_params(labelsize=15)
+    ax.set_xlim([-0.005, 1.005])
+    ax.set_ylim([-0.005, 1.005])
+    ax.set_xlabel("False Positive Rate", fontsize=15)
+    ax.set_ylabel("True Positive Rate", fontsize=15)
+
+    ax.plot(fpr, tpr, label="ROC curve", color=PALETTE[1])
     # Calculate pAUC at the specific threshold
     pAUC = roc_auc_score(y_true, y_pred_proba[:, 1], max_fpr=max_fpr)
 
     pos = np.where(fpr == max_fpr)[0][-1]
-    plt.fill_between(
+    ax.fill_between(
         fpr[:pos],
         tpr[:pos],
-        color="r",
+        color=PALETTE[0],
         alpha=0.6,
         label="pAUC@90 = " + str(round(pAUC, 2)),
         linestyle="--",
     )
-    plt.legend()
+    ax.legend(frameon=False, fontsize=15)
     return pAUC
 
 
 pAUC = Calculate_pAUC(y, pos, max_fpr=0.1)
+print("pAUC@90 =", round(pAUC, 2))

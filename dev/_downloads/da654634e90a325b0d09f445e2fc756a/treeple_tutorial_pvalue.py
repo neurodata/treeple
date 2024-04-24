@@ -1,16 +1,22 @@
 """
-========================================
-Treeple tutorial for calculating p-value
-========================================
+================================
+1-2: Calculating p-value (MIGHT)
+================================
 """
 
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
 from scipy.stats import entropy
 
 from sktree.datasets import make_trunk_classification
 from sktree.ensemble import HonestForestClassifier
 from sktree.stats import build_hyppo_oob_forest
+
+sns.set(color_codes=True, style="white", context="talk", font_scale=1.5)
+PALETTE = sns.color_palette("Set1")
+sns.set_palette(PALETTE[1:5] + PALETTE[6:], n_colors=9)
+sns.set_style("white", {"axes.edgecolor": "#dddddd"})
 
 # %%
 # Independence Testing
@@ -59,11 +65,16 @@ X, y = make_trunk_classification(
     seed=1,
 )
 
+fig, ax = plt.subplots(figsize=(6, 6))
+fig.tight_layout()
+ax.tick_params(labelsize=15)
 
-# scatter plot the samples
-plt.hist(X[:500], bins=15, alpha=0.6, color="blue", label="negative")
-plt.hist(X[500:], bins=15, alpha=0.6, color="red", label="positive")
-plt.legend()
+# histogram plot the samples
+ax.hist(X[:500], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
+ax.hist(X[500:], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
+ax.set_xlabel("X", fontsize=15)
+ax.set_ylabel("Likelihood", fontsize=15)
+plt.legend(frameon=False, fontsize=15)
 plt.show()
 
 # %%
@@ -89,13 +100,17 @@ _, observe_proba_tree = build_hyppo_oob_forest(est, X, y)
 # generate forest posteriors for the two classes
 observe_proba = np.nanmean(observe_proba_tree, axis=0)
 
+fig, ax = plt.subplots(figsize=(6, 6))
+fig.tight_layout()
+ax.tick_params(labelsize=15)
 
-# scatter plot the posterior probabilities for class one
-plt.hist(observe_proba[:500][:, 1], bins=30, alpha=0.6, color="blue", label="negative")
-plt.hist(observe_proba[500:][:, 1], bins=30, alpha=0.6, color="red", label="positive")
-plt.legend()
+# histogram plot the posterior probabilities for class one
+ax.hist(observe_proba[:500][:, 1], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
+ax.hist(observe_proba[500:][:, 1], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
+ax.set_ylabel("# of Samples", fontsize=15)
+ax.set_xlabel("Class One Posterior", fontsize=15)
+plt.legend(frameon=False, fontsize=15)
 plt.show()
-
 # %%
 # Generate null posteriors
 # ------------------------
@@ -122,11 +137,16 @@ _, null_proba_tree = build_hyppo_oob_forest(est, X_null, y_null)
 # generate forest posteriors for the two classes
 null_proba = np.nanmean(null_proba_tree, axis=0)
 
+fig, ax = plt.subplots(figsize=(6, 6))
+fig.tight_layout()
+ax.tick_params(labelsize=15)
 
-# scatter plot the posterior probabilities for class one
-plt.hist(null_proba[:500][:, 1], bins=30, alpha=0.6, color="blue", label="negative")
-plt.hist(null_proba[500:][:, 1], bins=30, alpha=0.6, color="red", label="positive")
-plt.legend()
+# histogram plot the posterior probabilities for class one
+ax.hist(null_proba[:500][:, 1], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
+ax.hist(null_proba[500:][:, 1], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
+ax.set_ylabel("# of Samples", fontsize=15)
+ax.set_xlabel("Class One Posterior", fontsize=15)
+plt.legend(frameon=False, fontsize=15)
 plt.show()
 
 # %%
@@ -149,7 +169,7 @@ mi = Calculate_MI(y, observe_proba)
 mi_null = Calculate_MI(y, null_proba)
 
 observed_diff = mi - mi_null
-print("Observed statistic difference =", round(observed_diff, 2))
+print("Observed mutual information difference =", round(observed_diff, 2))
 
 # %%
 # Permute the trees
@@ -179,6 +199,17 @@ for i in range(PERMUTE):
 # Calculate the p-value
 # ---------------------
 
+fig, ax = plt.subplots(figsize=(6, 6))
+fig.tight_layout()
+ax.tick_params(labelsize=15)
+
+# histogram plot the statistic differences
+ax.hist(mix_diff, bins=50, alpha=0.6, color=PALETTE[1], label="null")
+ax.axvline(x=observed_diff, color=PALETTE[0], linestyle="--", label="observed")
+ax.set_xlabel("Mutual Information Diff", fontsize=15)
+ax.set_ylabel("# of Samples", fontsize=15)
+plt.legend(frameon=False, fontsize=15)
+plt.show()
 
 pvalue = (1 + (mix_diff >= observed_diff).sum()) / (1 + PERMUTE)
 
@@ -187,3 +218,4 @@ if pvalue < 0.05:
     print("The null hypothesis is rejected.")
 else:
     print("The null hypothesis is not rejected.")
+# sphinx_gallery_thumbnail_number = -1

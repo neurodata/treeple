@@ -35,7 +35,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
-    <link rel="stylesheet" type="text/css" href="../../_static/style.css?v=42c02ab7" />
+    <link rel="stylesheet" type="text/css" href="../../_static/style.css?v=3035adc5" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=ac02cc09edc035673794" />
@@ -56,7 +56,7 @@
         </script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Treeple tutorial for calculating CMI" href="treeple_tutorial_CMI.html" />
+    <link rel="next" title="0: Estimating true posteriors &amp; statistics" href="treeple_tutorial_GMM.html" />
     <link rel="prev" title="Plot the sparse projection matrices of an oblique tree" href="../splitters/plot_sparse_projection_matrix.html" />
     <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
     <script type="text/javascript" src="../../_static/copybutton.js"></script>
@@ -436,14 +436,15 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Treeple for Hypothesis Testing</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="treeple_tutorial_CMI.html">Treeple tutorial for calculating CMI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="treeple_tutorial_MI.html">Treeple tutorial for calculating MI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="treeple_tutorial_SA98.html">Treeple tutorial for calculating S@98</a></li>
-<li class="toctree-l2"><a class="reference internal" href="treeple_tutorial_SA98_multiview.html">Treeple tutorial for calculating S@98 with multiview data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="treeple_tutorial_pvalue.html">Treeple tutorial for calculating p-value</a></li>
-<li class="toctree-l2"><a class="reference internal" href="treeple_tutorial_pvalue_multiview.html">Treeple tutorial for calculating p-value with multiview data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="treeple_tutorial_pAUC.html">Treeple tutorial for calculating pAUC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="treeple_tutorial_GMM.html">Treeple tutorial for estimating true posteriors &amp; statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="treeple_tutorial_GMM.html">0: Estimating true posteriors &amp; statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="treeple_tutorial_SA98.html">1-1a: Calculating S@98</a></li>
+<li class="toctree-l2"><a class="reference internal" href="treeple_tutorial_MI.html">1-1b: Calculating MI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="treeple_tutorial_pAUC.html">1-1c: Calculating pAUC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="treeple_tutorial_HD.html">1-1d: Calculating Hellinger Distance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="treeple_tutorial_pvalue.html">1-2: Calculating p-value (MIGHT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="treeple_tutorial_SA98_multiview.html">2-1a: Calculating S@98 with multiview data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="treeple_tutorial_CMI.html">2-1b: Calculating CMI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="treeple_tutorial_pvalue_multiview.html">2-2: Calculating p-value with multiview data (CoMIGHT)</a></li>
 </ul>
 </li>
 </ul>
@@ -508,30 +509,33 @@ document.write(`
 <p>Examples concerning how to use treeple as hypothesis test tools.
 Tutorials include estimating true statistics with true posterior functionss,
 using forest to calculate statistic estimates, and calculating p-values.</p>
-<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Treeple tutorial for calculating CMI"><img alt="" src="../../_images/sphx_glr_treeple_tutorial_CMI_thumb.png" />
-<p><a class="reference internal" href="treeple_tutorial_CMI.html#sphx-glr-auto-examples-treeple-treeple-tutorial-cmi-py"><span class="std std-ref">Treeple tutorial for calculating CMI</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Treeple tutorial for calculating CMI</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Treeple tutorial for calculating MI"><img alt="" src="../../_images/sphx_glr_treeple_tutorial_MI_thumb.png" />
-<p><a class="reference internal" href="treeple_tutorial_MI.html#sphx-glr-auto-examples-treeple-treeple-tutorial-mi-py"><span class="std std-ref">Treeple tutorial for calculating MI</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Treeple tutorial for calculating MI</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Treeple tutorial for calculating S@98"><img alt="" src="../../_images/sphx_glr_treeple_tutorial_SA98_thumb.png" />
-<p><a class="reference internal" href="treeple_tutorial_SA98.html#sphx-glr-auto-examples-treeple-treeple-tutorial-sa98-py"><span class="std std-ref">Treeple tutorial for calculating S&#64;98</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Treeple tutorial for calculating S@98</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Treeple tutorial for calculating S@98 with multiview data"><img alt="" src="../../_images/sphx_glr_treeple_tutorial_SA98_multiview_thumb.png" />
-<p><a class="reference internal" href="treeple_tutorial_SA98_multiview.html#sphx-glr-auto-examples-treeple-treeple-tutorial-sa98-multiview-py"><span class="std std-ref">Treeple tutorial for calculating S&#64;98 with multiview data</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Treeple tutorial for calculating S@98 with multiview data</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Treeple tutorial for calculating p-value"><img alt="" src="../../_images/sphx_glr_treeple_tutorial_pvalue_thumb.png" />
-<p><a class="reference internal" href="treeple_tutorial_pvalue.html#sphx-glr-auto-examples-treeple-treeple-tutorial-pvalue-py"><span class="std std-ref">Treeple tutorial for calculating p-value</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Treeple tutorial for calculating p-value</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Treeple tutorial for calculating p-value with multiview data"><img alt="" src="../../_images/sphx_glr_treeple_tutorial_pvalue_multiview_thumb.png" />
-<p><a class="reference internal" href="treeple_tutorial_pvalue_multiview.html#sphx-glr-auto-examples-treeple-treeple-tutorial-pvalue-multiview-py"><span class="std std-ref">Treeple tutorial for calculating p-value with multiview data</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Treeple tutorial for calculating p-value with multiview data</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Treeple tutorial for calculating pAUC"><img alt="" src="../../_images/sphx_glr_treeple_tutorial_pAUC_thumb.png" />
-<p><a class="reference internal" href="treeple_tutorial_pAUC.html#sphx-glr-auto-examples-treeple-treeple-tutorial-pauc-py"><span class="std std-ref">Treeple tutorial for calculating pAUC</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Treeple tutorial for calculating pAUC</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Treeple tutorial for estimating true posteriors &amp; statistics"><img alt="" src="../../_images/sphx_glr_treeple_tutorial_GMM_thumb.png" />
-<p><a class="reference internal" href="treeple_tutorial_GMM.html#sphx-glr-auto-examples-treeple-treeple-tutorial-gmm-py"><span class="std std-ref">Treeple tutorial for estimating true posteriors &amp; statistics</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Treeple tutorial for estimating true posteriors & statistics</div>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="0: Estimating true posteriors &amp; statistics"><img alt="" src="../../_images/sphx_glr_treeple_tutorial_GMM_thumb.png" />
+<p><a class="reference internal" href="treeple_tutorial_GMM.html#sphx-glr-auto-examples-treeple-treeple-tutorial-gmm-py"><span class="std std-ref">0: Estimating true posteriors &amp; statistics</span></a></p>
+  <div class="sphx-glr-thumbnail-title">0: Estimating true posteriors & statistics</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="1-1a: Calculating S@98"><img alt="" src="../../_images/sphx_glr_treeple_tutorial_SA98_thumb.png" />
+<p><a class="reference internal" href="treeple_tutorial_SA98.html#sphx-glr-auto-examples-treeple-treeple-tutorial-sa98-py"><span class="std std-ref">1-1a: Calculating S&#64;98</span></a></p>
+  <div class="sphx-glr-thumbnail-title">1-1a: Calculating S@98</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="1-1b: Calculating MI"><img alt="" src="../../_images/sphx_glr_treeple_tutorial_MI_thumb.png" />
+<p><a class="reference internal" href="treeple_tutorial_MI.html#sphx-glr-auto-examples-treeple-treeple-tutorial-mi-py"><span class="std std-ref">1-1b: Calculating MI</span></a></p>
+  <div class="sphx-glr-thumbnail-title">1-1b: Calculating MI</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="1-1c: Calculating pAUC"><img alt="" src="../../_images/sphx_glr_treeple_tutorial_pAUC_thumb.png" />
+<p><a class="reference internal" href="treeple_tutorial_pAUC.html#sphx-glr-auto-examples-treeple-treeple-tutorial-pauc-py"><span class="std std-ref">1-1c: Calculating pAUC</span></a></p>
+  <div class="sphx-glr-thumbnail-title">1-1c: Calculating pAUC</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="1-1d: Calculating Hellinger Distance"><img alt="" src="../../_images/sphx_glr_treeple_tutorial_HD_thumb.png" />
+<p><a class="reference internal" href="treeple_tutorial_HD.html#sphx-glr-auto-examples-treeple-treeple-tutorial-hd-py"><span class="std std-ref">1-1d: Calculating Hellinger Distance</span></a></p>
+  <div class="sphx-glr-thumbnail-title">1-1d: Calculating Hellinger Distance</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="1-2: Calculating p-value (MIGHT)"><img alt="" src="../../_images/sphx_glr_treeple_tutorial_pvalue_thumb.png" />
+<p><a class="reference internal" href="treeple_tutorial_pvalue.html#sphx-glr-auto-examples-treeple-treeple-tutorial-pvalue-py"><span class="std std-ref">1-2: Calculating p-value (MIGHT)</span></a></p>
+  <div class="sphx-glr-thumbnail-title">1-2: Calculating p-value (MIGHT)</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="2-1a: Calculating S@98 with multiview data"><img alt="" src="../../_images/sphx_glr_treeple_tutorial_SA98_multiview_thumb.png" />
+<p><a class="reference internal" href="treeple_tutorial_SA98_multiview.html#sphx-glr-auto-examples-treeple-treeple-tutorial-sa98-multiview-py"><span class="std std-ref">2-1a: Calculating S&#64;98 with multiview data</span></a></p>
+  <div class="sphx-glr-thumbnail-title">2-1a: Calculating S@98 with multiview data</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="2-1b: Calculating CMI"><img alt="" src="../../_images/sphx_glr_treeple_tutorial_CMI_thumb.png" />
+<p><a class="reference internal" href="treeple_tutorial_CMI.html#sphx-glr-auto-examples-treeple-treeple-tutorial-cmi-py"><span class="std std-ref">2-1b: Calculating CMI</span></a></p>
+  <div class="sphx-glr-thumbnail-title">2-1b: Calculating CMI</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="2-2: Calculating p-value with multiview data (CoMIGHT)"><img alt="" src="../../_images/sphx_glr_treeple_tutorial_pvalue_multiview_thumb.png" />
+<p><a class="reference internal" href="treeple_tutorial_pvalue_multiview.html#sphx-glr-auto-examples-treeple-treeple-tutorial-pvalue-multiview-py"><span class="std std-ref">2-2: Calculating p-value with multiview data (CoMIGHT)</span></a></p>
+  <div class="sphx-glr-thumbnail-title">2-2: Calculating p-value with multiview data (CoMIGHT)</div>
 </div></div><div class="toctree-wrapper compound">
 </div>
 </section>
@@ -556,11 +560,11 @@ using forest to calculate statistic estimates, and calculating p-values.</p>
       </div>
     </a>
     <a class="right-next"
-       href="treeple_tutorial_CMI.html"
+       href="treeple_tutorial_GMM.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Treeple tutorial for calculating CMI</p>
+        <p class="prev-next-title">0: Estimating true posteriors &amp; statistics</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -593,7 +597,7 @@ using forest to calculate statistic estimates, and calculating p-values.</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-04-17.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-04-24.
       <br/>
     
   </p>
