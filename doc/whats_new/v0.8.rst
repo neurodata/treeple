@@ -17,7 +17,7 @@ Changelog
     did not raise an error, and silently ran, assuming the missing-values were
     encoded as infinity value. This is now fixed, and the estimators will raise an
     ValueError if missing-values are encountered in ``X`` input array.
-    By `Adam Li`_ (:pr:`#263`)
+    By `Adam Li`_ (:pr:`#264`)
 
 Code and Documentation Contributors
 -----------------------------------
