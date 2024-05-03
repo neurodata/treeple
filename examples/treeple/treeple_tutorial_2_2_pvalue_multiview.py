@@ -90,8 +90,8 @@ fig.tight_layout()
 ax.tick_params(labelsize=15)
 sns.scatterplot(data=Z_X_y, x="Z", y="X", hue="y", palette=PALETTE[:2][::-1], alpha=0.2)
 sns.kdeplot(data=Z_X_y, x="Z", y="X", hue="y", palette=PALETTE[:2][::-1], alpha=0.6)
-ax.set_ylabel("X", fontsize=15)
-ax.set_xlabel("Z", fontsize=15)
+ax.set_ylabel("Variable Two", fontsize=15)
+ax.set_xlabel("Variable One", fontsize=15)
 plt.legend(frameon=False, fontsize=15)
 
 # %%
@@ -179,8 +179,8 @@ fig.tight_layout()
 ax.tick_params(labelsize=15)
 sns.scatterplot(data=Z_X_y, x="Z", y="Permuted X", hue="y", palette=PALETTE[:2][::-1], alpha=0.2)
 sns.kdeplot(data=Z_X_y, x="Z", y="Permuted X", hue="y", palette=PALETTE[:2][::-1], alpha=0.6)
-ax.set_ylabel("Permuted X", fontsize=15)
-ax.set_xlabel("Z", fontsize=15)
+ax.set_ylabel("Permuted Variable Two", fontsize=15)
+ax.set_xlabel("Variable One", fontsize=15)
 plt.legend(frameon=False, fontsize=15)
 
 # initialize another forest with 100 trees
