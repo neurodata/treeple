@@ -1,7 +1,7 @@
 """
-=====================
-2-1b: Calculating CMI
-=====================
+===============
+Calculating CMI
+===============
 """
 
 import matplotlib.pyplot as plt

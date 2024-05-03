@@ -1,7 +1,7 @@
 """
-================================
-1-2: Calculating p-value (MIGHT)
-================================
+===========================
+Calculating p-value (MIGHT)
+===========================
 """
 
 import matplotlib.pyplot as plt

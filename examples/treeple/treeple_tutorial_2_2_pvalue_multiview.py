@@ -1,7 +1,7 @@
 """
-======================================================
-2-2: Calculating p-value with multiview data (CoMIGHT)
-======================================================
+=================================================
+Calculating p-value with multiview data (CoMIGHT)
+=================================================
 """
 
 import matplotlib.pyplot as plt

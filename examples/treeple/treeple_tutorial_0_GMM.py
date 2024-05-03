@@ -1,7 +1,7 @@
 """
-==========================================
-0: Estimating true posteriors & statistics
-==========================================
+=======================================
+Estimating true posteriors & statistics
+=======================================
 """
 
 import warnings

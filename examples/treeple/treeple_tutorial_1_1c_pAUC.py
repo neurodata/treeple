@@ -1,12 +1,13 @@
 """
-====================================
-1-1d: Calculating Hellinger Distance
-====================================
+================
+Calculating pAUC
+================
 """
 
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+from sklearn.metrics import roc_auc_score, roc_curve
 
 from sktree.datasets import make_trunk_classification
 from sktree.ensemble import HonestForestClassifier
@@ -16,18 +17,19 @@ sns.set(color_codes=True, style="white", context="talk", font_scale=1.5)
 PALETTE = sns.color_palette("Set1")
 sns.set_palette(PALETTE[1:5] + PALETTE[6:], n_colors=9)
 sns.set_style("white", {"axes.edgecolor": "#dddddd"})
-
 # %%
-# Hellinger Distance
-# ------------------
+# pAUC@r
+# ------
 #
-# Hellinger distance quantifies the similarity between the two posterior
-# probability distributions (class zero and class one).
+# Partial area under the ROC curve (*pAUC*) integrates the true positive
+# rates (*TPR*) when the false positive rates (*FPR*) are below a specific
+# percentage threshold. Then the value is normalized by that percentage.
 #
-# .. math:: H(\eta(X), 1-\eta(X)) = \frac{1}{\sqrt{2}} \; \bigl\|\sqrt{\eta(X)} - \sqrt{1-\eta(X)} \bigr\|_2
+# .. math:: pAUC@r = \frac{100}{100 - r} \int_{T_r}^\infty \int_{\mathcal{X}} \mathbb{I}\{\eta(X_1) > \eta(X_0) \} dF_1 dF_0
 #
 # With a binary class simulation as an example, this tutorial will show
-# how to use ``treeple`` to calculate the statistic.
+# how to use ``treeple`` to calculate the statistic with 90% specificity
+# threshold.
 
 # %%
 # Create a simulation with two gaussians
@@ -58,6 +60,7 @@ ax.set_xlabel("X", fontsize=15)
 ax.set_ylabel("Likelihood", fontsize=15)
 plt.legend(frameon=False, fontsize=15)
 plt.show()
+
 
 # %%
 # Fit the model
@@ -93,16 +96,52 @@ ax.set_xlabel("Class One Posterior", fontsize=15)
 plt.legend(frameon=False, fontsize=15)
 plt.show()
 
+
 # %%
 # Calculate the statistic
 # -----------------------
 
 
-def Calculate_hd(y_pred_proba) -> float:
-    return np.sqrt(
-        np.sum((np.sqrt(y_pred_proba[:, 1]) - np.sqrt(y_pred_proba[:, 0])) ** 2)
-    ) / np.sqrt(2)
+def Calculate_pAUC(y_true, y_pred_proba, max_fpr=0.1) -> float:
+    # check the shape of true labels
+    if y_true.squeeze().ndim != 1:
+        raise ValueError(f"y_true must be 1d, not {y_true.shape}")
+
+    # find the positive class and calculate fpr and tpr
+    if 0 in y_true or -1 in y_true:
+        fpr, tpr, thresholds = roc_curve(
+            y_true, y_pred_proba[:, 1], pos_label=1, drop_intermediate=False
+        )
+    else:
+        fpr, tpr, thresholds = roc_curve(
+            y_true, y_pred_proba[:, 1], pos_label=2, drop_intermediate=False
+        )
+
+    fig, ax = plt.subplots(figsize=(6, 6))
+    fig.tight_layout()
+    ax.tick_params(labelsize=15)
+    ax.set_xlim([-0.005, 1.005])
+    ax.set_ylim([-0.005, 1.005])
+    ax.set_xlabel("False Positive Rate", fontsize=15)
+    ax.set_ylabel("True Positive Rate", fontsize=15)
+
+    ax.plot(fpr, tpr, label="ROC curve", color=PALETTE[1])
+    # Calculate pAUC at the specific threshold
+    pAUC = roc_auc_score(y_true, y_pred_proba[:, 1], max_fpr=max_fpr)
+
+    pos = np.where(fpr == max_fpr)[0][-1]
+    ax.fill_between(
+        fpr[:pos],
+        tpr[:pos],
+        color=PALETTE[0],
+        alpha=0.6,
+        label="pAUC@90 = " + str(round(pAUC, 2)),
+        linestyle="--",
+    )
+    ax.legend(frameon=False, fontsize=15)
+    return pAUC
 
 
-hd = Calculate_hd(observe_proba)
-print("Hellinger distance =", round(hd, 2))
+pAUC = Calculate_pAUC(y, observe_proba)
+print("pAUC@90 =", round(pAUC, 2))
+# sphinx_gallery_thumbnail_number = -1

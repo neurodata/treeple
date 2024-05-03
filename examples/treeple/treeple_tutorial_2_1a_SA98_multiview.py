@@ -1,7 +1,7 @@
 """
-==========================================
-2-1a: Calculating S@98 with multiview data
-==========================================
+====================================
+Calculating S@98 with multiview data
+====================================
 """
 
 import matplotlib.pyplot as plt

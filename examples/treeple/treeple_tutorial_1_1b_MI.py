@@ -1,7 +1,7 @@
 """
-====================
-1-1b: Calculating MI
-====================
+==============
+Calculating MI
+==============
 """
 
 import matplotlib.pyplot as plt

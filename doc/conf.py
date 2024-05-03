@@ -7,7 +7,7 @@ import sys
 from datetime import date
 
 import sphinx_gallery  # noqa: F401
-from sphinx_gallery.sorting import ExampleTitleSortKey
+from sphinx_gallery.sorting import FileNameSortKey
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -324,7 +324,7 @@ sphinx_gallery_conf = {
     "image_scrapers": scrapers,
     "show_memory": not sys.platform.startswith(("win", "darwin")),
     "line_numbers": False,  # messes with style
-    "within_subsection_order": ExampleTitleSortKey,
+    "within_subsection_order": FileNameSortKey,
     "capture_repr": ("_repr_html_",),
     "junit": os.path.join("..", "test-results", "sphinx-gallery", "junit.xml"),
     "matplotlib_animations": True,

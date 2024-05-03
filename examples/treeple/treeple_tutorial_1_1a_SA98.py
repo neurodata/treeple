@@ -1,13 +1,13 @@
 """
-======================
-1-1c: Calculating pAUC
-======================
+================
+Calculating S@98
+================
 """
 
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-from sklearn.metrics import roc_auc_score, roc_curve
+from sklearn.metrics import roc_curve
 
 from sktree.datasets import make_trunk_classification
 from sktree.ensemble import HonestForestClassifier
@@ -17,19 +17,18 @@ sns.set(color_codes=True, style="white", context="talk", font_scale=1.5)
 PALETTE = sns.color_palette("Set1")
 sns.set_palette(PALETTE[1:5] + PALETTE[6:], n_colors=9)
 sns.set_style("white", {"axes.edgecolor": "#dddddd"})
+
 # %%
-# pAUC@r
-# ------
+# S@98
+# ----
 #
-# Partial area under the ROC curve (*pAUC*) integrates the true positive
-# rates (*TPR*) when the false positive rates (*FPR*) are below a specific
-# percentage threshold. Then the value is normalized by that percentage.
+# Sensitivity at 98% specificity (*S@98*) measures, namely, the true
+# positive rate (*TPR*) when the false positive rate (*FPR*) is at 98%.
 #
-# .. math:: pAUC@r = \frac{100}{100 - r} \int_{T_r}^\infty \int_{\mathcal{X}} \mathbb{I}\{\eta(X_1) > \eta(X_0) \} dF_1 dF_0
+# .. math:: S@r = \mathbb{P}[\eta(X) > T_r \mid Y=1]
 #
 # With a binary class simulation as an example, this tutorial will show
-# how to use ``treeple`` to calculate the statistic with 90% specificity
-# threshold.
+# how to use ``treeple`` to calculate the statistic.
 
 # %%
 # Create a simulation with two gaussians
@@ -60,7 +59,6 @@ ax.set_xlabel("X", fontsize=15)
 ax.set_ylabel("Likelihood", fontsize=15)
 plt.legend(frameon=False, fontsize=15)
 plt.show()
-
 
 # %%
 # Fit the model
@@ -96,13 +94,13 @@ ax.set_xlabel("Class One Posterior", fontsize=15)
 plt.legend(frameon=False, fontsize=15)
 plt.show()
 
-
 # %%
 # Calculate the statistic
 # -----------------------
 
 
-def Calculate_pAUC(y_true, y_pred_proba, max_fpr=0.1) -> float:
+def Calculate_SA(y_true, y_pred_proba, max_fpr=0.02) -> float:
+    """Calculate the sensitivity at a specific specificity"""
     # check the shape of true labels
     if y_true.squeeze().ndim != 1:
         raise ValueError(f"y_true must be 1d, not {y_true.shape}")
@@ -116,6 +114,7 @@ def Calculate_pAUC(y_true, y_pred_proba, max_fpr=0.1) -> float:
         fpr, tpr, thresholds = roc_curve(
             y_true, y_pred_proba[:, 1], pos_label=2, drop_intermediate=False
         )
+    sa98 = max([tpr for (fpr, tpr) in zip(fpr, tpr) if fpr <= max_fpr])
 
     fig, ax = plt.subplots(figsize=(6, 6))
     fig.tight_layout()
@@ -126,22 +125,22 @@ def Calculate_pAUC(y_true, y_pred_proba, max_fpr=0.1) -> float:
     ax.set_ylabel("True Positive Rate", fontsize=15)
 
     ax.plot(fpr, tpr, label="ROC curve", color=PALETTE[1])
-    # Calculate pAUC at the specific threshold
-    pAUC = roc_auc_score(y_true, y_pred_proba[:, 1], max_fpr=max_fpr)
 
-    pos = np.where(fpr == max_fpr)[0][-1]
-    ax.fill_between(
-        fpr[:pos],
-        tpr[:pos],
+    spec = int((1 - max_fpr) * 100)
+    ax.axvline(
+        x=max_fpr,
         color=PALETTE[0],
-        alpha=0.6,
-        label="pAUC@90 = " + str(round(pAUC, 2)),
+        ymin=0,
+        ymax=sa98,
+        label="S@" + str(spec) + " = " + str(round(sa98, 2)),
         linestyle="--",
     )
+    ax.axhline(y=sa98, xmin=0, xmax=max_fpr, color="r", linestyle="--")
     ax.legend(frameon=False, fontsize=15)
-    return pAUC
+
+    return sa98
 
 
-pAUC = Calculate_pAUC(y, observe_proba)
-print("pAUC@90 =", round(pAUC, 2))
+sa98 = Calculate_SA(y, observe_proba, max_fpr=0.02)
+print("S@98 =", round(sa98, 2))
 # sphinx_gallery_thumbnail_number = -1
