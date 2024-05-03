@@ -12,7 +12,7 @@ from scipy.stats import entropy
 
 from sktree.datasets import make_trunk_classification
 from sktree.ensemble import HonestForestClassifier
-from sktree.stats import build_hyppo_oob_forest
+from sktree.stats import build_coleman_forest
 from sktree.tree import MultiViewDecisionTreeClassifier
 
 sns.set(color_codes=True, style="white", context="talk", font_scale=1.5)
@@ -95,77 +95,8 @@ ax.set_xlabel("Variable One", fontsize=15)
 plt.legend(frameon=False, fontsize=15)
 
 # %%
-# Generate observed posteriors with X and Z
-# -----------------------------------------
-
-
-# initialize the forest with 100 trees
-est = HonestForestClassifier(
-    n_estimators=100,
-    max_samples=1.6,
-    max_features=0.3,
-    bootstrap=True,
-    stratify=True,
-    tree_estimator=MultiViewDecisionTreeClassifier(),
-    random_state=1,
-)
-
-# fit the model and obtain the tree posteriors
-_, observe_proba_tree = build_hyppo_oob_forest(est, Z_X, y)
-
-# generate forest posteriors for the two classes
-observe_proba = np.nanmean(observe_proba_tree, axis=0)
-
-
-fig, ax = plt.subplots(figsize=(6, 6))
-fig.tight_layout()
-ax.tick_params(labelsize=15)
-
-# histogram plot the posterior probabilities for class one
-ax.hist(observe_proba[:500][:, 1], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
-ax.hist(observe_proba[500:][:, 1], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
-ax.set_ylabel("# of Samples", fontsize=15)
-ax.set_xlabel("Class One Posterior", fontsize=15)
-plt.legend(frameon=False, fontsize=15)
-plt.show()
-
-# %%
-# Generate observed posteriors with Z only
-# ----------------------------------------
-
-
-# initialize the forest with 100 trees
-est = HonestForestClassifier(
-    n_estimators=100,
-    max_samples=1.6,
-    max_features=0.3,
-    bootstrap=True,
-    stratify=True,
-    random_state=1,
-)
-
-# fit the model and obtain the tree posteriors
-_, single_proba_tree = build_hyppo_oob_forest(est, Z, y)
-
-# generate forest posteriors for the two classes
-single_proba = np.nanmean(single_proba_tree, axis=0)
-
-
-fig, ax = plt.subplots(figsize=(6, 6))
-fig.tight_layout()
-ax.tick_params(labelsize=15)
-
-# histogram plot the posterior probabilities for class one
-ax.hist(single_proba[:500][:, 1], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
-ax.hist(single_proba[500:][:, 1], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
-ax.set_ylabel("# of Samples", fontsize=15)
-ax.set_xlabel("Class One Posterior", fontsize=15)
-plt.legend(frameon=False, fontsize=15)
-plt.show()
-
-# %%
-# Generate null posteriors with Z and permuted X
-# ----------------------------------------------
+# Modify the simulation with permuted variable two
+# ------------------------------------------------
 
 
 # shuffle the labels
@@ -183,6 +114,30 @@ ax.set_ylabel("Permuted Variable Two", fontsize=15)
 ax.set_xlabel("Variable One", fontsize=15)
 plt.legend(frameon=False, fontsize=15)
 
+
+# %%
+# Fit the models and calculate the p-value
+# ----------------------------------------
+#
+# Construct two forests, one trained with original data,
+# and the other trained with permuted data. The test randomly
+# permutes the two forests for a specified number of times.
+#
+# Each pair of forest outputs a set of mutual information statistics,
+# and the statistic differences are used to calculate the p-vale.
+
+
+# initialize the forest with 100 trees
+est = HonestForestClassifier(
+    n_estimators=100,
+    max_samples=1.6,
+    max_features=0.3,
+    bootstrap=True,
+    stratify=True,
+    tree_estimator=MultiViewDecisionTreeClassifier(),
+    random_state=1,
+)
+
 # initialize another forest with 100 trees
 est_null = HonestForestClassifier(
     n_estimators=100,
@@ -194,77 +149,21 @@ est_null = HonestForestClassifier(
     random_state=1,
 )
 
-# fit the model and obtain the tree posteriors
-_, null_proba_tree = build_hyppo_oob_forest(est, np.hstack((Z, X_null)), y)
-
-# generate forest posteriors for the two classes
-null_proba = np.nanmean(null_proba_tree, axis=0)
-
-
-fig, ax = plt.subplots(figsize=(6, 6))
-fig.tight_layout()
-ax.tick_params(labelsize=15)
-
-# histogram plot the posterior probabilities for class one
-ax.hist(null_proba[:500][:, 1], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
-ax.hist(null_proba[500:][:, 1], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
-ax.set_ylabel("# of Samples", fontsize=15)
-ax.set_xlabel("Class One Posterior", fontsize=15)
-plt.legend(frameon=False, fontsize=15)
-plt.show()
-
-
-# %%
-# Find the observed statistic difference
-# --------------------------------------
-def Calculate_MI(y_true, y_pred_proba):
-    # calculate the conditional entropy
-    H_YX = np.mean(entropy(y_pred_proba, base=np.exp(1), axis=1))
-
-    # empirical count of each class (n_classes)
-    _, counts = np.unique(y_true, return_counts=True)
-    # calculate the entropy of labels
-    H_Y = entropy(counts, base=np.exp(1))
-    return H_Y - H_YX
-
-
-joint_mi = Calculate_MI(y, observe_proba)
-mi = Calculate_MI(y, single_proba)
-cmi = joint_mi - mi
-
-joint_mi_null = Calculate_MI(y, null_proba)
-cmi_null = joint_mi_null - mi
-
-observed_diff = cmi - cmi_null
-print("Observed conditional mutual information difference =", round(observed_diff, 2))
-
-# %%
-# Permute the trees
-# -----------------
-
-
 PERMUTE = 10000
-mix_diff = []
 
-# Collect all the tree posteriors
-proba = np.vstack((observe_proba_tree, null_proba_tree))
-for i in range(PERMUTE):
+# conduct the hypothesis test with conditional mutual information
+observed_diff, _, _, pvalue, mix_diff = build_coleman_forest(
+    est,
+    est_null,
+    Z_X,
+    y,
+    metric="mi",
+    n_repeats=PERMUTE,
+    covariate_index=[1],
+    return_posteriors=False,
+    seed=1,
+)
 
-    # permute the posteriors
-    np.random.shuffle(proba)
-
-    # calculate the statistic for
-    # the two mixed forest posteriors
-    mi_mix_one = Calculate_MI(y, np.nanmean(proba[:100], axis=0))
-    mi_mix_two = Calculate_MI(y, np.nanmean(proba[100:], axis=0))
-
-    # same difference of joint MI and CMI
-    mix_diff.append(mi_mix_one - mi_mix_two)
-
-
-# %%
-# Calculate the p-value
-# ---------------------
 fig, ax = plt.subplots(figsize=(6, 6))
 fig.tight_layout()
 ax.tick_params(labelsize=15)
@@ -276,8 +175,6 @@ ax.set_xlabel("Conditional Mutual Information Diff", fontsize=15)
 ax.set_ylabel("# of Samples", fontsize=15)
 plt.legend(frameon=False, fontsize=15)
 plt.show()
-
-pvalue = (1 + (mix_diff >= observed_diff).sum()) / (1 + PERMUTE)
 
 print("p-value is:", round(pvalue, 2))
 if pvalue < 0.05:
