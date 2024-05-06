@@ -402,7 +402,7 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
         max_features="sqrt",
         max_leaf_nodes=None,
         min_impurity_decrease=0.0,
-        bootstrap=False,
+        bootstrap=True,
         oob_score=False,
         n_jobs=None,
         random_state=None,

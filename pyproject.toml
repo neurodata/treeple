@@ -1,7 +1,7 @@
 [build-system]
 build-backend = "mesonpy"
 requires = [
-  "meson-python>=0.15.0",
+  "meson-python>=0.16.0",
   'ninja',
   # `wheel` is needed for non-isolated builds, given that `meson-python`
   # doesn't list it as a runtime requirement (at least in 0.10.0)
@@ -9,7 +9,7 @@ requires = [
   "wheel",
   "setuptools<=65.5",
   "packaging",
-  "Cython>=3.0.8",
+  "Cython>=3.0.10",
   "scikit-learn>=1.4.1",
   "scipy>=1.5.0",
   "numpy>=1.25; python_version>='3.9'"
