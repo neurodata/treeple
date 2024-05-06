@@ -2,7 +2,6 @@ python_sources = [
   '__init__.py',
   'forestht.py',
   'utils.py',
-  'permutationforest.py',
   'monte_carlo.py',
   'permuteforest.py',
 ]

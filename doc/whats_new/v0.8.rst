@@ -18,6 +18,10 @@ Changelog
     encoded as infinity value. This is now fixed, and the estimators will raise an
     ValueError if missing-values are encountered in ``X`` input array.
     By `Adam Li`_ (:pr:`#264`)
+- |API| :class:`sktree.HonestForestClassifier` now has ``bootstrap=True`` as the default
+    argument. By `Adam Li`_ (:pr:`#274`)
+- |API| Removed all instances of ``FeatureImportanceForestClassifier`` and outdated
+    MIGHT code. By `Adam Li`_ (:pr:`#274`)
 
 Code and Documentation Contributors
 -----------------------------------
