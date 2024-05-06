@@ -1285,6 +1285,7 @@ def build_coleman_forest(
         The predicted posterior probabilities for each of the permuted estimators
         on their out of bag samples.
     null_dist : ArrayLike of shape (n_repeats,)
+        The null statistic differences from permuted forests.
 
     References
     ----------
