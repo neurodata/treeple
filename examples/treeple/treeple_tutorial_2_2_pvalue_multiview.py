@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from scipy.stats import entropy
 
 from sktree.datasets import make_trunk_classification
 from sktree.ensemble import HonestForestClassifier
