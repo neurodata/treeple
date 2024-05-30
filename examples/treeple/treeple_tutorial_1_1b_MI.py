@@ -1,7 +1,7 @@
 """
-====================
-1-1b: Calculating MI
-====================
+==============
+Calculating MI
+==============
 """
 
 import matplotlib.pyplot as plt
@@ -55,7 +55,7 @@ ax.tick_params(labelsize=15)
 # histogram plot the samples
 ax.hist(X[:500], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
 ax.hist(X[500:], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
-ax.set_xlabel("X", fontsize=15)
+ax.set_xlabel("Variable One", fontsize=15)
 ax.set_ylabel("Likelihood", fontsize=15)
 plt.legend(frameon=False, fontsize=15)
 plt.show()

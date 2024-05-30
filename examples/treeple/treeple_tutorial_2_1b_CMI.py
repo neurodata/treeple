@@ -1,7 +1,7 @@
 """
-=====================
-2-1b: Calculating CMI
-=====================
+===============
+Calculating CMI
+===============
 """
 
 import matplotlib.pyplot as plt
@@ -71,10 +71,10 @@ Z_X_y = Z_X_y.replace({"y": 1.0}, "Class One")
 fig, ax = plt.subplots(figsize=(6, 6))
 fig.tight_layout()
 ax.tick_params(labelsize=15)
-sns.scatterplot(data=Z_X_y, x="Z", y="X", hue="y", palette=PALETTE[:2], alpha=0.2)
-sns.kdeplot(data=Z_X_y, x="Z", y="X", hue="y", palette=PALETTE[:2], alpha=0.6)
-ax.set_ylabel("X", fontsize=15)
-ax.set_xlabel("Z", fontsize=15)
+sns.scatterplot(data=Z_X_y, x="Z", y="X", hue="y", palette=PALETTE[:2][::-1], alpha=0.2)
+sns.kdeplot(data=Z_X_y, x="Z", y="X", hue="y", palette=PALETTE[:2][::-1], alpha=0.6)
+ax.set_ylabel("Variable Two", fontsize=15)
+ax.set_xlabel("Variable One", fontsize=15)
 plt.legend(frameon=False, fontsize=15)
 
 
@@ -142,7 +142,7 @@ ax.tick_params(labelsize=15)
 # histogram plot the posterior probabilities for class one
 ax.hist(single_proba[:500][:, 1], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
 ax.hist(single_proba[500:][:, 1], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
-ax.set_xlabel("Z", fontsize=15)
+ax.set_ylabel("# of Samples", fontsize=15)
 ax.set_xlabel("Class One Posterior", fontsize=15)
 plt.legend(frameon=False, fontsize=15)
 plt.show()
