@@ -18,6 +18,9 @@ Changelog
     encoded as infinity value. This is now fixed, and the estimators will raise an
     ValueError if missing-values are encountered in ``X`` input array.
     By `Adam Li`_ (:pr:`#264`)
+- |Feature| Simulations in ``sktree.datasets.hyppo`` now throw a warning instead
+    of an error when the number of samples is less than the number of dimensions.
+    By `Sambit Panda`_ (:pr:`#279`)
 
 Code and Documentation Contributors
 -----------------------------------
