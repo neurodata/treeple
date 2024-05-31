@@ -11,7 +11,7 @@ from sklearn.metrics import roc_curve
 
 from sktree.datasets import make_trunk_classification
 from sktree.ensemble import HonestForestClassifier
-from sktree.stats import build_hyppo_oob_forest
+from sktree.stats import build_oob_forest
 
 sns.set(color_codes=True, style="white", context="talk", font_scale=1.5)
 PALETTE = sns.color_palette("Set1")
@@ -76,7 +76,7 @@ est = HonestForestClassifier(
 )
 
 # fit the model and obtain the tree posteriors
-_, observe_proba = build_hyppo_oob_forest(est, X, y)
+_, observe_proba = build_oob_forest(est, X, y)
 
 # generate forest posteriors for the two classes
 observe_proba = np.nanmean(observe_proba, axis=0)

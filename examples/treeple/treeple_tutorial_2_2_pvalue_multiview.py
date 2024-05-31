@@ -41,9 +41,14 @@ sns.set_style("white", {"axes.edgecolor": "#dddddd"})
 #
 # Conditional mutual information (*CMI*) measures the dependence of *Y* on
 # *X* conditioned on *Z*. It can be calculated by the difference between
-# the joint MI (``I([X, Z]; Y)``) and the MI on Z (``I(Y; Z)``):
+# the joint *MI* (``I([X, Z]; Y)``) and the *MI* of Y on Z (``I(Y; Z)``):
 #
-# .. math:: I(X; Y | Z) = I([X, Z]; Y) - I(Y; Z)
+# .. math:: I(Y; X \mid Z) = I(Y; [X, Z]) - I(Y; Z)
+#
+# Under the null hypothesis :math:`H_0`, the joint *MI* ``I(Y; [X, Z])``
+# is equal to the *MI* of Y on Z ``I(Y; Z)``, so the *CMI* becomes zero. Thus, if
+# the *CMI* is significantly larger than zero, we can reject the null hypothesis
+# :math:`H_0`.
 #
 # With a multiview binary class simulation as an example, this tutorial
 # will show how to use ``treeple`` to calculate the statistic and test the

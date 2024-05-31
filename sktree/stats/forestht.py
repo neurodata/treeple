@@ -1294,7 +1294,7 @@ def build_coleman_forest(
     metric_func: Callable[[ArrayLike, ArrayLike], float] = METRIC_FUNCTIONS[metric]
 
     # build two sets of forests
-    est, orig_forest_proba = build_hyppo_oob_forest(est, X, y, verbose=verbose)
+    est, orig_forest_proba = build_oob_forest(est, X, y, verbose=verbose)
 
     X_null = np.copy(X)
     y_null = np.copy(y)
@@ -1307,7 +1307,7 @@ def build_coleman_forest(
         rng.shuffle(temp_col)
         X_null[:, covariate_index] = temp_col
 
-    perm_est, perm_forest_proba = build_hyppo_oob_forest(perm_est, X_null, y_null, verbose=verbose)
+    perm_est, perm_forest_proba = build_oob_forest(perm_est, X_null, y_null, verbose=verbose)
 
     # get the number of jobs
     n_jobs = est.n_jobs
@@ -1433,7 +1433,7 @@ def build_permutation_forest(
         )
 
     # train the original forest on unpermuted data
-    est, orig_forest_proba = build_hyppo_oob_forest(est, X, y, verbose=verbose)
+    est, orig_forest_proba = build_oob_forest(est, X, y, verbose=verbose)
     y_pred_proba_orig = np.nanmean(orig_forest_proba, axis=0)
     observe_test_stat = metric_func(y, y_pred_proba_orig, **metric_kwargs)
 
@@ -1452,7 +1452,7 @@ def build_permutation_forest(
         perm_est = clone(perm_est)
         perm_est.set_params(random_state=rng.integers(0, np.iinfo(np.int32).max))
 
-        perm_est, perm_forest_proba = build_hyppo_oob_forest(
+        perm_est, perm_forest_proba = build_oob_forest(
             perm_est, X_perm, y, verbose=verbose, covariate_index=covariate_index
         )
 
@@ -1474,7 +1474,7 @@ def build_permutation_forest(
         return forest_result
 
 
-def build_hyppo_oob_forest(est: ForestClassifier, X, y, verbose=False, **est_kwargs):
+def build_oob_forest(est: ForestClassifier, X, y, verbose=False, **est_kwargs):
     """Build a hypothesis testing forest using oob samples.
 
     Parameters
@@ -1532,7 +1532,7 @@ def build_hyppo_oob_forest(est: ForestClassifier, X, y, verbose=False, **est_kwa
     return est, all_proba
 
 
-def build_hyppo_cv_forest(
+def build_cv_forest(
     est,
     X,
     y,
@@ -1541,7 +1541,7 @@ def build_hyppo_cv_forest(
     verbose=False,
     seed=None,
 ):
-    """Build a hypothesis testing forest using oob samples.
+    """Build a hypothesis testing forest using using cross-validation.
 
     Parameters
     ----------

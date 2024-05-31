@@ -103,7 +103,7 @@ The trees that comprise those forests are also available as standalone classes.
 
 Outlier Detection
 -----------------
-Isolation forests are a model implemented in scikit-learn, which is an ensemble of 
+Isolation forests are a model implemented in scikit-learn, which is an ensemble of
 extremely randomized axis-aligned decision tree models. Extended isolation forests
 replaces the base tree model with an oblique tree, which allows a more flexible model
 for detecting outliers.
@@ -151,10 +151,10 @@ tree models.
    PermutationForestRegressor
    build_coleman_forest
    build_permutation_forest
-   build_hyppo_oob_forest
-   build_hyppo_cv_forest
+   build_oob_forest
+   build_cv_forest
    PermutationHonestForestClassifier
-   
+
 Datasets
 ------------------------------
 We provide some convenience functions for simulating datasets beyond
