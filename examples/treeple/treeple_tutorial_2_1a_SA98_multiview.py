@@ -12,7 +12,7 @@ from sklearn.metrics import roc_curve
 
 from sktree.datasets import make_trunk_classification
 from sktree.ensemble import HonestForestClassifier
-from sktree.stats import build_hyppo_oob_forest
+from sktree.stats import build_oob_forest
 from sktree.tree import MultiViewDecisionTreeClassifier
 
 sns.set(color_codes=True, style="white", context="talk", font_scale=1.5)
@@ -95,7 +95,7 @@ est = HonestForestClassifier(
 )
 
 # fit the model and obtain the tree posteriors
-_, observe_proba = build_hyppo_oob_forest(est, Z_X, y)
+_, observe_proba = build_oob_forest(est, Z_X, y)
 
 # generate forest posteriors for the two classes
 observe_proba = np.nanmean(observe_proba, axis=0)
