@@ -3,7 +3,7 @@ meson-python>=0.16.0
 cython>=3.0.10
 ninja
 numpy
-scikit-learn>=1.4.2
+scikit-learn>=1.5.0
 click
 rich-click
 doit
