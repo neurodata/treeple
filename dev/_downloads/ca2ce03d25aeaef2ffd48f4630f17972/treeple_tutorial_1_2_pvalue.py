@@ -43,8 +43,14 @@ sns.set_style("white", {"axes.edgecolor": "#dddddd"})
 #
 # .. math:: I(X; Y) = H(Y) - H(Y\mid X)
 #
+# Under the null hypothesis :math:`H_0`, the conditional entropy ``H(Y | X)``
+# is equal to the class entropy ``H(Y)``, so the *MI* becomes zero. Thus, if
+# the *MI* is significantly larger than zero, we can reject the null hypothesis
+# :math:`H_0`.
+#
 # With a binary class simulation as an example, this tutorial will show
-# how to use ``treeple`` to use the statistic and the p-value.
+# how to use ``treeple`` to calculate the statistic and test the
+# hypothesis with data.
 
 # %%
 # Create a simulation with two gaussians

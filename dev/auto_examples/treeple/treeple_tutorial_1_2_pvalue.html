@@ -553,8 +553,13 @@ differences, using mutual information as an example.</p>
 (<code class="docutils literal notranslate"><span class="pre">H(Y)</span></code>) and the conditional entropy (<code class="docutils literal notranslate"><span class="pre">H(Y</span> <span class="pre">|</span> <span class="pre">X)</span></code>):</p>
 <div class="math notranslate nohighlight">
 \[I(X; Y) = H(Y) - H(Y\mid X)\]</div>
+<p>Under the null hypothesis <span class="math notranslate nohighlight">\(H_0\)</span>, the conditional entropy <code class="docutils literal notranslate"><span class="pre">H(Y</span> <span class="pre">|</span> <span class="pre">X)</span></code>
+is equal to the class entropy <code class="docutils literal notranslate"><span class="pre">H(Y)</span></code>, so the <em>MI</em> becomes zero. Thus, if
+the <em>MI</em> is significantly larger than zero, we can reject the null hypothesis
+<span class="math notranslate nohighlight">\(H_0\)</span>.</p>
 <p>With a binary class simulation as an example, this tutorial will show
-how to use <code class="docutils literal notranslate"><span class="pre">treeple</span></code> to use the statistic and the p-value.</p>
+how to use <code class="docutils literal notranslate"><span class="pre">treeple</span></code> to calculate the statistic and test the
+hypothesis with data.</p>
 </section>
 <section id="create-a-simulation-with-two-gaussians">
 <h2>Create a simulation with two gaussians<a class="headerlink" href="#create-a-simulation-with-two-gaussians" title="Link to this heading">#</a></h2>
@@ -641,7 +646,7 @@ and the statistic differences are used to calculate the p-vale.</p>
 The null hypothesis is rejected.
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (3 minutes 16.281 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (2 minutes 46.614 seconds)</p>
 <p><strong>Estimated memory usage:</strong>  9 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-treeple-treeple-tutorial-1-2-pvalue-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">

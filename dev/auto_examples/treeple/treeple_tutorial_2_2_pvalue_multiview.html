@@ -552,9 +552,13 @@ information as a test statistic in this example.</p>
 <h2>CMI<a class="headerlink" href="#cmi" title="Link to this heading">#</a></h2>
 <p>Conditional mutual information (<em>CMI</em>) measures the dependence of <em>Y</em> on
 <em>X</em> conditioned on <em>Z</em>. It can be calculated by the difference between
-the joint MI (<code class="docutils literal notranslate"><span class="pre">I([X,</span> <span class="pre">Z];</span> <span class="pre">Y)</span></code>) and the MI on Z (<code class="docutils literal notranslate"><span class="pre">I(Y;</span> <span class="pre">Z)</span></code>):</p>
+the joint <em>MI</em> (<code class="docutils literal notranslate"><span class="pre">I([X,</span> <span class="pre">Z];</span> <span class="pre">Y)</span></code>) and the <em>MI</em> of Y on Z (<code class="docutils literal notranslate"><span class="pre">I(Y;</span> <span class="pre">Z)</span></code>):</p>
 <div class="math notranslate nohighlight">
-\[I(X; Y | Z) = I([X, Z]; Y) - I(Y; Z)\]</div>
+\[I(Y; X \mid Z) = I(Y; [X, Z]) - I(Y; Z)\]</div>
+<p>Under the null hypothesis <span class="math notranslate nohighlight">\(H_0\)</span>, the joint <em>MI</em> <code class="docutils literal notranslate"><span class="pre">I(Y;</span> <span class="pre">[X,</span> <span class="pre">Z])</span></code>
+is equal to the <em>MI</em> of Y on Z <code class="docutils literal notranslate"><span class="pre">I(Y;</span> <span class="pre">Z)</span></code>, so the <em>CMI</em> becomes zero. Thus, if
+the <em>CMI</em> is significantly larger than zero, we can reject the null hypothesis
+<span class="math notranslate nohighlight">\(H_0\)</span>.</p>
 <p>With a multiview binary class simulation as an example, this tutorial
 will show how to use <code class="docutils literal notranslate"><span class="pre">treeple</span></code> to calculate the statistic and test the
 hypothesis with multiview data.</p>
@@ -688,7 +692,7 @@ and the statistic differences are used to calculate the p-vale.</p>
 The null hypothesis is rejected.
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (3 minutes 11.713 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (3 minutes 4.441 seconds)</p>
 <p><strong>Estimated memory usage:</strong>  9 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-treeple-treeple-tutorial-2-2-pvalue-multiview-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">

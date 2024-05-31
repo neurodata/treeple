@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>sktree.stats.build_hyppo_oob_forest &#8212; scikit-tree 0.8.0dev0 documentation</title>
+    <title>sktree.stats.build_cv_forest &#8212; scikit-tree 0.8.0dev0 documentation</title>
   
   
   
@@ -47,7 +47,7 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=fd10adb8"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/sktree.stats.build_hyppo_oob_forest';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/sktree.stats.build_cv_forest';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.14.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/scikit-tree/main/doc/_static/versions.json';
@@ -56,8 +56,8 @@
         </script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sktree.stats.build_hyppo_cv_forest" href="sktree.stats.build_hyppo_cv_forest.html" />
-    <link rel="prev" title="sktree.stats.build_permutation_forest" href="sktree.stats.build_permutation_forest.html" />
+    <link rel="next" title="sktree.stats.PermutationHonestForestClassifier" href="sktree.stats.PermutationHonestForestClassifier.html" />
+    <link rel="prev" title="sktree.stats.build_oob_forest" href="sktree.stats.build_oob_forest.html" />
     <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
     <script type="text/javascript" src="../_static/copybutton.js"></script>
     <script type="text/javascript" src="../_static/scrollfix.js"></script>
@@ -444,8 +444,8 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="sktree.stats.PermutationForestRegressor.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.PermutationForestRegressor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sktree.stats.build_coleman_forest.html">sktree.stats.build_coleman_forest</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sktree.stats.build_permutation_forest.html">sktree.stats.build_permutation_forest</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">sktree.stats.build_hyppo_oob_forest</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sktree.stats.build_hyppo_cv_forest.html">sktree.stats.build_hyppo_cv_forest</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sktree.stats.build_oob_forest.html">sktree.stats.build_oob_forest</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">sktree.stats.build_cv_forest</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sktree.stats.PermutationHonestForestClassifier.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.PermutationHonestForestClassifier</a></li>
 </ul>
 <ul class="nav bd-sidenav">
@@ -528,12 +528,12 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="sktree-stats-build-hyppo-oob-forest">
-<h1>sktree.stats.build_hyppo_oob_forest<a class="headerlink" href="#sktree-stats-build-hyppo-oob-forest" title="Link to this heading">#</a></h1>
+  <section id="sktree-stats-build-cv-forest">
+<h1>sktree.stats.build_cv_forest<a class="headerlink" href="#sktree-stats-build-cv-forest" title="Link to this heading">#</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="sktree.stats.build_hyppo_oob_forest">
-<span class="sig-prename descclassname"><span class="pre">sktree.stats.</span></span><span class="sig-name descname"><span class="pre">build_hyppo_oob_forest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">est</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">est_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sktree/stats/forestht.html#build_hyppo_oob_forest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sktree.stats.build_hyppo_oob_forest" title="Link to this definition">#</a></dt>
-<dd><p>Build a hypothesis testing forest using oob samples.</p>
+<dt class="sig sig-object py" id="sktree.stats.build_cv_forest">
+<span class="sig-prename descclassname"><span class="pre">sktree.stats.</span></span><span class="sig-name descname"><span class="pre">build_cv_forest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">est</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sktree/stats/forestht.html#build_cv_forest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sktree.stats.build_cv_forest" title="Link to this definition">#</a></dt>
+<dd><p>Build a hypothesis testing forest using using cross-validation.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
@@ -543,46 +543,29 @@ document.write(`
 </dd>
 <dt><strong>y</strong><span class="classifier">ArrayLike of shape (n_samples, n_outputs)</span></dt><dd><p>Binary target, so <code class="docutils literal notranslate"><span class="pre">n_outputs</span></code> should be at most 1.</p>
 </dd>
+<dt><strong>cv</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>Number of folds to use for cross-validation, by default 5.</p>
+</dd>
+<dt><strong>test_size</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, optional</span></dt><dd><p>Proportion of samples per tree to use for the test set, by default 0.2.</p>
+</dd>
 <dt><strong>verbose</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>Verbosity, by default False.</p>
 </dd>
-<dt><strong>**est_kwargs</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">dict</span></code></a>, optional</span></dt><dd><p>Additional keyword arguments to pass to the forest estimator.</p>
+<dt><strong>seed</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>Random seed, by default None.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
+<dd class="field-even"><dl>
 <dt><strong>est</strong><span class="classifier">Forest</span></dt><dd><p>Fitted forest.</p>
 </dd>
-<dt><strong>all_proba</strong><span class="classifier">ArrayLike of shape (n_estimators, n_samples, n_outputs)</span></dt><dd><p>The predicted posterior probabilities for each estimator on their
-out of bag samples.</p>
+<dt><strong>all_proba_list</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of ArrayLike of shape (n_estimators, n_samples, n_outputs)</span></dt><dd><p>The predicted posterior probabilities for each estimator on their
+out of bag samples. Length of list is equal to the number of splits.</p>
 </dd>
 </dl>
 </dd>
 </dl>
 </dd></dl>
 
-<section id="examples-using-sktree-stats-build-hyppo-oob-forest">
-<span id="sphx-glr-backreferences-sktree-stats-build-hyppo-oob-forest"></span><h2>Examples using <code class="docutils literal notranslate"><span class="pre">sktree.stats.build_hyppo_oob_forest</span></code><a class="headerlink" href="#examples-using-sktree-stats-build-hyppo-oob-forest" title="Link to this heading">#</a></h2>
-<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Calculating S@98"><img alt="" src="../_images/sphx_glr_treeple_tutorial_1_1a_SA98_thumb.png" />
-<p><a class="reference internal" href="../auto_examples/treeple/treeple_tutorial_1_1a_SA98.html#sphx-glr-auto-examples-treeple-treeple-tutorial-1-1a-sa98-py"><span class="std std-ref">Calculating S&#64;98</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Calculating S@98</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Calculating MI"><img alt="" src="../_images/sphx_glr_treeple_tutorial_1_1b_MI_thumb.png" />
-<p><a class="reference internal" href="../auto_examples/treeple/treeple_tutorial_1_1b_MI.html#sphx-glr-auto-examples-treeple-treeple-tutorial-1-1b-mi-py"><span class="std std-ref">Calculating MI</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Calculating MI</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Calculating pAUC"><img alt="" src="../_images/sphx_glr_treeple_tutorial_1_1c_pAUC_thumb.png" />
-<p><a class="reference internal" href="../auto_examples/treeple/treeple_tutorial_1_1c_pAUC.html#sphx-glr-auto-examples-treeple-treeple-tutorial-1-1c-pauc-py"><span class="std std-ref">Calculating pAUC</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Calculating pAUC</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Calculating Hellinger Distance"><img alt="" src="../_images/sphx_glr_treeple_tutorial_1_1d_HD_thumb.png" />
-<p><a class="reference internal" href="../auto_examples/treeple/treeple_tutorial_1_1d_HD.html#sphx-glr-auto-examples-treeple-treeple-tutorial-1-1d-hd-py"><span class="std std-ref">Calculating Hellinger Distance</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Calculating Hellinger Distance</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Calculating S@98 with multiview data"><img alt="" src="../_images/sphx_glr_treeple_tutorial_2_1a_SA98_multiview_thumb.png" />
-<p><a class="reference internal" href="../auto_examples/treeple/treeple_tutorial_2_1a_SA98_multiview.html#sphx-glr-auto-examples-treeple-treeple-tutorial-2-1a-sa98-multiview-py"><span class="std std-ref">Calculating S&#64;98 with multiview data</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Calculating S@98 with multiview data</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Calculating CMI"><img alt="" src="../_images/sphx_glr_treeple_tutorial_2_1b_CMI_thumb.png" />
-<p><a class="reference internal" href="../auto_examples/treeple/treeple_tutorial_2_1b_CMI.html#sphx-glr-auto-examples-treeple-treeple-tutorial-2-1b-cmi-py"><span class="std std-ref">Calculating CMI</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Calculating CMI</div>
-</div></div></section>
-</section>
+<span class="target" id="sphx-glr-backreferences-sktree-stats-build-cv-forest"></span></section>
 
 
                 </article>
@@ -595,20 +578,20 @@ out of bag samples.</p>
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="sktree.stats.build_permutation_forest.html"
+       href="sktree.stats.build_oob_forest.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">sktree.stats.build_permutation_forest</p>
+        <p class="prev-next-title">sktree.stats.build_oob_forest</p>
       </div>
     </a>
     <a class="right-next"
-       href="sktree.stats.build_hyppo_cv_forest.html"
+       href="sktree.stats.PermutationHonestForestClassifier.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">sktree.stats.build_hyppo_cv_forest</p>
+        <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sktree.stats</span></code>.PermutationHonestForestClassifier</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -627,8 +610,7 @@ out of bag samples.</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.stats.build_hyppo_oob_forest"><code class="docutils literal notranslate"><span class="pre">build_hyppo_oob_forest()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples-using-sktree-stats-build-hyppo-oob-forest">Examples using <code class="docutils literal notranslate"><span class="pre">sktree.stats.build_hyppo_oob_forest</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sktree.stats.build_cv_forest"><code class="docutils literal notranslate"><span class="pre">build_cv_forest()</span></code></a></li>
 </ul>
   </nav></div>
 
