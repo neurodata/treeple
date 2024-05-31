@@ -56,7 +56,7 @@
         </script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Compare the decision surfaces of oblique extra-trees with standard oblique trees" href="plot_oblique_forests_iris.html" />
+    <link rel="next" title="Speed of Extra Oblique Random Forest vs Oblique Random Forest on different dataset sizes" href="plot_extra_orf_sample_size.html" />
     <link rel="prev" title="Sparse oblique projections with oblique decision-trees" href="index.html" />
     <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
     <script type="text/javascript" src="../../_static/copybutton.js"></script>
@@ -398,12 +398,12 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../hypothesis_testing/index.html">Hypothesis testing with decision trees</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../hypothesis_testing/plot_MI_genuine_hypothesis_testing_forest.html">Mutual Information for Genuine Hypothesis Testing (MIGHT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../hypothesis_testing/plot_MI_imbalanced_hyppo_testing.html">Mutual Information for Genuine Hypothesis Testing (MIGHT) with Imbalanced Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../hypothesis_testing/plot_co_MIGHT_alternative.html">Demonstrate Conditional Mutual Information for Genuine Hypothesis Testing (Co-MIGHT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../hypothesis_testing/plot_co_MIGHT_null.html">Co-MIGHT when Data Exhibits Conditional Independence</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../hypothesis_testing/plot_might_auc.html">Compute partial AUC using Mutual Information for Genuine Hypothesis Testing (MIGHT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../hypothesis_testing/plot_might_mv_auc.html">Compute partial AUC using multi-view MIGHT (MV-MIGHT)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../hypothesis_testing/plot_co_MIGHT_alternative.html">Demonstrate Conditional Mutual Information for Genuine Hypothesis Testing (Co-MIGHT)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../hypothesis_testing/plot_MI_genuine_hypothesis_testing_forest.html">Mutual Information for Genuine Hypothesis Testing (MIGHT)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../hypothesis_testing/plot_MI_imbalanced_hyppo_testing.html">Mutual Information for Genuine Hypothesis Testing (MIGHT) with Imbalanced Data</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../multiview/index.html">Multi-view learning with Decision-trees</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -427,10 +427,10 @@ document.write(`
 </li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Sparse oblique projections with oblique decision-trees</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Compare extra oblique forest and oblique random forest predictions on cc18 datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_extra_orf_sample_size.html">Speed of Extra Oblique Random Forest vs Oblique Random Forest on different dataset sizes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_oblique_axis_aligned_forests_sparse_parity.html">Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_oblique_forests_iris.html">Compare the decision surfaces of oblique extra-trees with standard oblique trees</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_oblique_random_forest.html">Plot oblique forest and axis-aligned random forest predictions on cc18 datasets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_oblique_axis_aligned_forests_sparse_parity.html">Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_extra_orf_sample_size.html">Speed of Extra Oblique Random Forest vs Oblique Random Forest on different dataset sizes</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../splitters/index.html">Decision-tree splitters</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -440,15 +440,15 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../treeple/index.html">Treeple for Hypothesis Testing</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_GMM.html">0: Estimating true posteriors &amp; statistics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_SA98.html">1-1a: Calculating S@98</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_MI.html">1-1b: Calculating MI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_pAUC.html">1-1c: Calculating pAUC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_HD.html">1-1d: Calculating Hellinger Distance</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_pvalue.html">1-2: Calculating p-value (MIGHT)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_SA98_multiview.html">2-1a: Calculating S@98 with multiview data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_CMI.html">2-1b: Calculating CMI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_pvalue_multiview.html">2-2: Calculating p-value with multiview data (CoMIGHT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_0_GMM.html">Estimating true posteriors &amp; statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_1_1a_SA98.html">Calculating S@98</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_1_1b_MI.html">Calculating MI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_1_1c_pAUC.html">Calculating pAUC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_1_1d_HD.html">Calculating Hellinger Distance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_1_2_pvalue.html">Calculating p-value (MIGHT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_2_1a_SA98_multiview.html">Calculating S@98 with multiview data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_2_1b_CMI.html">Calculating CMI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_2_2_pvalue_multiview.html">Calculating p-value with multiview data (CoMIGHT)</a></li>
 </ul>
 </li>
 </ul>
@@ -615,16 +615,16 @@ n_repeats        1
 n_jobs          -1
                                     time_taken
 dataset          dimension   model
-PhishingWebsites (2000, 30)  EORF     1.311186
-                             ORF      1.327308
-cnae-9           (864, 856)  EORF     1.406303
-                             ORF      1.404061
-har              (2000, 561) EORF     1.455924
-                             ORF      2.330169
-lsvt             (100, 310)  EORF     1.105004
-                             ORF      1.178633
-wdbc             (455, 30)   EORF     1.115495
-                             ORF      1.045287
+PhishingWebsites (2000, 30)  EORF     1.147788
+                             ORF      1.125296
+cnae-9           (864, 856)  EORF     1.161905
+                             ORF      1.267676
+har              (2000, 561) EORF     1.240129
+                             ORF      1.950759
+lsvt             (100, 310)  EORF     1.067830
+                             ORF      1.020105
+wdbc             (455, 30)   EORF     1.029011
+                             ORF      1.023350
 </pre></div>
 </div>
 <div class="line-block">
@@ -731,8 +731,8 @@ wdbc             (455, 30)   EORF     1.115495
 <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">d_names</span></a> <span class="o">=</span> <a href="https://pandas.pydata.org/pandas-docs/dev/reference/api/pandas.Series.unique.html#pandas.Series.unique" title="pandas.Series.unique" class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-method"><span class="n">df</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">unique</span></a><span class="p">()</span>
 <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">N</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">d_names</span><span class="o">.</span><span class="n">shape</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-<a href="https://matplotlib.org/stable/api/figure_api.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fig</span></a><span class="p">,</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ax</span></a> <span class="o">=</span> <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html#matplotlib.pyplot.subplots" title="matplotlib.pyplot.subplots" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span></a><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">N</span></a><span class="p">)</span>
-<a href="https://matplotlib.org/stable/api/figure_api.html#matplotlib.figure.Figure.set_size_inches" title="matplotlib.figure.Figure.set_size_inches" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-method"><span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span></a><span class="p">(</span><span class="mi">6</span> <span class="o">*</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">N</span></a><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fig</span></a><span class="p">,</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ax</span></a> <span class="o">=</span> <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html#matplotlib.pyplot.subplots" title="matplotlib.pyplot.subplots" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span></a><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">N</span></a><span class="p">)</span>
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.set_size_inches.html#matplotlib.figure.Figure.set_size_inches" title="matplotlib.figure.Figure.set_size_inches" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-method"><span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span></a><span class="p">(</span><span class="mi">6</span> <span class="o">*</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">N</span></a><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
 
 <span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">name</span></a> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">d_names</span></a><span class="p">):</span>
     <span class="n">sns</span><span class="o">.</span><span class="n">stripplot</span><span class="p">(</span>
@@ -757,8 +757,8 @@ wdbc             (455, 30)   EORF     1.115495
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 41.790 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  133 MB</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (3 minutes 11.262 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  230 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-sparse-oblique-trees-plot-extra-oblique-random-forest-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/9d192edccb7050fc654a0c44d8d3233e/plot_extra_oblique_random_forest.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_extra_oblique_random_forest.ipynb</span></code></a></p>
@@ -791,11 +791,11 @@ wdbc             (455, 30)   EORF     1.115495
       </div>
     </a>
     <a class="right-next"
-       href="plot_oblique_forests_iris.html"
+       href="plot_extra_orf_sample_size.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Compare the decision surfaces of oblique extra-trees with standard oblique trees</p>
+        <p class="prev-next-title">Speed of Extra Oblique Random Forest vs Oblique Random Forest on different dataset sizes</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -843,7 +843,7 @@ wdbc             (455, 30)   EORF     1.115495
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-05-06.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-05-31.
       <br/>
     
   </p>

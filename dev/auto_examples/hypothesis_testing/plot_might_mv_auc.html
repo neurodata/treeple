@@ -56,7 +56,7 @@
         </script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Demonstrate Conditional Mutual Information for Genuine Hypothesis Testing (Co-MIGHT)" href="plot_co_MIGHT_alternative.html" />
+    <link rel="next" title="Multi-view learning with Decision-trees" href="../multiview/index.html" />
     <link rel="prev" title="Compute partial AUC using Mutual Information for Genuine Hypothesis Testing (MIGHT)" href="plot_might_auc.html" />
     <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
     <script type="text/javascript" src="../../_static/copybutton.js"></script>
@@ -398,12 +398,12 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Hypothesis testing with decision trees</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="plot_MI_genuine_hypothesis_testing_forest.html">Mutual Information for Genuine Hypothesis Testing (MIGHT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_MI_imbalanced_hyppo_testing.html">Mutual Information for Genuine Hypothesis Testing (MIGHT) with Imbalanced Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_co_MIGHT_alternative.html">Demonstrate Conditional Mutual Information for Genuine Hypothesis Testing (Co-MIGHT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_co_MIGHT_null.html">Co-MIGHT when Data Exhibits Conditional Independence</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_might_auc.html">Compute partial AUC using Mutual Information for Genuine Hypothesis Testing (MIGHT)</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Compute partial AUC using multi-view MIGHT (MV-MIGHT)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_co_MIGHT_alternative.html">Demonstrate Conditional Mutual Information for Genuine Hypothesis Testing (Co-MIGHT)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_MI_genuine_hypothesis_testing_forest.html">Mutual Information for Genuine Hypothesis Testing (MIGHT)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_MI_imbalanced_hyppo_testing.html">Mutual Information for Genuine Hypothesis Testing (MIGHT) with Imbalanced Data</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../multiview/index.html">Multi-view learning with Decision-trees</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -427,10 +427,10 @@ document.write(`
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../sparse_oblique_trees/index.html">Sparse oblique projections with oblique decision-trees</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../sparse_oblique_trees/plot_extra_oblique_random_forest.html">Compare extra oblique forest and oblique random forest predictions on cc18 datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sparse_oblique_trees/plot_extra_orf_sample_size.html">Speed of Extra Oblique Random Forest vs Oblique Random Forest on different dataset sizes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sparse_oblique_trees/plot_oblique_axis_aligned_forests_sparse_parity.html">Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../sparse_oblique_trees/plot_oblique_forests_iris.html">Compare the decision surfaces of oblique extra-trees with standard oblique trees</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../sparse_oblique_trees/plot_oblique_random_forest.html">Plot oblique forest and axis-aligned random forest predictions on cc18 datasets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../sparse_oblique_trees/plot_oblique_axis_aligned_forests_sparse_parity.html">Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../sparse_oblique_trees/plot_extra_orf_sample_size.html">Speed of Extra Oblique Random Forest vs Oblique Random Forest on different dataset sizes</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../splitters/index.html">Decision-tree splitters</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -440,15 +440,15 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../treeple/index.html">Treeple for Hypothesis Testing</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_GMM.html">0: Estimating true posteriors &amp; statistics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_SA98.html">1-1a: Calculating S@98</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_MI.html">1-1b: Calculating MI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_pAUC.html">1-1c: Calculating pAUC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_HD.html">1-1d: Calculating Hellinger Distance</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_pvalue.html">1-2: Calculating p-value (MIGHT)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_SA98_multiview.html">2-1a: Calculating S@98 with multiview data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_CMI.html">2-1b: Calculating CMI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_pvalue_multiview.html">2-2: Calculating p-value with multiview data (CoMIGHT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_0_GMM.html">Estimating true posteriors &amp; statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_1_1a_SA98.html">Calculating S@98</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_1_1b_MI.html">Calculating MI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_1_1c_pAUC.html">Calculating pAUC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_1_1d_HD.html">Calculating Hellinger Distance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_1_2_pvalue.html">Calculating p-value (MIGHT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_2_1a_SA98_multiview.html">Calculating S@98 with multiview data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_2_1b_CMI.html">Calculating CMI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_2_2_pvalue_multiview.html">Calculating p-value with multiview data (CoMIGHT)</a></li>
 </ul>
 </li>
 </ul>
@@ -600,7 +600,7 @@ into a single dataset to perform hypothesis testing.</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Shape of Tree Posteriors for the positive class: </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">posterior_arr</span><span class="o">.</span><span class="n">shape</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ASH-90 / Partial AUC: 0.6083643452064504
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ASH-90 / Partial AUC: 0.5105440368598263
 Shape of Observed Samples: (1000,)
 Shape of Tree Posteriors for the positive class: (125, 1000, 1)
 </pre></div>
@@ -636,7 +636,7 @@ Shape of Tree Posteriors for the positive class: (125, 1000, 1)
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Shape of Tree Posteriors for the positive class: </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">posterior_arr</span><span class="o">.</span><span class="n">shape</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ASH-90 / Partial AUC: 0.5521126047441837
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ASH-90 / Partial AUC: 0.5235057340320498
 Shape of Observed Samples: (1000,)
 Shape of Tree Posteriors for the positive class: (125, 1000, 1)
 </pre></div>
@@ -650,8 +650,8 @@ Shape of Tree Posteriors for the positive class: (125, 1000, 1)
 <p>Tree Posteriors for the positive class: <code class="docutils literal notranslate"><span class="pre">est_mv.observe_posteriors_</span></code>
 (n_trees, n_samples_test, 1)</p>
 <p>True Labels: <code class="docutils literal notranslate"><span class="pre">est_mv.y_true_final_</span></code></p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 7.090 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  21 MB</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 6.854 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  9 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-hypothesis-testing-plot-might-mv-auc-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/bc0f3c3d39ef186c93e85f59521ebd8d/plot_might_mv_auc.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_might_mv_auc.ipynb</span></code></a></p>
@@ -684,11 +684,11 @@ Shape of Tree Posteriors for the positive class: (125, 1000, 1)
       </div>
     </a>
     <a class="right-next"
-       href="plot_co_MIGHT_alternative.html"
+       href="../multiview/index.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Demonstrate Conditional Mutual Information for Genuine Hypothesis Testing (Co-MIGHT)</p>
+        <p class="prev-next-title">Multi-view learning with Decision-trees</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -738,7 +738,7 @@ Shape of Tree Posteriors for the positive class: (125, 1000, 1)
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-05-06.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-05-31.
       <br/>
     
   </p>

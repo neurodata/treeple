@@ -1660,7 +1660,8 @@ document.write(`
 
 
 <span class="n">ForestTestResult</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span>
-    <span class="s2">&quot;ForestTestResult&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;observe_test_stat&quot;</span><span class="p">,</span> <span class="s2">&quot;permuted_stat&quot;</span><span class="p">,</span> <span class="s2">&quot;observe_stat&quot;</span><span class="p">,</span> <span class="s2">&quot;pvalue&quot;</span><span class="p">]</span>
+    <span class="s2">&quot;ForestTestResult&quot;</span><span class="p">,</span>
+    <span class="p">[</span><span class="s2">&quot;observe_test_stat&quot;</span><span class="p">,</span> <span class="s2">&quot;permuted_stat&quot;</span><span class="p">,</span> <span class="s2">&quot;observe_stat&quot;</span><span class="p">,</span> <span class="s2">&quot;pvalue&quot;</span><span class="p">,</span> <span class="s2">&quot;null_dist&quot;</span><span class="p">],</span>
 <span class="p">)</span>
 
 
@@ -1713,7 +1714,7 @@ document.write(`
 <span class="sd">    seed : int, optional</span>
 <span class="sd">        Random seed, by default None.</span>
 <span class="sd">    return_posteriors : bool, optional</span>
-<span class="sd">        Whether or not to return the posteriors, by default False.</span>
+<span class="sd">        Whether or not to return the posteriors, by default True.</span>
 <span class="sd">    **metric_kwargs : dict, optional</span>
 <span class="sd">        Additional keyword arguments to pass to the metric function.</span>
 
@@ -1730,6 +1731,8 @@ document.write(`
 <span class="sd">    perm_forest_proba : ArrayLike of shape (n_estimators, n_samples, n_outputs)</span>
 <span class="sd">        The predicted posterior probabilities for each of the permuted estimators</span>
 <span class="sd">        on their out of bag samples.</span>
+<span class="sd">    null_dist : ArrayLike of shape (n_repeats,)</span>
+<span class="sd">        The null statistic differences from permuted forests.</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
@@ -1737,23 +1740,27 @@ document.write(`
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">metric_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">ArrayLike</span><span class="p">,</span> <span class="n">ArrayLike</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">METRIC_FUNCTIONS</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span>
 
-    <span class="k">if</span> <span class="n">covariate_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">covariate_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">perm_est</span><span class="p">,</span> <span class="n">PermutationHonestForestClassifier</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Permutation forest must be a PermutationHonestForestClassifier, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">perm_est</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
-
     <span class="c1"># build two sets of forests</span>
     <span class="n">est</span><span class="p">,</span> <span class="n">orig_forest_proba</span> <span class="o">=</span> <span class="n">build_hyppo_oob_forest</span><span class="p">(</span><span class="n">est</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
-    <span class="n">perm_est</span><span class="p">,</span> <span class="n">perm_forest_proba</span> <span class="o">=</span> <span class="n">build_hyppo_oob_forest</span><span class="p">(</span>
-        <span class="n">perm_est</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">covariate_index</span><span class="o">=</span><span class="n">covariate_index</span>
-    <span class="p">)</span>
+
+    <span class="n">X_null</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">y_null</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">covariate_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">rng</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">y_null</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">temp_col</span> <span class="o">=</span> <span class="n">X_null</span><span class="p">[:,</span> <span class="n">covariate_index</span><span class="p">]</span>
+        <span class="n">rng</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">temp_col</span><span class="p">)</span>
+        <span class="n">X_null</span><span class="p">[:,</span> <span class="n">covariate_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_col</span>
+
+    <span class="n">perm_est</span><span class="p">,</span> <span class="n">perm_forest_proba</span> <span class="o">=</span> <span class="n">build_hyppo_oob_forest</span><span class="p">(</span><span class="n">perm_est</span><span class="p">,</span> <span class="n">X_null</span><span class="p">,</span> <span class="n">y_null</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
 
     <span class="c1"># get the number of jobs</span>
     <span class="n">n_jobs</span> <span class="o">=</span> <span class="n">est</span><span class="o">.</span><span class="n">n_jobs</span>
 
+    <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">metric_star</span><span class="p">,</span> <span class="n">metric_star_pi</span> <span class="o">=</span> <span class="n">_compute_null_distribution_coleman</span><span class="p">(</span>
         <span class="n">y</span><span class="p">,</span>
         <span class="n">orig_forest_proba</span><span class="p">,</span>
@@ -1772,18 +1779,20 @@ document.write(`
 
     <span class="c1"># metric^\pi - metric = observed test statistic, which under the</span>
     <span class="c1"># null is normally distributed around 0</span>
-    <span class="n">observe_test_stat</span> <span class="o">=</span> <span class="n">permute_stat</span> <span class="o">-</span> <span class="n">observe_stat</span>
+    <span class="n">observe_test_stat</span> <span class="o">=</span> <span class="n">observe_stat</span> <span class="o">-</span> <span class="n">permute_stat</span>
 
     <span class="c1"># metric^\pi_j - metric_j, which is centered at 0</span>
     <span class="n">null_dist</span> <span class="o">=</span> <span class="n">metric_star_pi</span> <span class="o">-</span> <span class="n">metric_star</span>
 
     <span class="c1"># compute pvalue</span>
     <span class="k">if</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">POSITIVE_METRICS</span><span class="p">:</span>
-        <span class="n">pvalue</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">null_dist</span> <span class="o">&lt;=</span> <span class="n">observe_test_stat</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">n_repeats</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
         <span class="n">pvalue</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">null_dist</span> <span class="o">&gt;=</span> <span class="n">observe_test_stat</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">n_repeats</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pvalue</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">null_dist</span> <span class="o">&lt;=</span> <span class="n">observe_test_stat</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">n_repeats</span><span class="p">)</span>
 
-    <span class="n">forest_result</span> <span class="o">=</span> <span class="n">ForestTestResult</span><span class="p">(</span><span class="n">observe_test_stat</span><span class="p">,</span> <span class="n">permute_stat</span><span class="p">,</span> <span class="n">observe_stat</span><span class="p">,</span> <span class="n">pvalue</span><span class="p">)</span>
+    <span class="n">forest_result</span> <span class="o">=</span> <span class="n">ForestTestResult</span><span class="p">(</span>
+        <span class="n">observe_test_stat</span><span class="p">,</span> <span class="n">permute_stat</span><span class="p">,</span> <span class="n">observe_stat</span><span class="p">,</span> <span class="n">pvalue</span><span class="p">,</span> <span class="n">null_dist</span>
+    <span class="p">)</span>
     <span class="k">if</span> <span class="n">return_posteriors</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">forest_result</span><span class="p">,</span> <span class="n">orig_forest_proba</span><span class="p">,</span> <span class="n">perm_forest_proba</span><span class="p">,</span> <span class="n">est</span><span class="p">,</span> <span class="n">perm_est</span>
     <span class="k">else</span><span class="p">:</span>
@@ -1840,7 +1849,7 @@ document.write(`
 <span class="sd">    seed : int, optional</span>
 <span class="sd">        Random seed, by default None.</span>
 <span class="sd">    return_posteriors : bool, optional</span>
-<span class="sd">        Whether or not to return the posteriors, by default False.</span>
+<span class="sd">        Whether or not to return the posteriors, by default True.</span>
 <span class="sd">    **metric_kwargs : dict, optional</span>
 <span class="sd">        Additional keyword arguments to pass to the metric function.</span>
 
@@ -1908,7 +1917,7 @@ document.write(`
     <span class="k">else</span><span class="p">:</span>
         <span class="n">pvalue</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">null_dist</span> <span class="o">&lt;=</span> <span class="n">observe_test_stat</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">n_repeats</span><span class="p">)</span>
 
-    <span class="n">forest_result</span> <span class="o">=</span> <span class="n">ForestTestResult</span><span class="p">(</span><span class="n">observe_test_stat</span><span class="p">,</span> <span class="n">permute_stat</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">pvalue</span><span class="p">)</span>
+    <span class="n">forest_result</span> <span class="o">=</span> <span class="n">ForestTestResult</span><span class="p">(</span><span class="n">observe_test_stat</span><span class="p">,</span> <span class="n">permute_stat</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">pvalue</span><span class="p">,</span> <span class="n">null_dist</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">return_posteriors</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">forest_result</span><span class="p">,</span> <span class="n">orig_forest_proba</span><span class="p">,</span> <span class="n">perm_forest_proba</span>
     <span class="k">else</span><span class="p">:</span>
@@ -2110,7 +2119,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-05-06.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-05-31.
       <br/>
     
   </p>

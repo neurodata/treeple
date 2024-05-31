@@ -56,8 +56,8 @@
         </script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Mutual Information for Genuine Hypothesis Testing (MIGHT)" href="plot_MI_genuine_hypothesis_testing_forest.html" />
-    <link rel="prev" title="Compute partial AUC using multi-view MIGHT (MV-MIGHT)" href="plot_might_mv_auc.html" />
+    <link rel="next" title="Co-MIGHT when Data Exhibits Conditional Independence" href="plot_co_MIGHT_null.html" />
+    <link rel="prev" title="Mutual Information for Genuine Hypothesis Testing (MIGHT) with Imbalanced Data" href="plot_MI_imbalanced_hyppo_testing.html" />
     <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
     <script type="text/javascript" src="../../_static/copybutton.js"></script>
     <script type="text/javascript" src="../../_static/scrollfix.js"></script>
@@ -398,12 +398,12 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Hypothesis testing with decision trees</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="plot_MI_genuine_hypothesis_testing_forest.html">Mutual Information for Genuine Hypothesis Testing (MIGHT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_MI_imbalanced_hyppo_testing.html">Mutual Information for Genuine Hypothesis Testing (MIGHT) with Imbalanced Data</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Demonstrate Conditional Mutual Information for Genuine Hypothesis Testing (Co-MIGHT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_co_MIGHT_null.html">Co-MIGHT when Data Exhibits Conditional Independence</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_might_auc.html">Compute partial AUC using Mutual Information for Genuine Hypothesis Testing (MIGHT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_might_mv_auc.html">Compute partial AUC using multi-view MIGHT (MV-MIGHT)</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Demonstrate Conditional Mutual Information for Genuine Hypothesis Testing (Co-MIGHT)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_MI_genuine_hypothesis_testing_forest.html">Mutual Information for Genuine Hypothesis Testing (MIGHT)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_MI_imbalanced_hyppo_testing.html">Mutual Information for Genuine Hypothesis Testing (MIGHT) with Imbalanced Data</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../multiview/index.html">Multi-view learning with Decision-trees</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -427,10 +427,10 @@ document.write(`
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../sparse_oblique_trees/index.html">Sparse oblique projections with oblique decision-trees</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../sparse_oblique_trees/plot_extra_oblique_random_forest.html">Compare extra oblique forest and oblique random forest predictions on cc18 datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sparse_oblique_trees/plot_extra_orf_sample_size.html">Speed of Extra Oblique Random Forest vs Oblique Random Forest on different dataset sizes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sparse_oblique_trees/plot_oblique_axis_aligned_forests_sparse_parity.html">Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../sparse_oblique_trees/plot_oblique_forests_iris.html">Compare the decision surfaces of oblique extra-trees with standard oblique trees</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../sparse_oblique_trees/plot_oblique_random_forest.html">Plot oblique forest and axis-aligned random forest predictions on cc18 datasets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../sparse_oblique_trees/plot_oblique_axis_aligned_forests_sparse_parity.html">Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../sparse_oblique_trees/plot_extra_orf_sample_size.html">Speed of Extra Oblique Random Forest vs Oblique Random Forest on different dataset sizes</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../splitters/index.html">Decision-tree splitters</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -440,15 +440,15 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../treeple/index.html">Treeple for Hypothesis Testing</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_GMM.html">0: Estimating true posteriors &amp; statistics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_SA98.html">1-1a: Calculating S@98</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_MI.html">1-1b: Calculating MI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_pAUC.html">1-1c: Calculating pAUC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_HD.html">1-1d: Calculating Hellinger Distance</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_pvalue.html">1-2: Calculating p-value (MIGHT)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_SA98_multiview.html">2-1a: Calculating S@98 with multiview data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_CMI.html">2-1b: Calculating CMI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_pvalue_multiview.html">2-2: Calculating p-value with multiview data (CoMIGHT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_0_GMM.html">Estimating true posteriors &amp; statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_1_1a_SA98.html">Calculating S@98</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_1_1b_MI.html">Calculating MI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_1_1c_pAUC.html">Calculating pAUC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_1_1d_HD.html">Calculating Hellinger Distance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_1_2_pvalue.html">Calculating p-value (MIGHT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_2_1a_SA98_multiview.html">Calculating S@98 with multiview data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_2_1b_CMI.html">Calculating CMI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_2_2_pvalue_multiview.html">Calculating p-value with multiview data (CoMIGHT)</a></li>
 </ul>
 </li>
 </ul>
@@ -708,7 +708,7 @@ All other parameters are kept the same.</p>
 <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">rf_results</span></a><span class="p">[</span><span class="s2">&quot;high_dim_feature_pvalue&quot;</span><span class="p">]</span> <span class="o">=</span> <a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">pvalue</span></a>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Estimated MI difference using regular decision-trees: </span><span class="si">{</span><a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">stat</span></a><span class="si">}</span><span class="s2"> with Pvalue: </span><span class="si">{</span><a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">pvalue</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-<a href="https://matplotlib.org/stable/api/figure_api.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fig</span></a><span class="p">,</span> <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="matplotlib.axes.Axes" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ax</span></a> <span class="o">=</span> <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html#matplotlib.pyplot.subplots" title="matplotlib.pyplot.subplots" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span></a><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fig</span></a><span class="p">,</span> <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="matplotlib.axes.Axes" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ax</span></a> <span class="o">=</span> <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html#matplotlib.pyplot.subplots" title="matplotlib.pyplot.subplots" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span></a><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
 
 <span class="c1"># plot pvalues</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.bar.html#matplotlib.axes.Axes.bar" title="matplotlib.axes.Axes.bar" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">bar</span></a><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">rf_results</span></a><span class="p">[</span><span class="s2">&quot;low_dim_feature_pvalue&quot;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Low-dim Feature Set (RF)&quot;</span><span class="p">)</span>
@@ -719,7 +719,7 @@ All other parameters are kept the same.</p>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set.html#matplotlib.axes.Axes.set" title="matplotlib.axes.Axes.set" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">set</span></a><span class="p">(</span><span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;Log10(PValue)&quot;</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">],</span> <span class="n">yscale</span><span class="o">=</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.legend.html#matplotlib.axes.Axes.legend" title="matplotlib.axes.Axes.legend" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">legend</span></a><span class="p">()</span>
 
-<a href="https://matplotlib.org/stable/api/figure_api.html#matplotlib.figure.Figure.tight_layout" title="matplotlib.figure.Figure.tight_layout" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-method"><span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span></a><span class="p">()</span>
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.tight_layout.html#matplotlib.figure.Figure.tight_layout" title="matplotlib.figure.Figure.tight_layout" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-method"><span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span></a><span class="p">()</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
@@ -748,8 +748,8 @@ reject the null hypothesis at lower $alpha$ levels.</p>
 </aside>
 </aside>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 23.047 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  15 MB</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 22.198 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  12 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-hypothesis-testing-plot-co-might-alternative-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/f5c159b9efcb8f3fb7fc4471d2b9307c/plot_co_MIGHT_alternative.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_co_MIGHT_alternative.ipynb</span></code></a></p>
@@ -773,20 +773,20 @@ reject the null hypothesis at lower $alpha$ levels.</p>
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="plot_might_mv_auc.html"
+       href="plot_MI_imbalanced_hyppo_testing.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Compute partial AUC using multi-view MIGHT (MV-MIGHT)</p>
+        <p class="prev-next-title">Mutual Information for Genuine Hypothesis Testing (MIGHT) with Imbalanced Data</p>
       </div>
     </a>
     <a class="right-next"
-       href="plot_MI_genuine_hypothesis_testing_forest.html"
+       href="plot_co_MIGHT_null.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Mutual Information for Genuine Hypothesis Testing (MIGHT)</p>
+        <p class="prev-next-title">Co-MIGHT when Data Exhibits Conditional Independence</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -836,7 +836,7 @@ reject the null hypothesis at lower $alpha$ levels.</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-05-06.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-05-31.
       <br/>
     
   </p>

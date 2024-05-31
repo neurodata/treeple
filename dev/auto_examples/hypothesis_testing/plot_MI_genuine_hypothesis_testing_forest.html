@@ -57,7 +57,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Mutual Information for Genuine Hypothesis Testing (MIGHT) with Imbalanced Data" href="plot_MI_imbalanced_hyppo_testing.html" />
-    <link rel="prev" title="Demonstrate Conditional Mutual Information for Genuine Hypothesis Testing (Co-MIGHT)" href="plot_co_MIGHT_alternative.html" />
+    <link rel="prev" title="Hypothesis testing with decision trees" href="index.html" />
     <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
     <script type="text/javascript" src="../../_static/copybutton.js"></script>
     <script type="text/javascript" src="../../_static/scrollfix.js"></script>
@@ -398,12 +398,12 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Hypothesis testing with decision trees</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Mutual Information for Genuine Hypothesis Testing (MIGHT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_MI_imbalanced_hyppo_testing.html">Mutual Information for Genuine Hypothesis Testing (MIGHT) with Imbalanced Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_co_MIGHT_alternative.html">Demonstrate Conditional Mutual Information for Genuine Hypothesis Testing (Co-MIGHT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_co_MIGHT_null.html">Co-MIGHT when Data Exhibits Conditional Independence</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_might_auc.html">Compute partial AUC using Mutual Information for Genuine Hypothesis Testing (MIGHT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_might_mv_auc.html">Compute partial AUC using multi-view MIGHT (MV-MIGHT)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_co_MIGHT_alternative.html">Demonstrate Conditional Mutual Information for Genuine Hypothesis Testing (Co-MIGHT)</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Mutual Information for Genuine Hypothesis Testing (MIGHT)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_MI_imbalanced_hyppo_testing.html">Mutual Information for Genuine Hypothesis Testing (MIGHT) with Imbalanced Data</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../multiview/index.html">Multi-view learning with Decision-trees</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -427,10 +427,10 @@ document.write(`
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../sparse_oblique_trees/index.html">Sparse oblique projections with oblique decision-trees</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../sparse_oblique_trees/plot_extra_oblique_random_forest.html">Compare extra oblique forest and oblique random forest predictions on cc18 datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sparse_oblique_trees/plot_extra_orf_sample_size.html">Speed of Extra Oblique Random Forest vs Oblique Random Forest on different dataset sizes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sparse_oblique_trees/plot_oblique_axis_aligned_forests_sparse_parity.html">Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../sparse_oblique_trees/plot_oblique_forests_iris.html">Compare the decision surfaces of oblique extra-trees with standard oblique trees</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../sparse_oblique_trees/plot_oblique_random_forest.html">Plot oblique forest and axis-aligned random forest predictions on cc18 datasets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../sparse_oblique_trees/plot_oblique_axis_aligned_forests_sparse_parity.html">Plot oblique forest and axis-aligned random forest predictions on sparse parity simulation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../sparse_oblique_trees/plot_extra_orf_sample_size.html">Speed of Extra Oblique Random Forest vs Oblique Random Forest on different dataset sizes</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../splitters/index.html">Decision-tree splitters</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -440,15 +440,15 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../treeple/index.html">Treeple for Hypothesis Testing</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_GMM.html">0: Estimating true posteriors &amp; statistics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_SA98.html">1-1a: Calculating S@98</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_MI.html">1-1b: Calculating MI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_pAUC.html">1-1c: Calculating pAUC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_HD.html">1-1d: Calculating Hellinger Distance</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_pvalue.html">1-2: Calculating p-value (MIGHT)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_SA98_multiview.html">2-1a: Calculating S@98 with multiview data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_CMI.html">2-1b: Calculating CMI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_pvalue_multiview.html">2-2: Calculating p-value with multiview data (CoMIGHT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_0_GMM.html">Estimating true posteriors &amp; statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_1_1a_SA98.html">Calculating S@98</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_1_1b_MI.html">Calculating MI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_1_1c_pAUC.html">Calculating pAUC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_1_1d_HD.html">Calculating Hellinger Distance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_1_2_pvalue.html">Calculating p-value (MIGHT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_2_1a_SA98_multiview.html">Calculating S@98 with multiview data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_2_1b_CMI.html">Calculating CMI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../treeple/treeple_tutorial_2_2_pvalue_multiview.html">Calculating p-value with multiview data (CoMIGHT)</a></li>
 </ul>
 </li>
 </ul>
@@ -656,8 +656,8 @@ Estimated MI difference for the unimportant feature set: 0.0026866694904621735 w
 </aside>
 </aside>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 21.043 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  16 MB</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 19.747 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  22 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-hypothesis-testing-plot-mi-genuine-hypothesis-testing-forest-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/edb15ea6cfcccab1e461f7807459ae91/plot_MI_genuine_hypothesis_testing_forest.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_MI_genuine_hypothesis_testing_forest.ipynb</span></code></a></p>
@@ -681,12 +681,12 @@ Estimated MI difference for the unimportant feature set: 0.0026866694904621735 w
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="plot_co_MIGHT_alternative.html"
+       href="index.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Demonstrate Conditional Mutual Information for Genuine Hypothesis Testing (Co-MIGHT)</p>
+        <p class="prev-next-title">Hypothesis testing with decision trees</p>
       </div>
     </a>
     <a class="right-next"
@@ -743,7 +743,7 @@ Estimated MI difference for the unimportant feature set: 0.0026866694904621735 w
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-05-06.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-05-31.
       <br/>
     
   </p>
