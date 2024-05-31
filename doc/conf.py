@@ -89,6 +89,7 @@ nitpick_ignore = [
     ("py:mod", "sktree.tree"),
     ("py:mod", "sktree.stats"),
     ("py:class", "sklearn.utils.metadata_routing.MetadataRequest"),
+    ('py:obj', 'MetadataRouter'),
 ]
 
 # The name of a reST role (builtin or Sphinx extension) to use as the default
