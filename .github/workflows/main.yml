@@ -22,7 +22,7 @@ env:
 
 jobs:
   build_and_test:
-    name: Meson build ${{ matrix.os }} - py${{ matrix.python-version }}
+    name: Meson ${{ matrix.os }} - py${{ matrix.python-version }}
     timeout-minutes: 20
     strategy:
       fail-fast: false
@@ -63,10 +63,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libopenblas-dev libatlas-base-dev liblapack-dev gfortran libgmp-dev libmpfr-dev libsuitesparse-dev ccache libmpc-dev
           sudo apt-get install -y gcc
-          sudo apt-get update
 
       - name: Install Ccache for MacOSX
-        if: ${{ matrix.os == 'macos-13' || matrix.os == 'macos-latest'}}
+        if: ${{ matrix.os == 'macos-13'}}
         run: |
           brew install ccache
           brew install gcc

@@ -12,9 +12,10 @@ def get_git_revision_hash(submodule) -> str:
 
 
 @click.command()
+@click.argument("meson_args", nargs=-1)
 @click.argument("slowtest", default=True)
 @click.pass_context
-def coverage(ctx, slowtest):
+def coverage(ctx, meson_args, slowtest=True):
     """📊 Generate coverage report"""
     if slowtest:
         pytest_args = (
