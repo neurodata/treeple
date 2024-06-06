@@ -33,7 +33,7 @@ def coverage(ctx, slowtest):
             "--cov=sktree",
             "--cov-report=xml",
         )
-    ctx.invoke(meson.test, pytest_args=pytest_args)
+    ctx.forward(meson.test, pytest_args=pytest_args)
 
 
 @click.command()
