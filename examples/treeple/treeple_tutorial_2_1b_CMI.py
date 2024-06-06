@@ -1,7 +1,7 @@
 """
-=====================
-2-1b: Calculating CMI
-=====================
+===============
+Calculating CMI
+===============
 """
 
 import matplotlib.pyplot as plt
@@ -12,7 +12,7 @@ from scipy.stats import entropy
 
 from sktree.datasets import make_trunk_classification
 from sktree.ensemble import HonestForestClassifier
-from sktree.stats import build_hyppo_oob_forest
+from sktree.stats import build_oob_forest
 from sktree.tree import MultiViewDecisionTreeClassifier
 
 sns.set(color_codes=True, style="white", context="talk", font_scale=1.5)
@@ -71,10 +71,10 @@ Z_X_y = Z_X_y.replace({"y": 1.0}, "Class One")
 fig, ax = plt.subplots(figsize=(6, 6))
 fig.tight_layout()
 ax.tick_params(labelsize=15)
-sns.scatterplot(data=Z_X_y, x="Z", y="X", hue="y", palette=PALETTE[:2], alpha=0.2)
-sns.kdeplot(data=Z_X_y, x="Z", y="X", hue="y", palette=PALETTE[:2], alpha=0.6)
-ax.set_ylabel("X", fontsize=15)
-ax.set_xlabel("Z", fontsize=15)
+sns.scatterplot(data=Z_X_y, x="Z", y="X", hue="y", palette=PALETTE[:2][::-1], alpha=0.2)
+sns.kdeplot(data=Z_X_y, x="Z", y="X", hue="y", palette=PALETTE[:2][::-1], alpha=0.6)
+ax.set_ylabel("Variable Two", fontsize=15)
+ax.set_xlabel("Variable One", fontsize=15)
 plt.legend(frameon=False, fontsize=15)
 
 
@@ -95,7 +95,7 @@ est = HonestForestClassifier(
 )
 
 # fit the model and obtain the tree posteriors
-_, observe_proba = build_hyppo_oob_forest(est, Z_X, y)
+_, observe_proba = build_oob_forest(est, Z_X, y)
 
 # generate forest posteriors for the two classes
 observe_proba = np.nanmean(observe_proba, axis=0)
@@ -129,7 +129,7 @@ est = HonestForestClassifier(
 )
 
 # fit the model and obtain the tree posteriors
-_, single_proba = build_hyppo_oob_forest(est, Z, y)
+_, single_proba = build_oob_forest(est, Z, y)
 
 # generate forest posteriors for the two classes
 single_proba = np.nanmean(single_proba, axis=0)
@@ -142,7 +142,7 @@ ax.tick_params(labelsize=15)
 # histogram plot the posterior probabilities for class one
 ax.hist(single_proba[:500][:, 1], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
 ax.hist(single_proba[500:][:, 1], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
-ax.set_xlabel("Z", fontsize=15)
+ax.set_ylabel("# of Samples", fontsize=15)
 ax.set_xlabel("Class One Posterior", fontsize=15)
 plt.legend(frameon=False, fontsize=15)
 plt.show()

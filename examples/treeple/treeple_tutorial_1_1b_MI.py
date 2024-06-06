@@ -1,35 +1,34 @@
 """
-======================
-1-1c: Calculating pAUC
-======================
+==============
+Calculating MI
+==============
 """
 
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-from sklearn.metrics import roc_auc_score, roc_curve
+from scipy.stats import entropy
 
 from sktree.datasets import make_trunk_classification
 from sktree.ensemble import HonestForestClassifier
-from sktree.stats import build_hyppo_oob_forest
+from sktree.stats import build_oob_forest
 
 sns.set(color_codes=True, style="white", context="talk", font_scale=1.5)
 PALETTE = sns.color_palette("Set1")
 sns.set_palette(PALETTE[1:5] + PALETTE[6:], n_colors=9)
 sns.set_style("white", {"axes.edgecolor": "#dddddd"})
 # %%
-# pAUC@r
-# ------
+# MI
+# --
 #
-# Partial area under the ROC curve (*pAUC*) integrates the true positive
-# rates (*TPR*) when the false positive rates (*FPR*) are below a specific
-# percentage threshold. Then the value is normalized by that percentage.
+# Mutual Information (*MI*) measures the mutual dependence between *X* and
+# *Y*. It can be calculated by the difference between the class entropy
+# (``H(Y)``) and the conditional entropy (``H(Y | X)``):
 #
-# .. math:: pAUC@r = \frac{100}{100 - r} \int_{T_r}^\infty \int_{\mathcal{X}} \mathbb{I}\{\eta(X_1) > \eta(X_0) \} dF_1 dF_0
+# .. math:: I(X; Y) = H(Y) - H(Y\mid X)
 #
 # With a binary class simulation as an example, this tutorial will show
-# how to use ``treeple`` to calculate the statistic with 90% specificity
-# threshold.
+# how to use ``treeple`` to calculate the statistic.
 
 # %%
 # Create a simulation with two gaussians
@@ -56,7 +55,7 @@ ax.tick_params(labelsize=15)
 # histogram plot the samples
 ax.hist(X[:500], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
 ax.hist(X[500:], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
-ax.set_xlabel("X", fontsize=15)
+ax.set_xlabel("Variable One", fontsize=15)
 ax.set_ylabel("Likelihood", fontsize=15)
 plt.legend(frameon=False, fontsize=15)
 plt.show()
@@ -78,7 +77,7 @@ est = HonestForestClassifier(
 )
 
 # fit the model and obtain the tree posteriors
-_, observe_proba = build_hyppo_oob_forest(est, X, y)
+_, observe_proba = build_oob_forest(est, X, y)
 
 # generate forest posteriors for the two classes
 observe_proba = np.nanmean(observe_proba, axis=0)
@@ -100,48 +99,16 @@ plt.show()
 # %%
 # Calculate the statistic
 # -----------------------
+def Calculate_MI(y_true, y_pred_proba):
+    # calculate the conditional entropy
+    H_YX = np.mean(entropy(y_pred_proba, base=np.exp(1), axis=1))
+
+    # empirical count of each class (n_classes)
+    _, counts = np.unique(y_true, return_counts=True)
+    # calculate the entropy of labels
+    H_Y = entropy(counts, base=np.exp(1))
+    return H_Y - H_YX
 
 
-def Calculate_pAUC(y_true, y_pred_proba, max_fpr=0.1) -> float:
-    # check the shape of true labels
-    if y_true.squeeze().ndim != 1:
-        raise ValueError(f"y_true must be 1d, not {y_true.shape}")
-
-    # find the positive class and calculate fpr and tpr
-    if 0 in y_true or -1 in y_true:
-        fpr, tpr, thresholds = roc_curve(
-            y_true, y_pred_proba[:, 1], pos_label=1, drop_intermediate=False
-        )
-    else:
-        fpr, tpr, thresholds = roc_curve(
-            y_true, y_pred_proba[:, 1], pos_label=2, drop_intermediate=False
-        )
-
-    fig, ax = plt.subplots(figsize=(6, 6))
-    fig.tight_layout()
-    ax.tick_params(labelsize=15)
-    ax.set_xlim([-0.005, 1.005])
-    ax.set_ylim([-0.005, 1.005])
-    ax.set_xlabel("False Positive Rate", fontsize=15)
-    ax.set_ylabel("True Positive Rate", fontsize=15)
-
-    ax.plot(fpr, tpr, label="ROC curve", color=PALETTE[1])
-    # Calculate pAUC at the specific threshold
-    pAUC = roc_auc_score(y_true, y_pred_proba[:, 1], max_fpr=max_fpr)
-
-    pos = np.where(fpr == max_fpr)[0][-1]
-    ax.fill_between(
-        fpr[:pos],
-        tpr[:pos],
-        color=PALETTE[0],
-        alpha=0.6,
-        label="pAUC@90 = " + str(round(pAUC, 2)),
-        linestyle="--",
-    )
-    ax.legend(frameon=False, fontsize=15)
-    return pAUC
-
-
-pAUC = Calculate_pAUC(y, observe_proba)
-print("pAUC@90 =", round(pAUC, 2))
-# sphinx_gallery_thumbnail_number = -1
+mi = Calculate_MI(y, observe_proba)
+print("MI =", round(mi, 2))
