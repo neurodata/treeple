@@ -174,7 +174,7 @@ jobs:
           gcc --version
 
       - name: Install Ccache for MacOSX
-        if: ${{ matrix.os == 'macos-13' || matrix.os == 'macos-latest}}
+        if: ${{ matrix.os == 'macos-13' || matrix.os == 'macos-latest'}}
         run: |
           brew install ccache
 
