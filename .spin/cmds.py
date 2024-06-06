@@ -13,8 +13,9 @@ def get_git_revision_hash(submodule) -> str:
 
 @click.command()
 @click.argument("slowtest", default=True)
+@click.argument("meson_args", nargs=-1)
 @click.pass_context
-def coverage(ctx, slowtest):
+def coverage(ctx, slowtest, meson_args):
     """📊 Generate coverage report"""
     if slowtest:
         pytest_args = (
@@ -33,7 +34,7 @@ def coverage(ctx, slowtest):
             "--cov=sktree",
             "--cov-report=xml",
         )
-    ctx.invoke(meson.test, pytest_args=pytest_args)
+    ctx.invoke(meson.test, pytest_args=pytest_args, meson_args=meson_args)
 
 
 @click.command()
