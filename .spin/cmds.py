@@ -126,28 +126,21 @@ def setup_submodule(forcesubmodule=False):
 
 
 @click.command()
+@click.argument("meson_args", nargs=-1)
 @click.option("-j", "--jobs", help="Number of parallel tasks to launch", type=int)
 @click.option("--clean", is_flag=True, help="Clean build directory before build")
+@click.option("-v", "--verbose", is_flag=True, help="Print all build output, even installation")
 @click.option(
     "--forcesubmodule", is_flag=True, help="Force submodule pull.", envvar="FORCE_SUBMODULE"
 )
-@click.option("-v", "--verbose", is_flag=True, help="Print all build output, even installation")
-@click.option(
-    "--gcov",
-    is_flag=True,
-    help="Enable C code coverage using `gcov`. Use `spin test --gcov` to generate reports.",
-)
-@click.argument("meson_args", nargs=-1)
 @click.pass_context
 def build(
     ctx,
     meson_args,
-    forcesubmodule=False,
     jobs=None,
     clean=False,
     verbose=False,
-    gcov=False,
-    quiet=False,
+    forcesubmodule=False,
 ):
     """Build scikit-tree using submodules.
 
@@ -164,8 +157,14 @@ def build(
     """
     ctx.invoke(setup_submodule, forcesubmodule=forcesubmodule)
 
+    # The spin `build` command doesn't know anything about `custom_arg`,
+    # so don't send it on.
+    del ctx.params["forcesubmodule"]
+
     # run build as normal
-    ctx.invoke(meson.build, meson_args=meson_args, jobs=jobs, clean=clean, verbose=verbose)
+    # Call the built-in `build` command, passing along
+    # all arguments and options.
+    ctx.forward(meson.build)
 
 
 @click.command()
