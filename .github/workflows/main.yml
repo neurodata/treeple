@@ -27,8 +27,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, macos-13, macos-14-arm64]
-        python-version: [3.9, "3.10", "3.11"]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        os:
+          - "windows-latest"
+          - "macos-latest"
+          - "ubuntu-latest"
+        # Python 3.9 is on macos-13 but not macos-latest (macos-14-arm64)
+        # https://github.com/actions/setup-python/issues/696#issuecomment-1637587760
+        exclude:
+          - {python-version: "3.9", os: "macos-latest"}
+        include:
+          - {python-version: "3.9", os: "macos-13"}
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -57,7 +66,7 @@ jobs:
           sudo apt-get update
 
       - name: Install Ccache for MacOSX
-        if: ${{ matrix.os == 'macos-13' || matrix.os == 'macos-14-arm64}}
+        if: ${{ matrix.os == 'macos-13' || matrix.os == 'macos-latest}}
         run: |
           brew install ccache
           brew install gcc
@@ -165,7 +174,7 @@ jobs:
           gcc --version
 
       - name: Install Ccache for MacOSX
-        if: ${{ matrix.os == 'macos-13' || matrix.os == 'macos-14-arm64}}
+        if: ${{ matrix.os == 'macos-13' || matrix.os == 'macos-latest}}
         run: |
           brew install ccache
 
