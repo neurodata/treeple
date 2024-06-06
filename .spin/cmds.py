@@ -132,6 +132,11 @@ def setup_submodule(forcesubmodule=False):
 @click.option("--clean", is_flag=True, help="Clean build directory before build")
 @click.option("-v", "--verbose", is_flag=True, help="Print all build output, even installation")
 @click.option(
+    "--gcov",
+    is_flag=True,
+    help="Enable C code coverage using `gcov`. Use `spin test --gcov` to generate reports.",
+)
+@click.option(
     "--forcesubmodule", is_flag=True, help="Force submodule pull.", envvar="FORCE_SUBMODULE"
 )
 @click.pass_context
@@ -141,6 +146,7 @@ def build(
     jobs=None,
     clean=False,
     verbose=False,
+    gcov=False,
     forcesubmodule=False,
 ):
     """Build scikit-tree using submodules.

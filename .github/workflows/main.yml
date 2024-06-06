@@ -58,14 +58,14 @@ jobs:
           cache-dependency-path: "pyproject.toml"
 
       - name: Install packages for Ubuntu
-        if: ${{ matrix.os == 'ubuntu-22.04'}}
+        if: ${{ matrix.os == 'ubuntu-latest'}}
         run: |
           sudo apt-get update
           sudo apt-get install -y libopenblas-dev libatlas-base-dev liblapack-dev gfortran libgmp-dev libmpfr-dev libsuitesparse-dev ccache libmpc-dev
           sudo apt-get install -y gcc
 
       - name: Install Ccache for MacOSX
-        if: ${{ matrix.os == 'macos-13'}}
+        if: ${{ matrix.os == 'macos-13' || matrix.os == 'macos-latest'}}
         run: |
           brew install ccache
           brew install gcc
