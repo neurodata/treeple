@@ -13,9 +13,8 @@ def get_git_revision_hash(submodule) -> str:
 
 @click.command()
 @click.argument("slowtest", default=True)
-@click.argument("meson_args", nargs=-1)
 @click.pass_context
-def coverage(ctx, slowtest, meson_args):
+def coverage(ctx, slowtest):
     """📊 Generate coverage report"""
     if slowtest:
         pytest_args = (
@@ -34,7 +33,7 @@ def coverage(ctx, slowtest, meson_args):
             "--cov=sktree",
             "--cov-report=xml",
         )
-    ctx.invoke(meson.test, pytest_args=pytest_args, meson_args=meson_args)
+    ctx.invoke(meson.test, pytest_args=pytest_args)
 
 
 @click.command()
@@ -133,9 +132,23 @@ def setup_submodule(forcesubmodule=False):
     "--forcesubmodule", is_flag=True, help="Force submodule pull.", envvar="FORCE_SUBMODULE"
 )
 @click.option("-v", "--verbose", is_flag=True, help="Print all build output, even installation")
+@click.option(
+    "--gcov",
+    is_flag=True,
+    help="Enable C code coverage using `gcov`. Use `spin test --gcov` to generate reports.",
+)
 @click.argument("meson_args", nargs=-1)
 @click.pass_context
-def build(ctx, meson_args, jobs=None, clean=False, forcesubmodule=False, verbose=False):
+def build(
+    ctx,
+    meson_args,
+    forcesubmodule=False,
+    jobs=None,
+    clean=False,
+    verbose=False,
+    gcov=False,
+    quiet=False,
+):
     """Build scikit-tree using submodules.
 
         git submodule update --recursive --remote
