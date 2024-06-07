@@ -29,7 +29,6 @@ jobs:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
         os:
-          # - "windows-latest"
           - "macos-latest"
           - "ubuntu-latest"
         # Python 3.9 is on macos-13 but not macos-latest (macos-14-arm64)
