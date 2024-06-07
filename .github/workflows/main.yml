@@ -307,9 +307,9 @@ jobs:
 
       - name: pip-packages
         run: |
+          pip install spin
           pip install .[build]
           pip install .[test]
-          pip install spin
 
       - name: Build
         run: |
@@ -325,4 +325,4 @@ jobs:
 
       - name: test
         run: |
-          spin test
+          pytest ./sktree
