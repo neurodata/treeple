@@ -1307,6 +1307,10 @@ def build_coleman_forest(
         rng.shuffle(temp_col)
         X_null[:, covariate_index] = temp_col
 
+    if not isinstance(perm_est, PermutationHonestForestClassifier):
+        raise RuntimeError(
+            f"Permutation forest must be a PermutationHonestForestClassifier, got {type(perm_est)}"
+        )
     perm_est, perm_forest_proba = build_oob_forest(perm_est, X_null, y_null, verbose=verbose)
 
     # get the number of jobs
