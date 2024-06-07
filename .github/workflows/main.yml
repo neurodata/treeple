@@ -317,6 +317,7 @@ jobs:
           echo "FORCE_SUBMODULE=True" >> $env:GITHUB_ENV
           spin setup_submodule --forcesubmodule
           spin build -j 2
+          spin install
           # Necessary because GitHub Actions checks out the repo to D:\ while OpenBLAS
           # got installed to C:\ higher up. The copying with `--win-cp-openblas` fails
           # when things are split over drives.
