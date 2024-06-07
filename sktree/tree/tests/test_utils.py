@@ -74,7 +74,7 @@ def is_contiguous_patch(patch_arr, patch_indices, data_dims):
 
 def test_best_patch_splitter_contiguous():
     """Test that patch splitter generates patches correctly."""
-    criterion = Gini(1, np.array((0, 1)))
+    criterion = Gini(1, np.array((0, 1), dtype=np.intp))
     max_features = 6
     min_samples_leaf = 1
     min_weight_leaf = 0.0
@@ -138,28 +138,28 @@ def test_best_patch_splitter_contiguous():
 
 def test_unravel_index():
     # Test with 1D array
-    indices = np.array([0, 1, 2, 3, 4])
-    shape = np.asarray((5,))
+    indices = np.array([0, 1, 2, 3, 4], dtype=np.intp)
+    shape = np.asarray((5,), dtype=np.intp)
     expected_output = [(0,), (1,), (2,), (3,), (4,)]
     for idx, index in enumerate(indices):
         assert unravel_index(index, shape) == expected_output[idx]
 
     # Test with 2D array
-    indices = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8])
-    shape = np.array((3, 3))
+    indices = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8], dtype=np.intp)
+    shape = np.array((3, 3), dtype=np.intp)
     expected_output = list(product(range(3), repeat=2))
     for idx, index in enumerate(indices):
         assert_equal(unravel_index(index, shape), expected_output[idx])
 
     # Test with 3D array
-    indices = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
-    shape = np.array((2, 2, 2, 2))
+    indices = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], dtype=np.intp)
+    shape = np.array((2, 2, 2, 2), dtype=np.intp)
     expected_output = list(product(range(2), repeat=4))
     for idx, index in enumerate(indices):
         assert_equal(unravel_index(index, shape), expected_output[idx])
 
     # Test with empty array
-    indices = np.array([])
+    indices = np.array([], dtype=np.intp)
     shape = (2, 2)
     expected_output = []
     for idx, index in enumerate(indices):
