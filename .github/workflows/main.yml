@@ -35,8 +35,10 @@ jobs:
         # https://github.com/actions/setup-python/issues/696#issuecomment-1637587760
         exclude:
           - { python-version: "3.9", os: "macos-latest" }
+          - { python-version: "3.10", os: "macos-latest" }
         include:
           - { python-version: "3.9", os: "macos-13" }
+          - { python-version: "3.10", os: "macos-13" }
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -80,6 +82,7 @@ jobs:
           python -m spin setup-submodule
           python -m pip install .[build]
           python -m pip install .[test]
+          python -m pip install compilers
 
       - name: Prepare compiler cache
         id: prep-ccache
@@ -109,6 +112,7 @@ jobs:
       - name: Setup build and install scikit-tree
         run: |
           ./spin build -j 2
+          ./spin install
 
       - name: Ccache performance
         shell: bash -l {0}
