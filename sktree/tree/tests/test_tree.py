@@ -164,8 +164,8 @@ def test_pickle_splitters():
     random_state = np.random.RandomState(100)
     boundary = None
     feature_weight = None
-    min_patch_dims = np.array((1, 1))
-    max_patch_dims = np.array((3, 1))
+    min_patch_dims = np.array((1, 1), dtype=np.intp)
+    max_patch_dims = np.array((3, 1), dtype=np.intp)
     dim_contiguous = np.array((True, True))
     data_dims = np.array((5, 5), dtype=np.intp)
 

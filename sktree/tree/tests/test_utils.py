@@ -90,8 +90,8 @@ def test_best_patch_splitter_contiguous():
 
     # We will make the patch 2D, which samples multiple rows contiguously. This is
     # a 2D patch of size 3 in the columns and 2 in the rows.
-    min_patch_dims = np.array((1, 2, 1))
-    max_patch_dims = np.array((2, 3, 6))
+    min_patch_dims = np.array((1, 2, 1), dtype=np.intp)
+    max_patch_dims = np.array((2, 3, 6), dtype=np.intp)
     dim_contiguous = np.array((True, True, True))
 
     boundary = None

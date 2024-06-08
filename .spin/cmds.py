@@ -12,10 +12,9 @@ def get_git_revision_hash(submodule) -> str:
 
 
 @click.command()
-@click.argument("meson_args", nargs=-1)
 @click.argument("slowtest", default=True)
 @click.pass_context
-def coverage(ctx, meson_args, slowtest=True):
+def coverage(ctx, slowtest=True):
     """📊 Generate coverage report"""
     if slowtest:
         pytest_args = (
@@ -34,6 +33,11 @@ def coverage(ctx, meson_args, slowtest=True):
             "--cov=sktree",
             "--cov-report=xml",
         )
+
+    # The spin `build` command doesn't know anything about `custom_arg`,
+    # so don't send it on.
+    del ctx.params["slowtest"]
+
     ctx.forward(meson.test, pytest_args=pytest_args)
 
 
