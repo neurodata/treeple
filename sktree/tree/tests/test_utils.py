@@ -81,7 +81,7 @@ def test_best_patch_splitter_contiguous():
     random_state = np.random.RandomState(10)
 
     # initialize some dummy data
-    data_dims = np.array((2, 3, 10))
+    data_dims = np.array((2, 3, 10), dtype=np.intp)
     X = np.repeat(np.arange(data_dims.prod()).astype(np.float32), 5).reshape(5, -1)
     y = np.array([0, 0, 0, 1, 1]).reshape(-1, 1).astype(np.float64)
     sample_weight = np.ones(5)
