@@ -245,7 +245,8 @@ jobs:
           ./spin --help
           ./spin coverage --help
           ./spin test --help
-          ./spin coverage
+          # ./spin coverage
+          pytest -o 'python_functions=test_*' sktree --cov=sktree --cov-report=xml '-k .'
           cp $PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages/coverage.xml ./coverage.xml
 
       - name: Upload coverage stats to codecov
