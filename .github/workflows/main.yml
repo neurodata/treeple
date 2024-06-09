@@ -228,10 +228,17 @@ jobs:
         shell: bash -l {0}
         run: ccache -s
 
-      - name: build-path
+      # - name: build-path
+      #   run: |
+      #     echo "$PWD/build-install/"
+      #     export INSTALLED_PATH=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages
+
+      - name: debug
         run: |
-          echo "$PWD/build-install/"
-          export INSTALLED_PATH=$PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages
+          ls $PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages/
+          echo "Okay..."
+          ls $PWD/build
+          ls ./
 
       - name: Run unit tests and coverage
         run: |
@@ -240,13 +247,6 @@ jobs:
           ./spin test --help
           ./spin coverage
           cp $PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages/coverage.xml ./coverage.xml
-
-      - name: debug
-        run: |
-          ls $PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages/
-          echo "Okay..."
-          ls $PWD/build
-          ls ./
 
       - name: Upload coverage stats to codecov
         uses: codecov/codecov-action@v4
