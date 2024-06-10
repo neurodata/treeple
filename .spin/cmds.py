@@ -38,7 +38,7 @@ def coverage(ctx, slowtest=True):
     # so don't send it on.
     del ctx.params["slowtest"]
 
-    ctx.forward(meson.test, pytest_args=pytest_args)
+    ctx.invoke(meson.test, pytest_args=pytest_args)
 
 
 @click.command()
