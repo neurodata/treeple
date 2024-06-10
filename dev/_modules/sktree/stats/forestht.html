@@ -1743,18 +1743,11 @@ document.write(`
     <span class="c1"># build two sets of forests</span>
     <span class="n">est</span><span class="p">,</span> <span class="n">orig_forest_proba</span> <span class="o">=</span> <span class="n">build_oob_forest</span><span class="p">(</span><span class="n">est</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
 
-    <span class="n">X_null</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-    <span class="n">y_null</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">covariate_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">rng</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">y_null</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">temp_col</span> <span class="o">=</span> <span class="n">X_null</span><span class="p">[:,</span> <span class="n">covariate_index</span><span class="p">]</span>
-        <span class="n">rng</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">temp_col</span><span class="p">)</span>
-        <span class="n">X_null</span><span class="p">[:,</span> <span class="n">covariate_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_col</span>
-
-    <span class="n">perm_est</span><span class="p">,</span> <span class="n">perm_forest_proba</span> <span class="o">=</span> <span class="n">build_oob_forest</span><span class="p">(</span><span class="n">perm_est</span><span class="p">,</span> <span class="n">X_null</span><span class="p">,</span> <span class="n">y_null</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">perm_est</span><span class="p">,</span> <span class="n">PermutationHonestForestClassifier</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Permutation forest must be a PermutationHonestForestClassifier, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">perm_est</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="n">perm_est</span><span class="p">,</span> <span class="n">perm_forest_proba</span> <span class="o">=</span> <span class="n">build_oob_forest</span><span class="p">(</span><span class="n">perm_est</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
 
     <span class="c1"># get the number of jobs</span>
     <span class="n">n_jobs</span> <span class="o">=</span> <span class="n">est</span><span class="o">.</span><span class="n">n_jobs</span>
@@ -2119,7 +2112,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-05-31.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-06-10.
       <br/>
     
   </p>
