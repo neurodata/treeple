@@ -60,7 +60,7 @@ def test_small_dataset_independent(seed):
     assert ~np.isnan(result.observe_test_stat)
     assert result.pvalue > 0.05
 
-    result = build_coleman_forest(clf, perm_clf, X, y, metric="mi")
+    result = build_coleman_forest(clf, perm_clf, X, y, metric="mi", return_posteriors=False)
     assert_almost_equal(result.observe_test_stat, 0.0, decimal=1)
     assert result.pvalue > 0.05
 
@@ -104,13 +104,13 @@ def test_small_dataset_dependent(seed):
     assert ~np.isnan(result.observe_test_stat)
     assert result.pvalue <= 0.05
 
-    result = build_coleman_forest(clf, perm_clf, X, y, metric="mi")
+    result = build_coleman_forest(clf, perm_clf, X, y, metric="mi", return_posteriors=False)
     assert result.pvalue <= 0.05
 
 
 def test_comight_repeated_feature_sets():
     """Test COMIGHT when there are repeated feature sets."""
-    n_samples = 50
+    n_samples = 100
     n_features = 500
     rng = np.random.default_rng(seed)
 
