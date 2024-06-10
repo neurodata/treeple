@@ -223,6 +223,7 @@ jobs:
       - name: Setup build and install scikit-tree
         run: |
           ./spin build -j 4 --forcesubmodule
+          ./spin install
 
       - name: Ccache performance
         shell: bash -l {0}
