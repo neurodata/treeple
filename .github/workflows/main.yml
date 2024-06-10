@@ -176,13 +176,7 @@ jobs:
         run: |
           gcc --version
 
-      - name: Install Ccache for MacOSX
-        if: ${{ matrix.os == 'macos-13' || matrix.os == 'macos-latest'}}
-        run: |
-          brew install ccache
-
       - name: Install packages for Ubuntu
-        if: ${{ matrix.os == 'ubuntu-22.04'}}
         run: |
           sudo apt-get update
           sudo apt-get install -y libopenblas-dev libatlas-base-dev liblapack-dev gfortran libgmp-dev libmpfr-dev libsuitesparse-dev ccache libmpc-dev
@@ -247,7 +241,7 @@ jobs:
           ./spin coverage --help
           ./spin test --help
           # ./spin coverage
-          pytest -o 'python_functions=test_*' sktree --cov=sktree --cov-report=xml '-k .'
+          python -m pytest -o 'python_functions=test_*' sktree --cov=sktree --cov-report=xml '-k .'
           cp $PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages/coverage.xml ./coverage.xml
 
       - name: Upload coverage stats to codecov
