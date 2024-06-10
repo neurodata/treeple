@@ -8,6 +8,7 @@ coverage
 *.xml
 .venv
 .pymon
+.coverage.*
 
 commit.txt
 sktree/_lib/sklearn/

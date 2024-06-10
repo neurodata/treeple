@@ -45,7 +45,8 @@ def _parallel_predict_proba_oob(predict_proba, X, out, idx, test_idx, lock):
 
 
 ForestTestResult = namedtuple(
-    "ForestTestResult", ["observe_test_stat", "permuted_stat", "observe_stat", "pvalue"]
+    "ForestTestResult",
+    ["observe_test_stat", "permuted_stat", "observe_stat", "pvalue", "null_dist"],
 )
 
 
@@ -96,7 +97,7 @@ def build_coleman_forest(
     seed : int, optional
         Random seed, by default None.
     return_posteriors : bool, optional
-        Whether or not to return the posteriors, by default False.
+        Whether or not to return the posteriors, by default True.
     **metric_kwargs : dict, optional
         Additional keyword arguments to pass to the metric function.
 
@@ -113,6 +114,8 @@ def build_coleman_forest(
     perm_forest_proba : ArrayLike of shape (n_estimators, n_samples, n_outputs)
         The predicted posterior probabilities for each of the permuted estimators
         on their out of bag samples.
+    null_dist : ArrayLike of shape (n_repeats,)
+        The null statistic differences from permuted forests.
 
     References
     ----------
@@ -120,23 +123,20 @@ def build_coleman_forest(
     """
     metric_func: Callable[[ArrayLike, ArrayLike], float] = METRIC_FUNCTIONS[metric]
 
-    if covariate_index is None:
-        covariate_index = np.arange(X.shape[1], dtype=int)
+    # build two sets of forests
+    est, orig_forest_proba = build_oob_forest(est, X, y, verbose=verbose)
 
     if not isinstance(perm_est, PermutationHonestForestClassifier):
         raise RuntimeError(
             f"Permutation forest must be a PermutationHonestForestClassifier, got {type(perm_est)}"
         )
-
-    # build two sets of forests
-    est, orig_forest_proba = build_hyppo_oob_forest(est, X, y, verbose=verbose)
-    perm_est, perm_forest_proba = build_hyppo_oob_forest(
-        perm_est, X, y, verbose=verbose, covariate_index=covariate_index
-    )
+    perm_est, perm_forest_proba = build_oob_forest(perm_est, X, y, verbose=verbose)
 
     # get the number of jobs
     n_jobs = est.n_jobs
 
+    if y.ndim == 1:
+        y = y.reshape(-1, 1)
     metric_star, metric_star_pi = _compute_null_distribution_coleman(
         y,
         orig_forest_proba,
@@ -155,18 +155,20 @@ def build_coleman_forest(
 
     # metric^\pi - metric = observed test statistic, which under the
     # null is normally distributed around 0
-    observe_test_stat = permute_stat - observe_stat
+    observe_test_stat = observe_stat - permute_stat
 
     # metric^\pi_j - metric_j, which is centered at 0
     null_dist = metric_star_pi - metric_star
 
     # compute pvalue
     if metric in POSITIVE_METRICS:
-        pvalue = (1 + (null_dist <= observe_test_stat).sum()) / (1 + n_repeats)
-    else:
         pvalue = (1 + (null_dist >= observe_test_stat).sum()) / (1 + n_repeats)
+    else:
+        pvalue = (1 + (null_dist <= observe_test_stat).sum()) / (1 + n_repeats)
 
-    forest_result = ForestTestResult(observe_test_stat, permute_stat, observe_stat, pvalue)
+    forest_result = ForestTestResult(
+        observe_test_stat, permute_stat, observe_stat, pvalue, null_dist
+    )
     if return_posteriors:
         return forest_result, orig_forest_proba, perm_forest_proba, est, perm_est
     else:
@@ -220,7 +222,7 @@ def build_permutation_forest(
     seed : int, optional
         Random seed, by default None.
     return_posteriors : bool, optional
-        Whether or not to return the posteriors, by default False.
+        Whether or not to return the posteriors, by default True.
     **metric_kwargs : dict, optional
         Additional keyword arguments to pass to the metric function.
 
@@ -254,7 +256,7 @@ def build_permutation_forest(
         )
 
     # train the original forest on unpermuted data
-    est, orig_forest_proba = build_hyppo_oob_forest(est, X, y, verbose=verbose)
+    est, orig_forest_proba = build_oob_forest(est, X, y, verbose=verbose)
     y_pred_proba_orig = np.nanmean(orig_forest_proba, axis=0)
     observe_test_stat = metric_func(y, y_pred_proba_orig, **metric_kwargs)
 
@@ -273,7 +275,7 @@ def build_permutation_forest(
         perm_est = clone(perm_est)
         perm_est.set_params(random_state=rng.integers(0, np.iinfo(np.int32).max))
 
-        perm_est, perm_forest_proba = build_hyppo_oob_forest(
+        perm_est, perm_forest_proba = build_oob_forest(
             perm_est, X_perm, y, verbose=verbose, covariate_index=covariate_index
         )
 
@@ -288,14 +290,14 @@ def build_permutation_forest(
     else:
         pvalue = (1 + (null_dist <= observe_test_stat).sum()) / (1 + n_repeats)
 
-    forest_result = ForestTestResult(observe_test_stat, permute_stat, None, pvalue)
+    forest_result = ForestTestResult(observe_test_stat, permute_stat, None, pvalue, null_dist)
     if return_posteriors:
         return forest_result, orig_forest_proba, perm_forest_proba
     else:
         return forest_result
 
 
-def build_hyppo_oob_forest(est: ForestClassifier, X, y, verbose=False, **est_kwargs):
+def build_oob_forest(est: ForestClassifier, X, y, verbose=False, **est_kwargs):
     """Build a hypothesis testing forest using oob samples.
 
     Parameters
@@ -353,7 +355,7 @@ def build_hyppo_oob_forest(est: ForestClassifier, X, y, verbose=False, **est_kwa
     return est, all_proba
 
 
-def build_hyppo_cv_forest(
+def build_cv_forest(
     est,
     X,
     y,
@@ -362,7 +364,7 @@ def build_hyppo_cv_forest(
     verbose=False,
     seed=None,
 ):
-    """Build a hypothesis testing forest using oob samples.
+    """Build a hypothesis testing forest using using cross-validation.
 
     Parameters
     ----------

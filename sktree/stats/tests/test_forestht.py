@@ -165,7 +165,7 @@ def test_build_coleman_forest():
 
     Test the function under alternative and null hypothesis for a very simple dataset.
     """
-    n_estimators = 40
+    n_estimators = 100
     n_samples = 30
     n_features = 5
     rng = np.random.default_rng(seed)
@@ -223,7 +223,7 @@ def test_build_coleman_forest_multiview():
 
     Test the function under alternative and null hypothesis for a very simple dataset.
     """
-    n_estimators = 40
+    n_estimators = 100
     n_samples = 30
     n_features = 5
     rng = np.random.default_rng(seed)

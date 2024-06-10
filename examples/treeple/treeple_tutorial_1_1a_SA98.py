@@ -1,16 +1,17 @@
 """
-====================================
-1-1d: Calculating Hellinger Distance
-====================================
+================
+Calculating S@98
+================
 """
 
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+from sklearn.metrics import roc_curve
 
 from sktree.datasets import make_trunk_classification
 from sktree.ensemble import HonestForestClassifier
-from sktree.stats import build_hyppo_oob_forest
+from sktree.stats import build_oob_forest
 
 sns.set(color_codes=True, style="white", context="talk", font_scale=1.5)
 PALETTE = sns.color_palette("Set1")
@@ -18,13 +19,13 @@ sns.set_palette(PALETTE[1:5] + PALETTE[6:], n_colors=9)
 sns.set_style("white", {"axes.edgecolor": "#dddddd"})
 
 # %%
-# Hellinger Distance
-# ------------------
+# S@98
+# ----
 #
-# Hellinger distance quantifies the similarity between the two posterior
-# probability distributions (class zero and class one).
+# Sensitivity at 98% specificity (*S@98*) measures, namely, the true
+# positive rate (*TPR*) when the false positive rate (*FPR*) is at 98%.
 #
-# .. math:: H(\eta(X), 1-\eta(X)) = \frac{1}{\sqrt{2}} \; \bigl\|\sqrt{\eta(X)} - \sqrt{1-\eta(X)} \bigr\|_2
+# .. math:: S@r = \mathbb{P}[\eta(X) > T_r \mid Y=1]
 #
 # With a binary class simulation as an example, this tutorial will show
 # how to use ``treeple`` to calculate the statistic.
@@ -54,7 +55,7 @@ ax.tick_params(labelsize=15)
 # histogram plot the samples
 ax.hist(X[:500], bins=50, alpha=0.6, color=PALETTE[1], label="negative")
 ax.hist(X[500:], bins=50, alpha=0.3, color=PALETTE[0], label="positive")
-ax.set_xlabel("X", fontsize=15)
+ax.set_xlabel("Variable One", fontsize=15)
 ax.set_ylabel("Likelihood", fontsize=15)
 plt.legend(frameon=False, fontsize=15)
 plt.show()
@@ -75,7 +76,7 @@ est = HonestForestClassifier(
 )
 
 # fit the model and obtain the tree posteriors
-_, observe_proba = build_hyppo_oob_forest(est, X, y)
+_, observe_proba = build_oob_forest(est, X, y)
 
 # generate forest posteriors for the two classes
 observe_proba = np.nanmean(observe_proba, axis=0)
@@ -98,11 +99,48 @@ plt.show()
 # -----------------------
 
 
-def Calculate_hd(y_pred_proba) -> float:
-    return np.sqrt(
-        np.sum((np.sqrt(y_pred_proba[:, 1]) - np.sqrt(y_pred_proba[:, 0])) ** 2)
-    ) / np.sqrt(2)
+def Calculate_SA(y_true, y_pred_proba, max_fpr=0.02) -> float:
+    """Calculate the sensitivity at a specific specificity"""
+    # check the shape of true labels
+    if y_true.squeeze().ndim != 1:
+        raise ValueError(f"y_true must be 1d, not {y_true.shape}")
+
+    # find the positive class and calculate fpr and tpr
+    if 0 in y_true or -1 in y_true:
+        fpr, tpr, thresholds = roc_curve(
+            y_true, y_pred_proba[:, 1], pos_label=1, drop_intermediate=False
+        )
+    else:
+        fpr, tpr, thresholds = roc_curve(
+            y_true, y_pred_proba[:, 1], pos_label=2, drop_intermediate=False
+        )
+    sa98 = max([tpr for (fpr, tpr) in zip(fpr, tpr) if fpr <= max_fpr])
+
+    fig, ax = plt.subplots(figsize=(6, 6))
+    fig.tight_layout()
+    ax.tick_params(labelsize=15)
+    ax.set_xlim([-0.005, 1.005])
+    ax.set_ylim([-0.005, 1.005])
+    ax.set_xlabel("False Positive Rate", fontsize=15)
+    ax.set_ylabel("True Positive Rate", fontsize=15)
+
+    ax.plot(fpr, tpr, label="ROC curve", color=PALETTE[1])
+
+    spec = int((1 - max_fpr) * 100)
+    ax.axvline(
+        x=max_fpr,
+        color=PALETTE[0],
+        ymin=0,
+        ymax=sa98,
+        label="S@" + str(spec) + " = " + str(round(sa98, 2)),
+        linestyle="--",
+    )
+    ax.axhline(y=sa98, xmin=0, xmax=max_fpr, color="r", linestyle="--")
+    ax.legend(frameon=False, fontsize=15)
+
+    return sa98
 
 
-hd = Calculate_hd(observe_proba)
-print("Hellinger distance =", round(hd, 2))
+sa98 = Calculate_SA(y, observe_proba, max_fpr=0.02)
+print("S@98 =", round(sa98, 2))
+# sphinx_gallery_thumbnail_number = -1

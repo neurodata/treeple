@@ -4,7 +4,8 @@ import numpy as np
 from numpy.typing import ArrayLike
 from scipy.sparse import issparse
 from sklearn.neighbors import NearestNeighbors
-from sklearn.utils import _approximate_mode, _safe_indexing, check_array, check_consistent_length
+from sklearn.utils import _safe_indexing, check_array, check_consistent_length
+from sklearn.utils.extmath import _approximate_mode
 
 
 def _conditional_shuffle(nbrs: ArrayLike, replace: bool = False, seed=None) -> ArrayLike:

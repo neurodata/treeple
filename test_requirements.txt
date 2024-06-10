@@ -1,0 +1,7 @@
+joblib
+pandas
+pytest
+pytest-cov
+memory_profiler
+flaky
+tqdm
