@@ -52,7 +52,9 @@ def test_small_dataset_independent(seed):
         bootstrap=True,
         max_samples=1.6,
     )
-    result = build_coleman_forest(clf, perm_clf, X, y, covariate_index=[1, 2], metric="mi")
+    result = build_coleman_forest(
+        clf, perm_clf, X, y, covariate_index=[1, 2], metric="mi", return_posteriors=False
+    )
 
     assert ~np.isnan(result.pvalue)
     assert ~np.isnan(result.observe_test_stat)
@@ -95,7 +97,9 @@ def test_small_dataset_dependent(seed):
         bootstrap=True,
         max_samples=1.6,
     )
-    result = build_coleman_forest(clf, perm_clf, X, y, covariate_index=[1, 2], metric="mi")
+    result = build_coleman_forest(
+        clf, perm_clf, X, y, covariate_index=[1, 2], metric="mi", return_posteriors=False
+    )
     assert ~np.isnan(result.pvalue)
     assert ~np.isnan(result.observe_test_stat)
     assert result.pvalue <= 0.05
@@ -149,13 +153,19 @@ def test_comight_repeated_feature_sets():
     )
 
     # first test MIGHT rejects the null, since there is information
-    result = build_coleman_forest(clf, perm_clf, X, y, metric="mi")
+    result = build_coleman_forest(clf, perm_clf, X, y, metric="mi", return_posteriors=False)
     assert result.pvalue < 0.05
 
     # second test CoMIGHT fails to reject the null, since the information
     # is entirely contained in the first feature set
     result = build_coleman_forest(
-        clf, perm_clf, X, y, covariate_index=np.arange(n_features), metric="mi"
+        clf,
+        perm_clf,
+        X,
+        y,
+        covariate_index=np.arange(n_features),
+        metric="mi",
+        return_posteriors=False,
     )
     assert result.pvalue > 0.05, f"{result.pvalue}"
 
