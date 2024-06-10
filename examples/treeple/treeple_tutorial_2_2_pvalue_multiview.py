@@ -11,7 +11,7 @@ import seaborn as sns
 
 from sktree.datasets import make_trunk_classification
 from sktree.ensemble import HonestForestClassifier
-from sktree.stats import build_coleman_forest
+from sktree.stats import PermutationHonestForestClassifier, build_coleman_forest
 from sktree.tree import MultiViewDecisionTreeClassifier
 
 sns.set(color_codes=True, style="white", context="talk", font_scale=1.5)
@@ -143,7 +143,7 @@ est = HonestForestClassifier(
 )
 
 # initialize another forest with 100 trees
-est_null = HonestForestClassifier(
+est_null = PermutationHonestForestClassifier(
     n_estimators=100,
     max_samples=1.6,
     max_features=0.3,

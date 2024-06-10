@@ -1296,18 +1296,11 @@ def build_coleman_forest(
     # build two sets of forests
     est, orig_forest_proba = build_oob_forest(est, X, y, verbose=verbose)
 
-    X_null = np.copy(X)
-    y_null = np.copy(y)
-    rng = np.random.default_rng(seed)
-
-    if covariate_index is None:
-        rng.shuffle(y_null)
-    else:
-        temp_col = X_null[:, covariate_index]
-        rng.shuffle(temp_col)
-        X_null[:, covariate_index] = temp_col
-
-    perm_est, perm_forest_proba = build_oob_forest(perm_est, X_null, y_null, verbose=verbose)
+    if not isinstance(perm_est, PermutationHonestForestClassifier):
+        raise RuntimeError(
+            f"Permutation forest must be a PermutationHonestForestClassifier, got {type(perm_est)}"
+        )
+    perm_est, perm_forest_proba = build_oob_forest(perm_est, X, y, verbose=verbose)
 
     # get the number of jobs
     n_jobs = est.n_jobs
