@@ -112,6 +112,7 @@ jobs:
       - name: Setup build and install scikit-tree
         run: |
           ./spin build -j 2 --forcesubmodule
+          ./spin install
 
       - name: Ccache performance
         shell: bash -l {0}
@@ -124,7 +125,7 @@ jobs:
 
       - name: Run unit tests and coverage
         run: |
-          ./spin test
+          pytest ./sktree
 
       - name: debug
         run: |
@@ -274,22 +275,6 @@ jobs:
       - name: show-gcc
         run: |
           gcc --version
-
-      # - name: Install system dependencies
-      #   run: |
-      #     # Download and install Miniconda
-      #     Invoke-WebRequest -Uri https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe -OutFile miniconda.exe
-      #     Start-Process -Wait -FilePath miniconda.exe -ArgumentList '/S', '/AddToPath=1'
-
-      #     # Add Miniconda to the PATH
-      #     $env:Path += ";C:\Users\runneradmin\Miniconda3\Scripts;C:\Users\runneradmin\Miniconda3"
-
-      #     # Update conda
-      #     conda update -y conda
-
-      #     # Add conda-forge channel and install openblas
-      #     conda config --add channels conda-forge
-      #     conda install -y openblas
 
       - name: pip-packages
         run: |
