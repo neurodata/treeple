@@ -156,7 +156,7 @@ def test_pickle_splitters():
     from sktree.tree._oblique_splitter import BestObliqueSplitter, RandomObliqueSplitter
     from sktree.tree.manifold._morf_splitter import BestPatchSplitter
 
-    criterion = Gini(1, np.array((0, 1)))
+    criterion = Gini(1, np.array((0, 1), dtype=np.intp))
     max_features = 6
     min_samples_leaf = 1
     min_weight_leaf = 0.0
@@ -164,10 +164,10 @@ def test_pickle_splitters():
     random_state = np.random.RandomState(100)
     boundary = None
     feature_weight = None
-    min_patch_dims = np.array((1, 1))
-    max_patch_dims = np.array((3, 1))
+    min_patch_dims = np.array((1, 1), dtype=np.intp)
+    max_patch_dims = np.array((3, 1), dtype=np.intp)
     dim_contiguous = np.array((True, True))
-    data_dims = np.array((5, 5))
+    data_dims = np.array((5, 5), dtype=np.intp)
 
     feature_combinations = 1.5
     splitter = BestObliqueSplitter(

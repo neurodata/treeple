@@ -90,7 +90,7 @@ def test_make_trunk_generator_errors(trunk_gen):
         trunk_gen(n_samples=50, rho=0.5, band_type="invalid_band_type")
 
     # Test with an invalid band type
-    with pytest.raises(ValueError, match="Number of informative dimensions"):
+    with pytest.warns(RuntimeWarning, match="Number of informative dimensions"):
         trunk_gen(n_samples=50, n_dim=10, n_informative=11, rho=0.5)
 
 
