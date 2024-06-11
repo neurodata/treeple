@@ -83,7 +83,8 @@ def build_coleman_forest(
     y : ArrayLike of shape (n_samples, n_outputs)
         Binary target, so ``n_outputs`` should be at most 1.
     covariate_index : ArrayLike, optional of shape (n_covariates,)
-        The index array of covariates to shuffle, by default None.
+        The index array of covariates to shuffle, by default None, which
+        defaults to all covariates.
     metric : str, optional
         The metric to compute, by default "s@98", for sensitivity at
         98% specificity.
