@@ -29,10 +29,11 @@ iris_y = iris_y[p]
 
 @pytest.mark.parametrize("seed", [None, 0])
 def test_small_dataset_independent(seed):
-    n_samples = 32
-    n_features = 5
+    n_samples = 64
+    n_features = 20
     n_estimators = 100
 
+    rng = np.random.default_rng(seed)
     X = rng.uniform(size=(n_samples, n_features))
     y = rng.integers(0, 2, size=n_samples)  # Binary classification
 
@@ -58,11 +59,11 @@ def test_small_dataset_independent(seed):
 
     assert ~np.isnan(result.pvalue)
     assert ~np.isnan(result.observe_test_stat)
-    assert result.pvalue > 0.05
+    assert result.pvalue > 0.05, f"{result.pvalue}"
 
     result = build_coleman_forest(clf, perm_clf, X, y, metric="mi", return_posteriors=False)
     assert_almost_equal(result.observe_test_stat, 0.0, decimal=1)
-    assert result.pvalue > 0.05
+    assert result.pvalue > 0.05, f"{result.pvalue}"
 
 
 @flaky(max_runs=3)
@@ -110,7 +111,7 @@ def test_small_dataset_dependent(seed):
 
 def test_comight_repeated_feature_sets():
     """Test COMIGHT when there are repeated feature sets."""
-    n_samples = 100
+    n_samples = 50
     n_features = 500
     rng = np.random.default_rng(seed)
 
