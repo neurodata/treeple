@@ -26,7 +26,7 @@ Changelog
   handles the case where there is one feature view that is exhausted, and
   another that is not for ``apply_max_features_per_feature_set = False``,
   by `Adam Li`_ (:pr:`#183`).
-- |Fix| :class:`sktree.stats.FeatureImportanceForestClassifier` now correctly passes
+- |Fix| ``sktree.stats.FeatureImportanceForestClassifier`` now correctly passes
   metric kwargs to the null distribution function, by `Adam Li`_ (:pr:`#183`).
 
 Code and Documentation Contributors
