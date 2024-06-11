@@ -103,6 +103,9 @@ def test_iris_multi(criterion, max_features, honest_prior, estimator):
     n_estimators = 10
 
     # Check consistency on dataset iris.
+    # Note: bootstrap is False here for backwards compatibility and making
+    # the unit-test pass. Since bootstrap is not the feature being tested
+    # here, this is fine.
     clf = HonestForestClassifier(
         criterion=criterion,
         random_state=0,
@@ -110,6 +113,7 @@ def test_iris_multi(criterion, max_features, honest_prior, estimator):
         n_estimators=n_estimators,
         honest_prior=honest_prior,
         tree_estimator=estimator,
+        bootstrap=False,
     )
 
     second_y = np.concatenate([(np.ones(50) * 3), (np.ones(50) * 4), (np.ones(50) * 5)])
@@ -259,7 +263,7 @@ def test_honest_decision_function(honest_fraction, val):
 
 
 @parametrize_with_checks(
-    [HonestForestClassifier(n_estimators=10, honest_fraction=0.5, random_state=0)]
+    [HonestForestClassifier(n_estimators=10, honest_fraction=0.5, random_state=0, bootstrap=False)]
 )
 def test_sklearn_compatible_estimator(estimator, check):
     # 1. check_class_weight_classifiers is not supported since it requires sample weight

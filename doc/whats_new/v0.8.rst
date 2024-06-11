@@ -21,6 +21,10 @@ Changelog
 - |Feature| Simulations in ``sktree.datasets.hyppo`` now throw a warning instead
     of an error when the number of samples is less than the number of dimensions.
     By `Sambit Panda`_ (:pr:`#279`)
+- |API| :class:`sktree.HonestForestClassifier` now has ``bootstrap=True`` as the default
+    argument. By `Adam Li`_ (:pr:`#274`)
+- |API| Removed all instances of ``FeatureImportanceForestClassifier`` and outdated
+    MIGHT code. By `Adam Li`_ (:pr:`#274`)
 
 Code and Documentation Contributors
 -----------------------------------

@@ -145,10 +145,6 @@ tree models.
 .. autosummary::
    :toctree: generated/
 
-   FeatureImportanceForestRegressor
-   FeatureImportanceForestClassifier
-   PermutationForestClassifier
-   PermutationForestRegressor
    build_coleman_forest
    build_permutation_forest
    build_oob_forest
