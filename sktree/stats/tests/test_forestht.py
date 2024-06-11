@@ -30,7 +30,7 @@ iris_y = iris_y[p]
 @pytest.mark.parametrize("seed", [None, 0])
 def test_small_dataset_independent(seed):
     n_samples = 64
-    n_features = 5
+    n_features = 10
     n_estimators = 100
 
     rng = np.random.default_rng(seed)
@@ -71,7 +71,7 @@ def test_small_dataset_independent(seed):
 @pytest.mark.parametrize("seed", [None, 0])
 def test_small_dataset_dependent(seed):
     n_samples = 100
-    n_features = 5
+    n_features = 10
     rng = np.random.default_rng(seed)
 
     X = rng.uniform(size=(n_samples, n_features))
