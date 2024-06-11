@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 from scipy.integrate import nquad
 from scipy.stats import entropy, multivariate_normal
@@ -159,9 +161,11 @@ def make_marron_wand_classification(
     .. footbibliography::
     """
     if n_dim < n_informative:
-        raise ValueError(
-            f"Number of informative dimensions {n_informative} must be less than number "
-            f"of dimensions, {n_dim}"
+        n_informative = n_dim
+        warnings.warn(
+            "Number of informative dimensions {n_informative} must be less than number "
+            f"of dimensions, {n_dim}. Setting n_informative to n_dim.",
+            RuntimeWarning,
         )
     if simulation not in MARRON_WAND_SIMS.keys():
         raise ValueError(
@@ -347,9 +351,11 @@ def make_trunk_mixture_classification(
     .. footbibliography::
     """
     if n_dim < n_informative:
-        raise ValueError(
-            f"Number of informative dimensions {n_informative} must be less than number "
-            f"of dimensions, {n_dim}"
+        n_informative = n_dim
+        warnings.warn(
+            "Number of informative dimensions {n_informative} must be less than number "
+            f"of dimensions, {n_dim}. Setting n_informative to n_dim.",
+            RuntimeWarning,
         )
     if mix < 0 or mix > 1:  # type: ignore
         raise ValueError("Mix must be between 0 and 1.")
@@ -506,9 +512,11 @@ def make_trunk_classification(
     .. footbibliography::
     """
     if n_dim < n_informative:
-        raise ValueError(
-            f"Number of informative dimensions {n_informative} must be less than number "
-            f"of dimensions, {n_dim}"
+        n_informative = n_dim
+        warnings.warn(
+            "Number of informative dimensions {n_informative} must be less than number "
+            f"of dimensions, {n_dim}. Setting n_informative to n_dim.",
+            RuntimeWarning,
         )
     rng = np.random.default_rng(seed=seed)
 
@@ -537,7 +545,7 @@ def make_trunk_classification(
     X = np.vstack(
         [
             rng_children.multivariate_normal(mu_vec, cov, n_samples // 2, method=method)
-            for rng_children, mu_vec in zip(rng.spawn(2), [mu_1_vec, mu_0_vec])
+            for rng_children, mu_vec in zip(rng.spawn(2), [mu_0_vec, mu_1_vec])
         ]
     )
 

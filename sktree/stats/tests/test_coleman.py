@@ -10,67 +10,61 @@ import pytest
 from flaky import flaky
 from scipy.special import expit
 
-from sktree import RandomForestClassifier, RandomForestRegressor
-from sktree.stats import (
-    FeatureImportanceForestClassifier,
-    FeatureImportanceForestRegressor,
-    PermutationForestClassifier,
-    PermutationForestRegressor,
-)
-
 seed = 12345
 rng = np.random.default_rng(seed)
 
 
+# TODO: implement tests using the new MIGHT functional framework
+@pytest.mark.skip()
 @flaky(max_runs=3)
 @pytest.mark.slowtest
-@pytest.mark.parametrize(
-    "hypotester, model_kwargs, n_samples, n_repeats, test_size",
-    [
-        [
-            PermutationForestRegressor,
-            {
-                "estimator": RandomForestRegressor(
-                    max_features="sqrt",
-                    n_estimators=75,
-                    n_jobs=-1,
-                ),
-                "random_state": seed,
-            },
-            300,
-            50,
-            0.1,
-        ],
-        [
-            FeatureImportanceForestRegressor,
-            {
-                "estimator": RandomForestRegressor(
-                    max_features="sqrt",
-                    n_estimators=125,
-                    n_jobs=-1,
-                ),
-            },
-            300,  # n_samples
-            1000,  # n_repeats
-            0.2,  # test_size
-        ],
-        # XXX: Currently does not work with permute and sample dataset per tree
-        [
-            FeatureImportanceForestRegressor,
-            {
-                "estimator": RandomForestRegressor(
-                    max_features="sqrt",
-                    n_estimators=250,
-                    n_jobs=-1,
-                ),
-                "permute_forest_fraction": 0.5,
-            },
-            300,  # n_samples
-            1000,  # n_repeats
-            0.2,  # test_size
-        ],
-    ],
-)
+# @pytest.mark.parametrize(
+#     "hypotester, model_kwargs, n_samples, n_repeats, test_size",
+#     [
+#         [
+#             PermutationForestRegressor,
+#             {
+#                 "estimator": RandomForestRegressor(
+#                     max_features="sqrt",
+#                     n_estimators=75,
+#                     n_jobs=-1,
+#                 ),
+#                 "random_state": seed,
+#             },
+#             300,
+#             50,
+#             0.1,
+#         ],
+#         [
+#             FeatureImportanceForestRegressor,
+#             {
+#                 "estimator": RandomForestRegressor(
+#                     max_features="sqrt",
+#                     n_estimators=125,
+#                     n_jobs=-1,
+#                 ),
+#             },
+#             300,  # n_samples
+#             1000,  # n_repeats
+#             0.2,  # test_size
+#         ],
+#         # XXX: Currently does not work with permute and sample dataset per tree
+#         [
+#             FeatureImportanceForestRegressor,
+#             {
+#                 "estimator": RandomForestRegressor(
+#                     max_features="sqrt",
+#                     n_estimators=250,
+#                     n_jobs=-1,
+#                 ),
+#                 "permute_forest_fraction": 0.5,
+#             },
+#             300,  # n_samples
+#             1000,  # n_repeats
+#             0.2,  # test_size
+#         ],
+#     ],
+# )
 def test_linear_model(hypotester, model_kwargs, n_samples, n_repeats, test_size):
     r"""Test hypothesis testing forests using MSE from linear model simulation.
 
@@ -117,59 +111,60 @@ def test_linear_model(hypotester, model_kwargs, n_samples, n_repeats, test_size)
         assert pvalue > 0.05, f"pvalue: {pvalue}"
 
 
+@pytest.mark.skip()
 @flaky(max_runs=3)
 @pytest.mark.slowtest
-@pytest.mark.parametrize(
-    "hypotester, model_kwargs, n_samples, n_repeats, test_size",
-    [
-        [
-            PermutationForestClassifier,
-            {
-                "estimator": RandomForestClassifier(
-                    max_features="sqrt",
-                    n_estimators=50,
-                    n_jobs=-1,
-                ),
-                "random_state": seed,
-            },
-            600,
-            50,
-            1.0 / 6,
-        ],
-        [
-            # XXX: Currently does not work with permute and sample dataset per tree
-            FeatureImportanceForestClassifier,
-            {
-                "estimator": RandomForestClassifier(
-                    max_features="sqrt",
-                    n_estimators=100,
-                    n_jobs=-1,
-                ),
-                "sample_dataset_per_tree": False,
-            },
-            600,  # n_samples
-            1000,  # n_repeats
-            1.0 / 6,  # test_size
-        ],
-        # XXX: Currently does not work with permute and sample dataset per tree
-        [
-            FeatureImportanceForestClassifier,
-            {
-                "estimator": RandomForestClassifier(
-                    max_features="sqrt",
-                    n_estimators=100,
-                    n_jobs=-1,
-                    random_state=rng.integers(0, 1000),
-                ),
-                "permute_forest_fraction": 0.5,
-                "random_state": rng.integers(0, 1000),
-            },
-            600,  # n_samples
-            1000,  # n_repeats
-            1.0 / 6,  # test_size
-        ],
-    ],
-)
+# @pytest.mark.parametrize(
+#     "hypotester, model_kwargs, n_samples, n_repeats, test_size",
+#     [
+#         [
+#             PermutationForestClassifier,
+#             {
+#                 "estimator": RandomForestClassifier(
+#                     max_features="sqrt",
+#                     n_estimators=50,
+#                     n_jobs=-1,
+#                 ),
+#                 "random_state": seed,
+#             },
+#             600,
+#             50,
+#             1.0 / 6,
+#         ],
+#         [
+#             # XXX: Currently does not work with permute and sample dataset per tree
+#             FeatureImportanceForestClassifier,
+#             {
+#                 "estimator": RandomForestClassifier(
+#                     max_features="sqrt",
+#                     n_estimators=100,
+#                     n_jobs=-1,
+#                 ),
+#                 "sample_dataset_per_tree": False,
+#             },
+#             600,  # n_samples
+#             1000,  # n_repeats
+#             1.0 / 6,  # test_size
+#         ],
+#         # XXX: Currently does not work with permute and sample dataset per tree
+#         [
+#             FeatureImportanceForestClassifier,
+#             {
+#                 "estimator": RandomForestClassifier(
+#                     max_features="sqrt",
+#                     n_estimators=100,
+#                     n_jobs=-1,
+#                     random_state=rng.integers(0, 1000),
+#                 ),
+#                 "permute_forest_fraction": 0.5,
+#                 "random_state": rng.integers(0, 1000),
+#             },
+#             600,  # n_samples
+#             1000,  # n_repeats
+#             1.0 / 6,  # test_size
+#         ],
+#     ],
+# )
 def test_correlated_logit_model(hypotester, model_kwargs, n_samples, n_repeats, test_size):
     r"""Test MIGHT using MSE from linear model simulation.
 

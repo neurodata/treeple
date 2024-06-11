@@ -528,14 +528,6 @@ class UnsupervisedRandomForest(ForestCluster):
     labels_ : ndarray of shape (n_samples,)
         Labels of each point.
 
-    similarity_matrix_ : ndarray of shape (n_samples, n_samples)
-        Stores the affinity/similarity matrix used in fit. Note this matrix
-        is computed from within-bag and OOB samples.
-
-    dissimilarity_matrix_ : ndarray of shape (n_samples, n_samples)
-        Stores the dissimilarity matrix used in fit. Note this matrix
-        is computed from within-bag and OOB samples.
-
     oob_score_ : float
         Score of the training dataset obtained using an out-of-bag estimate.
         This attribute exists only when ``oob_score`` is True.
@@ -761,14 +753,6 @@ class UnsupervisedObliqueRandomForest(ForestCluster):
 
     labels_ : ndarray of shape (n_samples,)
         Labels of each point.
-
-    similarity_matrix_ : ndarray of shape (n_samples, n_samples)
-        Stores the affinity/similarity matrix used in fit. Note this matrix
-        is computed from within-bag and OOB samples.
-
-    dissimilarity_matrix_ : ndarray of shape (n_samples, n_samples)
-        Stores the dissimilarity matrix used in fit. Note this matrix
-        is computed from within-bag and OOB samples.
 
     oob_score_ : float
         Score of the training dataset obtained using an out-of-bag estimate.

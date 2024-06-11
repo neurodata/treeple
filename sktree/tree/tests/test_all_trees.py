@@ -3,7 +3,7 @@ import numpy as np
 import pytest
 from numpy.testing import assert_almost_equal, assert_array_equal
 from sklearn.base import is_classifier, is_regressor
-from sklearn.datasets import make_blobs
+from sklearn.datasets import load_iris, make_blobs
 from sklearn.tree._tree import TREE_LEAF
 
 from sktree.tree import (
@@ -166,3 +166,24 @@ def test_similarity_matrix(tree):
 
     assert np.allclose(sim_mat, sim_mat.T)
     assert np.all((sim_mat.diagonal() == 1))
+
+
+@pytest.mark.parametrize("tree", ALL_TREES)
+def test_missing_values(tree):
+    """Smoke test to ensure that correct error is raised when missing values are present.
+
+    xref: https://github.com/neurodata/scikit-tree/issues/263
+    """
+    rng = np.random.default_rng(123)
+
+    iris_X, iris_y = load_iris(return_X_y=True, as_frame=True)
+
+    # Make the feature matrix 25% sparse
+    iris_X = iris_X.mask(rng.standard_normal(iris_X.shape) < 0.25)
+
+    classifier = tree()
+    with pytest.raises(ValueError, match="Input X contains NaN"):
+        if tree.__name__.startswith("Unsupervised"):
+            classifier.fit(iris_X)
+        else:
+            classifier.fit(iris_X, iris_y)
