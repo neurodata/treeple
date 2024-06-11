@@ -82,7 +82,7 @@ def test_small_dataset_dependent(seed):
         [np.zeros((n_samples // 2, 1)), np.ones((n_samples // 2, 1))]
     )  # Binary classification
 
-    n_estimators = 50
+    n_estimators = 100
     clf = HonestForestClassifier(
         n_estimators=n_estimators,
         random_state=seed,
