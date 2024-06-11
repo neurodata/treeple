@@ -130,7 +130,9 @@ def build_coleman_forest(
         raise RuntimeError(
             f"Permutation forest must be a PermutationHonestForestClassifier, got {type(perm_est)}"
         )
-    perm_est, perm_forest_proba = build_oob_forest(perm_est, X, y, verbose=verbose)
+    perm_est, perm_forest_proba = build_oob_forest(
+        perm_est, X, y, verbose=verbose, covariate_index=covariate_index
+    )
 
     # get the number of jobs
     n_jobs = est.n_jobs

@@ -30,7 +30,7 @@ iris_y = iris_y[p]
 @pytest.mark.parametrize("seed", [None, 0])
 def test_small_dataset_independent(seed):
     n_samples = 64
-    n_features = 20
+    n_features = 5
     n_estimators = 100
 
     rng = np.random.default_rng(seed)
@@ -44,6 +44,7 @@ def test_small_dataset_independent(seed):
         honest_fraction=0.5,
         bootstrap=True,
         max_samples=1.6,
+        stratify=True,
     )
     perm_clf = PermutationHonestForestClassifier(
         n_estimators=n_estimators,
@@ -52,11 +53,11 @@ def test_small_dataset_independent(seed):
         honest_fraction=0.5,
         bootstrap=True,
         max_samples=1.6,
+        stratify=True,
     )
     result = build_coleman_forest(
         clf, perm_clf, X, y, covariate_index=[1, 2], metric="mi", return_posteriors=False
     )
-
     assert ~np.isnan(result.pvalue)
     assert ~np.isnan(result.observe_test_stat)
     assert result.pvalue > 0.05, f"{result.pvalue}"
@@ -109,7 +110,8 @@ def test_small_dataset_dependent(seed):
     assert result.pvalue <= 0.05
 
 
-def test_comight_repeated_feature_sets():
+@pytest.mark.parametrize("seed", [None, 0])
+def test_comight_repeated_feature_sets(seed):
     """Test COMIGHT when there are repeated feature sets."""
     n_samples = 50
     n_features = 500
@@ -122,7 +124,7 @@ def test_comight_repeated_feature_sets():
     X = np.vstack([X, X2])
     y = np.vstack([np.zeros((n_samples, 1)), np.ones((n_samples, 1))])  # Binary classification
 
-    X = np.hstack((X, X))
+    X = np.hstack((X, X + rng.standard_normal(size=(n_samples * 2, n_features)) * 1e-5))
     feature_set_ends = [n_features, n_features * 2]
 
     n_estimators = 50
@@ -134,6 +136,7 @@ def test_comight_repeated_feature_sets():
         bootstrap=True,
         max_samples=1.6,
         max_features=0.3,
+        stratify=True,
         tree_estimator=MultiViewDecisionTreeClassifier(
             feature_set_ends=feature_set_ends,
             apply_max_features_per_feature_set=True,
@@ -147,6 +150,7 @@ def test_comight_repeated_feature_sets():
         bootstrap=True,
         max_samples=1.6,
         max_features=0.3,
+        stratify=True,
         tree_estimator=MultiViewDecisionTreeClassifier(
             feature_set_ends=feature_set_ends,
             apply_max_features_per_feature_set=True,
