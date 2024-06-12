@@ -163,6 +163,37 @@ def test_max_samples():
     uf = uf.fit(X, y)
 
 
+def test_honest_forest_samples():
+    bootstrap = True
+    max_samples = 1.6
+
+    n_estimators = 5
+    est = HonestForestClassifier(
+        n_estimators=n_estimators,
+        random_state=0,
+        bootstrap=bootstrap,
+        max_samples=max_samples,
+        honest_fraction=0.5,
+        stratify=True,
+    )
+    X = rng.normal(0, 1, (100, 2))
+    X[:50] *= -1
+    y = [0, 1] * 50
+    samples = np.arange(len(y))
+
+    est.fit(X, y)
+
+    structure_samples = est.structure_indices_
+    leaf_samples = est.honest_indices_
+    oob_samples = est.oob_samples_
+    for tree_idx in range(est.n_estimators):
+        assert len(structure_samples[tree_idx]) + len(leaf_samples[tree_idx]) + len(
+            oob_samples[tree_idx]
+        ) == len(
+            samples
+        ), f"{tree_idx} {len(structure_samples[tree_idx])} {len(leaf_samples[tree_idx])} {len(samples)}"
+
+
 @pytest.mark.parametrize("max_samples", [0.75, 1.0])
 def test_honest_forest_has_deterministic_sampling_for_oob_structure_and_leaves(max_samples):
     """Test that honest forest can produce the oob, structure and leaf-node samples.

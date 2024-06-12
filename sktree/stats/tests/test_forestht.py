@@ -8,6 +8,7 @@ from sktree import HonestForestClassifier
 from sktree.stats import (
     PermutationHonestForestClassifier,
     build_coleman_forest,
+    build_oob_forest,
     build_permutation_forest,
 )
 from sktree.tree import MultiViewDecisionTreeClassifier
@@ -392,3 +393,34 @@ def test_build_permutation_forest():
     )
     assert forest_result.pvalue > 0.05, f"{forest_result.pvalue}"
     assert forest_result.observe_test_stat < 0.05, f"{forest_result.observe_test_stat}"
+
+
+def test_build_oob_honest_forest():
+    bootstrap = True
+    max_samples = 1.6
+
+    n_estimators = 100
+    est = HonestForestClassifier(
+        n_estimators=n_estimators,
+        random_state=0,
+        bootstrap=bootstrap,
+        max_samples=max_samples,
+        honest_fraction=0.5,
+        stratify=True,
+    )
+    X = rng.normal(0, 1, (100, 2))
+    X[:50] *= -1
+    y = np.array([0, 1] * 50)
+    samples = np.arange(len(y))
+
+    est, proba = build_oob_forest(est, X, y)
+
+    structure_samples = est.structure_indices_
+    leaf_samples = est.honest_indices_
+    oob_samples = est.oob_samples_
+    for tree_idx in range(est.n_estimators):
+        assert len(structure_samples[tree_idx]) + len(leaf_samples[tree_idx]) + len(
+            oob_samples[tree_idx]
+        ) == len(
+            samples
+        ), f"{tree_idx} {len(structure_samples[tree_idx])} {len(leaf_samples[tree_idx])} {len(samples)}"
