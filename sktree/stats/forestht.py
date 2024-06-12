@@ -307,6 +307,9 @@ def build_oob_forest(est: ForestClassifier, X, y, verbose=False, **est_kwargs):
     ----------
     est : Forest
         The type of forest to use. Must be enabled with ``bootstrap=True``.
+        The forest should have either ``oob_samples_`` or ``estimators_samples_``
+        property defined, which will be used to compute the out of bag samples
+        per tree.
     X : ArrayLike of shape (n_samples, n_features)
         Data.
     y : ArrayLike of shape (n_samples, n_outputs)
@@ -314,7 +317,7 @@ def build_oob_forest(est: ForestClassifier, X, y, verbose=False, **est_kwargs):
     verbose : bool, optional
         Verbosity, by default False.
     **est_kwargs : dict, optional
-        Additional keyword arguments to pass to the forest estimator.
+        Additional keyword arguments to pass to the forest estimator ``fit`` function.
 
     Returns
     -------
@@ -351,10 +354,22 @@ def build_oob_forest(est: ForestClassifier, X, y, verbose=False, **est_kwargs):
     all_proba = np.full(
         (len(est.estimators_), X.shape[0], est.n_classes_), np.nan, dtype=np.float64
     )
-    Parallel(n_jobs=n_jobs, verbose=verbose, require="sharedmem")(
-        delayed(_parallel_predict_proba_oob)(e.predict_proba, X, all_proba, idx, test_idx, lock)
-        for idx, (e, test_idx) in enumerate(zip(est.estimators_, est.oob_samples_))
-    )
+    if hasattr(est, "oob_samples_"):
+        Parallel(n_jobs=n_jobs, verbose=verbose, require="sharedmem")(
+            delayed(_parallel_predict_proba_oob)(e.predict_proba, X, all_proba, idx, test_idx, lock)
+            for idx, (e, test_idx) in enumerate(zip(est.estimators_, est.oob_samples_))
+        )
+    else:
+        inbag_samples = est.estimators_samples_
+        all_samples = np.arange(X.shape[0])
+        oob_samples_list = [
+            np.setdiff1d(all_samples, inbag_samples[i]) for i in range(len(inbag_samples))
+        ]
+        Parallel(n_jobs=n_jobs, verbose=verbose, require="sharedmem")(
+            delayed(_parallel_predict_proba_oob)(e.predict_proba, X, all_proba, idx, test_idx, lock)
+            for idx, (e, test_idx) in enumerate(zip(est.estimators_, oob_samples_list))
+        )
+
     return est, all_proba
 
 
