@@ -705,7 +705,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         y = y_encoded
 
         # y-encoded ensures that y values match the indices of the classes
-        self._set_leaf_nodes(honest_leaves, y)
+        self._set_leaf_nodes(honest_leaves, y, sample_weight)
 
         self.n_classes_ = np.array(self.n_classes_, dtype=np.intp)
         if self.n_outputs_ == 1:
@@ -714,7 +714,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
             self.empirical_prior_ = self.empirical_prior_[0]
             y = y[:, 0]
 
-    def _set_leaf_nodes(self, leaf_ids, y):
+    def _set_leaf_nodes(self, leaf_ids, y, sample_weight):
         """Traverse the already built tree with X and set leaf nodes with y.
 
         tree_.value has shape (n_nodes, n_outputs, max_n_classes), where
@@ -725,8 +725,10 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         classes are ordered by their index in the tree_.value array.
         """
         self.tree_.value[:, :, :] = 0
-        for leaf_id, yval in zip(leaf_ids, y[self.honest_indices_, :]):
-            self.tree_.value[leaf_id][:, yval] += 1
+        for leaf_id, yval, weight in zip(
+            leaf_ids, y[self.honest_indices_, :], sample_weight[self.honest_indices_]
+        ):
+            self.tree_.value[leaf_id][:, yval] += weight
 
     def _inherit_estimator_attributes(self):
         """Initialize necessary attributes from the provided tree estimator"""
