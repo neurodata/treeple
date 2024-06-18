@@ -393,7 +393,7 @@ def make_trunk_mixture_classification(
             rng_children.multivariate_normal(*(norm_params[i]), size=1, method=method)
             for i, rng_children in zip(mixture_idx, rng.spawn(n_samples // 2))
         ),
-        dtype=np.dtype((float, n_informative)),
+        dtype=float,
     )
 
     # create new generator instance to ensure reproducibility with multiple runs with the same seed

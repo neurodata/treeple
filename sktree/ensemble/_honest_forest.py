@@ -36,7 +36,11 @@ def _parallel_build_trees(
     """
     Private function used to fit a single tree in parallel.
 
-    Overrides the scikit-learn implementation to allow for stratification during bootstrapping
+    XXX:
+    1. this is copied over from scikit-learn and modified to allow sampling with
+    and without replacement given ``bootstrap``.
+
+    2. Overrides the scikit-learn implementation to allow for stratification during bootstrapping
     via the `stratify` parameter.
     """
     if verbose > 1:

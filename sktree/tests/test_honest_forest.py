@@ -72,7 +72,9 @@ def test_iris(criterion, max_features, honest_prior, estimator):
         tree_estimator=estimator,
     )
     if honest_prior == "error":
-        with pytest.raises(ValueError, match="honest_prior error not a valid input."):
+        with pytest.raises(
+            ValueError, match=".*must be a str among {'empirical', 'ignore', 'uniform'}"
+        ):
             clf.fit(iris.data, iris.target)
     else:
         clf.fit(iris.data, iris.target)
@@ -121,7 +123,9 @@ def test_iris_multi(criterion, max_features, honest_prior, estimator):
     X = iris.data
     y = np.stack((iris.target, second_y[perm])).T
     if honest_prior == "error":
-        with pytest.raises(ValueError, match="honest_prior error not a valid input."):
+        with pytest.raises(
+            ValueError, match="must be a str among {'empirical', 'ignore', 'uniform'}"
+        ):
             clf.fit(X, y)
     else:
         clf.fit(X, y)
