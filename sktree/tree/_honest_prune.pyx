@@ -15,6 +15,9 @@ def _build_pruned_tree_honesty(
     # initialize the pruner/splitter
     pruner.init(X, y, sample_weight, orig_tree.missing_values_in_feature_mask)
 
+    # apply pruning to the tree
+    _honest_prune(leaves_in_subtree, orig_tree, pruner)
+
     _build_pruned_tree(tree, orig_tree, leaves_in_subtree,
                        pruner.capacity)
 
@@ -112,42 +115,55 @@ cdef class HonestPruner(Splitter):
 
         # return np.asarray(out)
 
-# cdef _honest_prune(
-#     unsigned char[:] leaves_in_subtree,
-#     Tree orig_tree,
-#     object X
-# ):
-#     """Perform honest pruning of the tree.
 
-#     Parameters
-#     ----------
-#     leaves_in_subtree : array of shape (n_nodes,), dtype=np.uint8
-#         Array of booleans indicating whether the node is in the subtree.
-#     orig_tree : Tree
-#         The original tree.
-#     X : array-like of shape (n_samples, n_features)
-#         The input samples to be used for computing the split of samples
-#         in the nodes.
-#     """
-#     cdef:
-#         intp_t i
-#         intp_t n_nodes = orig_tree.node_count
-#         # prior probability using weighted samples
-#         float64_t[:] weighted_n_node_samples = orig_tree.weighted_n_node_samples
-#         float64_t total_sum_weights = weighted_n_node_samples[0]
-#         float64_t[:] impurity = orig_tree.impurity
-#         # weighted impurity of each node
-#         float64_t[:] r_node = np.empty(shape=n_nodes, dtype=np.float64)
+cdef _honest_prune(
+    unsigned char[:] leaves_in_subtree,
+    Tree orig_tree,
+    HonestPruner pruner,
+):
+    """Perform honest pruning of the tree.
 
-#         # Initialize output
-#         intp_t[:] out = np.zeros(n_samples, dtype=np.intp)
+    Iterates through the original tree in a BFS fashion using the pruner
+    and tracks at each node:
 
-#     out = orig_tree.apply(X)
+    - the parent node id
+    - the number of samples in the parent node
+    - the number of samples in the node
 
-#     # find parent node ids and leaves
-#     with nogil:
-#         # initialize the weights of each node
-#         for i in range(r_node.shape[0]):
-#             r_node[i] = (
-#                 weighted_n_node_samples[i] * impurity[i] / total_sum_weights)
-#         # Push the root node
+    Until one of two stopping conditions are met:
+
+    1. The orig_node is a leaf node.
+    2. The orig_node is a non-leaf node and the split is degenerate.
+
+    Parameters
+    ----------
+    leaves_in_subtree : array of shape (n_nodes,), dtype=np.uint8
+        Array of booleans indicating whether the node is in the subtree.
+    orig_tree : Tree
+        The original tree.
+    pruner : HonestPruner
+        The input samples to be used for computing the split of samples
+        in the nodes.
+    """
+    cdef:
+        intp_t i
+        intp_t n_nodes = orig_tree.node_count
+        # prior probability using weighted samples
+        float64_t[:] weighted_n_node_samples = orig_tree.weighted_n_node_samples
+        float64_t total_sum_weights = weighted_n_node_samples[0]
+        float64_t[:] impurity = orig_tree.impurity
+        # weighted impurity of each node
+        float64_t[:] r_node = np.empty(shape=n_nodes, dtype=np.float64)
+
+        # Initialize output
+        # intp_t[:] out = np.zeros(n_samples, dtype=np.intp)
+
+    # out = orig_tree.apply(X)
+
+    # find parent node ids and leaves
+    with nogil:
+        # initialize the weights of each node
+        for i in range(r_node.shape[0]):
+            r_node[i] = (
+                weighted_n_node_samples[i] * impurity[i] / total_sum_weights)
+        # Push the root node
