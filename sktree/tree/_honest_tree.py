@@ -322,6 +322,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         honest_fraction=0.5,
         honest_prior="empirical",
         stratify=False,
+        honest_method="apply",
         **tree_estimator_params,
     ):
         self.tree_estimator = tree_estimator
@@ -342,6 +343,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         self.honest_fraction = honest_fraction
         self.honest_prior = honest_prior
         self.stratify = stratify
+        self.honest_method = honest_method
 
         # XXX: to enable this, we need to also reset the leaf node samples during `_set_leaf_nodes`
         self.store_leaf_values = False

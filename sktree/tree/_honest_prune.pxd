@@ -1,3 +1,5 @@
+from .._lib.sklearn.tree._tree import _build_pruned_tree
+
 from .._lib.sklearn.tree._criterion cimport Criterion
 from .._lib.sklearn.tree._splitter cimport SplitRecord, Splitter
 from .._lib.sklearn.tree._tree cimport Node, ParentInfo, Tree
@@ -28,13 +30,3 @@ cdef class HonestPruner(Splitter):
         ParentInfo* parent_record,
         SplitRecord* split,
     ) except -1 nogil
-
-
-def _build_pruned_tree_honesty(
-    Tree tree,
-    Tree orig_tree,
-    HonestPruner pruner,
-    object X,
-    const float64_t[:, ::1] y,
-    const float64_t[:] sample_weight,
-)
