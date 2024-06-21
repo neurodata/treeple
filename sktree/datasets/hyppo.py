@@ -388,13 +388,11 @@ def make_trunk_mixture_classification(
     mixture_idx = rng.choice(2, n_samples // 2, replace=True, shuffle=True, p=[mix, 1 - mix])  # type: ignore
 
     norm_params = [[mu_0_vec, cov], [mu_1_vec, cov]]
-    X_mixture = np.fromiter(
-        (
-            rng_children.multivariate_normal(*(norm_params[i]), size=1, method=method)
-            for i, rng_children in zip(mixture_idx, rng.spawn(n_samples // 2))
-        ),
-        dtype=float,
-    )
+    dim_sample = len(norm_params[0][0])  # Dimensionality of the samples
+    X_mixture = np.empty((n_samples // 2, dim_sample))  # Pre-allocate array for samples
+    for idx, (i, rng_child) in enumerate(zip(mixture_idx, rng.spawn(n_samples // 2))):
+        mean, cov = norm_params[i]
+        X_mixture[idx, :] = rng_child.multivariate_normal(mean, cov, size=1, method=method)
 
     # create new generator instance to ensure reproducibility with multiple runs with the same seed
     rng_F = np.random.default_rng(seed=seed)
