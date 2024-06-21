@@ -84,4 +84,4 @@ repos:
         files: ^(?!doc/use\.rst$).*\.(rst|inc)$
 
 ci:
-  autofix_prs: false
+  autofix_prs: true

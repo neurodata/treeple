@@ -32,9 +32,9 @@ iris_y = iris_y[p]
 def test_small_dataset_independent(seed):
     # XXX: unit test interestingly does not work for MI, possibly due to bias
     bootstrap = True
-    n_samples = 100
+    n_samples = 200
     n_features = 1000
-    n_estimators = 100
+    n_estimators = 200
 
     rng = np.random.default_rng(seed)
     X = rng.standard_normal(size=(n_samples, n_features))
@@ -66,8 +66,8 @@ def test_small_dataset_independent(seed):
         clf, perm_clf, X, y, n_repeats=1000, metric="s@98", return_posteriors=False, seed=seed
     )
     print(result.observe_stat, result.permuted_stat, result.pvalue, result.observe_test_stat)
-    assert_almost_equal(np.abs(result.observe_test_stat), 0.0, decimal=1)
     assert result.pvalue > 0.05, f"{result.pvalue}"
+    assert_almost_equal(np.abs(result.observe_test_stat), 0.0, decimal=1)
 
     # now permute only some of the features
     feature_set_ends = [3, n_features]
