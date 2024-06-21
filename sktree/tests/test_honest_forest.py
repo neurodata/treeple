@@ -9,7 +9,7 @@ from sklearn.utils import check_random_state
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from sktree._lib.sklearn.tree import DecisionTreeClassifier
-from sktree.datasets import make_quadratic_classification
+from sktree.datasets import make_quadratic_classification, make_trunk_classification
 from sktree.ensemble import HonestForestClassifier
 from sktree.stats.utils import _mutual_information
 from sktree.tree import (
@@ -529,13 +529,17 @@ def test_honest_forest_with_tree_estimator_params(tree, tree_kwargs):
 
 
 def test_honest_forest_posteriors_on_independent():
-    from sktree.datasets import make_trunk_classification
+    """Test regression from :gh:`283`.
 
-    # seed = 12345
+    Posteriors were biased when the classes were independent and using the bootstrap and oob sample
+    technique to estimate the final population test statistic. This resulted in a biased estimate
+    of the AUC score. Stratification of the bootstrapping samples was the solution to this problem.
+    """
     scores = []
-    for idx in range(20):
+    for idx in range(5):
+        # create a dataset with overlapping classes
         X, y = make_trunk_classification(
-            n_samples=256, n_dim=4096, n_informative=1, mu_0=0.0, mu_1=0.0, seed=idx
+            n_samples=128, n_dim=4096, n_informative=1, mu_0=0.0, mu_1=0.0, seed=idx
         )
         clf = HonestForestClassifier(
             n_estimators=100,
@@ -552,6 +556,5 @@ def test_honest_forest_posteriors_on_independent():
         auc_score = roc_auc_score(y, np.nanmean(oob_posteriors, axis=0)[:, 1])
         scores.append(auc_score)
 
-    print(np.mean(scores), scores)
-    assert np.mean(scores) > 0.48, f"{np.mean(scores)} {scores}"
-    assert False
+    # Without stratification, this test should fail
+    assert np.mean(scores) > 0.49, f"{np.mean(scores)} {scores}"
