@@ -531,13 +531,20 @@ def test_honest_forest_with_tree_estimator_params(tree, tree_kwargs):
 def test_honest_forest_posteriors_on_independent():
     from sktree.datasets import make_trunk_classification
 
+    # seed = 12345
     scores = []
-    X, y = make_trunk_classification(
-        n_samples=128, n_dim=4096, n_informative=1, mu_0=0.0, mu_1=0.0, seed=seed
-    )
-    for idx in range(5):
+    for idx in range(20):
+        X, y = make_trunk_classification(
+            n_samples=256, n_dim=4096, n_informative=1, mu_0=0.0, mu_1=0.0, seed=idx
+        )
         clf = HonestForestClassifier(
-            n_estimators=100, random_state=idx, bootstrap=True, max_samples=1.6
+            n_estimators=100,
+            random_state=idx,
+            bootstrap=True,
+            max_samples=1.6,
+            n_jobs=-1,
+            honest_prior="ignore",
+            stratify=True,
         )
         clf.fit(X, y)
 
