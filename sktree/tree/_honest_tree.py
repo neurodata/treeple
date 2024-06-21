@@ -173,6 +173,13 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         Whether or not to stratify sample when considering structure and leaf indices.
         By default False.
 
+    honest_method : {"apply", "prune"}, default="apply"
+        Method to use for fitting the leaf nodes. If "apply", the leaf nodes
+        are fit using the structure as is. In this case, empty leaves may occur
+        if not enough data. If "prune", the leaf nodes are fit
+        by pruning using the honest-set of data after the tree structure is built
+        using the structure-set of data.
+
     **tree_estimator_params : dict
         Parameters to pass to the underlying base tree estimators.
         These must be parameters for ``tree_estimator``.
@@ -305,6 +312,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         honest_fraction=0.5,
         honest_prior="empirical",
         stratify=False,
+        honest_method="apply",
         **tree_estimator_params,
     ):
         self.tree_estimator = tree_estimator
@@ -325,6 +333,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         self.honest_fraction = honest_fraction
         self.honest_prior = honest_prior
         self.stratify = stratify
+        self.honest_method = honest_method
 
         # XXX: to enable this, we need to also reset the leaf node samples during `_set_leaf_nodes`
         self.store_leaf_values = False
