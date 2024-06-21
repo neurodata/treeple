@@ -664,13 +664,15 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         y = y_encoded
         self.n_classes_ = np.array(self.n_classes_, dtype=np.intp)
 
-        if self.honest_method == "apply":
+        # XXX: implement honest pruning
+        honest_method = "apply"
+        if honest_method == "apply":
             # Fit leaves using other subsample
             honest_leaves = self.tree_.apply(X[self.honest_indices_])
 
             # y-encoded ensures that y values match the indices of the classes
             self._set_leaf_nodes(honest_leaves, y, sample_weight)
-        elif self.honest_method == "prune":
+        elif honest_method == "prune":
             raise NotImplementedError("Pruning is not yet implemented.")
 
         if self.n_outputs_ == 1:
