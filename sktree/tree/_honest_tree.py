@@ -686,52 +686,6 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
             # y-encoded ensures that y values match the indices of the classes
             self._set_leaf_nodes(honest_leaves, y, sample_weight)
         elif self.honest_method == "prune":
-            # if getattr(y, "dtype", None) != DOUBLE or not y.flags.contiguous:
-            #     y = np.ascontiguousarray(y, dtype=DOUBLE)
-
-            # n_samples = X.shape[0]
-
-            # # Build tree
-            # criterion = self.criterion
-            # if not isinstance(criterion, BaseCriterion):
-            #     if is_classifier(self):
-            #         criterion = CRITERIA_CLF[self.criterion](self.n_outputs_, self.n_classes_)
-            #     else:
-            #         criterion = CRITERIA_REG[self.criterion](self.n_outputs_, n_samples)
-            # else:
-            #     # Make a deepcopy in case the criterion has mutable attributes that
-            #     # might be shared and modified concurrently during parallel fitting
-            #     criterion = copy.deepcopy(criterion)
-
-            # random_state = check_random_state(self.random_state)
-            # pruner = HonestPruner(
-            #     criterion,
-            #     self.max_features_,
-            #     self.min_samples_leaf_,
-            #     self.min_weight_leaf_,
-            #     random_state,
-            #     self.monotonic_cst_,
-            #     self.tree_,
-            # )
-
-            # # build pruned tree
-            # if is_classifier(self):
-            #     n_classes = np.atleast_1d(self.n_classes_)
-            #     pruned_tree = Tree(self.n_features_in_, n_classes, self.n_outputs_)
-            # else:
-            #     pruned_tree = Tree(
-            #         self.n_features_in_,
-            #         # TODO: the tree shouldn't need this param
-            #         np.array([1] * self.n_outputs_, dtype=np.intp),
-            #         self.n_outputs_,
-            #     )
-
-            # # get the leaves
-            # missing_values_in_feature_mask = self._compute_missing_values_in_feature_mask(X)
-            # _build_pruned_tree_honesty(
-            #     pruned_tree, self.tree_, pruner, X, y, sample_weight, missing_values_in_feature_mask
-            # )
-            # self.tree_ = pruned_tree
             raise NotImplementedError("Pruning is not yet implemented.")
 
         if self.n_outputs_ == 1:
