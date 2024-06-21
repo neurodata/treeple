@@ -280,6 +280,8 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
 
     stratify : bool
         Whether or not to stratify sample when considering structure and leaf indices.
+        This will also stratify samples when bootstrap sampling is used. For more
+        information, see :func:`sklearn.utils.resample`.
         By default False.
 
     **tree_estimator_params : dict
