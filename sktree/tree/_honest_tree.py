@@ -10,7 +10,7 @@ from sklearn.utils._param_validation import HasMethods, Interval, RealNotInt, St
 from sklearn.utils.multiclass import _check_partial_fit_first_call, check_classification_targets
 from sklearn.utils.validation import check_is_fitted, check_X_y
 
-from .._lib.sklearn.tree import DecisionTreeClassifier, _criterion
+from .._lib.sklearn.tree import DecisionTreeClassifier, _criterion, _tree
 from .._lib.sklearn.tree._classes import BaseDecisionTree
 from .._lib.sklearn.tree._criterion import BaseCriterion
 from .._lib.sklearn.tree._tree import Tree
@@ -27,6 +27,8 @@ CRITERIA_REG = {
     "absolute_error": _criterion.MAE,
     "poisson": _criterion.Poisson,
 }
+
+DOUBLE = _tree.DOUBLE
 
 
 class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree):
@@ -189,6 +191,13 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
     stratify : bool
         Whether or not to stratify sample when considering structure and leaf indices.
         By default False.
+
+    honest_method : {"apply", "prune"}, default="apply"
+        Method to use for fitting the leaf nodes. If "apply", the leaf nodes
+        are fit using the structure as is. In this case, empty leaves may occur
+        if not enough data. If "prune", the leaf nodes are fit
+        by pruning using the honest-set of data after the tree structure is built
+        using the structure-set of data.
 
     **tree_estimator_params : dict
         Parameters to pass to the underlying base tree estimators.
@@ -653,49 +662,46 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         return self
 
     def _fit_leaves(self, X, y, sample_weight):
+        # update the number of classes, unsplit
+        if y.ndim == 1:
+            # reshape is necessary to preserve the data contiguity against vs
+            # [:, np.newaxis] that does not.
+            y = np.reshape(y, (-1, 1))
+        check_classification_targets(y)
+        y = np.copy(y)  # .astype(int)
+
+        # Normally called by super
+        X = self.estimator_._validate_X_predict(X, True)
+
+        # preserve from underlying tree
+        # https://github.com/scikit-learn/scikit-learn/blob/1.0.X/sklearn/tree/_classes.py#L202
+        self._tree_classes_ = self.classes_
+        self._tree_n_classes_ = self.n_classes_
+        self.classes_ = []
+        self.n_classes_ = []
+        self.empirical_prior_ = []
+
+        y_encoded = np.zeros(y.shape, dtype=int)
+        for k in range(self.n_outputs_):
+            classes_k, y_encoded[:, k] = np.unique(y[:, k], return_inverse=True)
+            self.classes_.append(classes_k)
+            self.n_classes_.append(classes_k.shape[0])
+            self.empirical_prior_.append(
+                np.bincount(y_encoded[:, k], minlength=classes_k.shape[0]) / y.shape[0]
+            )
+        y = y_encoded
+        self.n_classes_ = np.array(self.n_classes_, dtype=np.intp)
+
         if self.honest_method == "apply":
-            # update the number of classes, unsplit
-            if y.ndim == 1:
-                # reshape is necessary to preserve the data contiguity against vs
-                # [:, np.newaxis] that does not.
-                y = np.reshape(y, (-1, 1))
-            check_classification_targets(y)
-            y = np.copy(y)  # .astype(int)
-
-            # Normally called by super
-            X = self.estimator_._validate_X_predict(X, True)
-
             # Fit leaves using other subsample
             honest_leaves = self.tree_.apply(X[self.honest_indices_])
 
-            # preserve from underlying tree
-            # https://github.com/scikit-learn/scikit-learn/blob/1.0.X/sklearn/tree/_classes.py#L202
-            self._tree_classes_ = self.classes_
-            self._tree_n_classes_ = self.n_classes_
-            self.classes_ = []
-            self.n_classes_ = []
-            self.empirical_prior_ = []
-
-            y_encoded = np.zeros(y.shape, dtype=int)
-            for k in range(self.n_outputs_):
-                classes_k, y_encoded[:, k] = np.unique(y[:, k], return_inverse=True)
-                self.classes_.append(classes_k)
-                self.n_classes_.append(classes_k.shape[0])
-                self.empirical_prior_.append(
-                    np.bincount(y_encoded[:, k], minlength=classes_k.shape[0]) / y.shape[0]
-                )
-            y = y_encoded
-
             # y-encoded ensures that y values match the indices of the classes
             self._set_leaf_nodes(honest_leaves, y, sample_weight)
-
-            self.n_classes_ = np.array(self.n_classes_, dtype=np.intp)
-            if self.n_outputs_ == 1:
-                self.n_classes_ = self.n_classes_[0]
-                self.classes_ = self.classes_[0]
-                self.empirical_prior_ = self.empirical_prior_[0]
-                y = y[:, 0]
         elif self.honest_method == "prune":
+            if getattr(y, "dtype", None) != DOUBLE or not y.flags.contiguous:
+                y = np.ascontiguousarray(y, dtype=DOUBLE)
+
             n_samples = X.shape[0]
 
             # Build tree
@@ -717,6 +723,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
                 self.min_weight_leaf_,
                 self.random_state,
                 self.monotonic_cst_,
+                self.tree_,
             )
 
             # build pruned tree
@@ -732,10 +739,18 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
                 )
 
             # get the leaves
-            _build_pruned_tree_honesty(pruned_tree, self.tree_, pruner, X, y, sample_weight)
+            missing_values_in_feature_mask = self._compute_missing_values_in_feature_mask(X)
+            _build_pruned_tree_honesty(
+                pruned_tree, self.tree_, pruner, X, y, sample_weight, missing_values_in_feature_mask
+            )
             self.tree_ = pruned_tree
-
             raise NotImplementedError("Pruning is not yet implemented.")
+
+        if self.n_outputs_ == 1:
+            self.n_classes_ = self.n_classes_[0]
+            self.classes_ = self.classes_[0]
+            self.empirical_prior_ = self.empirical_prior_[0]
+            y = y[:, 0]
 
     def _set_leaf_nodes(self, leaf_ids, y, sample_weight):
         """Traverse the already built tree with X and set leaf nodes with y.

@@ -4,6 +4,15 @@ cimport numpy as cnp
 
 cnp.import_array()
 
+from libc.math cimport isnan
+from libc.stdlib cimport free, malloc
+from libcpp.stack cimport stack
+
+TREE_LEAF = -1
+TREE_UNDEFINED = -2
+cdef intp_t _TREE_LEAF = TREE_LEAF
+cdef intp_t _TREE_UNDEFINED = TREE_UNDEFINED
+
 
 def _build_pruned_tree_honesty(
     Tree tree,
@@ -12,6 +21,7 @@ def _build_pruned_tree_honesty(
     object X,
     const float64_t[:, ::1] y,
     const float64_t[:] sample_weight,
+    const unsigned char[::1] missing_values_in_feature_mask=None,
 ):
     cdef:
         intp_t n_nodes = orig_tree.node_count
@@ -19,7 +29,7 @@ def _build_pruned_tree_honesty(
             shape=n_nodes, dtype=np.uint8)
 
     # initialize the pruner/splitter
-    pruner.init(X, y, sample_weight, orig_tree.missing_values_in_feature_mask)
+    pruner.init(X, y, sample_weight, missing_values_in_feature_mask)
 
     # apply pruning to the tree
     _honest_prune(leaves_in_subtree, orig_tree, pruner)
@@ -81,6 +91,123 @@ cdef class HonestPruner(Splitter):
         const unsigned char[::1] missing_values_in_feature_mask,
     ) except -1:
         Splitter.init(self, X, y, sample_weight, missing_values_in_feature_mask)
+        self.X = X
+
+    cdef int partition_samples(
+        self,
+        intp_t node_idx,
+    ) noexcept nogil:
+        """Partition samples for X at the threshold and feature index.
+
+        If missing values are present, this method partitions `samples`
+        so that the `best_n_missing` missing values' indices are in the
+        right-most end of `samples`, that is `samples[end_non_missing:end]`.
+        """
+        cdef float64_t threshold = self.tree.nodes[node_idx].feature
+        cdef intp_t feature = self.tree.nodes[node_idx].feature
+        cdef intp_t n_missing = 0
+        cdef intp_t pos = self.start
+        cdef intp_t p
+        cdef intp_t sample_idx
+        cdef intp_t current_end = self.end - n_missing
+        cdef const float32_t[:, :] X_ndarray = self.X
+
+        # TODO
+        # partition the samples one by one
+        for p in range(self.start, self.end):
+            sample_idx = self.samples[p]
+
+            if isnan(X_ndarray[sample_idx, feature]):
+                self.samples[p], self.samples[current_end] = \
+                    self.samples[current_end], self.samples[p]
+
+                n_missing += 1
+                current_end -= 1
+            elif p > pos and X_ndarray[sample_idx, feature] <= threshold:
+                self.samples[p], self.samples[pos] = \
+                    self.samples[pos], self.samples[p]
+                pos += 1
+
+        # this is the split point for left/right children
+        self.pos = pos
+        self.n_missing = n_missing
+        self.missing_go_to_left = self.tree.nodes[node_idx].missing_go_to_left
+
+    cdef bint check_node_partition_conditions(
+        self,
+        SplitRecord* current_split,
+    ) noexcept nogil:
+        """Check that the current node satisfies paritioning conditions.
+
+        Parameters
+        ----------
+        current_split : SplitRecord pointer
+            A pointer to a memory-allocated SplitRecord object which will be filled with the
+            split chosen.
+        """
+        # update the criterion if we are checking split conditions
+        self.criterion.init_missing(self.n_missing)
+        self.criterion.reset()
+        self.criterion.update(self.pos)
+
+        current_split.pos = self.pos
+        current_split.n_missing = self.n_missing
+        current_split.missing_go_to_left = self.missing_go_to_left
+
+        shift_missing_values_to_left_if_required(
+            current_split,
+            self.samples,
+            self.end
+        )
+
+        # first check the presplit conditions
+        cdef bint valid_split = self.check_presplit_conditions(
+            current_split,
+            self.n_missing,
+            self.missing_go_to_left
+        )
+
+        if not valid_split:
+            return 0
+
+        # TODO: make work with lower/upper bound
+        # Reject if monotonicity constraints are not satisfied
+        # if (
+        #     self.with_monotonic_cst and
+        #     self.monotonic_cst[current_split.feature] != 0 and
+        #     not self.criterion.check_monotonicity(
+        #         self.monotonic_cst[current_split.feature],
+        #         lower_bound,
+        #         upper_bound,
+        #     )
+        # ):
+        #     return 0
+
+        # next check the postsplit conditions that leverages the criterion
+        valid_split = self.check_postsplit_conditions()
+        return valid_split
+
+    cdef inline intp_t n_left_samples(
+        self
+    ) noexcept nogil:
+        cdef intp_t n_left
+
+        if self.missing_go_to_left:
+            n_left = self.pos - self.start + self.n_missing
+        else:
+            n_left = self.pos - self.start
+        return n_left
+
+    cdef inline intp_t n_right_samples(
+        self
+    ) noexcept nogil:
+        cdef intp_t n_right
+        cdef intp_t end_non_missing = self.end - self.n_missing
+        if self.missing_go_to_left:
+            n_right = end_non_missing - self.pos
+        else:
+            n_right = end_non_missing - self.pos + self.n_missing
+        return n_right
 
     cdef int node_split(
         self,
@@ -93,33 +220,6 @@ cdef class HonestPruner(Splitter):
         and -1 in case of failure to allocate memory (and raise MemoryError).
         """
         pass
-        # Extract input
-        # cdef float32_t X_i_node_feature
-
-        # # Initialize auxiliary data-structure
-        # cdef Node* node = NULL
-        # cdef intp_t i = 0
-        # with nogil:
-        #     for i in range(self.n_samples):
-        #         node = self.nodes
-
-        #         # While node not a leaf
-        #         while node.left_child != _TREE_LEAF:
-        #             X_i_node_feature = self._compute_feature(X_ndarray, i, node)
-        #             # ... and node.right_child != _TREE_LEAF:
-        #             if isnan(X_i_node_feature):
-        #                 if node.missing_go_to_left:
-        #                     node = &self.nodes[node.left_child]
-        #                 else:
-        #                     node = &self.nodes[node.right_child]
-        #             elif X_i_node_feature <= node.threshold:
-        #                 node = &self.nodes[node.left_child]
-        #             else:
-        #                 node = &self.nodes[node.right_child]
-
-        #         out[i] = <intp_t>(node - self.nodes)  # node offset
-
-        # return np.asarray(out)
 
 
 cdef _honest_prune(
@@ -136,10 +236,12 @@ cdef _honest_prune(
     - the number of samples in the parent node
     - the number of samples in the node
 
-    Until one of two stopping conditions are met:
+    Until one of three stopping conditions are met:
 
     1. The orig_node is a leaf node.
     2. The orig_node is a non-leaf node and the split is degenerate.
+    3. Stopping criterion is met based on the samples that reach the node.
+        These are the stopping conditions implemented in a Splitter/Pruner.
 
     Parameters
     ----------
@@ -152,24 +254,82 @@ cdef _honest_prune(
         in the nodes.
     """
     cdef:
-        intp_t i
         intp_t n_nodes = orig_tree.node_count
-        # prior probability using weighted samples
-        float64_t[:] weighted_n_node_samples = orig_tree.weighted_n_node_samples
-        float64_t total_sum_weights = weighted_n_node_samples[0]
-        float64_t[:] impurity = orig_tree.impurity
-        # weighted impurity of each node
-        float64_t[:] r_node = np.empty(shape=n_nodes, dtype=np.float64)
 
-        # Initialize output
-        # intp_t[:] out = np.zeros(n_samples, dtype=np.intp)
+        # get the left child, right child and parents of every node
+        intp_t[:] child_l = orig_tree.children_left
+        intp_t[:] child_r = orig_tree.children_right
+        intp_t[:] parents = np.zeros(shape=n_nodes, dtype=np.intp)
 
-    # out = orig_tree.apply(X)
+        # stack to keep track of the nodes to be pruned such that BFS is done
+        stack[PruningRecord] pruning_stack
+        PruningRecord stack_record
+
+        intp_t node_idx
+        SplitRecord* split_ptr = <SplitRecord *>malloc(pruner.pointer_size())
+
+        bint is_leaf_in_origtree
+        bint valid_split
+        bint split_is_degenerate
+
+        intp_t start = 0
+        intp_t end = 0
+        float64_t weighted_n_node_samples
 
     # find parent node ids and leaves
     with nogil:
-        # initialize the weights of each node
-        for i in range(r_node.shape[0]):
-            r_node[i] = (
-                weighted_n_node_samples[i] * impurity[i] / total_sum_weights)
         # Push the root node
+        pruning_stack.push({
+            "node_idx": 0,
+            "parent": _TREE_UNDEFINED,
+            "start": 0,
+            "end": pruner.n_samples
+        })
+
+        while not pruning_stack.empty():
+            stack_record = pruning_stack.top()
+            pruning_stack.pop()
+            start = stack_record.start
+            end = stack_record.end
+            # node index and parent pointer to actual node within the orig_tree
+            parents[node_idx] = stack_record.parent
+            node_idx = stack_record.node_idx
+
+            # reset what is the samples considered at this split node
+            pruner.node_reset(start, end, &weighted_n_node_samples)
+
+            # first partition samples into left/right child
+            pruner.partition_samples(node_idx)
+            # check end conditions
+            valid_split = pruner.check_node_partition_conditions(
+                split_ptr
+            )
+            split_is_degenerate = (
+                pruner.n_left_samples() == 0 or pruner.n_right_samples() == 0
+            )
+            is_leaf_in_origtree = child_l[node_idx] == _TREE_LEAF
+
+            if not valid_split or split_is_degenerate or is_leaf_in_origtree:
+                # ... and child_r[node_idx] == _TREE_LEAF:
+                #
+                # 1) if node is not degenerate, that means there are still honest-samples in
+                # both left/right children of the proposed split, or the node itself is a leaf
+                # or 2) there are still nodes to split on, but the honest-samples have been
+                # used up so the "parent" should be the new leaf
+                leaves_in_subtree[node_idx] = 1
+            else:
+                pruning_stack.push({
+                    "node_idx": child_l[node_idx],
+                    "parent": node_idx,
+                    "start": pruner.start,
+                    "end": pruner.pos,
+                })
+                pruning_stack.push({
+                    "node_idx": child_r[node_idx],
+                    "parent": node_idx,
+                    "start": pruner.pos,
+                    "end": pruner.end,
+                })
+
+    # free the memory created for the SplitRecord pointer
+    free(split_ptr)
