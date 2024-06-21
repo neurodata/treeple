@@ -1,4 +1,3 @@
-# Authors: Ronan Perry, Sambit Panda, Haoyin Xu
 # Adopted from: https://github.com/neurodata/honest-forests
 
 
@@ -9,22 +8,8 @@ from sklearn.utils._param_validation import HasMethods, Interval, RealNotInt, St
 from sklearn.utils.multiclass import _check_partial_fit_first_call, check_classification_targets
 from sklearn.utils.validation import check_is_fitted, check_X_y
 
-from .._lib.sklearn.tree import DecisionTreeClassifier, _criterion, _tree
+from .._lib.sklearn.tree import DecisionTreeClassifier
 from .._lib.sklearn.tree._classes import BaseDecisionTree
-
-CRITERIA_CLF = {
-    "gini": _criterion.Gini,
-    "log_loss": _criterion.Entropy,
-    "entropy": _criterion.Entropy,
-}
-CRITERIA_REG = {
-    "squared_error": _criterion.MSE,
-    "friedman_mse": _criterion.FriedmanMSE,
-    "absolute_error": _criterion.MAE,
-    "poisson": _criterion.Poisson,
-}
-
-DOUBLE = _tree.DOUBLE
 
 
 class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree):
