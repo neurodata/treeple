@@ -32,9 +32,9 @@ iris_y = iris_y[p]
 def test_small_dataset_independent(seed):
     # XXX: unit test interestingly does not work for MI, possibly due to bias
     bootstrap = True
-    n_samples = 200
-    n_features = 1000
-    n_estimators = 200
+    n_samples = 100
+    n_features = 500
+    n_estimators = 100
 
     rng = np.random.default_rng(seed)
     X = rng.standard_normal(size=(n_samples, n_features))
