@@ -474,6 +474,7 @@ def make_trunk_classification(
         Either 'ma', or 'ar'.
     return_params : bool, optional
         Whether or not to return the distribution parameters of the classes normal distributions.
+        Default false.
     scaling_factor : float, optional
         The scaling factor for the covariance matrix. By default 1.
     seed : int, optional

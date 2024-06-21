@@ -9,7 +9,7 @@ from sklearn.utils import check_random_state
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from sktree._lib.sklearn.tree import DecisionTreeClassifier
-from sktree.datasets import make_quadratic_classification
+from sktree.datasets import make_quadratic_classification, make_trunk_classification
 from sktree.ensemble import HonestForestClassifier
 from sktree.stats.utils import _mutual_information
 from sktree.tree import (
@@ -19,6 +19,8 @@ from sktree.tree import (
 )
 
 CLF_CRITERIONS = ("gini", "entropy")
+
+seed = 12345
 
 # also load the iris dataset
 # and randomly permute it
@@ -524,3 +526,23 @@ def test_honest_forest_with_tree_estimator_params(tree, tree_kwargs):
                 )
             else:
                 assert getattr(clf, attr_name) == getattr(clf.estimators_[0], attr_name)
+
+
+def test_honest_forest_posteriors_on_independent():
+    scores = []
+    for idx in range(5):
+        X, y = make_trunk_classification(
+            n_samples=256, n_dim=4096, n_informative=1, mu_0=0.0, mu_1=0.0, seed=idx
+        )
+        clf = HonestForestClassifier(
+            n_estimators=50, random_state=idx, bootstrap=True, max_samples=1.6
+        )
+        clf.fit(X, y)
+
+        oob_posteriors = clf.predict_proba_per_tree(X, clf.oob_samples_)
+        auc_score = roc_auc_score(y, np.nanmean(oob_posteriors, axis=0)[:, 1])
+        scores.append(auc_score)
+
+    print(np.mean(scores), scores)
+    assert np.mean(scores) > 0.48, f"{np.mean(scores)} {scores}"
+    assert False

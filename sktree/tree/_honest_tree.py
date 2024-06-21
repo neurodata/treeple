@@ -8,7 +8,7 @@ from sklearn.base import ClassifierMixin, MetaEstimatorMixin, _fit_context, clon
 from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.utils._param_validation import HasMethods, Interval, RealNotInt, StrOptions
 from sklearn.utils.multiclass import _check_partial_fit_first_call, check_classification_targets
-from sklearn.utils.validation import check_is_fitted, check_X_y
+from sklearn.utils.validation import check_is_fitted, check_random_state, check_X_y
 
 from .._lib.sklearn.tree import DecisionTreeClassifier, _criterion, _tree
 from .._lib.sklearn.tree._classes import BaseDecisionTree
@@ -716,12 +716,13 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
                 # might be shared and modified concurrently during parallel fitting
                 criterion = copy.deepcopy(criterion)
 
+            random_state = check_random_state(self.random_state)
             pruner = HonestPruner(
                 criterion,
                 self.max_features_,
                 self.min_samples_leaf_,
                 self.min_weight_leaf_,
-                self.random_state,
+                random_state,
                 self.monotonic_cst_,
                 self.tree_,
             )
@@ -769,14 +770,6 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
             leaf_ids, y[self.honest_indices_, :], sample_weight[self.honest_indices_]
         ):
             self.tree_.value[leaf_id][:, yval] += y_weight
-        # new_leaf_values = np.zeros(self.tree_.value.shape)
-        # for idx, (leaf_id, yval, y_weight) in enumerate(
-        #     zip(leaf_ids, y[self.honest_indices_, :], sample_weight[self.honest_indices_])
-        # ):
-        #     new_leaf_values[leaf_id, :, yval] += y_weight
-
-        # for leaf_id in leaf_ids:
-        #     self.tree_.value[leaf_id] = new_leaf_values[leaf_id]
 
     def _inherit_estimator_attributes(self):
         """Initialize necessary attributes from the provided tree estimator"""

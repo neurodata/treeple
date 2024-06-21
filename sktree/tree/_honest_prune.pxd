@@ -1,4 +1,4 @@
-from .._lib.sklearn.tree._tree import _build_pruned_tree
+# from .._lib.sklearn.tree._tree import _build_pruned_tree
 
 from .._lib.sklearn.tree._criterion cimport Criterion
 from .._lib.sklearn.tree._splitter cimport (
