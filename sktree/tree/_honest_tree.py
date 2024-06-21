@@ -737,8 +737,6 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
                 proba[zero_mask] = 1 / self.n_classes_[pos]
             elif self.honest_prior == "ignore":
                 proba[zero_mask] = np.nan
-            else:
-                raise ValueError(f"honest_prior {self.honest_prior} not a valid input.")
         else:
             if self.honest_prior == "empirical":
                 proba[zero_mask] = self.empirical_prior_
@@ -746,8 +744,6 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
                 proba[zero_mask] = 1 / self.n_classes_
             elif self.honest_prior == "ignore":
                 proba[zero_mask] = np.nan
-            else:
-                raise ValueError(f"honest_prior {self.honest_prior} not a valid input.")
         return proba
 
     def predict_proba(self, X, check_input=True):
