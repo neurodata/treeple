@@ -9,8 +9,8 @@ on:
     types: [published]
   workflow_run:
     workflows: [Build_Wheels]
-    types:
-      - completed  # This ensures it triggers only after the workflow completes
+    branches: [main]
+    types: [completed]  # This ensures it triggers only after the workflow completes
 
 permissions:
   contents: read
