@@ -52,6 +52,7 @@ clf = MultiViewObliqueDecisionTreeClassifier(
     feature_set_ends=[n_features_1, X.shape[1]],
     max_features=0.3,
 )
+print(X.shape)
 clf.fit(X, y)
 assert (
     accuracy_score(y, clf.predict(X)) == 1.0
