@@ -11,7 +11,7 @@ on:
     branches:
       - main
   workflow_run:
-    workflows: [Build Wheels]
+    workflows: [Build_Wheels]
     branches: [main]
   pull_request:
     branches:
@@ -28,14 +28,14 @@ jobs:
         id: get-run-id
         run: |
           OTHER_REPO="${{ github.repository }}"
-          WF_NAME="Build Wheels"
+          WF_NAME="Build_Wheels"
           RUN_ID=`gh run --repo ${OTHER_REPO} list --workflow ${WF_NAME} --json databaseId --jq .[0].databaseId`
           echo "Detected latest run id of ${RUN_ID} for workflow ${WF_NAME}"
           echo "run-id=${RUN_ID}" >> "$GITHUB_OUTPUT"
         env:
           GH_TOKEN: ${{ github.token }}
 
-      - name: Download artifact from "Build Wheels" workflow
+      - name: Download artifact from "Build_Wheels" workflow
         uses: actions/download-artifact@v4
         with:
           name: dist  # Match name used in test.yml upload artifact step
