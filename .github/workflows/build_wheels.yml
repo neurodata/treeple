@@ -84,7 +84,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           path: ./wheelhouse/
-          name: ${{ matrix.python[0] }}-${{ matrix.os[1] }}
+          # name: ${{ matrix.python[0] }}-${{ matrix.os[1] }}
 
   build-wheels-m1:
     name: Build wheels on Arm M1 with Python ${{ matrix.python[0] }}
@@ -128,7 +128,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           path: ./wheelhouse
-          name: ${{ matrix.python[0] }}-arm
+          # name: ${{ matrix.python[0] }}-arm
 
   # Build the source distribution under Linux
   build_sdist:
@@ -151,15 +151,10 @@ jobs:
           pip install .[build]
           python -m build --sdist
 
-      - name: Store artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          path: dist/*.tar.gz
-
       - uses: actions/upload-artifact@v4
         with:
           path: dist
-          name: ${{ matrix.python[0] }}-${{ matrix.os[1] }}
+          # name: ${{ matrix.python[0] }}-${{ matrix.os[1] }}
 
   merge-wheels:
     name: Merge all wheels into one directory
@@ -171,7 +166,7 @@ jobs:
           path: all
       - name: List all files
         run: |
-          ls -a
+          ls all/**
       - name: Merge files
         run: |
           mkdir dist
