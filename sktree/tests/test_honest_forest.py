@@ -9,7 +9,7 @@ from sklearn.utils import check_random_state
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from sktree._lib.sklearn.tree import DecisionTreeClassifier
-from sktree.datasets import make_quadratic_classification
+from sktree.datasets import make_quadratic_classification, make_trunk_classification
 from sktree.ensemble import HonestForestClassifier
 from sktree.stats.utils import _mutual_information
 from sktree.tree import (
@@ -19,6 +19,8 @@ from sktree.tree import (
 )
 
 CLF_CRITERIONS = ("gini", "entropy")
+
+seed = 12345
 
 # also load the iris dataset
 # and randomly permute it
@@ -51,7 +53,7 @@ def test_toy_accuracy():
 
 @pytest.mark.parametrize("criterion", ["gini", "entropy"])
 @pytest.mark.parametrize("max_features", [None, 2])
-@pytest.mark.parametrize("honest_prior", ["empirical", "uniform", "ignore", "error"])
+@pytest.mark.parametrize("honest_prior", ["empirical", "uniform", "ignore"])
 @pytest.mark.parametrize(
     "estimator",
     [
@@ -71,26 +73,22 @@ def test_iris(criterion, max_features, honest_prior, estimator):
         honest_prior=honest_prior,
         tree_estimator=estimator,
     )
-    if honest_prior == "error":
-        with pytest.raises(ValueError, match="honest_prior error not a valid input."):
-            clf.fit(iris.data, iris.target)
-    else:
-        clf.fit(iris.data, iris.target)
-        score = accuracy_score(clf.predict(iris.data), iris.target)
+    clf.fit(iris.data, iris.target)
+    score = accuracy_score(clf.predict(iris.data), iris.target)
 
-        assert (
-            score > 0.5 and score < 1.0
-        ), "Failed with {0}, criterion = {1} and score = {2}".format("HForest", criterion, score)
+    assert score > 0.5 and score < 1.0, "Failed with {0}, criterion = {1} and score = {2}".format(
+        "HForest", criterion, score
+    )
 
-        score = accuracy_score(clf.predict(iris.data), clf.predict_proba(iris.data).argmax(1))
-        assert score == 1.0, "Failed with {0}, criterion = {1} and score = {2}".format(
-            "HForest", criterion, score
-        )
+    score = accuracy_score(clf.predict(iris.data), clf.predict_proba(iris.data).argmax(1))
+    assert score == 1.0, "Failed with {0}, criterion = {1} and score = {2}".format(
+        "HForest", criterion, score
+    )
 
 
 @pytest.mark.parametrize("criterion", ["gini", "entropy"])
 @pytest.mark.parametrize("max_features", [None, 2])
-@pytest.mark.parametrize("honest_prior", ["empirical", "uniform", "ignore", "error"])
+@pytest.mark.parametrize("honest_prior", ["empirical", "uniform", "ignore"])
 @pytest.mark.parametrize(
     "estimator",
     [
@@ -120,24 +118,16 @@ def test_iris_multi(criterion, max_features, honest_prior, estimator):
 
     X = iris.data
     y = np.stack((iris.target, second_y[perm])).T
-    if honest_prior == "error":
-        with pytest.raises(ValueError, match="honest_prior error not a valid input."):
-            clf.fit(X, y)
+    clf.fit(X, y)
+    score = r2_score(clf.predict(X), y)
+    if honest_prior == "ignore":
+        assert (
+            score > 0.4 and score < 1.0
+        ), "Failed with {0}, criterion = {1} and score = {2}".format("HForest", criterion, score)
     else:
-        clf.fit(X, y)
-        score = r2_score(clf.predict(X), y)
-        if honest_prior == "ignore":
-            assert (
-                score > 0.4 and score < 1.0
-            ), "Failed with {0}, criterion = {1} and score = {2}".format(
-                "HForest", criterion, score
-            )
-        else:
-            assert (
-                score > 0.9 and score < 1.0
-            ), "Failed with {0}, criterion = {1} and score = {2}".format(
-                "HForest", criterion, score
-            )
+        assert (
+            score > 0.9 and score < 1.0
+        ), "Failed with {0}, criterion = {1} and score = {2}".format("HForest", criterion, score)
 
 
 def test_max_samples():
@@ -161,6 +151,37 @@ def test_max_samples():
         n_estimators=2, random_state=0, max_samples=1.6, bootstrap=True, n_jobs=-1
     )
     uf = uf.fit(X, y)
+
+
+def test_honest_forest_samples():
+    bootstrap = True
+    max_samples = 1.6
+
+    n_estimators = 5
+    est = HonestForestClassifier(
+        n_estimators=n_estimators,
+        random_state=0,
+        bootstrap=bootstrap,
+        max_samples=max_samples,
+        honest_fraction=0.5,
+        stratify=True,
+    )
+    X = rng.normal(0, 1, (100, 2))
+    X[:50] *= -1
+    y = [0, 1] * 50
+    samples = np.arange(len(y))
+
+    est.fit(X, y)
+
+    structure_samples = est.structure_indices_
+    leaf_samples = est.honest_indices_
+    oob_samples = est.oob_samples_
+    for tree_idx in range(est.n_estimators):
+        assert len(structure_samples[tree_idx]) + len(leaf_samples[tree_idx]) + len(
+            oob_samples[tree_idx]
+        ) == len(
+            samples
+        ), f"{tree_idx} {len(structure_samples[tree_idx])} {len(leaf_samples[tree_idx])} {len(samples)}"
 
 
 @pytest.mark.parametrize("max_samples", [0.75, 1.0])
@@ -489,3 +510,35 @@ def test_honest_forest_with_tree_estimator_params(tree, tree_kwargs):
                 )
             else:
                 assert getattr(clf, attr_name) == getattr(clf.estimators_[0], attr_name)
+
+
+def test_honest_forest_posteriors_on_independent():
+    """Test regression from :gh:`283`.
+
+    Posteriors were biased when the classes were independent and using the bootstrap and oob sample
+    technique to estimate the final population test statistic. This resulted in a biased estimate
+    of the AUC score. Stratification of the bootstrapping samples was the solution to this problem.
+    """
+    scores = []
+    for idx in range(5):
+        # create a dataset with overlapping classes
+        X, y = make_trunk_classification(
+            n_samples=128, n_dim=4096, n_informative=1, mu_0=0.0, mu_1=0.0, seed=idx
+        )
+        clf = HonestForestClassifier(
+            n_estimators=100,
+            random_state=idx,
+            bootstrap=True,
+            max_samples=1.6,
+            n_jobs=-1,
+            honest_prior="ignore",
+            stratify=True,
+        )
+        clf.fit(X, y)
+
+        oob_posteriors = clf.predict_proba_per_tree(X, clf.oob_samples_)
+        auc_score = roc_auc_score(y, np.nanmean(oob_posteriors, axis=0)[:, 1])
+        scores.append(auc_score)
+
+    # Without stratification, this test should fail
+    assert np.mean(scores) > 0.49 and np.mean(scores) < 0.51, f"{np.mean(scores)} {scores}"

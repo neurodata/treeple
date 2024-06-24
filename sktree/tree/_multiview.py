@@ -525,7 +525,7 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                 min_weight_leaf,
                 random_state,
                 monotonic_cst,
-                self.feature_combinations_,
+                self._feature_combinations_,
                 self.feature_set_ends_,
                 self.n_feature_sets_,
                 self.max_features_per_set_,

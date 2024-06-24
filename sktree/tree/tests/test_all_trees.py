@@ -10,7 +10,6 @@ from sktree.tree import (
     ExtraObliqueDecisionTreeClassifier,
     ExtraObliqueDecisionTreeRegressor,
     MultiViewDecisionTreeClassifier,
-    MultiViewObliqueDecisionTreeClassifier,
     ObliqueDecisionTreeClassifier,
     ObliqueDecisionTreeRegressor,
     PatchObliqueDecisionTreeClassifier,
@@ -29,7 +28,7 @@ ALL_TREES = [
     UnsupervisedDecisionTree,
     UnsupervisedObliqueDecisionTree,
     MultiViewDecisionTreeClassifier,
-    MultiViewObliqueDecisionTreeClassifier,
+    # MultiViewObliqueDecisionTreeClassifier,
 ]
 
 

@@ -1,8 +1,8 @@
 # distutils: language=c++
 # cython: language_level=3
-# cython: boundscheck=False
-# cython: wraparound=False
-# cython: initializedcheck=False
+# cython: boundscheck=True
+# cython: wraparound=True
+# cython: initializedcheck=True
 
 import numpy as np
 
@@ -826,6 +826,8 @@ cdef class MultiViewObliqueSplitter(MultiViewSplitter):
         for i in range(self.n_feature_sets):
             n_non_zeros_per_set[i] = <intp_t> (self.max_features_per_set[i] * self.feature_combinations)
         self.n_non_zeros_per_set = n_non_zeros_per_set
+        with gil:
+            print("Initialized")
 
     cdef void sample_proj_mat(
         self,
@@ -838,7 +840,6 @@ cdef class MultiViewObliqueSplitter(MultiViewSplitter):
         but now also uniformly samples features from each feature set.
         """
         cdef intp_t n_features = self.n_features
-        cdef intp_t n_non_zeros = self.n_non_zeros
         cdef uint32_t* random_state = &self.rand_r_state
 
         cdef intp_t i, j, feat_i, proj_i, rand_vec_index
@@ -856,6 +857,8 @@ cdef class MultiViewObliqueSplitter(MultiViewSplitter):
         # them independently.
         feature_set_begin = 0
 
+        with gil:
+            print("Starting to sample projection matrix")
         # sample from a feature set using linear combinations among the two sets
         for idx in range(self.n_feature_sets):
             feature_set_end = self.feature_set_ends[idx]

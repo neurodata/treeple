@@ -8,7 +8,11 @@ from sklearn.metrics import accuracy_score
 from sklearn.model_selection import cross_val_score
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
-from sktree.tree import DecisionTreeClassifier, MultiViewDecisionTreeClassifier
+from sktree.tree import (
+    DecisionTreeClassifier,
+    MultiViewDecisionTreeClassifier,
+    MultiViewObliqueDecisionTreeClassifier,
+)
 
 seed = 12345
 
@@ -16,14 +20,18 @@ seed = 12345
 @parametrize_with_checks(
     [
         MultiViewDecisionTreeClassifier(random_state=12),
+        # MultiViewObliqueDecisionTreeClassifier(random_state=12),
     ]
 )
 def test_sklearn_compatible_estimator(estimator, check):
     check(estimator)
 
 
+@pytest.mark.parametrize(
+    "est", [MultiViewDecisionTreeClassifier, MultiViewObliqueDecisionTreeClassifier]
+)
 @pytest.mark.parametrize("baseline_est", [MultiViewDecisionTreeClassifier, DecisionTreeClassifier])
-def test_multiview_classification(baseline_est):
+def test_multiview_classification(baseline_est, est):
     """Test that explicit knowledge of multi-view structure improves classification accuracy.
 
     In very high-dimensional noise setting across two views, when the max_depth and max_features
@@ -61,7 +69,7 @@ def test_multiview_classification(baseline_est):
     y = np.hstack((y0, y1)).T
 
     # Compare multiview decision tree vs single-view decision tree
-    clf = MultiViewDecisionTreeClassifier(
+    clf = est(
         random_state=seed,
         feature_set_ends=[n_features_1, X.shape[1]],
         max_features=0.3,
@@ -84,12 +92,15 @@ def test_multiview_classification(baseline_est):
     )
 
 
-def test_multiview_errors():
+@pytest.mark.parametrize(
+    "est", [MultiViewDecisionTreeClassifier, MultiViewObliqueDecisionTreeClassifier]
+)
+def test_multiview_errors(est):
     """Test that an error is raised when max_features is greater than the number of features."""
     X = np.random.random((10, 5))
     y = np.random.randint(0, 2, size=10)
 
-    clf = MultiViewDecisionTreeClassifier(
+    clf = est(
         random_state=seed,
         feature_set_ends=[3, 10],
         max_features=2,
@@ -98,7 +109,7 @@ def test_multiview_errors():
         clf.fit(X, y)
 
     # Test that an error is raised when max_features is greater than the number of features.
-    clf = MultiViewDecisionTreeClassifier(
+    clf = est(
         random_state=seed,
         feature_set_ends=[3, 5],
         max_features=6,

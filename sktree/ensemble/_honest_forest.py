@@ -9,8 +9,8 @@ import numpy as np
 from joblib import Parallel, delayed
 from sklearn.base import _fit_context, clone
 from sklearn.ensemble._base import _partition_estimators, _set_random_states
-from sklearn.utils import compute_sample_weight
-from sklearn.utils._param_validation import Interval, RealNotInt
+from sklearn.utils import compute_sample_weight, resample
+from sklearn.utils._param_validation import Interval, RealNotInt, StrOptions
 from sklearn.utils.validation import check_is_fitted
 
 from .._lib.sklearn.ensemble._forest import ForestClassifier
@@ -31,41 +31,67 @@ def _parallel_build_trees(
     n_samples_bootstrap=None,
     missing_values_in_feature_mask=None,
     classes=None,
+    stratify=False,
 ):
     """
     Private function used to fit a single tree in parallel.
 
-    XXX: this is copied over from scikit-learn and modified to allow sampling with
+    XXX:
+    1. this is copied over from scikit-learn and modified to allow sampling with
     and without replacement given ``bootstrap``.
+
+    2. Overrides the scikit-learn implementation to allow for stratification during bootstrapping
+    via the `stratify` parameter.
     """
     if verbose > 1:
         print("building tree %d of %d" % (tree_idx + 1, n_trees))
 
-    n_samples = X.shape[0]
-    if sample_weight is None:
-        curr_sample_weight = np.ones((n_samples,), dtype=np.float64)
+    if bootstrap:
+        n_samples = X.shape[0]
+        if sample_weight is None:
+            curr_sample_weight = np.ones((n_samples,), dtype=np.float64)
+        else:
+            curr_sample_weight = sample_weight.copy()
+
+        if stratify:
+            indices = resample(
+                np.arange(n_samples),
+                n_samples=n_samples_bootstrap,
+                stratify=y,
+                replace=True,
+                random_state=tree.random_state,
+            )
+        else:
+            indices = _generate_sample_indices(
+                tree.random_state, n_samples, n_samples_bootstrap, bootstrap=bootstrap
+            )
+        sample_counts = np.bincount(indices, minlength=n_samples)
+        curr_sample_weight *= sample_counts
+
+        if class_weight == "subsample":
+            with catch_warnings():
+                simplefilter("ignore", DeprecationWarning)
+                curr_sample_weight *= compute_sample_weight("auto", y, indices=indices)
+        elif class_weight == "balanced_subsample":
+            curr_sample_weight *= compute_sample_weight("balanced", y, indices=indices)
+
+        tree._fit(
+            X,
+            y,
+            sample_weight=curr_sample_weight,
+            check_input=False,
+            missing_values_in_feature_mask=missing_values_in_feature_mask,
+            classes=classes,
+        )
     else:
-        curr_sample_weight = sample_weight.copy()
-
-    indices = _generate_sample_indices(tree.random_state, n_samples, n_samples_bootstrap, bootstrap)
-    sample_counts = np.bincount(indices, minlength=n_samples)
-    curr_sample_weight *= sample_counts
-
-    if class_weight == "subsample":
-        with catch_warnings():
-            simplefilter("ignore", DeprecationWarning)
-            curr_sample_weight *= compute_sample_weight("auto", y, indices=indices)
-    elif class_weight == "balanced_subsample":
-        curr_sample_weight *= compute_sample_weight("balanced", y, indices=indices)
-
-    tree._fit(
-        X,
-        y,
-        sample_weight=curr_sample_weight,
-        check_input=False,
-        missing_values_in_feature_mask=missing_values_in_feature_mask,
-        classes=classes,
-    )
+        tree._fit(
+            X,
+            y,
+            sample_weight=sample_weight,
+            check_input=False,
+            missing_values_in_feature_mask=missing_values_in_feature_mask,
+            classes=classes,
+        )
 
     return tree
 
@@ -254,6 +280,8 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
 
     stratify : bool
         Whether or not to stratify sample when considering structure and leaf indices.
+        This will also stratify samples when bootstrap sampling is used. For more
+        information, see :func:`sklearn.utils.resample`.
         By default False.
 
     **tree_estimator_params : dict
@@ -389,6 +417,11 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
         Interval(RealNotInt, 0.0, None, closed="right"),
         Interval(Integral, 1, None, closed="left"),
     ]
+    _parameter_constraints["honest_fraction"] = [Interval(RealNotInt, 0.0, 1.0, closed="both")]
+    _parameter_constraints["honest_prior"] = [
+        StrOptions({"empirical", "uniform", "ignore"}),
+    ]
+    _parameter_constraints["stratify"] = ["boolean"]
 
     def __init__(
         self,
@@ -514,6 +547,55 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
         )
 
         return self
+
+    def _construct_trees(
+        self,
+        X,
+        y,
+        sample_weight,
+        random_state,
+        n_samples_bootstrap,
+        missing_values_in_feature_mask,
+        classes,
+        n_more_estimators,
+    ):
+        """Override construction of trees to allow stratification during bootstrapping."""
+        trees = [
+            self._make_estimator(append=False, random_state=random_state)
+            for i in range(n_more_estimators)
+        ]
+
+        # Parallel loop: we prefer the threading backend as the Cython code
+        # for fitting the trees is internally releasing the Python GIL
+        # making threading more efficient than multiprocessing in
+        # that case. However, for joblib 0.12+ we respect any
+        # parallel_backend contexts set at a higher level,
+        # since correctness does not rely on using threads.
+        trees = Parallel(
+            n_jobs=self.n_jobs,
+            verbose=self.verbose,
+            prefer="threads",
+        )(
+            delayed(_parallel_build_trees)(
+                t,
+                self.bootstrap,
+                X,
+                y,
+                sample_weight,
+                i,
+                len(trees),
+                verbose=self.verbose,
+                class_weight=self.class_weight,
+                n_samples_bootstrap=n_samples_bootstrap,
+                missing_values_in_feature_mask=missing_values_in_feature_mask,
+                classes=classes,
+                stratify=self.stratify,
+            )
+            for i, t in enumerate(trees)
+        )
+
+        # Collect newly grown trees
+        self.estimators_.extend(trees)
 
     def _make_estimator(self, append=True, random_state=None):
         """Make and configure a copy of the `estimator_` attribute.

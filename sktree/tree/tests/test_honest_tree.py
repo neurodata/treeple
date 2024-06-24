@@ -115,6 +115,7 @@ def test_honest_tree_with_tree_estimator_params(tree, tree_kwargs):
     ],
 )
 def test_impute_posteriors(honest_prior, val):
+    # XXX: test could be improved as we don't actually test proper behavior of the imputation
     np.random.seed(0)
     X = np.random.normal(0, 1, (100, 2))
     y = [0] * 75 + [1] * 25
@@ -123,9 +124,14 @@ def test_impute_posteriors(honest_prior, val):
 
     y_proba = clf.predict_proba(X)
     if np.isnan(val):
-        assert len(np.where(np.isnan(y_proba[:, 0]))[0]) > 50, f"Failed with {honest_prior}"
+        assert (
+            len(np.where(np.isnan(y_proba[:, 0]))[0]) > 50
+        ), f"Failed with {honest_prior}, {len(np.where(np.isnan(y_proba[:, 0]))[0])}"
+        # assert len(np.where(np.isnan(y_proba[:, 0]))[0]) < 60, f"Failed with {honest_prior}, {len(np.where(np.isnan(y_proba[:, 0]))[0])}"
     else:
-        assert len(np.where(y_proba[:, 0] == val)[0]) > 50, f"Failed with {honest_prior}"
+        assert (
+            len(np.where(y_proba[:, 0] == val)[0]) > 50
+        ), f"Failed with {honest_prior}, {len(np.where(y_proba[:, 0] == val)[0])}"
 
 
 def test_increasing_leaves():

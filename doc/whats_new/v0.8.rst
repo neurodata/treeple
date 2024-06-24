@@ -25,6 +25,10 @@ Changelog
     argument. By `Adam Li`_ (:pr:`#274`)
 - |API| Removed all instances of ``FeatureImportanceForestClassifier`` and outdated
     MIGHT code. By `Adam Li`_ (:pr:`#274`)
+- |Fix| Fixed a bug in the ``sktree.HonestForestClassifier`` where posteriors
+    estimated on oob samples were biased when there was a low number of samples
+    due to imbalance in the classes when ``bootstrap=True``.
+    By `Adam Li`_ (:pr:`#283`)
 - |API| :class:`sktree.tree.MultiViewDecisionTreeClassifier` do not have the
     ``apply_max_features_per_feature_set`` argument anymore. Instead, the
     ``max_features`` argument is used to control the number of features to

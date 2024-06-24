@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/psf/black
-    rev: 24.1.1
+    rev: 24.4.2
     hooks:
       - id: black
         args: [--quiet]
@@ -15,14 +15,14 @@ repos:
         types: [cython]
 
   - repo: https://github.com/MarcoGorelli/cython-lint
-    rev: v0.16.0
+    rev: v0.16.2
     hooks:
       - id: cython-lint
       - id: double-quote-cython-strings
 
   # Ruff sktree
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.2.0
+    rev: v0.4.10
     hooks:
       - id: ruff
         name: ruff sktree
@@ -31,7 +31,7 @@ repos:
 
   # Ruff tutorials and examples
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.2.0
+    rev: v0.4.10
     hooks:
       - id: ruff
         name: ruff tutorials and examples
@@ -42,7 +42,7 @@ repos:
 
   # Codespell
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.6
+    rev: v2.3.0
     hooks:
       - id: codespell
         additional_dependencies:
@@ -52,7 +52,7 @@ repos:
 
   # yamllint
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.33.0
+    rev: v1.35.1
     hooks:
       - id: yamllint
         args: [--strict, -c, .yamllint.yml]
@@ -67,7 +67,7 @@ repos:
 
   # mypy
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.8.0
+    rev: v1.10.0
     hooks:
       - id: mypy
         # Avoid the conflict between mne/__init__.py and mne/__init__.pyi by ignoring the former
@@ -84,4 +84,4 @@ repos:
         files: ^(?!doc/use\.rst$).*\.(rst|inc)$
 
 ci:
-  autofix_prs: false
+  autofix_prs: true

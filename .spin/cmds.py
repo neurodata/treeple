@@ -23,6 +23,7 @@ def coverage(ctx, slowtest=True):
             "sktree",
             "--cov=sktree",
             "--cov-report=xml",
+            "--cov-config=pyproject.toml",
             "-k .",
         )
     else:
@@ -32,6 +33,7 @@ def coverage(ctx, slowtest=True):
             "sktree",
             "--cov=sktree",
             "--cov-report=xml",
+            "--cov-config=pyproject.toml",
         )
 
     # The spin `build` command doesn't know anything about `custom_arg`,
