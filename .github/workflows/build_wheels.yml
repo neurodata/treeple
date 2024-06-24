@@ -164,9 +164,11 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: all
+
       - name: List all files
         run: |
           ls all/**
+
       - name: Merge files
         run: |
           mkdir dist
