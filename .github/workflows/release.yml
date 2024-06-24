@@ -7,16 +7,10 @@ concurrency:
 on:
   release:
     types: [published]
-  push:
-    branches:
-      - main
   workflow_run:
     workflows: [Build_Wheels]
     types:
       - completed  # This ensures it triggers only after the workflow completes
-  pull_request:
-    branches:
-      - main
 
 permissions:
   contents: read
@@ -25,7 +19,7 @@ jobs:
   check_wheels:
     runs-on: ubuntu-latest
     steps:
-      - name: Get run ID of "Test" workflow
+      - name: Get run ID of "Build_Wheels" workflow
         id: get-run-id
         run: |
           OTHER_REPO="${{ github.repository }}"
