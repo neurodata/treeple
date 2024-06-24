@@ -4,10 +4,11 @@ from flaky import flaky
 from numpy.testing import assert_almost_equal, assert_array_equal
 from sklearn import datasets
 
-from sktree import HonestForestClassifier
+from sktree import HonestForestClassifier, RandomForestClassifier
 from sktree.stats import (
     PermutationHonestForestClassifier,
     build_coleman_forest,
+    build_cv_forest,
     build_oob_forest,
     build_permutation_forest,
 )
@@ -424,3 +425,80 @@ def test_build_oob_honest_forest():
         ) == len(
             samples
         ), f"{tree_idx} {len(structure_samples[tree_idx])} {len(leaf_samples[tree_idx])} {len(samples)}"
+
+
+def test_build_oob_random_forest():
+    """Test building oob random forest."""
+    bootstrap = True
+    max_samples = 1.0
+
+    n_estimators = 100
+    est = RandomForestClassifier(
+        n_estimators=n_estimators, random_state=0, bootstrap=bootstrap, max_samples=max_samples
+    )
+    X = rng.normal(0, 1, (100, 2))
+    X[:50] *= -1
+    y = np.array([0, 1] * 50)
+    samples = np.arange(len(y))
+
+    est, proba = build_oob_forest(est, X, y)
+
+    structure_samples = est.estimators_samples_
+    all_samples = np.arange(X.shape[0])
+    oob_samples_list = [
+        np.setdiff1d(all_samples, structure_samples[i]) for i in range(len(structure_samples))
+    ]
+    for tree_idx in range(est.n_estimators):
+        assert len(np.unique(structure_samples[tree_idx])) + len(oob_samples_list[tree_idx]) == len(
+            samples
+        ), f"{tree_idx} {len(structure_samples[tree_idx])} + {len(oob_samples_list[tree_idx])} != {len(samples)}"
+
+
+@pytest.mark.parametrize("bootstrap, max_samples", [(True, 1.6), (False, None)])
+def test_build_cv_honest_forest(bootstrap, max_samples):
+    n_estimators = 100
+    est = HonestForestClassifier(
+        n_estimators=n_estimators,
+        random_state=0,
+        bootstrap=bootstrap,
+        max_samples=max_samples,
+        honest_fraction=0.5,
+        stratify=True,
+    )
+    X = rng.normal(0, 1, (100, 2))
+    X[:50] *= -1
+    y = np.array([0, 1] * 50)
+    samples = np.arange(len(y))
+
+    est_list, proba_list, train_idx_list, test_idx_list = build_cv_forest(
+        est,
+        X,
+        y,
+        return_indices=True,
+        seed=seed,
+        cv=3,
+    )
+
+    assert isinstance(est_list, list)
+    assert isinstance(proba_list, list)
+
+    for est, proba, train_idx, test_idx in zip(est_list, proba_list, train_idx_list, test_idx_list):
+        assert len(train_idx) + len(test_idx) == len(samples)
+        structure_samples = est.structure_indices_
+        leaf_samples = est.honest_indices_
+
+        if not bootstrap:
+            oob_samples = [[] for _ in range(est.n_estimators)]
+        else:
+            oob_samples = est.oob_samples_
+
+        # compared to oob samples, now the train samples are comprised of the entire dataset
+        # seen over the entire forest. The test dataset is completely disjoint
+        for tree_idx in range(est.n_estimators):
+            n_samples_in_tree = len(structure_samples[tree_idx]) + len(leaf_samples[tree_idx])
+            assert n_samples_in_tree + len(oob_samples[tree_idx]) == len(train_idx), (
+                f"For tree: "
+                f"{tree_idx} {len(structure_samples[tree_idx])} + "
+                f"{len(leaf_samples[tree_idx])} + {len(oob_samples[tree_idx])} "
+                f"!= {len(train_idx)} {len(test_idx)}"
+            )

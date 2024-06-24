@@ -472,7 +472,6 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
             _sample_weight = np.array(sample_weight)
 
         nonzero_indices = np.where(_sample_weight > 0)[0]
-
         # sample the structure indices
         if self.stratify:
             ss = StratifiedShuffleSplit(

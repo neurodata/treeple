@@ -380,6 +380,7 @@ def build_cv_forest(
     cv=5,
     test_size=0.2,
     verbose=False,
+    return_indices=False,
     seed=None,
 ):
     """Build a hypothesis testing forest using using cross-validation.
@@ -398,6 +399,8 @@ def build_cv_forest(
         Proportion of samples per tree to use for the test set, by default 0.2.
     verbose : bool, optional
         Verbosity, by default False.
+    return_indices : bool, optional
+        Whether or not to return the train and test indices, by default False.
     seed : int, optional
         Random seed, by default None.
 
@@ -408,6 +411,7 @@ def build_cv_forest(
     all_proba_list : list of ArrayLike of shape (n_estimators, n_samples, n_outputs)
         The predicted posterior probabilities for each estimator on their
         out of bag samples. Length of list is equal to the number of splits.
+    tr
     """
     X = X.astype(np.float32)
     if cv is not None:
@@ -430,6 +434,9 @@ def build_cv_forest(
     est_list = []
     all_proba_list = []
     for isplit in range(n_splits):
+        # clone the estimator to remove all fitted attributes
+        est = clone(est)
+
         X_train, y_train = X[train_idx_list[isplit], :], y[train_idx_list[isplit]]
         # X_test = X[test_idx_list[isplit], :]
 
@@ -461,5 +468,8 @@ def build_cv_forest(
 
         all_proba_list.append(posterior_arr)
         est_list.append(est)
+
+    if return_indices:
+        return est_list, all_proba_list, train_idx_list, test_idx_list
 
     return est_list, all_proba_list
