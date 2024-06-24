@@ -7,160 +7,43 @@ concurrency:
 on:
   release:
     types: [published]
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+  workflow_run:
+    workflows: [Build_Wheels]
+    branches: [main]
+    types: [completed]  # This ensures it triggers only after the workflow completes
 
 permissions:
   contents: read
 
-env:
-  INSTALLDIR: "build-install"
-  CCACHE_DIR: "${{ github.workspace }}/.ccache"
-
 jobs:
-  # release is ran when a release is made on Github
-  # Build the source distribution under Linux
-  build_sdist:
-    name: Source distribution
+  check_wheels:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout scikit-tree
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"  # update once build dependencies are available
-
-      - name: Build source distribution
+      - name: Get run ID of "Build_Wheels" workflow
+        id: get-run-id
         run: |
-          pip install spin build
-          spin setup-submodule
-          pip install .[build]
-          python -m build
-
-      - name: Store artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          path: dist/*.tar.gz
-
-  build_wheels:
-    name: Build wheels on ${{ matrix.os[1] }} - ${{ matrix.os[2] }} with Python ${{ matrix.python[0] }}
-    runs-on: ${{ matrix.os[0] }}
-
-    strategy:
-      # Ensure that a wheel builder finishes even if another fails
-      fail-fast: false
-      matrix:
-        os:  # see scipy wheels.yml GH actions
-          - [ubuntu-22.04, manylinux, x86_64]
-          - [macos-11, macosx, x86_64]
-          # - [macos-12, macosx_*, arm64]
-          - [windows-2019, win, AMD64]
-
-        python: [["cp39", "3.9"], ["cp310", "3.10"], ["cp311", "3.11"], ["cp312", "3.12"]]
-        # python[0] is used to specify the python versions made by cibuildwheel
-
-    env:
-      IS_32_BIT: ${{ matrix.os[2] == 'x86' }}
-
-    steps:
-      - name: Checkout scikit-tree
-        uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
-
-      - name: Setup submodule
-        run: |
-          python -m pip install --upgrade pip spin
-          python -m spin setup-submodule
-
-      - name: win_amd64 - install rtools
-        run: |
-          choco install rtools -y --no-progress --force --version=4.0.0.20220206
-          echo "c:\rtools40\ucrt64\bin;" >> $env:GITHUB_PATH
-        if: ${{ runner.os == 'Windows' && env.IS_32_BIT == 'false' }}
-
-      - name: Build wheels
-        uses: pypa/cibuildwheel@v2.19.1
-        # Build all wheels here, apart from macosx_arm64, linux_aarch64
-        # cibuildwheel is currently unable to pass configuration flags to
-        # CIBW_BUILD_FRONTEND https://github.com/pypa/cibuildwheel/issues/1227
-        # (pip/build). Cross compilation with meson requires an initial
-        # configuration step to create a build directory. The subsequent wheel
-        # build then needs to use that directory. This can be done with pip
-        # using a command like:
-        # pip wheel --config-settings builddir=build .
-        # if: >-
-        #   ( ! contains(matrix.os[2], 'arm64' ) )
+          OTHER_REPO="${{ github.repository }}"
+          WF_NAME="Build_Wheels"
+          RUN_ID=`gh run --repo ${OTHER_REPO} list --workflow ${WF_NAME} --json databaseId --jq .[0].databaseId`
+          echo "Detected latest run id of ${RUN_ID} for workflow ${WF_NAME}"
+          echo "run-id=${RUN_ID}" >> "$GITHUB_OUTPUT"
         env:
-          CIBW_BUILD: ${{ matrix.python[0] }}-${{ matrix.os[1] }}*
-          CIBW_ARCHS: ${{ matrix.os[2] }}
-          CIBW_ENVIRONMENT_PASS_LINUX: RUNNER_OS
+          GH_TOKEN: ${{ github.token }}
 
-      - name: Move wheels to dist
-        run: |
-          mkdir -p dist
-          mv ./wheelhouse/* dist/
-
-      - uses: actions/upload-artifact@v4
+      - name: Download artifact from "Build_Wheels" workflow
+        uses: actions/download-artifact@v4
         with:
-          path: ./dist/
-          name: ${{ matrix.python[0] }}-${{ matrix.os[1] }}
+          name: dist  # Match name used in build_wheels.yml upload artifact step
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ steps.get-run-id.outputs.run-id }}
 
-  build-wheels-m1:
-    name: Build wheels on Arm M1 with Python ${{ matrix.python[0] }}
-    runs-on: macos-latest
-
-    strategy:
-      # Ensure that a wheel builder finishes even if another fails
-      fail-fast: false
-      matrix:
-        python: [["cp39", "3.9"], ["cp310", "3.10"], ["cp311", "3.11"], ["cp312", "3.12"]]
-        # python[0] is used to specify the python versions made by cibuildwheel
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"  # Replace with the desired Python version
-
-      - name: Install cibuildwheel dependencies
-        run: |
-          pip install cibuildwheel
-          pip install spin
-          spin setup-submodule
-          pip install .[build]
-
-      - name: Build wheels
-        uses: pypa/cibuildwheel@v2.19.1
-        env:
-          CIBW_BUILD: ${{ matrix.python[0] }}-macosx_arm64
-          CIBW_ARCHS_MACOS: arm64
-
-      - name: Move wheels to dist
-        run: |
-          mkdir -p dist
-          mv ./wheelhouse/* dist/
-
-      - uses: actions/upload-artifact@v4
-        with:
-          path: ./dist/
-          name: ${{ matrix.python[0] }}-arm
+      - name: Show downloaded files
+        run: ls -la
 
   # PyPI on release
   pypi:
-    needs: [build_sdist, build_wheels, build-wheels-m1]
+    needs: [check_wheels]
     runs-on: ubuntu-latest
     if: github.event_name == 'release'
     permissions:
