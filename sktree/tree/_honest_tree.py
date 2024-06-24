@@ -1,5 +1,5 @@
-# Authors: Ronan Perry, Sambit Panda, Haoyin Xu
 # Adopted from: https://github.com/neurodata/honest-forests
+
 
 import numpy as np
 from sklearn.base import ClassifierMixin, MetaEstimatorMixin, _fit_context, clone
@@ -446,7 +446,6 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
             replace=False,
         )
         self.honest_indices_ = np.setdiff1d(nonzero_indices, self.structure_indices_)
-
         _sample_weight[self.honest_indices_] = 0
 
         self.estimator_.partial_fit(
@@ -458,46 +457,8 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         )
         self._inherit_estimator_attributes()
 
-        # update the number of classes, unsplit
-        if y.ndim == 1:
-            # reshape is necessary to preserve the data contiguity against vs
-            # [:, np.newaxis] that does not.
-            y = np.reshape(y, (-1, 1))
-        check_classification_targets(y)
-        y = np.copy(y)  # .astype(int)
-
-        # Normally called by super
-        X = self.estimator_._validate_X_predict(X, True)
-
-        # Fit leaves using other subsample
-        honest_leaves = self.tree_.apply(X[self.honest_indices_])
-
-        # preserve from underlying tree
-        self._tree_classes_ = self.classes_
-        self._tree_n_classes_ = self.n_classes_
-        self.classes_ = []
-        self.n_classes_ = []
-        self.empirical_prior_ = []
-
-        y_encoded = np.zeros(y.shape, dtype=int)
-        for k in range(self.n_outputs_):
-            classes_k, y_encoded[:, k] = np.unique(y[:, k], return_inverse=True)
-            self.classes_.append(classes_k)
-            self.n_classes_.append(classes_k.shape[0])
-            self.empirical_prior_.append(
-                np.bincount(y_encoded[:, k], minlength=classes_k.shape[0]) / y.shape[0]
-            )
-        y = y_encoded
-
-        # y-encoded ensures that y values match the indices of the classes
-        self._set_leaf_nodes(honest_leaves, y)
-
-        self.n_classes_ = np.array(self.n_classes_, dtype=np.intp)
-        if self.n_outputs_ == 1:
-            self.n_classes_ = self.n_classes_[0]
-            self.classes_ = self.classes_[0]
-            self.empirical_prior_ = self.empirical_prior_[0]
-            y = y[:, 0]
+        # set leaf nodes
+        self._fit_leaves(X, y, sample_weight=_sample_weight)
 
         return self
 
@@ -511,7 +472,6 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
             _sample_weight = np.array(sample_weight)
 
         nonzero_indices = np.where(_sample_weight > 0)[0]
-
         # sample the structure indices
         if self.stratify:
             ss = StratifiedShuffleSplit(
@@ -663,15 +623,16 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         else:
             sample_weight_leaves = np.array(sample_weight)
         sample_weight_leaves[not_honest_mask] = 0
+
+        # determine the honest indices using the sample weight
+        nonzero_indices = np.where(sample_weight_leaves > 0)[0]
+        # sample the structure indices
+        self.honest_indices_ = nonzero_indices
+
         self._fit_leaves(X, y, sample_weight=sample_weight_leaves)
         return self
 
     def _fit_leaves(self, X, y, sample_weight):
-        nonzero_indices = np.where(sample_weight > 0)[0]
-
-        # sample the structure indices
-        self.honest_indices_ = nonzero_indices
-
         # update the number of classes, unsplit
         if y.ndim == 1:
             # reshape is necessary to preserve the data contiguity against vs
@@ -682,9 +643,6 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
 
         # Normally called by super
         X = self.estimator_._validate_X_predict(X, True)
-
-        # Fit leaves using other subsample
-        honest_leaves = self.tree_.apply(X[self.honest_indices_])
 
         # preserve from underlying tree
         # https://github.com/scikit-learn/scikit-learn/blob/1.0.X/sklearn/tree/_classes.py#L202
@@ -703,18 +661,26 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
                 np.bincount(y_encoded[:, k], minlength=classes_k.shape[0]) / y.shape[0]
             )
         y = y_encoded
-
-        # y-encoded ensures that y values match the indices of the classes
-        self._set_leaf_nodes(honest_leaves, y)
-
         self.n_classes_ = np.array(self.n_classes_, dtype=np.intp)
+
+        # XXX: implement honest pruning
+        honest_method = "apply"
+        if honest_method == "apply":
+            # Fit leaves using other subsample
+            honest_leaves = self.tree_.apply(X[self.honest_indices_])
+
+            # y-encoded ensures that y values match the indices of the classes
+            self._set_leaf_nodes(honest_leaves, y, sample_weight)
+        elif honest_method == "prune":
+            raise NotImplementedError("Pruning is not yet implemented.")
+
         if self.n_outputs_ == 1:
             self.n_classes_ = self.n_classes_[0]
             self.classes_ = self.classes_[0]
             self.empirical_prior_ = self.empirical_prior_[0]
             y = y[:, 0]
 
-    def _set_leaf_nodes(self, leaf_ids, y):
+    def _set_leaf_nodes(self, leaf_ids, y, sample_weight):
         """Traverse the already built tree with X and set leaf nodes with y.
 
         tree_.value has shape (n_nodes, n_outputs, max_n_classes), where
@@ -725,8 +691,12 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         classes are ordered by their index in the tree_.value array.
         """
         self.tree_.value[:, :, :] = 0
-        for leaf_id, yval in zip(leaf_ids, y[self.honest_indices_, :]):
-            self.tree_.value[leaf_id][:, yval] += 1
+
+        # apply sample-weight to the leaf nodes
+        for leaf_id, yval, y_weight in zip(
+            leaf_ids, y[self.honest_indices_, :], sample_weight[self.honest_indices_]
+        ):
+            self.tree_.value[leaf_id][:, yval] += y_weight
 
     def _inherit_estimator_attributes(self):
         """Initialize necessary attributes from the provided tree estimator"""
@@ -750,6 +720,8 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
     def _empty_leaf_correction(self, proba, pos=0):
         """Leaves with empty posteriors are assigned values.
 
+        This is called only during prediction.
+
         The posteriors are corrected according to the honest prior.
         In multi-output cases, the posterior corrections only correspond
         to the respective y dimension, indicated by the position param pos.
@@ -764,8 +736,6 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
                 proba[zero_mask] = 1 / self.n_classes_[pos]
             elif self.honest_prior == "ignore":
                 proba[zero_mask] = np.nan
-            else:
-                raise ValueError(f"honest_prior {self.honest_prior} not a valid input.")
         else:
             if self.honest_prior == "empirical":
                 proba[zero_mask] = self.empirical_prior_
@@ -773,8 +743,6 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
                 proba[zero_mask] = 1 / self.n_classes_
             elif self.honest_prior == "ignore":
                 proba[zero_mask] = np.nan
-            else:
-                raise ValueError(f"honest_prior {self.honest_prior} not a valid input.")
         return proba
 
     def predict_proba(self, X, check_input=True):

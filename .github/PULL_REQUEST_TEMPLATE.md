@@ -1,23 +1,30 @@
-<!-- To ensure we can review your pull request promptly please complete this template entirely. -->
+<!--
+Thanks for contributing a pull request! Please ensure you have taken a look at
+the contribution guidelines from scikit-learn: https://github.com/scikit-learn/scikit-learn/blob/main/CONTRIBUTING.md
+-->
 
-<!-- Please reference the issue number here. You can replace "Fixes" with "Closes" if it makes more sense. -->
-Fixes #
+#### Reference Issues/PRs
+<!--
+Example: Fixes #1234. See also #3456.
+Please use keywords (e.g., Fixes) to create link to the issues or pull requests
+you resolved, so that they will automatically be closed when your pull request
+is merged. See https://github.com/blog/1506-closing-issues-via-pull-requests
+-->
 
-Changes proposed in this pull request:
-<!-- Please list all changes/additions here. -->
--
 
-## Before submitting
+#### What does this implement/fix? Explain your changes.
 
-<!-- Please complete this checklist BEFORE submitting your PR to speed along the review process. -->
-- [ ] I've read and followed all steps in the [Making a pull request](https://github.com/py-why/pywhy-graphs/blob/main/CONTRIBUTING.md#making-a-pull-request)
-    section of the `CONTRIBUTING` docs.
-- [ ] I've updated or added any relevant docstrings following the syntax described in the
-    [Writing docstrings](https://github.com/py-why/pywhy-graphs/blob/main/CONTRIBUTING.md#writing-docstrings) section of the `CONTRIBUTING` docs.
-- [ ] If this PR fixes a bug, I've added a test that will fail without my fix.
-- [ ] If this PR adds a new feature, I've added tests that sufficiently cover my new functionality.
 
-## After submitting
+#### Any other comments?
 
-<!-- Please complete this checklist AFTER submitting your PR to speed along the review process. -->
-- [ ] All GitHub Actions jobs for my pull request have passed.
+
+<!--
+Please be aware that we are a loose team of volunteers so patience is
+necessary; assistance handling other issues is very welcome. We value
+all user contributions, no matter how minor they are.
+
+See https://github.com/neurodata/scikit-tree/blob/main/CONTRIBUTING.md for more
+information on contributing.
+
+Thanks for contributing!
+-->
