@@ -44,8 +44,14 @@ jobs:
           # - [macos-12, macosx_*, arm64]
           - [windows-2019, win, AMD64]
 
-        python: [["cp39", "3.9"], ["cp310", "3.10"], ["cp311", "3.11"], ["cp312", "3.12"]]
         # python[0] is used to specify the python versions made by cibuildwheel
+        python:
+          [
+            ["cp39", "3.9"],
+            ["cp310", "3.10"],
+            ["cp311", "3.11"],
+            ["cp312", "3.12"],
+          ]
 
     env:
       IS_32_BIT: ${{ matrix.os[2] == 'x86' }}
@@ -99,8 +105,14 @@ jobs:
       # Ensure that a wheel builder finishes even if another fails
       fail-fast: false
       matrix:
-        python: [["cp39", "3.9"], ["cp310", "3.10"], ["cp311", "3.11"], ["cp312", "3.12"]]
         # python[0] is used to specify the python versions made by cibuildwheel
+        python:
+          [
+            ["cp39", "3.9"],
+            ["cp310", "3.10"],
+            ["cp311", "3.11"],
+            ["cp312", "3.12"],
+          ]
 
     steps:
       - name: Checkout code
@@ -141,7 +153,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"  # update once build dependencies are available
+          python-version: "3.10"
 
       - name: Build source distribution
         run: |
@@ -159,3 +171,19 @@ jobs:
         with:
           path: dist
           name: ${{ matrix.python[0] }}-${{ matrix.os[1] }}
+
+  merge-wheels:
+    name: Merge all wheels into one directory
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: all
+      - name: Merge files
+        run: |
+          mkdir dist
+          mv all/*/dist/* ./dist
+      - uses: actions/upload-artifact@v4
+        with:
+          path: dist
+          name: dist
