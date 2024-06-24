@@ -13,6 +13,7 @@ doc/
 _data/
 sktree/*
 examples/*
+.coverage*
 
 # Sphinx documentation
 docs/_build/
