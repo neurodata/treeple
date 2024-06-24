@@ -12,7 +12,8 @@ on:
       - main
   workflow_run:
     workflows: [Build_Wheels]
-    branches: [main]
+    types:
+      - completed  # This ensures it triggers only after the workflow completes
   pull_request:
     branches:
       - main
