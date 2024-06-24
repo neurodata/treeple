@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>sktree.stats.forestht &#8212; scikit-tree 0.8.0dev0 documentation</title>
+    <title>sktree.stats.forestht &#8212; scikit-tree 0.9.0dev0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=ac02cc09edc035673794" />
   <script src="../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=ac02cc09edc035673794"></script>
 
-    <script src="../../../_static/documentation_options.js?v=286c8373"></script>
+    <script src="../../../_static/documentation_options.js?v=54a029fc"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -131,7 +131,7 @@
   
   
   
-    <p class="title logo__title">scikit-tree 0.8.0dev0 documentation</p>
+    <p class="title logo__title">scikit-tree 0.9.0dev0 documentation</p>
   
 </a></div>
     
@@ -751,6 +751,9 @@ document.write(`
 <span class="sd">    ----------</span>
 <span class="sd">    est : Forest</span>
 <span class="sd">        The type of forest to use. Must be enabled with ``bootstrap=True``.</span>
+<span class="sd">        The forest should have either ``oob_samples_`` or ``estimators_samples_``</span>
+<span class="sd">        property defined, which will be used to compute the out of bag samples</span>
+<span class="sd">        per tree.</span>
 <span class="sd">    X : ArrayLike of shape (n_samples, n_features)</span>
 <span class="sd">        Data.</span>
 <span class="sd">    y : ArrayLike of shape (n_samples, n_outputs)</span>
@@ -758,7 +761,7 @@ document.write(`
 <span class="sd">    verbose : bool, optional</span>
 <span class="sd">        Verbosity, by default False.</span>
 <span class="sd">    **est_kwargs : dict, optional</span>
-<span class="sd">        Additional keyword arguments to pass to the forest estimator.</span>
+<span class="sd">        Additional keyword arguments to pass to the forest estimator ``fit`` function.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -795,10 +798,22 @@ document.write(`
     <span class="n">all_proba</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
         <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">est</span><span class="o">.</span><span class="n">estimators_</span><span class="p">),</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">est</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span>
     <span class="p">)</span>
-    <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">require</span><span class="o">=</span><span class="s2">&quot;sharedmem&quot;</span><span class="p">)(</span>
-        <span class="n">delayed</span><span class="p">(</span><span class="n">_parallel_predict_proba_oob</span><span class="p">)(</span><span class="n">e</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">all_proba</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">test_idx</span><span class="p">,</span> <span class="n">lock</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">test_idx</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">est</span><span class="o">.</span><span class="n">estimators_</span><span class="p">,</span> <span class="n">est</span><span class="o">.</span><span class="n">oob_samples_</span><span class="p">))</span>
-    <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">est</span><span class="p">,</span> <span class="s2">&quot;oob_samples_&quot;</span><span class="p">):</span>
+        <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">require</span><span class="o">=</span><span class="s2">&quot;sharedmem&quot;</span><span class="p">)(</span>
+            <span class="n">delayed</span><span class="p">(</span><span class="n">_parallel_predict_proba_oob</span><span class="p">)(</span><span class="n">e</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">all_proba</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">test_idx</span><span class="p">,</span> <span class="n">lock</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">test_idx</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">est</span><span class="o">.</span><span class="n">estimators_</span><span class="p">,</span> <span class="n">est</span><span class="o">.</span><span class="n">oob_samples_</span><span class="p">))</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">inbag_samples</span> <span class="o">=</span> <span class="n">est</span><span class="o">.</span><span class="n">estimators_samples_</span>
+        <span class="n">all_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">oob_samples_list</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">(</span><span class="n">all_samples</span><span class="p">,</span> <span class="n">inbag_samples</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">inbag_samples</span><span class="p">))</span>
+        <span class="p">]</span>
+        <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">require</span><span class="o">=</span><span class="s2">&quot;sharedmem&quot;</span><span class="p">)(</span>
+            <span class="n">delayed</span><span class="p">(</span><span class="n">_parallel_predict_proba_oob</span><span class="p">)(</span><span class="n">e</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">all_proba</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">test_idx</span><span class="p">,</span> <span class="n">lock</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">test_idx</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">est</span><span class="o">.</span><span class="n">estimators_</span><span class="p">,</span> <span class="n">oob_samples_list</span><span class="p">))</span>
+        <span class="p">)</span>
+
     <span class="k">return</span> <span class="n">est</span><span class="p">,</span> <span class="n">all_proba</span></div>
 
 
@@ -812,6 +827,7 @@ document.write(`
     <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
     <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">return_indices</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a hypothesis testing forest using using cross-validation.</span>
@@ -830,6 +846,8 @@ document.write(`
 <span class="sd">        Proportion of samples per tree to use for the test set, by default 0.2.</span>
 <span class="sd">    verbose : bool, optional</span>
 <span class="sd">        Verbosity, by default False.</span>
+<span class="sd">    return_indices : bool, optional</span>
+<span class="sd">        Whether or not to return the train and test indices, by default False.</span>
 <span class="sd">    seed : int, optional</span>
 <span class="sd">        Random seed, by default None.</span>
 
@@ -840,6 +858,10 @@ document.write(`
 <span class="sd">    all_proba_list : list of ArrayLike of shape (n_estimators, n_samples, n_outputs)</span>
 <span class="sd">        The predicted posterior probabilities for each estimator on their</span>
 <span class="sd">        out of bag samples. Length of list is equal to the number of splits.</span>
+<span class="sd">    train_idx_list : list of ArrayLike of shape (n_samples,)</span>
+<span class="sd">        The training indices for each split.</span>
+<span class="sd">    test_idx_list : list of ArrayLike of shape (n_samples,)</span>
+<span class="sd">        The testing indices for each split.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">cv</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -862,6 +884,9 @@ document.write(`
     <span class="n">est_list</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">all_proba_list</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">isplit</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_splits</span><span class="p">):</span>
+        <span class="c1"># clone the estimator to remove all fitted attributes</span>
+        <span class="n">est</span> <span class="o">=</span> <span class="n">clone</span><span class="p">(</span><span class="n">est</span><span class="p">)</span>
+
         <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">train_idx_list</span><span class="p">[</span><span class="n">isplit</span><span class="p">],</span> <span class="p">:],</span> <span class="n">y</span><span class="p">[</span><span class="n">train_idx_list</span><span class="p">[</span><span class="n">isplit</span><span class="p">]]</span>
         <span class="c1"># X_test = X[test_idx_list[isplit], :]</span>
 
@@ -893,6 +918,9 @@ document.write(`
 
         <span class="n">all_proba_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">posterior_arr</span><span class="p">)</span>
         <span class="n">est_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">est</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">return_indices</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">est_list</span><span class="p">,</span> <span class="n">all_proba_list</span><span class="p">,</span> <span class="n">train_idx_list</span><span class="p">,</span> <span class="n">test_idx_list</span>
 
     <span class="k">return</span> <span class="n">est_list</span><span class="p">,</span> <span class="n">all_proba_list</span></div>
 
@@ -936,7 +964,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-06-20.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-06-24.
       <br/>
     
   </p>

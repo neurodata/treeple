@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>sktree.tree._honest_tree &#8212; scikit-tree 0.8.0dev0 documentation</title>
+    <title>sktree.tree._honest_tree &#8212; scikit-tree 0.9.0dev0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=ac02cc09edc035673794" />
   <script src="../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=ac02cc09edc035673794"></script>
 
-    <script src="../../../_static/documentation_options.js?v=286c8373"></script>
+    <script src="../../../_static/documentation_options.js?v=54a029fc"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -131,7 +131,7 @@
   
   
   
-    <p class="title logo__title">scikit-tree 0.8.0dev0 documentation</p>
+    <p class="title logo__title">scikit-tree 0.9.0dev0 documentation</p>
   
 </a></div>
     
@@ -434,8 +434,8 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for sktree.tree._honest_tree</h1><div class="highlight"><pre>
-<span></span><span class="c1"># Authors: Ronan Perry, Sambit Panda, Haoyin Xu</span>
-<span class="c1"># Adopted from: https://github.com/neurodata/honest-forests</span>
+<span></span><span class="c1"># Adopted from: https://github.com/neurodata/honest-forests</span>
+
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">ClassifierMixin</span><span class="p">,</span> <span class="n">MetaEstimatorMixin</span><span class="p">,</span> <span class="n">_fit_context</span><span class="p">,</span> <span class="n">clone</span>
@@ -889,7 +889,6 @@ document.write(`
             <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">(</span><span class="n">nonzero_indices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">structure_indices_</span><span class="p">)</span>
-
         <span class="n">_sample_weight</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">partial_fit</span><span class="p">(</span>
@@ -901,46 +900,8 @@ document.write(`
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inherit_estimator_attributes</span><span class="p">()</span>
 
-        <span class="c1"># update the number of classes, unsplit</span>
-        <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="c1"># reshape is necessary to preserve the data contiguity against vs</span>
-            <span class="c1"># [:, np.newaxis] that does not.</span>
-            <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-        <span class="n">check_classification_targets</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>  <span class="c1"># .astype(int)</span>
-
-        <span class="c1"># Normally called by super</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">_validate_X_predict</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-
-        <span class="c1"># Fit leaves using other subsample</span>
-        <span class="n">honest_leaves</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span><span class="p">])</span>
-
-        <span class="c1"># preserve from underlying tree</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_tree_classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_tree_n_classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">empirical_prior_</span> <span class="o">=</span> <span class="p">[]</span>
-
-        <span class="n">y_encoded</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">):</span>
-            <span class="n">classes_k</span><span class="p">,</span> <span class="n">y_encoded</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y</span><span class="p">[:,</span> <span class="n">k</span><span class="p">],</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">classes_k</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">classes_k</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">empirical_prior_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">y_encoded</span><span class="p">[:,</span> <span class="n">k</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">classes_k</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">y_encoded</span>
-
-        <span class="c1"># y-encoded ensures that y values match the indices of the classes</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_set_leaf_nodes</span><span class="p">(</span><span class="n">honest_leaves</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">empirical_prior_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">empirical_prior_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># set leaf nodes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fit_leaves</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="n">_sample_weight</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span></div>
 
@@ -955,7 +916,6 @@ document.write(`
             <span class="n">_sample_weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sample_weight</span><span class="p">)</span>
 
         <span class="n">nonzero_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">_sample_weight</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-
         <span class="c1"># sample the structure indices</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stratify</span><span class="p">:</span>
             <span class="n">ss</span> <span class="o">=</span> <span class="n">StratifiedShuffleSplit</span><span class="p">(</span>
@@ -1107,15 +1067,16 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="n">sample_weight_leaves</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sample_weight</span><span class="p">)</span>
         <span class="n">sample_weight_leaves</span><span class="p">[</span><span class="n">not_honest_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># determine the honest indices using the sample weight</span>
+        <span class="n">nonzero_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">sample_weight_leaves</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># sample the structure indices</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span> <span class="o">=</span> <span class="n">nonzero_indices</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_fit_leaves</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight_leaves</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">_fit_leaves</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">):</span>
-        <span class="n">nonzero_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">sample_weight</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-
-        <span class="c1"># sample the structure indices</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span> <span class="o">=</span> <span class="n">nonzero_indices</span>
-
         <span class="c1"># update the number of classes, unsplit</span>
         <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="c1"># reshape is necessary to preserve the data contiguity against vs</span>
@@ -1126,9 +1087,6 @@ document.write(`
 
         <span class="c1"># Normally called by super</span>
         <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">_validate_X_predict</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-
-        <span class="c1"># Fit leaves using other subsample</span>
-        <span class="n">honest_leaves</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span><span class="p">])</span>
 
         <span class="c1"># preserve from underlying tree</span>
         <span class="c1"># https://github.com/scikit-learn/scikit-learn/blob/1.0.X/sklearn/tree/_classes.py#L202</span>
@@ -1147,18 +1105,26 @@ document.write(`
                 <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">y_encoded</span><span class="p">[:,</span> <span class="n">k</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">classes_k</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="p">)</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">y_encoded</span>
-
-        <span class="c1"># y-encoded ensures that y values match the indices of the classes</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_set_leaf_nodes</span><span class="p">(</span><span class="n">honest_leaves</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">)</span>
+
+        <span class="c1"># XXX: implement honest pruning</span>
+        <span class="n">honest_method</span> <span class="o">=</span> <span class="s2">&quot;apply&quot;</span>
+        <span class="k">if</span> <span class="n">honest_method</span> <span class="o">==</span> <span class="s2">&quot;apply&quot;</span><span class="p">:</span>
+            <span class="c1"># Fit leaves using other subsample</span>
+            <span class="n">honest_leaves</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span><span class="p">])</span>
+
+            <span class="c1"># y-encoded ensures that y values match the indices of the classes</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_leaf_nodes</span><span class="p">(</span><span class="n">honest_leaves</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">honest_method</span> <span class="o">==</span> <span class="s2">&quot;prune&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Pruning is not yet implemented.&quot;</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">empirical_prior_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">empirical_prior_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_set_leaf_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">leaf_ids</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_set_leaf_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">leaf_ids</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Traverse the already built tree with X and set leaf nodes with y.</span>
 
 <span class="sd">        tree_.value has shape (n_nodes, n_outputs, max_n_classes), where</span>
@@ -1169,8 +1135,12 @@ document.write(`
 <span class="sd">        classes are ordered by their index in the tree_.value array.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">value</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">leaf_id</span><span class="p">,</span> <span class="n">yval</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">leaf_ids</span><span class="p">,</span> <span class="n">y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span><span class="p">,</span> <span class="p">:]):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">leaf_id</span><span class="p">][:,</span> <span class="n">yval</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># apply sample-weight to the leaf nodes</span>
+        <span class="k">for</span> <span class="n">leaf_id</span><span class="p">,</span> <span class="n">yval</span><span class="p">,</span> <span class="n">y_weight</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+            <span class="n">leaf_ids</span><span class="p">,</span> <span class="n">y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span><span class="p">,</span> <span class="p">:],</span> <span class="n">sample_weight</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">leaf_id</span><span class="p">][:,</span> <span class="n">yval</span><span class="p">]</span> <span class="o">+=</span> <span class="n">y_weight</span>
 
     <span class="k">def</span> <span class="nf">_inherit_estimator_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize necessary attributes from the provided tree estimator&quot;&quot;&quot;</span>
@@ -1194,6 +1164,8 @@ document.write(`
     <span class="k">def</span> <span class="nf">_empty_leaf_correction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">proba</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Leaves with empty posteriors are assigned values.</span>
 
+<span class="sd">        This is called only during prediction.</span>
+
 <span class="sd">        The posteriors are corrected according to the honest prior.</span>
 <span class="sd">        In multi-output cases, the posterior corrections only correspond</span>
 <span class="sd">        to the respective y dimension, indicated by the position param pos.</span>
@@ -1208,8 +1180,6 @@ document.write(`
                 <span class="n">proba</span><span class="p">[</span><span class="n">zero_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">honest_prior</span> <span class="o">==</span> <span class="s2">&quot;ignore&quot;</span><span class="p">:</span>
                 <span class="n">proba</span><span class="p">[</span><span class="n">zero_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;honest_prior </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_prior</span><span class="si">}</span><span class="s2"> not a valid input.&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">honest_prior</span> <span class="o">==</span> <span class="s2">&quot;empirical&quot;</span><span class="p">:</span>
                 <span class="n">proba</span><span class="p">[</span><span class="n">zero_mask</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">empirical_prior_</span>
@@ -1217,8 +1187,6 @@ document.write(`
                 <span class="n">proba</span><span class="p">[</span><span class="n">zero_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">honest_prior</span> <span class="o">==</span> <span class="s2">&quot;ignore&quot;</span><span class="p">:</span>
                 <span class="n">proba</span><span class="p">[</span><span class="n">zero_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;honest_prior </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_prior</span><span class="si">}</span><span class="s2"> not a valid input.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">proba</span>
 
 <div class="viewcode-block" id="HonestTreeClassifier.predict_proba">
@@ -1343,7 +1311,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-06-20.
+      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-06-24.
       <br/>
     
   </p>
