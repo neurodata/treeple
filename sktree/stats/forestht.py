@@ -411,7 +411,10 @@ def build_cv_forest(
     all_proba_list : list of ArrayLike of shape (n_estimators, n_samples, n_outputs)
         The predicted posterior probabilities for each estimator on their
         out of bag samples. Length of list is equal to the number of splits.
-    tr
+    train_idx_list : list of ArrayLike of shape (n_samples,)
+        The training indices for each split.
+    test_idx_list : list of ArrayLike of shape (n_samples,)
+        The testing indices for each split.
     """
     X = X.astype(np.float32)
     if cv is not None:

@@ -3,12 +3,15 @@
 .. include:: _contributors.rst
 .. currentmodule:: sktree
 
-.. _current:
+.. _v0_9:
 
 Version 0.8
 ===========
 
-**In Development**
+This development fixes a major bug with (CO)MIGHT, where low sample sizes produce biased tree
+posteriors, which is fixed by stratifying the sampling of the dataset to ensure that each class
+is represented in the bootstrap sample. Additionally, the release includes a number of bug fixes
+and improvements to the codebase.
 
 Changelog
 ---------
