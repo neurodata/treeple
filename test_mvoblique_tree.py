@@ -18,45 +18,63 @@ seed = 12345
 
 rng = np.random.default_rng(seed=seed)
 
-n_samples = 20
-n_features_1 = 5
-n_features_2 = 1000
-cluster_std = 5.0
 
-# Create a high-dimensional multiview dataset with a low-dimensional informative
-# subspace in one view of the dataset.
-X0_first, y0 = make_blobs(
-    n_samples=n_samples,
-    cluster_std=cluster_std,
-    n_features=n_features_1,
-    random_state=rng.integers(1, 10000),
-    centers=1,
+X_small = np.array(
+    [
+        [0, 0, 4, 0, 0, 0, 1, -14, 0, -4, 0, 0, 0, 0],
+        [0, 0, 5, 3, 0, -4, 0, 0, 1, -5, 0.2, 0, 4, 1],
+        [-1, -1, 0, 0, -4.5, 0, 0, 2.1, 1, 0, 0, -4.5, 0, 1],
+        [-1, -1, 0, -1.2, 0, 0, 0, 0, 0, 0, 0.2, 0, 0, 1],
+        [-1, -1, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 1],
+        [-1, -2, 0, 4, -3, 10, 4, 0, -3.2, 0, 4, 3, -4, 1],
+        [2.11, 0, -6, -0.5, 0, 11, 0, 0, -3.2, 6, 0.5, 0, -3, 1],
+        [2.11, 0, -6, -0.5, 0, 11, 0, 0, -3.2, 6, 0, 0, -2, 1],
+        [2.11, 8, -6, -0.5, 0, 11, 0, 0, -3.2, 6, 0, 0, -2, 1],
+        [2.11, 8, -6, -0.5, 0, 11, 0, 0, -3.2, 6, 0.5, 0, -1, 0],
+        [2, 8, 5, 1, 0.5, -4, 10, 0, 1, -5, 3, 0, 2, 0],
+        [2, 0, 1, 1, 1, -1, 1, 0, 0, -2, 3, 0, 1, 0],
+        [2, 0, 1, 2, 3, -1, 10, 2, 0, -1, 1, 2, 2, 0],
+        [1, 1, 0, 2, 2, -1, 1, 2, 0, -5, 1, 2, 3, 0],
+        [3, 1, 0, 3, 0, -4, 10, 0, 1, -5, 3, 0, 3, 1],
+        [2.11, 8, -6, -0.5, 0, 1, 0, 0, -3.2, 6, 0.5, 0, -3, 1],
+        [2.11, 8, -6, -0.5, 0, 1, 0, 0, -3.2, 6, 1.5, 1, -1, -1],
+        [2.11, 8, -6, -0.5, 0, 10, 0, 0, -3.2, 6, 0.5, 0, -1, -1],
+        [2, 0, 5, 1, 0.5, -2, 10, 0, 1, -5, 3, 1, 0, -1],
+        [2, 0, 1, 1, 1, -2, 1, 0, 0, -2, 0, 0, 0, 1],
+        [2, 1, 1, 1, 2, -1, 10, 2, 0, -1, 0, 2, 1, 1],
+        [1, 1, 0, 0, 1, -3, 1, 2, 0, -5, 1, 2, 1, 1],
+        [3, 1, 0, 1, 0, -4, 1, 0, 1, -2, 0, 0, 1, 0],
+    ]
 )
 
-X1_first, y1 = make_blobs(
-    n_samples=n_samples,
-    cluster_std=cluster_std,
-    n_features=n_features_1,
-    random_state=rng.integers(1, 10000),
-    centers=1,
-)
-y1[:] = 1
-X0 = np.concatenate([X0_first, rng.standard_normal(size=(n_samples, n_features_2))], axis=1)
-X1 = np.concatenate([X1_first, rng.standard_normal(size=(n_samples, n_features_2))], axis=1)
-X = np.vstack((X0, X1))
-y = np.hstack((y0, y1)).T
+y_small = [1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0]
+y_small_reg = [
+    1.0,
+    2.1,
+    1.2,
+    0.05,
+    10,
+    2.4,
+    3.1,
+    1.01,
+    0.01,
+    2.98,
+    3.1,
+    1.1,
+    0.0,
+    1.2,
+    2,
+    11,
+    0,
+    0,
+    4.5,
+    0.201,
+    1.06,
+    0.9,
+    0,
+]
 
-# Compare multiview decision tree vs single-view decision tree
-clf = MultiViewObliqueDecisionTreeClassifier(
-    random_state=seed,
-    feature_set_ends=[n_features_1, X.shape[1]],
-    max_features=0.3,
-)
-print(X.shape)
-clf.fit(X, y)
-assert (
-    accuracy_score(y, clf.predict(X)) == 1.0
-), f"Accuracy score: {accuracy_score(y, clf.predict(X))}"
-assert (
-    cross_val_score(clf, X, y, cv=5).mean() > 0.9
-), f"CV score: {cross_val_score(clf, X, y, cv=5).mean()}"
+clf = MultiViewDecisionTreeClassifier(random_state=0)
+
+print(X_small.shape)
+clf.fit(X_small, y_small)

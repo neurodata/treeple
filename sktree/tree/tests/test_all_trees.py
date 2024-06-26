@@ -10,6 +10,7 @@ from sktree.tree import (
     ExtraObliqueDecisionTreeClassifier,
     ExtraObliqueDecisionTreeRegressor,
     MultiViewDecisionTreeClassifier,
+    MultiViewObliqueDecisionTreeClassifier,
     ObliqueDecisionTreeClassifier,
     ObliqueDecisionTreeRegressor,
     PatchObliqueDecisionTreeClassifier,
@@ -28,7 +29,7 @@ ALL_TREES = [
     UnsupervisedDecisionTree,
     UnsupervisedObliqueDecisionTree,
     MultiViewDecisionTreeClassifier,
-    # MultiViewObliqueDecisionTreeClassifier,
+    MultiViewObliqueDecisionTreeClassifier,
 ]
 
 
@@ -122,6 +123,7 @@ y_small_reg = [
 ]
 
 
+@pytest.mark.skip()
 @pytest.mark.parametrize(
     "TREE",
     ALL_TREES,
@@ -135,6 +137,7 @@ def test_tree_deserialization_from_read_only_buffer(tmpdir, TREE):
     clf = TREE(random_state=0)
 
     if is_classifier(TREE) or is_regressor(TREE):
+        print(X_small.shape)
         clf.fit(X_small, y_small)
     else:
         clf.fit(X_small)

@@ -331,8 +331,8 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
         # Sample the projection matrix
         self.sample_proj_mat(self.proj_mat_weights, self.proj_mat_indices)
 
-        with gil:
-            print("Finished sampling projection matrix")
+        # with gil:
+        #     print("Finished sampling projection matrix")
 
         # For every vector in the projection matrix
         for feat_i in range(max_features):
@@ -733,12 +733,15 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
         cdef intp_t size_of_feature_set, size_of_sampling
         cdef intp_t ifeat = 0
         for i_feature in range(self.n_feature_sets):
+            # n_features * max_features_per_set
             size_of_feature_set = self.feature_set_ends[i_feature] - feature_set_begin
             size_of_sampling = self.max_features_per_set[i_feature] * size_of_feature_set
 
             # push an index corresponding to each element we want to sample
             for ifeat in range(size_of_sampling):
                 self.multi_indices_to_sample[i_feature].push_back(ifeat + feature_set_begin)
+
+                print(i_feature, ifeat + feature_set_begin)
             feature_set_begin = self.feature_set_ends[i_feature]
         return 0
 
@@ -791,9 +794,15 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
                     # here, axis-aligned splits are entirely weights of 1
                     weight = 1  # if (rand_int(0, 2, random_state) == 1) else -1
 
-                    proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
+                    proj_mat_indices[proj_i].push_back(feat_i)  # Store vectorized index of nonzero
                     proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
 
+                    # XXX: debug only
+                    if feat_i > self.n_features:
+                        with gil:
+                            print(idx, ifeature, proj_i, self.n_samples, self.n_features, feat_i)
+
+                    # break early if we've sampled enough features
                     proj_i += 1
                     if proj_i >= self.max_features:
                         break
@@ -858,8 +867,6 @@ cdef class MultiViewObliqueSplitter(MultiViewSplitter):
 
         # 02: Algorithm samples feature combinations from each feature set uniformly and evaluates
         # them independently.
-        with gil:
-            print("Starting to sample projection matrix", self.n_feature_sets)
         # sample from a feature set using linear combinations among the two sets
         for idx in range(self.n_feature_sets):
             # indices to sample is a 1D-index array of size (max_features * n_features_in_set)
@@ -873,10 +880,10 @@ cdef class MultiViewObliqueSplitter(MultiViewSplitter):
                 indices_to_sample[j], indices_to_sample[i] = \
                     indices_to_sample[i], indices_to_sample[j]
 
-            with gil:
-                print(idx, "Finished fisher yates...")
-                print(len(self.n_non_zeros_per_set), len(self.max_features_per_set), len(self.multi_indices_to_sample))
-                print(len(indices_to_sample), grid_size, self.n_non_zeros_per_set[idx])
+            # with gil:
+            #     print(idx, "Finished fisher yates...")
+            #     print(len(self.n_non_zeros_per_set), len(self.max_features_per_set), len(self.multi_indices_to_sample))
+            #     print(len(indices_to_sample), grid_size, self.n_non_zeros_per_set[idx])
 
             # we want "n_non_zeros / K" for this feature set over K feature sets
             for i in range(0, self.n_non_zeros_per_set[idx]):
@@ -891,13 +898,8 @@ cdef class MultiViewObliqueSplitter(MultiViewSplitter):
                 # sample a random weight
                 weight = 1 if (rand_int(0, 2, random_state) == 1) else -1
 
-                # with gil:
-                #     print(i, proj_i, feat_i)
                 proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
                 proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
-
-            # the new beginning is the previous end
-            # feature_set_begin = feature_set_end
 
 
 cdef class MultiViewSplitterTester(MultiViewSplitter):
