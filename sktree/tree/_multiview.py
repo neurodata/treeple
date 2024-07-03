@@ -441,7 +441,12 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         # the total number of features to sample per split
         self.max_features_ = np.sum(self.max_features_per_set_)
 
-        print(self.max_features_, self.max_features_per_set_, self.feature_set_ends_, self.n_features_in_set_)
+        print(
+            self.max_features_,
+            self.max_features_per_set_,
+            self.feature_set_ends_,
+            self.n_features_in_set_,
+        )
         if not isinstance(self.splitter, ObliqueSplitter):
             splitter = SPLITTERS[self.splitter](
                 criterion,

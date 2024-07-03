@@ -7,8 +7,8 @@
 import numpy as np
 
 from cython.operator cimport dereference as deref
-from libcpp.vector cimport vector
 from libcpp.algorithm cimport swap
+from libcpp.vector cimport vector
 
 from .._lib.sklearn.tree._criterion cimport Criterion
 from .._lib.sklearn.tree._utils cimport rand_int, rand_uniform
@@ -756,7 +756,7 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
                 # index of the sampled feature in this feature set + feature set offset + projection offset
                 index = ifeat + feature_set_begin + (iproj * self.n_features)
                 self.multi_indices_to_sample[i_feature].push_back(index)
-                print('Inside init: ', i_feature, index, size_of_sampling, size_of_feature_set)
+                print("Inside init: ", i_feature, index, size_of_sampling, size_of_feature_set)
             iproj += 1
             feature_set_begin = self.feature_set_ends[i_feature]
         return 0
@@ -793,7 +793,7 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
         while proj_i < self.max_features:
             # sample from a feature set
             with gil:
-                print('Sampling projection: ', proj_i, self.n_samples, self.n_features, 
+                print("Sampling projection: ", proj_i, self.n_samples, self.n_features, 
                 self.max_features, self.n_feature_sets, 
                 list(self.feature_set_ends[:]),
                 list(self.max_features_per_set[:]))
@@ -834,7 +834,7 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
                     # XXX: debug only
                     if feat_i > self.n_features:
                         with gil:
-                            print('Sampling projection: ', idx, ifeature, proj_i, self.n_samples, self.n_features, feat_i)
+                            print("Sampling projection: ", idx, ifeature, proj_i, self.n_samples, self.n_features, feat_i)
 
                     # break early if we've sampled enough features
                     proj_i += 1
