@@ -157,12 +157,15 @@ def test_small_dataset_dependent(seed):
         n_repeats=1000,
         metric="mi",
         return_posteriors=False,
+        seed=seed,
     )
     assert ~np.isnan(result.pvalue)
     assert ~np.isnan(result.observe_test_stat)
     assert result.pvalue <= 0.05
 
-    result = build_coleman_forest(clf, perm_clf, X, y, metric="mi", return_posteriors=False)
+    result = build_coleman_forest(
+        clf, perm_clf, X, y, metric="mi", return_posteriors=False, seed=seed
+    )
     assert result.pvalue <= 0.05
 
 

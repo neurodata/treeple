@@ -259,7 +259,7 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
         - If int, then draw `max_samples` samples.
         - If float, then draw `max_samples * X.shape[0]` samples.
 
-    honest_prior : {"ignore", "uniform", "empirical"}, default="empirical"
+    honest_prior : {"ignore", "uniform", "empirical"}, default="ignore"
         Method for dealing with empty leaves during evaluation of a test
         sample. If "ignore", the tree is ignored. If "uniform", the prior tree
         posterior is 1/(number of classes). If "empirical", the prior tree
@@ -444,7 +444,7 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
         class_weight=None,
         ccp_alpha=0.0,
         max_samples=None,
-        honest_prior="empirical",
+        honest_prior="ignore",
         honest_fraction=0.5,
         tree_estimator=None,
         stratify=False,
