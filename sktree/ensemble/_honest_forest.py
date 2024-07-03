@@ -823,7 +823,7 @@ def _accumulate_prediction(predict, X, out, lock, indices=None):
 
     with lock:
         if len(out) == 1:
-            out[0][indices] += proba
+            out[0][indices] = np.nansum([out[0][indices], proba], axis=0)
         else:
             for i in range(len(out)):
-                out[i][indices] += proba[i]
+                out[i][indices] = np.nansum([out[i][indices], proba[i]], axis=0)
