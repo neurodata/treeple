@@ -96,8 +96,11 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
 
     # Oblique Splitting extra parameters
     cdef public float64_t feature_combinations          # Number of features to combine
-    cdef intp_t n_non_zeros                             # Number of non-zero features
-    cdef intp_t[::1] indices_to_sample                  # An array of indices to sample of size mtry X n_features
+    cdef intp_t n_non_zeros                             # Number of non-zero features to sample per projection matrix
+
+    # Oblique Splitting extra parameters (mtry, n_dims) matrix
+    # This will contain indices 0 to mtry*n_features to allow efficient shuffling.
+    cdef intp_t[::1] indices_to_sample                  # A 2D array of indices to sample of size mtry X n_features
     #                                                   # to sample from that produces a non-zero feature combination.
     #                                                   # This array is multiplied by the data matrix n_samples X n_features
     #                                                   # to produce a non-zero feature combination of size
@@ -148,6 +151,9 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
 
     cdef const intp_t[:] max_features_per_set   # the maximum number of features to sample from each feature set
 
+    # Each feature set has a different set of indices to sample from with a potentially different
+    # max_features argument. This is a 2D array of indices to sample of size mtry_in_set X features_in_set
+    # to sample from that produces a non-zero feature combination for each feature set.
     cdef vector[vector[intp_t]] multi_indices_to_sample
 
     cdef void sample_proj_mat(

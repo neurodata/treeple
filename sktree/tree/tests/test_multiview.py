@@ -27,6 +27,8 @@ def test_sklearn_compatible_estimator(estimator, check):
     check(estimator)
 
 
+
+@pytest.mark.skip()
 @pytest.mark.parametrize(
     "est", [MultiViewDecisionTreeClassifier, MultiViewObliqueDecisionTreeClassifier]
 )

@@ -13,6 +13,8 @@ import pandas as pd
 import seaborn as sns
 from scipy.special import expit
 
+# using an outdated API, but the code could get refactored to use our new API
+# build_coleman_forest, build_oob_forest, etc.
 from sktree.stats import PermutationForestClassifier, PermutationForestRegressor
 
 seed = 12345

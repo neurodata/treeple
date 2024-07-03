@@ -140,6 +140,7 @@ def build_coleman_forest(
 
     if y.ndim == 1:
         y = y.reshape(-1, 1)
+
     metric_star, metric_star_pi = _compute_null_distribution_coleman(
         y,
         orig_forest_proba,
