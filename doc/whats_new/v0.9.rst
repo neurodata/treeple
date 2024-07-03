@@ -13,7 +13,10 @@ Version 0.9
 Changelog
 ---------
 
-- 
+- |Fix| Fixed a bug in the :class:`sktree.HonestForestClassifier` where posteriors
+    estimated on empty leaf with ``ignore`` prior would result in ``np.nan``
+    values for all trees on that sample.
+    By `Haoyin Xu`_ (:pr:`#291`)
 
 Code and Documentation Contributors
 -----------------------------------
@@ -21,5 +24,4 @@ Code and Documentation Contributors
 Thanks to everyone who has contributed to the maintenance and improvement of
 the project since version inception, including:
 
-* `Adam Li`_
-
+* `Haoyin Xu`_
