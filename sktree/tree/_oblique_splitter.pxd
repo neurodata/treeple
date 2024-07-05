@@ -165,7 +165,6 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
 
 # XXX: This splitter is experimental. Expect changes frequently.
 cdef class MultiViewObliqueSplitter(MultiViewSplitter):
-    # cdef const intp_t[:] n_non_zeros_per_set  # the number of non-zero features in each feature set
     cdef intp_t _max_feature_combinations       # Number of non-zero features to sample per projection matrix
     cdef bint cross_feature_set_sampling        # Whether we sample across feature set when creating a projection vector
 

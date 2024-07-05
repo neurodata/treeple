@@ -1,8 +1,8 @@
 # distutils: language=c++
 # cython: language_level=3
-# cython: boundscheck=True
-# cython: wraparound=True
-# cython: initializedcheck=True
+# cython: boundscheck=False
+# cython: wraparound=False
+# cython: initializedcheck=False
 
 import numpy as np
 
@@ -813,8 +813,7 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
                 if proj_i >= self.max_features:
                     break
 
-# TODO: need to check segfault for multiview oblique splitter
-# REBUILD WITH BOUNDS CHECK
+
 cdef class MultiViewObliqueSplitter(MultiViewSplitter):
     def __cinit__(
         self,
@@ -839,14 +838,12 @@ cdef class MultiViewObliqueSplitter(MultiViewSplitter):
         # replaces usage of max_features
         self.max_features_per_set = max_features_per_set
 
-        # compute # of non-zeros expected on average per feature set
-        # cdef intp_t[:] n_non_zeros_per_set = np.zeros(self.n_feature_sets, dtype=np.intp)
-        # cdef intp_t i
-        # for i in range(self.n_feature_sets):
-        #     n_non_zeros_per_set[i] = <intp_t> (self.max_features_per_set[i] * self.feature_combinations)
-        # self.n_non_zeros_per_set = n_non_zeros_per_set
-
+        # each projection vector (i.e. mtry) of each feature set will sample a feature combination of
+        # 1 to "max feature combinations" number of features.
         self._max_feature_combinations = <intp_t> ceil(self.feature_combinations)
+
+        # with cross-feature-set sampling, the projection vector can combine different
+        # feature sets
         self.cross_feature_set_sampling = cross_feature_set_sampling
 
     def __reduce__(self):
@@ -876,26 +873,6 @@ cdef class MultiViewObliqueSplitter(MultiViewSplitter):
         Splitter.init(self, X, y, sample_weight, missing_values_in_feature_mask)
 
         self.X = X
-
-        # create a helper array for allowing efficient Fisher-Yates
-        self.multi_indices_to_sample = vector[vector[intp_t]](self.n_feature_sets)
-
-        # Here, we sample the indices of the features to sample in each feature set
-        # as a separate vector. This is done to allow for efficient Fisher-Yates
-        # shuffling of the indices, such that we randomly sample features to consider, but within
-        # each feature set separately. This ensures that the sampled projection matrix consists of
-        # a balanced number of features from each feature set.
-        #
-        # Example:
-        # multi_indices_to_sample[0] = [0, 1, 2, 3]
-        # multi_indices_to_sample[1] = [4, 5]
-        # which corresponds to a feature set with 4 features and another with 2 features.
-        # for i_feature in range(self.n_feature_sets):
-        #     size_of_feature_set = self.feature_set_ends[i_feature] - feature_set_begin
-        #     for ifeat in range(size_of_feature_set):
-        #         self.multi_indices_to_sample[i_feature].push_back(ifeat + feature_set_begin)
-        #     feature_set_begin = self.feature_set_ends[i_feature]
-
         return 0
 
     cdef void sample_proj_mat(
