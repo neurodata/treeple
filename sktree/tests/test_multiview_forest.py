@@ -6,7 +6,11 @@ from sklearn.metrics import accuracy_score
 from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
-from sktree import MultiViewRandomForestClassifier, RandomForestClassifier
+from sktree import (
+    MultiViewObliqueRandomForestClassifier,
+    MultiViewRandomForestClassifier,
+    RandomForestClassifier,
+)
 from sktree.datasets.multiview import make_joint_factor_model
 
 seed = 12345
@@ -15,6 +19,7 @@ seed = 12345
 @parametrize_with_checks(
     [
         MultiViewRandomForestClassifier(random_state=12345, n_estimators=10),
+        MultiViewObliqueRandomForestClassifier(random_state=12345, n_estimators=10),
     ]
 )
 def test_sklearn_compatible_estimator(estimator, check):

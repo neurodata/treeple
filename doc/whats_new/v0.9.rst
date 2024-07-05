@@ -17,7 +17,11 @@ Changelog
     ``apply_max_features_per_feature_set`` argument anymore. Instead, the
     ``max_features`` argument is used to control the number of features to
     consider when looking for the best split within each feature set explicitly.
-    By `Adam Li`_ :pr:`#247`.
+    By `Adam Li`_ :pr:`#265`.
+
+- |Feature| :class:`sktree.tree.MultiViewObliqueDecisionTreeClassifier` is implemented
+    along with its forest version :class:`sktree.ensemble.MultiViewObliqueRandomForestClassifier`.
+    By `Adam Li`_ :pr:`#265`.
 
 Code and Documentation Contributors
 -----------------------------------
