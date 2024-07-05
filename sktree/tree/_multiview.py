@@ -441,12 +441,6 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         # the total number of features to sample per split
         self.max_features_ = np.sum(self.max_features_per_set_)
 
-        print(
-            self.max_features_,
-            self.max_features_per_set_,
-            self.feature_set_ends_,
-            self.n_features_in_set_,
-        )
         if not isinstance(self.splitter, ObliqueSplitter):
             splitter = SPLITTERS[self.splitter](
                 criterion,
@@ -851,6 +845,7 @@ class MultiViewObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassif
         "array-like",
         None,
     ]
+    _parameter_constraints["cross_feature_set_sampling"] = ["boolean"]
 
     def __init__(
         self,
@@ -871,6 +866,7 @@ class MultiViewObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassif
         monotonic_cst=None,
         feature_set_ends=None,
         feature_combinations=None,
+        cross_feature_set_sampling=False,
     ):
         super().__init__(
             criterion=criterion,
@@ -891,6 +887,7 @@ class MultiViewObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassif
 
         self.feature_set_ends = feature_set_ends
         self.feature_combinations = feature_combinations
+        self.cross_feature_set_sampling = cross_feature_set_sampling
         self._max_features_arr = None
 
     def _build_tree(
@@ -1053,6 +1050,7 @@ class MultiViewObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassif
                 self.feature_set_ends_,
                 self.n_feature_sets_,
                 self.max_features_per_set_,
+                self.cross_feature_set_sampling,
             )
 
         self.tree_ = ObliqueTree(self.n_features_in_, self.n_classes_, self.n_outputs_)
@@ -1083,6 +1081,62 @@ class MultiViewObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassif
         if self.n_outputs_ == 1:
             self.n_classes_ = self.n_classes_[0]
             self.classes_ = self.classes_[0]
+
+    def _fit(
+        self,
+        X,
+        y,
+        sample_weight=None,
+        check_input=True,
+        missing_values_in_feature_mask=None,
+        classes=None,
+    ):
+        # XXX: BaseDecisionTree does a check that requires max_features to not be a list/array-like
+        # so we need to temporarily set it to an acceptable value
+        # in the meantime, we will reset:
+        #  - self.max_features_ to the original value
+        #  - self.max_features_arr contains a possible array-like setting of max_features
+        self._max_features_arr = self.max_features
+        self.max_features = None
+        super()._fit(X, y, sample_weight, check_input, missing_values_in_feature_mask, classes)
+        self.max_features = self._max_features_arr
+        return self
+
+    def fit(self, X, y, sample_weight=None, check_input=True, classes=None):
+        """Build a decision tree classifier from the training set (X, y).
+
+        Parameters
+        ----------
+        X : {array-like, sparse matrix} of shape (n_samples, n_features)
+            The training input samples. Internally, it will be converted to
+            ``dtype=np.float32`` and if a sparse matrix is provided
+            to a sparse ``csc_matrix``.
+
+        y : array-like of shape (n_samples,) or (n_samples, n_outputs)
+            The target values (class labels) as integers or strings.
+
+        sample_weight : array-like of shape (n_samples,), default=None
+            Sample weights. If None, then samples are equally weighted. Splits
+            that would create child nodes with net zero or negative weight are
+            ignored while searching for a split in each node. Splits are also
+            ignored if they would result in any single class carrying a
+            negative weight in either child node.
+
+        check_input : bool, default=True
+            Allow to bypass several input checking.
+            Don't use this parameter unless you know what you're doing.
+
+        classes : array-like of shape (n_classes,), default=None
+            List of all the classes that can possibly appear in the y vector.
+
+        Returns
+        -------
+        self : MultiViewDecisionTreeClassifier
+            Fitted estimator.
+        """
+        return self._fit(
+            X, y, sample_weight=sample_weight, check_input=check_input, classes=classes
+        )
 
     @property
     def _inheritable_fitted_attribute(self):

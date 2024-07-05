@@ -27,11 +27,13 @@ def test_sklearn_compatible_estimator(estimator, check):
     check(estimator)
 
 
-@pytest.mark.skip()
 @pytest.mark.parametrize(
-    "est", [MultiViewDecisionTreeClassifier, MultiViewObliqueDecisionTreeClassifier]
+    "est, baseline_est",
+    [
+        (MultiViewDecisionTreeClassifier, DecisionTreeClassifier),
+        (MultiViewDecisionTreeClassifier, MultiViewObliqueDecisionTreeClassifier),
+    ],
 )
-@pytest.mark.parametrize("baseline_est", [MultiViewDecisionTreeClassifier, DecisionTreeClassifier])
 def test_multiview_classification(baseline_est, est):
     """Test that explicit knowledge of multi-view structure improves classification accuracy.
 
