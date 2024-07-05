@@ -32,7 +32,10 @@ def test_predict_proba_per_tree(Forest, n_classes):
     )
 
     # Call the method being tested
-    est = Forest(n_estimators=10, bootstrap=True, random_state=0)
+    if Forest == HonestForestClassifier:
+        est = Forest(n_estimators=10, bootstrap=True, random_state=0, honest_prior="empirical")
+    else:
+        est = Forest(n_estimators=10, bootstrap=True, random_state=0)
     est.fit(X, y)
     proba_per_tree = est.predict_proba_per_tree(X)
 

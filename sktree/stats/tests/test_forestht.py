@@ -139,6 +139,7 @@ def test_small_dataset_dependent(seed):
         honest_fraction=0.5,
         bootstrap=True,
         max_samples=1.6,
+        honest_prior='empirical',
     )
     perm_clf = PermutationHonestForestClassifier(
         n_estimators=n_estimators,
