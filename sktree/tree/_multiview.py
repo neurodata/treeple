@@ -493,7 +493,7 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         # set decision-tree model parameters
         max_depth = np.iinfo(np.int32).max if self.max_depth is None else self.max_depth
 
-        monotonic_cst = self.monotonic_cst_
+        monotonic_cst = None
 
         # Build tree
         # Note: this reconstructs the builder with the same state it had during the

@@ -849,6 +849,23 @@ cdef class MultiViewObliqueSplitter(MultiViewSplitter):
         self._max_feature_combinations = <intp_t> ceil(self.feature_combinations)
         self.cross_feature_set_sampling = cross_feature_set_sampling
 
+    def __reduce__(self):
+        """Enable pickling the splitter."""
+        return (type(self),
+                (
+                    self.criterion,
+                    self.max_features,
+                    self.min_samples_leaf,
+                    self.min_weight_leaf,
+                    self.random_state,
+                    self.monotonic_cst.base if self.monotonic_cst is not None else None,
+                    self.feature_combinations,
+                    self.feature_set_ends.base if self.feature_set_ends is not None else None,
+                    self.n_feature_sets,
+                    self.max_features_per_set.base if self.max_features_per_set is not None else None,
+                    self.cross_feature_set_sampling,
+                ), self.__getstate__())
+
     cdef int init(
         self,
         object X,
