@@ -182,7 +182,7 @@ def test_multiview_separate_feature_set_sampling_is_consistent():
     X = rng.standard_normal(size=(20, 10))
     y = rng.integers(0, 2, size=20)
 
-    # test with max_features as an array but apply_max_features is off
+    # test with max_features as an array
     clf = MultiViewDecisionTreeClassifier(
         random_state=seed,
         feature_set_ends=[1, 3, 6, 10],
@@ -195,7 +195,7 @@ def test_multiview_separate_feature_set_sampling_is_consistent():
     assert_array_equal(clf.max_features_per_set_, [1, 2, 2, 3])
     assert clf.max_features_ == np.sum(clf.max_features_per_set_), np.sum(clf.max_features_per_set_)
 
-    # test with max_features as an array but apply_max_features is off
+    # multiview feature set should be consistent across tres
     other_clf = MultiViewDecisionTreeClassifier(
         random_state=seed,
         feature_set_ends=[1, 3, 6, 10],
