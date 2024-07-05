@@ -294,7 +294,7 @@ class MultiViewRandomForestClassifier(
         self.min_impurity_decrease = min_impurity_decrease
 
 
-class MultiViewObliqueRandomForestClassifier(MultiViewDecisionTreeClassifier):
+class MultiViewObliqueRandomForestClassifier(MultiViewRandomForestClassifier):
     """
     A multi-view axis-aligned random forest classifier.
 
@@ -450,6 +450,14 @@ class MultiViewObliqueRandomForestClassifier(MultiViewDecisionTreeClassifier):
         feature set is the first 10 features, and the second feature set is the
         next 20 features, then ``feature_set_ends = [10, 30]``. If ``None``,
         then this will assume that there is only one feature set.
+
+    feature_combinations : float, default=None
+        The number of feature combinations to consider at each split.
+        If None, then this will default to the number of features in the
+        respective feature set.
+
+    cross_feature_set_sampling : bool, default=False
+        Whether to sample features across feature sets during the oblique splits.
 
     Attributes
     ----------
