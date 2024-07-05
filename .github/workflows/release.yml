@@ -11,13 +11,17 @@ on:
     workflows: [Build_Wheels]
     branches: [main]
     types: [completed]  # This ensures it triggers only after the workflow completes
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  check_wheels:
+  pypi:
     runs-on: ubuntu-latest
+    if: github.event_name == 'release'
+    permissions:
+      id-token: write
     steps:
       - name: Get run ID of "Build_Wheels" workflow
         id: get-run-id
@@ -34,6 +38,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: dist  # Match name used in build_wheels.yml upload artifact step
+          path: dist
           github-token: ${{ github.token }}
           repository: ${{ github.repository }}
           run-id: ${{ steps.get-run-id.outputs.run-id }}
@@ -41,17 +46,5 @@ jobs:
       - name: Show downloaded files
         run: ls -la
 
-  # PyPI on release
-  pypi:
-    needs: [check_wheels]
-    runs-on: ubuntu-latest
-    if: github.event_name == 'release'
-    permissions:
-      id-token: write
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: dist
-          path: dist
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
