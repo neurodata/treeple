@@ -119,11 +119,10 @@ def test_small_dataset_independent(seed):
 @flaky(max_runs=3)
 @pytest.mark.parametrize("seed", [10, 0])
 def test_small_dataset_dependent(seed):
-    n_samples = 50
+    n_samples = 100
     n_features = 5
     rng = np.random.default_rng(seed)
 
-    X = rng.uniform(size=(n_samples, n_features))
     X = rng.uniform(size=(n_samples // 2, n_features))
     X2 = X + 3
     X = np.vstack([X, X2])
@@ -139,7 +138,6 @@ def test_small_dataset_dependent(seed):
         honest_fraction=0.5,
         bootstrap=True,
         max_samples=1.6,
-        honest_prior="empirical",
     )
     perm_clf = PermutationHonestForestClassifier(
         n_estimators=n_estimators,
