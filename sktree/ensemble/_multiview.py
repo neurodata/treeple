@@ -294,7 +294,9 @@ class MultiViewRandomForestClassifier(
         self.min_impurity_decrease = min_impurity_decrease
 
 
-class MultiViewObliqueRandomForestClassifier(MultiViewRandomForestClassifier):
+class MultiViewObliqueRandomForestClassifier(
+    SimMatrixMixin, ForestClassifierMixin, ForestMixin, ForestClassifier
+):
     """
     A multi-view axis-aligned random forest classifier.
 
