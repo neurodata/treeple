@@ -20,7 +20,7 @@ Changelog
     By `Adam Li`_ :pr:`#265`.
 
 - |Feature| :class:`sktree.tree.MultiViewObliqueDecisionTreeClassifier` is implemented
-    along with its forest version :class:`sktree.ensemble.MultiViewObliqueRandomForestClassifier`.
+    along with its forest version :class:`sktree.MultiViewObliqueRandomForestClassifier`.
     By `Adam Li`_ :pr:`#265`.
 
 Code and Documentation Contributors
