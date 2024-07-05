@@ -269,7 +269,7 @@ def test_impute_posteriors(honest_prior, val):
         ("ignore", np.nan),
     ],
 )
-def test_ignore_posteriors(honest_prior, val):
+def test_honestforest_predict_proba_with_honest_prior(honest_prior, val):
     X = rng.normal(0, 1, (100, 2))
     y = [0] * 75 + [1] * 25
     clf = HonestForestClassifier(
