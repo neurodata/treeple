@@ -13,7 +13,8 @@ Version 0.9
 Changelog
 ---------
 
-- 
+- |MNT| Rename the package to ``treeple``. By `SUKI-O`_ (:pr:`#292`)
+
 
 Code and Documentation Contributors
 -----------------------------------
@@ -22,4 +23,4 @@ Thanks to everyone who has contributed to the maintenance and improvement of
 the project since version inception, including:
 
 * `Adam Li`_
-
+* `SUKI-O`_

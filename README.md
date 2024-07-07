@@ -8,11 +8,13 @@
 [![DOI](https://zenodo.org/badge/491260497.svg)](https://zenodo.org/doi/10.5281/zenodo.8412279)
 
 treeple
-===========
+=======
 
 treeple is a scikit-learn compatible API for building state-of-the-art decision trees. These include unsupervised trees, oblique trees, uncertainty trees, quantile trees and causal trees.
 
 Tree-models have withstood the test of time, and are consistently used for modern-day data science and machine learning applications. They especially perform well when there are limited samples for a problem and are flexible learners that can be applied to a wide variety of different settings, such as tabular, images, time-series, genomics, EEG data and more.
+
+Note that this package was originally named ``scikit-tree`` but was renamed to ``treeple`` after version 0.9.0. version <0.9.0 is still available at <https://pypi.org/project/scikit-tree/>.
 
 Documentation
 =============
