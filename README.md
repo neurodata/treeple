@@ -1,23 +1,23 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![CircleCI](https://circleci.com/gh/neurodata/scikit-tree/tree/main.svg?style=svg)](https://circleci.com/gh/neurodata/scikit-tree/tree/main)
-[![Main](https://github.com/neurodata/scikit-tree/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/neurodata/scikit-tree/actions/workflows/main.yml)
+[![CircleCI](https://circleci.com/gh/neurodata/treeple/tree/main.svg?style=svg)](https://circleci.com/gh/neurodata/treeple/tree/main)
+[![Main](https://github.com/neurodata/treeple/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/neurodata/treeple/actions/workflows/main.yml)
 [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
-[![codecov](https://codecov.io/gh/neurodata/scikit-tree/branch/main/graph/badge.svg?token=H1reh7Qwf4)](https://codecov.io/gh/neurodata/scikit-tree)
-[![PyPI Download count](https://img.shields.io/pypi/dm/scikit-tree.svg)](https://pypistats.org/packages/scikit-tree)
-[![Latest PyPI release](https://img.shields.io/pypi/v/scikit-tree.svg)](https://pypi.org/project/scikit-tree/)
+[![codecov](https://codecov.io/gh/neurodata/treeple/branch/main/graph/badge.svg?token=H1reh7Qwf4)](https://codecov.io/gh/neurodata/treeple)
+[![PyPI Download count](https://img.shields.io/pypi/dm/treeple.svg)](https://pypistats.org/packages/treeple)
+[![Latest PyPI release](https://img.shields.io/pypi/v/treeple.svg)](https://pypi.org/project/treeple/)
 [![DOI](https://zenodo.org/badge/491260497.svg)](https://zenodo.org/doi/10.5281/zenodo.8412279)
 
-scikit-tree
+treeple
 ===========
 
-scikit-tree is a scikit-learn compatible API for building state-of-the-art decision trees. These include unsupervised trees, oblique trees, uncertainty trees, quantile trees and causal trees.
+treeple is a scikit-learn compatible API for building state-of-the-art decision trees. These include unsupervised trees, oblique trees, uncertainty trees, quantile trees and causal trees.
 
 Tree-models have withstood the test of time, and are consistently used for modern-day data science and machine learning applications. They especially perform well when there are limited samples for a problem and are flexible learners that can be applied to a wide variety of different settings, such as tabular, images, time-series, genomics, EEG data and more.
 
 Documentation
 =============
 
-See here for the documentation for our dev version: <https://docs.neurodata.io/scikit-tree/dev/index.html>
+See here for the documentation for our dev version: <https://docs.neurodata.io/treeple/dev/index.html>
 
 Why oblique trees and why trees beyond those in scikit-learn?
 =============================================================
@@ -39,12 +39,12 @@ We minimally require:
     * scipy
     * scikit-learn >= 1.3
 
-Installation with Pip (<https://pypi.org/project/scikit-tree/>)
+Installation with Pip (<https://pypi.org/project/treeple/>)
 -------------------------------------------------------------
 
 Installing with pip on a conda environment is the recommended route.
 
-    pip install scikit-tree
+    pip install treeple
 
 Building locally with Meson (For developers)
 --------------------------------------------
@@ -77,7 +77,7 @@ We use the ``spin`` CLI to abstract away build details:
     export PYTHONPATH=${PWD}/build-install/usr/lib/python3.9/site-packages
 
     # run specific unit tests
-    ./spin test -- sktree/tree/tests/test_tree.py
+    ./spin test -- treeple/tree/tests/test_tree.py
 
     # you can bring up the CLI menu
     ./spin --help
@@ -90,14 +90,14 @@ You can also do the same thing using Meson/Ninja itself. Run the following to bu
     # compile
     ninja -C build
 
-    # install scikit-tree package
+    # install treeple package
     meson install -C build
 
     export PYTHONPATH=${PWD}/build/lib/python3.9/site-packages
 
     # to check installation, you need to be in a different directory
     cd docs;  
-    python -c "from sktree import tree"
+    python -c "from treeple import tree"
     python -c "import sklearn; print(sklearn.__version__);"
 
 After building locally, you can use editable installs (warning: this only registers Python changes locally)

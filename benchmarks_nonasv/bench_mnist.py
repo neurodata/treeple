@@ -37,7 +37,7 @@ from sklearn.ensemble import ExtraTreesClassifier, RandomForestClassifier
 from sklearn.metrics import zero_one_loss
 from sklearn.utils import check_array
 
-from sktree import ObliqueRandomForestClassifier, PatchObliqueRandomForestClassifier
+from treeple import ObliqueRandomForestClassifier, PatchObliqueRandomForestClassifier
 
 # Memoize the data extraction and memory map the resulting
 # train / test splits in readonly mode

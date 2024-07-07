@@ -9,9 +9,9 @@ import numpy as np
 import seaborn as sns
 from sklearn.metrics import roc_auc_score, roc_curve
 
-from sktree.datasets import make_trunk_classification
-from sktree.ensemble import HonestForestClassifier
-from sktree.stats import build_oob_forest
+from treeple.datasets import make_trunk_classification
+from treeple.ensemble import HonestForestClassifier
+from treeple.stats import build_oob_forest
 
 sns.set(color_codes=True, style="white", context="talk", font_scale=1.5)
 PALETTE = sns.color_palette("Set1")

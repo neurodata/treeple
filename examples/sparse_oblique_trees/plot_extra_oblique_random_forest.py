@@ -75,7 +75,7 @@ import seaborn as sns
 from sklearn.datasets import fetch_openml
 from sklearn.model_selection import RepeatedKFold, cross_validate
 
-from sktree import ExtraObliqueRandomForestClassifier, ObliqueRandomForestClassifier
+from treeple import ExtraObliqueRandomForestClassifier, ObliqueRandomForestClassifier
 
 # Model parameters
 max_depth = 3

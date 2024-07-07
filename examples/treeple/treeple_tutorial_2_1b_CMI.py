@@ -10,10 +10,10 @@ import pandas as pd
 import seaborn as sns
 from scipy.stats import entropy
 
-from sktree.datasets import make_trunk_classification
-from sktree.ensemble import HonestForestClassifier
-from sktree.stats import build_oob_forest
-from sktree.tree import MultiViewDecisionTreeClassifier
+from treeple.datasets import make_trunk_classification
+from treeple.ensemble import HonestForestClassifier
+from treeple.stats import build_oob_forest
+from treeple.tree import MultiViewDecisionTreeClassifier
 
 sns.set(color_codes=True, style="white", context="talk", font_scale=1.5)
 PALETTE = sns.color_palette("Set1")

@@ -16,14 +16,14 @@ requires = [
 ]
 
 [project]
-name = "scikit-tree"
+name = "treeple"
 version = "0.9.0dev0"
 description = "Modern decision trees in Python"
 maintainers = [
   {name = "Neurodata", email = "adam.li@columbia.edu"}
 ]
-documentation = "https://scikit-tree.neurodata.io"
-repository = "https://github.com/neurodata/scikit-tree"
+documentation = "https://treeple.neurodata.io"
+repository = "https://github.com/neurodata/treeple"
 readme = "README.md"
 requires-python = ">=3.9"
 classifiers = [
@@ -57,10 +57,10 @@ dependencies = [
 
 [project.optional-dependencies]
 all = [
-  'scikit-tree[build]',
-  'scikit-tree[doc]',
-  'scikit-tree[style]',
-  'scikit-tree[test]'
+  'treeple[build]',
+  'treeple[doc]',
+  'treeple[style]',
+  'treeple[test]'
 ]
 build = [
   'build',

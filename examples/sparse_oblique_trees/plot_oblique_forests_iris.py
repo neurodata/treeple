@@ -23,7 +23,7 @@ from matplotlib.colors import ListedColormap
 from sklearn.datasets import load_iris
 from sklearn.tree import DecisionTreeClassifier
 
-from sktree import ExtraObliqueRandomForestClassifier, ObliqueRandomForestClassifier
+from treeple import ExtraObliqueRandomForestClassifier, ObliqueRandomForestClassifier
 
 # Parameters
 n_classes = 3

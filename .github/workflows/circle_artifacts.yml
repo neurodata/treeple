@@ -9,7 +9,7 @@ permissions: read-all
 jobs:
   circleci_artifacts_redirector_job:
     runs-on: ubuntu-20.04
-    if: "github.repository == 'neurodata/scikit-tree' && github.event.context == 'ci/circleci: build_docs'"
+    if: "github.repository == 'neurodata/treeple' && github.event.context == 'ci/circleci: build_docs'"
     permissions:
       statuses: write
     name: Run CircleCI artifacts redirector
