@@ -9,7 +9,7 @@ on:
     branches:
       - main
     paths:
-      - "sktree/**"
+      - "treeple/**"
 
 jobs:
   changelog:

@@ -8,7 +8,7 @@ commands:
       - run:
           name: Check-skip
           command: |
-            if [ ! -d "sktree" ]; then
+            if [ ! -d "treeple" ]; then
               echo "Build was not run due to skip, exiting job ${CIRCLE_JOB} for PR ${CIRCLE_PULL_REQUEST}."
               circleci-agent step halt;
             fi
@@ -184,7 +184,7 @@ jobs:
       - save_cache:
           key: website-cache
           paths:
-            - ~/sktree
+            - ~/treeple
 
 workflows:
   build-docs:

@@ -125,7 +125,7 @@ test = [
 ]
 
 [tool.bandit]
-exclude_dirs = ["sktree/tests", "sktree/**/tests/*", 'sktree/_build_utils/*', 'sktree/_lib/*']
+exclude_dirs = ["treeple/tests", "treeple/**/tests/*", 'treeple/_build_utils/*', 'treeple/_lib/*']
 skips = ['B404', 'B603']
 
 [tool.black]
@@ -136,7 +136,7 @@ extend-exclude = '''
 (
       __pycache__
     | \.github
-    | sktree/_lib
+    | treeple/_lib
     | .asv
     | env
     | build-install
@@ -146,7 +146,7 @@ extend-exclude = '''
 [tool.codespell]
 builtin = "clear,rare,informal,names,usage"
 ignore-words = ".codespellignore"
-skip = "doc/references.bib,sktree/_lib/"
+skip = "doc/references.bib,treeple/_lib/"
 
 [tool.coverage.report]
 exclude_lines = ['pragma: no cover', 'if __name__ == .__main__.:']
@@ -155,8 +155,8 @@ precision = 2
 [tool.coverage.run]
 branch = true
 cover_pylib = false
-source = ['sktree']
-omit = ['**/__init__.py', '**/tests/**', 'sktree/_build_utils/*', 'sktree/_lib/*']
+source = ['treeple']
+omit = ['**/__init__.py', '**/tests/**', 'treeple/_build_utils/*', 'treeple/_lib/*']
 
 [tool.cython-lint]
 # Ignore the same error codes as flake8
@@ -184,13 +184,13 @@ profile = 'black'
 multi_line_output = 3
 line_length = 100
 py_version = 38
-extend_skip_glob = ['sktree/__init__.py', 'sktree/_lib/*', '.asv/*', 'env/*', 'build-install/*']
+extend_skip_glob = ['treeple/__init__.py', 'treeple/_lib/*', '.asv/*', 'env/*', 'build-install/*']
 
 [tool.mypy]
 ignore_missing_imports = true
 no_site_packages = true
 exclude = [
-  'sktree/_lib/',
+  'treeple/_lib/',
   'benchmarks_nonasv/'
 ]
 
@@ -198,12 +198,12 @@ exclude = [
 convention = 'numpy'
 ignore-decorators = '(copy_doc|property|.*setter|.*getter)'
 match = '^(?!setup|__init__|test_|_lib).*\.py'
-match-dir = '^sktree*'
+match-dir = '^treeple*'
 add_ignore = 'D100,D104,D105,D107'
 
 [tool.pytest.ini_options]
 minversion = '6.0'
-addopts = '--durations 20 --junit-xml=junit-results.xml --verbose --ignore=sktree/_lib/ -k "not slowtest"'
+addopts = '--durations 20 --junit-xml=junit-results.xml --verbose --ignore=treeple/_lib/ -k "not slowtest"'
 filterwarnings = [
   'ignore:Using sklearn tree so store_leaf_values cannot be set.*'
 ]
@@ -272,7 +272,7 @@ ignore = ['E731']
 '__init__.py' = ['F401']
 
 [tool.spin]
-package = 'sktree'
+package = 'treeple'
 
 [tool.spin.commands]
 Build = [
