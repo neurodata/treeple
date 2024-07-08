@@ -11,7 +11,7 @@ Version 0.9
 **In Development**
 
 This release include a rename of the package to from ``scikit-learn`` to ``treeple``
-The users can replace the previous useage as follows:
+The users can replace the previous usage as follows:
 ``import sktree`` to ``import treeple``
 ``from sktree import tree`` to ``from treeple import tree``
 ``from sktree import ...`` to ``from treeple import ...``
