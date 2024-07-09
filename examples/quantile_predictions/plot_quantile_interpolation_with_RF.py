@@ -30,7 +30,7 @@ y = np.array([-2, -1, 0, 1, 2])
 # -------------------------
 # The following interpolation methods demonstrated here are:
 # To interpolate between the data points, i and j (``i <= j``),
-# linear, lower, higher, midpoint, or nearest. For more details, see `sktree.RandomForestRegressor`.
+# linear, lower, higher, midpoint, or nearest. For more details, see `treeple.RandomForestRegressor`.
 # The difference between the methods can be illustrated with the following example:
 
 interpolations = ["linear", "lower", "higher", "midpoint", "nearest"]

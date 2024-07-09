@@ -1,7 +1,7 @@
 extends: default
 
 ignore: |
-  sktree/_lib/
+  treeple/_lib/
   .asv/
 
 rules:

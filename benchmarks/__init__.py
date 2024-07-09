@@ -1,1 +1,1 @@
-"""Benchmark suite for scikit-tree using ASV"""
+"""Benchmark suite for treeple using ASV"""

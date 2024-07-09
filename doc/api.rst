@@ -4,9 +4,9 @@
 API Documentation
 =================
 
-:py:mod:`sktree`:
+:py:mod:`treeple`:
 
-.. automodule:: sktree
+.. automodule:: treeple
    :no-members:
    :no-inherited-members:
 
@@ -21,11 +21,11 @@ significantly for high-dimensional and high-sample size data.
 Use at your own risk! We have not tested these estimators extensively, compared
 to the scikit-learn estimators.
 
-.. automodule:: sktree._lib.sklearn.ensemble
+.. automodule:: treeple._lib.sklearn.ensemble
    :members:
    :show-inheritance:
 
-.. currentmodule:: sktree
+.. currentmodule:: treeple
 .. autosummary::
    :toctree: generated/
 
@@ -34,7 +34,7 @@ to the scikit-learn estimators.
    ExtraTreesClassifier
    ExtraTreesRegressor
 
-.. currentmodule:: sktree.tree
+.. currentmodule:: treeple.tree
 .. autosummary::
    :toctree: generated/
 
@@ -56,7 +56,7 @@ sample feature indices in a manifold-aware fashion. This class of models general
 the splitting function in the trees, while everything else is consistent with
 how scikit-learn builds trees.
 
-.. currentmodule:: sktree
+.. currentmodule:: treeple
 .. autosummary::
    :toctree: generated/
 
@@ -68,7 +68,7 @@ how scikit-learn builds trees.
    MultiViewRandomForestClassifier
    MultiViewObliqueRandomForestClassifier
 
-.. currentmodule:: sktree.tree
+.. currentmodule:: treeple.tree
 .. autosummary::
    :toctree: generated/
 
@@ -88,7 +88,7 @@ The :class:`~sklearn.ensemble.RandomTreesEmbedding` is an example of unsupervise
 tree model. We implement other state-of-the-art models that explicitly split based
 on unsupervised criterion such as variance and BIC.
 
-.. currentmodule:: sktree
+.. currentmodule:: treeple
 .. autosummary::
    :toctree: generated/
 
@@ -121,7 +121,7 @@ Trees inherently produce a "distance-like" metric. We provide an API for
 extracting pairwise distances from the trees that include a correction
 that turns the "tree-distance" into a proper distance metric.
 
-.. currentmodule:: sktree.tree
+.. currentmodule:: treeple.tree
 .. autosummary::
    :toctree: generated/
 
@@ -132,7 +132,7 @@ provide a natural way to compute neighbors based on the splits. We provide
 an API for extracting the nearest neighbors from a tree-model. This provides
 an API-like interface similar to :class:`~sklearn.neighbors.NearestNeighbors`.
 
-.. currentmodule:: sktree
+.. currentmodule:: treeple
 .. autosummary::
    :toctree: generated/
 
@@ -143,7 +143,7 @@ Statistical Hypothesis Testing
 We provide an API for performing statistical hypothesis testing using Decision
 tree models.
 
-.. currentmodule:: sktree.stats
+.. currentmodule:: treeple.stats
 .. autosummary::
    :toctree: generated/
 
@@ -158,7 +158,7 @@ Datasets
 We provide some convenience functions for simulating datasets beyond
 those offered in scikit-learn.
 
-.. currentmodule:: sktree.datasets
+.. currentmodule:: treeple.datasets
 .. autosummary::
    :toctree: generated/
 
@@ -176,7 +176,7 @@ Experimental Functionality
 --------------------------
 We also include experimental functionality that is works in progress.
 
-.. currentmodule:: sktree.experimental
+.. currentmodule:: treeple.experimental
 .. autosummary::
    :toctree: generated/
 
@@ -188,7 +188,7 @@ and conditional mutual information (CMI) estimators. Specifically, functions tha
 help simulate multivariate gaussian data and compute the analytical solutions
 for the entropy, MI and CMI of the Gaussian distributions.
 
-.. currentmodule:: sktree.experimental.simulate
+.. currentmodule:: treeple.experimental.simulate
 .. autosummary::
    :toctree: generated/
 
@@ -196,7 +196,7 @@ for the entropy, MI and CMI of the Gaussian distributions.
    simulate_helix
    simulate_sphere
 
-.. currentmodule:: sktree.experimental.mutual_info
+.. currentmodule:: treeple.experimental.mutual_info
 .. autosummary::
    :toctree: generated/
 

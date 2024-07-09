@@ -4,14 +4,14 @@ Demonstrate and visualize a multi-view projection matrix for an axis-aligned tre
 =================================================================================
 
 This example shows how multi-view projection matrices are generated for a decision tree,
-specifically the :class:`sktree.tree.MultiViewDecisionTreeClassifier`.
+specifically the :class:`treeple.tree.MultiViewDecisionTreeClassifier`.
 
 Multi-view projection matrices operate under the assumption that the input ``X`` array
 consists of multiple feature-sets that are groups of features important for predicting
 ``y``.
 
 For details on how to use the hyperparameters related to the multi-view, see
-:class:`sktree.tree.MultiViewDecisionTreeClassifier`.
+:class:`treeple.tree.MultiViewDecisionTreeClassifier`.
 """
 
 # import modules
@@ -27,8 +27,8 @@ import numpy as np
 from matplotlib.cm import ScalarMappable
 from matplotlib.colors import ListedColormap
 
-from sktree._lib.sklearn.tree._criterion import Gini
-from sktree.tree._oblique_splitter import MultiViewObliqueSplitterTester, MultiViewSplitterTester
+from treeple._lib.sklearn.tree._criterion import Gini
+from treeple.tree._oblique_splitter import MultiViewObliqueSplitterTester, MultiViewSplitterTester
 
 criterion = Gini(1, np.array((0, 1)))
 max_features = 6
@@ -56,7 +56,7 @@ print("The shape of our dataset is: ", X.shape, y.shape, sample_weight.shape)
 # Initialize the multi-view splitter
 # ----------------------------------
 # The multi-view splitter is a Cython class that is initialized internally
-# in scikit-tree. However, we expose a Python tester object to demonstrate
+# in treeple. However, we expose a Python tester object to demonstrate
 # how the splitter works in practice.
 #
 # .. warning:: Do not use this interface directly in practice.

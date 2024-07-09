@@ -1,7 +1,7 @@
 :orphan:
 
 .. include:: _contributors.rst
-.. currentmodule:: sktree
+.. currentmodule:: treeple
 
 .. _current:
 
@@ -10,18 +10,28 @@ Version 0.9
 
 **In Development**
 
+This release include a rename of the package to from ``scikit-learn`` to ``treeple``
+The users can replace the previous usage as follows:
+``import sktree`` to ``import treeple``
+``from sktree import tree`` to ``from treeple import tree``
+``from sktree import ...`` to ``from treeple import ...``
+
+
 Changelog
 ---------
 
-- |API| :class:`sktree.tree.MultiViewDecisionTreeClassifier` do not have the
+- |API| :class:`treeple.tree.MultiViewDecisionTreeClassifier` do not have the
     ``apply_max_features_per_feature_set`` argument anymore. Instead, the
     ``max_features`` argument is used to control the number of features to
     consider when looking for the best split within each feature set explicitly.
     By `Adam Li`_ :pr:`#265`.
 
-- |Feature| :class:`sktree.tree.MultiViewObliqueDecisionTreeClassifier` is implemented
-    along with its forest version :class:`sktree.MultiViewObliqueRandomForestClassifier`.
+- |Feature| :class:`treeple.tree.MultiViewObliqueDecisionTreeClassifier` is implemented
+    along with its forest version :class:`treeple.MultiViewObliqueRandomForestClassifier`.
     By `Adam Li`_ :pr:`#265`.
+
+- |API| Rename the package to ``treeple``. By `SUKI-O`_ (:pr:`#292`)
+
 
 Code and Documentation Contributors
 -----------------------------------
@@ -30,4 +40,4 @@ Thanks to everyone who has contributed to the maintenance and improvement of
 the project since version inception, including:
 
 * `Adam Li`_
-
+* `SUKI-O`_

@@ -23,7 +23,7 @@ Please be aware that we are a loose team of volunteers so patience is
 necessary; assistance handling other issues is very welcome. We value
 all user contributions, no matter how minor they are.
 
-See https://github.com/neurodata/scikit-tree/blob/main/CONTRIBUTING.md for more
+See https://github.com/neurodata/treeple/blob/main/CONTRIBUTING.md for more
 information on contributing.
 
 Thanks for contributing!

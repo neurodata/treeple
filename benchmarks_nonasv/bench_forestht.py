@@ -13,7 +13,7 @@ import pandas as pd
 import seaborn as sns
 from scipy.special import expit
 
-from sktree.stats import PermutationForestClassifier, PermutationForestRegressor
+from treeple.stats import PermutationForestClassifier, PermutationForestRegressor
 
 seed = 12345
 
