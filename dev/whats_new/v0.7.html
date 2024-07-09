@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Version 0.7 &#8212; scikit-tree 0.9.0dev0 documentation</title>
+    <title>Version 0.7 &#8212; treeple 0.9.0dev0 documentation</title>
   
   
   
@@ -50,7 +50,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'whats_new/v0.7';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.14.1';
-        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/scikit-tree/main/doc/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/treeple/main/doc/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Version 0.8" href="v0.8.html" />
     <link rel="prev" title="Version 0.6" href="v0.6.html" />
-    <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
+    <link rel="canonical" href="https://neurodata.github.io/treeple/stable/index.html" />
     <script type="text/javascript" src="../_static/copybutton.js"></script>
     <script type="text/javascript" src="../_static/scrollfix.js"></script>
 
@@ -134,7 +134,7 @@
   
   
   
-    <p class="title logo__title">scikit-tree 0.9.0dev0 documentation</p>
+    <p class="title logo__title">treeple 0.9.0dev0 documentation</p>
   
 </a></div>
     
@@ -183,7 +183,7 @@
 
                     <li class="nav-item">
                       <a class="nav-link nav-internal" href="../use.html">
-                        Examples using scikit-tree
+                        Examples using treeple
                       </a>
                     </li>
                 
@@ -246,7 +246,7 @@ document.write(`
           
           
           
-          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+          <a href="https://github.com/neurodata/treeple" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
             <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
@@ -329,7 +329,7 @@ document.write(`
 
                     <li class="nav-item">
                       <a class="nav-link nav-internal" href="../use.html">
-                        Examples using scikit-tree
+                        Examples using treeple
                       </a>
                     </li>
                 
@@ -379,7 +379,7 @@ document.write(`
           
           
           
-          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+          <a href="https://github.com/neurodata/treeple" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
             <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
@@ -469,54 +469,54 @@ testing of feature sets.</p>
 <h2>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">#</a></h2>
 <ul class="simple">
 <li><dl class="simple">
-<dt><span class="raw-html"><span class="badge badge-success">Feature</span></span>  Introduce a new light-weight class for fitting honest forests while</dt><dd><p>permuting the covariate index <a class="reference internal" href="../generated/sktree.stats.PermutationHonestForestClassifier.html#sktree.stats.PermutationHonestForestClassifier" title="sktree.stats.PermutationHonestForestClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">sktree.stats.PermutationHonestForestClassifier</span></code></a>,
-by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/#211">##211</a>)</p>
+<dt><span class="raw-html"><span class="badge badge-success">Feature</span></span>  Introduce a new light-weight class for fitting honest forests while</dt><dd><p>permuting the covariate index <a class="reference internal" href="../generated/treeple.stats.PermutationHonestForestClassifier.html#treeple.stats.PermutationHonestForestClassifier" title="treeple.stats.PermutationHonestForestClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">treeple.stats.PermutationHonestForestClassifier</span></code></a>,
+by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/#211">##211</a>)</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
 <dt><span class="raw-html"><span class="badge badge-success">Feature</span></span>  Introduce a new class method <code class="docutils literal notranslate"><span class="pre">predict_proba_per_tree</span></code> for all</dt><dd><p>Forest classifiers, which will predict the probability per tree and keep the
 output as a <code class="docutils literal notranslate"><span class="pre">(n_estimators,</span> <span class="pre">n_samples,</span> <span class="pre">n_classes)</span></code> output,
-by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/#211">##211</a>)</p>
+by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/#211">##211</a>)</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
 <dt><span class="raw-html"><span class="badge badge-success">Feature</span></span>  Introduce a new class fitted attribute <code class="docutils literal notranslate"><span class="pre">oob_samples_</span></code> for all</dt><dd><p>Forest models, which will keep track of the samples used.
-by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/#211">##211</a>)</p>
+by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/#211">##211</a>)</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><span class="raw-html"><span class="badge badge-success">Feature</span></span>  Introduce a new set of simulations based on Marron and Wand 1992.</dt><dd><p>by <a class="reference external" href="https://sampan.me">Sambit Panda</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/#203">##203</a>)</p>
+<dt><span class="raw-html"><span class="badge badge-success">Feature</span></span>  Introduce a new set of simulations based on Marron and Wand 1992.</dt><dd><p>by <a class="reference external" href="https://sampan.me">Sambit Panda</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/#203">##203</a>)</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><span class="raw-html"><span class="badge badge-success">Feature</span></span>  <a class="reference internal" href="../generated/sktree.stats.build_coleman_forest.html#sktree.stats.build_coleman_forest" title="sktree.stats.build_coleman_forest"><code class="xref py py-func docutils literal notranslate"><span class="pre">sktree.stats.build_coleman_forest()</span></code></a> and <a class="reference internal" href="../generated/sktree.stats.build_permutation_forest.html#sktree.stats.build_permutation_forest" title="sktree.stats.build_permutation_forest"><code class="xref py py-func docutils literal notranslate"><span class="pre">sktree.stats.build_permutation_forest()</span></code></a></dt><dd><p>are added to compute p-values given an estimator and permutation-estimator, <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/#222">##222</a>)</p>
+<dt><span class="raw-html"><span class="badge badge-success">Feature</span></span>  <a class="reference internal" href="../generated/treeple.stats.build_coleman_forest.html#treeple.stats.build_coleman_forest" title="treeple.stats.build_coleman_forest"><code class="xref py py-func docutils literal notranslate"><span class="pre">treeple.stats.build_coleman_forest()</span></code></a> and <a class="reference internal" href="../generated/treeple.stats.build_permutation_forest.html#treeple.stats.build_permutation_forest" title="treeple.stats.build_permutation_forest"><code class="xref py py-func docutils literal notranslate"><span class="pre">treeple.stats.build_permutation_forest()</span></code></a></dt><dd><p>are added to compute p-values given an estimator and permutation-estimator, <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/#222">##222</a>)</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><span class="raw-html"><span class="badge badge-warning">API Change</span></span>  <a class="reference internal" href="../generated/sktree.datasets.make_trunk_classification.html#sktree.datasets.make_trunk_classification" title="sktree.datasets.make_trunk_classification"><code class="xref py py-func docutils literal notranslate"><span class="pre">sktree.datasets.make_trunk_classification()</span></code></a> for generating trunk mixture and Marron-Wand</dt><dd><p>simulations are separated out into <a class="reference internal" href="../generated/sktree.datasets.make_marron_wand_classification.html#sktree.datasets.make_marron_wand_classification" title="sktree.datasets.make_marron_wand_classification"><code class="xref py py-func docutils literal notranslate"><span class="pre">sktree.datasets.make_marron_wand_classification()</span></code></a> and
-<a class="reference internal" href="../generated/sktree.datasets.make_trunk_mixture_classification.html#sktree.datasets.make_trunk_mixture_classification" title="sktree.datasets.make_trunk_mixture_classification"><code class="xref py py-func docutils literal notranslate"><span class="pre">sktree.datasets.make_trunk_mixture_classification()</span></code></a>, <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/#227">##227</a>)</p>
+<dt><span class="raw-html"><span class="badge badge-warning">API Change</span></span>  <a class="reference internal" href="../generated/treeple.datasets.make_trunk_classification.html#treeple.datasets.make_trunk_classification" title="treeple.datasets.make_trunk_classification"><code class="xref py py-func docutils literal notranslate"><span class="pre">treeple.datasets.make_trunk_classification()</span></code></a> for generating trunk mixture and Marron-Wand</dt><dd><p>simulations are separated out into <a class="reference internal" href="../generated/treeple.datasets.make_marron_wand_classification.html#treeple.datasets.make_marron_wand_classification" title="treeple.datasets.make_marron_wand_classification"><code class="xref py py-func docutils literal notranslate"><span class="pre">treeple.datasets.make_marron_wand_classification()</span></code></a> and
+<a class="reference internal" href="../generated/treeple.datasets.make_trunk_mixture_classification.html#treeple.datasets.make_trunk_mixture_classification" title="treeple.datasets.make_trunk_mixture_classification"><code class="xref py py-func docutils literal notranslate"><span class="pre">treeple.datasets.make_trunk_mixture_classification()</span></code></a>, <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/#227">##227</a>)</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><span class="raw-html"><span class="badge badge-warning">API Change</span></span>  <a class="reference internal" href="../generated/sktree.HonestForestClassifier.html#sktree.HonestForestClassifier" title="sktree.HonestForestClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">sktree.HonestForestClassifier</span></code></a> and <a class="reference internal" href="../generated/sktree.tree.HonestTreeClassifier.html#sktree.tree.HonestTreeClassifier" title="sktree.tree.HonestTreeClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">sktree.tree.HonestTreeClassifier</span></code></a></dt><dd><p>now overwrite all parameters set by the underlying <code class="docutils literal notranslate"><span class="pre">tree_estimator</span></code> and allow you to directly
+<dt><span class="raw-html"><span class="badge badge-warning">API Change</span></span>  <a class="reference internal" href="../generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier" title="treeple.HonestForestClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">treeple.HonestForestClassifier</span></code></a> and <a class="reference internal" href="../generated/treeple.tree.HonestTreeClassifier.html#treeple.tree.HonestTreeClassifier" title="treeple.tree.HonestTreeClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">treeple.tree.HonestTreeClassifier</span></code></a></dt><dd><p>now overwrite all parameters set by the underlying <code class="docutils literal notranslate"><span class="pre">tree_estimator</span></code> and allow you to directly
 pass any extra parameters that <code class="docutils literal notranslate"><span class="pre">tree_estimator</span></code> has compared to the original
-<a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.tree.DecisionTreeClassifier.html#sklearn.tree.DecisionTreeClassifier" title="(in scikit-learn v1.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DecisionTreeClassifier</span></code></a>, <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/#228">##228</a>)</p>
+<a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.tree.DecisionTreeClassifier.html#sklearn.tree.DecisionTreeClassifier" title="(in scikit-learn v1.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DecisionTreeClassifier</span></code></a>, <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/#228">##228</a>)</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  Trunk simulators now correctly generate random values with a fixed seed,</dt><dd><p>by <a class="reference external" href="https://sampan.me">Sambit Panda</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/#236">##236</a>)</p>
+<dt><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  Trunk simulators now correctly generate random values with a fixed seed,</dt><dd><p>by <a class="reference external" href="https://sampan.me">Sambit Panda</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/#236">##236</a>)</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  Trunk simulators now correctly generate random values with a fixed seed,</dt><dd><p>by <a class="reference external" href="https://sampan.me">Sambit Panda</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/#236">##236</a>)</p>
+<dt><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  Trunk simulators now correctly generate random values with a fixed seed,</dt><dd><p>by <a class="reference external" href="https://sampan.me">Sambit Panda</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/#236">##236</a>)</p>
 </dd>
 </dl>
 </li>
@@ -524,7 +524,7 @@ pass any extra parameters that <code class="docutils literal notranslate"><span 
 <dt><span class="raw-html"><span class="badge badge-info">Efficiency</span></span>  All scikit-tree estimators are now at least 2X faster than they were</dt><dd><p>in previous versions. This was due to adding in compiler-directives to turn on
 optimizations ‘-03’ when compiling the C++ generated code from Cython. In addition,
 we explicitly turned off bounds-checking and related runtime checks in the Cython code,
-which would lead to performance degradation during runtime. by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/#242">##242</a>)</p>
+which would lead to performance degradation during runtime. by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/#242">##242</a>)</p>
 </dd>
 </dl>
 </li>
@@ -613,7 +613,7 @@ the project since version inception, including:</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-06-24.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-07-09.
       <br/>
     
   </p>

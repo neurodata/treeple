@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Version 0.5 &#8212; scikit-tree 0.9.0dev0 documentation</title>
+    <title>Version 0.5 &#8212; treeple 0.9.0dev0 documentation</title>
   
   
   
@@ -50,7 +50,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'whats_new/v0.5';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.14.1';
-        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/scikit-tree/main/doc/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/treeple/main/doc/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Version 0.6" href="v0.6.html" />
     <link rel="prev" title="Version 0.4" href="v0.4.html" />
-    <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
+    <link rel="canonical" href="https://neurodata.github.io/treeple/stable/index.html" />
     <script type="text/javascript" src="../_static/copybutton.js"></script>
     <script type="text/javascript" src="../_static/scrollfix.js"></script>
 
@@ -134,7 +134,7 @@
   
   
   
-    <p class="title logo__title">scikit-tree 0.9.0dev0 documentation</p>
+    <p class="title logo__title">treeple 0.9.0dev0 documentation</p>
   
 </a></div>
     
@@ -183,7 +183,7 @@
 
                     <li class="nav-item">
                       <a class="nav-link nav-internal" href="../use.html">
-                        Examples using scikit-tree
+                        Examples using treeple
                       </a>
                     </li>
                 
@@ -246,7 +246,7 @@ document.write(`
           
           
           
-          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+          <a href="https://github.com/neurodata/treeple" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
             <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
@@ -329,7 +329,7 @@ document.write(`
 
                     <li class="nav-item">
                       <a class="nav-link nav-internal" href="../use.html">
-                        Examples using scikit-tree
+                        Examples using treeple
                       </a>
                     </li>
                 
@@ -379,7 +379,7 @@ document.write(`
           
           
           
-          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+          <a href="https://github.com/neurodata/treeple" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
             <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
@@ -461,24 +461,24 @@ document.write(`
   <section id="version-0-5">
 <span id="v0-5"></span><h1>Version 0.5<a class="headerlink" href="#version-0-5" title="Link to this heading">#</a></h1>
 <p>This release includes a number of enhancements and bug fixes, mainly
-to the <a class="reference internal" href="../generated/sktree.tree.MultiViewDecisionTreeClassifier.html#sktree.tree.MultiViewDecisionTreeClassifier" title="sktree.tree.MultiViewDecisionTreeClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">sktree.tree.MultiViewDecisionTreeClassifier</span></code></a>. Most notably,
+to the <a class="reference internal" href="../generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier" title="treeple.tree.MultiViewDecisionTreeClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">treeple.tree.MultiViewDecisionTreeClassifier</span></code></a>. Most notably,
 the <code class="docutils literal notranslate"><span class="pre">max_features</span></code> argument now supports an array of values, which
 applies a different <code class="docutils literal notranslate"><span class="pre">max_features</span></code> argument per feature view.</p>
 <section id="changelog">
 <h2>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">#</a></h2>
 <ul class="simple">
-<li><p><span class="raw-html"><span class="badge badge-info">Enhancement</span></span>  <a class="reference internal" href="../generated/sktree.tree.MultiViewDecisionTreeClassifier.html#sktree.tree.MultiViewDecisionTreeClassifier" title="sktree.tree.MultiViewDecisionTreeClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">sktree.tree.MultiViewDecisionTreeClassifier</span></code></a> now
+<li><p><span class="raw-html"><span class="badge badge-info">Enhancement</span></span>  <a class="reference internal" href="../generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier" title="treeple.tree.MultiViewDecisionTreeClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">treeple.tree.MultiViewDecisionTreeClassifier</span></code></a> now
 rounds up the number of features to split on to the nearest integer when
-applying <code class="docutils literal notranslate"><span class="pre">max_features</span></code> to each feature view, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/#183">##183</a>).</p></li>
-<li><p><span class="raw-html"><span class="badge badge-success">Feature</span></span>  <a class="reference internal" href="../generated/sktree.tree.MultiViewDecisionTreeClassifier.html#sktree.tree.MultiViewDecisionTreeClassifier" title="sktree.tree.MultiViewDecisionTreeClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">sktree.tree.MultiViewDecisionTreeClassifier</span></code></a> now
+applying <code class="docutils literal notranslate"><span class="pre">max_features</span></code> to each feature view, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/#183">##183</a>).</p></li>
+<li><p><span class="raw-html"><span class="badge badge-success">Feature</span></span>  <a class="reference internal" href="../generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier" title="treeple.tree.MultiViewDecisionTreeClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">treeple.tree.MultiViewDecisionTreeClassifier</span></code></a> now
 supports an array passed in for <code class="docutils literal notranslate"><span class="pre">max_features</span></code>, which applies a different
-max_features argument per view, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/#183">##183</a>).</p></li>
-<li><p><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  <a class="reference internal" href="../generated/sktree.tree.MultiViewDecisionTreeClassifier.html#sktree.tree.MultiViewDecisionTreeClassifier" title="sktree.tree.MultiViewDecisionTreeClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">sktree.tree.MultiViewDecisionTreeClassifier</span></code></a> now correctly
+max_features argument per view, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/#183">##183</a>).</p></li>
+<li><p><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  <a class="reference internal" href="../generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier" title="treeple.tree.MultiViewDecisionTreeClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">treeple.tree.MultiViewDecisionTreeClassifier</span></code></a> now correctly
 handles the case where there is one feature view that is exhausted, and
 another that is not for <code class="docutils literal notranslate"><span class="pre">apply_max_features_per_feature_set</span> <span class="pre">=</span> <span class="pre">False</span></code>,
-by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/#183">##183</a>).</p></li>
-<li><p><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  <code class="docutils literal notranslate"><span class="pre">sktree.stats.FeatureImportanceForestClassifier</span></code> now correctly passes
-metric kwargs to the null distribution function, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/#183">##183</a>).</p></li>
+by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/#183">##183</a>).</p></li>
+<li><p><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  <code class="docutils literal notranslate"><span class="pre">treeple.stats.FeatureImportanceForestClassifier</span></code> now correctly passes
+metric kwargs to the null distribution function, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/#183">##183</a>).</p></li>
 </ul>
 </section>
 <section id="code-and-documentation-contributors">
@@ -563,7 +563,7 @@ the project since version inception, including:</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-06-24.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-07-09.
       <br/>
     
   </p>

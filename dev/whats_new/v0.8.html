@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Version 0.8 &#8212; scikit-tree 0.9.0dev0 documentation</title>
+    <title>Version 0.8 &#8212; treeple 0.9.0dev0 documentation</title>
   
   
   
@@ -50,7 +50,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'whats_new/v0.8';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.14.1';
-        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/scikit-tree/main/doc/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/treeple/main/doc/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Installation" href="../install.html" />
     <link rel="prev" title="Version 0.7" href="v0.7.html" />
-    <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
+    <link rel="canonical" href="https://neurodata.github.io/treeple/stable/index.html" />
     <script type="text/javascript" src="../_static/copybutton.js"></script>
     <script type="text/javascript" src="../_static/scrollfix.js"></script>
 
@@ -134,7 +134,7 @@
   
   
   
-    <p class="title logo__title">scikit-tree 0.9.0dev0 documentation</p>
+    <p class="title logo__title">treeple 0.9.0dev0 documentation</p>
   
 </a></div>
     
@@ -183,7 +183,7 @@
 
                     <li class="nav-item">
                       <a class="nav-link nav-internal" href="../use.html">
-                        Examples using scikit-tree
+                        Examples using treeple
                       </a>
                     </li>
                 
@@ -246,7 +246,7 @@ document.write(`
           
           
           
-          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+          <a href="https://github.com/neurodata/treeple" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
             <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
@@ -329,7 +329,7 @@ document.write(`
 
                     <li class="nav-item">
                       <a class="nav-link nav-internal" href="../use.html">
-                        Examples using scikit-tree
+                        Examples using treeple
                       </a>
                     </li>
                 
@@ -379,7 +379,7 @@ document.write(`
           
           
           
-          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+          <a href="https://github.com/neurodata/treeple" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
             <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
@@ -468,33 +468,33 @@ and improvements to the codebase.</p>
 <h2>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">#</a></h2>
 <ul class="simple">
 <li><dl class="simple">
-<dt><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  Previously missing-values in <code class="docutils literal notranslate"><span class="pre">X</span></code> input array for sktree estimators</dt><dd><p>did not raise an error, and silently ran, assuming the missing-values were
+<dt><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  Previously missing-values in <code class="docutils literal notranslate"><span class="pre">X</span></code> input array for treeple estimators</dt><dd><p>did not raise an error, and silently ran, assuming the missing-values were
 encoded as infinity value. This is now fixed, and the estimators will raise an
 ValueError if missing-values are encountered in <code class="docutils literal notranslate"><span class="pre">X</span></code> input array.
-By <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/#264">##264</a>)</p>
+By <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/#264">##264</a>)</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><span class="raw-html"><span class="badge badge-success">Feature</span></span>  Simulations in <code class="docutils literal notranslate"><span class="pre">sktree.datasets.hyppo</span></code> now throw a warning instead</dt><dd><p>of an error when the number of samples is less than the number of dimensions.
-By <a class="reference external" href="https://sampan.me">Sambit Panda</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/#279">##279</a>)</p>
+<dt><span class="raw-html"><span class="badge badge-success">Feature</span></span>  Simulations in <code class="docutils literal notranslate"><span class="pre">treeple.datasets.hyppo</span></code> now throw a warning instead</dt><dd><p>of an error when the number of samples is less than the number of dimensions.
+By <a class="reference external" href="https://sampan.me">Sambit Panda</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/#279">##279</a>)</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><span class="raw-html"><span class="badge badge-warning">API Change</span></span>  <a class="reference internal" href="../generated/sktree.HonestForestClassifier.html#sktree.HonestForestClassifier" title="sktree.HonestForestClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">sktree.HonestForestClassifier</span></code></a> now has <code class="docutils literal notranslate"><span class="pre">bootstrap=True</span></code> as the default</dt><dd><p>argument. By <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/#274">##274</a>)</p>
+<dt><span class="raw-html"><span class="badge badge-warning">API Change</span></span>  <a class="reference internal" href="../generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier" title="treeple.HonestForestClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">treeple.HonestForestClassifier</span></code></a> now has <code class="docutils literal notranslate"><span class="pre">bootstrap=True</span></code> as the default</dt><dd><p>argument. By <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/#274">##274</a>)</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><span class="raw-html"><span class="badge badge-warning">API Change</span></span>  Removed all instances of <code class="docutils literal notranslate"><span class="pre">FeatureImportanceForestClassifier</span></code> and outdated</dt><dd><p>MIGHT code. By <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/#274">##274</a>)</p>
+<dt><span class="raw-html"><span class="badge badge-warning">API Change</span></span>  Removed all instances of <code class="docutils literal notranslate"><span class="pre">FeatureImportanceForestClassifier</span></code> and outdated</dt><dd><p>MIGHT code. By <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/#274">##274</a>)</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  Fixed a bug in the <code class="docutils literal notranslate"><span class="pre">sktree.HonestForestClassifier</span></code> where posteriors</dt><dd><p>estimated on oob samples were biased when there was a low number of samples
+<dt><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  Fixed a bug in the <code class="docutils literal notranslate"><span class="pre">treeple.HonestForestClassifier</span></code> where posteriors</dt><dd><p>estimated on oob samples were biased when there was a low number of samples
 due to imbalance in the classes when <code class="docutils literal notranslate"><span class="pre">bootstrap=True</span></code>.
-By <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/#283">##283</a>)</p>
+By <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/#283">##283</a>)</p>
 </dd>
 </dl>
 </li>
@@ -582,7 +582,7 @@ the project since version inception, including:</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-06-24.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-07-09.
       <br/>
     
   </p>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Version 0.3 &#8212; scikit-tree 0.9.0dev0 documentation</title>
+    <title>Version 0.3 &#8212; treeple 0.9.0dev0 documentation</title>
   
   
   
@@ -50,7 +50,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'whats_new/v0.3';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.14.1';
-        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/scikit-tree/main/doc/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/treeple/main/doc/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Version 0.4" href="v0.4.html" />
     <link rel="prev" title="Version 0.2" href="v0.2.html" />
-    <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
+    <link rel="canonical" href="https://neurodata.github.io/treeple/stable/index.html" />
     <script type="text/javascript" src="../_static/copybutton.js"></script>
     <script type="text/javascript" src="../_static/scrollfix.js"></script>
 
@@ -134,7 +134,7 @@
   
   
   
-    <p class="title logo__title">scikit-tree 0.9.0dev0 documentation</p>
+    <p class="title logo__title">treeple 0.9.0dev0 documentation</p>
   
 </a></div>
     
@@ -183,7 +183,7 @@
 
                     <li class="nav-item">
                       <a class="nav-link nav-internal" href="../use.html">
-                        Examples using scikit-tree
+                        Examples using treeple
                       </a>
                     </li>
                 
@@ -246,7 +246,7 @@ document.write(`
           
           
           
-          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+          <a href="https://github.com/neurodata/treeple" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
             <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
@@ -329,7 +329,7 @@ document.write(`
 
                     <li class="nav-item">
                       <a class="nav-link nav-internal" href="../use.html">
-                        Examples using scikit-tree
+                        Examples using treeple
                       </a>
                     </li>
                 
@@ -379,7 +379,7 @@ document.write(`
           
           
           
-          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+          <a href="https://github.com/neurodata/treeple" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
             <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
@@ -467,12 +467,12 @@ making it easier for users to find examples related to specific use cases.</p>
 <section id="changelog">
 <h2>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">#</a></h2>
 <ul class="simple">
-<li><p><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  Fixes a bug in consistency of train/test samples when <code class="docutils literal notranslate"><span class="pre">random_state</span></code> is not set in FeatureImportanceForestClassifier and FeatureImportanceForestRegressor, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/135">#135</a>)</p></li>
-<li><p><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  Fixes a bug where covariate indices were not shuffled by default when running FeatureImportanceForestClassifier and FeatureImportanceForestRegressor test methods, by <a class="reference external" href="https://sampan.me">Sambit Panda</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/140">#140</a>)</p></li>
-<li><p><span class="raw-html"><span class="badge badge-info">Enhancement</span></span>  Add multi-view splitter for axis-aligned decision trees, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/129">#129</a>)</p></li>
-<li><p><span class="raw-html"><span class="badge badge-info">Enhancement</span></span>  Add stratified sampling option to <code class="docutils literal notranslate"><span class="pre">FeatureImportance*</span></code> via the <code class="docutils literal notranslate"><span class="pre">stratify</span></code> keyword argument, by <a class="reference external" href="https://github.com/YuxinB">Yuxin Bai</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/143">#143</a>)</p></li>
-<li><p><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  Fixed usage of <code class="docutils literal notranslate"><span class="pre">feature_importances_</span></code> property in <code class="docutils literal notranslate"><span class="pre">HonestForestClassifier</span></code>, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/156">#156</a>)</p></li>
-<li><p><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  Fixed <code class="docutils literal notranslate"><span class="pre">HonestForestClassifier</span></code> to allow decision-trees from sklearn, albeit with a limited API, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/158">#158</a>)</p></li>
+<li><p><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  Fixes a bug in consistency of train/test samples when <code class="docutils literal notranslate"><span class="pre">random_state</span></code> is not set in FeatureImportanceForestClassifier and FeatureImportanceForestRegressor, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/135">#135</a>)</p></li>
+<li><p><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  Fixes a bug where covariate indices were not shuffled by default when running FeatureImportanceForestClassifier and FeatureImportanceForestRegressor test methods, by <a class="reference external" href="https://sampan.me">Sambit Panda</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/140">#140</a>)</p></li>
+<li><p><span class="raw-html"><span class="badge badge-info">Enhancement</span></span>  Add multi-view splitter for axis-aligned decision trees, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/129">#129</a>)</p></li>
+<li><p><span class="raw-html"><span class="badge badge-info">Enhancement</span></span>  Add stratified sampling option to <code class="docutils literal notranslate"><span class="pre">FeatureImportance*</span></code> via the <code class="docutils literal notranslate"><span class="pre">stratify</span></code> keyword argument, by <a class="reference external" href="https://github.com/YuxinB">Yuxin Bai</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/143">#143</a>)</p></li>
+<li><p><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  Fixed usage of <code class="docutils literal notranslate"><span class="pre">feature_importances_</span></code> property in <code class="docutils literal notranslate"><span class="pre">HonestForestClassifier</span></code>, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/156">#156</a>)</p></li>
+<li><p><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  Fixed <code class="docutils literal notranslate"><span class="pre">HonestForestClassifier</span></code> to allow decision-trees from sklearn, albeit with a limited API, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/158">#158</a>)</p></li>
 </ul>
 </section>
 <section id="code-and-documentation-contributors">
@@ -559,7 +559,7 @@ the project since version inception, including:</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-06-24.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-07-09.
       <br/>
     
   </p>

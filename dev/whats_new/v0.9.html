@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Version 0.9 &#8212; scikit-tree 0.9.0dev0 documentation</title>
+    <title>Version 0.9 &#8212; treeple 0.9.0dev0 documentation</title>
   
   
   
@@ -50,13 +50,13 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'whats_new/v0.9';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.14.1';
-        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/scikit-tree/main/doc/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/treeple/main/doc/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
+    <link rel="canonical" href="https://neurodata.github.io/treeple/stable/index.html" />
     <script type="text/javascript" src="../_static/copybutton.js"></script>
     <script type="text/javascript" src="../_static/scrollfix.js"></script>
 
@@ -132,7 +132,7 @@
   
   
   
-    <p class="title logo__title">scikit-tree 0.9.0dev0 documentation</p>
+    <p class="title logo__title">treeple 0.9.0dev0 documentation</p>
   
 </a></div>
     
@@ -181,7 +181,7 @@
 
                     <li class="nav-item">
                       <a class="nav-link nav-internal" href="../use.html">
-                        Examples using scikit-tree
+                        Examples using treeple
                       </a>
                     </li>
                 
@@ -244,7 +244,7 @@ document.write(`
           
           
           
-          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+          <a href="https://github.com/neurodata/treeple" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
             <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
@@ -327,7 +327,7 @@ document.write(`
 
                     <li class="nav-item">
                       <a class="nav-link nav-internal" href="../use.html">
-                        Examples using scikit-tree
+                        Examples using treeple
                       </a>
                     </li>
                 
@@ -377,7 +377,7 @@ document.write(`
           
           
           
-          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+          <a href="https://github.com/neurodata/treeple" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
             <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
@@ -438,10 +438,15 @@ document.write(`
   <section id="version-0-9">
 <span id="current"></span><h1>Version 0.9<a class="headerlink" href="#version-0-9" title="Link to this heading">#</a></h1>
 <p><strong>In Development</strong></p>
+<p>This release include a rename of the package to from <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> to <code class="docutils literal notranslate"><span class="pre">treeple</span></code>
+The users can replace the previous usage as follows:
+<code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">sktree</span></code> to <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">treeple</span></code>
+<code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">sktree</span> <span class="pre">import</span> <span class="pre">tree</span></code> to <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">treeple</span> <span class="pre">import</span> <span class="pre">tree</span></code>
+<code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">sktree</span> <span class="pre">import</span> <span class="pre">...</span></code> to <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">treeple</span> <span class="pre">import</span> <span class="pre">...</span></code></p>
 <section id="changelog">
 <h2>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">#</a></h2>
 <ul class="simple">
-<li></li>
+<li><p><span class="raw-html"><span class="badge badge-warning">API Change</span></span>  Rename the package to <code class="docutils literal notranslate"><span class="pre">treeple</span></code>. By <a class="reference external" href="https://github.com/SUKI-O">SUKI-O</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/#292">##292</a>)</p></li>
 </ul>
 </section>
 <section id="code-and-documentation-contributors">
@@ -450,6 +455,7 @@ document.write(`
 the project since version inception, including:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://adam2392.github.io">Adam Li</a></p></li>
+<li><p><a class="reference external" href="https://github.com/SUKI-O">SUKI-O</a></p></li>
 </ul>
 </section>
 </section>
@@ -508,7 +514,7 @@ the project since version inception, including:</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-06-24.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-07-09.
       <br/>
     
   </p>

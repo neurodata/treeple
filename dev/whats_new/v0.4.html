@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Version 0.4 &#8212; scikit-tree 0.9.0dev0 documentation</title>
+    <title>Version 0.4 &#8212; treeple 0.9.0dev0 documentation</title>
   
   
   
@@ -50,7 +50,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'whats_new/v0.4';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.14.1';
-        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/scikit-tree/main/doc/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/treeple/main/doc/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Version 0.5" href="v0.5.html" />
     <link rel="prev" title="Version 0.3" href="v0.3.html" />
-    <link rel="canonical" href="https://neurodata.github.io/scikit-tree/stable/index.html" />
+    <link rel="canonical" href="https://neurodata.github.io/treeple/stable/index.html" />
     <script type="text/javascript" src="../_static/copybutton.js"></script>
     <script type="text/javascript" src="../_static/scrollfix.js"></script>
 
@@ -134,7 +134,7 @@
   
   
   
-    <p class="title logo__title">scikit-tree 0.9.0dev0 documentation</p>
+    <p class="title logo__title">treeple 0.9.0dev0 documentation</p>
   
 </a></div>
     
@@ -183,7 +183,7 @@
 
                     <li class="nav-item">
                       <a class="nav-link nav-internal" href="../use.html">
-                        Examples using scikit-tree
+                        Examples using treeple
                       </a>
                     </li>
                 
@@ -246,7 +246,7 @@ document.write(`
           
           
           
-          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+          <a href="https://github.com/neurodata/treeple" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
             <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
@@ -329,7 +329,7 @@ document.write(`
 
                     <li class="nav-item">
                       <a class="nav-link nav-internal" href="../use.html">
-                        Examples using scikit-tree
+                        Examples using treeple
                       </a>
                     </li>
                 
@@ -379,7 +379,7 @@ document.write(`
           
           
           
-          <a href="https://github.com/neurodata/scikit-tree" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+          <a href="https://github.com/neurodata/treeple" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
             <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
@@ -466,14 +466,14 @@ equally.</p>
 <section id="changelog">
 <h2>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">#</a></h2>
 <ul class="simple">
-<li><p><span class="raw-html"><span class="badge badge-warning">API Change</span></span>  <code class="docutils literal notranslate"><span class="pre">FeatureImportanceForest*</span></code> now has a hyperparameter to control the number of permutations is done per forest <code class="docutils literal notranslate"><span class="pre">permute_per_forest_fraction</span></code>, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/145">#145</a>)</p></li>
-<li><p><span class="raw-html"><span class="badge badge-info">Enhancement</span></span>  Add dataset generators for regression and classification and hypothesis testing, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/169">#169</a>)</p></li>
-<li><p><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  Fixes a bug where <code class="docutils literal notranslate"><span class="pre">FeatureImportanceForest*</span></code> was unable to be run when calling <code class="docutils literal notranslate"><span class="pre">statistic</span></code> with <code class="docutils literal notranslate"><span class="pre">covariate_index</span></code> defined for MI, AUC metrics, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/164">#164</a>)</p></li>
-<li><p><span class="raw-html"><span class="badge badge-info">Enhancement</span></span>  Add <a class="reference internal" href="../generated/sktree.experimental.conditional_resample.html#sktree.experimental.conditional_resample" title="sktree.experimental.conditional_resample"><code class="xref py py-func docutils literal notranslate"><span class="pre">sktree.experimental.conditional_resample()</span></code></a>, which allows conditional resampling of rows based on nearest-neighbors defined via a feature set, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/170">#170</a>)</p></li>
-<li><p><span class="raw-html"><span class="badge badge-info">Enhancement</span></span>  Multi-view trees now are able to scale the sampling of split candidates at the same rate per feature-set now, which means ‘sqrt’ would sample split candidates equal to the square root of each feature-set size, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/152">#152</a>)</p></li>
+<li><p><span class="raw-html"><span class="badge badge-warning">API Change</span></span>  <code class="docutils literal notranslate"><span class="pre">FeatureImportanceForest*</span></code> now has a hyperparameter to control the number of permutations is done per forest <code class="docutils literal notranslate"><span class="pre">permute_per_forest_fraction</span></code>, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/145">#145</a>)</p></li>
+<li><p><span class="raw-html"><span class="badge badge-info">Enhancement</span></span>  Add dataset generators for regression and classification and hypothesis testing, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/169">#169</a>)</p></li>
+<li><p><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  Fixes a bug where <code class="docutils literal notranslate"><span class="pre">FeatureImportanceForest*</span></code> was unable to be run when calling <code class="docutils literal notranslate"><span class="pre">statistic</span></code> with <code class="docutils literal notranslate"><span class="pre">covariate_index</span></code> defined for MI, AUC metrics, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/164">#164</a>)</p></li>
+<li><p><span class="raw-html"><span class="badge badge-info">Enhancement</span></span>  Add <a class="reference internal" href="../generated/treeple.experimental.conditional_resample.html#treeple.experimental.conditional_resample" title="treeple.experimental.conditional_resample"><code class="xref py py-func docutils literal notranslate"><span class="pre">treeple.experimental.conditional_resample()</span></code></a>, which allows conditional resampling of rows based on nearest-neighbors defined via a feature set, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/170">#170</a>)</p></li>
+<li><p><span class="raw-html"><span class="badge badge-info">Enhancement</span></span>  Multi-view trees now are able to scale the sampling of split candidates at the same rate per feature-set now, which means ‘sqrt’ would sample split candidates equal to the square root of each feature-set size, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/152">#152</a>)</p></li>
 <li><dl class="simple">
-<dt><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  Fixes bug in <a class="reference internal" href="../generated/sktree.tree.MultiViewDecisionTreeClassifier.html#sktree.tree.MultiViewDecisionTreeClassifier" title="sktree.tree.MultiViewDecisionTreeClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">sktree.tree.MultiViewDecisionTreeClassifier</span></code></a> where the max_features argument applied over</dt><dd><p>more than two views with <code class="docutils literal notranslate"><span class="pre">apply_max_features_per_set</span></code> set to <code class="docutils literal notranslate"><span class="pre">True</span></code> results in an incorrect and oversampled
-number of max_features in the views after the first two, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/scikit-tree/pull/172">#172</a>)</p>
+<dt><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  Fixes bug in <a class="reference internal" href="../generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier" title="treeple.tree.MultiViewDecisionTreeClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">treeple.tree.MultiViewDecisionTreeClassifier</span></code></a> where the max_features argument applied over</dt><dd><p>more than two views with <code class="docutils literal notranslate"><span class="pre">apply_max_features_per_set</span></code> set to <code class="docutils literal notranslate"><span class="pre">True</span></code> results in an incorrect and oversampled
+number of max_features in the views after the first two, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/172">#172</a>)</p>
 </dd>
 </dl>
 </li>
@@ -561,7 +561,7 @@ the project since version inception, including:</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, scikit-tree Developers. Last updated on 2024-06-24.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-07-09.
       <br/>
     
   </p>

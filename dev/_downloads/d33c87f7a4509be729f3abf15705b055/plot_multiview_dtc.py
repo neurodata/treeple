@@ -3,7 +3,7 @@
 Analyze a multi-view dataset with a multi-view random forest
 ============================================================
 
-An example using :class:`~sktree.MultiViewRandomForestClassifier` for high-dimensional
+An example using :class:`~treeple.MultiViewRandomForestClassifier` for high-dimensional
 classification when there are multiple feature sets that are correlated with the
 target variable, ``y``. The multi-view random forest is a variant of the random forest
 that samples from each feature set uniformly, instead of sampling from all features
@@ -28,7 +28,7 @@ import seaborn as sns
 from sklearn.datasets import make_blobs
 from sklearn.model_selection import cross_val_score
 
-from sktree import MultiViewRandomForestClassifier, RandomForestClassifier
+from treeple import MultiViewRandomForestClassifier, RandomForestClassifier
 
 seed = 12345
 rng = np.random.default_rng(seed)
