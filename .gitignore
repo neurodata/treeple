@@ -12,7 +12,6 @@ coverage
 
 commit.txt
 treeple/_lib/sklearn/
-treeple/_lib/sklearn_fork/
 
 *.png
 _data
