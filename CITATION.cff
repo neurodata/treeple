@@ -19,7 +19,7 @@ authors:
     orcid: "https://orcid.org/0000-0001-8235-4950"
 type: software
 repository-code: "https://github.com/neurodata/treeple"
-license: 'BSD-3-Clause'
+license: 'PolyForm Noncommercial 1.0.0'
 keywords:
   - random forest
   - oblique trees
