@@ -672,7 +672,8 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
         zero_mask = posteriors.sum(2) == 0
         posteriors[~zero_mask] /= posteriors[~zero_mask].sum(1, keepdims=True)
 
-        posteriors[zero_mask] = impute_missing
+        if impute_missing is not None:
+            posteriors[zero_mask] = impute_missing
 
         # preserve shape of multi-outputs
         if self.n_outputs_ > 1:
