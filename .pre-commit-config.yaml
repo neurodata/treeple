@@ -83,5 +83,5 @@ repos:
           - tomli
         files: ^(?!doc/use\.rst$).*\.(rst|inc)$
 
-ci:
-  autofix_prs: true
+# ci:
+#   autofix_prs: true
