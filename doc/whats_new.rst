@@ -7,9 +7,9 @@
 Release History
 ===============
 
-Release notes for all scikit-tree releases are linked in this page.
+Release notes for all treeple releases are linked in this page.
 
-**Tip:** `Subscribe to scikit-tree releases <https://libraries.io/pypi/scikit-tree>`__
+**Tip:** `Subscribe to treeple releases <https://libraries.io/pypi/treeple>`__
 on libraries.io to be notified when new versions are released.
 
 .. toctree::

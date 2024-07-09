@@ -4,7 +4,7 @@ from time import time
 import numpy as np
 from numpy import random as nr
 
-from sktree import UnsupervisedObliqueRandomForest, UnsupervisedRandomForest
+from treeple import UnsupervisedObliqueRandomForest, UnsupervisedRandomForest
 
 
 def compute_bench(samples_range, features_range):

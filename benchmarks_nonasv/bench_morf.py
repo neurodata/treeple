@@ -30,7 +30,7 @@ from time import perf_counter
 import numpy as np
 from sklearn.datasets import make_classification, make_low_rank_matrix, make_regression
 
-from sktree import PatchObliqueRandomForestClassifier, PatchObliqueRandomForestRegressor
+from treeple import PatchObliqueRandomForestClassifier, PatchObliqueRandomForestRegressor
 
 
 def make_poisson_data(n_samples, n_features=50, random_state=0, has_missing=False):
