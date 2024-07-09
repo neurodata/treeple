@@ -1,4 +1,4 @@
-from sktree.ensemble import ObliqueRandomForestClassifier
+from treeple.ensemble import ObliqueRandomForestClassifier
 
 from .common import Benchmark, Estimator, Predictor
 from .datasets import (

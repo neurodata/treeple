@@ -7,9 +7,9 @@ Calculating p-value (MIGHT)
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from sktree.datasets import make_trunk_classification
-from sktree.ensemble import HonestForestClassifier
-from sktree.stats import PermutationHonestForestClassifier, build_coleman_forest
+from treeple.datasets import make_trunk_classification
+from treeple.ensemble import HonestForestClassifier
+from treeple.stats import PermutationHonestForestClassifier, build_coleman_forest
 
 sns.set(color_codes=True, style="white", context="talk", font_scale=1.5)
 PALETTE = sns.color_palette("Set1")

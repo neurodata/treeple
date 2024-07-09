@@ -3,7 +3,7 @@
 Oblique Random Forests
 ----------------------
 
-In oblique random forests (see :class:`~sktree.ObliqueRandomForestClassifier` and
+In oblique random forests (see :class:`~treeple.ObliqueRandomForestClassifier` and
 `ObliqueRandomForestRegressor` classes), each tree in the ensemble is built
 from a sample drawn with replacement (i.e., a bootstrap sample) from the
 training set. The oblique random forest is the same as that of a random forest,
@@ -40,7 +40,7 @@ respect to the predictability of the target variable. Features used at
 the top of the tree contribute to the final prediction decision of a
 larger fraction of the input samples. The **expected fraction of the
 samples** they contribute to can thus be used as an estimate of the
-**relative importance of the features**. In scikit-tree, the fraction of
+**relative importance of the features**. In treeple, the fraction of
 samples a feature contributes to is combined with the decrease in impurity
 from splitting them to create a normalized estimate of the predictive power
 of that feature. This is essentially exactly the same it is done in scikit-learn.

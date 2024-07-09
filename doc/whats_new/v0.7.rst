@@ -1,7 +1,7 @@
 :orphan:
 
 .. include:: _contributors.rst
-.. currentmodule:: sktree
+.. currentmodule:: treeple
 
 .. _v0_7:
 
@@ -19,7 +19,7 @@ Changelog
 ---------
 
 - |Feature| Introduce a new light-weight class for fitting honest forests while
-    permuting the covariate index :class:`sktree.stats.PermutationHonestForestClassifier`,
+    permuting the covariate index :class:`treeple.stats.PermutationHonestForestClassifier`,
     by `Adam Li`_ (:pr:`#211`)
 - |Feature| Introduce a new class method ``predict_proba_per_tree`` for all
     Forest classifiers, which will predict the probability per tree and keep the
@@ -30,12 +30,12 @@ Changelog
     by `Adam Li`_ (:pr:`#211`)
 - |Feature| Introduce a new set of simulations based on Marron and Wand 1992.
     by `Sambit Panda`_ (:pr:`#203`)
-- |Feature| :func:`sktree.stats.build_coleman_forest` and :func:`sktree.stats.build_permutation_forest`
+- |Feature| :func:`treeple.stats.build_coleman_forest` and :func:`treeple.stats.build_permutation_forest`
     are added to compute p-values given an estimator and permutation-estimator, `Adam Li`_ (:pr:`#222`)
-- |API| :func:`sktree.datasets.make_trunk_classification` for generating trunk mixture and Marron-Wand
-    simulations are separated out into :func:`sktree.datasets.make_marron_wand_classification` and
-    :func:`sktree.datasets.make_trunk_mixture_classification`, `Adam Li`_ (:pr:`#227`)
-- |API| :class:`sktree.HonestForestClassifier` and :class:`sktree.tree.HonestTreeClassifier`
+- |API| :func:`treeple.datasets.make_trunk_classification` for generating trunk mixture and Marron-Wand
+    simulations are separated out into :func:`treeple.datasets.make_marron_wand_classification` and
+    :func:`treeple.datasets.make_trunk_mixture_classification`, `Adam Li`_ (:pr:`#227`)
+- |API| :class:`treeple.HonestForestClassifier` and :class:`treeple.tree.HonestTreeClassifier`
     now overwrite all parameters set by the underlying ``tree_estimator`` and allow you to directly
     pass any extra parameters that ``tree_estimator`` has compared to the original
     :class:`~sklearn.tree.DecisionTreeClassifier`, `Adam Li`_ (:pr:`#228`)

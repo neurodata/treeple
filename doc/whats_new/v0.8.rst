@@ -1,7 +1,7 @@
 :orphan:
 
 .. include:: _contributors.rst
-.. currentmodule:: sktree
+.. currentmodule:: treeple
 
 .. _v0_9:
 
@@ -16,19 +16,19 @@ and improvements to the codebase.
 Changelog
 ---------
 
-- |Fix| Previously missing-values in ``X`` input array for sktree estimators
+- |Fix| Previously missing-values in ``X`` input array for treeple estimators
     did not raise an error, and silently ran, assuming the missing-values were
     encoded as infinity value. This is now fixed, and the estimators will raise an
     ValueError if missing-values are encountered in ``X`` input array.
     By `Adam Li`_ (:pr:`#264`)
-- |Feature| Simulations in ``sktree.datasets.hyppo`` now throw a warning instead
+- |Feature| Simulations in ``treeple.datasets.hyppo`` now throw a warning instead
     of an error when the number of samples is less than the number of dimensions.
     By `Sambit Panda`_ (:pr:`#279`)
-- |API| :class:`sktree.HonestForestClassifier` now has ``bootstrap=True`` as the default
+- |API| :class:`treeple.HonestForestClassifier` now has ``bootstrap=True`` as the default
     argument. By `Adam Li`_ (:pr:`#274`)
 - |API| Removed all instances of ``FeatureImportanceForestClassifier`` and outdated
     MIGHT code. By `Adam Li`_ (:pr:`#274`)
-- |Fix| Fixed a bug in the ``sktree.HonestForestClassifier`` where posteriors
+- |Fix| Fixed a bug in the ``treeple.HonestForestClassifier`` where posteriors
     estimated on oob samples were biased when there was a low number of samples
     due to imbalance in the classes when ``bootstrap=True``.
     By `Adam Li`_ (:pr:`#283`)
