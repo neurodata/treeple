@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: thomasjpfan/labeler@v2.5.1
         continue-on-error: true
-        if: github.repository == 'neurodata/scikit-tree'
+        if: github.repository == 'neurodata/treeple'
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
           configuration-path: ".github/label-globs.yml"

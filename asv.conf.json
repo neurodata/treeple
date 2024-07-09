@@ -4,10 +4,10 @@
     "version": 1,
 
     // The name of the project being benchmarked
-    "project": "scikit-tree",
+    "project": "treeple",
 
     // The project's homepage
-    "project_url": "https://docs.neurodata.io/scikit-tree/",
+    "project_url": "https://docs.neurodata.io/treeple/",
 
     // The URL or local path of the source code repository for the
     // project being benchmarked
@@ -57,11 +57,11 @@
     //"install_timeout": 600,
 
     // the base URL to show a commit for the project.
-    "show_commit_url": "https://github.com/neurodata/scikit-tree/commit/",
+    "show_commit_url": "https://github.com/neurodata/treeple/commit/",
 
     // The Pythons you'd like to test against. If not provided, defaults
     // to the current version of Python used to run `asv`.
-    // "pythons": ["/Users/adam2392/miniforge3/envs/sktree/bin/python"],
+    // "pythons": ["/Users/adam2392/miniforge3/envs/treeple/bin/python"],
 
     // The list of conda channel names to be searched for benchmark
     // dependency packages in the specified order

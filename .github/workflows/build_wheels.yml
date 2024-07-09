@@ -46,7 +46,7 @@ jobs:
       IS_32_BIT: ${{ matrix.os[2] == 'x86' }}
 
     steps:
-      - name: Checkout scikit-tree
+      - name: Checkout treeple
         uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
@@ -136,7 +136,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout scikit-tree
+      - name: Checkout treeple
         uses: actions/checkout@v4
 
       - name: Setup Python

@@ -17,34 +17,34 @@ sys.path.append(
     os.path.abspath(os.path.join(curdir, "../build-install/usr/lib/python3.9/site-packages/"))
 )
 sys.path.insert(0, os.path.abspath("sphinxext"))
-import sktree
-from sktree._lib.sklearn.ensemble._forest import ExtraTreesClassifier  # noqa
-from sktree._lib.sklearn.ensemble._forest import ExtraTreesRegressor  # noqa
-from sktree._lib.sklearn.ensemble._forest import RandomForestClassifier  # noqa
-from sktree._lib.sklearn.ensemble._forest import RandomForestRegressor  # noqa
+import treeple
+from treeple._lib.sklearn.ensemble._forest import ExtraTreesClassifier  # noqa
+from treeple._lib.sklearn.ensemble._forest import ExtraTreesRegressor  # noqa
+from treeple._lib.sklearn.ensemble._forest import RandomForestClassifier  # noqa
+from treeple._lib.sklearn.ensemble._forest import RandomForestRegressor  # noqa
 
-sys.path.append(os.path.abspath(os.path.join(curdir, "..", "sktree")))
-sys.path.append(os.path.abspath(os.path.join(curdir, "..", "sktree/_lib")))
+sys.path.append(os.path.abspath(os.path.join(curdir, "..", "treeple")))
+sys.path.append(os.path.abspath(os.path.join(curdir, "..", "treeple/_lib")))
 
 # -- project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 # General information about the project.
-project = "scikit-tree"
+project = "treeple"
 author = "Adam Li <adam.li@columbia.edu>"
 td = date.today()
-copyright = f"2022-{td.year}, scikit-tree Developers. Last updated on {td.isoformat()}"
+copyright = f"2022-{td.year}, treeple Developers. Last updated on {td.isoformat()}"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # The short X.Y version.
-version = sktree.__version__
+version = treeple.__version__
 # The full version, including alpha/beta/rc tags.
 release = version
 
-gh_url = "https://github.com/neurodata/scikit-tree"
+gh_url = "https://github.com/neurodata/treeple"
 
 # -- general configuration ------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -86,8 +86,8 @@ nitpicky = False
 
 # TODO: figure out why these are raising an error?
 nitpick_ignore = [
-    ("py:mod", "sktree.tree"),
-    ("py:mod", "sktree.stats"),
+    ("py:mod", "treeple.tree"),
+    ("py:mod", "treeple.stats"),
     ("py:class", "sklearn.utils.metadata_routing.MetadataRequest"),
     ("py:obj", "MetadataRouter"),
 ]
@@ -129,7 +129,7 @@ html_theme_options = {
     "show_toc_level": 1,
     "navbar_end": ["theme-switcher", "version-switcher", "navbar-icon-links"],
     "switcher": {
-        "json_url": "https://raw.githubusercontent.com/neurodata/scikit-tree/main/doc/_static/versions.json",  # noqa: E501
+        "json_url": "https://raw.githubusercontent.com/neurodata/treeple/main/doc/_static/versions.json",  # noqa: E501
         "version_match": switcher_version_match,
     },
 }
@@ -169,13 +169,13 @@ numpydoc_xref_aliases = {
     # Python
     "Path": "pathlib.Path",
     "bool": ":class:`python:bool`",
-    "UnsupervisedDecisionTree": "sktree.tree.UnsupervisedDecisionTree",
-    "ObliqueDecisionTreeClassifier": "sktree.tree.ObliqueDecisionTreeClassifier",
-    "PatchObliqueDecisionTreeClassifier": "sktree.tree.PatchObliqueDecisionTreeClassifier",
-    "ObliqueDecisionTreeRegressor": "sktree.tree.ObliqueDecisionTreeRegressor",
-    "PatchObliqueDecisionTreeRegressor": "sktree.tree.PatchObliqueDecisionTreeRegressor",
-    "UnsupervisedObliqueRandomForest": "sktree.ensemble.UnsupervisedObliqueRandomForest",
-    "ExtraObliqueDecisionTreeRegressor": "sktree.tree.ExtraObliqueDecisionTreeRegressor",
+    "UnsupervisedDecisionTree": "treeple.tree.UnsupervisedDecisionTree",
+    "ObliqueDecisionTreeClassifier": "treeple.tree.ObliqueDecisionTreeClassifier",
+    "PatchObliqueDecisionTreeClassifier": "treeple.tree.PatchObliqueDecisionTreeClassifier",
+    "ObliqueDecisionTreeRegressor": "treeple.tree.ObliqueDecisionTreeRegressor",
+    "PatchObliqueDecisionTreeRegressor": "treeple.tree.PatchObliqueDecisionTreeRegressor",
+    "UnsupervisedObliqueRandomForest": "treeple.ensemble.UnsupervisedObliqueRandomForest",
+    "ExtraObliqueDecisionTreeRegressor": "treeple.tree.ExtraObliqueDecisionTreeRegressor",
     "DecisionTreeClassifier": "sklearn.tree.DecisionTreeClassifier",
     "DecisionTreeRegressor": "sklearn.tree.DecisionTreeRegressor",
     "ExtraTreeRegressor": "sklearn.tree.ExtraTreeRegressor",
@@ -297,7 +297,7 @@ intersphinx_mapping = {
 intersphinx_timeout = 5
 
 # -- sphinx-gallery ----------------------------------------------------------
-os.environ["_sktree_BUILDING_DOC"] = "true"
+os.environ["_treeple_BUILDING_DOC"] = "true"
 scrapers = ("matplotlib",)
 
 compress_images = ("images", "thumbnails")
@@ -310,9 +310,9 @@ if sys.platform.startswith("win"):
         compress_images = ()
 
 sphinx_gallery_conf = {
-    "doc_module": ("sktree",),
+    "doc_module": ("treeple",),
     "reference_url": {
-        "sktree": None,
+        "treeple": None,
     },
     "examples_dirs": ["../examples"],
     "gallery_dirs": ["auto_examples"],
@@ -339,7 +339,7 @@ bibtex_style = "unsrt"
 bibtex_footbibliography_header = ""
 
 # -- Sphinx-issues -----------------------------------------------------------
-issues_github_path = "neurodata/scikit-tree"
+issues_github_path = "neurodata/treeple"
 
 # -- sphinx.ext.linkcode -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/extensions/linkcode.html
@@ -383,8 +383,8 @@ issues_github_path = "neurodata/scikit-tree"
 #         branch = "main"
 #     else:
 #         return None  # alternatively, link to a maint/version branch
-#     fname = fname.split("/scikit-tree/")[1]
-#     url = f"{gh_url}/blob/{branch}/scikit-tree/{fname}#{lines}"
+#     fname = fname.split("/treeple/")[1]
+#     url = f"{gh_url}/blob/{branch}/treeple/{fname}#{lines}"
 #     return url
 
 

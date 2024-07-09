@@ -12,7 +12,7 @@ import seaborn as sns
 from scipy.stats import entropy, multivariate_normal
 from sklearn.metrics import roc_auc_score, roc_curve
 
-from sktree.datasets import make_trunk_mixture_classification
+from treeple.datasets import make_trunk_mixture_classification
 
 sns.set(color_codes=True, style="white", context="talk", font_scale=1.5)
 PALETTE = sns.color_palette("Set1")

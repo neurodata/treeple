@@ -35,13 +35,13 @@ along oblique curves. Using the Iris dataset, we can similarly construct an OT
 as follows:
 
     >>> from sklearn.datasets import load_iris
-    >>> from sktree import tree
+    >>> from treeple import tree
     >>> iris = load_iris()
     >>> X, y = iris.data, iris.target
     >>> clf = tree.ObliqueDecisionTreeClassifier()
     >>> clf = clf.fit(X, y)
 
-.. figure:: ../auto_examples/sklearn_vs_sktree/images/sphx_glr_plot_iris_dtc_002.png
+.. figure:: ../auto_examples/sklearn_vs_treeple/images/sphx_glr_plot_iris_dtc_002.png
    :target: ../auto_examples/plot_iris_dtc.html
    :align: center
 

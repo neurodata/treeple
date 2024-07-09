@@ -11,7 +11,7 @@ coverage
 .coverage.*
 
 commit.txt
-sktree/_lib/sklearn/
+treeple/_lib/sklearn/
 
 *.png
 _data
