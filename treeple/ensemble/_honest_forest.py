@@ -648,7 +648,7 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
         """
         return self._predict_proba(X)
 
-    def _predict_proba(self, X, indices=None, impute_missing=None):
+    def _predict_proba(self, X, indices=None, impute_missing=np.nan):
         """predict_proba helper class"""
         check_is_fitted(self)
         X = self._validate_X_predict(X)
