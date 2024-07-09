@@ -34,7 +34,7 @@ from sklearn.calibration import CalibratedClassifierCV
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 
-from sktree.ensemble import HonestForestClassifier
+from treeple.ensemble import HonestForestClassifier
 
 # %%
 # Define the classifiers and generate the data

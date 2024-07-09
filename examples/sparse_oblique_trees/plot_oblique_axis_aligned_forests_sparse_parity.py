@@ -25,7 +25,7 @@ import seaborn as sns
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import RepeatedKFold, cross_validate
 
-from sktree import ObliqueRandomForestClassifier
+from treeple import ObliqueRandomForestClassifier
 
 random_state = 123456
 t0 = datetime.now()

@@ -9,7 +9,7 @@ on:
     branches:
       - main
     paths:
-      - "sktree/**"
+      - "treeple/**"
 
 jobs:
   changelog:
@@ -60,7 +60,7 @@ jobs:
             echo ""
             echo "Please add an entry to the changelog at 'doc/whats_new/v*.rst'"
             echo "to document your change assuming that the PR will be merged"
-            echo "in time for the next release of scikit-tree."
+            echo "in time for the next release of treeple."
             echo ""
             echo "Look at other entries in that file for inspiration and please"
             echo "reference this pull request using the ':pr:' directive and"

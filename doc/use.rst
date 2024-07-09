@@ -1,9 +1,9 @@
 :orphan:
 
-Examples using scikit-tree
+Examples using treeple
 ==========================
 
-To be able to effectively use scikit-tree, look at some of the examples here
+To be able to effectively use treeple, look at some of the examples here
 to learn everything you need!
 
 .. rstcheck: ignore-next-code-block

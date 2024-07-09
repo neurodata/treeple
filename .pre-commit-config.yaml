@@ -20,14 +20,14 @@ repos:
       - id: cython-lint
       - id: double-quote-cython-strings
 
-  # Ruff sktree
+  # Ruff treeple
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.5.1
     hooks:
       - id: ruff
-        name: ruff sktree
+        name: ruff treeple
         args: ["--fix"]
-        files: ^sktree/
+        files: ^treeple/
 
   # Ruff tutorials and examples
   - repo: https://github.com/astral-sh/ruff-pre-commit
@@ -47,7 +47,7 @@ repos:
       - id: codespell
         additional_dependencies:
           - tomli
-        files: ^sktree/|^doc/|^examples/|^tutorials/
+        files: ^treeple/|^doc/|^examples/|^tutorials/
         types_or: [python, bib, rst, inc]
 
   # yamllint

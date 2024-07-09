@@ -1,15 +1,15 @@
 Cython:
-  - sktree/**/*.pyx.*
-  - sktree/**/*.pxd.*
-  - sktree/**/*.pxi.*
+  - treeple/**/*.pyx.*
+  - treeple/**/*.pxd.*
+  - treeple/**/*.pxi.*
 
 C/C++:
-  - sktree/**/*.c
-  - sktree/**/*.c.in
-  - sktree/**/*.c.old
-  - sktree/**/*.h
-  - sktree/**/*.h.in
-  - sktree/**/*.cpp
-  - sktree/**/*.cc
-  - sktree/**/*.cxx
-  - sktree/**/*.hpp
+  - treeple/**/*.c
+  - treeple/**/*.c.in
+  - treeple/**/*.c.old
+  - treeple/**/*.h
+  - treeple/**/*.h.in
+  - treeple/**/*.cpp
+  - treeple/**/*.cc
+  - treeple/**/*.cxx
+  - treeple/**/*.hpp

@@ -20,8 +20,8 @@ def coverage(ctx, slowtest=True):
         pytest_args = (
             "-o",
             "python_functions=test_*",
-            "sktree",
-            "--cov=sktree",
+            "treeple",
+            "--cov=treeple",
             "--cov-report=xml",
             "--cov-config=pyproject.toml",
             "-k .",
@@ -30,8 +30,8 @@ def coverage(ctx, slowtest=True):
         pytest_args = (
             "-o",
             "python_functions=test_*",
-            "sktree",
-            "--cov=sktree",
+            "treeple",
+            "--cov=treeple",
             "--cov-report=xml",
             "--cov-config=pyproject.toml",
         )
@@ -46,9 +46,9 @@ def coverage(ctx, slowtest=True):
 @click.command()
 @click.option("--forcesubmodule", is_flag=False, help="Force submodule pull.")
 def setup_submodule(forcesubmodule=False):
-    """Build scikit-tree using submodules.
+    """Build treeple using submodules.
 
-    git submodule set-branch -b submodulev3 sktree/_lib/sklearn
+    git submodule set-branch -b submodulev3 treeple/_lib/sklearn
 
     git submodule update --recursive --remote
 
@@ -61,13 +61,13 @@ def setup_submodule(forcesubmodule=False):
     This will update the submodule, which then must be commited so that
     git knows the submodule needs to be at a certain commit hash.
     """
-    commit_fpath = "./sktree/_lib/commit.txt"
-    submodule = "./sktree/_lib/sklearn_fork"
+    commit_fpath = "./treeple/_lib/commit.txt"
+    submodule = "./treeple/_lib/sklearn_fork"
     commit = ""
     current_hash = ""
 
     # if the forked folder does not exist, we will need to force update the submodule
-    if not os.path.exists("./sktree/_lib/sklearn/") or forcesubmodule:
+    if not os.path.exists("./treeple/_lib/sklearn/") or forcesubmodule:
         # update git submodule
         util.run(["git", "submodule", "update", "--init", "--force"])
     else:
@@ -100,7 +100,7 @@ def setup_submodule(forcesubmodule=False):
             [
                 "mkdir",
                 "-p",
-                "./sktree/_lib/sklearn/",
+                "./treeple/_lib/sklearn/",
             ],
         )
         util.run(
@@ -117,17 +117,17 @@ def setup_submodule(forcesubmodule=False):
             [
                 "rm",
                 "-rf",
-                "sktree/_lib/sklearn",
+                "treeple/_lib/sklearn",
             ]
         )
 
-        if os.path.exists("sktree/_lib/sklearn_fork/sklearn") and (commit != current_hash):
+        if os.path.exists("treeple/_lib/sklearn_fork/sklearn") and (commit != current_hash):
             util.run(
                 [
                     "cp",
                     "-r",
-                    "sktree/_lib/sklearn_fork/sklearn",
-                    "sktree/_lib/sklearn",
+                    "treeple/_lib/sklearn_fork/sklearn",
+                    "treeple/_lib/sklearn",
                 ]
             )
 
@@ -155,7 +155,7 @@ def build(
     gcov=False,
     forcesubmodule=False,
 ):
-    """Build scikit-tree using submodules.
+    """Build treeple using submodules.
 
         git submodule update --recursive --remote
 
@@ -195,7 +195,7 @@ def asv(asv_args):
     """
     site_path = meson._get_site_packages()
     if site_path is None:
-        print("No built scikit-tree found; run `spin build` first.")
+        print("No built treeple found; run `spin build` first.")
         sys.exit(1)
 
     os.environ["ASV_ENV_DIR"] = "/Users/adam2392/miniforge3"
