@@ -1956,7 +1956,7 @@ document.write(`
     <span class="k">def</span> <span class="nf">_more_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># XXX: nan is only support for dense arrays, but we set this for common test to</span>
         <span class="c1"># pass, specifically: check_estimators_nan_inf</span>
-        <span class="n">allow_nan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splitter</span> <span class="o">==</span> <span class="s2">&quot;best&quot;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span> <span class="ow">in</span> <span class="p">{</span>
+        <span class="n">allow_nan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splitter</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;best&quot;</span><span class="p">,</span> <span class="s2">&quot;random&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span> <span class="ow">in</span> <span class="p">{</span>
             <span class="s2">&quot;gini&quot;</span><span class="p">,</span>
             <span class="s2">&quot;log_loss&quot;</span><span class="p">,</span>
             <span class="s2">&quot;entropy&quot;</span><span class="p">,</span>
@@ -2328,7 +2328,7 @@ document.write(`
     <span class="k">def</span> <span class="nf">_more_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># XXX: nan is only support for dense arrays, but we set this for common test to</span>
         <span class="c1"># pass, specifically: check_estimators_nan_inf</span>
-        <span class="n">allow_nan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splitter</span> <span class="o">==</span> <span class="s2">&quot;best&quot;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span> <span class="ow">in</span> <span class="p">{</span>
+        <span class="n">allow_nan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splitter</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;best&quot;</span><span class="p">,</span> <span class="s2">&quot;random&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span> <span class="ow">in</span> <span class="p">{</span>
             <span class="s2">&quot;squared_error&quot;</span><span class="p">,</span>
             <span class="s2">&quot;friedman_mse&quot;</span><span class="p">,</span>
             <span class="s2">&quot;poisson&quot;</span><span class="p">,</span>
@@ -2634,7 +2634,17 @@ document.write(`
             <span class="n">ccp_alpha</span><span class="o">=</span><span class="n">ccp_alpha</span><span class="p">,</span>
             <span class="n">store_leaf_values</span><span class="o">=</span><span class="n">store_leaf_values</span><span class="p">,</span>
             <span class="n">monotonic_cst</span><span class="o">=</span><span class="n">monotonic_cst</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_more_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># XXX: nan is only supported for dense arrays, but we set this for the</span>
+        <span class="c1"># common test to pass, specifically: check_estimators_nan_inf</span>
+        <span class="n">allow_nan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splitter</span> <span class="o">==</span> <span class="s2">&quot;random&quot;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span> <span class="ow">in</span> <span class="p">{</span>
+            <span class="s2">&quot;gini&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;log_loss&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;entropy&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;multilabel&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;allow_nan&quot;</span><span class="p">:</span> <span class="n">allow_nan</span><span class="p">}</span></div>
 
 
 
@@ -2905,7 +2915,17 @@ document.write(`
             <span class="n">ccp_alpha</span><span class="o">=</span><span class="n">ccp_alpha</span><span class="p">,</span>
             <span class="n">store_leaf_values</span><span class="o">=</span><span class="n">store_leaf_values</span><span class="p">,</span>
             <span class="n">monotonic_cst</span><span class="o">=</span><span class="n">monotonic_cst</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_more_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># XXX: nan is only supported for dense arrays, but we set this for the</span>
+        <span class="c1"># common test to pass, specifically: check_estimators_nan_inf</span>
+        <span class="n">allow_nan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splitter</span> <span class="o">==</span> <span class="s2">&quot;random&quot;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span> <span class="ow">in</span> <span class="p">{</span>
+            <span class="s2">&quot;squared_error&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;friedman_mse&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;poisson&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;allow_nan&quot;</span><span class="p">:</span> <span class="n">allow_nan</span><span class="p">}</span></div>
 
 </pre></div>
 
@@ -2947,7 +2967,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, treeple Developers. Last updated on 2024-07-09.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-07-11.
       <br/>
     
   </p>
