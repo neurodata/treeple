@@ -17,12 +17,12 @@ requires = [
 
 [project]
 name = "treeple"
-version = "0.9.0dev0"
+version = "0.9.0"
 description = "Modern decision trees in Python"
 maintainers = [
   {name = "Neurodata", email = "adam.li@columbia.edu"}
 ]
-documentation = "https://treeple.neurodata.io"
+documentation = "https://treeple.ai"
 repository = "https://github.com/neurodata/treeple"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -30,7 +30,7 @@ classifiers = [
   'Development Status :: 4 - Beta',
   "Intended Audience :: Science/Research",
   "Intended Audience :: Developers",
-  "License :: OSI Approved :: BSD License",
+  "License :: Free for non-commercial use",
   "Programming Language :: C",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
