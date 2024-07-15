@@ -21,7 +21,7 @@ Changelog
 ---------
 
 - |API| Rename the package to ``treeple``. By `SUKI-O`_ (:pr:`#292`)
-- |Fix| Fixed a bug in the :class:`treeple.HonestForestClassifier` where posteriors
+- |Fix| Fixed a bug in the predict_proba function of the :class:`treeple.HonestForestClassifier` where posteriors
     estimated on empty leaf with ``ignore`` prior would result in ``np.nan``
     values for all trees on that sample.
     By `Haoyin Xu`_ (:pr:`#291`)
