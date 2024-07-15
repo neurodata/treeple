@@ -263,6 +263,23 @@ def test_impute_posteriors(honest_prior, val):
         ), f"Failed with {honest_prior}, prior {clf.estimators_[0].empirical_prior_}"
 
 
+def test_honestforest_predict_proba_with_honest_prior():
+    X = rng.normal(0, 1, (100, 2))
+    y = [0] * 75 + [1] * 25
+    honest_prior = "ignore"
+    clf = HonestForestClassifier(
+        honest_fraction=0.5, random_state=0, honest_prior=honest_prior, n_estimators=100
+    )
+    clf = clf.fit(X, y)
+
+    y_proba = clf.predict_proba(X)
+
+    # With enough trees no nan values should exist
+    assert (
+        len(np.where(np.isnan(y_proba[:, 0]))[0]) == 0
+    ), f"Failed with {honest_prior}, prior {clf.estimators_[0].empirical_prior_}"
+
+
 @pytest.mark.parametrize(
     "honest_fraction, val",
     [
