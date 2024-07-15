@@ -697,7 +697,7 @@ document.write(`
 <span class="sd">        - If int, then draw `max_samples` samples.</span>
 <span class="sd">        - If float, then draw `max_samples * X.shape[0]` samples.</span>
 
-<span class="sd">    honest_prior : {&quot;ignore&quot;, &quot;uniform&quot;, &quot;empirical&quot;}, default=&quot;empirical&quot;</span>
+<span class="sd">    honest_prior : {&quot;ignore&quot;, &quot;uniform&quot;, &quot;empirical&quot;}, default=&quot;ignore&quot;</span>
 <span class="sd">        Method for dealing with empty leaves during evaluation of a test</span>
 <span class="sd">        sample. If &quot;ignore&quot;, the tree is ignored. If &quot;uniform&quot;, the prior tree</span>
 <span class="sd">        posterior is 1/(number of classes). If &quot;empirical&quot;, the prior tree</span>
@@ -882,7 +882,7 @@ document.write(`
         <span class="n">class_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">ccp_alpha</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
         <span class="n">max_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">honest_prior</span><span class="o">=</span><span class="s2">&quot;empirical&quot;</span><span class="p">,</span>
+        <span class="n">honest_prior</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span>
         <span class="n">honest_fraction</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
         <span class="n">tree_estimator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">stratify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -1092,7 +1092,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_proba</span><span class="p">(</span><span class="n">X</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_predict_proba</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">impute_missing</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_predict_proba</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">impute_missing</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;predict_proba helper class&quot;&quot;&quot;</span>
         <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_X_predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
@@ -1116,10 +1116,7 @@ document.write(`
         <span class="n">zero_mask</span> <span class="o">=</span> <span class="n">posteriors</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
         <span class="n">posteriors</span><span class="p">[</span><span class="o">~</span><span class="n">zero_mask</span><span class="p">]</span> <span class="o">/=</span> <span class="n">posteriors</span><span class="p">[</span><span class="o">~</span><span class="n">zero_mask</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">impute_missing</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">pass</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">posteriors</span><span class="p">[</span><span class="n">zero_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">impute_missing</span>
+        <span class="n">posteriors</span><span class="p">[</span><span class="n">zero_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">impute_missing</span>
 
         <span class="c1"># preserve shape of multi-outputs</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
@@ -1277,10 +1274,10 @@ document.write(`
 
     <span class="k">with</span> <span class="n">lock</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">indices</span><span class="p">]</span> <span class="o">+=</span> <span class="n">proba</span>
+            <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">indices</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">([</span><span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">indices</span><span class="p">],</span> <span class="n">proba</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="p">)):</span>
-                <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">indices</span><span class="p">]</span> <span class="o">+=</span> <span class="n">proba</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">indices</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">([</span><span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">indices</span><span class="p">],</span> <span class="n">proba</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 
                 </article>
@@ -1321,7 +1318,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, treeple Developers. Last updated on 2024-07-11.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-07-15.
       <br/>
     
   </p>
