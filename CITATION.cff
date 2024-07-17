@@ -17,6 +17,9 @@ authors:
     family-names: Xu
     affiliation: "Department of Biomedical Engineering, Johns Hopkins University, Baltimore, MD, USA"
     orcid: "https://orcid.org/0000-0001-8235-4950"
+  - given-names: Itsuki
+    family-names: Ogihara
+    affiliation: "Department of Biomedical Engineering, Johns Hopkins University, Baltimore, MD, USA"
 type: software
 repository-code: "https://github.com/neurodata/treeple"
 license: 'PolyForm-Noncommercial-1.0.0'

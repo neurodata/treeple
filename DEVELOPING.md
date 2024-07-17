@@ -115,11 +115,14 @@ In order to develop new tree models, generally Cython and C++ code will need to 
 
 treeple is in-line with scikit-learn and thus relies on each new version released there. Moreover, treeple relies on compiled code, so releases are a bit more complex than the typical Python package.
 
+GH Actions will build wheels for each Python version and OS. Then the wheels needs to be uploaded to PyPi. The following steps outline the process:
+
 1. Download wheels from GH Actions and put all wheels into a ``dist/`` folder
 
 <https://github.com/neurodata/treeple/actions/workflows/build_wheels.yml> will have all the wheels for common OSes built for each Python version.
 
 2. Upload wheels to test PyPi
+This is to ensure that the wheels are built correctly and can be installed on a fresh environment. For more information, see <https://packaging.python.org/guides/using-testpypi/>. You will need to follow the instructions to create an account and get your API token for testpypi and pypi. 
 
 ```
 twine upload dist/* --repository testpypi
