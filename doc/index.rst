@@ -5,10 +5,8 @@ learning problems. It extends the robust API of `scikit-learn <https://github.co
 for tree algorithms that achieve strong performance in benchmark tasks.
 
 Our package has implemented unsupervised forests (Geodesic Forests
-[Madhyastha2020]_), oblique random forests (SPORF [Tomita2020]_ and
-MORF [Li2023]_), and honest forests [Perry2021]_.
-In the near future, we also plan to include extended isolation forests
-and stream decision forests [Xu2022]_.
+[Madhyastha2020]_), oblique random forests (SPORF [Tomita2020]_, manifold random forests,
+MORF [Li2023]_), honest forests [Perry2021]_, extended isolation forests [Hariri2019]_, and more.
 
 We encourage you to use the package for your research and also build on top
 with relevant Pull Requests. See our examples for walk-throughs of how to use the package.
@@ -17,6 +15,10 @@ Also, see our `contributing guide <https://github.com/neurodata/treeple/blob/mai
 We are licensed under BSD-3 (see `License <https://github.com/neurodata/treeple/blob/main/LICENSE>`_).
 
 .. topic:: References
+
+ .. [Hariri2019] Hariri, Sahand, Matias Carrasco Kind, and Robert J. Brunner.
+   "Extended isolation forest." IEEE transactions on knowledge and data
+   engineering 33.4 (2019): 1479-1489.
 
  .. [Madhyastha2020] Madhyastha, Meghana, et al. :doi:`"Geodesic Forests"
     <10.1145/3394486.3403094>`, KDD 2020, 513-523, 2020.
