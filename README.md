@@ -21,6 +21,13 @@ Documentation
 
 See here for the documentation for our dev version: <https://docs.neurodata.io/treeple/dev/index.html>
 
+Is treeple useful for me?
+=========================
+
+1. If you use decision tree models (random forest, extra trees, isolation forests, etc.) in your work, treeple is a good package to try out. We have a variety of better tree models that are not available in scikit-learn, and we are always looking for new tree models to implement. For example, oblique decision trees are in general better than their axis-aligned counterparts.
+
+2. If you are interested in extending the decision tree API in scikit-learn, treeple is a good package to try out. We have a variety of internal APIs that are not available in scikit-learn, and are able to support new decision tree models easier.
+
 Why oblique trees and why trees beyond those in scikit-learn?
 =============================================================
 
