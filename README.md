@@ -48,72 +48,10 @@ Installing with pip on a conda environment is the recommended route.
 
     pip install treeple
 
-Building locally with Meson (For developers)
---------------------------------------------
-
-Make sure you have the necessary packages installed
-
-    # install build dependencies
-    pip install -r build_requirements.txt
-
-    # you may need these optional dependencies to build scikit-learn locally
-    conda install -c conda-forge joblib threadpoolctl pytest compilers llvm-openmp
-
-We use the ``spin`` CLI to abstract away build details:
-
-    # run the build using Meson/Ninja
-    ./spin build
-
-    # you can run the following command to see what other options there are
-    ./spin --help
-    ./spin build --help
-
-    # For example, you might want to start from a clean build
-    ./spin build --clean
-
-    # or build in parallel for faster builds
-    ./spin build -j 2
-
-    # you will need to double check the build-install has the proper path
-    # this might be different from machine to machine
-    export PYTHONPATH=${PWD}/build-install/usr/lib/python3.9/site-packages
-
-    # run specific unit tests
-    ./spin test -- treeple/tree/tests/test_tree.py
-
-    # you can bring up the CLI menu
-    ./spin --help
-
-You can also do the same thing using Meson/Ninja itself. Run the following to build the local files:
-
-    # generate ninja make files
-    meson build --prefix=$PWD/build
-
-    # compile
-    ninja -C build
-
-    # install treeple package
-    meson install -C build
-
-    export PYTHONPATH=${PWD}/build/lib/python3.9/site-packages
-
-    # to check installation, you need to be in a different directory
-    cd docs;  
-    python -c "from treeple import tree"
-    python -c "import sklearn; print(sklearn.__version__);"
-
-After building locally, you can use editable installs (warning: this only registers Python changes locally)
-
-    pip install --no-build-isolation --editable .
-
-Or if you have spin v0.8+ installed, you can just run directly
-
-    spin install
-
 Development
 ===========
 
-We welcome contributions for modern tree-based algorithms. We use Cython to achieve fast C/C++ speeds, while abiding by a scikit-learn compatible (tested) API. Moreover, our Cython internals are easily extensible because they follow the internal Cython API of scikit-learn as well.
+We welcome contributions for modern tree-based algorithms. We use Cython to achieve fast C/C++ speeds, while abiding by a scikit-learn compatible (tested) API. We also will welcome contributions in C/C++ if they improve the extensibility, or runtime performance of the codebase. Our Cython internals are easily extensible because they follow the internal Cython API of scikit-learn as well.
 
 Due to the current state of scikit-learn's internal Cython code for trees, we have to instead leverage a fork of scikit-learn at <https://github.com/neurodata/scikit-learn> when
 extending the decision tree model API of scikit-learn. Specifically, we extend the Python and Cython API of the tree submodule in scikit-learn in our submodule, so we can introduce the tree models housed in this package. Thus these extend the functionality of decision-tree based models in a way that is not possible yet in scikit-learn itself. As one example, we introduce an abstract API to allow users to implement their own oblique splits. Our plan in the future is to benchmark these functionalities and introduce them upstream to scikit-learn where applicable and inclusion criterion are met.
