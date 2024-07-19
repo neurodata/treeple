@@ -436,10 +436,10 @@ document.write(`
 learning problems. It extends the robust API of <a class="reference external" href="https://github.com/scikit-learn/scikit-learn">scikit-learn</a>
 for tree algorithms that achieve strong performance in benchmark tasks.</p>
 <p>Our package has implemented unsupervised forests (Geodesic Forests
-<a class="reference internal" href="#madhyastha2020" id="id1"><span>[Madhyastha2020]</span></a>), oblique random forests (SPORF <a class="reference internal" href="#tomita2020" id="id2"><span>[Tomita2020]</span></a> and
-MORF <a class="reference internal" href="#li2023" id="id3"><span>[Li2023]</span></a>), and honest forests <a class="reference internal" href="#perry2021" id="id4"><span>[Perry2021]</span></a>.
-In the near future, we also plan to include extended isolation forests
-and stream decision forests <a class="reference internal" href="#xu2022" id="id5"><span>[Xu2022]</span></a>.</p>
+<a class="reference internal" href="#madhyastha2020" id="id1"><span>[Madhyastha2020]</span></a>), oblique random forests (SPORF <a class="reference internal" href="#tomita2020" id="id2"><span>[Tomita2020]</span></a>, manifold random forests,
+MORF <a class="reference internal" href="#li2023" id="id3"><span>[Li2023]</span></a>), honest forests <a class="reference internal" href="#perry2021" id="id4"><span>[Perry2021]</span></a>, extended isolation forests <a class="reference internal" href="#hariri2019" id="id5"><span>[Hariri2019]</span></a>, and more.</p>
+<p>For all forests, we also support incremental building of the forests, using the
+<code class="docutils literal notranslate"><span class="pre">partial_fit</span></code> API from scikit-learn <a class="reference internal" href="#xu2022" id="id6"><span>[Xu2022]</span></a>.</p>
 <p>We encourage you to use the package for your research and also build on top
 with relevant Pull Requests. See our examples for walk-throughs of how to use the package.
 Also, see our <a class="reference external" href="https://github.com/neurodata/treeple/blob/main/CONTRIBUTING.md">contributing guide</a>.</p>
@@ -447,6 +447,12 @@ Also, see our <a class="reference external" href="https://github.com/neurodata/t
 <aside class="topic">
 <p class="topic-title">References</p>
 <div role="list" class="citation-list">
+<div class="citation" id="hariri2019" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">Hariri2019</a><span class="fn-bracket">]</span></span>
+<p>Hariri, Sahand, Matias Carrasco Kind, and Robert J. Brunner.
+“Extended isolation forest.” IEEE transactions on knowledge and data
+engineering 33.4 (2019): 1479-1489.</p>
+</div>
 <div class="citation" id="madhyastha2020" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">Madhyastha2020</a><span class="fn-bracket">]</span></span>
 <p>Madhyastha, Meghana, et al. <a class="reference external" href="https://doi.org/10.1145/3394486.3403094">“Geodesic Forests”</a>, KDD 2020, 513-523, 2020.</p>
@@ -469,7 +475,7 @@ SIAM Journal on Mathematics of Data Science, 5(1), 77-96, 2023.</p>
 Nearest Neighbor Estimation of Information-Theoretic Quantities”</a>, arXiv preprint arXiv:1907.00325, 2021.</p>
 </div>
 <div class="citation" id="xu2022" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">Xu2022</a><span class="fn-bracket">]</span></span>
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id6">Xu2022</a><span class="fn-bracket">]</span></span>
 <p>Xu, Haoyin, et al. <a class="reference external" href="https://arxiv.org/abs/2110.08483">“Simplest Streaming Trees”</a>, arXiv preprint arXiv:2110.08483, 2022.</p>
 </div>
 </div>
@@ -602,7 +608,7 @@ Nearest Neighbor Estimation of Information-Theoretic Quantities”</a>, arXiv pr
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, treeple Developers. Last updated on 2024-07-18.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-07-19.
       <br/>
     
   </p>
