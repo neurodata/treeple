@@ -3,19 +3,22 @@
 - [Requirements](#requirements)
 - [Setting up your development environment](#setting-up-your-development-environment)
 - [Building the project from source](#building-the-project-from-source)
+    - [Summary: Building locally with Meson For developers](#summary-building-locally-with-meson-for-developers)
 - [Development Tasks](#development-tasks)
 - [Advanced Updating submodules](#advanced-updating-submodules)
 - [Cython and C++](#cython-and-c)
 - [Making a Release](#making-a-release)
+    - [Releasing on PyPi for pip installs](#releasing-on-pypi-for-pip-installs)
+    - [Releasing documentation](#releasing-documentation)
 
 <!-- /TOC -->
 
 # Requirements
 
 - Python 3.9+
-- numpy>=1.25
-- scipy>=1.11
-- scikit-learn>=1.3.1
+- numpy>=1.25.0
+- scipy>=1.5.0
+- scikit-learn>=1.4.1
 
 For the other requirements, inspect the ``pyproject.toml`` file.
 
@@ -70,21 +73,82 @@ For other commands, see
 
 Note at this stage, you will be unable to run Python commands directly. For example, ``pytest ./treeple`` will not work.
 
-However, after installing and building the project from source using meson, you can leverage editable installs to make testing code changes much faster. For more information on meson-python's progress supporting editable installs in a better fashion, see <https://meson-python.readthedocs.io/en/latest/how-to-guides/editable-installs.html>.
+However, after installing and building the project from source using meson, you can leverage editable installs to make testing code changes much faster.
 
-    pip install --no-build-isolation --editable .
+    spin install
 
-**Note: editable installs for treeple REQUIRE you to have built the project using meson already.** This will now link the meson build to your Python runtime. Now if you run
+This will now link the meson build to your Python runtime. Now if you run
 
     pytest ./treeple
 
 the unit-tests should run.
 
+Summary: Building locally with Meson (For developers)
+-----------------------------------------------------
+Make sure you have the necessary packages installed.
+
+    # install build dependencies
+    pip install -r build_requirements.txt
+
+    # you may need these optional dependencies to build scikit-learn locally
+    conda install -c conda-forge joblib threadpoolctl pytest compilers llvm-openmp
+
+``YOUR_PYTHON_VERSION`` below should be any of the acceptable versions of Python for treeple. We use the ``spin`` CLI to abstract away build details:
+
+    # run the build using Meson/Ninja
+    ./spin build
+
+    # you can run the following command to see what other options there are
+    ./spin --help
+    ./spin build --help
+
+    # For example, you might want to start from a clean build
+    ./spin build --clean
+
+    # or build in parallel for faster builds
+    ./spin build -j 2
+
+    # you will need to double check the build-install has the proper path
+    # this might be different from machine to machine
+    export PYTHONPATH=${PWD}/build-install/usr/lib/python<YOUR_PYTHON_VERSION>/site-packages
+
+    # run specific unit tests
+    ./spin test -- treeple/tree/tests/test_tree.py
+
+    # you can bring up the CLI menu
+    ./spin --help
+
+You can also do the same thing using Meson/Ninja itself. Run the following to build the local files:
+
+    # generate ninja make files
+    meson build --prefix=$PWD/build
+
+    # compile
+    ninja -C build
+
+    # install treeple package
+    meson install -C build
+
+    export PYTHONPATH=${PWD}/build/lib/python<YOUR_PYTHON_VERSION>/site-packages
+
+    # to check installation, you need to be in a different directory
+    cd docs;  
+    python -c "from treeple import tree"
+    python -c "import sklearn; print(sklearn.__version__);"
+
+After building locally, you can use editable installs (warning: this only registers Python changes locally)
+
+    pip install --no-build-isolation --editable .
+
+Or if you have spin v0.8+ installed, you can just run directly
+
+    spin install
+
 # Development Tasks
 
 There are a series of top-level tasks available.
 
-    make run-checks
+    make pre-commit
 
 This leverage pre-commit to run a series of precommit checks.
 
@@ -115,6 +179,8 @@ In order to develop new tree models, generally Cython and C++ code will need to 
 
 treeple is in-line with scikit-learn and thus relies on each new version released there. Moreover, treeple relies on compiled code, so releases are a bit more complex than the typical Python package.
 
+## Releasing on PyPi (for pip installs)
+
 GH Actions will build wheels for each Python version and OS. Then the wheels needs to be uploaded to PyPi. The following steps outline the process:
 
 1. Download wheels from GH Actions and put all wheels into a ``dist/`` folder
@@ -143,3 +209,61 @@ or if you have two-factor authentication enabled: <https://pypi.org/help/#apitok
 4. Update version number on ``meson.build`` and ``pyproject.toml`` to the relevant version.
 
 See https://github.com/neurodata/treeple/pull/160 as an example.
+
+## Releasing documentation
+
+1. Build the documentation locally
+
+```
+spin docs
+```
+
+2. Make a copy of the documentation in the ``docs/_build/html`` folder somewhere outside of the git folder.
+
+3. Push the documentation to the ``gh-pages`` branch
+
+```
+git checkout gh-pages
+```
+
+Rename the current ``stable`` folder to the version number of the previous release, e.g. If we are releasing ``0.8.0``, then rename the ``stable`` folder to ``0.7.0``.
+
+Copy the contents of the ``docs/_build/html`` folder to the root of the ``gh-pages`` branch under the `stable` folder, since this new release is the "stable" version.
+
+4. Update the versions pointer file in main `doc/_static/versions.json` to point to the new version.
+
+e.g. If we are releasing ``0.8.0``, then you will see:
+
+```
+{
+    "name": "0.7",
+    "version": "stable",
+    "url": "https://docs.neurodata.io/treeple/stable/"
+},
+```
+
+which should get renamed to its corresponding version number:
+
+```
+    {
+        "name": "0.7",
+        "version": "0.7",
+        "url": "https://docs.neurodata.io/treeple/v0.7/"
+    },
+```
+
+Similarly, we will add pointers to the development version and new stable v0.8 version:
+
+```
+    {
+        "name": "0.9 (devel)",
+        "version": "dev",
+        "url": "https://docs.neurodata.io/treeple/dev/"
+    },
+    {
+        "name": "0.8",
+        "version": "stable",
+        "url": "https://docs.neurodata.io/treeple/stable/"
+    },
+```
+
