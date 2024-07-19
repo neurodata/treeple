@@ -18,7 +18,7 @@ import scipy as sp
 from sklearn.model_selection import train_test_split
 from sklearn.utils.validation import check_random_state
 
-from sktree.ensemble import ObliqueRandomForestRegressor
+from treeple.ensemble import ObliqueRandomForestRegressor
 
 rng = check_random_state(0)
 

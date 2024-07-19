@@ -3,7 +3,7 @@
 ExtendedIsolationForest example
 ===============================
 
-An example using :class:`~sktree.ExtendedIsolationForest` for anomaly
+An example using :class:`~treeple.ExtendedIsolationForest` for anomaly
 detection, which compares to the :class:`~sklearn.ensemble.IsolationForest` based
 on the algorithm in :footcite:`hariri2019extended`.
 
@@ -34,7 +34,7 @@ from sklearn.ensemble import IsolationForest
 from sklearn.inspection import DecisionBoundaryDisplay
 from sklearn.model_selection import train_test_split
 
-from sktree import ExtendedIsolationForest
+from treeple import ExtendedIsolationForest
 
 n_samples, n_outliers = 120, 40
 rng = np.random.RandomState(0)

@@ -1,4 +1,4 @@
-name: Build Wheels
+name: Build_Wheels
 
 on:
   pull_request:
@@ -19,17 +19,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  create_artifacts_folder:
-    name: Create Artifacts Folder
-    runs-on: ubuntu-latest
-    outputs:
-      artifacts_folder: ${{ steps.set_folder.outputs.folder_name }}
-
-    steps:
-      - name: Set Artifacts Folder
-        id: set_folder
-        run: echo "folder_name=artifacts/${{ github.run_id }}" >> $GITHUB_ENV
-
   build_wheels:
     name: Build wheels on ${{ matrix.os[1] }} - ${{ matrix.os[2] }} with Python ${{ matrix.python[0] }}
     runs-on: ${{ matrix.os[0] }}
@@ -40,18 +29,24 @@ jobs:
       matrix:
         os:  # see scipy wheels.yml GH actions
           - [ubuntu-22.04, manylinux, x86_64]
-          - [macos-11, macosx, x86_64]
+          - [macos-12, macosx, x86_64]
           # - [macos-12, macosx_*, arm64]
           - [windows-2019, win, AMD64]
 
-        python: [["cp39", "3.9"], ["cp310", "3.10"], ["cp311", "3.11"], ["cp312", "3.12"]]
         # python[0] is used to specify the python versions made by cibuildwheel
+        python:
+          [
+            ["cp39", "3.9"],
+            ["cp310", "3.10"],
+            ["cp311", "3.11"],
+            ["cp312", "3.12"],
+          ]
 
     env:
       IS_32_BIT: ${{ matrix.os[2] == 'x86' }}
 
     steps:
-      - name: Checkout scikit-tree
+      - name: Checkout treeple
         uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
@@ -70,7 +65,7 @@ jobs:
         if: ${{ runner.os == 'Windows' && env.IS_32_BIT == 'false' }}
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.19.1
+        uses: pypa/cibuildwheel@v2.19.2
         # Build all wheels here, apart from macosx_arm64, linux_aarch64
         # cibuildwheel is currently unable to pass configuration flags to
         # CIBW_BUILD_FRONTEND https://github.com/pypa/cibuildwheel/issues/1227
@@ -99,8 +94,14 @@ jobs:
       # Ensure that a wheel builder finishes even if another fails
       fail-fast: false
       matrix:
-        python: [["cp39", "3.9"], ["cp310", "3.10"], ["cp311", "3.11"], ["cp312", "3.12"]]
         # python[0] is used to specify the python versions made by cibuildwheel
+        python:
+          [
+            ["cp39", "3.9"],
+            ["cp310", "3.10"],
+            ["cp311", "3.11"],
+            ["cp312", "3.12"],
+          ]
 
     steps:
       - name: Checkout code
@@ -119,7 +120,7 @@ jobs:
           pip install .[build]
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.19.1
+        uses: pypa/cibuildwheel@v2.19.2
         env:
           CIBW_BUILD: ${{ matrix.python[0] }}-macosx_arm64
           CIBW_ARCHS_MACOS: arm64
@@ -135,27 +136,46 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout scikit-tree
+      - name: Checkout treeple
         uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"  # update once build dependencies are available
+          python-version: "3.10"
 
       - name: Build source distribution
         run: |
           pip install spin build
           spin setup-submodule
           pip install .[build]
-          python -m build
+          python -m build --sdist
 
-      - name: Store artifacts
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          path: dist/*.tar.gz
+          name: ${{ matrix.python[0] }}-${{ matrix.os[1] }}
+          path: dist
+
+  merge-wheels:
+    name: Merge all wheels into one directory
+    needs: [build_wheels, build-wheels-m1, build_sdist]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: all
+
+      - name: List all files
+        run: |
+          ls all/**
+
+      - name: Merge files
+        run: |
+          mkdir dist
+          mv all/**/*.whl ./dist
+          mv all/**/*.tar.gz ./dist
 
       - uses: actions/upload-artifact@v4
         with:
           path: dist
-          name: ${{ matrix.python[0] }}-${{ matrix.os[1] }}
+          name: dist

@@ -3,19 +3,22 @@
 - [Requirements](#requirements)
 - [Setting up your development environment](#setting-up-your-development-environment)
 - [Building the project from source](#building-the-project-from-source)
+    - [Summary: Building locally with Meson For developers](#summary-building-locally-with-meson-for-developers)
 - [Development Tasks](#development-tasks)
 - [Advanced Updating submodules](#advanced-updating-submodules)
 - [Cython and C++](#cython-and-c)
 - [Making a Release](#making-a-release)
+    - [Releasing on PyPi for pip installs](#releasing-on-pypi-for-pip-installs)
+    - [Releasing documentation](#releasing-documentation)
 
 <!-- /TOC -->
 
 # Requirements
 
 - Python 3.9+
-- numpy>=1.25
-- scipy>=1.11
-- scikit-learn>=1.3.1
+- numpy>=1.25.0
+- scipy>=1.5.0
+- scikit-learn>=1.4.1
 
 For the other requirements, inspect the ``pyproject.toml`` file.
 
@@ -25,8 +28,8 @@ We recommend using miniconda, as python virtual environments may not setup prope
 
 <!-- Setup a conda env -->
 
-    conda create -n sktree
-    conda activate sktree
+    conda create -n treeple
+    conda activate treeple
 
 **Make sure you specify a Python version if your system defaults to anything less than Python 3.9.**
 
@@ -35,7 +38,7 @@ Next, install necessary build dependencies. For more information, see <https://s
 
     conda install -c conda-forge joblib threadpoolctl pytest compilers llvm-openmp
 
-Assuming these steps have worked properly and you have read and followed any necessary scikit-learn advanced installation instructions, you can then install dependencies for scikit-tree.
+Assuming these steps have worked properly and you have read and followed any necessary scikit-learn advanced installation instructions, you can then install dependencies for treeple.
 
 If you are developing locally, you will need the build dependencies to compile the Cython / C++ code:
 
@@ -50,7 +53,7 @@ Other requirements can be installed as such:
 
 # Building the project from source
 
-We leverage meson to build scikit-tree from source. We utilize a CLI tool, called [spin](https://github.com/scientific-python/spin), which wraps certain meson commands to make building easier.
+We leverage meson to build treeple from source. We utilize a CLI tool, called [spin](https://github.com/scientific-python/spin), which wraps certain meson commands to make building easier.
 
 For example, the following command will build the project completely from scratch
 
@@ -68,34 +71,95 @@ For other commands, see
 
     spin --help
 
-Note at this stage, you will be unable to run Python commands directly. For example, ``pytest ./sktree`` will not work.
+Note at this stage, you will be unable to run Python commands directly. For example, ``pytest ./treeple`` will not work.
 
-However, after installing and building the project from source using meson, you can leverage editable installs to make testing code changes much faster. For more information on meson-python's progress supporting editable installs in a better fashion, see <https://meson-python.readthedocs.io/en/latest/how-to-guides/editable-installs.html>.
+However, after installing and building the project from source using meson, you can leverage editable installs to make testing code changes much faster.
+
+    spin install
+
+This will now link the meson build to your Python runtime. Now if you run
+
+    pytest ./treeple
+
+the unit-tests should run.
+
+Summary: Building locally with Meson (For developers)
+-----------------------------------------------------
+Make sure you have the necessary packages installed.
+
+    # install build dependencies
+    pip install -r build_requirements.txt
+
+    # you may need these optional dependencies to build scikit-learn locally
+    conda install -c conda-forge joblib threadpoolctl pytest compilers llvm-openmp
+
+``YOUR_PYTHON_VERSION`` below should be any of the acceptable versions of Python for treeple. We use the ``spin`` CLI to abstract away build details:
+
+    # run the build using Meson/Ninja
+    ./spin build
+
+    # you can run the following command to see what other options there are
+    ./spin --help
+    ./spin build --help
+
+    # For example, you might want to start from a clean build
+    ./spin build --clean
+
+    # or build in parallel for faster builds
+    ./spin build -j 2
+
+    # you will need to double check the build-install has the proper path
+    # this might be different from machine to machine
+    export PYTHONPATH=${PWD}/build-install/usr/lib/python<YOUR_PYTHON_VERSION>/site-packages
+
+    # run specific unit tests
+    ./spin test -- treeple/tree/tests/test_tree.py
+
+    # you can bring up the CLI menu
+    ./spin --help
+
+You can also do the same thing using Meson/Ninja itself. Run the following to build the local files:
+
+    # generate ninja make files
+    meson build --prefix=$PWD/build
+
+    # compile
+    ninja -C build
+
+    # install treeple package
+    meson install -C build
+
+    export PYTHONPATH=${PWD}/build/lib/python<YOUR_PYTHON_VERSION>/site-packages
+
+    # to check installation, you need to be in a different directory
+    cd docs;  
+    python -c "from treeple import tree"
+    python -c "import sklearn; print(sklearn.__version__);"
+
+After building locally, you can use editable installs (warning: this only registers Python changes locally)
 
     pip install --no-build-isolation --editable .
 
-**Note: editable installs for scikit-tree REQUIRE you to have built the project using meson already.** This will now link the meson build to your Python runtime. Now if you run
+Or if you have spin v0.8+ installed, you can just run directly
 
-    pytest ./sktree
-
-the unit-tests should run.
+    spin install
 
 # Development Tasks
 
 There are a series of top-level tasks available.
 
-    make run-checks
+    make pre-commit
 
 This leverage pre-commit to run a series of precommit checks.
 
 # (Advanced) Updating submodules
 
-Scikit-tree relies on a submodule of a forked-version of scikit-learn for certain Python and Cython code that extends the ``DecisionTree*`` models. Usually, if a developer is making changes, they should go over to the ``submodulev3`` branch on ``https://github.com/neurodata/scikit-learn`` and
+treeple relies on a submodule of a forked-version of scikit-learn for certain Python and Cython code that extends the ``DecisionTree*`` models. Usually, if a developer is making changes, they should go over to the ``submodulev3`` branch on ``https://github.com/neurodata/scikit-learn`` and
 submit a PR to make changes to the submodule.
 
-This should **ALWAYS** be supported by some use-case in scikit-tree. We want the minimal amount of code-change in our forked version of scikit-learn to make it very easy to merge in upstream changes, bug fixes and features for tree-based code.
+This should **ALWAYS** be supported by some use-case in treeple. We want the minimal amount of code-change in our forked version of scikit-learn to make it very easy to merge in upstream changes, bug fixes and features for tree-based code.
 
-Once a PR is submitted and merged, the developer can update the submodule here in scikit-tree, so that we leverage the new commit. You **must** update the submodule commit ID and also commit this change, so that way the build leverages the new submodule commit ID.
+Once a PR is submitted and merged, the developer can update the submodule here in treeple, so that we leverage the new commit. You **must** update the submodule commit ID and also commit this change, so that way the build leverages the new submodule commit ID.
 
     git submodule update --init --recursive --remote
     git add -A
@@ -107,17 +171,19 @@ Now, you can re-build the project using the latest submodule changes.
 
 # Cython and C++
 
-The general design of scikit-tree follows that of the tree-models inside scikit-learn, where tree-based models are inherently Cythonized, or written with C++. Then the actual forest (e.g. RandomForest, or ExtraForest) is just a Python API wrapper that creates an ensemble of the trees.
+The general design of treeple follows that of the tree-models inside scikit-learn, where tree-based models are inherently Cythonized, or written with C++. Then the actual forest (e.g. RandomForest, or ExtraForest) is just a Python API wrapper that creates an ensemble of the trees.
 
 In order to develop new tree models, generally Cython and C++ code will need to be written in order to optimize the tree building process, otherwise fitting a single forest model would take very long.
 
 # Making a Release
 
-Scikit-tree is in-line with scikit-learn and thus relies on each new version released there. Moreover, scikit-tree relies on compiled code, so releases are a bit more complex than the typical Python package.
+treeple is in-line with scikit-learn and thus relies on each new version released there. Moreover, treeple relies on compiled code, so releases are a bit more complex than the typical Python package.
+
+## Releasing on PyPi (for pip installs)
 
 1. Download wheels from GH Actions and put all wheels into a ``dist/`` folder
 
-<https://github.com/neurodata/scikit-tree/actions/workflows/build_wheels.yml> will have all the wheels for common OSes built for each Python version.
+<https://github.com/neurodata/treeple/actions/workflows/build_wheels.yml> will have all the wheels for common OSes built for each Python version.
 
 2. Upload wheels to test PyPi
 
@@ -135,8 +201,66 @@ twine upload dist/*
 
 or if you have two-factor authentication enabled: <https://pypi.org/help/#apitoken>
 
-    twine upload dist/* --repository scikit-tree
+    twine upload dist/* --repository treeple
 
 4. Update version number on ``meson.build`` and ``pyproject.toml`` to the relevant version.
 
-See https://github.com/neurodata/scikit-tree/pull/160 as an example.
+See https://github.com/neurodata/treeple/pull/160 as an example.
+
+## Releasing documentation
+
+1. Build the documentation locally
+
+```
+spin docs
+```
+
+2. Make a copy of the documentation in the ``docs/_build/html`` folder somewhere outside of the git folder.
+
+3. Push the documentation to the ``gh-pages`` branch
+
+```
+git checkout gh-pages
+```
+
+Rename the current ``stable`` folder to the version number of the previous release, e.g. If we are releasing ``0.8.0``, then rename the ``stable`` folder to ``0.7.0``.
+
+Copy the contents of the ``docs/_build/html`` folder to the root of the ``gh-pages`` branch under the `stable` folder, since this new release is the "stable" version.
+
+4. Update the versions pointer file in main `doc/_static/versions.json` to point to the new version.
+
+e.g. If we are releasing ``0.8.0``, then you will see:
+
+```
+{
+    "name": "0.7",
+    "version": "stable",
+    "url": "https://docs.neurodata.io/treeple/stable/"
+},
+```
+
+which should get renamed to its corresponding version number:
+
+```
+    {
+        "name": "0.7",
+        "version": "0.7",
+        "url": "https://docs.neurodata.io/treeple/v0.7/"
+    },
+```
+
+Similarly, we will add pointers to the development version and new stable v0.8 version:
+
+```
+    {
+        "name": "0.9 (devel)",
+        "version": "dev",
+        "url": "https://docs.neurodata.io/treeple/dev/"
+    },
+    {
+        "name": "0.8",
+        "version": "stable",
+        "url": "https://docs.neurodata.io/treeple/stable/"
+    },
+```
+

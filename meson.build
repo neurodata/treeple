@@ -1,10 +1,10 @@
 project(
-  'scikit-tree',
+  'treeple',
   'c', 'cpp', 'cython',
   # Note that the git commit hash cannot be added dynamically here
   # That only happens when importing from a git repository.
-  # See `sktree/__init__.py`
-  version: '0.8.0dev0',
+  # See `treeple/__init__.py`
+  version: '0.9.0dev0',
   license: 'BSD-3',
   meson_version: '>= 1.1.0',
   default_options: [
@@ -20,11 +20,11 @@ cpp = meson.get_compiler('cpp')
 # Check compiler is recent enough (see "Toolchain Roadmap" for details)
 if cc.get_id() == 'gcc'
   if not cc.version().version_compare('>=8.0')
-    error('scikit-tree requires GCC >= 8.0')
+    error('treeple requires GCC >= 8.0')
   endif
 elif cc.get_id() == 'msvc'
   if not cc.version().version_compare('>=19.20')
-    error('scikit-tree requires at least vc142 (default with Visual Studio 2019) ' + \
+    error('treeple requires at least vc142 (default with Visual Studio 2019) ' + \
           'when building with MSVC')
   endif
 endif
@@ -45,7 +45,7 @@ _global_c_args = cc.get_supported_arguments(
 add_project_arguments(_global_c_args, language : 'c')
 
 # We need -lm for all C code (assuming it uses math functions, which is safe to
-# assume for scikit-tree). For C++ it isn't needed, because libstdc++/libc++ is
+# assume for treeple). For C++ it isn't needed, because libstdc++/libc++ is
 # guaranteed to depend on it. For Fortran code, Meson already adds `-lm`.
 m_dep = cc.find_library('m', required : false)
 if m_dep.found()
@@ -61,7 +61,7 @@ if not cython.found()
 endif
 
 # r = run_command('git', 'submodule', 'update', '--init', check: false)
-r = run_command('mv', 'sktree/_lib/sklearn_fork/sklearn', 'sktree/_lib/sklearn', check: false)
+r = run_command('mv', 'treeple/_lib/sklearn_fork/sklearn', 'treeple/_lib/sklearn', check: false)
 
 # Setup Python:
 # https://mesonbuild.com/Python-module.html
@@ -74,4 +74,4 @@ if py.language_version().version_compare('<3.9')
     error('At least Python 3.9 is required.')
 endif
 
-subdir('sktree')
+subdir('treeple')

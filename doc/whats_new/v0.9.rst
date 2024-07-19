@@ -1,0 +1,37 @@
+:orphan:
+
+.. include:: _contributors.rst
+.. currentmodule:: treeple
+
+.. _current:
+
+Version 0.9
+===========
+
+**In Development**
+
+This release include a rename of the package to from ``scikit-tree`` to ``treeple``
+The users can replace the previous usage as follows:
+``import sktree`` to ``import treeple``
+``from sktree import tree`` to ``from treeple import tree``
+``from sktree import ...`` to ``from treeple import ...``
+
+
+Changelog
+---------
+
+- |API| Rename the package to ``treeple``. By `SUKI-O`_ (:pr:`#292`)
+- |Fix| Fixed a bug in the predict_proba function of the :class:`treeple.HonestForestClassifier` where posteriors
+    estimated on empty leaf with ``ignore`` prior would result in ``np.nan``
+    values for all trees on that sample.
+    By `Haoyin Xu`_ (:pr:`#291`)
+
+Code and Documentation Contributors
+-----------------------------------
+
+Thanks to everyone who has contributed to the maintenance and improvement of
+the project since version inception, including:
+
+* `Adam Li`_
+* `SUKI-O`_
+* `Haoyin Xu`_

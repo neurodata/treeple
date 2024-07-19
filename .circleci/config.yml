@@ -8,7 +8,7 @@ commands:
       - run:
           name: Check-skip
           command: |
-            if [ ! -d "sktree" ]; then
+            if [ ! -d "treeple" ]; then
               echo "Build was not run due to skip, exiting job ${CIRCLE_JOB} for PR ${CIRCLE_PULL_REQUEST}."
               circleci-agent step halt;
             fi
@@ -55,13 +55,13 @@ commands:
             echo ${CI_PULL_REQUEST//*pull\//} | tee merge.txt
             if [[ $(cat merge.txt) != "" ]]; then
               echo "Merging $(cat merge.txt)";
-              git remote add upstream https://github.com/neurodata/scikit-tree.git;
+              git remote add upstream https://github.com/neurodata/treeple.git;
               git pull --ff-only upstream "refs/pull/$(cat merge.txt)/merge";
               git fetch upstream main;
             fi
 
 jobs:
-  # Build scikit-tree from source
+  # Build treeple from source
   build_scikit_tree:
     docker:
       # CircleCI maintains a library of pre-built images
@@ -86,7 +86,7 @@ jobs:
             pip install .[build,doc]
 
       - run:
-          name: build scikit-tree
+          name: build treeple
           command: |
             spin build -j2
 
@@ -162,7 +162,7 @@ jobs:
           name: Install and configure dependencies
           command: |
             npm install --global gh-pages@3.0
-            git config --global user.email "circle@scikit-tree.com"
+            git config --global user.email "circle@treeple.com"
             git config --global user.name "Circle Ci"
 
       - add_ssh_keys:
@@ -184,7 +184,7 @@ jobs:
       - save_cache:
           key: website-cache
           paths:
-            - ~/sktree
+            - ~/treeple
 
 workflows:
   build-docs:

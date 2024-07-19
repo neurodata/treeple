@@ -5,8 +5,8 @@
 PYTHON ?= python
 PYTESTS ?= pytest
 CTAGS ?= ctags
-CODESPELL_SKIPS ?= "*.fif,*.eve,*.gz,*.tgz,*.zip,*.mat,*.stc,*.label,*.w,*.bz2,*.annot,*.sulc,*.log,*.local-copy,*.orig_avg,*.inflated_avg,*.gii,*.pyc,*.doctree,*.pickle,*.inv,*.png,*.edf,*.touch,*.thickness,*.nofix,*.volume,*.defect_borders,*.mgh,lh.*,rh.*,COR-*,FreeSurferColorLUT.txt,*.examples,.xdebug_mris_calc,bad.segments,BadChannels,*.hist,empty_file,*.orig,*.js,*.map,*.ipynb,searchindex.dat,plot_*.rst,*.rst.txt,*.html,gdf_encodes.txt,sktree/_lib/*,doc/auto_examples/*"
-CODESPELL_DIRS ?= sktree/ doc/ examples/ benchmarks/
+CODESPELL_SKIPS ?= "*.fif,*.eve,*.gz,*.tgz,*.zip,*.mat,*.stc,*.label,*.w,*.bz2,*.annot,*.sulc,*.log,*.local-copy,*.orig_avg,*.inflated_avg,*.gii,*.pyc,*.doctree,*.pickle,*.inv,*.png,*.edf,*.touch,*.thickness,*.nofix,*.volume,*.defect_borders,*.mgh,lh.*,rh.*,COR-*,FreeSurferColorLUT.txt,*.examples,.xdebug_mris_calc,bad.segments,BadChannels,*.hist,empty_file,*.orig,*.js,*.map,*.ipynb,searchindex.dat,plot_*.rst,*.rst.txt,*.html,gdf_encodes.txt,treeple/_lib/*,doc/auto_examples/*"
+CODESPELL_DIRS ?= treeple/ doc/ examples/ benchmarks/
 all: clean inplace test test-doc
 
 clean-pyc:
@@ -25,7 +25,7 @@ pytest: test
 
 test: in
 	rm -f .coverage
-	$(PYTESTS) sktree
+	$(PYTESTS) treeple
 
 test-doc: sample_data testing_data
 	$(PYTESTS) --doctest-modules --doctest-ignore-import-errors --doctest-glob='*.rst' ./doc/
@@ -33,7 +33,7 @@ test-doc: sample_data testing_data
 flake:
 	@if command -v flake8 > /dev/null; then \
 		echo "Running flake8"; \
-		flake8 --count sktree examples; \
+		flake8 --count treeple examples; \
 	else \
 		echo "flake8 not found, please install it!"; \
 		exit 1; \
@@ -43,7 +43,7 @@ flake:
 black:
 	@if command -v black > /dev/null; then \
 		echo "Running black"; \
-		black sktree examples; \
+		black treeple examples; \
 	else \
 		echo "black not found, please install it!"; \
 		exit 1; \
@@ -53,7 +53,7 @@ black:
 isort:
 	@if command -v isort > /dev/null; then \
 		echo "Running isort"; \
-		isort sktree examples doc; \
+		isort treeple examples doc; \
 	else \
 		echo "isort not found, please install it!"; \
 		exit 1; \
@@ -86,9 +86,9 @@ build-doc-noplot:
 
 run-checks:
 	isort --check .
-	black --check sktree examples
+	black --check treeple examples
 	flake8 .
-	mypy ./sktree
+	mypy ./treeple
 	@$(MAKE) pydocstyle
 	@$(MAKE) codespell-error
 	ruff .
