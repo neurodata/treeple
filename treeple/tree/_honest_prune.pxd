@@ -7,7 +7,7 @@ from .._lib.sklearn.tree._splitter cimport (
     shift_missing_values_to_left_if_required,
 )
 from .._lib.sklearn.tree._tree cimport Node, ParentInfo, Tree
-from .._lib.sklearn.utils._typedefs cimport float32_t, float64_t, int8_t, intp_t, uint32_t
+from .._lib.sklearn.utils._typedefs cimport float32_t, float64_t, int8_t, intp_t, uint8_t, uint32_t
 
 
 # for each node, keep track of the node index and the parent index
@@ -23,7 +23,7 @@ cdef class HonestPruner(Splitter):
     cdef intp_t capacity    # The maximum number of nodes in the pruned tree
     cdef intp_t pos         # The current position to split left/right children
     cdef intp_t n_missing   # The number of missing values in the feature currently considered
-    cdef unsigned char missing_go_to_left
+    cdef uint8_t missing_go_to_left
     cdef const float32_t[:, :] X
 
     cdef int init(
@@ -31,7 +31,7 @@ cdef class HonestPruner(Splitter):
         object X,
         const float64_t[:, ::1] y,
         const float64_t[:] sample_weight,
-        const unsigned char[::1] missing_values_in_feature_mask,
+        const uint8_t[::1] missing_values_in_feature_mask,
     ) except -1
 
     cdef int node_split(

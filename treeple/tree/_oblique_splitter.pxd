@@ -15,7 +15,7 @@ from libcpp.vector cimport vector
 from .._lib.sklearn.tree._criterion cimport Criterion
 from .._lib.sklearn.tree._splitter cimport SplitRecord, Splitter
 from .._lib.sklearn.tree._tree cimport ParentInfo
-from .._lib.sklearn.utils._typedefs cimport float32_t, float64_t, int8_t, intp_t, uint32_t
+from .._lib.sklearn.utils._typedefs cimport float32_t, float64_t, int8_t, intp_t, uint8_t, uint32_t
 from ._sklearn_splitter cimport sort
 
 
@@ -29,7 +29,7 @@ cdef struct ObliqueSplitRecord:
     float64_t improvement          # Impurity improvement given parent node.
     float64_t impurity_left        # Impurity of the left split.
     float64_t impurity_right       # Impurity of the right split.
-    unsigned char missing_go_to_left  # Controls if missing values go to the left node.
+    uint8_t missing_go_to_left  # Controls if missing values go to the left node.
     intp_t n_missing            # Number of missing values for the feature being split on
 
     vector[float32_t]* proj_vec_weights  # weights of the vector (max_features,)

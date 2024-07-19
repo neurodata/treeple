@@ -12,6 +12,7 @@ from libcpp.vector cimport vector
 
 from ..._lib.sklearn.tree._criterion cimport Criterion
 from ..._lib.sklearn.tree._utils cimport rand_int
+from ..._lib.sklearn.utils._typedefs cimport uint8_t
 from .._utils cimport ravel_multi_index_cython, unravel_index_cython
 
 
@@ -31,7 +32,7 @@ cdef class PatchSplitter(BestObliqueSplitter):
         object X,
         const float64_t[:, ::1] y,
         const float64_t[:] sample_weight,
-        const unsigned char[::1] missing_values_in_feature_mask,
+        const uint8_t[::1] missing_values_in_feature_mask,
     ) except -1:
         BestObliqueSplitter.init(self, X, y, sample_weight, missing_values_in_feature_mask)
 
@@ -97,7 +98,7 @@ cdef class BaseDensePatchSplitter(PatchSplitter):
         object X,
         const float64_t[:, ::1] y,
         const float64_t[:] sample_weight,
-        const unsigned char[::1] missing_values_in_feature_mask,
+        const uint8_t[::1] missing_values_in_feature_mask,
         # const int32_t[:] n_categories
     ) except -1:
         """Initialize the splitter

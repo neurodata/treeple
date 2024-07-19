@@ -21,11 +21,11 @@ def _build_pruned_tree_honesty(
     object X,
     const float64_t[:, ::1] y,
     const float64_t[:] sample_weight,
-    const unsigned char[::1] missing_values_in_feature_mask=None,
+    const uint8_t[::1] missing_values_in_feature_mask=None,
 ):
     cdef:
         intp_t n_nodes = orig_tree.node_count
-        unsigned char[:] leaves_in_subtree = np.zeros(
+        uint8_t[:] leaves_in_subtree = np.zeros(
             shape=n_nodes, dtype=np.uint8)
 
     # initialize the pruner/splitter
@@ -88,7 +88,7 @@ cdef class HonestPruner(Splitter):
         object X,
         const float64_t[:, ::1] y,
         const float64_t[:] sample_weight,
-        const unsigned char[::1] missing_values_in_feature_mask,
+        const uint8_t[::1] missing_values_in_feature_mask,
     ) except -1:
         Splitter.init(self, X, y, sample_weight, missing_values_in_feature_mask)
         self.X = X
@@ -223,7 +223,7 @@ cdef class HonestPruner(Splitter):
 
 
 cdef _honest_prune(
-    unsigned char[:] leaves_in_subtree,
+    uint8_t[:] leaves_in_subtree,
     Tree orig_tree,
     HonestPruner pruner,
 ):
@@ -349,7 +349,7 @@ cdef struct BuildPrunedRecord:
 cdef _build_pruned_tree(
     Tree tree,  # OUT
     Tree orig_tree,
-    const unsigned char[:] leaves_in_subtree,
+    const uint8_t[:] leaves_in_subtree,
     intp_t capacity
 ):
     """Build a pruned tree.
@@ -363,7 +363,7 @@ cdef _build_pruned_tree(
         Location to place the pruned tree
     orig_tree : Tree
         Original tree
-    leaves_in_subtree : unsigned char memoryview, shape=(node_count, )
+    leaves_in_subtree : uint8_t memoryview, shape=(node_count, )
         Boolean mask for leaves to include in subtree
     capacity : intp_t
         Number of nodes to initially allocate in pruned tree
