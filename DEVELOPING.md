@@ -3,10 +3,13 @@
 - [Requirements](#requirements)
 - [Setting up your development environment](#setting-up-your-development-environment)
 - [Building the project from source](#building-the-project-from-source)
+    - [Summary: Building locally with Meson For developers](#summary-building-locally-with-meson-for-developers)
 - [Development Tasks](#development-tasks)
 - [Advanced Updating submodules](#advanced-updating-submodules)
 - [Cython and C++](#cython-and-c)
 - [Making a Release](#making-a-release)
+    - [Releasing on PyPi for pip installs](#releasing-on-pypi-for-pip-installs)
+    - [Releasing documentation](#releasing-documentation)
 
 <!-- /TOC -->
 
@@ -82,7 +85,7 @@ the unit-tests should run.
 
 Summary: Building locally with Meson (For developers)
 -----------------------------------------------------
-Make sure you have the necessary packages installed
+Make sure you have the necessary packages installed.
 
     # install build dependencies
     pip install -r build_requirements.txt
@@ -90,7 +93,7 @@ Make sure you have the necessary packages installed
     # you may need these optional dependencies to build scikit-learn locally
     conda install -c conda-forge joblib threadpoolctl pytest compilers llvm-openmp
 
-We use the ``spin`` CLI to abstract away build details:
+``YOUR_PYTHON_VERSION`` below should be any of the acceptable versions of Python for treeple. We use the ``spin`` CLI to abstract away build details:
 
     # run the build using Meson/Ninja
     ./spin build
@@ -107,7 +110,7 @@ We use the ``spin`` CLI to abstract away build details:
 
     # you will need to double check the build-install has the proper path
     # this might be different from machine to machine
-    export PYTHONPATH=${PWD}/build-install/usr/lib/python3.9/site-packages
+    export PYTHONPATH=${PWD}/build-install/usr/lib/python<YOUR_PYTHON_VERSION>/site-packages
 
     # run specific unit tests
     ./spin test -- treeple/tree/tests/test_tree.py
@@ -126,7 +129,7 @@ You can also do the same thing using Meson/Ninja itself. Run the following to bu
     # install treeple package
     meson install -C build
 
-    export PYTHONPATH=${PWD}/build/lib/python3.9/site-packages
+    export PYTHONPATH=${PWD}/build/lib/python<YOUR_PYTHON_VERSION>/site-packages
 
     # to check installation, you need to be in a different directory
     cd docs;  
