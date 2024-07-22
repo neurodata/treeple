@@ -8,7 +8,7 @@ project(
   license: 'BSD-3',
   meson_version: '>= 1.1.0',
   default_options: [
-    'buildtype=debugoptimized',
+    'buildtype=release',
     'c_std=c99',
     'cpp_std=c++14',
   ],
