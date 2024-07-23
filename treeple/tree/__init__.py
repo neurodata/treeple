@@ -7,6 +7,7 @@ from .._lib.sklearn.tree import (
 from ._classes import (
     ExtraObliqueDecisionTreeClassifier,
     ExtraObliqueDecisionTreeRegressor,
+    KernelDecisionTreeClassifier,
     ObliqueDecisionTreeClassifier,
     ObliqueDecisionTreeRegressor,
     PatchObliqueDecisionTreeClassifier,
@@ -34,4 +35,5 @@ __all__ = [
     "ExtraTreeClassifier",
     "ExtraTreeRegressor",
     "MultiViewDecisionTreeClassifier",
+    "KernelDecisionTreeClassifier",
 ]
