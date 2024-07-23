@@ -31,7 +31,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -606,16 +606,16 @@ n_repeats        1
 n_jobs          -1
                                     time_taken
 dataset          dimension   model
-PhishingWebsites (2000, 30)  EORF     1.155547
-                             ORF      1.155353
-cnae-9           (864, 856)  EORF     1.148518
-                             ORF      1.120995
-har              (2000, 561) EORF     1.200630
-                             ORF      2.086691
-lsvt             (100, 310)  EORF     1.008857
-                             ORF      1.024711
-wdbc             (455, 30)   EORF     0.935673
-                             ORF      0.997241
+PhishingWebsites (2000, 30)  EORF     1.254105
+                             ORF      1.257008
+cnae-9           (864, 856)  EORF     1.354885
+                             ORF      1.388710
+har              (2000, 561) EORF     1.306953
+                             ORF      2.105186
+lsvt             (100, 310)  EORF     1.023911
+                             ORF      0.999970
+wdbc             (455, 30)   EORF     1.021897
+                             ORF      1.021268
 </pre></div>
 </div>
 <div class="line-block">
@@ -673,10 +673,10 @@ wdbc             (455, 30)   EORF     0.935673
     <a href="https://pandas.pydata.org/pandas-docs/dev/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame" class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tmp</span></a> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">,</span> <span class="n">clf</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">clfs</span><span class="p">):</span>
-        <span class="n">t0</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="n">t0</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/datetime.html#datetime.datetime.now" title="datetime.datetime.now" class="sphx-glr-backref-module-datetime-datetime sphx-glr-backref-type-py-method"><span class="n">datetime</span><span class="o">.</span><span class="n">now</span></a><span class="p">()</span>
         <span class="n">cv</span> <span class="o">=</span> <a href="https://scikit-learn.org/dev/modules/generated/sklearn.model_selection.RepeatedKFold.html#sklearn.model_selection.RepeatedKFold" title="sklearn.model_selection.RepeatedKFold" class="sphx-glr-backref-module-sklearn-model_selection sphx-glr-backref-type-py-class"><span class="n">RepeatedKFold</span></a><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="n">n_cv</span><span class="p">,</span> <span class="n">n_repeats</span><span class="o">=</span><span class="n">n_repeats</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">random_state</span></a><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;random_state&quot;</span><span class="p">])</span>
         <span class="n">test_score</span> <span class="o">=</span> <a href="https://scikit-learn.org/dev/modules/generated/sklearn.model_selection.cross_validate.html#sklearn.model_selection.cross_validate" title="sklearn.model_selection.cross_validate" class="sphx-glr-backref-module-sklearn-model_selection sphx-glr-backref-type-py-function"><span class="n">cross_validate</span></a><span class="p">(</span><span class="n">estimator</span><span class="o">=</span><span class="n">clf</span><span class="p">,</span> <a href="https://pandas.pydata.org/pandas-docs/dev/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame" class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="o">=</span><a href="https://pandas.pydata.org/pandas-docs/dev/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame" class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <a href="https://pandas.pydata.org/pandas-docs/dev/reference/api/pandas.Series.html#pandas.Series" title="pandas.core.series.Series" class="sphx-glr-backref-module-pandas-core-series sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a><span class="o">=</span><a href="https://pandas.pydata.org/pandas-docs/dev/reference/api/pandas.Series.html#pandas.Series" title="pandas.core.series.Series" class="sphx-glr-backref-module-pandas-core-series sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">cv</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s2">&quot;accuracy&quot;</span><span class="p">)</span>
-        <span class="n">time_taken</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+        <span class="n">time_taken</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/datetime.html#datetime.datetime.now" title="datetime.datetime.now" class="sphx-glr-backref-module-datetime-datetime sphx-glr-backref-type-py-method"><span class="n">datetime</span><span class="o">.</span><span class="n">now</span></a><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
         <span class="c1"># convert the time taken to seconds</span>
         <span class="n">time_taken</span> <span class="o">=</span> <span class="n">time_taken</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
 
@@ -748,14 +748,17 @@ wdbc             (455, 30)   EORF     0.935673
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 41.147 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  180 MB</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 30.179 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  342 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-sparse-oblique-trees-plot-extra-oblique-random-forest-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/9d192edccb7050fc654a0c44d8d3233e/plot_extra_oblique_random_forest.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_extra_oblique_random_forest.ipynb</span></code></a></p>
 </div>
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/85ca306af8c9c82712ad771553d9bddb/plot_extra_oblique_random_forest.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_extra_oblique_random_forest.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-zip docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/b01556ebe3a6cbe751683b3f2e7e108d/plot_extra_oblique_random_forest.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">zipped:</span> <span class="pre">plot_extra_oblique_random_forest.zip</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
@@ -834,7 +837,7 @@ wdbc             (455, 30)   EORF     0.935673
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, treeple Developers. Last updated on 2024-07-19.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-07-23.
       <br/>
     
   </p>
