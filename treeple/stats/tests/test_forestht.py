@@ -117,11 +117,10 @@ def test_small_dataset_independent(seed):
 @flaky(max_runs=3)
 @pytest.mark.parametrize("seed", [10, 0])
 def test_small_dataset_dependent(seed):
-    n_samples = 50
+    n_samples = 100
     n_features = 5
     rng = np.random.default_rng(seed)
 
-    X = rng.uniform(size=(n_samples, n_features))
     X = rng.uniform(size=(n_samples // 2, n_features))
     X2 = X + 3
     X = np.vstack([X, X2])
@@ -155,12 +154,15 @@ def test_small_dataset_dependent(seed):
         n_repeats=1000,
         metric="mi",
         return_posteriors=False,
+        seed=seed,
     )
     assert ~np.isnan(result.pvalue)
     assert ~np.isnan(result.observe_test_stat)
     assert result.pvalue <= 0.05
 
-    result = build_coleman_forest(clf, perm_clf, X, y, metric="mi", return_posteriors=False)
+    result = build_coleman_forest(
+        clf, perm_clf, X, y, metric="mi", return_posteriors=False, seed=seed
+    )
     assert result.pvalue <= 0.05
 
 

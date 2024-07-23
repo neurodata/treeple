@@ -259,7 +259,7 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
         - If int, then draw `max_samples` samples.
         - If float, then draw `max_samples * X.shape[0]` samples.
 
-    honest_prior : {"ignore", "uniform", "empirical"}, default="empirical"
+    honest_prior : {"ignore", "uniform", "empirical"}, default="ignore"
         Method for dealing with empty leaves during evaluation of a test
         sample. If "ignore", the tree is ignored. If "uniform", the prior tree
         posterior is 1/(number of classes). If "empirical", the prior tree
@@ -444,7 +444,7 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
         class_weight=None,
         ccp_alpha=0.0,
         max_samples=None,
-        honest_prior="empirical",
+        honest_prior="ignore",
         honest_fraction=0.5,
         tree_estimator=None,
         stratify=False,
@@ -648,7 +648,7 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
         """
         return self._predict_proba(X)
 
-    def _predict_proba(self, X, indices=None, impute_missing=None):
+    def _predict_proba(self, X, indices=None, impute_missing=np.nan):
         """predict_proba helper class"""
         check_is_fitted(self)
         X = self._validate_X_predict(X)
@@ -672,10 +672,7 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
         zero_mask = posteriors.sum(2) == 0
         posteriors[~zero_mask] /= posteriors[~zero_mask].sum(1, keepdims=True)
 
-        if impute_missing is None:
-            pass
-        else:
-            posteriors[zero_mask] = impute_missing
+        posteriors[zero_mask] = impute_missing
 
         # preserve shape of multi-outputs
         if self.n_outputs_ > 1:
@@ -823,7 +820,7 @@ def _accumulate_prediction(predict, X, out, lock, indices=None):
 
     with lock:
         if len(out) == 1:
-            out[0][indices] += proba
+            out[0][indices] = np.nansum([out[0][indices], proba], axis=0)
         else:
             for i in range(len(out)):
-                out[i][indices] += proba[i]
+                out[i][indices] = np.nansum([out[i][indices], proba[i]], axis=0)
