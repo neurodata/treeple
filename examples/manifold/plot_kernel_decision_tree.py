@@ -15,11 +15,11 @@ dimensional vector. The dataset is then split into a training and testing set.
 See :ref:`sphx_glr_auto_examples_plot_projection_matrices` for more information on
 projection matrices and the way they can be sampled.
 """
+
 import matplotlib.pyplot as plt
 
 # %%
 # Importing the necessary modules
-import numpy as np
 from sklearn.datasets import fetch_openml
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
