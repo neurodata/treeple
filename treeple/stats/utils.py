@@ -19,10 +19,13 @@ from treeple._lib.sklearn.ensemble._forest import BaseForest, ForestClassifier
 
 try:
     import bottleneck as bn
+
     nanmean_f = bn.nanmean
     anynan_f = lambda arr: bn.anynan(arr, axis=2)
 except ImportError:
-    warnings.warn("bottleneck is not installed, falling back to numpy for nanmean and anynan functions. This may be slower.")
+    warnings.warn(
+        "bottleneck is not installed, falling back to numpy for nanmean and anynan functions. This may be slower."
+    )
     nanmean_f = np.nanmean
     anynan_f = lambda arr: np.isnan(arr).any(axis=2)
 
