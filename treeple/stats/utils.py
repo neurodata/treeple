@@ -1,3 +1,4 @@
+import os
 import warnings
 from typing import Optional, Tuple
 
@@ -20,11 +21,18 @@ from treeple._lib.sklearn.ensemble._forest import BaseForest, ForestClassifier
 try:
     import bottleneck as bn
 
+    BOTTLENECK_AVAILABLE = True
+except ImportError:
+    BOTTLENECK_AVAILABLE = False
+
+DISABLE_BN_ENV_VAR = "TREEPLE_NO_BOTTLENECK"
+
+if BOTTLENECK_AVAILABLE and DISABLE_BN_ENV_VAR not in os.environ:
     nanmean_f = bn.nanmean
     anynan_f = lambda arr: bn.anynan(arr, axis=2)
-except ImportError:
+else:
     warnings.warn(
-        "bottleneck is not installed, falling back to numpy for nanmean and anynan functions. This may be slower."
+        "Not using bottleneck for calculations involvings nans. Expect slower performance."
     )
     nanmean_f = np.nanmean
     anynan_f = lambda arr: np.isnan(arr).any(axis=2)
