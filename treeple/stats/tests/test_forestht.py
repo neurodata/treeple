@@ -1,5 +1,5 @@
-import os
 import importlib
+import os
 
 import numpy as np
 import pytest
@@ -7,9 +7,9 @@ from flaky import flaky
 from numpy.testing import assert_almost_equal, assert_array_equal
 from sklearn import datasets
 
-from treeple import HonestForestClassifier, RandomForestClassifier
-import treeple.stats.utils as utils
 import treeple.stats as stats
+import treeple.stats.utils as utils
+from treeple import HonestForestClassifier, RandomForestClassifier
 from treeple.stats import (
     PermutationHonestForestClassifier,
     build_coleman_forest,
