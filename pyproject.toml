@@ -60,7 +60,8 @@ all = [
   'treeple[build]',
   'treeple[doc]',
   'treeple[style]',
-  'treeple[test]'
+  'treeple[test]',
+  'treeple[extra]'
 ]
 build = [
   'build',
@@ -122,6 +123,9 @@ test = [
   'memory_profiler',
   'flaky',
   'tqdm'
+]
+extra = [
+  'bottleneck'
 ]
 
 [tool.bandit]

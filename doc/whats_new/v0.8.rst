@@ -32,6 +32,8 @@ Changelog
     estimated on oob samples were biased when there was a low number of samples
     due to imbalance in the classes when ``bootstrap=True``.
     By `Adam Li`_ (:pr:`#283`)
+- |Feature| Calculations involving nans in ``treeple.stats.utils`` now use the
+    ``bottleneck`` library for faster computation. By `Ryan Hausen`_ (:pr:`#306`)
 
 Code and Documentation Contributors
 -----------------------------------
@@ -41,3 +43,4 @@ the project since version inception, including:
 
 * `Adam Li`_
 * `Sambit Panda`_
+* `Ryan Hausen`_
