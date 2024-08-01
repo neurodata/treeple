@@ -183,7 +183,7 @@ treeple is in-line with scikit-learn and thus relies on each new version release
 
 GH Actions will build wheels for each Python version and OS. Then the wheels needs to be uploaded to PyPi. The following steps outline the process:
 
-1. Download wheels from GH Actions and put all wheels into a ``dist/`` folder
+1. Download wheels from GH Actions and put all wheels into a ``dist/`` folder in the root (local) of the project.
 
 <https://github.com/neurodata/treeple/actions/workflows/build_wheels.yml> will have all the wheels for common OSes built for each Python version.
 

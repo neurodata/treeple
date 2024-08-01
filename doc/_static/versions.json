@@ -1,13 +1,18 @@
 [
     {
-        "name": "0.9 (devel)",
+        "name": "0.10",
         "version": "dev",
-        "url": "https://docs.neurodata.io/treeple/dev/"
+        "url": "https://docs.neurodata.io/treeple/v0.10/"
+    },
+    {
+        "name": "0.9",
+        "version": "0.9",
+        "url": "https://docs.neurodata.io/treeple/v0.9/"
     },
     {
         "name": "0.8",
-        "version": "stable",
-        "url": "https://docs.neurodata.io/treeple/stable/"
+        "version": "0.8",
+        "url": "https://docs.neurodata.io/treeple/v0.8/"
     },
     {
         "name": "0.7",

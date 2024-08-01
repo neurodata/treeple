@@ -1,0 +1,23 @@
+:orphan:
+
+.. include:: _contributors.rst
+.. currentmodule:: treeple
+
+.. _current:
+
+Version 0.10
+============
+
+** In Development **
+
+Changelog
+---------
+
+
+Code and Documentation Contributors
+-----------------------------------
+
+Thanks to everyone who has contributed to the maintenance and improvement of
+the project since version inception, including:
+
+* `Adam Li`_
