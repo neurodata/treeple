@@ -226,33 +226,16 @@ spin docs
 git checkout gh-pages
 ```
 
-Rename the current ``stable`` folder to the version number of the previous release, e.g. If we are releasing ``0.8.0``, then rename the ``stable`` folder to ``0.7.0``.
+Create a new folder for the new version, e.g. ``v0.8`` if you are releasing version 0.8.0.
 
-Copy the contents of the ``docs/_build/html`` folder to the root of the ``gh-pages`` branch under the `stable` folder, since this new release is the "stable" version.
+Copy the contents of the locally build ``docs/_build/html`` folder to newly created folder at the root of the ``gh-pages`` branch.
 
 4. Update the versions pointer file in main `doc/_static/versions.json` to point to the new version.
 
 e.g. If we are releasing ``0.8.0``, then you will see:
 
-```
-{
-    "name": "0.7",
-    "version": "stable",
-    "url": "https://docs.neurodata.io/treeple/stable/"
-},
-```
 
-which should get renamed to its corresponding version number:
-
-```
-    {
-        "name": "0.7",
-        "version": "0.7",
-        "url": "https://docs.neurodata.io/treeple/v0.7/"
-    },
-```
-
-Similarly, we will add pointers to the development version and new stable v0.8 version:
+Change the development version to the next version i.e. v0.9 and rename v0.8 version appropriately:
 
 ```
     {
@@ -262,8 +245,8 @@ Similarly, we will add pointers to the development version and new stable v0.8 v
     },
     {
         "name": "0.8",
-        "version": "stable",
-        "url": "https://docs.neurodata.io/treeple/stable/"
+        "version": "0.8",
+        "url": "https://docs.neurodata.io/treeple/v0.8/"
     },
 ```
 
