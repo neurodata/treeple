@@ -8,6 +8,7 @@ rules:
   line-length: disable
   document-start: disable
   truthy: disable
+  comments: disable
   braces:
     forbid: false
     min-spaces-inside: 0
