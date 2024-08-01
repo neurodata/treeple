@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Version 0.5 &#8212; treeple 0.9.0dev0 documentation</title>
+    <title>Version 0.10 &#8212; treeple 0.9.0dev0 documentation</title>
   
   
   
@@ -47,7 +47,7 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=fd10adb8"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'whats_new/v0.5';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'whats_new/v0.10';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.14.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/treeple/main/doc/_static/versions.json';
@@ -56,8 +56,8 @@
         </script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Version 0.6" href="v0.6.html" />
-    <link rel="prev" title="Version 0.4" href="v0.4.html" />
+    <link rel="next" title="Installation" href="../install.html" />
+    <link rel="prev" title="Version 0.9" href="v0.9.html" />
     <link rel="canonical" href="https://neurodata.github.io/treeple/stable/index.html" />
     <script type="text/javascript" src="../_static/copybutton.js"></script>
     <script type="text/javascript" src="../_static/scrollfix.js"></script>
@@ -397,12 +397,12 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="v0.2.html">Version 0.2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="v0.3.html">Version 0.3</a></li>
 <li class="toctree-l1"><a class="reference internal" href="v0.4.html">Version 0.4</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Version 0.5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="v0.5.html">Version 0.5</a></li>
 <li class="toctree-l1"><a class="reference internal" href="v0.6.html">Version 0.6</a></li>
 <li class="toctree-l1"><a class="reference internal" href="v0.7.html">Version 0.7</a></li>
 <li class="toctree-l1"><a class="reference internal" href="v0.8.html">Version 0.8</a></li>
 <li class="toctree-l1"><a class="reference internal" href="v0.9.html">Version 0.9</a></li>
-<li class="toctree-l1"><a class="reference internal" href="v0.10.html">Version 0.10 (Unreleased)</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Version 0.10 (Unreleased)</a></li>
 </ul>
 </div>
 </nav></div>
@@ -443,7 +443,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="../whats_new.html" class="nav-link">Release History</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">Version 0.5</li>
+    <li class="breadcrumb-item active" aria-current="page">Version 0.10</li>
   </ul>
 </nav>
 </div>
@@ -460,28 +460,11 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="version-0-5">
-<span id="v0-5"></span><h1>Version 0.5<a class="headerlink" href="#version-0-5" title="Link to this heading">#</a></h1>
-<p>This release includes a number of enhancements and bug fixes, mainly
-to the <a class="reference internal" href="../generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier" title="treeple.tree.MultiViewDecisionTreeClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">treeple.tree.MultiViewDecisionTreeClassifier</span></code></a>. Most notably,
-the <code class="docutils literal notranslate"><span class="pre">max_features</span></code> argument now supports an array of values, which
-applies a different <code class="docutils literal notranslate"><span class="pre">max_features</span></code> argument per feature view.</p>
+  <section id="version-0-10">
+<span id="current"></span><h1>Version 0.10<a class="headerlink" href="#version-0-10" title="Link to this heading">#</a></h1>
+<p>** In Development **</p>
 <section id="changelog">
 <h2>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">#</a></h2>
-<ul class="simple">
-<li><p><span class="raw-html"><span class="badge badge-info">Enhancement</span></span>  <a class="reference internal" href="../generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier" title="treeple.tree.MultiViewDecisionTreeClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">treeple.tree.MultiViewDecisionTreeClassifier</span></code></a> now
-rounds up the number of features to split on to the nearest integer when
-applying <code class="docutils literal notranslate"><span class="pre">max_features</span></code> to each feature view, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/#183">##183</a>).</p></li>
-<li><p><span class="raw-html"><span class="badge badge-success">Feature</span></span>  <a class="reference internal" href="../generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier" title="treeple.tree.MultiViewDecisionTreeClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">treeple.tree.MultiViewDecisionTreeClassifier</span></code></a> now
-supports an array passed in for <code class="docutils literal notranslate"><span class="pre">max_features</span></code>, which applies a different
-max_features argument per view, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/#183">##183</a>).</p></li>
-<li><p><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  <a class="reference internal" href="../generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier" title="treeple.tree.MultiViewDecisionTreeClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">treeple.tree.MultiViewDecisionTreeClassifier</span></code></a> now correctly
-handles the case where there is one feature view that is exhausted, and
-another that is not for <code class="docutils literal notranslate"><span class="pre">apply_max_features_per_feature_set</span> <span class="pre">=</span> <span class="pre">False</span></code>,
-by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/#183">##183</a>).</p></li>
-<li><p><span class="raw-html"><span class="badge badge-danger">Fix</span></span>  <code class="docutils literal notranslate"><span class="pre">treeple.stats.FeatureImportanceForestClassifier</span></code> now correctly passes
-metric kwargs to the null distribution function, by <a class="reference external" href="https://adam2392.github.io">Adam Li</a> (<a class="reference external" href="https://github.com/neurodata/treeple/pull/#183">##183</a>).</p></li>
-</ul>
 </section>
 <section id="code-and-documentation-contributors">
 <h2>Code and Documentation Contributors<a class="headerlink" href="#code-and-documentation-contributors" title="Link to this heading">#</a></h2>
@@ -504,20 +487,20 @@ the project since version inception, including:</p>
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="v0.4.html"
+       href="v0.9.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Version 0.4</p>
+        <p class="prev-next-title">Version 0.9</p>
       </div>
     </a>
     <a class="right-next"
-       href="v0.6.html"
+       href="../install.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Version 0.6</p>
+        <p class="prev-next-title">Installation</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
