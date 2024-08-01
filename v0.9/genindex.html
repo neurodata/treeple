@@ -1,0 +1,1821 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" data-theme="auto">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Index &#8212; treeple 0.9.0dev0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "auto";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "auto";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/plot_directive.css?v=7f9a90b1" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="_static/style.css?v=3035adc5" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="_static/documentation_options.js?v=54a029fc"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=fd10adb8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/treeple/main/doc/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="canonical" href="https://neurodata.github.io/treeple/stable/index.html" />
+    <script type="text/javascript" src="_static/copybutton.js"></script>
+    <script type="text/javascript" src="_static/scrollfix.js"></script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="auto">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">treeple 0.9.0dev0 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="whats_new.html">
+    Release History
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="install.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="use.html">
+    Examples using treeple
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/neurodata/treeple" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="whats_new.html">
+    Release History
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="install.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="use.html">
+    Examples using treeple
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-3"
+      type="button"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-3"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-3"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-3">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/neurodata/treeple" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none"></div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
+ | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
+ | <a href="#K"><strong>K</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
+ 
+</div>
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.ExtraTreesClassifier.html#treeple.ExtraTreesClassifier.apply">apply() (treeple.ExtraTreesClassifier method)</a>
+
+      <ul>
+        <li><a href="generated/treeple.ExtraTreesRegressor.html#treeple.ExtraTreesRegressor.apply">(treeple.ExtraTreesRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier.apply">(treeple.HonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.MultiViewRandomForestClassifier.html#treeple.MultiViewRandomForestClassifier.apply">(treeple.MultiViewRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestClassifier.html#treeple.ObliqueRandomForestClassifier.apply">(treeple.ObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestRegressor.html#treeple.ObliqueRandomForestRegressor.apply">(treeple.ObliqueRandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestClassifier.html#treeple.PatchObliqueRandomForestClassifier.apply">(treeple.PatchObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestRegressor.html#treeple.PatchObliqueRandomForestRegressor.apply">(treeple.PatchObliqueRandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestClassifier.html#treeple.RandomForestClassifier.apply">(treeple.RandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestRegressor.html#treeple.RandomForestRegressor.apply">(treeple.RandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.stats.PermutationHonestForestClassifier.html#treeple.stats.PermutationHonestForestClassifier.apply">(treeple.stats.PermutationHonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeClassifier.html#treeple.tree.DecisionTreeClassifier.apply">(treeple.tree.DecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeRegressor.html#treeple.tree.DecisionTreeRegressor.apply">(treeple.tree.DecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeClassifier.html#treeple.tree.ExtraTreeClassifier.apply">(treeple.tree.ExtraTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeRegressor.html#treeple.tree.ExtraTreeRegressor.apply">(treeple.tree.ExtraTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.HonestTreeClassifier.html#treeple.tree.HonestTreeClassifier.apply">(treeple.tree.HonestTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier.apply">(treeple.tree.MultiViewDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeClassifier.html#treeple.tree.ObliqueDecisionTreeClassifier.apply">(treeple.tree.ObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeRegressor.html#treeple.tree.ObliqueDecisionTreeRegressor.apply">(treeple.tree.ObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeClassifier.html#treeple.tree.PatchObliqueDecisionTreeClassifier.apply">(treeple.tree.PatchObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeRegressor.html#treeple.tree.PatchObliqueDecisionTreeRegressor.apply">(treeple.tree.PatchObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedDecisionTree.html#treeple.tree.UnsupervisedDecisionTree.apply">(treeple.tree.UnsupervisedDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedObliqueDecisionTree.html#treeple.tree.UnsupervisedObliqueDecisionTree.apply">(treeple.tree.UnsupervisedObliqueDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedObliqueRandomForest.html#treeple.UnsupervisedObliqueRandomForest.apply">(treeple.UnsupervisedObliqueRandomForest method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedRandomForest.html#treeple.UnsupervisedRandomForest.apply">(treeple.UnsupervisedRandomForest method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.datasets.approximate_clf_mutual_information.html#treeple.datasets.approximate_clf_mutual_information">approximate_clf_mutual_information() (in module treeple.datasets)</a>
+</li>
+      <li><a href="generated/treeple.datasets.approximate_clf_mutual_information_with_monte_carlo.html#treeple.datasets.approximate_clf_mutual_information_with_monte_carlo">approximate_clf_mutual_information_with_monte_carlo() (in module treeple.datasets)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.stats.build_coleman_forest.html#treeple.stats.build_coleman_forest">build_coleman_forest() (in module treeple.stats)</a>
+</li>
+      <li><a href="generated/treeple.stats.build_cv_forest.html#treeple.stats.build_cv_forest">build_cv_forest() (in module treeple.stats)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.stats.build_oob_forest.html#treeple.stats.build_oob_forest">build_oob_forest() (in module treeple.stats)</a>
+</li>
+      <li><a href="generated/treeple.stats.build_permutation_forest.html#treeple.stats.build_permutation_forest">build_permutation_forest() (in module treeple.stats)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.experimental.mutual_info.cmi_gaussian.html#treeple.experimental.mutual_info.cmi_gaussian">cmi_gaussian() (in module treeple.experimental.mutual_info)</a>
+</li>
+      <li><a href="generated/treeple.tree.compute_forest_similarity_matrix.html#treeple.tree.compute_forest_similarity_matrix">compute_forest_similarity_matrix() (in module treeple.tree)</a>
+</li>
+      <li><a href="generated/treeple.MultiViewRandomForestClassifier.html#treeple.MultiViewRandomForestClassifier.compute_similarity_matrix">compute_similarity_matrix() (treeple.MultiViewRandomForestClassifier method)</a>
+
+      <ul>
+        <li><a href="generated/treeple.ObliqueRandomForestClassifier.html#treeple.ObliqueRandomForestClassifier.compute_similarity_matrix">(treeple.ObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestRegressor.html#treeple.ObliqueRandomForestRegressor.compute_similarity_matrix">(treeple.ObliqueRandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestClassifier.html#treeple.PatchObliqueRandomForestClassifier.compute_similarity_matrix">(treeple.PatchObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestRegressor.html#treeple.PatchObliqueRandomForestRegressor.compute_similarity_matrix">(treeple.PatchObliqueRandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier.compute_similarity_matrix">(treeple.tree.MultiViewDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeClassifier.html#treeple.tree.ObliqueDecisionTreeClassifier.compute_similarity_matrix">(treeple.tree.ObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeRegressor.html#treeple.tree.ObliqueDecisionTreeRegressor.compute_similarity_matrix">(treeple.tree.ObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeClassifier.html#treeple.tree.PatchObliqueDecisionTreeClassifier.compute_similarity_matrix">(treeple.tree.PatchObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeRegressor.html#treeple.tree.PatchObliqueDecisionTreeRegressor.compute_similarity_matrix">(treeple.tree.PatchObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedDecisionTree.html#treeple.tree.UnsupervisedDecisionTree.compute_similarity_matrix">(treeple.tree.UnsupervisedDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedObliqueDecisionTree.html#treeple.tree.UnsupervisedObliqueDecisionTree.compute_similarity_matrix">(treeple.tree.UnsupervisedObliqueDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedObliqueRandomForest.html#treeple.UnsupervisedObliqueRandomForest.compute_similarity_matrix">(treeple.UnsupervisedObliqueRandomForest method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedRandomForest.html#treeple.UnsupervisedRandomForest.compute_similarity_matrix">(treeple.UnsupervisedRandomForest method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.experimental.conditional_resample.html#treeple.experimental.conditional_resample">conditional_resample() (in module treeple.experimental)</a>
+</li>
+      <li><a href="generated/treeple.tree.DecisionTreeClassifier.html#treeple.tree.DecisionTreeClassifier.cost_complexity_pruning_path">cost_complexity_pruning_path() (treeple.tree.DecisionTreeClassifier method)</a>
+
+      <ul>
+        <li><a href="generated/treeple.tree.DecisionTreeRegressor.html#treeple.tree.DecisionTreeRegressor.cost_complexity_pruning_path">(treeple.tree.DecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeClassifier.html#treeple.tree.ExtraTreeClassifier.cost_complexity_pruning_path">(treeple.tree.ExtraTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeRegressor.html#treeple.tree.ExtraTreeRegressor.cost_complexity_pruning_path">(treeple.tree.ExtraTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.HonestTreeClassifier.html#treeple.tree.HonestTreeClassifier.cost_complexity_pruning_path">(treeple.tree.HonestTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier.cost_complexity_pruning_path">(treeple.tree.MultiViewDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeClassifier.html#treeple.tree.ObliqueDecisionTreeClassifier.cost_complexity_pruning_path">(treeple.tree.ObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeRegressor.html#treeple.tree.ObliqueDecisionTreeRegressor.cost_complexity_pruning_path">(treeple.tree.ObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeClassifier.html#treeple.tree.PatchObliqueDecisionTreeClassifier.cost_complexity_pruning_path">(treeple.tree.PatchObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeRegressor.html#treeple.tree.PatchObliqueDecisionTreeRegressor.cost_complexity_pruning_path">(treeple.tree.PatchObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedDecisionTree.html#treeple.tree.UnsupervisedDecisionTree.cost_complexity_pruning_path">(treeple.tree.UnsupervisedDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedObliqueDecisionTree.html#treeple.tree.UnsupervisedObliqueDecisionTree.cost_complexity_pruning_path">(treeple.tree.UnsupervisedObliqueDecisionTree method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.ExtendedIsolationForest.html#treeple.ExtendedIsolationForest.decision_function">decision_function() (treeple.ExtendedIsolationForest method)</a>
+</li>
+      <li><a href="generated/treeple.ExtraTreesClassifier.html#treeple.ExtraTreesClassifier.decision_path">decision_path() (treeple.ExtraTreesClassifier method)</a>
+
+      <ul>
+        <li><a href="generated/treeple.ExtraTreesRegressor.html#treeple.ExtraTreesRegressor.decision_path">(treeple.ExtraTreesRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier.decision_path">(treeple.HonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.MultiViewRandomForestClassifier.html#treeple.MultiViewRandomForestClassifier.decision_path">(treeple.MultiViewRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestClassifier.html#treeple.ObliqueRandomForestClassifier.decision_path">(treeple.ObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestRegressor.html#treeple.ObliqueRandomForestRegressor.decision_path">(treeple.ObliqueRandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestClassifier.html#treeple.PatchObliqueRandomForestClassifier.decision_path">(treeple.PatchObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestRegressor.html#treeple.PatchObliqueRandomForestRegressor.decision_path">(treeple.PatchObliqueRandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestClassifier.html#treeple.RandomForestClassifier.decision_path">(treeple.RandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestRegressor.html#treeple.RandomForestRegressor.decision_path">(treeple.RandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.stats.PermutationHonestForestClassifier.html#treeple.stats.PermutationHonestForestClassifier.decision_path">(treeple.stats.PermutationHonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeClassifier.html#treeple.tree.DecisionTreeClassifier.decision_path">(treeple.tree.DecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeRegressor.html#treeple.tree.DecisionTreeRegressor.decision_path">(treeple.tree.DecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeClassifier.html#treeple.tree.ExtraTreeClassifier.decision_path">(treeple.tree.ExtraTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeRegressor.html#treeple.tree.ExtraTreeRegressor.decision_path">(treeple.tree.ExtraTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.HonestTreeClassifier.html#treeple.tree.HonestTreeClassifier.decision_path">(treeple.tree.HonestTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier.decision_path">(treeple.tree.MultiViewDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeClassifier.html#treeple.tree.ObliqueDecisionTreeClassifier.decision_path">(treeple.tree.ObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeRegressor.html#treeple.tree.ObliqueDecisionTreeRegressor.decision_path">(treeple.tree.ObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeClassifier.html#treeple.tree.PatchObliqueDecisionTreeClassifier.decision_path">(treeple.tree.PatchObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeRegressor.html#treeple.tree.PatchObliqueDecisionTreeRegressor.decision_path">(treeple.tree.PatchObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedDecisionTree.html#treeple.tree.UnsupervisedDecisionTree.decision_path">(treeple.tree.UnsupervisedDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedObliqueDecisionTree.html#treeple.tree.UnsupervisedObliqueDecisionTree.decision_path">(treeple.tree.UnsupervisedObliqueDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedObliqueRandomForest.html#treeple.UnsupervisedObliqueRandomForest.decision_path">(treeple.UnsupervisedObliqueRandomForest method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedRandomForest.html#treeple.UnsupervisedRandomForest.decision_path">(treeple.UnsupervisedRandomForest method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.tree.DecisionTreeClassifier.html#treeple.tree.DecisionTreeClassifier">DecisionTreeClassifier (class in treeple.tree)</a>
+</li>
+      <li><a href="generated/treeple.tree.DecisionTreeRegressor.html#treeple.tree.DecisionTreeRegressor">DecisionTreeRegressor (class in treeple.tree)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.experimental.mutual_info.entropy_gaussian.html#treeple.experimental.mutual_info.entropy_gaussian">entropy_gaussian() (in module treeple.experimental.mutual_info)</a>
+</li>
+      <li><a href="generated/treeple.ExtendedIsolationForest.html#treeple.ExtendedIsolationForest.estimators_samples_">estimators_samples_ (treeple.ExtendedIsolationForest property)</a>
+
+      <ul>
+        <li><a href="generated/treeple.ExtraTreesClassifier.html#treeple.ExtraTreesClassifier.estimators_samples_">(treeple.ExtraTreesClassifier property)</a>
+</li>
+        <li><a href="generated/treeple.ExtraTreesRegressor.html#treeple.ExtraTreesRegressor.estimators_samples_">(treeple.ExtraTreesRegressor property)</a>
+</li>
+        <li><a href="generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier.estimators_samples_">(treeple.HonestForestClassifier property)</a>
+</li>
+        <li><a href="generated/treeple.MultiViewRandomForestClassifier.html#treeple.MultiViewRandomForestClassifier.estimators_samples_">(treeple.MultiViewRandomForestClassifier property)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestClassifier.html#treeple.ObliqueRandomForestClassifier.estimators_samples_">(treeple.ObliqueRandomForestClassifier property)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestRegressor.html#treeple.ObliqueRandomForestRegressor.estimators_samples_">(treeple.ObliqueRandomForestRegressor property)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestClassifier.html#treeple.PatchObliqueRandomForestClassifier.estimators_samples_">(treeple.PatchObliqueRandomForestClassifier property)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestRegressor.html#treeple.PatchObliqueRandomForestRegressor.estimators_samples_">(treeple.PatchObliqueRandomForestRegressor property)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestClassifier.html#treeple.RandomForestClassifier.estimators_samples_">(treeple.RandomForestClassifier property)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestRegressor.html#treeple.RandomForestRegressor.estimators_samples_">(treeple.RandomForestRegressor property)</a>
+</li>
+        <li><a href="generated/treeple.stats.PermutationHonestForestClassifier.html#treeple.stats.PermutationHonestForestClassifier.estimators_samples_">(treeple.stats.PermutationHonestForestClassifier property)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedObliqueRandomForest.html#treeple.UnsupervisedObliqueRandomForest.estimators_samples_">(treeple.UnsupervisedObliqueRandomForest property)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedRandomForest.html#treeple.UnsupervisedRandomForest.estimators_samples_">(treeple.UnsupervisedRandomForest property)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.ExtendedIsolationForest.html#treeple.ExtendedIsolationForest">ExtendedIsolationForest (class in treeple)</a>
+</li>
+      <li><a href="generated/treeple.tree.ExtraTreeClassifier.html#treeple.tree.ExtraTreeClassifier">ExtraTreeClassifier (class in treeple.tree)</a>
+</li>
+      <li><a href="generated/treeple.tree.ExtraTreeRegressor.html#treeple.tree.ExtraTreeRegressor">ExtraTreeRegressor (class in treeple.tree)</a>
+</li>
+      <li><a href="generated/treeple.ExtraTreesClassifier.html#treeple.ExtraTreesClassifier">ExtraTreesClassifier (class in treeple)</a>
+</li>
+      <li><a href="generated/treeple.ExtraTreesRegressor.html#treeple.ExtraTreesRegressor">ExtraTreesRegressor (class in treeple)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.ExtraTreesClassifier.html#treeple.ExtraTreesClassifier.feature_importances_">feature_importances_ (treeple.ExtraTreesClassifier property)</a>
+
+      <ul>
+        <li><a href="generated/treeple.ExtraTreesRegressor.html#treeple.ExtraTreesRegressor.feature_importances_">(treeple.ExtraTreesRegressor property)</a>
+</li>
+        <li><a href="generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier.feature_importances_">(treeple.HonestForestClassifier property)</a>
+</li>
+        <li><a href="generated/treeple.MultiViewRandomForestClassifier.html#treeple.MultiViewRandomForestClassifier.feature_importances_">(treeple.MultiViewRandomForestClassifier property)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestClassifier.html#treeple.ObliqueRandomForestClassifier.feature_importances_">(treeple.ObliqueRandomForestClassifier property)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestRegressor.html#treeple.ObliqueRandomForestRegressor.feature_importances_">(treeple.ObliqueRandomForestRegressor property)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestClassifier.html#treeple.PatchObliqueRandomForestClassifier.feature_importances_">(treeple.PatchObliqueRandomForestClassifier property)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestRegressor.html#treeple.PatchObliqueRandomForestRegressor.feature_importances_">(treeple.PatchObliqueRandomForestRegressor property)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestClassifier.html#treeple.RandomForestClassifier.feature_importances_">(treeple.RandomForestClassifier property)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestRegressor.html#treeple.RandomForestRegressor.feature_importances_">(treeple.RandomForestRegressor property)</a>
+</li>
+        <li><a href="generated/treeple.stats.PermutationHonestForestClassifier.html#treeple.stats.PermutationHonestForestClassifier.feature_importances_">(treeple.stats.PermutationHonestForestClassifier property)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeClassifier.html#treeple.tree.DecisionTreeClassifier.feature_importances_">(treeple.tree.DecisionTreeClassifier property)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeRegressor.html#treeple.tree.DecisionTreeRegressor.feature_importances_">(treeple.tree.DecisionTreeRegressor property)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeClassifier.html#treeple.tree.ExtraTreeClassifier.feature_importances_">(treeple.tree.ExtraTreeClassifier property)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeRegressor.html#treeple.tree.ExtraTreeRegressor.feature_importances_">(treeple.tree.ExtraTreeRegressor property)</a>
+</li>
+        <li><a href="generated/treeple.tree.HonestTreeClassifier.html#treeple.tree.HonestTreeClassifier.feature_importances_">(treeple.tree.HonestTreeClassifier property)</a>
+</li>
+        <li><a href="generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier.feature_importances_">(treeple.tree.MultiViewDecisionTreeClassifier property)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeClassifier.html#treeple.tree.ObliqueDecisionTreeClassifier.feature_importances_">(treeple.tree.ObliqueDecisionTreeClassifier property)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeRegressor.html#treeple.tree.ObliqueDecisionTreeRegressor.feature_importances_">(treeple.tree.ObliqueDecisionTreeRegressor property)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeClassifier.html#treeple.tree.PatchObliqueDecisionTreeClassifier.feature_importances_">(treeple.tree.PatchObliqueDecisionTreeClassifier property)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeRegressor.html#treeple.tree.PatchObliqueDecisionTreeRegressor.feature_importances_">(treeple.tree.PatchObliqueDecisionTreeRegressor property)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedDecisionTree.html#treeple.tree.UnsupervisedDecisionTree.feature_importances_">(treeple.tree.UnsupervisedDecisionTree property)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedObliqueDecisionTree.html#treeple.tree.UnsupervisedObliqueDecisionTree.feature_importances_">(treeple.tree.UnsupervisedObliqueDecisionTree property)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedObliqueRandomForest.html#treeple.UnsupervisedObliqueRandomForest.feature_importances_">(treeple.UnsupervisedObliqueRandomForest property)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedRandomForest.html#treeple.UnsupervisedRandomForest.feature_importances_">(treeple.UnsupervisedRandomForest property)</a>
+</li>
+      </ul></li>
+      <li><a href="generated/treeple.ExtendedIsolationForest.html#treeple.ExtendedIsolationForest.fit">fit() (treeple.ExtendedIsolationForest method)</a>
+
+      <ul>
+        <li><a href="generated/treeple.ExtraTreesClassifier.html#treeple.ExtraTreesClassifier.fit">(treeple.ExtraTreesClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ExtraTreesRegressor.html#treeple.ExtraTreesRegressor.fit">(treeple.ExtraTreesRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier.fit">(treeple.HonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.MultiViewRandomForestClassifier.html#treeple.MultiViewRandomForestClassifier.fit">(treeple.MultiViewRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.NearestNeighborsMetaEstimator.html#treeple.NearestNeighborsMetaEstimator.fit">(treeple.NearestNeighborsMetaEstimator method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestClassifier.html#treeple.ObliqueRandomForestClassifier.fit">(treeple.ObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestRegressor.html#treeple.ObliqueRandomForestRegressor.fit">(treeple.ObliqueRandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestClassifier.html#treeple.PatchObliqueRandomForestClassifier.fit">(treeple.PatchObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestRegressor.html#treeple.PatchObliqueRandomForestRegressor.fit">(treeple.PatchObliqueRandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestClassifier.html#treeple.RandomForestClassifier.fit">(treeple.RandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestRegressor.html#treeple.RandomForestRegressor.fit">(treeple.RandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.stats.PermutationHonestForestClassifier.html#treeple.stats.PermutationHonestForestClassifier.fit">(treeple.stats.PermutationHonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeClassifier.html#treeple.tree.DecisionTreeClassifier.fit">(treeple.tree.DecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeRegressor.html#treeple.tree.DecisionTreeRegressor.fit">(treeple.tree.DecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeClassifier.html#treeple.tree.ExtraTreeClassifier.fit">(treeple.tree.ExtraTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeRegressor.html#treeple.tree.ExtraTreeRegressor.fit">(treeple.tree.ExtraTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.HonestTreeClassifier.html#treeple.tree.HonestTreeClassifier.fit">(treeple.tree.HonestTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier.fit">(treeple.tree.MultiViewDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeClassifier.html#treeple.tree.ObliqueDecisionTreeClassifier.fit">(treeple.tree.ObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeRegressor.html#treeple.tree.ObliqueDecisionTreeRegressor.fit">(treeple.tree.ObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeClassifier.html#treeple.tree.PatchObliqueDecisionTreeClassifier.fit">(treeple.tree.PatchObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeRegressor.html#treeple.tree.PatchObliqueDecisionTreeRegressor.fit">(treeple.tree.PatchObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedObliqueRandomForest.html#treeple.UnsupervisedObliqueRandomForest.fit">(treeple.UnsupervisedObliqueRandomForest method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedRandomForest.html#treeple.UnsupervisedRandomForest.fit">(treeple.UnsupervisedRandomForest method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.ExtendedIsolationForest.html#treeple.ExtendedIsolationForest.fit_predict">fit_predict() (treeple.ExtendedIsolationForest method)</a>
+
+      <ul>
+        <li><a href="generated/treeple.tree.UnsupervisedDecisionTree.html#treeple.tree.UnsupervisedDecisionTree.fit_predict">(treeple.tree.UnsupervisedDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedObliqueDecisionTree.html#treeple.tree.UnsupervisedObliqueDecisionTree.fit_predict">(treeple.tree.UnsupervisedObliqueDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedObliqueRandomForest.html#treeple.UnsupervisedObliqueRandomForest.fit_predict">(treeple.UnsupervisedObliqueRandomForest method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedRandomForest.html#treeple.UnsupervisedRandomForest.fit_predict">(treeple.UnsupervisedRandomForest method)</a>
+</li>
+      </ul></li>
+      <li><a href="generated/treeple.tree.UnsupervisedDecisionTree.html#treeple.tree.UnsupervisedDecisionTree.fit_transform">fit_transform() (treeple.tree.UnsupervisedDecisionTree method)</a>
+
+      <ul>
+        <li><a href="generated/treeple.tree.UnsupervisedObliqueDecisionTree.html#treeple.tree.UnsupervisedObliqueDecisionTree.fit_transform">(treeple.tree.UnsupervisedObliqueDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedObliqueRandomForest.html#treeple.UnsupervisedObliqueRandomForest.fit_transform">(treeple.UnsupervisedObliqueRandomForest method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedRandomForest.html#treeple.UnsupervisedRandomForest.fit_transform">(treeple.UnsupervisedRandomForest method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.tree.DecisionTreeClassifier.html#treeple.tree.DecisionTreeClassifier.get_depth">get_depth() (treeple.tree.DecisionTreeClassifier method)</a>
+
+      <ul>
+        <li><a href="generated/treeple.tree.DecisionTreeRegressor.html#treeple.tree.DecisionTreeRegressor.get_depth">(treeple.tree.DecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeClassifier.html#treeple.tree.ExtraTreeClassifier.get_depth">(treeple.tree.ExtraTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeRegressor.html#treeple.tree.ExtraTreeRegressor.get_depth">(treeple.tree.ExtraTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.HonestTreeClassifier.html#treeple.tree.HonestTreeClassifier.get_depth">(treeple.tree.HonestTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier.get_depth">(treeple.tree.MultiViewDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeClassifier.html#treeple.tree.ObliqueDecisionTreeClassifier.get_depth">(treeple.tree.ObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeRegressor.html#treeple.tree.ObliqueDecisionTreeRegressor.get_depth">(treeple.tree.ObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeClassifier.html#treeple.tree.PatchObliqueDecisionTreeClassifier.get_depth">(treeple.tree.PatchObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeRegressor.html#treeple.tree.PatchObliqueDecisionTreeRegressor.get_depth">(treeple.tree.PatchObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedDecisionTree.html#treeple.tree.UnsupervisedDecisionTree.get_depth">(treeple.tree.UnsupervisedDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedObliqueDecisionTree.html#treeple.tree.UnsupervisedObliqueDecisionTree.get_depth">(treeple.tree.UnsupervisedObliqueDecisionTree method)</a>
+</li>
+      </ul></li>
+      <li><a href="generated/treeple.ExtraTreesClassifier.html#treeple.ExtraTreesClassifier.get_leaf_node_samples">get_leaf_node_samples() (treeple.ExtraTreesClassifier method)</a>
+
+      <ul>
+        <li><a href="generated/treeple.ExtraTreesRegressor.html#treeple.ExtraTreesRegressor.get_leaf_node_samples">(treeple.ExtraTreesRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier.get_leaf_node_samples">(treeple.HonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.MultiViewRandomForestClassifier.html#treeple.MultiViewRandomForestClassifier.get_leaf_node_samples">(treeple.MultiViewRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestClassifier.html#treeple.ObliqueRandomForestClassifier.get_leaf_node_samples">(treeple.ObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestRegressor.html#treeple.ObliqueRandomForestRegressor.get_leaf_node_samples">(treeple.ObliqueRandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestClassifier.html#treeple.PatchObliqueRandomForestClassifier.get_leaf_node_samples">(treeple.PatchObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestRegressor.html#treeple.PatchObliqueRandomForestRegressor.get_leaf_node_samples">(treeple.PatchObliqueRandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestClassifier.html#treeple.RandomForestClassifier.get_leaf_node_samples">(treeple.RandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestRegressor.html#treeple.RandomForestRegressor.get_leaf_node_samples">(treeple.RandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.stats.PermutationHonestForestClassifier.html#treeple.stats.PermutationHonestForestClassifier.get_leaf_node_samples">(treeple.stats.PermutationHonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeClassifier.html#treeple.tree.DecisionTreeClassifier.get_leaf_node_samples">(treeple.tree.DecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeRegressor.html#treeple.tree.DecisionTreeRegressor.get_leaf_node_samples">(treeple.tree.DecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeClassifier.html#treeple.tree.ExtraTreeClassifier.get_leaf_node_samples">(treeple.tree.ExtraTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeRegressor.html#treeple.tree.ExtraTreeRegressor.get_leaf_node_samples">(treeple.tree.ExtraTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.HonestTreeClassifier.html#treeple.tree.HonestTreeClassifier.get_leaf_node_samples">(treeple.tree.HonestTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier.get_leaf_node_samples">(treeple.tree.MultiViewDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeClassifier.html#treeple.tree.ObliqueDecisionTreeClassifier.get_leaf_node_samples">(treeple.tree.ObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeRegressor.html#treeple.tree.ObliqueDecisionTreeRegressor.get_leaf_node_samples">(treeple.tree.ObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeClassifier.html#treeple.tree.PatchObliqueDecisionTreeClassifier.get_leaf_node_samples">(treeple.tree.PatchObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeRegressor.html#treeple.tree.PatchObliqueDecisionTreeRegressor.get_leaf_node_samples">(treeple.tree.PatchObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedDecisionTree.html#treeple.tree.UnsupervisedDecisionTree.get_leaf_node_samples">(treeple.tree.UnsupervisedDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedObliqueDecisionTree.html#treeple.tree.UnsupervisedObliqueDecisionTree.get_leaf_node_samples">(treeple.tree.UnsupervisedObliqueDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedObliqueRandomForest.html#treeple.UnsupervisedObliqueRandomForest.get_leaf_node_samples">(treeple.UnsupervisedObliqueRandomForest method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedRandomForest.html#treeple.UnsupervisedRandomForest.get_leaf_node_samples">(treeple.UnsupervisedRandomForest method)</a>
+</li>
+      </ul></li>
+      <li><a href="generated/treeple.ExtendedIsolationForest.html#treeple.ExtendedIsolationForest.get_metadata_routing">get_metadata_routing() (treeple.ExtendedIsolationForest method)</a>
+
+      <ul>
+        <li><a href="generated/treeple.ExtraTreesClassifier.html#treeple.ExtraTreesClassifier.get_metadata_routing">(treeple.ExtraTreesClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ExtraTreesRegressor.html#treeple.ExtraTreesRegressor.get_metadata_routing">(treeple.ExtraTreesRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier.get_metadata_routing">(treeple.HonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.MultiViewRandomForestClassifier.html#treeple.MultiViewRandomForestClassifier.get_metadata_routing">(treeple.MultiViewRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.NearestNeighborsMetaEstimator.html#treeple.NearestNeighborsMetaEstimator.get_metadata_routing">(treeple.NearestNeighborsMetaEstimator method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestClassifier.html#treeple.ObliqueRandomForestClassifier.get_metadata_routing">(treeple.ObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestRegressor.html#treeple.ObliqueRandomForestRegressor.get_metadata_routing">(treeple.ObliqueRandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestClassifier.html#treeple.PatchObliqueRandomForestClassifier.get_metadata_routing">(treeple.PatchObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestRegressor.html#treeple.PatchObliqueRandomForestRegressor.get_metadata_routing">(treeple.PatchObliqueRandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestClassifier.html#treeple.RandomForestClassifier.get_metadata_routing">(treeple.RandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestRegressor.html#treeple.RandomForestRegressor.get_metadata_routing">(treeple.RandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.stats.PermutationHonestForestClassifier.html#treeple.stats.PermutationHonestForestClassifier.get_metadata_routing">(treeple.stats.PermutationHonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeClassifier.html#treeple.tree.DecisionTreeClassifier.get_metadata_routing">(treeple.tree.DecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeRegressor.html#treeple.tree.DecisionTreeRegressor.get_metadata_routing">(treeple.tree.DecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeClassifier.html#treeple.tree.ExtraTreeClassifier.get_metadata_routing">(treeple.tree.ExtraTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeRegressor.html#treeple.tree.ExtraTreeRegressor.get_metadata_routing">(treeple.tree.ExtraTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.HonestTreeClassifier.html#treeple.tree.HonestTreeClassifier.get_metadata_routing">(treeple.tree.HonestTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier.get_metadata_routing">(treeple.tree.MultiViewDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeClassifier.html#treeple.tree.ObliqueDecisionTreeClassifier.get_metadata_routing">(treeple.tree.ObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeRegressor.html#treeple.tree.ObliqueDecisionTreeRegressor.get_metadata_routing">(treeple.tree.ObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeClassifier.html#treeple.tree.PatchObliqueDecisionTreeClassifier.get_metadata_routing">(treeple.tree.PatchObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeRegressor.html#treeple.tree.PatchObliqueDecisionTreeRegressor.get_metadata_routing">(treeple.tree.PatchObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedDecisionTree.html#treeple.tree.UnsupervisedDecisionTree.get_metadata_routing">(treeple.tree.UnsupervisedDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedObliqueDecisionTree.html#treeple.tree.UnsupervisedObliqueDecisionTree.get_metadata_routing">(treeple.tree.UnsupervisedObliqueDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedObliqueRandomForest.html#treeple.UnsupervisedObliqueRandomForest.get_metadata_routing">(treeple.UnsupervisedObliqueRandomForest method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedRandomForest.html#treeple.UnsupervisedRandomForest.get_metadata_routing">(treeple.UnsupervisedRandomForest method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.tree.DecisionTreeClassifier.html#treeple.tree.DecisionTreeClassifier.get_n_leaves">get_n_leaves() (treeple.tree.DecisionTreeClassifier method)</a>
+
+      <ul>
+        <li><a href="generated/treeple.tree.DecisionTreeRegressor.html#treeple.tree.DecisionTreeRegressor.get_n_leaves">(treeple.tree.DecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeClassifier.html#treeple.tree.ExtraTreeClassifier.get_n_leaves">(treeple.tree.ExtraTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeRegressor.html#treeple.tree.ExtraTreeRegressor.get_n_leaves">(treeple.tree.ExtraTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.HonestTreeClassifier.html#treeple.tree.HonestTreeClassifier.get_n_leaves">(treeple.tree.HonestTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier.get_n_leaves">(treeple.tree.MultiViewDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeClassifier.html#treeple.tree.ObliqueDecisionTreeClassifier.get_n_leaves">(treeple.tree.ObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeRegressor.html#treeple.tree.ObliqueDecisionTreeRegressor.get_n_leaves">(treeple.tree.ObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeClassifier.html#treeple.tree.PatchObliqueDecisionTreeClassifier.get_n_leaves">(treeple.tree.PatchObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeRegressor.html#treeple.tree.PatchObliqueDecisionTreeRegressor.get_n_leaves">(treeple.tree.PatchObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedDecisionTree.html#treeple.tree.UnsupervisedDecisionTree.get_n_leaves">(treeple.tree.UnsupervisedDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedObliqueDecisionTree.html#treeple.tree.UnsupervisedObliqueDecisionTree.get_n_leaves">(treeple.tree.UnsupervisedObliqueDecisionTree method)</a>
+</li>
+      </ul></li>
+      <li><a href="generated/treeple.ExtendedIsolationForest.html#treeple.ExtendedIsolationForest.get_params">get_params() (treeple.ExtendedIsolationForest method)</a>
+
+      <ul>
+        <li><a href="generated/treeple.ExtraTreesClassifier.html#treeple.ExtraTreesClassifier.get_params">(treeple.ExtraTreesClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ExtraTreesRegressor.html#treeple.ExtraTreesRegressor.get_params">(treeple.ExtraTreesRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier.get_params">(treeple.HonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.MultiViewRandomForestClassifier.html#treeple.MultiViewRandomForestClassifier.get_params">(treeple.MultiViewRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.NearestNeighborsMetaEstimator.html#treeple.NearestNeighborsMetaEstimator.get_params">(treeple.NearestNeighborsMetaEstimator method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestClassifier.html#treeple.ObliqueRandomForestClassifier.get_params">(treeple.ObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestRegressor.html#treeple.ObliqueRandomForestRegressor.get_params">(treeple.ObliqueRandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestClassifier.html#treeple.PatchObliqueRandomForestClassifier.get_params">(treeple.PatchObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestRegressor.html#treeple.PatchObliqueRandomForestRegressor.get_params">(treeple.PatchObliqueRandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestClassifier.html#treeple.RandomForestClassifier.get_params">(treeple.RandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestRegressor.html#treeple.RandomForestRegressor.get_params">(treeple.RandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.stats.PermutationHonestForestClassifier.html#treeple.stats.PermutationHonestForestClassifier.get_params">(treeple.stats.PermutationHonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeClassifier.html#treeple.tree.DecisionTreeClassifier.get_params">(treeple.tree.DecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeRegressor.html#treeple.tree.DecisionTreeRegressor.get_params">(treeple.tree.DecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeClassifier.html#treeple.tree.ExtraTreeClassifier.get_params">(treeple.tree.ExtraTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeRegressor.html#treeple.tree.ExtraTreeRegressor.get_params">(treeple.tree.ExtraTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.HonestTreeClassifier.html#treeple.tree.HonestTreeClassifier.get_params">(treeple.tree.HonestTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier.get_params">(treeple.tree.MultiViewDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeClassifier.html#treeple.tree.ObliqueDecisionTreeClassifier.get_params">(treeple.tree.ObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeRegressor.html#treeple.tree.ObliqueDecisionTreeRegressor.get_params">(treeple.tree.ObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeClassifier.html#treeple.tree.PatchObliqueDecisionTreeClassifier.get_params">(treeple.tree.PatchObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeRegressor.html#treeple.tree.PatchObliqueDecisionTreeRegressor.get_params">(treeple.tree.PatchObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedDecisionTree.html#treeple.tree.UnsupervisedDecisionTree.get_params">(treeple.tree.UnsupervisedDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedObliqueDecisionTree.html#treeple.tree.UnsupervisedObliqueDecisionTree.get_params">(treeple.tree.UnsupervisedObliqueDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedObliqueRandomForest.html#treeple.UnsupervisedObliqueRandomForest.get_params">(treeple.UnsupervisedObliqueRandomForest method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedRandomForest.html#treeple.UnsupervisedRandomForest.get_params">(treeple.UnsupervisedRandomForest method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier.honest_indices_">honest_indices_ (treeple.HonestForestClassifier property)</a>
+
+      <ul>
+        <li><a href="generated/treeple.stats.PermutationHonestForestClassifier.html#treeple.stats.PermutationHonestForestClassifier.honest_indices_">(treeple.stats.PermutationHonestForestClassifier property)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier">HonestForestClassifier (class in treeple)</a>
+</li>
+      <li><a href="generated/treeple.tree.HonestTreeClassifier.html#treeple.tree.HonestTreeClassifier">HonestTreeClassifier (class in treeple.tree)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="K">K</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.NearestNeighborsMetaEstimator.html#treeple.NearestNeighborsMetaEstimator.kneighbors">kneighbors() (treeple.NearestNeighborsMetaEstimator method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.datasets.make_gaussian_mixture.html#treeple.datasets.make_gaussian_mixture">make_gaussian_mixture() (in module treeple.datasets)</a>
+</li>
+      <li><a href="generated/treeple.datasets.make_joint_factor_model.html#treeple.datasets.make_joint_factor_model">make_joint_factor_model() (in module treeple.datasets)</a>
+</li>
+      <li><a href="generated/treeple.datasets.make_marron_wand_classification.html#treeple.datasets.make_marron_wand_classification">make_marron_wand_classification() (in module treeple.datasets)</a>
+</li>
+      <li><a href="generated/treeple.datasets.make_quadratic_classification.html#treeple.datasets.make_quadratic_classification">make_quadratic_classification() (in module treeple.datasets)</a>
+</li>
+      <li><a href="generated/treeple.datasets.make_trunk_classification.html#treeple.datasets.make_trunk_classification">make_trunk_classification() (in module treeple.datasets)</a>
+</li>
+      <li><a href="generated/treeple.datasets.make_trunk_mixture_classification.html#treeple.datasets.make_trunk_mixture_classification">make_trunk_mixture_classification() (in module treeple.datasets)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.experimental.mutual_info.mi_gaussian.html#treeple.experimental.mutual_info.mi_gaussian">mi_gaussian() (in module treeple.experimental.mutual_info)</a>
+</li>
+      <li>
+    module
+
+      <ul>
+        <li><a href="api.html#module-treeple">treeple</a>
+</li>
+        <li><a href="api.html#module-treeple._lib.sklearn.ensemble">treeple._lib.sklearn.ensemble</a>
+</li>
+      </ul></li>
+      <li><a href="generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier">MultiViewDecisionTreeClassifier (class in treeple.tree)</a>
+</li>
+      <li><a href="generated/treeple.MultiViewRandomForestClassifier.html#treeple.MultiViewRandomForestClassifier">MultiViewRandomForestClassifier (class in treeple)</a>
+</li>
+      <li><a href="generated/treeple.experimental.mutual_info_ksg.html#treeple.experimental.mutual_info_ksg">mutual_info_ksg() (in module treeple.experimental)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.NearestNeighborsMetaEstimator.html#treeple.NearestNeighborsMetaEstimator">NearestNeighborsMetaEstimator (class in treeple)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.tree.ObliqueDecisionTreeClassifier.html#treeple.tree.ObliqueDecisionTreeClassifier">ObliqueDecisionTreeClassifier (class in treeple.tree)</a>
+</li>
+      <li><a href="generated/treeple.tree.ObliqueDecisionTreeRegressor.html#treeple.tree.ObliqueDecisionTreeRegressor">ObliqueDecisionTreeRegressor (class in treeple.tree)</a>
+</li>
+      <li><a href="generated/treeple.ObliqueRandomForestClassifier.html#treeple.ObliqueRandomForestClassifier">ObliqueRandomForestClassifier (class in treeple)</a>
+</li>
+      <li><a href="generated/treeple.ObliqueRandomForestRegressor.html#treeple.ObliqueRandomForestRegressor">ObliqueRandomForestRegressor (class in treeple)</a>
+</li>
+      <li><a href="generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier.oob_samples_">oob_samples_ (treeple.HonestForestClassifier property)</a>
+
+      <ul>
+        <li><a href="generated/treeple.MultiViewRandomForestClassifier.html#treeple.MultiViewRandomForestClassifier.oob_samples_">(treeple.MultiViewRandomForestClassifier property)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestClassifier.html#treeple.ObliqueRandomForestClassifier.oob_samples_">(treeple.ObliqueRandomForestClassifier property)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestRegressor.html#treeple.ObliqueRandomForestRegressor.oob_samples_">(treeple.ObliqueRandomForestRegressor property)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestClassifier.html#treeple.PatchObliqueRandomForestClassifier.oob_samples_">(treeple.PatchObliqueRandomForestClassifier property)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestRegressor.html#treeple.PatchObliqueRandomForestRegressor.oob_samples_">(treeple.PatchObliqueRandomForestRegressor property)</a>
+</li>
+        <li><a href="generated/treeple.stats.PermutationHonestForestClassifier.html#treeple.stats.PermutationHonestForestClassifier.oob_samples_">(treeple.stats.PermutationHonestForestClassifier property)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.ExtraTreesClassifier.html#treeple.ExtraTreesClassifier.partial_fit">partial_fit() (treeple.ExtraTreesClassifier method)</a>
+
+      <ul>
+        <li><a href="generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier.partial_fit">(treeple.HonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.MultiViewRandomForestClassifier.html#treeple.MultiViewRandomForestClassifier.partial_fit">(treeple.MultiViewRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestClassifier.html#treeple.ObliqueRandomForestClassifier.partial_fit">(treeple.ObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestClassifier.html#treeple.PatchObliqueRandomForestClassifier.partial_fit">(treeple.PatchObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestClassifier.html#treeple.RandomForestClassifier.partial_fit">(treeple.RandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.stats.PermutationHonestForestClassifier.html#treeple.stats.PermutationHonestForestClassifier.partial_fit">(treeple.stats.PermutationHonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeClassifier.html#treeple.tree.DecisionTreeClassifier.partial_fit">(treeple.tree.DecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeClassifier.html#treeple.tree.ExtraTreeClassifier.partial_fit">(treeple.tree.ExtraTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.HonestTreeClassifier.html#treeple.tree.HonestTreeClassifier.partial_fit">(treeple.tree.HonestTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier.partial_fit">(treeple.tree.MultiViewDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeClassifier.html#treeple.tree.ObliqueDecisionTreeClassifier.partial_fit">(treeple.tree.ObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeClassifier.html#treeple.tree.PatchObliqueDecisionTreeClassifier.partial_fit">(treeple.tree.PatchObliqueDecisionTreeClassifier method)</a>
+</li>
+      </ul></li>
+      <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeClassifier.html#treeple.tree.PatchObliqueDecisionTreeClassifier">PatchObliqueDecisionTreeClassifier (class in treeple.tree)</a>
+</li>
+      <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeRegressor.html#treeple.tree.PatchObliqueDecisionTreeRegressor">PatchObliqueDecisionTreeRegressor (class in treeple.tree)</a>
+</li>
+      <li><a href="generated/treeple.PatchObliqueRandomForestClassifier.html#treeple.PatchObliqueRandomForestClassifier">PatchObliqueRandomForestClassifier (class in treeple)</a>
+</li>
+      <li><a href="generated/treeple.PatchObliqueRandomForestRegressor.html#treeple.PatchObliqueRandomForestRegressor">PatchObliqueRandomForestRegressor (class in treeple)</a>
+</li>
+      <li><a href="generated/treeple.stats.PermutationHonestForestClassifier.html#treeple.stats.PermutationHonestForestClassifier">PermutationHonestForestClassifier (class in treeple.stats)</a>
+</li>
+      <li><a href="generated/treeple.ExtendedIsolationForest.html#treeple.ExtendedIsolationForest.predict">predict() (treeple.ExtendedIsolationForest method)</a>
+
+      <ul>
+        <li><a href="generated/treeple.ExtraTreesClassifier.html#treeple.ExtraTreesClassifier.predict">(treeple.ExtraTreesClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ExtraTreesRegressor.html#treeple.ExtraTreesRegressor.predict">(treeple.ExtraTreesRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier.predict">(treeple.HonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.MultiViewRandomForestClassifier.html#treeple.MultiViewRandomForestClassifier.predict">(treeple.MultiViewRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestClassifier.html#treeple.ObliqueRandomForestClassifier.predict">(treeple.ObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestRegressor.html#treeple.ObliqueRandomForestRegressor.predict">(treeple.ObliqueRandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestClassifier.html#treeple.PatchObliqueRandomForestClassifier.predict">(treeple.PatchObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestRegressor.html#treeple.PatchObliqueRandomForestRegressor.predict">(treeple.PatchObliqueRandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestClassifier.html#treeple.RandomForestClassifier.predict">(treeple.RandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestRegressor.html#treeple.RandomForestRegressor.predict">(treeple.RandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.stats.PermutationHonestForestClassifier.html#treeple.stats.PermutationHonestForestClassifier.predict">(treeple.stats.PermutationHonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeClassifier.html#treeple.tree.DecisionTreeClassifier.predict">(treeple.tree.DecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeRegressor.html#treeple.tree.DecisionTreeRegressor.predict">(treeple.tree.DecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeClassifier.html#treeple.tree.ExtraTreeClassifier.predict">(treeple.tree.ExtraTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeRegressor.html#treeple.tree.ExtraTreeRegressor.predict">(treeple.tree.ExtraTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.HonestTreeClassifier.html#treeple.tree.HonestTreeClassifier.predict">(treeple.tree.HonestTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier.predict">(treeple.tree.MultiViewDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeClassifier.html#treeple.tree.ObliqueDecisionTreeClassifier.predict">(treeple.tree.ObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeRegressor.html#treeple.tree.ObliqueDecisionTreeRegressor.predict">(treeple.tree.ObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeClassifier.html#treeple.tree.PatchObliqueDecisionTreeClassifier.predict">(treeple.tree.PatchObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeRegressor.html#treeple.tree.PatchObliqueDecisionTreeRegressor.predict">(treeple.tree.PatchObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedDecisionTree.html#treeple.tree.UnsupervisedDecisionTree.predict">(treeple.tree.UnsupervisedDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedObliqueDecisionTree.html#treeple.tree.UnsupervisedObliqueDecisionTree.predict">(treeple.tree.UnsupervisedObliqueDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedObliqueRandomForest.html#treeple.UnsupervisedObliqueRandomForest.predict">(treeple.UnsupervisedObliqueRandomForest method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedRandomForest.html#treeple.UnsupervisedRandomForest.predict">(treeple.UnsupervisedRandomForest method)</a>
+</li>
+      </ul></li>
+      <li><a href="generated/treeple.ExtraTreesClassifier.html#treeple.ExtraTreesClassifier.predict_log_proba">predict_log_proba() (treeple.ExtraTreesClassifier method)</a>
+
+      <ul>
+        <li><a href="generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier.predict_log_proba">(treeple.HonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.MultiViewRandomForestClassifier.html#treeple.MultiViewRandomForestClassifier.predict_log_proba">(treeple.MultiViewRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestClassifier.html#treeple.ObliqueRandomForestClassifier.predict_log_proba">(treeple.ObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestClassifier.html#treeple.PatchObliqueRandomForestClassifier.predict_log_proba">(treeple.PatchObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestClassifier.html#treeple.RandomForestClassifier.predict_log_proba">(treeple.RandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.stats.PermutationHonestForestClassifier.html#treeple.stats.PermutationHonestForestClassifier.predict_log_proba">(treeple.stats.PermutationHonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeClassifier.html#treeple.tree.DecisionTreeClassifier.predict_log_proba">(treeple.tree.DecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeClassifier.html#treeple.tree.ExtraTreeClassifier.predict_log_proba">(treeple.tree.ExtraTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier.predict_log_proba">(treeple.tree.MultiViewDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeClassifier.html#treeple.tree.ObliqueDecisionTreeClassifier.predict_log_proba">(treeple.tree.ObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeClassifier.html#treeple.tree.PatchObliqueDecisionTreeClassifier.predict_log_proba">(treeple.tree.PatchObliqueDecisionTreeClassifier method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.ExtraTreesClassifier.html#treeple.ExtraTreesClassifier.predict_proba">predict_proba() (treeple.ExtraTreesClassifier method)</a>
+
+      <ul>
+        <li><a href="generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier.predict_proba">(treeple.HonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.MultiViewRandomForestClassifier.html#treeple.MultiViewRandomForestClassifier.predict_proba">(treeple.MultiViewRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestClassifier.html#treeple.ObliqueRandomForestClassifier.predict_proba">(treeple.ObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestClassifier.html#treeple.PatchObliqueRandomForestClassifier.predict_proba">(treeple.PatchObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestClassifier.html#treeple.RandomForestClassifier.predict_proba">(treeple.RandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.stats.PermutationHonestForestClassifier.html#treeple.stats.PermutationHonestForestClassifier.predict_proba">(treeple.stats.PermutationHonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeClassifier.html#treeple.tree.DecisionTreeClassifier.predict_proba">(treeple.tree.DecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeClassifier.html#treeple.tree.ExtraTreeClassifier.predict_proba">(treeple.tree.ExtraTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.HonestTreeClassifier.html#treeple.tree.HonestTreeClassifier.predict_proba">(treeple.tree.HonestTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier.predict_proba">(treeple.tree.MultiViewDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeClassifier.html#treeple.tree.ObliqueDecisionTreeClassifier.predict_proba">(treeple.tree.ObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeClassifier.html#treeple.tree.PatchObliqueDecisionTreeClassifier.predict_proba">(treeple.tree.PatchObliqueDecisionTreeClassifier method)</a>
+</li>
+      </ul></li>
+      <li><a href="generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier.predict_proba_per_tree">predict_proba_per_tree() (treeple.HonestForestClassifier method)</a>
+
+      <ul>
+        <li><a href="generated/treeple.MultiViewRandomForestClassifier.html#treeple.MultiViewRandomForestClassifier.predict_proba_per_tree">(treeple.MultiViewRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestClassifier.html#treeple.ObliqueRandomForestClassifier.predict_proba_per_tree">(treeple.ObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestClassifier.html#treeple.PatchObliqueRandomForestClassifier.predict_proba_per_tree">(treeple.PatchObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.stats.PermutationHonestForestClassifier.html#treeple.stats.PermutationHonestForestClassifier.predict_proba_per_tree">(treeple.stats.PermutationHonestForestClassifier method)</a>
+</li>
+      </ul></li>
+      <li><a href="generated/treeple.ExtraTreesClassifier.html#treeple.ExtraTreesClassifier.predict_quantiles">predict_quantiles() (treeple.ExtraTreesClassifier method)</a>
+
+      <ul>
+        <li><a href="generated/treeple.ExtraTreesRegressor.html#treeple.ExtraTreesRegressor.predict_quantiles">(treeple.ExtraTreesRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier.predict_quantiles">(treeple.HonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.MultiViewRandomForestClassifier.html#treeple.MultiViewRandomForestClassifier.predict_quantiles">(treeple.MultiViewRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestClassifier.html#treeple.ObliqueRandomForestClassifier.predict_quantiles">(treeple.ObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestRegressor.html#treeple.ObliqueRandomForestRegressor.predict_quantiles">(treeple.ObliqueRandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestClassifier.html#treeple.PatchObliqueRandomForestClassifier.predict_quantiles">(treeple.PatchObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestRegressor.html#treeple.PatchObliqueRandomForestRegressor.predict_quantiles">(treeple.PatchObliqueRandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestClassifier.html#treeple.RandomForestClassifier.predict_quantiles">(treeple.RandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestRegressor.html#treeple.RandomForestRegressor.predict_quantiles">(treeple.RandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.stats.PermutationHonestForestClassifier.html#treeple.stats.PermutationHonestForestClassifier.predict_quantiles">(treeple.stats.PermutationHonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeClassifier.html#treeple.tree.DecisionTreeClassifier.predict_quantiles">(treeple.tree.DecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeRegressor.html#treeple.tree.DecisionTreeRegressor.predict_quantiles">(treeple.tree.DecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeClassifier.html#treeple.tree.ExtraTreeClassifier.predict_quantiles">(treeple.tree.ExtraTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeRegressor.html#treeple.tree.ExtraTreeRegressor.predict_quantiles">(treeple.tree.ExtraTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.HonestTreeClassifier.html#treeple.tree.HonestTreeClassifier.predict_quantiles">(treeple.tree.HonestTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier.predict_quantiles">(treeple.tree.MultiViewDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeClassifier.html#treeple.tree.ObliqueDecisionTreeClassifier.predict_quantiles">(treeple.tree.ObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeRegressor.html#treeple.tree.ObliqueDecisionTreeRegressor.predict_quantiles">(treeple.tree.ObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeClassifier.html#treeple.tree.PatchObliqueDecisionTreeClassifier.predict_quantiles">(treeple.tree.PatchObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeRegressor.html#treeple.tree.PatchObliqueDecisionTreeRegressor.predict_quantiles">(treeple.tree.PatchObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedDecisionTree.html#treeple.tree.UnsupervisedDecisionTree.predict_quantiles">(treeple.tree.UnsupervisedDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedObliqueDecisionTree.html#treeple.tree.UnsupervisedObliqueDecisionTree.predict_quantiles">(treeple.tree.UnsupervisedObliqueDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedObliqueRandomForest.html#treeple.UnsupervisedObliqueRandomForest.predict_quantiles">(treeple.UnsupervisedObliqueRandomForest method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedRandomForest.html#treeple.UnsupervisedRandomForest.predict_quantiles">(treeple.UnsupervisedRandomForest method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.NearestNeighborsMetaEstimator.html#treeple.NearestNeighborsMetaEstimator.radius_neighbors">radius_neighbors() (treeple.NearestNeighborsMetaEstimator method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.RandomForestClassifier.html#treeple.RandomForestClassifier">RandomForestClassifier (class in treeple)</a>
+</li>
+      <li><a href="generated/treeple.RandomForestRegressor.html#treeple.RandomForestRegressor">RandomForestRegressor (class in treeple)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.ExtraTreesClassifier.html#treeple.ExtraTreesClassifier.score">score() (treeple.ExtraTreesClassifier method)</a>
+
+      <ul>
+        <li><a href="generated/treeple.ExtraTreesRegressor.html#treeple.ExtraTreesRegressor.score">(treeple.ExtraTreesRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier.score">(treeple.HonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.MultiViewRandomForestClassifier.html#treeple.MultiViewRandomForestClassifier.score">(treeple.MultiViewRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestClassifier.html#treeple.ObliqueRandomForestClassifier.score">(treeple.ObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestRegressor.html#treeple.ObliqueRandomForestRegressor.score">(treeple.ObliqueRandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestClassifier.html#treeple.PatchObliqueRandomForestClassifier.score">(treeple.PatchObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestRegressor.html#treeple.PatchObliqueRandomForestRegressor.score">(treeple.PatchObliqueRandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestClassifier.html#treeple.RandomForestClassifier.score">(treeple.RandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestRegressor.html#treeple.RandomForestRegressor.score">(treeple.RandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.stats.PermutationHonestForestClassifier.html#treeple.stats.PermutationHonestForestClassifier.score">(treeple.stats.PermutationHonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeClassifier.html#treeple.tree.DecisionTreeClassifier.score">(treeple.tree.DecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeRegressor.html#treeple.tree.DecisionTreeRegressor.score">(treeple.tree.DecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeClassifier.html#treeple.tree.ExtraTreeClassifier.score">(treeple.tree.ExtraTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeRegressor.html#treeple.tree.ExtraTreeRegressor.score">(treeple.tree.ExtraTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.HonestTreeClassifier.html#treeple.tree.HonestTreeClassifier.score">(treeple.tree.HonestTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier.score">(treeple.tree.MultiViewDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeClassifier.html#treeple.tree.ObliqueDecisionTreeClassifier.score">(treeple.tree.ObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeRegressor.html#treeple.tree.ObliqueDecisionTreeRegressor.score">(treeple.tree.ObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeClassifier.html#treeple.tree.PatchObliqueDecisionTreeClassifier.score">(treeple.tree.PatchObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeRegressor.html#treeple.tree.PatchObliqueDecisionTreeRegressor.score">(treeple.tree.PatchObliqueDecisionTreeRegressor method)</a>
+</li>
+      </ul></li>
+      <li><a href="generated/treeple.ExtendedIsolationForest.html#treeple.ExtendedIsolationForest.score_samples">score_samples() (treeple.ExtendedIsolationForest method)</a>
+</li>
+      <li><a href="generated/treeple.ExtendedIsolationForest.html#treeple.ExtendedIsolationForest.set_fit_request">set_fit_request() (treeple.ExtendedIsolationForest method)</a>
+
+      <ul>
+        <li><a href="generated/treeple.ExtraTreesClassifier.html#treeple.ExtraTreesClassifier.set_fit_request">(treeple.ExtraTreesClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ExtraTreesRegressor.html#treeple.ExtraTreesRegressor.set_fit_request">(treeple.ExtraTreesRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier.set_fit_request">(treeple.HonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.MultiViewRandomForestClassifier.html#treeple.MultiViewRandomForestClassifier.set_fit_request">(treeple.MultiViewRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestClassifier.html#treeple.ObliqueRandomForestClassifier.set_fit_request">(treeple.ObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestRegressor.html#treeple.ObliqueRandomForestRegressor.set_fit_request">(treeple.ObliqueRandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestClassifier.html#treeple.PatchObliqueRandomForestClassifier.set_fit_request">(treeple.PatchObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestRegressor.html#treeple.PatchObliqueRandomForestRegressor.set_fit_request">(treeple.PatchObliqueRandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestClassifier.html#treeple.RandomForestClassifier.set_fit_request">(treeple.RandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestRegressor.html#treeple.RandomForestRegressor.set_fit_request">(treeple.RandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.stats.PermutationHonestForestClassifier.html#treeple.stats.PermutationHonestForestClassifier.set_fit_request">(treeple.stats.PermutationHonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeClassifier.html#treeple.tree.DecisionTreeClassifier.set_fit_request">(treeple.tree.DecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeRegressor.html#treeple.tree.DecisionTreeRegressor.set_fit_request">(treeple.tree.DecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeClassifier.html#treeple.tree.ExtraTreeClassifier.set_fit_request">(treeple.tree.ExtraTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeRegressor.html#treeple.tree.ExtraTreeRegressor.set_fit_request">(treeple.tree.ExtraTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.HonestTreeClassifier.html#treeple.tree.HonestTreeClassifier.set_fit_request">(treeple.tree.HonestTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier.set_fit_request">(treeple.tree.MultiViewDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeClassifier.html#treeple.tree.ObliqueDecisionTreeClassifier.set_fit_request">(treeple.tree.ObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeRegressor.html#treeple.tree.ObliqueDecisionTreeRegressor.set_fit_request">(treeple.tree.ObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeClassifier.html#treeple.tree.PatchObliqueDecisionTreeClassifier.set_fit_request">(treeple.tree.PatchObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeRegressor.html#treeple.tree.PatchObliqueDecisionTreeRegressor.set_fit_request">(treeple.tree.PatchObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedDecisionTree.html#treeple.tree.UnsupervisedDecisionTree.set_fit_request">(treeple.tree.UnsupervisedDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedObliqueDecisionTree.html#treeple.tree.UnsupervisedObliqueDecisionTree.set_fit_request">(treeple.tree.UnsupervisedObliqueDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedObliqueRandomForest.html#treeple.UnsupervisedObliqueRandomForest.set_fit_request">(treeple.UnsupervisedObliqueRandomForest method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedRandomForest.html#treeple.UnsupervisedRandomForest.set_fit_request">(treeple.UnsupervisedRandomForest method)</a>
+</li>
+      </ul></li>
+      <li><a href="generated/treeple.tree.UnsupervisedDecisionTree.html#treeple.tree.UnsupervisedDecisionTree.set_output">set_output() (treeple.tree.UnsupervisedDecisionTree method)</a>
+
+      <ul>
+        <li><a href="generated/treeple.tree.UnsupervisedObliqueDecisionTree.html#treeple.tree.UnsupervisedObliqueDecisionTree.set_output">(treeple.tree.UnsupervisedObliqueDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedObliqueRandomForest.html#treeple.UnsupervisedObliqueRandomForest.set_output">(treeple.UnsupervisedObliqueRandomForest method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedRandomForest.html#treeple.UnsupervisedRandomForest.set_output">(treeple.UnsupervisedRandomForest method)</a>
+</li>
+      </ul></li>
+      <li><a href="generated/treeple.ExtendedIsolationForest.html#treeple.ExtendedIsolationForest.set_params">set_params() (treeple.ExtendedIsolationForest method)</a>
+
+      <ul>
+        <li><a href="generated/treeple.ExtraTreesClassifier.html#treeple.ExtraTreesClassifier.set_params">(treeple.ExtraTreesClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ExtraTreesRegressor.html#treeple.ExtraTreesRegressor.set_params">(treeple.ExtraTreesRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier.set_params">(treeple.HonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.MultiViewRandomForestClassifier.html#treeple.MultiViewRandomForestClassifier.set_params">(treeple.MultiViewRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.NearestNeighborsMetaEstimator.html#treeple.NearestNeighborsMetaEstimator.set_params">(treeple.NearestNeighborsMetaEstimator method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestClassifier.html#treeple.ObliqueRandomForestClassifier.set_params">(treeple.ObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestRegressor.html#treeple.ObliqueRandomForestRegressor.set_params">(treeple.ObliqueRandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestClassifier.html#treeple.PatchObliqueRandomForestClassifier.set_params">(treeple.PatchObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestRegressor.html#treeple.PatchObliqueRandomForestRegressor.set_params">(treeple.PatchObliqueRandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestClassifier.html#treeple.RandomForestClassifier.set_params">(treeple.RandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestRegressor.html#treeple.RandomForestRegressor.set_params">(treeple.RandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.stats.PermutationHonestForestClassifier.html#treeple.stats.PermutationHonestForestClassifier.set_params">(treeple.stats.PermutationHonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeClassifier.html#treeple.tree.DecisionTreeClassifier.set_params">(treeple.tree.DecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeRegressor.html#treeple.tree.DecisionTreeRegressor.set_params">(treeple.tree.DecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeClassifier.html#treeple.tree.ExtraTreeClassifier.set_params">(treeple.tree.ExtraTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeRegressor.html#treeple.tree.ExtraTreeRegressor.set_params">(treeple.tree.ExtraTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.HonestTreeClassifier.html#treeple.tree.HonestTreeClassifier.set_params">(treeple.tree.HonestTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier.set_params">(treeple.tree.MultiViewDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeClassifier.html#treeple.tree.ObliqueDecisionTreeClassifier.set_params">(treeple.tree.ObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeRegressor.html#treeple.tree.ObliqueDecisionTreeRegressor.set_params">(treeple.tree.ObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeClassifier.html#treeple.tree.PatchObliqueDecisionTreeClassifier.set_params">(treeple.tree.PatchObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeRegressor.html#treeple.tree.PatchObliqueDecisionTreeRegressor.set_params">(treeple.tree.PatchObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedDecisionTree.html#treeple.tree.UnsupervisedDecisionTree.set_params">(treeple.tree.UnsupervisedDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedObliqueDecisionTree.html#treeple.tree.UnsupervisedObliqueDecisionTree.set_params">(treeple.tree.UnsupervisedObliqueDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedObliqueRandomForest.html#treeple.UnsupervisedObliqueRandomForest.set_params">(treeple.UnsupervisedObliqueRandomForest method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedRandomForest.html#treeple.UnsupervisedRandomForest.set_params">(treeple.UnsupervisedRandomForest method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.ExtraTreesClassifier.html#treeple.ExtraTreesClassifier.set_partial_fit_request">set_partial_fit_request() (treeple.ExtraTreesClassifier method)</a>
+
+      <ul>
+        <li><a href="generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier.set_partial_fit_request">(treeple.HonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.MultiViewRandomForestClassifier.html#treeple.MultiViewRandomForestClassifier.set_partial_fit_request">(treeple.MultiViewRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestClassifier.html#treeple.ObliqueRandomForestClassifier.set_partial_fit_request">(treeple.ObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestClassifier.html#treeple.PatchObliqueRandomForestClassifier.set_partial_fit_request">(treeple.PatchObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestClassifier.html#treeple.RandomForestClassifier.set_partial_fit_request">(treeple.RandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.stats.PermutationHonestForestClassifier.html#treeple.stats.PermutationHonestForestClassifier.set_partial_fit_request">(treeple.stats.PermutationHonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeClassifier.html#treeple.tree.DecisionTreeClassifier.set_partial_fit_request">(treeple.tree.DecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeClassifier.html#treeple.tree.ExtraTreeClassifier.set_partial_fit_request">(treeple.tree.ExtraTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.HonestTreeClassifier.html#treeple.tree.HonestTreeClassifier.set_partial_fit_request">(treeple.tree.HonestTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier.set_partial_fit_request">(treeple.tree.MultiViewDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeClassifier.html#treeple.tree.ObliqueDecisionTreeClassifier.set_partial_fit_request">(treeple.tree.ObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeClassifier.html#treeple.tree.PatchObliqueDecisionTreeClassifier.set_partial_fit_request">(treeple.tree.PatchObliqueDecisionTreeClassifier method)</a>
+</li>
+      </ul></li>
+      <li><a href="generated/treeple.tree.DecisionTreeClassifier.html#treeple.tree.DecisionTreeClassifier.set_predict_proba_request">set_predict_proba_request() (treeple.tree.DecisionTreeClassifier method)</a>
+
+      <ul>
+        <li><a href="generated/treeple.tree.ExtraTreeClassifier.html#treeple.tree.ExtraTreeClassifier.set_predict_proba_request">(treeple.tree.ExtraTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.HonestTreeClassifier.html#treeple.tree.HonestTreeClassifier.set_predict_proba_request">(treeple.tree.HonestTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier.set_predict_proba_request">(treeple.tree.MultiViewDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeClassifier.html#treeple.tree.ObliqueDecisionTreeClassifier.set_predict_proba_request">(treeple.tree.ObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeClassifier.html#treeple.tree.PatchObliqueDecisionTreeClassifier.set_predict_proba_request">(treeple.tree.PatchObliqueDecisionTreeClassifier method)</a>
+</li>
+      </ul></li>
+      <li><a href="generated/treeple.tree.DecisionTreeClassifier.html#treeple.tree.DecisionTreeClassifier.set_predict_request">set_predict_request() (treeple.tree.DecisionTreeClassifier method)</a>
+
+      <ul>
+        <li><a href="generated/treeple.tree.DecisionTreeRegressor.html#treeple.tree.DecisionTreeRegressor.set_predict_request">(treeple.tree.DecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeClassifier.html#treeple.tree.ExtraTreeClassifier.set_predict_request">(treeple.tree.ExtraTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeRegressor.html#treeple.tree.ExtraTreeRegressor.set_predict_request">(treeple.tree.ExtraTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.HonestTreeClassifier.html#treeple.tree.HonestTreeClassifier.set_predict_request">(treeple.tree.HonestTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier.set_predict_request">(treeple.tree.MultiViewDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeClassifier.html#treeple.tree.ObliqueDecisionTreeClassifier.set_predict_request">(treeple.tree.ObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeRegressor.html#treeple.tree.ObliqueDecisionTreeRegressor.set_predict_request">(treeple.tree.ObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeClassifier.html#treeple.tree.PatchObliqueDecisionTreeClassifier.set_predict_request">(treeple.tree.PatchObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeRegressor.html#treeple.tree.PatchObliqueDecisionTreeRegressor.set_predict_request">(treeple.tree.PatchObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedDecisionTree.html#treeple.tree.UnsupervisedDecisionTree.set_predict_request">(treeple.tree.UnsupervisedDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.tree.UnsupervisedObliqueDecisionTree.html#treeple.tree.UnsupervisedObliqueDecisionTree.set_predict_request">(treeple.tree.UnsupervisedObliqueDecisionTree method)</a>
+</li>
+      </ul></li>
+      <li><a href="generated/treeple.ExtraTreesClassifier.html#treeple.ExtraTreesClassifier.set_score_request">set_score_request() (treeple.ExtraTreesClassifier method)</a>
+
+      <ul>
+        <li><a href="generated/treeple.ExtraTreesRegressor.html#treeple.ExtraTreesRegressor.set_score_request">(treeple.ExtraTreesRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier.set_score_request">(treeple.HonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.MultiViewRandomForestClassifier.html#treeple.MultiViewRandomForestClassifier.set_score_request">(treeple.MultiViewRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestClassifier.html#treeple.ObliqueRandomForestClassifier.set_score_request">(treeple.ObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.ObliqueRandomForestRegressor.html#treeple.ObliqueRandomForestRegressor.set_score_request">(treeple.ObliqueRandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestClassifier.html#treeple.PatchObliqueRandomForestClassifier.set_score_request">(treeple.PatchObliqueRandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.PatchObliqueRandomForestRegressor.html#treeple.PatchObliqueRandomForestRegressor.set_score_request">(treeple.PatchObliqueRandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestClassifier.html#treeple.RandomForestClassifier.set_score_request">(treeple.RandomForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.RandomForestRegressor.html#treeple.RandomForestRegressor.set_score_request">(treeple.RandomForestRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.stats.PermutationHonestForestClassifier.html#treeple.stats.PermutationHonestForestClassifier.set_score_request">(treeple.stats.PermutationHonestForestClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeClassifier.html#treeple.tree.DecisionTreeClassifier.set_score_request">(treeple.tree.DecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.DecisionTreeRegressor.html#treeple.tree.DecisionTreeRegressor.set_score_request">(treeple.tree.DecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeClassifier.html#treeple.tree.ExtraTreeClassifier.set_score_request">(treeple.tree.ExtraTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ExtraTreeRegressor.html#treeple.tree.ExtraTreeRegressor.set_score_request">(treeple.tree.ExtraTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.HonestTreeClassifier.html#treeple.tree.HonestTreeClassifier.set_score_request">(treeple.tree.HonestTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.MultiViewDecisionTreeClassifier.html#treeple.tree.MultiViewDecisionTreeClassifier.set_score_request">(treeple.tree.MultiViewDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeClassifier.html#treeple.tree.ObliqueDecisionTreeClassifier.set_score_request">(treeple.tree.ObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.ObliqueDecisionTreeRegressor.html#treeple.tree.ObliqueDecisionTreeRegressor.set_score_request">(treeple.tree.ObliqueDecisionTreeRegressor method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeClassifier.html#treeple.tree.PatchObliqueDecisionTreeClassifier.set_score_request">(treeple.tree.PatchObliqueDecisionTreeClassifier method)</a>
+</li>
+        <li><a href="generated/treeple.tree.PatchObliqueDecisionTreeRegressor.html#treeple.tree.PatchObliqueDecisionTreeRegressor.set_score_request">(treeple.tree.PatchObliqueDecisionTreeRegressor method)</a>
+</li>
+      </ul></li>
+      <li><a href="generated/treeple.experimental.simulate.simulate_helix.html#treeple.experimental.simulate.simulate_helix">simulate_helix() (in module treeple.experimental.simulate)</a>
+</li>
+      <li><a href="generated/treeple.experimental.simulate.simulate_multivariate_gaussian.html#treeple.experimental.simulate.simulate_multivariate_gaussian">simulate_multivariate_gaussian() (in module treeple.experimental.simulate)</a>
+</li>
+      <li><a href="generated/treeple.experimental.simulate.simulate_sphere.html#treeple.experimental.simulate.simulate_sphere">simulate_sphere() (in module treeple.experimental.simulate)</a>
+</li>
+      <li><a href="generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier.structure_indices_">structure_indices_ (treeple.HonestForestClassifier property)</a>
+
+      <ul>
+        <li><a href="generated/treeple.stats.PermutationHonestForestClassifier.html#treeple.stats.PermutationHonestForestClassifier.structure_indices_">(treeple.stats.PermutationHonestForestClassifier property)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.tree.UnsupervisedDecisionTree.html#treeple.tree.UnsupervisedDecisionTree.transform">transform() (treeple.tree.UnsupervisedDecisionTree method)</a>
+
+      <ul>
+        <li><a href="generated/treeple.tree.UnsupervisedObliqueDecisionTree.html#treeple.tree.UnsupervisedObliqueDecisionTree.transform">(treeple.tree.UnsupervisedObliqueDecisionTree method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedObliqueRandomForest.html#treeple.UnsupervisedObliqueRandomForest.transform">(treeple.UnsupervisedObliqueRandomForest method)</a>
+</li>
+        <li><a href="generated/treeple.UnsupervisedRandomForest.html#treeple.UnsupervisedRandomForest.transform">(treeple.UnsupervisedRandomForest method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    treeple
+
+      <ul>
+        <li><a href="api.html#module-treeple">module</a>
+</li>
+      </ul></li>
+      <li>
+    treeple._lib.sklearn.ensemble
+
+      <ul>
+        <li><a href="api.html#module-treeple._lib.sklearn.ensemble">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.tree.UnsupervisedDecisionTree.html#treeple.tree.UnsupervisedDecisionTree">UnsupervisedDecisionTree (class in treeple.tree)</a>
+</li>
+      <li><a href="generated/treeple.tree.UnsupervisedObliqueDecisionTree.html#treeple.tree.UnsupervisedObliqueDecisionTree">UnsupervisedObliqueDecisionTree (class in treeple.tree)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/treeple.UnsupervisedObliqueRandomForest.html#treeple.UnsupervisedObliqueRandomForest">UnsupervisedObliqueRandomForest (class in treeple)</a>
+</li>
+      <li><a href="generated/treeple.UnsupervisedRandomForest.html#treeple.UnsupervisedRandomForest">UnsupervisedRandomForest (class in treeple)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-08-01.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,1369 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" data-theme="auto">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>treeple.ensemble._honest_forest &#8212; treeple 0.9.0dev0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "auto";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "auto";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/style.css?v=3035adc5" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../../_static/documentation_options.js?v=54a029fc"></script>
+    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=fd10adb8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/treeple/ensemble/_honest_forest';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/neurodata/treeple/main/doc/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="canonical" href="https://neurodata.github.io/treeple/stable/index.html" />
+    <script type="text/javascript" src="../../../_static/copybutton.js"></script>
+    <script type="text/javascript" src="../../../_static/scrollfix.js"></script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="auto">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">treeple 0.9.0dev0 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api.html">
+    API Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../whats_new.html">
+    Release History
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../install.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../use.html">
+    Examples using treeple
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/neurodata/treeple" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api.html">
+    API Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../whats_new.html">
+    Release History
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../install.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../use.html">
+    Examples using treeple
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-3"
+      type="button"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-3"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-3"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-3">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/neurodata/treeple" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">treeple.ense...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for treeple.ensemble._honest_forest</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Authors: Ronan Perry, Sambit Panda, Haoyin Xu</span>
+<span class="c1"># Adopted from: https://github.com/neurodata/honest-forests</span>
+
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Integral</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">catch_warnings</span><span class="p">,</span> <span class="n">simplefilter</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">joblib</span> <span class="kn">import</span> <span class="n">Parallel</span><span class="p">,</span> <span class="n">delayed</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">_fit_context</span><span class="p">,</span> <span class="n">clone</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble._base</span> <span class="kn">import</span> <span class="n">_partition_estimators</span><span class="p">,</span> <span class="n">_set_random_states</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils</span> <span class="kn">import</span> <span class="n">compute_sample_weight</span><span class="p">,</span> <span class="n">resample</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils._param_validation</span> <span class="kn">import</span> <span class="n">Interval</span><span class="p">,</span> <span class="n">RealNotInt</span><span class="p">,</span> <span class="n">StrOptions</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">check_is_fitted</span>
+
+<span class="kn">from</span> <span class="nn">.._lib.sklearn.ensemble._forest</span> <span class="kn">import</span> <span class="n">ForestClassifier</span>
+<span class="kn">from</span> <span class="nn">..tree</span> <span class="kn">import</span> <span class="n">HonestTreeClassifier</span>
+<span class="kn">from</span> <span class="nn">._extensions</span> <span class="kn">import</span> <span class="n">ForestClassifierMixin</span><span class="p">,</span> <span class="n">_generate_sample_indices</span>
+
+
+<span class="k">def</span> <span class="nf">_parallel_build_trees</span><span class="p">(</span>
+    <span class="n">tree</span><span class="p">,</span>
+    <span class="n">bootstrap</span><span class="p">,</span>
+    <span class="n">X</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">,</span>
+    <span class="n">sample_weight</span><span class="p">,</span>
+    <span class="n">tree_idx</span><span class="p">,</span>
+    <span class="n">n_trees</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">class_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">n_samples_bootstrap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">missing_values_in_feature_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">classes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">stratify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Private function used to fit a single tree in parallel.</span>
+
+<span class="sd">    XXX:</span>
+<span class="sd">    1. this is copied over from scikit-learn and modified to allow sampling with</span>
+<span class="sd">    and without replacement given ``bootstrap``.</span>
+
+<span class="sd">    2. Overrides the scikit-learn implementation to allow for stratification during bootstrapping</span>
+<span class="sd">    via the `stratify` parameter.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;building tree </span><span class="si">%d</span><span class="s2"> of </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tree_idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_trees</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">bootstrap</span><span class="p">:</span>
+        <span class="n">n_samples</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">sample_weight</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">curr_sample_weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">curr_sample_weight</span> <span class="o">=</span> <span class="n">sample_weight</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">stratify</span><span class="p">:</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="n">resample</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_samples</span><span class="p">),</span>
+                <span class="n">n_samples</span><span class="o">=</span><span class="n">n_samples_bootstrap</span><span class="p">,</span>
+                <span class="n">stratify</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
+                <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">random_state</span><span class="o">=</span><span class="n">tree</span><span class="o">.</span><span class="n">random_state</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="n">_generate_sample_indices</span><span class="p">(</span>
+                <span class="n">tree</span><span class="o">.</span><span class="n">random_state</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span> <span class="n">n_samples_bootstrap</span><span class="p">,</span> <span class="n">bootstrap</span><span class="o">=</span><span class="n">bootstrap</span>
+            <span class="p">)</span>
+        <span class="n">sample_counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">n_samples</span><span class="p">)</span>
+        <span class="n">curr_sample_weight</span> <span class="o">*=</span> <span class="n">sample_counts</span>
+
+        <span class="k">if</span> <span class="n">class_weight</span> <span class="o">==</span> <span class="s2">&quot;subsample&quot;</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">catch_warnings</span><span class="p">():</span>
+                <span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
+                <span class="n">curr_sample_weight</span> <span class="o">*=</span> <span class="n">compute_sample_weight</span><span class="p">(</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="n">indices</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">class_weight</span> <span class="o">==</span> <span class="s2">&quot;balanced_subsample&quot;</span><span class="p">:</span>
+            <span class="n">curr_sample_weight</span> <span class="o">*=</span> <span class="n">compute_sample_weight</span><span class="p">(</span><span class="s2">&quot;balanced&quot;</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="n">indices</span><span class="p">)</span>
+
+        <span class="n">tree</span><span class="o">.</span><span class="n">_fit</span><span class="p">(</span>
+            <span class="n">X</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">,</span>
+            <span class="n">sample_weight</span><span class="o">=</span><span class="n">curr_sample_weight</span><span class="p">,</span>
+            <span class="n">check_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">missing_values_in_feature_mask</span><span class="o">=</span><span class="n">missing_values_in_feature_mask</span><span class="p">,</span>
+            <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">tree</span><span class="o">.</span><span class="n">_fit</span><span class="p">(</span>
+            <span class="n">X</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">,</span>
+            <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">,</span>
+            <span class="n">check_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">missing_values_in_feature_mask</span><span class="o">=</span><span class="n">missing_values_in_feature_mask</span><span class="p">,</span>
+            <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tree</span>
+
+
+<div class="viewcode-block" id="HonestForestClassifier">
+<a class="viewcode-back" href="../../../generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier">[docs]</a>
+<span class="k">class</span> <span class="nc">HonestForestClassifier</span><span class="p">(</span><span class="n">ForestClassifier</span><span class="p">,</span> <span class="n">ForestClassifierMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A forest classifier with honest leaf estimates.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_estimators : int, default=100</span>
+<span class="sd">        The number of trees in the forest.</span>
+
+<span class="sd">    criterion : {&quot;gini&quot;, &quot;entropy&quot;}, default=&quot;gini&quot;</span>
+<span class="sd">        The function to measure the quality of a split. Supported criteria are</span>
+<span class="sd">        &quot;gini&quot; for the Gini impurity and &quot;entropy&quot; for the information gain.</span>
+<span class="sd">        Note: this parameter is tree-specific.</span>
+
+<span class="sd">    splitter : {&quot;best&quot;, &quot;random&quot;}, default=&quot;best&quot;</span>
+<span class="sd">        The strategy used to choose the split at each node. Supported</span>
+<span class="sd">        strategies are &quot;best&quot; to choose the best split and &quot;random&quot; to choose</span>
+<span class="sd">        the best random split.</span>
+
+<span class="sd">    max_depth : int, default=None</span>
+<span class="sd">        The maximum depth of the tree. If None, then nodes are expanded until</span>
+<span class="sd">        all leaves are pure or until all leaves contain less than</span>
+<span class="sd">        min_samples_split samples.</span>
+
+<span class="sd">    min_samples_split : int or float, default=2</span>
+<span class="sd">        The minimum number of samples required to split an internal node:</span>
+
+<span class="sd">        - If int, then consider `min_samples_split` as the minimum number.</span>
+<span class="sd">        - If float, then `min_samples_split` is a fraction and</span>
+<span class="sd">          `ceil(min_samples_split * n_samples)` are the minimum</span>
+<span class="sd">          number of samples for each split.</span>
+
+<span class="sd">    min_samples_leaf : int or float, default=1</span>
+<span class="sd">        The minimum number of samples required to be at a leaf node.</span>
+<span class="sd">        A split point at any depth will only be considered if it leaves at</span>
+<span class="sd">        least ``min_samples_leaf`` training samples in each of the left and</span>
+<span class="sd">        right branches.  This may have the effect of smoothing the model,</span>
+<span class="sd">        especially in regression.</span>
+
+<span class="sd">        - If int, then consider `min_samples_leaf` as the minimum number.</span>
+<span class="sd">        - If float, then `min_samples_leaf` is a fraction and</span>
+<span class="sd">          `ceil(min_samples_leaf * n_samples)` are the minimum</span>
+<span class="sd">          number of samples for each node.</span>
+
+<span class="sd">    min_weight_fraction_leaf : float, default=0.0</span>
+<span class="sd">        The minimum weighted fraction of the sum total of weights (of all</span>
+<span class="sd">        the input samples) required to be at a leaf node. Samples have</span>
+<span class="sd">        equal weight when sample_weight is not provided.</span>
+
+<span class="sd">    max_features : {&quot;sqrt&quot;, &quot;log2&quot;, None}, int or float, default=&quot;sqrt&quot;</span>
+<span class="sd">        The number of features to consider when looking for the best split:</span>
+
+<span class="sd">        - If int, then consider `max_features` features at each split.</span>
+<span class="sd">        - If float, then `max_features` is a fraction and</span>
+<span class="sd">          `round(max_features * n_features)` features are considered at each</span>
+<span class="sd">          split.</span>
+<span class="sd">        - If &quot;auto&quot;, then `max_features=sqrt(n_features)`.</span>
+<span class="sd">        - If &quot;sqrt&quot;, then `max_features=sqrt(n_features)`.</span>
+<span class="sd">        - If &quot;log2&quot;, then `max_features=log2(n_features)`.</span>
+<span class="sd">        - If None, then `max_features=n_features`.</span>
+
+<span class="sd">        Note: the search for a split does not stop until at least one</span>
+<span class="sd">        valid partition of the node samples is found, even if it requires to</span>
+<span class="sd">        effectively inspect more than ``max_features`` features.</span>
+
+<span class="sd">    max_leaf_nodes : int, default=None</span>
+<span class="sd">        Grow trees with ``max_leaf_nodes`` in best-first fashion.</span>
+<span class="sd">        Best nodes are defined as relative reduction in impurity.</span>
+<span class="sd">        If None then unlimited number of leaf nodes.</span>
+
+<span class="sd">    min_impurity_decrease : float, default=0.0</span>
+<span class="sd">        A node will be split if this split induces a decrease of the impurity</span>
+<span class="sd">        greater than or equal to this value.</span>
+
+<span class="sd">        The weighted impurity decrease equation is the following::</span>
+
+<span class="sd">            N_t / N * (impurity - N_t_R / N_t * right_impurity</span>
+<span class="sd">                                - N_t_L / N_t * left_impurity)</span>
+
+<span class="sd">        where ``N`` is the total number of samples, ``N_t`` is the number of</span>
+<span class="sd">        samples at the current node, ``N_t_L`` is the number of samples in the</span>
+<span class="sd">        left child, and ``N_t_R`` is the number of samples in the right child.</span>
+
+<span class="sd">        ``N``, ``N_t``, ``N_t_R`` and ``N_t_L`` all refer to the weighted sum,</span>
+<span class="sd">        if ``sample_weight`` is passed.</span>
+
+<span class="sd">    bootstrap : bool, default=False</span>
+<span class="sd">        Whether bootstrap samples are used when building trees. If False, the</span>
+<span class="sd">        whole dataset is used to build each tree.</span>
+
+<span class="sd">        When bootstrap is True, each tree bootstrap samples the dataset, and then</span>
+<span class="sd">        the unique indices are split in half, where one half is used to train</span>
+<span class="sd">        the structure of the tree and one half is used to train the leaves of the tree.</span>
+<span class="sd">        The remaining sample indices are considered &quot;out of bag&quot;.</span>
+
+<span class="sd">    oob_score : bool, default=False</span>
+<span class="sd">        Whether to use out-of-bag samples to estimate the generalization score.</span>
+<span class="sd">        Only available if bootstrap=True.</span>
+
+<span class="sd">    n_jobs : int, default=None</span>
+<span class="sd">        The number of jobs to run in parallel. :meth:`fit`, :meth:`predict`,</span>
+<span class="sd">        :meth:`decision_path` and :meth:`apply` are all parallelized over the</span>
+<span class="sd">        trees. ``None`` means 1 unless in a `joblib.parallel_backend`</span>
+<span class="sd">        context. ``-1`` means using all processors. See :term:`Glossary</span>
+<span class="sd">        &lt;n_jobs&gt;` for more details.</span>
+
+<span class="sd">    random_state : int, RandomState instance or None, default=None</span>
+<span class="sd">        Controls both the randomness of the bootstrapping of the samples used</span>
+<span class="sd">        when building trees (if ``bootstrap=True``) and the sampling of the</span>
+<span class="sd">        features to consider when looking for the best split at each node</span>
+<span class="sd">        (if ``max_features &lt; n_features``).</span>
+<span class="sd">        See :term:`Glossary &lt;random_state&gt;` for details.</span>
+
+<span class="sd">    verbose : int, default=0</span>
+<span class="sd">        Controls the verbosity when fitting and predicting.</span>
+
+<span class="sd">    warm_start : bool, default=False</span>
+<span class="sd">        When set to ``True``, reuse the solution of the previous call to fit</span>
+<span class="sd">        and add more estimators to the ensemble, otherwise, just fit a whole</span>
+<span class="sd">        new forest. See :term:`the Glossary &lt;warm_start&gt;`.</span>
+
+<span class="sd">    class_weight : {&quot;balanced&quot;, &quot;balanced_subsample&quot;}, dict or list of dicts, \</span>
+<span class="sd">            default=None</span>
+<span class="sd">        Weights associated with classes in the form ``{class_label: weight}``.</span>
+<span class="sd">        If not given, all classes are supposed to have weight one. For</span>
+<span class="sd">        multi-output problems, a list of dicts can be provided in the same</span>
+<span class="sd">        order as the columns of y.</span>
+
+<span class="sd">        Note that for multioutput (including multilabel) weights should be</span>
+<span class="sd">        defined for each class of every column in its own dict. For example,</span>
+<span class="sd">        for four-class multilabel classification weights should be</span>
+<span class="sd">        [{0: 1, 1: 1}, {0: 1, 1: 5}, {0: 1, 1: 1}, {0: 1, 1: 1}] instead of</span>
+<span class="sd">        [{1:1}, {2:5}, {3:1}, {4:1}].</span>
+
+<span class="sd">        The &quot;balanced&quot; mode uses the values of y to automatically adjust</span>
+<span class="sd">        weights inversely proportional to class frequencies in the input data</span>
+<span class="sd">        as ``n_samples / (n_classes * np.bincount(y))``</span>
+
+<span class="sd">        The &quot;balanced_subsample&quot; mode is the same as &quot;balanced&quot; except that</span>
+<span class="sd">        weights are computed based on the bootstrap sample for every tree</span>
+<span class="sd">        grown.</span>
+
+<span class="sd">        For multi-output, the weights of each column of y will be multiplied.</span>
+
+<span class="sd">        Note that these weights will be multiplied with sample_weight (passed</span>
+<span class="sd">        through the fit method) if sample_weight is specified.</span>
+
+<span class="sd">    ccp_alpha : non-negative float, default=0.0</span>
+<span class="sd">        Complexity parameter used for Minimal Cost-Complexity Pruning. The</span>
+<span class="sd">        subtree with the largest cost complexity that is smaller than</span>
+<span class="sd">        ``ccp_alpha`` will be chosen. By default, no pruning is performed. See</span>
+<span class="sd">        :ref:`minimal_cost_complexity_pruning` for details.</span>
+
+<span class="sd">    max_samples : int or float, default=None</span>
+<span class="sd">        If bootstrap is True, the number of samples to draw from X</span>
+<span class="sd">        to train each base tree estimator with replacement.</span>
+<span class="sd">        If bootstrap is False, then this will subsample</span>
+<span class="sd">        the dataset without replacement.</span>
+
+<span class="sd">        - If None (default), then draw `X.shape[0]` samples.</span>
+<span class="sd">        - If int, then draw `max_samples` samples.</span>
+<span class="sd">        - If float, then draw `max_samples * X.shape[0]` samples.</span>
+
+<span class="sd">    honest_prior : {&quot;ignore&quot;, &quot;uniform&quot;, &quot;empirical&quot;}, default=&quot;ignore&quot;</span>
+<span class="sd">        Method for dealing with empty leaves during evaluation of a test</span>
+<span class="sd">        sample. If &quot;ignore&quot;, the tree is ignored. If &quot;uniform&quot;, the prior tree</span>
+<span class="sd">        posterior is 1/(number of classes). If &quot;empirical&quot;, the prior tree</span>
+<span class="sd">        posterior is the relative class frequency in the voting subsample.</span>
+<span class="sd">        If all trees are ignored, the empirical estimate is returned.</span>
+
+<span class="sd">    honest_fraction : float, default=0.5</span>
+<span class="sd">        Fraction of training samples used for estimates in the trees. The</span>
+<span class="sd">        remaining samples will be used to learn the tree structure. A larger</span>
+<span class="sd">        fraction creates shallower trees with lower variance estimates.</span>
+
+<span class="sd">    tree_estimator : object, default=None</span>
+<span class="sd">        Instantiated tree of type BaseDecisionTree from treeple.</span>
+<span class="sd">        If None, then sklearn&#39;s DecisionTreeClassifier with default parameters will</span>
+<span class="sd">        be used. Note that none of the parameters in ``tree_estimator`` need</span>
+<span class="sd">        to be set. The parameters of the ``tree_estimator`` can be set using</span>
+<span class="sd">        the ``tree_estimator_params`` keyword argument.</span>
+
+<span class="sd">    stratify : bool</span>
+<span class="sd">        Whether or not to stratify sample when considering structure and leaf indices.</span>
+<span class="sd">        This will also stratify samples when bootstrap sampling is used. For more</span>
+<span class="sd">        information, see :func:`sklearn.utils.resample`.</span>
+<span class="sd">        By default False.</span>
+
+<span class="sd">    **tree_estimator_params : dict</span>
+<span class="sd">        Parameters to pass to the underlying base tree estimators.</span>
+<span class="sd">        These must be parameters for ``tree_estimator``.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    estimator : treeple.tree.HonestTreeClassifier</span>
+<span class="sd">        The child estimator template used to create the collection of fitted</span>
+<span class="sd">        sub-estimators.</span>
+
+<span class="sd">    estimators_ : list of treeple.tree.HonestTreeClassifier</span>
+<span class="sd">        The collection of fitted sub-estimators.</span>
+
+<span class="sd">    classes_ : ndarray of shape (n_classes,) or a list of such arrays</span>
+<span class="sd">        The classes labels (single output problem), or a list of arrays of</span>
+<span class="sd">        class labels (multi-output problem).</span>
+
+<span class="sd">    n_classes_ : int or list</span>
+<span class="sd">        The number of classes (single output problem), or a list containing the</span>
+<span class="sd">        number of classes for each output (multi-output problem).</span>
+
+<span class="sd">    n_features_in_ : int</span>
+<span class="sd">        Number of features seen during :term:`fit`.</span>
+
+<span class="sd">    feature_names_in_ : ndarray of shape (`n_features_in_`,)</span>
+<span class="sd">        Names of features seen during :term:`fit`. Defined only when `X`</span>
+<span class="sd">        has feature names that are all strings.</span>
+
+<span class="sd">    n_outputs_ : int</span>
+<span class="sd">        The number of outputs when ``fit`` is performed.</span>
+
+<span class="sd">    feature_importances_ : ndarray of shape (n_features,)</span>
+<span class="sd">        The impurity-based feature importances.</span>
+<span class="sd">        The higher, the more important the feature.</span>
+<span class="sd">        The importance of a feature is computed as the (normalized)</span>
+<span class="sd">        total reduction of the criterion brought by that feature.  It is also</span>
+<span class="sd">        known as the Gini importance.</span>
+
+<span class="sd">        Warning: impurity-based feature importances can be misleading for</span>
+<span class="sd">        high cardinality features (many unique values). See</span>
+<span class="sd">        :func:`sklearn.inspection.permutation_importance` as an alternative.</span>
+
+<span class="sd">    oob_score_ : float</span>
+<span class="sd">        Score of the training dataset obtained using an out-of-bag estimate.</span>
+<span class="sd">        This attribute exists only when ``oob_score`` is True.</span>
+
+<span class="sd">    oob_decision_function_ : ndarray of shape (n_samples, n_classes) or \</span>
+<span class="sd">            (n_samples, n_classes, n_outputs)</span>
+<span class="sd">        Decision function computed with out-of-bag estimate on the training</span>
+<span class="sd">        set. If n_estimators is small it might be possible that a data point</span>
+<span class="sd">        was never left out during the bootstrap. In this case,</span>
+<span class="sd">        `oob_decision_function_` might contain NaN. This attribute exists</span>
+<span class="sd">        only when ``oob_score`` is True.</span>
+
+<span class="sd">    honest_decision_function_ : ndarray of shape (n_samples, n_classes) or \</span>
+<span class="sd">            (n_samples, n_classes, n_outputs)</span>
+<span class="sd">        Decision function computed on each sample, including only the trees</span>
+<span class="sd">        for which it was in the honest subsample. It is possible that a sample</span>
+<span class="sd">        is never in the honest subset in which case `honest_decision_function_`</span>
+<span class="sd">        might contain NaN.</span>
+
+<span class="sd">    structure_indices_ : list of lists, shape=(n_estimators, n_structure)</span>
+<span class="sd">        Indices of training samples used to learn the structure.</span>
+
+<span class="sd">    honest_indices_ : list of lists, shape=(n_estimators, n_honest)</span>
+<span class="sd">        Indices of training samples used to learn leaf estimates.</span>
+
+<span class="sd">    oob_samples_ : list of lists, shape=(n_estimators, n_samples_bootstrap)</span>
+<span class="sd">        The indices of training samples that are &quot;out-of-bag&quot;. Only used</span>
+<span class="sd">        if ``bootstrap=True``.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The default values for the parameters controlling the size of the trees</span>
+<span class="sd">    (e.g. ``max_depth``, ``min_samples_leaf``, etc.) lead to fully grown and</span>
+<span class="sd">    unpruned trees which can potentially be very large on some data sets. To</span>
+<span class="sd">    reduce memory consumption, the complexity and size of the trees should be</span>
+<span class="sd">    controlled by setting those parameter values.</span>
+
+<span class="sd">    The features are always randomly permuted at each split. Therefore,</span>
+<span class="sd">    the best found split may vary, even with the same training data,</span>
+<span class="sd">    ``max_features=n_features`` and ``bootstrap=False``, if the improvement</span>
+<span class="sd">    of the criterion is identical for several splits enumerated during the</span>
+<span class="sd">    search of the best split. To obtain a deterministic behaviour during</span>
+<span class="sd">    fitting, ``random_state`` has to be fixed.</span>
+
+<span class="sd">    Honesty is a feature of trees that enables unbiased estimates of confidence</span>
+<span class="sd">    intervals. The default implementation here is using double sampling to</span>
+<span class="sd">    implement honesty. The amount of samples used for learning split nodes vs</span>
+<span class="sd">    leaf nodes is controlled by the ``honest_fraction`` parameter. In order to</span>
+<span class="sd">    enforce honesty, but also enable the tree to have access to all y labels,</span>
+<span class="sd">    we set sample_weight to 0 for a random subset of samples. This results in</span>
+<span class="sd">    inefficiency when building trees using a greedy splitter as we still sort</span>
+<span class="sd">    over all values of X. We recommend using propensity trees if you are</span>
+<span class="sd">    computing causal effects.</span>
+
+<span class="sd">    This forest classifier is a &quot;meta-estimator&quot; because any tree model can</span>
+<span class="sd">    be used in the classification process, while enabling honesty separates</span>
+<span class="sd">    the data used for split and leaf nodes.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] L. Breiman, &quot;Random Forests&quot;, Machine Learning, 45(1), 5-32, 2001.</span>
+
+<span class="sd">    .. [2] S. Athey, J. Tibshirani, and S. Wager. &quot;Generalized</span>
+<span class="sd">            Random Forests&quot;, Annals of Statistics, 2019.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from honest_forests.estimators import HonestForestClassifier</span>
+<span class="sd">    &gt;&gt;&gt; from sklearn.datasets import make_classification</span>
+<span class="sd">    &gt;&gt;&gt; X, y = make_classification(n_samples=1000, n_features=4,</span>
+<span class="sd">    ...                            n_informative=2, n_redundant=0,</span>
+<span class="sd">    ...                            random_state=0, shuffle=False)</span>
+<span class="sd">    &gt;&gt;&gt; clf = HonestForestClassifier(</span>
+<span class="sd">    &gt;&gt;&gt;        max_depth=2,</span>
+<span class="sd">    &gt;&gt;&gt;        random_state=0,</span>
+<span class="sd">    &gt;&gt;&gt;        tree_estimator=ObliqueDecisionTreeClassifier())</span>
+<span class="sd">    &gt;&gt;&gt; clf.fit(X, y)</span>
+<span class="sd">    HonestForestClassifier(...)</span>
+<span class="sd">    &gt;&gt;&gt; print(clf.predict([[0, 0, 0, 0]]))</span>
+<span class="sd">    [1]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_parameter_constraints</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="o">**</span><span class="n">ForestClassifier</span><span class="o">.</span><span class="n">_parameter_constraints</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">_parameter_constraints</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;max_samples&quot;</span><span class="p">)</span>
+    <span class="n">_parameter_constraints</span><span class="p">[</span><span class="s2">&quot;max_samples&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="kc">None</span><span class="p">,</span>
+        <span class="n">Interval</span><span class="p">(</span><span class="n">RealNotInt</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span>
+        <span class="n">Interval</span><span class="p">(</span><span class="n">Integral</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">),</span>
+    <span class="p">]</span>
+    <span class="n">_parameter_constraints</span><span class="p">[</span><span class="s2">&quot;honest_fraction&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">Interval</span><span class="p">(</span><span class="n">RealNotInt</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">)]</span>
+    <span class="n">_parameter_constraints</span><span class="p">[</span><span class="s2">&quot;honest_prior&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">StrOptions</span><span class="p">({</span><span class="s2">&quot;empirical&quot;</span><span class="p">,</span> <span class="s2">&quot;uniform&quot;</span><span class="p">,</span> <span class="s2">&quot;ignore&quot;</span><span class="p">}),</span>
+    <span class="p">]</span>
+    <span class="n">_parameter_constraints</span><span class="p">[</span><span class="s2">&quot;stratify&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;boolean&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">n_estimators</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">criterion</span><span class="o">=</span><span class="s2">&quot;gini&quot;</span><span class="p">,</span>
+        <span class="n">splitter</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">,</span>
+        <span class="n">max_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">min_samples_split</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">min_samples_leaf</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">min_weight_fraction_leaf</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">max_features</span><span class="o">=</span><span class="s2">&quot;sqrt&quot;</span><span class="p">,</span>
+        <span class="n">max_leaf_nodes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">min_impurity_decrease</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">bootstrap</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">oob_score</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">n_jobs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">warm_start</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">class_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">ccp_alpha</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">max_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">honest_prior</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span>
+        <span class="n">honest_fraction</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">tree_estimator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">stratify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">tree_estimator_params</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">estimator</span><span class="o">=</span><span class="n">HonestTreeClassifier</span><span class="p">(),</span>
+            <span class="n">n_estimators</span><span class="o">=</span><span class="n">n_estimators</span><span class="p">,</span>
+            <span class="n">estimator_params</span><span class="o">=</span><span class="p">(</span>
+                <span class="s2">&quot;criterion&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;splitter&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;max_depth&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;min_samples_split&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;min_samples_leaf&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;min_weight_fraction_leaf&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;max_features&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;max_leaf_nodes&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;min_impurity_decrease&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;random_state&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;ccp_alpha&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;tree_estimator&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;honest_fraction&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;honest_prior&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;stratify&quot;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">bootstrap</span><span class="o">=</span><span class="n">bootstrap</span><span class="p">,</span>
+            <span class="n">oob_score</span><span class="o">=</span><span class="n">oob_score</span><span class="p">,</span>
+            <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">warm_start</span><span class="o">=</span><span class="n">warm_start</span><span class="p">,</span>
+            <span class="n">class_weight</span><span class="o">=</span><span class="n">class_weight</span><span class="p">,</span>
+            <span class="n">max_samples</span><span class="o">=</span><span class="n">max_samples</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span> <span class="o">=</span> <span class="n">criterion</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">splitter</span> <span class="o">=</span> <span class="n">splitter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_depth</span> <span class="o">=</span> <span class="n">max_depth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_samples_split</span> <span class="o">=</span> <span class="n">min_samples_split</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_samples_leaf</span> <span class="o">=</span> <span class="n">min_samples_leaf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_weight_fraction_leaf</span> <span class="o">=</span> <span class="n">min_weight_fraction_leaf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_features</span> <span class="o">=</span> <span class="n">max_features</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_leaf_nodes</span> <span class="o">=</span> <span class="n">max_leaf_nodes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_impurity_decrease</span> <span class="o">=</span> <span class="n">min_impurity_decrease</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ccp_alpha</span> <span class="o">=</span> <span class="n">ccp_alpha</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">honest_fraction</span> <span class="o">=</span> <span class="n">honest_fraction</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">honest_prior</span> <span class="o">=</span> <span class="n">honest_prior</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree_estimator</span> <span class="o">=</span> <span class="n">tree_estimator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stratify</span> <span class="o">=</span> <span class="n">stratify</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tree_estimator_params</span> <span class="o">=</span> <span class="n">tree_estimator_params</span>
+
+<div class="viewcode-block" id="HonestForestClassifier.fit">
+<a class="viewcode-back" href="../../../generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier.fit">[docs]</a>
+    <span class="nd">@_fit_context</span><span class="p">(</span><span class="n">prefer_skip_nested_validation</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">fit_params</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build a forest of trees from the training set (X, y).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : {array-like, sparse matrix} of shape (n_samples, n_features)</span>
+<span class="sd">            The training input samples. Internally, its dtype will be converted</span>
+<span class="sd">            to ``dtype=np.float32``. If a sparse matrix is provided, it will be</span>
+<span class="sd">            converted into a sparse ``csc_matrix``.</span>
+
+<span class="sd">        y : array-like of shape (n_samples,) or (n_samples, n_outputs)</span>
+<span class="sd">            The target values (class labels in classification, real numbers in</span>
+<span class="sd">            regression).</span>
+
+<span class="sd">        sample_weight : array-like of shape (n_samples,), default=None</span>
+<span class="sd">            Sample weights. If None, then samples are equally weighted. Splits</span>
+<span class="sd">            that would create child nodes with net zero or negative weight are</span>
+<span class="sd">            ignored while searching for a split in each node. In the case of</span>
+<span class="sd">            classification, splits are also ignored if they would result in any</span>
+<span class="sd">            single class carrying a negative weight in either child node.</span>
+
+<span class="sd">        classes : array-like of shape (n_classes,), default=None</span>
+<span class="sd">            List of all the classes that can possibly appear in the y vector.</span>
+
+<span class="sd">        **fit_params : dict</span>
+<span class="sd">            Parameters to pass to the underlying base tree estimators.</span>
+
+<span class="sd">                Only available if `enable_metadata_routing=True`,</span>
+<span class="sd">                which can be set by using</span>
+<span class="sd">                ``sklearn.set_config(enable_metadata_routing=True)``.</span>
+<span class="sd">                See :ref:`Metadata Routing User Guide &lt;metadata_routing&gt;` for</span>
+<span class="sd">                more details.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self : object</span>
+<span class="sd">            Fitted estimator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span> <span class="o">**</span><span class="n">fit_params</span><span class="p">)</span>
+
+        <span class="c1"># Inherit attributes from the tree estimator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_inherit_estimator_attributes</span><span class="p">()</span>
+
+        <span class="c1"># Compute honest decision function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">honest_decision_function_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_proba</span><span class="p">(</span>
+            <span class="n">X</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span><span class="p">,</span> <span class="n">impute_missing</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_construct_trees</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">X</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">,</span>
+        <span class="n">sample_weight</span><span class="p">,</span>
+        <span class="n">random_state</span><span class="p">,</span>
+        <span class="n">n_samples_bootstrap</span><span class="p">,</span>
+        <span class="n">missing_values_in_feature_mask</span><span class="p">,</span>
+        <span class="n">classes</span><span class="p">,</span>
+        <span class="n">n_more_estimators</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Override construction of trees to allow stratification during bootstrapping.&quot;&quot;&quot;</span>
+        <span class="n">trees</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_make_estimator</span><span class="p">(</span><span class="n">append</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_more_estimators</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Parallel loop: we prefer the threading backend as the Cython code</span>
+        <span class="c1"># for fitting the trees is internally releasing the Python GIL</span>
+        <span class="c1"># making threading more efficient than multiprocessing in</span>
+        <span class="c1"># that case. However, for joblib 0.12+ we respect any</span>
+        <span class="c1"># parallel_backend contexts set at a higher level,</span>
+        <span class="c1"># since correctness does not rely on using threads.</span>
+        <span class="n">trees</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span>
+            <span class="n">n_jobs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">prefer</span><span class="o">=</span><span class="s2">&quot;threads&quot;</span><span class="p">,</span>
+        <span class="p">)(</span>
+            <span class="n">delayed</span><span class="p">(</span><span class="n">_parallel_build_trees</span><span class="p">)(</span>
+                <span class="n">t</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bootstrap</span><span class="p">,</span>
+                <span class="n">X</span><span class="p">,</span>
+                <span class="n">y</span><span class="p">,</span>
+                <span class="n">sample_weight</span><span class="p">,</span>
+                <span class="n">i</span><span class="p">,</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">trees</span><span class="p">),</span>
+                <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span>
+                <span class="n">class_weight</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">class_weight</span><span class="p">,</span>
+                <span class="n">n_samples_bootstrap</span><span class="o">=</span><span class="n">n_samples_bootstrap</span><span class="p">,</span>
+                <span class="n">missing_values_in_feature_mask</span><span class="o">=</span><span class="n">missing_values_in_feature_mask</span><span class="p">,</span>
+                <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span>
+                <span class="n">stratify</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stratify</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">trees</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Collect newly grown trees</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">estimators_</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">trees</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_make_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Make and configure a copy of the `estimator_` attribute.</span>
+
+<span class="sd">        Warning: This method should be used to properly instantiate new</span>
+<span class="sd">        sub-estimators.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">estimator</span> <span class="o">=</span> <span class="n">clone</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="p">)</span>
+        <span class="n">estimator</span><span class="o">.</span><span class="n">set_params</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">p</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_params</span><span class="p">})</span>
+
+        <span class="c1"># XXX: This is the only change compared to scikit-learn&#39;s make_estimator</span>
+        <span class="c1"># additionally set the tree_estimator_params</span>
+        <span class="n">estimator</span><span class="o">.</span><span class="n">_tree_estimator_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tree_estimator_params</span>
+
+        <span class="k">if</span> <span class="n">random_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_set_random_states</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="n">random_state</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">append</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">estimators_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">estimator</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">estimator</span>
+
+    <span class="k">def</span> <span class="nf">_inherit_estimator_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize necessary attributes from the provided tree estimator&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_estimator</span><span class="p">,</span> <span class="s2">&quot;_inheritable_fitted_attribute&quot;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree_estimator</span><span class="o">.</span><span class="n">_inheritable_fitted_attribute</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimators_</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">attr</span><span class="p">))</span>
+
+<div class="viewcode-block" id="HonestForestClassifier.predict_proba">
+<a class="viewcode-back" href="../../../generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier.predict_proba">[docs]</a>
+    <span class="k">def</span> <span class="nf">predict_proba</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Predict class probabilities for X.</span>
+
+<span class="sd">        The predicted class probabilities of an input sample are computed as</span>
+<span class="sd">        the mean predicted class probabilities of the trees in the forest.</span>
+<span class="sd">        The class probability of a single tree is the fraction of samples of</span>
+<span class="sd">        the same class in a leaf.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : {array-like, sparse matrix} of shape (n_samples, n_features)</span>
+<span class="sd">            The input samples. Internally, its dtype will be converted to</span>
+<span class="sd">            ``dtype=np.float32``. If a sparse matrix is provided, it will be</span>
+<span class="sd">            converted into a sparse ``csr_matrix``.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        p : ndarray of shape (n_samples, n_classes), or a list of such arrays</span>
+<span class="sd">            The class probabilities of the input samples. The order of the</span>
+<span class="sd">            classes corresponds to that in the attribute :term:`classes_`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_proba</span><span class="p">(</span><span class="n">X</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_predict_proba</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">impute_missing</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;predict_proba helper class&quot;&quot;&quot;</span>
+        <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_X_predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="n">n_jobs</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_partition_estimators</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_estimators</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">)</span>
+
+        <span class="c1"># avoid storing the output of every tree estimator by summing them here</span>
+        <span class="n">posteriors</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">j</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="n">indices</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_estimators</span>
+
+        <span class="n">lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+        <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span> <span class="n">require</span><span class="o">=</span><span class="s2">&quot;sharedmem&quot;</span><span class="p">)(</span>
+            <span class="n">delayed</span><span class="p">(</span><span class="n">_accumulate_prediction</span><span class="p">)(</span><span class="n">tree</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">posteriors</span><span class="p">,</span> <span class="n">lock</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">tree</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimators_</span><span class="p">,</span> <span class="n">indices</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Normalize to unit length, due to prior weighting</span>
+        <span class="n">posteriors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">posteriors</span><span class="p">)</span>
+        <span class="n">zero_mask</span> <span class="o">=</span> <span class="n">posteriors</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="n">posteriors</span><span class="p">[</span><span class="o">~</span><span class="n">zero_mask</span><span class="p">]</span> <span class="o">/=</span> <span class="n">posteriors</span><span class="p">[</span><span class="o">~</span><span class="n">zero_mask</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">posteriors</span><span class="p">[</span><span class="n">zero_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">impute_missing</span>
+
+        <span class="c1"># preserve shape of multi-outputs</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">posteriors</span> <span class="o">=</span> <span class="p">[</span><span class="n">post</span> <span class="k">for</span> <span class="n">post</span> <span class="ow">in</span> <span class="n">posteriors</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">posteriors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">posteriors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">posteriors</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">structure_indices_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The indices used to learn the structure of the trees.&quot;&quot;&quot;</span>
+        <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">tree</span><span class="o">.</span><span class="n">structure_indices_</span> <span class="k">for</span> <span class="n">tree</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimators_</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">honest_indices_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The indices used to fit the leaf nodes.&quot;&quot;&quot;</span>
+        <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">tree</span><span class="o">.</span><span class="n">honest_indices_</span> <span class="k">for</span> <span class="n">tree</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimators_</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">oob_samples_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The sample indices that are out-of-bag.</span>
+
+<span class="sd">        Only utilized if ``bootstrap=True``, otherwise, all samples are &quot;in-bag&quot;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bootstrap</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_bootstrap</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_bootstrap</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Cannot extract out-of-bag samples when bootstrap is False and &quot;</span>
+                <span class="s2">&quot;n_samples == n_samples_bootstrap&quot;</span>
+            <span class="p">)</span>
+        <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="n">oob_samples</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">possible_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_samples</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">structure_idx</span><span class="p">,</span> <span class="n">honest_idx</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">structure_indices_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span><span class="p">):</span>
+            <span class="n">_oob_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">(</span>
+                <span class="n">possible_indices</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">structure_idx</span><span class="p">,</span> <span class="n">honest_idx</span><span class="p">))</span>
+            <span class="p">)</span>
+            <span class="n">oob_samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_oob_samples</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">oob_samples</span>
+
+    <span class="k">def</span> <span class="nf">_more_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;multioutput&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+
+<div class="viewcode-block" id="HonestForestClassifier.decision_path">
+<a class="viewcode-back" href="../../../generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier.decision_path">[docs]</a>
+    <span class="k">def</span> <span class="nf">decision_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the decision path in the forest.</span>
+
+<span class="sd">        .. versionadded:: 0.18</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : {array-like, sparse matrix} of shape (n_samples, n_features)</span>
+<span class="sd">            The input samples. Internally, its dtype will be converted to</span>
+<span class="sd">            ``dtype=np.float32``. If a sparse matrix is provided, it will be</span>
+<span class="sd">            converted into a sparse ``csr_matrix``.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        indicator : sparse matrix of shape (n_samples, n_nodes)</span>
+<span class="sd">            Return a node indicator matrix where non zero elements indicates</span>
+<span class="sd">            that the samples goes through the nodes. The matrix is of CSR</span>
+<span class="sd">            format.</span>
+
+<span class="sd">        n_nodes_ptr : ndarray of shape (n_estimators + 1,)</span>
+<span class="sd">            The columns from indicator[n_nodes_ptr[i]:n_nodes_ptr[i+1]]</span>
+<span class="sd">            gives the indicator value for the i-th estimator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">decision_path</span><span class="p">(</span><span class="n">X</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="HonestForestClassifier.predict_quantiles">
+<a class="viewcode-back" href="../../../generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier.predict_quantiles">[docs]</a>
+    <span class="k">def</span> <span class="nf">predict_quantiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">quantiles</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Predict class or regression value for X at given quantiles.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : {array-like, sparse matrix} of shape (n_samples, n_features)</span>
+<span class="sd">            Input data.</span>
+<span class="sd">        quantiles : float, optional</span>
+<span class="sd">            The quantiles at which to evaluate, by default 0.5 (median).</span>
+<span class="sd">        method : str, optional</span>
+<span class="sd">            The method to interpolate, by default &#39;linear&#39;. Can be any keyword</span>
+<span class="sd">            argument accepted by :func:`~np.quantile`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        y : ndarray of shape (n_samples, n_quantiles, [n_outputs])</span>
+<span class="sd">            The predicted values. The ``n_outputs`` dimension is present only</span>
+<span class="sd">            for multi-output regressors.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">predict_quantiles</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">quantiles</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="HonestForestClassifier.get_leaf_node_samples">
+<a class="viewcode-back" href="../../../generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier.get_leaf_node_samples">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_leaf_node_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get samples in each leaf node across the forest.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : array-like of shape (n_samples, n_features)</span>
+<span class="sd">            The data array.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        leaf_node_samples : array-like of shape (n_samples, n_estimators)</span>
+<span class="sd">            Samples within each leaf node.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">get_leaf_node_samples</span><span class="p">(</span><span class="n">X</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_get_estimators_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Get drawn indices along both sample and feature axes</span>
+        <span class="k">for</span> <span class="n">tree</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimators_</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">bootstrap</span> <span class="ow">and</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_bootstrap</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_bootstrap</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples</span><span class="p">)</span>
+            <span class="p">):</span>
+                <span class="k">yield</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_samples</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># tree.random_state is actually an immutable integer seed rather</span>
+                <span class="c1"># than a mutable RandomState instance, so it&#39;s safe to use it</span>
+                <span class="c1"># repeatedly when calling this property.</span>
+                <span class="n">seed</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">random_state</span>
+
+                <span class="c1"># Operations accessing random_state must be performed identically</span>
+                <span class="c1"># to those in `_parallel_build_trees()`</span>
+                <span class="k">yield</span> <span class="n">_generate_sample_indices</span><span class="p">(</span>
+                    <span class="n">seed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_samples_bootstrap</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bootstrap</span>
+                <span class="p">)</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">_accumulate_prediction</span><span class="p">(</span><span class="n">predict</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">lock</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    See https://github.com/scikit-learn/scikit-learn/blob/</span>
+<span class="sd">    95119c13af77c76e150b753485c662b7c52a41a2/sklearn/ensemble/_forest.py#L460</span>
+<span class="sd">    This is a utility function for joblib&#39;s Parallel.</span>
+<span class="sd">    It cannot be placed in ForestClassifier or ForestRegressor due to joblib&#39;s</span>
+<span class="sd">    compatibility issue with pickle.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">indices</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">proba</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">indices</span><span class="p">],</span> <span class="n">check_input</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">lock</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">indices</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">([</span><span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">indices</span><span class="p">],</span> <span class="n">proba</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="p">)):</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">indices</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">([</span><span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">indices</span><span class="p">],</span> <span class="n">proba</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-07-24.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
