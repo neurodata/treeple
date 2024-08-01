@@ -1,4 +1,5 @@
 import os
+import sys
 import warnings
 from typing import Optional, Tuple
 
@@ -18,12 +19,11 @@ from sklearn.utils.validation import check_is_fitted, check_X_y
 
 from treeple._lib.sklearn.ensemble._forest import BaseForest, ForestClassifier
 
-try:
+BOTTLENECK_AVAILABLE = False
+if "bottleneck" in sys.modules:
     import bottleneck as bn
 
     BOTTLENECK_AVAILABLE = True
-except ImportError:
-    BOTTLENECK_AVAILABLE = False
 
 DISABLE_BN_ENV_VAR = "TREEPLE_NO_BOTTLENECK"
 

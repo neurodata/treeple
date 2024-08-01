@@ -247,7 +247,11 @@ def test_build_coleman_forest(use_bottleneck: bool):
 
     Test the function under alternative and null hypothesis for a very simple dataset.
     """
-    if not use_bottleneck:
+    if use_bottleneck and utils.DISABLE_BN_ENV_VAR in os.environ:
+        del os.environ[utils.DISABLE_BN_ENV_VAR]
+        importlib.reload(utils)
+        importlib.reload(stats)
+    else:
         os.environ[utils.DISABLE_BN_ENV_VAR] = "1"
         importlib.reload(utils)
         importlib.reload(stats)
