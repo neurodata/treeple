@@ -1,7 +1,11 @@
+import importlib
+import os
+
 import numpy as np
 import pytest
 from numpy.testing import assert_array_equal
 
+import treeple.stats.utils as utils
 from treeple import HonestForestClassifier
 from treeple.stats.utils import get_per_tree_oob_samples
 
@@ -32,3 +36,35 @@ def test_get_per_tree_oob_samples(bootstrap):
     else:
         with pytest.raises(RuntimeError, match="Cannot extract out-of-bag samples"):
             get_per_tree_oob_samples(est)
+
+
+@pytest.mark.parametrize("use_bottleneck", [True, False])
+def test_non_nan_samples(use_bottleneck: bool):
+
+    if use_bottleneck and utils.DISABLE_BN_ENV_VAR in os.environ:
+        del os.environ[utils.DISABLE_BN_ENV_VAR]
+        importlib.reload(utils)
+    else:
+        os.environ[utils.DISABLE_BN_ENV_VAR] = "1"
+        importlib.reload(utils)
+
+    posterior_array = np.array(
+        [
+            # tree 1
+            [
+                [0, 1],
+                [np.nan, np.nan],
+                [np.nan, np.nan],
+            ],
+            # tree 2
+            [
+                [0, 1],
+                [np.nan, np.nan],
+                [1, 0],
+            ],
+        ]
+    )  # [2, 3, 2]
+
+    expected = np.array([0, 2])
+    actual = utils._non_nan_samples(posterior_array)
+    np.testing.assert_array_equal(expected, actual)
