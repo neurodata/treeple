@@ -439,7 +439,10 @@ for tree algorithms that achieve strong performance in benchmark tasks.</p>
 <a class="reference internal" href="#madhyastha2020" id="id1"><span>[Madhyastha2020]</span></a>), oblique random forests (SPORF <a class="reference internal" href="#tomita2020" id="id2"><span>[Tomita2020]</span></a>, manifold random forests,
 MORF <a class="reference internal" href="#li2023" id="id3"><span>[Li2023]</span></a>), honest forests <a class="reference internal" href="#perry2021" id="id4"><span>[Perry2021]</span></a>, extended isolation forests <a class="reference internal" href="#hariri2019" id="id5"><span>[Hariri2019]</span></a>, and more.</p>
 <p>For all forests, we also support incremental building of the forests, using the
-<code class="docutils literal notranslate"><span class="pre">partial_fit</span></code> API from scikit-learn <a class="reference internal" href="#xu2022" id="id6"><span>[Xu2022]</span></a>.</p>
+<code class="docutils literal notranslate"><span class="pre">partial_fit</span></code> API from scikit-learn <a class="reference internal" href="#xu2022" id="id6"><span>[Xu2022]</span></a>, and quantile regression by storing
+the training samples in the leaves of the trees <a class="reference internal" href="#meinshausen2006" id="id7"><span>[Meinshausen2006]</span></a> (Warning: high memory usage
+will occur in this setting since predicting quantiles stores the training data within the
+leaves of the tree).</p>
 <p>We encourage you to use the package for your research and also build on top
 with relevant Pull Requests. See our examples for walk-throughs of how to use the package.
 Also, see our <a class="reference external" href="https://github.com/neurodata/treeple/blob/main/CONTRIBUTING.md">contributing guide</a>.</p>
@@ -452,6 +455,11 @@ Also, see our <a class="reference external" href="https://github.com/neurodata/t
 <p>Hariri, Sahand, Matias Carrasco Kind, and Robert J. Brunner.
 “Extended isolation forest.” IEEE transactions on knowledge and data
 engineering 33.4 (2019): 1479-1489.</p>
+</div>
+<div class="citation" id="meinshausen2006" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id7">Meinshausen2006</a><span class="fn-bracket">]</span></span>
+<p>Meinshausen, Nicolai, and Greg Ridgeway. “Quantile regression forests.”
+Journal of machine learning research 7.6 (2006). “Quantile regression forests.”</p>
 </div>
 <div class="citation" id="madhyastha2020" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">Madhyastha2020</a><span class="fn-bracket">]</span></span>
@@ -610,7 +618,7 @@ Nearest Neighbor Estimation of Information-Theoretic Quantities”</a>, arXiv pr
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, treeple Developers. Last updated on 2024-08-01.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-08-02.
       <br/>
     
   </p>
