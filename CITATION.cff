@@ -17,9 +17,12 @@ authors:
     family-names: Xu
     affiliation: "Department of Biomedical Engineering, Johns Hopkins University, Baltimore, MD, USA"
     orcid: "https://orcid.org/0000-0001-8235-4950"
+  - given-names: Itsuki
+    family-names: Ogihara
+    affiliation: "Department of Biomedical Engineering, Johns Hopkins University, Baltimore, MD, USA"
 type: software
 repository-code: "https://github.com/neurodata/treeple"
-license: 'BSD-3-Clause'
+license: 'PolyForm-Noncommercial-1.0.0'
 keywords:
   - random forest
   - oblique trees

@@ -3,12 +3,10 @@
 .. include:: _contributors.rst
 .. currentmodule:: treeple
 
-.. _current:
+.. _v0_9:
 
 Version 0.9
 ===========
-
-**In Development**
 
 This release include a rename of the package to from ``scikit-tree`` to ``treeple``
 The users can replace the previous usage as follows:
@@ -16,6 +14,7 @@ The users can replace the previous usage as follows:
 ``from sktree import tree`` to ``from treeple import tree``
 ``from sktree import ...`` to ``from treeple import ...``
 
+Note that the previous version of the package will still be available under the name ``scikit-tree`` on PyPI.
 
 Changelog
 ---------
