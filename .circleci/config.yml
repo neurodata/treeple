@@ -62,7 +62,7 @@ commands:
 
 jobs:
   # Build treeple from source
-  build_scikit_tree:
+  build_treeple:
     docker:
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/doc/2.0/circleci-images/
@@ -189,10 +189,10 @@ jobs:
 workflows:
   build-docs:
     jobs:
-      - build_scikit_tree
+      - build_treeple
       - build_docs:
           requires:
-            - build_scikit_tree
+            - build_treeple
       - docs-deploy:
           requires:
             - build_docs

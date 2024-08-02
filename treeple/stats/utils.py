@@ -1,3 +1,6 @@
+import os
+import sys
+import warnings
 from typing import Optional, Tuple
 
 import numpy as np
@@ -15,6 +18,24 @@ from sklearn.metrics import (
 from sklearn.utils.validation import check_is_fitted, check_X_y
 
 from treeple._lib.sklearn.ensemble._forest import BaseForest, ForestClassifier
+
+BOTTLENECK_AVAILABLE = False
+if "bottleneck" in sys.modules:
+    import bottleneck as bn
+
+    BOTTLENECK_AVAILABLE = True
+
+DISABLE_BN_ENV_VAR = "TREEPLE_NO_BOTTLENECK"
+
+if BOTTLENECK_AVAILABLE and DISABLE_BN_ENV_VAR not in os.environ:
+    nanmean_f = bn.nanmean
+    anynan_f = lambda arr: bn.anynan(arr, axis=2)
+else:
+    warnings.warn(
+        "Not using bottleneck for calculations involvings nans. Expect slower performance."
+    )
+    nanmean_f = np.nanmean
+    anynan_f = lambda arr: np.isnan(arr).any(axis=2)
 
 
 def _mutual_information(y_true: ArrayLike, y_pred_proba: ArrayLike) -> float:
@@ -131,7 +152,7 @@ def _non_nan_samples(posterior_arr: ArrayLike) -> ArrayLike:
         along axis=1.
     """
     # Find the row indices with NaN values along the specified axis
-    nan_indices = np.isnan(posterior_arr).any(axis=2).all(axis=0)
+    nan_indices = anynan_f(posterior_arr).all(axis=0)
 
     # Invert the boolean mask to get indices without NaN values
     nonnan_indices = np.where(~nan_indices)[0]
@@ -320,8 +341,8 @@ def _parallel_build_null_forests(
     # first_half_metric = metric_func(y_test[non_nan_samples, :], y_pred_first_half)
     # second_half_metric = metric_func(y_test[non_nan_samples, :], y_pred_second_half)
 
-    y_pred_first_half = np.nanmean(first_forest_pred[:, first_forest_samples, :], axis=0)
-    y_pred_second_half = np.nanmean(second_forest_pred[:, second_forest_samples, :], axis=0)
+    y_pred_first_half = nanmean_f(first_forest_pred[:, first_forest_samples, :], axis=0)
+    y_pred_second_half = nanmean_f(second_forest_pred[:, second_forest_samples, :], axis=0)
 
     # compute two instances of the metric from the sampled trees
     first_half_metric = metric_func(

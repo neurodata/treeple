@@ -3,7 +3,7 @@
 .. include:: _contributors.rst
 .. currentmodule:: treeple
 
-.. _v0_9:
+.. _v0_8:
 
 Version 0.8
 ===========
