@@ -283,7 +283,7 @@ Build = [
   ".spin/cmds.py:build",
   ".spin/cmds.py:setup_submodule",
   "spin.cmds.meson.test",
-  ".spin/cmds.py:install"
+  "spin.cmds.pip.install"
 ]
 Environments = [
   'spin.cmds.meson.shell',
