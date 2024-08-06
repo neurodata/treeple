@@ -6,7 +6,11 @@ from sklearn.metrics import accuracy_score
 from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
-from treeple import MultiViewRandomForestClassifier, RandomForestClassifier
+from treeple import (
+    MultiViewObliqueRandomForestClassifier,
+    MultiViewRandomForestClassifier,
+    RandomForestClassifier,
+)
 from treeple.datasets.multiview import make_joint_factor_model
 
 seed = 12345
@@ -15,14 +19,25 @@ seed = 12345
 @parametrize_with_checks(
     [
         MultiViewRandomForestClassifier(random_state=12345, n_estimators=10),
+        MultiViewObliqueRandomForestClassifier(random_state=12345, n_estimators=10),
     ]
 )
 def test_sklearn_compatible_estimator(estimator, check):
     check(estimator)
 
 
-@pytest.mark.parametrize("baseline_est", [RandomForestClassifier])
-def test_multiview_classification(baseline_est):
+@pytest.mark.parametrize(
+    "mv_est, kwargs",
+    [
+        (MultiViewRandomForestClassifier, dict()),
+        (MultiViewObliqueRandomForestClassifier, dict(feature_combinations=2)),
+        (
+            MultiViewObliqueRandomForestClassifier,
+            dict(feature_combinations=2, cross_feature_set_sampling=True),
+        ),
+    ],
+)
+def test_multiview_classification(mv_est, kwargs):
     """Test that explicit knowledge of multi-view structure improves classification accuracy.
 
     In very high-dimensional noise setting across two views, when the max_depth and max_features
@@ -61,12 +76,13 @@ def test_multiview_classification(baseline_est):
     y = np.hstack((y0, y1)).T
 
     # Compare multiview decision tree vs single-view decision tree
-    clf = MultiViewRandomForestClassifier(
+    clf = mv_est(
         random_state=seed,
         feature_set_ends=[n_features_1, X.shape[1]],
         max_features="sqrt",
         max_depth=4,
         n_estimators=n_estimators,
+        **kwargs,
     )
     clf.fit(X, y)
     assert (
@@ -76,7 +92,7 @@ def test_multiview_classification(baseline_est):
         cross_val_score(clf, X, y, cv=5).mean() == 1.0
     ), f"CV score: {cross_val_score(clf, X, y, cv=5).mean()}"
 
-    clf = baseline_est(
+    clf = RandomForestClassifier(
         random_state=seed,
         max_depth=4,
         max_features="sqrt",
@@ -150,7 +166,6 @@ def test_three_view_dataset(n_views, max_features):
     clf = MultiViewRandomForestClassifier(
         random_state=seed,
         feature_set_ends=feature_set_ends,
-        apply_max_features_per_feature_set=True,
         max_features=max_features,
         n_estimators=n_estimators,
     )

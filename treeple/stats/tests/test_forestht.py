@@ -88,7 +88,6 @@ def test_small_dataset_independent(seed):
         stratify=True,
         tree_estimator=MultiViewDecisionTreeClassifier(
             feature_set_ends=feature_set_ends,
-            apply_max_features_per_feature_set=True,
         ),
     )
     perm_clf = PermutationHonestForestClassifier(
@@ -102,7 +101,6 @@ def test_small_dataset_independent(seed):
         stratify=True,
         tree_estimator=MultiViewDecisionTreeClassifier(
             feature_set_ends=feature_set_ends,
-            apply_max_features_per_feature_set=True,
         ),
     )
     result = build_coleman_forest(
@@ -202,7 +200,6 @@ def test_comight_repeated_feature_sets(seed):
         stratify=True,
         tree_estimator=MultiViewDecisionTreeClassifier(
             feature_set_ends=feature_set_ends,
-            apply_max_features_per_feature_set=True,
         ),
     )
     perm_clf = PermutationHonestForestClassifier(
@@ -216,7 +213,6 @@ def test_comight_repeated_feature_sets(seed):
         stratify=True,
         tree_estimator=MultiViewDecisionTreeClassifier(
             feature_set_ends=feature_set_ends,
-            apply_max_features_per_feature_set=True,
         ),
     )
 

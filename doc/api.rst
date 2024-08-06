@@ -66,6 +66,7 @@ how scikit-learn builds trees.
    PatchObliqueRandomForestRegressor
    HonestForestClassifier
    MultiViewRandomForestClassifier
+   MultiViewObliqueRandomForestClassifier
 
 .. currentmodule:: treeple.tree
 .. autosummary::
@@ -77,6 +78,7 @@ how scikit-learn builds trees.
    PatchObliqueDecisionTreeRegressor
    HonestTreeClassifier
    MultiViewDecisionTreeClassifier
+   MultiViewObliqueDecisionTreeClassifier
 
 Unsupervised
 ------------

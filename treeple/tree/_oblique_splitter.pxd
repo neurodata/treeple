@@ -95,9 +95,16 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
     # to split the samples samples[start:end].
 
     # Oblique Splitting extra parameters
-    cdef public float64_t feature_combinations             # Number of features to combine
-    cdef intp_t n_non_zeros                             # Number of non-zero features
-    cdef intp_t[::1] indices_to_sample                  # an array of indices to sample of size mtry X n_features
+    cdef public float64_t feature_combinations          # Number of features to combine
+    cdef intp_t n_non_zeros                             # Number of non-zero features to sample per projection matrix
+
+    # Oblique Splitting extra parameters (mtry, n_dims) matrix
+    # This will contain indices 0 to mtry*n_features to allow efficient shuffling.
+    cdef intp_t[::1] indices_to_sample                  # A 2D array of indices to sample of size mtry X n_features
+    #                                                   # to sample from that produces a non-zero feature combination.
+    #                                                   # This array is multiplied by the data matrix n_samples X n_features
+    #                                                   # to produce a non-zero feature combination of size
+    #                                                   # n_samples X mtry.
 
     # All oblique splitters (i.e. non-axis aligned splitters) require a
     # function to sample a projection matrix that is applied to the feature matrix
@@ -139,11 +146,14 @@ cdef class RandomObliqueSplitter(ObliqueSplitter):
 
 # XXX: This splitter is experimental. Expect changes frequently.
 cdef class MultiViewSplitter(BestObliqueSplitter):
-    cdef const intp_t[:] feature_set_ends   # an array indicating the column indices of the end of each feature set
+    cdef const intp_t[:] feature_set_ends       # an array indicating the column indices of the end of each feature set
     cdef intp_t n_feature_sets                  # the number of feature sets is the length of feature_set_ends + 1
 
-    cdef const intp_t[:] max_features_per_set  # the maximum number of features to sample from each feature set
+    cdef const intp_t[:] max_features_per_set   # the maximum number of features to sample from each feature set
 
+    # Each feature set has a different set of indices to sample from with a potentially different
+    # max_features argument. This is a 2D array of indices to sample of size mtry_in_set X features_in_set
+    # to sample from that produces a non-zero feature combination for each feature set.
     cdef vector[vector[intp_t]] multi_indices_to_sample
 
     cdef void sample_proj_mat(
@@ -154,15 +164,9 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
 
 
 # XXX: This splitter is experimental. Expect changes frequently.
-cdef class MultiViewObliqueSplitter(BestObliqueSplitter):
-    cdef const intp_t[:] feature_set_ends   # an array indicating the column indices of the end of each feature set
-    cdef intp_t n_feature_sets                  # the number of feature sets is the length of feature_set_ends + 1
-
-    # whether or not to uniformly sample feature-sets into each projection vector
-    # if True, then sample from each feature set for each projection vector
-    cdef bint uniform_sampling
-
-    cdef vector[vector[intp_t]] multi_indices_to_sample
+cdef class MultiViewObliqueSplitter(MultiViewSplitter):
+    cdef intp_t _max_feature_combinations       # Number of non-zero features to sample per projection matrix
+    cdef bint cross_feature_set_sampling        # Whether we sample across feature set when creating a projection vector
 
     cdef void sample_proj_mat(
         self,

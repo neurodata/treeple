@@ -19,6 +19,16 @@ Note that the previous version of the package will still be available under the 
 Changelog
 ---------
 
+- |API| :class:`treeple.tree.MultiViewDecisionTreeClassifier` do not have the
+    ``apply_max_features_per_feature_set`` argument anymore. Instead, the
+    ``max_features`` argument is used to control the number of features to
+    consider when looking for the best split within each feature set explicitly.
+    By `Adam Li`_ :pr:`#265`.
+
+- |Feature| :class:`treeple.tree.MultiViewObliqueDecisionTreeClassifier` is implemented
+    along with its forest version :class:`treeple.MultiViewObliqueRandomForestClassifier`.
+    By `Adam Li`_ :pr:`#265`.
+
 - |API| Rename the package to ``treeple``. By `SUKI-O`_ (:pr:`#292`)
 - |Fix| Fixed a bug in the predict_proba function of the :class:`treeple.HonestForestClassifier` where posteriors
     estimated on empty leaf with ``ignore`` prior would result in ``np.nan``
