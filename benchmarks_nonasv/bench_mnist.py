@@ -33,11 +33,14 @@ import numpy as np
 from joblib import Memory
 from sklearn.datasets import fetch_openml, get_data_home
 from sklearn.dummy import DummyClassifier
-from sklearn.ensemble import ExtraTreesClassifier, RandomForestClassifier
 from sklearn.metrics import zero_one_loss
 from sklearn.utils import check_array
 
-from treeple import ObliqueRandomForestClassifier, PatchObliqueRandomForestClassifier
+from treeple import (
+    ObliqueRandomForestClassifier,
+    PatchObliqueRandomForestClassifier,
+    RandomForestClassifier,
+)
 
 # Memoize the data extraction and memory map the resulting
 # train / test splits in readonly mode
@@ -70,10 +73,10 @@ def load_data(dtype=np.float32, order="F"):
 
 ESTIMATORS = {
     "dummy": DummyClassifier(),
-    "ExtraTrees": ExtraTreesClassifier(),
+    # "ExtraTrees": ExtraTreesClassifier(),
     "RandomForest": RandomForestClassifier(),
-    "ObliqueRandomForest": ObliqueRandomForestClassifier(),
-    "PatchObliqueRandomForest": PatchObliqueRandomForestClassifier(),
+    # "ObliqueRandomForest": ObliqueRandomForestClassifier(),
+    # "PatchObliqueRandomForest": PatchObliqueRandomForestClassifier(),
 }
 
 

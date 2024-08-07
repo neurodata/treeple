@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/psf/black
-    rev: 24.4.2
+    rev: 24.8.0
     hooks:
       - id: black
         args: [--quiet]
@@ -22,7 +22,7 @@ repos:
 
   # Ruff treeple
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.5.4
+    rev: v0.5.6
     hooks:
       - id: ruff
         name: ruff treeple
@@ -31,7 +31,7 @@ repos:
 
   # Ruff tutorials and examples
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.5.4
+    rev: v0.5.6
     hooks:
       - id: ruff
         name: ruff tutorials and examples
@@ -67,7 +67,7 @@ repos:
 
   # mypy
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.11.0
+    rev: v1.11.1
     hooks:
       - id: mypy
         # Avoid the conflict between mne/__init__.py and mne/__init__.pyi by ignoring the former

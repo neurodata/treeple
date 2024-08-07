@@ -1,9 +1,14 @@
+import importlib
+import os
+
 import numpy as np
 import pytest
 from flaky import flaky
 from numpy.testing import assert_almost_equal, assert_array_equal
 from sklearn import datasets
 
+import treeple.stats as stats
+import treeple.stats.utils as utils
 from treeple import HonestForestClassifier, RandomForestClassifier
 from treeple.stats import (
     PermutationHonestForestClassifier,
@@ -236,11 +241,21 @@ def test_comight_repeated_feature_sets(seed):
     assert result.pvalue > 0.05, f"{result.pvalue}"
 
 
-def test_build_coleman_forest():
+@pytest.mark.parametrize("use_bottleneck", [True, False])
+def test_build_coleman_forest(use_bottleneck: bool):
     """Simple test for building a Coleman forest.
 
     Test the function under alternative and null hypothesis for a very simple dataset.
     """
+    if use_bottleneck and utils.DISABLE_BN_ENV_VAR in os.environ:
+        del os.environ[utils.DISABLE_BN_ENV_VAR]
+        importlib.reload(utils)
+        importlib.reload(stats)
+    else:
+        os.environ[utils.DISABLE_BN_ENV_VAR] = "1"
+        importlib.reload(utils)
+        importlib.reload(stats)
+
     n_estimators = 100
     n_samples = 30
     n_features = 5
@@ -273,10 +288,10 @@ def test_build_coleman_forest():
     with pytest.raises(
         RuntimeError, match="Permutation forest must be a PermutationHonestForestClassifier"
     ):
-        build_coleman_forest(clf, clf, X, y)
+        stats.build_coleman_forest(clf, clf, X, y)
 
     forest_result, orig_forest_proba, perm_forest_proba, clf_fitted, perm_clf_fitted = (
-        build_coleman_forest(clf, perm_clf, X, y, metric="s@98", n_repeats=1000, seed=seed)
+        stats.build_coleman_forest(clf, perm_clf, X, y, metric="s@98", n_repeats=1000, seed=seed)
     )
     assert clf_fitted._n_samples_bootstrap == round(n_samples * 1.6)
     assert perm_clf_fitted._n_samples_bootstrap == round(n_samples * 1.6)
@@ -287,7 +302,7 @@ def test_build_coleman_forest():
     assert_array_equal(orig_forest_proba.shape, perm_forest_proba.shape)
 
     X = np.vstack([_X, _X])
-    forest_result, _, _, clf_fitted, perm_clf_fitted = build_coleman_forest(
+    forest_result, _, _, clf_fitted, perm_clf_fitted = stats.build_coleman_forest(
         clf, perm_clf, X, y, metric="s@98"
     )
     assert forest_result.pvalue > 0.05, f"{forest_result.pvalue}"

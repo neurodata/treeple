@@ -27,3 +27,4 @@
 .. _Ronan Perry : https://rflperry.github.io/
 .. _Haoyin Xu : https://github.com/PSSF23
 .. _Yuxin Bai : https://github.com/YuxinB
+.. _Ryan Hausen : https://ryanhausen.github.io
