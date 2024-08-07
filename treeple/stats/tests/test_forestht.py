@@ -290,9 +290,13 @@ def test_build_coleman_forest(use_bottleneck: bool):
     ):
         stats.build_coleman_forest(clf, clf, X, y)
 
-    forest_result, orig_forest_proba, perm_forest_proba, clf_fitted, perm_clf_fitted = (
-        stats.build_coleman_forest(clf, perm_clf, X, y, metric="s@98", n_repeats=1000, seed=seed)
-    )
+    (
+        forest_result,
+        orig_forest_proba,
+        perm_forest_proba,
+        clf_fitted,
+        perm_clf_fitted,
+    ) = stats.build_coleman_forest(clf, perm_clf, X, y, metric="s@98", n_repeats=1000, seed=seed)
     assert clf_fitted._n_samples_bootstrap == round(n_samples * 1.6)
     assert perm_clf_fitted._n_samples_bootstrap == round(n_samples * 1.6)
     assert_array_equal(perm_clf_fitted.permutation_indices_.shape, (n_samples, 1))
@@ -354,9 +358,13 @@ def test_build_coleman_forest_multiview():
     ):
         build_coleman_forest(clf, clf, X, y)
 
-    forest_result, orig_forest_proba, perm_forest_proba, clf_fitted, perm_clf_fitted = (
-        build_coleman_forest(clf, perm_clf, X, y, metric="s@98", n_repeats=1000, seed=seed)
-    )
+    (
+        forest_result,
+        orig_forest_proba,
+        perm_forest_proba,
+        clf_fitted,
+        perm_clf_fitted,
+    ) = build_coleman_forest(clf, perm_clf, X, y, metric="s@98", n_repeats=1000, seed=seed)
     assert clf_fitted._n_samples_bootstrap == round(n_samples * 1.6)
     assert perm_clf_fitted._n_samples_bootstrap == round(n_samples * 1.6)
     assert_array_equal(perm_clf_fitted.permutation_indices_.shape, (n_samples, 1))

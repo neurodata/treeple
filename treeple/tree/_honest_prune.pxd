@@ -17,6 +17,9 @@ cdef struct PruningRecord:
     intp_t parent
     intp_t start
     intp_t end
+    float64_t impurity
+    float64_t lower_bound
+    float64_t upper_bound
 
 cdef class HonestPruner(Splitter):
     cdef Tree tree          # The tree to be pruned
@@ -43,6 +46,8 @@ cdef class HonestPruner(Splitter):
     cdef bint check_node_partition_conditions(
         self,
         SplitRecord* current_split,
+        float64_t lower_bound,
+        float64_t upper_bound
     ) noexcept nogil
 
     cdef inline intp_t n_left_samples(
