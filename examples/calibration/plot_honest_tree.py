@@ -66,7 +66,7 @@ plt.show()
 # dataset into two parts: the training set and the validation set. The training
 # set is used to build the tree, while the validation set is used to fit the
 # leaf nodes for posterior prediction. This results in calibrated posteriors
-# (see :ref:`sphx_glr_auto_examples_calibration_plot_overlapping_gaussians`).
+# (see :ref:`sphx_glr_auto_examples_calibration_plot_overlapping_gaussians.py`).
 #
 # Compared to the ``honest_prior='apply'`` method, the ``honest_prior='prune'``
 # method builds a tree that will not contain empty leaves, and also leverages
