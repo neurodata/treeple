@@ -105,13 +105,13 @@ plt.show()
 # in a posterior that is ``np.nan``.
 
 # this is the same as a decision tree classifier that is trained on less data
-print("Dishonest posteriors: ", dishonest_clf.predict_proba(X_val))
+print("\nDishonest posteriors: ", dishonest_clf.predict_proba(X_val))
 
 # this is the honest tree with empty leaves that predict the prior
-print(honest_noprune_clf.predict_proba(X_val))
+print("\nHonest tree without pruning: ", honest_noprune_clf.predict_proba(X_val))
 
 # this is the honest tree that is pruned
-print(honest_clf.predict_proba(X_val))
+print("\nHonest tree with pruning: ", honest_clf.predict_proba(X_val))
 
 # this is a regular decision tree classifier from sklearn
-print(sklearn_clf.predict_proba(X_val))
+print("\nDTC: ", sklearn_clf.predict_proba(X_val))
