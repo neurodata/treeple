@@ -1,6 +1,6 @@
-# cython: boundscheck=True
-# cython: wraparound=True
-# cython: initializedcheck=True
+# cython: boundscheck=False
+# cython: wraparound=False
+# cython: initializedcheck=False
 
 import numpy as np
 

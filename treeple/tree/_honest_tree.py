@@ -306,6 +306,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         ],
         "honest_fraction": [Interval(RealNotInt, 0.0, 1.0, closed="neither")],
         "honest_prior": [StrOptions({"empirical", "uniform", "ignore"})],
+        "honest_method": [StrOptions({"apply", "prune"}), None],
         "stratify": ["boolean"],
     }
 
@@ -689,7 +690,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         self.n_classes_ = np.array(self.n_classes_, dtype=np.intp)
 
         # XXX: implement honest pruning
-        # honest_method = "apply"
+        print(self.honest_method)
         if self.honest_method == "apply":
             # Fit leaves using other subsample
             honest_leaves = self.tree_.apply(X[self.honest_indices_])
@@ -763,11 +764,24 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         """
         self.tree_.value[:, :, :] = 0
 
+        # XXX: Note this method does not make these into a proportion of the leaf
+        total_n_node_samples = 0.0
+
         # apply sample-weight to the leaf nodes
+        seen_leaf_ids = set()
         for leaf_id, yval, y_weight in zip(
             leaf_ids, y[self.honest_indices_, :], sample_weight[self.honest_indices_]
         ):
-            self.tree_.value[leaf_id][:, yval] += y_weight
+            total_n_node_samples += y_weight
+
+            if leaf_id in seen_leaf_ids:
+                self.tree_.value[leaf_id][:, yval] += 1  # y_weight
+            else:
+                self.tree_.value[leaf_id][:, yval] = 1  # y_weight
+            seen_leaf_ids.add(leaf_id)
+
+        for leaf_id in seen_leaf_ids:
+            self.tree_.value[leaf_id] /= total_n_node_samples
 
     def _inherit_estimator_attributes(self):
         """Initialize necessary attributes from the provided tree estimator"""
