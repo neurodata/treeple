@@ -84,6 +84,11 @@ jobs:
           pip install -r build_requirements.txt
           pip install -r test_requirements.txt
 
+      - name: Install nightly wheels for scikit-learn (only for ubuntu 3.12)
+        if: ${{ matrix.python-version == '3.12' }} && ${{ matrix.os == 'ubuntu-latest' }}
+        run: |
+          pip install --pre --extra-index https://pypi.anaconda.org/scientific-python-nightly-wheels/simple scikit-learn --force
+
       - name: Prepare compiler cache
         id: prep-ccache
         shell: bash

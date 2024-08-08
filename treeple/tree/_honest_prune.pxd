@@ -1,11 +1,6 @@
-# from .._lib.sklearn.tree._tree import _build_pruned_tree
-
 from .._lib.sklearn.tree._criterion cimport Criterion
-from .._lib.sklearn.tree._splitter cimport (
-    SplitRecord,
-    Splitter,
-    shift_missing_values_to_left_if_required,
-)
+from .._lib.sklearn.tree._partitioner cimport shift_missing_values_to_left_if_required
+from .._lib.sklearn.tree._splitter cimport SplitRecord, Splitter
 from .._lib.sklearn.tree._tree cimport Node, ParentInfo, Tree
 from .._lib.sklearn.utils._typedefs cimport float32_t, float64_t, int8_t, intp_t, uint8_t, uint32_t
 
