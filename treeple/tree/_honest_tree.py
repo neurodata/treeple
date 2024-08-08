@@ -1,4 +1,5 @@
 from copy import copy
+from numbers import Integral
 
 import numpy as np
 from sklearn.base import ClassifierMixin, MetaEstimatorMixin, _fit_context, clone, is_classifier
@@ -309,6 +310,14 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         "honest_method": [StrOptions({"apply", "prune"}), None],
         "stratify": ["boolean"],
     }
+    _parameter_constraints.pop("max_features")
+    _parameter_constraints["max_features"] = [
+        Interval(Integral, 1, None, closed="left"),
+        Interval(RealNotInt, 0.0, 1.0, closed="right"),
+        StrOptions({"sqrt", "log2"}),
+        "array-like",
+        None,
+    ]
 
     def __init__(
         self,

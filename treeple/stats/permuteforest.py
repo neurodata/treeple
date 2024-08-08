@@ -179,6 +179,11 @@ class PermutationHonestForestClassifier(HonestForestClassifier):
         remaining samples will be used to learn the tree structure. A larger
         fraction creates shallower trees with lower variance estimates.
 
+    honest_method : {"prune", "apply"}, default="prune"
+        Method for enforcing honesty. If "prune", the tree is pruned to enforce
+        honesty. If "apply", the tree is not pruned, but the leaf estimates are
+        adjusted to enforce honesty.
+
     tree_estimator : object, default=None
         Type of decision tree classifier to use. By default `None`, which
         defaults to `treeple.tree.DecisionTreeClassifier`. Note
