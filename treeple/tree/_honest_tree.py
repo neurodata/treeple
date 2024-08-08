@@ -781,9 +781,9 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
             total_n_node_samples += y_weight
 
             if leaf_id in seen_leaf_ids:
-                self.tree_.value[leaf_id][:, yval] += 1  # y_weight
+                self.tree_.value[leaf_id][:, yval] += y_weight
             else:
-                self.tree_.value[leaf_id][:, yval] = 1  # y_weight
+                self.tree_.value[leaf_id][:, yval] = y_weight
             seen_leaf_ids.add(leaf_id)
 
         for leaf_id in seen_leaf_ids:
