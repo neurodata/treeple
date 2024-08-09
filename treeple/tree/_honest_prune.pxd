@@ -22,6 +22,8 @@ cdef class HonestPruner(Splitter):
     cdef intp_t pos         # The current position to split left/right children
     cdef intp_t n_missing   # The number of missing values in the feature currently considered
     cdef uint8_t missing_go_to_left
+
+    # TODO: only supports sparse for now.
     cdef const float32_t[:, :] X
 
     cdef int init(
@@ -32,6 +34,7 @@ cdef class HonestPruner(Splitter):
         const uint8_t[::1] missing_values_in_feature_mask,
     ) except -1
 
+    # This function is not used, and should be disabled for pruners
     cdef int node_split(
         self,
         ParentInfo* parent_record,
