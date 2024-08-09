@@ -41,22 +41,32 @@ def test_honest_tree_pruning():
         original_tree.value.sum(axis=(1, 2)) > 0
     )
 
-    # Ensure all nodes in pruned tree exist in the original tree
-    # for pruned_node_id in range(pruned_tree.node_count):
-    #     pruned_left_child = pruned_tree.children_left[pruned_node_id]
-    #     pruned_right_child = pruned_tree.children_right[pruned_node_id]
+    # test that the first three nodes are the same, since these are unlikely to be
+    # pruned, and should remain invariant.
+    #
+    # Note: pruning the tree will have the node_ids change since the tree is
+    # ordered via DFS.
+    for pruned_node_id in range(3):
+        pruned_left_child = pruned_tree.children_left[pruned_node_id]
+        pruned_right_child = pruned_tree.children_right[pruned_node_id]
 
-    #     print(pruned_node_id, pruned_left_child, pruned_right_child)
-    #     # Check if the pruned node exists in the original tree
-    #     assert pruned_left_child in original_tree.children_left, \
-    #         "Left child node of pruned tree not found in original tree"
-    #     assert pruned_right_child in original_tree.children_right, \
-    #         "Right child node of pruned tree not found in original tree"
+        # Check if the pruned node exists in the original tree
+        assert (
+            pruned_left_child in original_tree.children_left
+        ), "Left child node of pruned tree not found in original tree"
+        assert (
+            pruned_right_child in original_tree.children_right
+        ), "Right child node of pruned tree not found in original tree"
 
-    # Check if the node's parameters match
-    # assert pruned_tree.feature[pruned_node_id] == original_tree.feature[pruned_node_id], \
-    #     "Feature does not match for node {}".format(pruned_node_id)
-    # assert pruned_tree.threshold[pruned_node_id] == original_tree.threshold[pruned_node_id], \
-    #     "Threshold does not match for node {}".format(pruned_node_id)
-    # assert np.allclose(pruned_tree.value[pruned_node_id], original_tree.value[pruned_node_id]), \
-    #     "Values do not match for node {}".format(pruned_node_id)
+        # Check if the node's parameters match for non-leaf nodes
+        if pruned_left_child != -1:
+            assert (
+                pruned_tree.feature[pruned_node_id] == original_tree.feature[pruned_node_id]
+            ), "Feature does not match for node {}".format(pruned_node_id)
+            assert (
+                pruned_tree.threshold[pruned_node_id] == original_tree.threshold[pruned_node_id]
+            ), "Threshold does not match for node {}".format(pruned_node_id)
+            assert (
+                pruned_tree.weighted_n_node_samples[pruned_node_id]
+                == original_tree.weighted_n_node_samples[pruned_node_id]
+            ), "Weighted n_node samples does not match for node {}".format(pruned_node_id)
