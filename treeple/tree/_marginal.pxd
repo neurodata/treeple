@@ -3,7 +3,7 @@ import numpy as np
 cimport numpy as cnp
 
 from .._lib.sklearn.tree._tree cimport BaseTree, Node
-from .._lib.sklearn.utils._typedefs cimport float32_t, float64_t, intp_t, uint32_t
+from .._lib.sklearn.utils._typedefs cimport float32_t, float64_t, intp_t, uint8_t, uint32_t
 
 
 cpdef apply_marginal_tree(
@@ -11,6 +11,6 @@ cpdef apply_marginal_tree(
     object X,
     const intp_t[:] marginal_indices,
     intp_t traversal_method,
-    unsigned char use_sample_weight,
+    uint8_t use_sample_weight,
     object random_state
 )

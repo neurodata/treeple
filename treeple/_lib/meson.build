@@ -8,6 +8,9 @@ tree_extension_metadata = {
   '_tree':
     {'sources': ['./sklearn/tree/' + '_tree.pyx'],
      'override_options': ['cython_language=cpp', 'optimization=3']},
+  '_partitioner':
+    {'sources': ['./sklearn/tree/' + '_partitioner.pyx'],
+     'override_options': ['cython_language=cpp', 'optimization=3']},
   '_splitter':
     {'sources': ['./sklearn/tree/' + '_splitter.pyx'],
      'override_options': ['cython_language=cpp', 'optimization=3']},
