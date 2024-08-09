@@ -27,7 +27,7 @@ cpdef apply_marginal_tree(
     object X,
     const intp_t[:] marginal_indices,
     intp_t traversal_method,
-    unsigned char use_sample_weight,
+    uint8_t use_sample_weight,
     object random_state
 ):
     """Apply a dataset to a marginalized tree.
@@ -44,7 +44,7 @@ cpdef apply_marginal_tree(
     traversal_method : intp_t
         The traversal method to use. 0 for 'random', 1 for
         'weighted'.
-    use_sample_weight : unsigned char
+    use_sample_weight : uint8_t
         Whether or not to use the weighted number of samples
         in each node.
     random_state : object
@@ -107,7 +107,7 @@ cdef inline cnp.ndarray _apply_dense_marginal(
     const float32_t[:, :] X,
     unordered_set[intp_t] marginal_indices_map,
     intp_t traversal_method,
-    unsigned char use_sample_weight,
+    uint8_t use_sample_weight,
     uint32_t* rand_r_state
 ):
     """Finds the terminal region (=leaf node) for each sample in X.
@@ -128,7 +128,7 @@ cdef inline cnp.ndarray _apply_dense_marginal(
     traversal_method : intp_t
         The traversal method to use. 0 for 'random', 1 for
         'weighted'.
-    use_sample_weight : unsigned char
+    use_sample_weight : uint8_t
         Whether or not to use the weighted number of samples
         in each node.
     rand_r_state : uint32_t
