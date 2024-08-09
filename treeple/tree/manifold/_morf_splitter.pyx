@@ -12,7 +12,6 @@ from libcpp.vector cimport vector
 
 from ..._lib.sklearn.tree._criterion cimport Criterion
 from ..._lib.sklearn.tree._utils cimport rand_int
-from ..._lib.sklearn.utils._typedefs cimport uint8_t
 from .._utils cimport ravel_multi_index_cython, unravel_index_cython
 
 
