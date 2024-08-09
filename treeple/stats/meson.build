@@ -2,8 +2,8 @@ python_sources = [
   '__init__.py',
   'forestht.py',
   'utils.py',
-  'monte_carlo.py',
   'permuteforest.py',
+  'baseline.py',
 ]
 
 py.install_sources(

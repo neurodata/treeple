@@ -40,7 +40,6 @@ def test_get_per_tree_oob_samples(bootstrap):
 
 @pytest.mark.parametrize("use_bottleneck", [True, False])
 def test_non_nan_samples(use_bottleneck: bool):
-
     if use_bottleneck and utils.DISABLE_BN_ENV_VAR in os.environ:
         del os.environ[utils.DISABLE_BN_ENV_VAR]
         importlib.reload(utils)
