@@ -189,6 +189,7 @@ jobs:
           pip install compilers
           pip install -r build_requirements.txt
           pip install -r test_requirements.txt
+          pip install --pre --extra-index https://pypi.anaconda.org/scientific-python-nightly-wheels/simple scikit-learn --force
 
       - name: Prepare compiler cache
         id: prep-ccache
@@ -284,6 +285,7 @@ jobs:
           pip install spin
           pip install -r build_requirements.txt
           pip install -r test_requirements.txt
+          pip install --pre --extra-index https://pypi.anaconda.org/scientific-python-nightly-wheels/simple scikit-learn --force
 
       - name: Build
         run: |
