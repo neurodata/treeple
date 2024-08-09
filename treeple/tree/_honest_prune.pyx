@@ -16,14 +16,11 @@ from sklearn.tree._tree cimport ParentInfo
 from ._prune cimport _build_pruned_tree
 
 TREE_LEAF = -1
-TREE_UNDEFINED = -2
 cdef intp_t _TREE_LEAF = TREE_LEAF
-cdef intp_t _TREE_UNDEFINED = TREE_UNDEFINED
 cdef float64_t INFINITY = np.inf
 
 cdef inline void _init_parent_record(ParentInfo* record) noexcept nogil:
     record.n_constant_features = 0
-    record.impurity = INFINITY
     record.lower_bound = -INFINITY
     record.upper_bound = INFINITY
 
@@ -336,7 +333,6 @@ cdef _honest_prune(
             "node_idx": 0,
             "start": 0,
             "end": pruner.n_samples,
-            "impurity": INFINITY,
             "lower_bound": -INFINITY,
             "upper_bound": INFINITY,
         })
@@ -350,7 +346,6 @@ cdef _honest_prune(
             pruning_stack.pop()
             start = stack_record.start
             end = stack_record.end
-            impurity = stack_record.impurity
             lower_bound = stack_record.lower_bound
             upper_bound = stack_record.upper_bound
 
@@ -360,11 +355,6 @@ cdef _honest_prune(
             # reset which samples indices are considered at this split node
             pruner.node_reset(start, end, &weighted_n_node_samples)
 
-            # get the impurity to initialize passing into its children
-            if first:
-                impurity = pruner.node_impurity()
-                first = 0
-
             # partition samples into left/right child based on the
             # current node split in the orig_tree
             pruner.partition_samples(node_idx)
@@ -373,7 +363,6 @@ cdef _honest_prune(
             split_ptr.feature = orig_tree.nodes[node_idx].feature
             invalid_split = pruner.check_node_partition_conditions(
                 split_ptr,
-                impurity,
                 lower_bound,
                 upper_bound
             )
@@ -426,7 +415,6 @@ cdef _honest_prune(
                     "node_idx": child_l[node_idx],
                     "start": pruner.start,
                     "end": pruner.pos,
-                    "impurity": split_ptr.impurity_left,
                     "lower_bound": left_child_min,
                     "upper_bound": left_child_max,
                 })
@@ -434,7 +422,6 @@ cdef _honest_prune(
                     "node_idx": child_r[node_idx],
                     "start": pruner.pos,
                     "end": pruner.end,
-                    "impurity": split_ptr.impurity_right,
                     "lower_bound": right_child_min,
                     "upper_bound": right_child_max,
                 })

@@ -1,6 +1,15 @@
 # cython: boundscheck=False
 # cython: wraparound=False
 # cython: initializedcheck=False
+from libcpp.stack cimport stack
+
+from .._lib.sklearn.tree._splitter cimport SplitRecord
+
+TREE_UNDEFINED = -2
+cdef intp_t _TREE_UNDEFINED = TREE_UNDEFINED
+
+TREE_LEAF = -1
+cdef intp_t _TREE_LEAF = TREE_LEAF
 
 cdef void _build_pruned_tree(
     Tree tree,  # OUT

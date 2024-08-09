@@ -9,13 +9,14 @@ from .._lib.sklearn.utils._typedefs cimport float32_t, float64_t, int8_t, intp_t
 # within the tree's node array
 cdef struct PruningRecord:
     intp_t node_idx
-    intp_t parent
     intp_t start
     intp_t end
-    float64_t impurity
     float64_t lower_bound
     float64_t upper_bound
 
+
+# TODO: this may break the notion of feature importances, as we don't set the node's impurity
+# at the child nodes.
 cdef class HonestPruner(Splitter):
     cdef Tree tree          # The tree to be pruned
     cdef intp_t capacity    # The maximum number of nodes in the pruned tree

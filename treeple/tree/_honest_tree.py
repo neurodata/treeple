@@ -911,3 +911,12 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         check_is_fitted(self)
         X = self._validate_X_predict(X, check_input)
         return self.estimator_.predict(X, False)
+
+    @property
+    def feature_importances_(self):
+        if self.honest_method == "apply":
+            raise RuntimeError(
+                "Feature importances are not available when honest_method is 'apply'."
+            )
+
+        return super().feature_importances_

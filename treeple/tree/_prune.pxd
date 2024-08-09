@@ -3,6 +3,9 @@
 from libc.stdint cimport INTPTR_MAX
 from libc.string cimport memcpy
 
+from .._lib.sklearn.tree._tree cimport Node, Tree
+from .._lib.sklearn.utils._typedefs cimport float64_t, intp_t, uint8_t
+
 
 cdef struct BuildPrunedRecord:
     intp_t start
