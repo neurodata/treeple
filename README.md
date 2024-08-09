@@ -46,7 +46,7 @@ We minimally require:
     * Python (>=3.9)
     * numpy
     * scipy
-    * scikit-learn >= 1.3
+    * scikit-learn >= 1.5
 
 Installation with Pip (<https://pypi.org/project/treeple/>)
 -------------------------------------------------------------
