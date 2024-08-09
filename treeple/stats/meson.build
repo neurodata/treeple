@@ -1,6 +1,6 @@
 python_sources = [
   '__init__.py',
-  'forestht.py',
+  'forest.py',
   'utils.py',
   'permuteforest.py',
   'baseline.py',
