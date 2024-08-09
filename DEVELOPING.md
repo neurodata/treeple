@@ -18,7 +18,7 @@
 - Python 3.9+
 - numpy>=1.25.0
 - scipy>=1.5.0
-- scikit-learn>=1.4.1
+- scikit-learn>=1.5.0
 
 For the other requirements, inspect the ``pyproject.toml`` file.
 
@@ -181,11 +181,14 @@ treeple is in-line with scikit-learn and thus relies on each new version release
 
 ## Releasing on PyPi (for pip installs)
 
-1. Download wheels from GH Actions and put all wheels into a ``dist/`` folder
+GH Actions will build wheels for each Python version and OS. Then the wheels needs to be uploaded to PyPi. The following steps outline the process:
+
+1. Download wheels from GH Actions and put all wheels into a ``dist/`` folder in the root (local) of the project.
 
 <https://github.com/neurodata/treeple/actions/workflows/build_wheels.yml> will have all the wheels for common OSes built for each Python version.
 
 2. Upload wheels to test PyPi
+This is to ensure that the wheels are built correctly and can be installed on a fresh environment. For more information, see <https://packaging.python.org/guides/using-testpypi/>. You will need to follow the instructions to create an account and get your API token for testpypi and pypi. 
 
 ```
 twine upload dist/* --repository testpypi
@@ -223,33 +226,16 @@ spin docs
 git checkout gh-pages
 ```
 
-Rename the current ``stable`` folder to the version number of the previous release, e.g. If we are releasing ``0.8.0``, then rename the ``stable`` folder to ``0.7.0``.
+Create a new folder for the new version, e.g. ``v0.8`` if you are releasing version 0.8.0.
 
-Copy the contents of the ``docs/_build/html`` folder to the root of the ``gh-pages`` branch under the `stable` folder, since this new release is the "stable" version.
+Copy the contents of the locally build ``docs/_build/html`` folder to newly created folder at the root of the ``gh-pages`` branch.
 
 4. Update the versions pointer file in main `doc/_static/versions.json` to point to the new version.
 
 e.g. If we are releasing ``0.8.0``, then you will see:
 
-```
-{
-    "name": "0.7",
-    "version": "stable",
-    "url": "https://docs.neurodata.io/treeple/stable/"
-},
-```
 
-which should get renamed to its corresponding version number:
-
-```
-    {
-        "name": "0.7",
-        "version": "0.7",
-        "url": "https://docs.neurodata.io/treeple/v0.7/"
-    },
-```
-
-Similarly, we will add pointers to the development version and new stable v0.8 version:
+Change the development version to the next version i.e. v0.9 and rename v0.8 version appropriately:
 
 ```
     {
@@ -259,8 +245,8 @@ Similarly, we will add pointers to the development version and new stable v0.8 v
     },
     {
         "name": "0.8",
-        "version": "stable",
-        "url": "https://docs.neurodata.io/treeple/stable/"
+        "version": "0.8",
+        "url": "https://docs.neurodata.io/treeple/v0.8/"
     },
 ```
 

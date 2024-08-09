@@ -5,3 +5,4 @@ pytest-cov
 memory_profiler
 flaky
 tqdm
+bottleneck

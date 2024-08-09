@@ -1,0 +1,27 @@
+:orphan:
+
+.. include:: _contributors.rst
+.. currentmodule:: treeple
+
+.. _current:
+
+Version 0.10
+============
+
+** In Development **
+
+Changelog
+---------
+
+- |Feature| Calculations involving nans in ``treeple.stats.utils`` now use the
+    ``bottleneck`` library for faster computation. By `Ryan Hausen`_ (:pr:`#306`)
+
+
+Code and Documentation Contributors
+-----------------------------------
+
+Thanks to everyone who has contributed to the maintenance and improvement of
+the project since version inception, including:
+
+* `Adam Li`_
+* `Ryan Hausen`_
