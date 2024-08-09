@@ -84,6 +84,7 @@ jobs:
             pip install --upgrade pip spin
             spin setup-submodule
             pip install .[build,doc]
+            pip install --pre --extra-index https://pypi.anaconda.org/scientific-python-nightly-wheels/simple scikit-learn --force
 
       - run:
           name: build treeple

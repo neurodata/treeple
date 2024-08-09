@@ -18,7 +18,7 @@
 - Python 3.9+
 - numpy>=1.25.0
 - scipy>=1.5.0
-- scikit-learn>=1.4.1
+- scikit-learn>=1.5.0
 
 For the other requirements, inspect the ``pyproject.toml`` file.
 
