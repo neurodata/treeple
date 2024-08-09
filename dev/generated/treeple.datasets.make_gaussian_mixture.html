@@ -536,13 +536,13 @@ a (possibly nonlinear) transformation.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>centers</strong><span class="classifier">1D <a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of 1D array-likes</span></dt><dd><p>The mean(s) of the Gaussian(s) from which the latent
+<dt><strong>centers</strong><span class="classifier">1D <a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of 1D array-likes</span></dt><dd><p>The mean(s) of the Gaussian(s) from which the latent
 points are sampled. If is a list of 1D array-likes, each is the
 mean of a distinct Gaussian, sampled from with
 probability given by <code class="docutils literal notranslate"><span class="pre">class_probs</span></code>. Otherwise is the mean of a
 single Gaussian from which all are sampled.</p>
 </dd>
-<dt><strong>covariances</strong><span class="classifier">2D <a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of 2D array-likes</span></dt><dd><p>The covariance matrix(s) of the Gaussian(s), matched
+<dt><strong>covariances</strong><span class="classifier">2D <a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of 2D array-likes</span></dt><dd><p>The covariance matrix(s) of the Gaussian(s), matched
 to the specified centers.</p>
 </dd>
 <dt><strong>n_samples</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>The number of points in each view, divided across Gaussians per
@@ -555,7 +555,7 @@ applies it to the latent. Otherwise uses an implemented function.</p>
 </dd>
 <dt><strong>noise_dims</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a> (default=None)</span></dt><dd><p>Number of additional dimensions of standard normal noise to add.</p>
 </dd>
-<dt><strong>class_probs</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a>, default=None</span></dt><dd><p>A list of probabilities specifying the probability of a latent
+<dt><strong>class_probs</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a>, default=None</span></dt><dd><p>A list of probabilities specifying the probability of a latent
 point being sampled from each of the Gaussians. Must sum to 1. If
 None, then is taken to be uniform over the Gaussians.</p>
 </dd>
@@ -572,11 +572,11 @@ transformation.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>Xs</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a>, of shape (n_samples, n_features)</span></dt><dd><p>The latent data and its noisy transformation.</p>
+<dt><strong>Xs</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a>, of shape (n_samples, n_features)</span></dt><dd><p>The latent data and its noisy transformation.</p>
 </dd>
-<dt><strong>y</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a>, shape (n_samples,)</span></dt><dd><p>The integer labels for each sample’s Gaussian membership.</p>
+<dt><strong>y</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a>, shape (n_samples,)</span></dt><dd><p>The integer labels for each sample’s Gaussian membership.</p>
 </dd>
-<dt><strong>latents</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a>, shape (n_samples, n_features)</span></dt><dd><p>The non-noisy latent variables. Only returned if
+<dt><strong>latents</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a>, shape (n_samples, n_features)</span></dt><dd><p>The non-noisy latent variables. Only returned if
 <code class="docutils literal notranslate"><span class="pre">return_latents=True</span></code>.</p>
 </dd>
 </dl>
@@ -680,7 +680,7 @@ dimensions to both views.</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, treeple Developers. Last updated on 2024-08-06.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-08-09.
       <br/>
     
   </p>

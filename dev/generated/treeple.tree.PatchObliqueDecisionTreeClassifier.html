@@ -592,7 +592,7 @@ effectively inspect more than <code class="docutils literal notranslate"><span c
 <p>Note: Compared to axis-aligned Random Forests, one can set
 max_features to a number greater then <code class="docutils literal notranslate"><span class="pre">n_features</span></code>.</p>
 </dd>
-<dt><strong>random_state</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://numpy.org/devdocs/reference/random/legacy.html#numpy.random.RandomState" title="(in NumPy v2.1.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RandomState</span></code></a> instance or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a>, default=None</span></dt><dd><p>Controls the randomness of the estimator. The features are always
+<dt><strong>random_state</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://numpy.org/devdocs/reference/random/legacy.html#numpy.random.RandomState" title="(in NumPy v2.2.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RandomState</span></code></a> instance or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a>, default=None</span></dt><dd><p>Controls the randomness of the estimator. The features are always
 randomly permuted at each split, even if <code class="docutils literal notranslate"><span class="pre">splitter</span></code> is set to
 <code class="docutils literal notranslate"><span class="pre">&quot;best&quot;</span></code>. When <code class="docutils literal notranslate"><span class="pre">max_features</span> <span class="pre">&lt;</span> <span class="pre">n_features</span></code>, the algorithm will
 select <code class="docutils literal notranslate"><span class="pre">max_features</span></code> at random at each split before finding the best
@@ -636,19 +636,19 @@ as <code class="docutils literal notranslate"><span class="pre">n_samples</span>
 <p>Note that these weights will be multiplied with sample_weight (passed
 through the fit method) if sample_weight is specified.</p>
 </dd>
-<dt><strong>min_patch_dims</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a>, optional</span></dt><dd><p>The minimum dimensions of a patch, by default 1 along all dimensions.</p>
+<dt><strong>min_patch_dims</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a>, optional</span></dt><dd><p>The minimum dimensions of a patch, by default 1 along all dimensions.</p>
 </dd>
-<dt><strong>max_patch_dims</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a>, optional</span></dt><dd><p>The maximum dimensions of a patch, by default 1 along all dimensions.</p>
+<dt><strong>max_patch_dims</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a>, optional</span></dt><dd><p>The maximum dimensions of a patch, by default 1 along all dimensions.</p>
 </dd>
-<dt><strong>dim_contiguous</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>Whether or not each patch is sampled contiguously along this dimension.</p>
+<dt><strong>dim_contiguous</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>Whether or not each patch is sampled contiguously along this dimension.</p>
 </dd>
-<dt><strong>data_dims</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a>, optional</span></dt><dd><p>The presumed dimensions of the un-vectorized feature vector, by default
+<dt><strong>data_dims</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a>, optional</span></dt><dd><p>The presumed dimensions of the un-vectorized feature vector, by default
 will be a 1D vector with (1, n_features) shape.</p>
 </dd>
 <dt><strong>boundary</strong><span class="classifier">optional, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a> {‘wrap’}</span></dt><dd><p>The boundary condition to use when sampling patches, by default None.
 ‘wrap’ corresponds to the boundary condition as is in numpy and scipy.</p>
 </dd>
-<dt><strong>feature_weight</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a> of shape (n_samples,n_features,), default=None</span></dt><dd><p>Feature weights. If None, then features are equally weighted as is.
+<dt><strong>feature_weight</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a> of shape (n_samples,n_features,), default=None</span></dt><dd><p>Feature weights. If None, then features are equally weighted as is.
 If provided, then the feature weights are used to weight the
 patches that are generated. The feature weights are used
 as follows: for every patch that is sampled, the feature weights over
@@ -658,7 +658,7 @@ the entire patch is summed and normalizes the patch.</p>
 </dd>
 <dt><strong>store_leaf_values</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=False</span></dt><dd><p>Whether to store the leaf values.</p>
 </dd>
-<dt><strong>monotonic_cst</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a> of shape (n_features), default=None</span></dt><dd><dl class="simple">
+<dt><strong>monotonic_cst</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a> of shape (n_features), default=None</span></dt><dd><dl class="simple">
 <dt>Indicates the monotonicity constraint to enforce on each feature.</dt><dd><ul class="simple">
 <li><p>1: monotonic increase</p></li>
 <li><p>0: no constraint</p></li>
@@ -670,36 +670,12 @@ the entire patch is summed and normalizes the patch.</p>
 </dd>
 </dl>
 </dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>Patches can be 2D masks that are applied onto the data matrix. Following sklearn
-API standards, <code class="docutils literal notranslate"><span class="pre">X</span></code> is always a <code class="docutils literal notranslate"><span class="pre">(n_samples,</span> <span class="pre">n_features)</span></code> array even if
-X is comprised of images, or multivariate-time series. The <code class="docutils literal notranslate"><span class="pre">data_width</span></code> and
-<code class="docutils literal notranslate"><span class="pre">data_height</span></code> parameters are used to inform the <code class="docutils literal notranslate"><span class="pre">PatchObliqueDecisionTreeClassifier</span></code>
-of the original structure of the data. It is required that
-<code class="docutils literal notranslate"><span class="pre">data_width</span> <span class="pre">*</span> <span class="pre">data_height</span> <span class="pre">=</span> <span class="pre">n_features</span></code>.</p>
-<p>When users pass in <code class="docutils literal notranslate"><span class="pre">X</span></code> to <a class="reference internal" href="#treeple.tree.PatchObliqueDecisionTreeClassifier.fit" title="treeple.tree.PatchObliqueDecisionTreeClassifier.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a>, tt is presumed that all vectorization operations
-are done C-contiguously (i.e. the last axis is contiguous).</p>
-<p>Note that for a patch height and width of size 1, the tree is exactly the same as the
-decision tree, albeit with less efficienc optimizations. Therefore, it is always
-recommended to set the range of patch heights and widths based on the structure of your
-expected input data.</p>
-<p class="rubric">References</p>
-<div class="docutils container" id="id2">
-<aside class="footnote-list brackets">
-<aside class="footnote brackets" id="footcite-li2023manifold" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
-<p>Adam Li, Ronan Perry, Chester Huynh, Tyler M. Tomita, Ronak Mehta, Jesus Arroyo, Jesse Patsolic, Ben Falk, Sridevi Sarma, and Joshua Vogelstein. Manifold oblique random forests: towards closing the gap on convolutional deep networks. <em>SIAM Journal on Mathematics of Data Science</em>, 5(1):77–96, 2023. <a class="reference external" href="https://doi.org/10.1137/21M1449117">doi:10.1137/21M1449117</a>.</p>
-</aside>
-</aside>
-</div>
-<dl class="field-list">
-<dt class="field-odd">Attributes<span class="colon">:</span></dt>
-<dd class="field-odd"><dl>
-<dt><strong>classes_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_classes,) or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a></span></dt><dd><p>The classes labels (single output problem),
+<dt class="field-even">Attributes<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>classes_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_classes,) or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a></span></dt><dd><p>The classes labels (single output problem),
 or a list of arrays of class labels (multi-output problem).</p>
 </dd>
-<dt><a class="reference internal" href="#treeple.tree.PatchObliqueDecisionTreeClassifier.feature_importances_" title="treeple.tree.PatchObliqueDecisionTreeClassifier.feature_importances_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">feature_importances_</span></code></a><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_features,)</span></dt><dd><p>Return the feature importances.</p>
+<dt><a class="reference internal" href="#treeple.tree.PatchObliqueDecisionTreeClassifier.feature_importances_" title="treeple.tree.PatchObliqueDecisionTreeClassifier.feature_importances_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">feature_importances_</span></code></a><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_features,)</span></dt><dd><p>Return the feature importances.</p>
 </dd>
 <dt><strong>max_features_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>The inferred value of max_features.</p>
 </dd>
@@ -709,7 +685,7 @@ output (for multi-output problems).</p>
 </dd>
 <dt><strong>n_features_in_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>Number of features seen during <a class="reference external" href="https://scikit-learn.org/dev/glossary.html#term-fit" title="(in scikit-learn v1.6)"><span class="xref std std-term">fit</span></a>.</p>
 </dd>
-<dt><strong>feature_names_in_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (<code class="docutils literal notranslate"><span class="pre">n_features_in_</span></code>,)</span></dt><dd><p>Names of features seen during <a class="reference external" href="https://scikit-learn.org/dev/glossary.html#term-fit" title="(in scikit-learn v1.6)"><span class="xref std std-term">fit</span></a>. Defined only when <code class="docutils literal notranslate"><span class="pre">X</span></code>
+<dt><strong>feature_names_in_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (<code class="docutils literal notranslate"><span class="pre">n_features_in_</span></code>,)</span></dt><dd><p>Names of features seen during <a class="reference external" href="https://scikit-learn.org/dev/glossary.html#term-fit" title="(in scikit-learn v1.6)"><span class="xref std std-term">fit</span></a>. Defined only when <code class="docutils literal notranslate"><span class="pre">X</span></code>
 has feature names that are all strings.</p>
 </dd>
 <dt><strong>n_outputs_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>The number of outputs when <code class="docutils literal notranslate"><span class="pre">fit</span></code> is performed.</p>
@@ -718,11 +694,11 @@ has feature names that are all strings.</p>
 <code class="docutils literal notranslate"><span class="pre">help(sklearn.tree._tree.Tree)</span></code> for
 attributes of Tree object.</p>
 </dd>
-<dt><strong>min_patch_dims_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a></span></dt><dd><p>The minimum dimensions of a patch.</p>
+<dt><strong>min_patch_dims_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a></span></dt><dd><p>The minimum dimensions of a patch.</p>
 </dd>
-<dt><strong>max_patch_dims_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a></span></dt><dd><p>The maximum dimensions of a patch.</p>
+<dt><strong>max_patch_dims_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a></span></dt><dd><p>The maximum dimensions of a patch.</p>
 </dd>
-<dt><strong>data_dims_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a></span></dt><dd><p>The presumed dimensions of the un-vectorized feature vector.</p>
+<dt><strong>data_dims_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a></span></dt><dd><p>The presumed dimensions of the un-vectorized feature vector.</p>
 </dd>
 </dl>
 </dd>
@@ -798,6 +774,28 @@ attributes of Tree object.</p>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Notes</p>
+<p>Patches can be 2D masks that are applied onto the data matrix. Following sklearn
+API standards, <code class="docutils literal notranslate"><span class="pre">X</span></code> is always a <code class="docutils literal notranslate"><span class="pre">(n_samples,</span> <span class="pre">n_features)</span></code> array even if
+X is comprised of images, or multivariate-time series. The <code class="docutils literal notranslate"><span class="pre">data_width</span></code> and
+<code class="docutils literal notranslate"><span class="pre">data_height</span></code> parameters are used to inform the <code class="docutils literal notranslate"><span class="pre">PatchObliqueDecisionTreeClassifier</span></code>
+of the original structure of the data. It is required that
+<code class="docutils literal notranslate"><span class="pre">data_width</span> <span class="pre">*</span> <span class="pre">data_height</span> <span class="pre">=</span> <span class="pre">n_features</span></code>.</p>
+<p>When users pass in <code class="docutils literal notranslate"><span class="pre">X</span></code> to <a class="reference internal" href="#treeple.tree.PatchObliqueDecisionTreeClassifier.fit" title="treeple.tree.PatchObliqueDecisionTreeClassifier.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a>, tt is presumed that all vectorization operations
+are done C-contiguously (i.e. the last axis is contiguous).</p>
+<p>Note that for a patch height and width of size 1, the tree is exactly the same as the
+decision tree, albeit with less efficienc optimizations. Therefore, it is always
+recommended to set the range of patch heights and widths based on the structure of your
+expected input data.</p>
+<p class="rubric">References</p>
+<div class="docutils container" id="id2">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-li2023manifold" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Adam Li, Ronan Perry, Chester Huynh, Tyler M. Tomita, Ronak Mehta, Jesus Arroyo, Jesse Patsolic, Ben Falk, Sridevi Sarma, and Joshua Vogelstein. Manifold oblique random forests: towards closing the gap on convolutional deep networks. <em>SIAM Journal on Mathematics of Data Science</em>, 5(1):77–96, 2023. <a class="reference external" href="https://doi.org/10.1137/21M1449117">doi:10.1137/21M1449117</a>.</p>
+</aside>
+</aside>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="treeple.tree.PatchObliqueDecisionTreeClassifier.apply">
 <span class="sig-name descname"><span class="pre">apply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#treeple.tree.PatchObliqueDecisionTreeClassifier.apply" title="Link to this definition">#</a></dt>
@@ -808,7 +806,7 @@ attributes of Tree object.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>The input samples. Internally, it will be converted to
+<dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>The input samples. Internally, it will be converted to
 <code class="docutils literal notranslate"><span class="pre">dtype=np.float32</span></code> and if a sparse matrix is provided
 to a sparse <code class="docutils literal notranslate"><span class="pre">csr_matrix</span></code>.</p>
 </dd>
@@ -819,7 +817,7 @@ Don’t use this parameter unless you know what you’re doing.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>X_leaves</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a> of shape (n_samples,)</span></dt><dd><p>For each datapoint x in X, return the index of the leaf x
+<dt><strong>X_leaves</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a> of shape (n_samples,)</span></dt><dd><p>For each datapoint x in X, return the index of the leaf x
 ends up in. Leaves are numbered within
 <code class="docutils literal notranslate"><span class="pre">[0;</span> <span class="pre">self.tree_.node_count)</span></code>, possibly with gaps in the
 numbering.</p>
@@ -836,13 +834,13 @@ numbering.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>X</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a> of shape (n_samples, n_features)</span></dt><dd><p>The input data.</p>
+<dt><strong>X</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a> of shape (n_samples, n_features)</span></dt><dd><p>The input data.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>sim_matrix</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a> of shape (n_samples, n_samples)</span></dt><dd><p>The similarity matrix among the samples.</p>
+<dt><strong>sim_matrix</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a> of shape (n_samples, n_samples)</span></dt><dd><p>The similarity matrix among the samples.</p>
 </dd>
 </dl>
 </dd>
@@ -858,13 +856,13 @@ process.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>The training input samples. Internally, it will be converted to
+<dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>The training input samples. Internally, it will be converted to
 <code class="docutils literal notranslate"><span class="pre">dtype=np.float32</span></code> and if a sparse matrix is provided
 to a sparse <code class="docutils literal notranslate"><span class="pre">csc_matrix</span></code>.</p>
 </dd>
-<dt><strong>y</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a> of shape (n_samples,) or (n_samples, n_outputs)</span></dt><dd><p>The target values (class labels) as integers or strings.</p>
+<dt><strong>y</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a> of shape (n_samples,) or (n_samples, n_outputs)</span></dt><dd><p>The target values (class labels) as integers or strings.</p>
 </dd>
-<dt><strong>sample_weight</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a> of shape (n_samples,), default=None</span></dt><dd><p>Sample weights. If None, then samples are equally weighted. Splits
+<dt><strong>sample_weight</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a> of shape (n_samples,), default=None</span></dt><dd><p>Sample weights. If None, then samples are equally weighted. Splits
 that would create child nodes with net zero or negative weight are
 ignored while searching for a split in each node. Splits are also
 ignored if they would result in any single class carrying a
@@ -898,7 +896,7 @@ corresponding alpha value in <code class="docutils literal notranslate"><span cl
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>The input samples. Internally, it will be converted to
+<dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>The input samples. Internally, it will be converted to
 <code class="docutils literal notranslate"><span class="pre">dtype=np.float32</span></code> and if a sparse matrix is provided
 to a sparse <code class="docutils literal notranslate"><span class="pre">csr_matrix</span></code>.</p>
 </dd>
@@ -924,13 +922,13 @@ indicates that the samples goes through the nodes.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>The training input samples. Internally, it will be converted to
+<dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>The training input samples. Internally, it will be converted to
 <code class="docutils literal notranslate"><span class="pre">dtype=np.float32</span></code> and if a sparse matrix is provided
 to a sparse <code class="docutils literal notranslate"><span class="pre">csc_matrix</span></code>.</p>
 </dd>
-<dt><strong>y</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a> of shape (n_samples,) or (n_samples, n_outputs)</span></dt><dd><p>The target values (class labels) as integers or strings.</p>
+<dt><strong>y</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a> of shape (n_samples,) or (n_samples, n_outputs)</span></dt><dd><p>The target values (class labels) as integers or strings.</p>
 </dd>
-<dt><strong>sample_weight</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a> of shape (n_samples,), default=None</span></dt><dd><p>Sample weights. If None, then samples are equally weighted. Splits
+<dt><strong>sample_weight</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a> of shape (n_samples,), default=None</span></dt><dd><p>Sample weights. If None, then samples are equally weighted. Splits
 that would create child nodes with net zero or negative weight are
 ignored while searching for a split in each node. Splits are also
 ignored if they would result in any single class carrying a
@@ -939,7 +937,7 @@ negative weight in either child node.</p>
 <dt><strong>check_input</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=True</span></dt><dd><p>Allow to bypass several input checking.
 Don’t use this parameter unless you know what you’re doing.</p>
 </dd>
-<dt><strong>classes</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a> of shape (n_classes,), default=None</span></dt><dd><p>List of all the classes that can possibly appear in the y vector.</p>
+<dt><strong>classes</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a> of shape (n_classes,), default=None</span></dt><dd><p>List of all the classes that can possibly appear in the y vector.</p>
 </dd>
 </dl>
 </dd>
@@ -975,7 +973,7 @@ and any leaf.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>X</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a> of shape (n_samples, n_features)</span></dt><dd><p>Dataset to apply the forest to.</p>
+<dt><strong>X</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a> of shape (n_samples, n_features)</span></dt><dd><p>Dataset to apply the forest to.</p>
 </dd>
 <dt><strong>check_input</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=True</span></dt><dd><p>Allow to bypass several input checking.</p>
 </dd>
@@ -983,7 +981,7 @@ and any leaf.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>leaf_nodes_samples</strong><span class="classifier">a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a> of length (n_samples,)</span></dt><dd><p>Each sample is represented by the indices of the training samples that
+<dt><strong>leaf_nodes_samples</strong><span class="classifier">a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a> of length (n_samples,)</span></dt><dd><p>Each sample is represented by the indices of the training samples that
 reached the leaf node. The <code class="docutils literal notranslate"><span class="pre">n_leaf_node_samples</span></code> may vary between
 samples, since the number of samples that fall in a leaf node is
 variable. Each array has shape (n_leaf_node_samples, n_outputs).</p>
@@ -1052,13 +1050,13 @@ contained subobjects that are estimators.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>The training input samples. Internally, it will be converted to
+<dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>The training input samples. Internally, it will be converted to
 <code class="docutils literal notranslate"><span class="pre">dtype=np.float32</span></code> and if a sparse matrix is provided
 to a sparse <code class="docutils literal notranslate"><span class="pre">csc_matrix</span></code>.</p>
 </dd>
-<dt><strong>y</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a> of shape (n_samples,) or (n_samples, n_outputs)</span></dt><dd><p>The target values (class labels) as integers or strings.</p>
+<dt><strong>y</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a> of shape (n_samples,) or (n_samples, n_outputs)</span></dt><dd><p>The target values (class labels) as integers or strings.</p>
 </dd>
-<dt><strong>sample_weight</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a> of shape (n_samples,), default=None</span></dt><dd><p>Sample weights. If None, then samples are equally weighted. Splits
+<dt><strong>sample_weight</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a> of shape (n_samples,), default=None</span></dt><dd><p>Sample weights. If None, then samples are equally weighted. Splits
 that would create child nodes with net zero or negative weight are
 ignored while searching for a split in each node. Splits are also
 ignored if they would result in any single class carrying a
@@ -1067,7 +1065,7 @@ negative weight in either child node.</p>
 <dt><strong>check_input</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, default=True</span></dt><dd><p>Allow to bypass several input checking.
 Don’t use this parameter unless you know what you do.</p>
 </dd>
-<dt><strong>classes</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a> of shape (n_classes,), default=None</span></dt><dd><p>List of all the classes that can possibly appear in the y vector.
+<dt><strong>classes</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a> of shape (n_classes,), default=None</span></dt><dd><p>List of all the classes that can possibly appear in the y vector.
 Must be provided at the first call to partial_fit, can be omitted
 in subsequent calls.</p>
 </dd>
@@ -1092,7 +1090,7 @@ returned.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>The input samples. Internally, it will be converted to
+<dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>The input samples. Internally, it will be converted to
 <code class="docutils literal notranslate"><span class="pre">dtype=np.float32</span></code> and if a sparse matrix is provided
 to a sparse <code class="docutils literal notranslate"><span class="pre">csr_matrix</span></code>.</p>
 </dd>
@@ -1103,7 +1101,7 @@ Don’t use this parameter unless you know what you’re doing.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>y</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a> of shape (n_samples,) or (n_samples, n_outputs)</span></dt><dd><p>The predicted classes, or the predict values.</p>
+<dt><strong>y</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a> of shape (n_samples,) or (n_samples, n_outputs)</span></dt><dd><p>The predicted classes, or the predict values.</p>
 </dd>
 </dl>
 </dd>
@@ -1117,7 +1115,7 @@ Don’t use this parameter unless you know what you’re doing.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>The input samples. Internally, it will be converted to
+<dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>The input samples. Internally, it will be converted to
 <code class="docutils literal notranslate"><span class="pre">dtype=np.float32</span></code> and if a sparse matrix is provided
 to a sparse <code class="docutils literal notranslate"><span class="pre">csr_matrix</span></code>.</p>
 </dd>
@@ -1125,7 +1123,7 @@ to a sparse <code class="docutils literal notranslate"><span class="pre">csr_mat
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>proba</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_samples, n_classes) or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of n_outputs             such arrays if n_outputs &gt; 1</span></dt><dd><p>The class log-probabilities of the input samples. The order of the
+<dt><strong>proba</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_samples, n_classes) or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of n_outputs             such arrays if n_outputs &gt; 1</span></dt><dd><p>The class log-probabilities of the input samples. The order of the
 classes corresponds to that in the attribute <a class="reference external" href="https://scikit-learn.org/dev/glossary.html#term-classes_" title="(in scikit-learn v1.6)"><span class="xref std std-term">classes_</span></a>.</p>
 </dd>
 </dl>
@@ -1142,7 +1140,7 @@ class in a leaf.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>The input samples. Internally, it will be converted to
+<dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>The input samples. Internally, it will be converted to
 <code class="docutils literal notranslate"><span class="pre">dtype=np.float32</span></code> and if a sparse matrix is provided
 to a sparse <code class="docutils literal notranslate"><span class="pre">csr_matrix</span></code>.</p>
 </dd>
@@ -1153,7 +1151,7 @@ Don’t use this parameter unless you know what you’re doing.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>proba</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_samples, n_classes) or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of n_outputs             such arrays if n_outputs &gt; 1</span></dt><dd><p>The class probabilities of the input samples. The order of the
+<dt><strong>proba</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_samples, n_classes) or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of n_outputs             such arrays if n_outputs &gt; 1</span></dt><dd><p>The class probabilities of the input samples. The order of the
 classes corresponds to that in the attribute <a class="reference external" href="https://scikit-learn.org/dev/glossary.html#term-classes_" title="(in scikit-learn v1.6)"><span class="xref std std-term">classes_</span></a>.</p>
 </dd>
 </dl>
@@ -1168,12 +1166,12 @@ classes corresponds to that in the attribute <a class="reference external" href=
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>Input data.</p>
+<dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>Input data.</p>
 </dd>
 <dt><strong>quantiles</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, optional</span></dt><dd><p>The quantiles at which to evaluate, by default 0.5 (median).</p>
 </dd>
 <dt><strong>method</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>The method to interpolate, by default ‘linear’. Can be any keyword
-argument accepted by <a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.quantile.html#numpy.quantile" title="(in NumPy v2.1.dev0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.quantile()</span></code></a>.</p>
+argument accepted by <a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.quantile.html#numpy.quantile" title="(in NumPy v2.2.dev0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.quantile()</span></code></a>.</p>
 </dd>
 <dt><strong>check_input</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>Whether or not to check input, by default True.</p>
 </dd>
@@ -1181,7 +1179,7 @@ argument accepted by <a class="reference external" href="https://numpy.org/devdo
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>predictions</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a> of shape (n_samples, n_outputs, <a class="reference external" href="https://docs.python.org/3/library/functions.html#len" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">len</span></code></a>(quantiles))</span></dt><dd><p>The predicted quantiles.</p>
+<dt><strong>predictions</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a> of shape (n_samples, n_outputs, <a class="reference external" href="https://docs.python.org/3/library/functions.html#len" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">len</span></code></a>(quantiles))</span></dt><dd><p>The predicted quantiles.</p>
 </dd>
 </dl>
 </dd>
@@ -1198,11 +1196,11 @@ each label set be correctly predicted.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>X</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a> of shape (n_samples, n_features)</span></dt><dd><p>Test samples.</p>
+<dt><strong>X</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a> of shape (n_samples, n_features)</span></dt><dd><p>Test samples.</p>
 </dd>
-<dt><strong>y</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a> of shape (n_samples,) or (n_samples, n_outputs)</span></dt><dd><p>True labels for <code class="docutils literal notranslate"><span class="pre">X</span></code>.</p>
+<dt><strong>y</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a> of shape (n_samples,) or (n_samples, n_outputs)</span></dt><dd><p>True labels for <code class="docutils literal notranslate"><span class="pre">X</span></code>.</p>
 </dd>
-<dt><strong>sample_weight</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a> of shape (n_samples,), default=None</span></dt><dd><p>Sample weights.</p>
+<dt><strong>sample_weight</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a> of shape (n_samples,), default=None</span></dt><dd><p>Sample weights.</p>
 </dd>
 </dl>
 </dd>
@@ -1475,7 +1473,7 @@ high cardinality features (many unique values). See
 <dl class="field-list">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>feature_importances_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_features,)</span></dt><dd><p>Normalized total reduction of criteria by feature
+<dt><strong>feature_importances_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_features,)</span></dt><dd><p>Normalized total reduction of criteria by feature
 (Gini importance).</p>
 </dd>
 </dl>
@@ -1583,7 +1581,7 @@ high cardinality features (many unique values). See
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, treeple Developers. Last updated on 2024-08-06.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-08-09.
       <br/>
     
   </p>

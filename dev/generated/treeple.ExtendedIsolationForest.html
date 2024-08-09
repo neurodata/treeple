@@ -587,7 +587,7 @@ For more information, see <code class="docutils literal notranslate"><span class
 <a class="reference external" href="https://joblib.readthedocs.io/en/latest/generated/joblib.parallel_backend.html#joblib.parallel_backend" title="(in joblib v1.5.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">joblib.parallel_backend</span></code></a> context. <code class="docutils literal notranslate"><span class="pre">-1</span></code> means using all
 processors. See <a class="reference external" href="https://scikit-learn.org/dev/glossary.html#term-n_jobs" title="(in scikit-learn v1.6)"><span class="xref std std-term">Glossary</span></a> for more details.</p>
 </dd>
-<dt><strong>random_state</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://numpy.org/devdocs/reference/random/legacy.html#numpy.random.RandomState" title="(in NumPy v2.1.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RandomState</span></code></a> instance or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a>, default=None</span></dt><dd><p>Controls the pseudo-randomness of the selection of the feature
+<dt><strong>random_state</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://numpy.org/devdocs/reference/random/legacy.html#numpy.random.RandomState" title="(in NumPy v2.2.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RandomState</span></code></a> instance or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a>, default=None</span></dt><dd><p>Controls the pseudo-randomness of the selection of the feature
 and split values for each branching step and each tree in the forest.</p>
 <p>Pass an int for reproducible results across multiple function calls.
 See <a class="reference external" href="https://scikit-learn.org/dev/glossary.html#term-random_state" title="(in scikit-learn v1.6)"><span class="xref std std-term">Glossary</span></a>.</p>
@@ -603,48 +603,8 @@ new forest. See <a class="reference external" href="https://scikit-learn.org/dev
 </dd>
 </dl>
 </dd>
-</dl>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<dl class="simple">
-<dt><a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.covariance.EllipticEnvelope.html#sklearn.covariance.EllipticEnvelope" title="(in scikit-learn v1.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.covariance.EllipticEnvelope</span></code></a></dt><dd><p>An object for detecting outliers in a Gaussian distributed dataset.</p>
-</dd>
-<dt><a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.svm.OneClassSVM.html#sklearn.svm.OneClassSVM" title="(in scikit-learn v1.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.svm.OneClassSVM</span></code></a></dt><dd><p>Unsupervised Outlier Detection. Estimate the support of a high-dimensional distribution. The implementation is based on libsvm.</p>
-</dd>
-<dt><a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.neighbors.LocalOutlierFactor.html#sklearn.neighbors.LocalOutlierFactor" title="(in scikit-learn v1.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.neighbors.LocalOutlierFactor</span></code></a></dt><dd><p>Unsupervised Outlier Detection using Local Outlier Factor (LOF).</p>
-</dd>
-</dl>
-</div>
-<p class="rubric">Notes</p>
-<p>The implementation is based on an ensemble of ExtraTreeRegressor. The
-maximum depth of each tree is set to <code class="docutils literal notranslate"><span class="pre">ceil(log_2(n))</span></code> where
-<span class="math notranslate nohighlight">\(n\)</span> is the number of samples used to build the tree
-(see (Liu et al., 2008) for more details).</p>
-<p class="rubric">References</p>
-<div role="list" class="citation-list">
-<div class="citation" id="r2752558458bb-1" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
-<p>Liu, Fei Tony, Ting, Kai Ming and Zhou, Zhi-Hua. “Isolation forest.”
-Data Mining, 2008. ICDM’08. Eighth IEEE International Conference on.</p>
-</div>
-<div class="citation" id="r2752558458bb-2" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></span>
-<p>Liu, Fei Tony, Ting, Kai Ming and Zhou, Zhi-Hua. “Isolation-based
-anomaly detection.” ACM Transactions on Knowledge Discovery from
-Data (TKDD) 6.1 (2012): 3.</p>
-</div>
-</div>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">treeple.ensemble</span> <span class="kn">import</span> <span class="n">ExtendedIsolationForest</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="p">[[</span><span class="o">-</span><span class="mf">1.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.3</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">],</span> <span class="p">[</span><span class="mi">100</span><span class="p">]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">clf</span> <span class="o">=</span> <span class="n">ExtendedIsolationForest</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">([[</span><span class="mf">0.1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">90</span><span class="p">]])</span>
-<span class="go">array([ 1,  1, -1])</span>
-</pre></div>
-</div>
-<dl class="field-list">
-<dt class="field-odd">Attributes<span class="colon">:</span></dt>
-<dd class="field-odd"><dl>
+<dt class="field-even">Attributes<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
 <dt><strong>estimator_</strong><span class="classifier"><a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.tree.ExtraTreeRegressor.html#sklearn.tree.ExtraTreeRegressor" title="(in scikit-learn v1.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExtraTreeRegressor</span></code></a> instance</span></dt><dd><p>The child estimator template used to create the collection of
 fitted sub-estimators.</p>
 <div class="versionadded">
@@ -653,9 +613,9 @@ fitted sub-estimators.</p>
 </dd>
 <dt><strong>estimators_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.tree.ExtraTreeRegressor.html#sklearn.tree.ExtraTreeRegressor" title="(in scikit-learn v1.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExtraTreeRegressor</span></code></a> instances</span></dt><dd><p>The collection of fitted sub-estimators.</p>
 </dd>
-<dt><strong>estimators_features_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a></span></dt><dd><p>The subset of drawn features for each base estimator.</p>
+<dt><strong>estimators_features_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a></span></dt><dd><p>The subset of drawn features for each base estimator.</p>
 </dd>
-<dt><a class="reference internal" href="#treeple.ExtendedIsolationForest.estimators_samples_" title="treeple.ExtendedIsolationForest.estimators_samples_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimators_samples_</span></code></a><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a></span></dt><dd><p>The subset of drawn samples for each base estimator.</p>
+<dt><a class="reference internal" href="#treeple.ExtendedIsolationForest.estimators_samples_" title="treeple.ExtendedIsolationForest.estimators_samples_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimators_samples_</span></code></a><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a></span></dt><dd><p>The subset of drawn samples for each base estimator.</p>
 </dd>
 <dt><strong>max_samples_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>The actual number of samples.</p>
 </dd>
@@ -676,7 +636,7 @@ is defined in such a way we obtain the expected number of outliers
 <p><span class="versionmodified added">New in version 0.24.</span></p>
 </div>
 </dd>
-<dt><strong>feature_names_in_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (<code class="docutils literal notranslate"><span class="pre">n_features_in_</span></code>,)</span></dt><dd><p>Names of features seen during <a class="reference external" href="https://scikit-learn.org/dev/glossary.html#term-fit" title="(in scikit-learn v1.6)"><span class="xref std std-term">fit</span></a>. Defined only when <code class="docutils literal notranslate"><span class="pre">X</span></code>
+<dt><strong>feature_names_in_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (<code class="docutils literal notranslate"><span class="pre">n_features_in_</span></code>,)</span></dt><dd><p>Names of features seen during <a class="reference external" href="https://scikit-learn.org/dev/glossary.html#term-fit" title="(in scikit-learn v1.6)"><span class="xref std std-term">fit</span></a>. Defined only when <code class="docutils literal notranslate"><span class="pre">X</span></code>
 has feature names that are all strings.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.0.</span></p>
@@ -717,6 +677,44 @@ has feature names that are all strings.</p>
 </tr>
 </tbody>
 </table>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.covariance.EllipticEnvelope.html#sklearn.covariance.EllipticEnvelope" title="(in scikit-learn v1.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.covariance.EllipticEnvelope</span></code></a></dt><dd><p>An object for detecting outliers in a Gaussian distributed dataset.</p>
+</dd>
+<dt><a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.svm.OneClassSVM.html#sklearn.svm.OneClassSVM" title="(in scikit-learn v1.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.svm.OneClassSVM</span></code></a></dt><dd><p>Unsupervised Outlier Detection. Estimate the support of a high-dimensional distribution. The implementation is based on libsvm.</p>
+</dd>
+<dt><a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.neighbors.LocalOutlierFactor.html#sklearn.neighbors.LocalOutlierFactor" title="(in scikit-learn v1.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.neighbors.LocalOutlierFactor</span></code></a></dt><dd><p>Unsupervised Outlier Detection using Local Outlier Factor (LOF).</p>
+</dd>
+</dl>
+</div>
+<p class="rubric">Notes</p>
+<p>The implementation is based on an ensemble of ExtraTreeRegressor. The
+maximum depth of each tree is set to <code class="docutils literal notranslate"><span class="pre">ceil(log_2(n))</span></code> where
+<span class="math notranslate nohighlight">\(n\)</span> is the number of samples used to build the tree
+(see (Liu et al., 2008) for more details).</p>
+<p class="rubric">References</p>
+<div role="list" class="citation-list">
+<div class="citation" id="r2752558458bb-1" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<p>Liu, Fei Tony, Ting, Kai Ming and Zhou, Zhi-Hua. “Isolation forest.”
+Data Mining, 2008. ICDM’08. Eighth IEEE International Conference on.</p>
+</div>
+<div class="citation" id="r2752558458bb-2" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></span>
+<p>Liu, Fei Tony, Ting, Kai Ming and Zhou, Zhi-Hua. “Isolation-based
+anomaly detection.” ACM Transactions on Knowledge Discovery from
+Data (TKDD) 6.1 (2012): 3.</p>
+</div>
+</div>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">treeple.ensemble</span> <span class="kn">import</span> <span class="n">ExtendedIsolationForest</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="p">[[</span><span class="o">-</span><span class="mf">1.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.3</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">],</span> <span class="p">[</span><span class="mi">100</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clf</span> <span class="o">=</span> <span class="n">ExtendedIsolationForest</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">([[</span><span class="mf">0.1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">90</span><span class="p">]])</span>
+<span class="go">array([ 1,  1, -1])</span>
+</pre></div>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="treeple.ExtendedIsolationForest.decision_function">
 <span class="sig-name descname"><span class="pre">decision_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#treeple.ExtendedIsolationForest.decision_function" title="Link to this definition">#</a></dt>
@@ -731,7 +729,7 @@ a n_left samples isolation tree is added.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>The input samples. Internally, it will be converted to
+<dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>The input samples. Internally, it will be converted to
 <code class="docutils literal notranslate"><span class="pre">dtype=np.float32</span></code> and if a sparse matrix is provided
 to a sparse <code class="docutils literal notranslate"><span class="pre">csr_matrix</span></code>.</p>
 </dd>
@@ -739,13 +737,29 @@ to a sparse <code class="docutils literal notranslate"><span class="pre">csr_mat
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>scores</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_samples,)</span></dt><dd><p>The anomaly score of the input samples.
+<dt><strong>scores</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_samples,)</span></dt><dd><p>The anomaly score of the input samples.
 The lower, the more abnormal. Negative scores represent outliers,
 positive scores represent inliers.</p>
 </dd>
 </dl>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>The decision_function method can be parallelized by setting a joblib context.
+This inherently does NOT use the <code class="docutils literal notranslate"><span class="pre">n_jobs</span></code> parameter initialized in the class,
+which is used during <code class="docutils literal notranslate"><span class="pre">fit</span></code>. This is because, calculating the score may
+actually be faster without parallelization for a small number of samples,
+such as for 1000 samples or less.
+The user can set the number of jobs in the joblib context to control the
+number of parallel jobs.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">joblib</span> <span class="kn">import</span> <span class="n">parallel_backend</span>
+
+<span class="c1"># Note, we use threading here as the decision_function method is</span>
+<span class="c1"># not CPU bound.</span>
+<span class="k">with</span> <span class="n">parallel_backend</span><span class="p">(</span><span class="s2">&quot;threading&quot;</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">decision_function</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -755,13 +769,13 @@ positive scores represent inliers.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>The input samples. Use <code class="docutils literal notranslate"><span class="pre">dtype=np.float32</span></code> for maximum
+<dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>The input samples. Use <code class="docutils literal notranslate"><span class="pre">dtype=np.float32</span></code> for maximum
 efficiency. Sparse matrices are also supported, use sparse
 <code class="docutils literal notranslate"><span class="pre">csc_matrix</span></code> for maximum efficiency.</p>
 </dd>
 <dt><strong>y</strong><span class="classifier">Ignored</span></dt><dd><p>Not used, present for API consistency by convention.</p>
 </dd>
-<dt><strong>sample_weight</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a> of shape (n_samples,), default=None</span></dt><dd><p>Sample weights. If None, then samples are equally weighted.</p>
+<dt><strong>sample_weight</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a> of shape (n_samples,), default=None</span></dt><dd><p>Sample weights. If None, then samples are equally weighted.</p>
 </dd>
 </dl>
 </dd>
@@ -782,7 +796,7 @@ efficiency. Sparse matrices are also supported, use sparse
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>The input samples.</p>
+<dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>The input samples.</p>
 </dd>
 <dt><strong>y</strong><span class="classifier">Ignored</span></dt><dd><p>Not used, present for API consistency by convention.</p>
 </dd>
@@ -795,7 +809,7 @@ efficiency. Sparse matrices are also supported, use sparse
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>y</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_samples,)</span></dt><dd><p>1 for inliers, -1 for outliers.</p>
+<dt><strong>y</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_samples,)</span></dt><dd><p>1 for inliers, -1 for outliers.</p>
 </dd>
 </dl>
 </dd>
@@ -850,7 +864,7 @@ contained subobjects that are estimators.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>The input samples. Internally, it will be converted to
+<dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>The input samples. Internally, it will be converted to
 <code class="docutils literal notranslate"><span class="pre">dtype=np.float32</span></code> and if a sparse matrix is provided
 to a sparse <code class="docutils literal notranslate"><span class="pre">csr_matrix</span></code>.</p>
 </dd>
@@ -858,12 +872,26 @@ to a sparse <code class="docutils literal notranslate"><span class="pre">csr_mat
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>is_inlier</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_samples,)</span></dt><dd><p>For each observation, tells whether or not (+1 or -1) it should
+<dt><strong>is_inlier</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_samples,)</span></dt><dd><p>For each observation, tells whether or not (+1 or -1) it should
 be considered as an inlier according to the fitted model.</p>
 </dd>
 </dl>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>The predict method can be parallelized by setting a joblib context. This
+inherently does NOT use the <code class="docutils literal notranslate"><span class="pre">n_jobs</span></code> parameter initialized in the class,
+which is used during <code class="docutils literal notranslate"><span class="pre">fit</span></code>. This is because, predict may actually be faster
+without parallelization for a small number of samples,
+such as for 1000 samples or less. The user can set the
+number of jobs in the joblib context to control the number of parallel jobs.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">joblib</span> <span class="kn">import</span> <span class="n">parallel_backend</span>
+
+<span class="c1"># Note, we use threading here as the predict method is not CPU bound.</span>
+<span class="k">with</span> <span class="n">parallel_backend</span><span class="p">(</span><span class="s2">&quot;threading&quot;</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -880,18 +908,33 @@ a n_left samples isolation tree is added.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.1.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>The input samples.</p>
+<dt><strong>X</strong><span class="classifier">{<a class="reference external" href="https://numpy.org/devdocs/glossary.html#term-array_like" title="(in NumPy v2.2.dev0)"><span>array_like</span></a>, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>The input samples.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>scores</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.1.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_samples,)</span></dt><dd><p>The anomaly score of the input samples.
+<dt><strong>scores</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></a> of shape (n_samples,)</span></dt><dd><p>The anomaly score of the input samples.
 The lower, the more abnormal.</p>
 </dd>
 </dl>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>The score function method can be parallelized by setting a joblib context. This
+inherently does NOT use the <code class="docutils literal notranslate"><span class="pre">n_jobs</span></code> parameter initialized in the class,
+which is used during <code class="docutils literal notranslate"><span class="pre">fit</span></code>. This is because, calculating the score may
+actually be faster without parallelization for a small number of samples,
+such as for 1000 samples or less.
+The user can set the number of jobs in the joblib context to control the
+number of parallel jobs.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">joblib</span> <span class="kn">import</span> <span class="n">parallel_backend</span>
+
+<span class="c1"># Note, we use threading here as the score_samples method is not CPU bound.</span>
+<span class="k">with</span> <span class="n">parallel_backend</span><span class="p">(</span><span class="s2">&quot;threading&quot;</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -1060,7 +1103,7 @@ data. Thus fetching the property may be slower than expected.</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, treeple Developers. Last updated on 2024-08-06.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-08-09.
       <br/>
     
   </p>
