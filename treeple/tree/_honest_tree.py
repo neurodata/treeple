@@ -914,9 +914,10 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
 
     @property
     def feature_importances_(self):
-        if self.honest_method == "apply":
-            raise RuntimeError(
-                "Feature importances are not available when honest_method is 'apply'."
-            )
+        # TODO: technically, the feature importances is built rn using the structure set
+        # if self.honest_method == "apply":
+        #     raise RuntimeError(
+        #         "Feature importances are not available when honest_method is 'apply'."
+        #     )
 
         return super().feature_importances_
