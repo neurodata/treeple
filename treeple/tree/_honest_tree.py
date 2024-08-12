@@ -914,10 +914,13 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
 
     @property
     def feature_importances_(self):
-        # TODO: technically, the feature importances is built rn using the structure set
-        # if self.honest_method == "apply":
-        #     raise RuntimeError(
-        #         "Feature importances are not available when honest_method is 'apply'."
-        #     )
+        """Feature importances.
 
+        This is the impurity-based feature importances. The higher, the more important
+        that the feature was used in constructing the structure.
+
+        Note: this does not give the feature importances relative for setting the
+        leaf node posterior estimates.
+        """
+        # TODO: technically, the feature importances is built rn using the structure set
         return super().feature_importances_
