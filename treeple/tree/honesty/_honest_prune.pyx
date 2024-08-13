@@ -11,9 +11,8 @@ cnp.import_array()
 from libc.math cimport isnan
 from libc.stdlib cimport free, malloc
 from libcpp.stack cimport stack
-from sklearn.tree._tree cimport ParentInfo
 
-from ._prune cimport _build_pruned_tree
+from ..._lib.sklearn.tree._tree cimport ParentInfo, _build_pruned_tree
 
 TREE_LEAF = -1
 cdef intp_t _TREE_LEAF = TREE_LEAF

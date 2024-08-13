@@ -12,7 +12,7 @@ from .._lib.sklearn.tree import DecisionTreeClassifier, _criterion, _tree
 from .._lib.sklearn.tree._classes import BaseDecisionTree
 from .._lib.sklearn.tree._criterion import BaseCriterion
 from .._lib.sklearn.tree._tree import Tree
-from ._honest_prune import HonestPruner, _build_pruned_tree_honesty
+from .honesty._honest_prune import HonestPruner, _build_pruned_tree_honesty
 
 CRITERIA_CLF = {
     "gini": _criterion.Gini,
