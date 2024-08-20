@@ -33,14 +33,22 @@ BOTTLENECK_WARNING = (
 DISABLE_BN_ENV_VAR = "TREEPLE_NO_BOTTLENECK"
 
 if BOTTLENECK_AVAILABLE and DISABLE_BN_ENV_VAR not in os.environ:
-    nanmean_f = bn.nanmean
-    anynan_f = lambda arr: bn.anynan(arr, axis=2)
+
+    def nanmean_f(arr: ArrayLike, axis=None) -> ArrayLike:
+        return bn.nanmean(arr, axis=axis)
+
+    def anynan_f(arr: ArrayLike) -> ArrayLike:
+        return bn.anynan(arr, axis=2)
+
 else:
-    warnings.warn(
-        "Not using bottleneck for calculations involvings nans. Expect slower performance."
-    )
-    nanmean_f = np.nanmean
-    anynan_f = lambda arr: np.isnan(arr).any(axis=2)
+
+    def nanmean_f(arr: ArrayLike, axis=None) -> ArrayLike:
+        warnings.warn(BOTTLENECK_WARNING)
+        return np.nanmean(arr, axis=axis)
+
+    def anynan_f(arr: ArrayLike) -> ArrayLike:
+        warnings.warn(BOTTLENECK_WARNING)
+        return np.isnan(arr).any(axis=2)
 
 
 def _mutual_information(y_true: ArrayLike, y_pred_proba: ArrayLike) -> float:
