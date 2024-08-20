@@ -1,4 +1,5 @@
 import importlib
+import itertools
 import os
 
 import numpy as np
@@ -235,8 +236,11 @@ def test_comight_repeated_feature_sets(seed):
     assert result.pvalue > 0.05, f"{result.pvalue}"
 
 
-@pytest.mark.parametrize("use_bottleneck", [True, False])
-def test_build_coleman_forest(use_bottleneck: bool):
+@pytest.mark.parametrize(
+    ("use_bottleneck", "use_sparse"),
+    itertools.product([True, False], [True, False]),
+)
+def test_build_coleman_forest(use_bottleneck: bool, use_sparse: bool):
     """Simple test for building a Coleman forest.
 
     Test the function under alternative and null hypothesis for a very simple dataset.
@@ -290,7 +294,9 @@ def test_build_coleman_forest(use_bottleneck: bool):
         perm_forest_proba,
         clf_fitted,
         perm_clf_fitted,
-    ) = stats.build_coleman_forest(clf, perm_clf, X, y, metric="s@98", n_repeats=1000, seed=seed)
+    ) = stats.build_coleman_forest(
+        clf, perm_clf, X, y, metric="s@98", n_repeats=1000, seed=seed, use_sparse=use_sparse
+    )
     assert clf_fitted._n_samples_bootstrap == round(n_samples * 1.6)
     assert perm_clf_fitted._n_samples_bootstrap == round(n_samples * 1.6)
     assert_array_equal(perm_clf_fitted.permutation_indices_.shape, (n_samples, 1))
