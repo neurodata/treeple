@@ -476,15 +476,15 @@ def _compute_null_distribution_coleman_sparse(
         :, 0
     ]  # (n_oob_samples)
 
-    oob_predictions = sp.coo_matrix(
+    oob_predictions = sp.csc_matrix(
         (all_oob_values, (tree_row_ids, all_oob_idxs)),
         shape=(n_trees, len(y_test)),
-    ).tocsc()  # (n_trees, n_samples)
+    )  # (n_trees, n_samples)
 
-    oob_indicators = sp.coo_matrix(
+    oob_indicators = sp.csc_matrix(
         (np.ones_like(all_oob_values, dtype=np.uint8), (tree_row_ids, all_oob_idxs)),
         shape=(n_trees, len(y_test)),
-    ).tocsc()  # (n_trees, n_samples)
+    )  # (n_trees, n_samples)
 
     observe_stat, permute_stat = _parallel_build_null_forests_sparse(
         np.arange(n_trees),
