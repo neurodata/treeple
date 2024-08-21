@@ -435,7 +435,3 @@ def test_build_oob_random_forest():
         assert len(np.unique(structure_samples[tree_idx])) + len(oob_samples_list[tree_idx]) == len(
             samples
         ), f"{tree_idx} {len(structure_samples[tree_idx])} + {len(oob_samples_list[tree_idx])} != {len(samples)}"
-
-
-if __name__ == "__main__":
-    test_build_coleman_forest(False, False)
