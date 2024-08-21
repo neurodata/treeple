@@ -214,9 +214,6 @@ def _compute_null_distribution_coleman(
     metric_star_pi : ArrayLike of shape (n_samples,)
         An array of the metrics computed on the other half of the trees.
     """
-    if not BOTTLENECK_AVAILABLE:
-        warnings.warn(BOTTLENECK_WARNING)
-
     # sample two sets of equal number of trees from the combined forest these are the posteriors
     # (n_estimators * 2, n_samples, n_outputs)
     all_y_pred = np.concatenate((y_pred_proba_normal, y_pred_proba_perm), axis=0)
@@ -337,9 +334,24 @@ def get_per_tree_oob_samples(est: BaseForest):
 def _get_forest_preds_sparse(
     all_y_pred: sp.csc_matrix,  # (n_trees, n_samples)
     all_y_indicator: sp.csc_matrix,  # (n_trees, n_samples)
-    forest_indices: ArrayLike,  # (n_trees,)
+    forest_indices: ArrayLike,  # (n_trees/2,)
 ) -> ArrayLike:
-    """Get the forest predictions for a set of trees using sparse matrices."""
+    """Get the forest predictions for a set of trees using sparse matrices.
+
+    Parameters
+    ----------
+    all_y_pred : sp.csc_matrix of shape (n_trees, n_samples)
+        The predicted posteriors from the forest.
+    all_y_indicator : sp.csc_matrix of shape (n_trees, n_samples)
+        The indicator matrix for the predictions.
+    forest_indices : ArrayLike of shape (n_trees/2,)
+        The indices of the trees in the forest that we are evaluating.
+
+    Returns
+    -------
+    ArrayLike of shape (n_samples,)
+        The averaged predictions for the forest.
+    """
     forest_indicator = np.zeros(len(forest_indices) * 2, dtype=np.uint8)
     forest_indicator[forest_indices] = 1
 

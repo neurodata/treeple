@@ -107,7 +107,8 @@ def build_coleman_forest(
     return_posteriors : bool, optional
         Whether or not to return the posteriors, by default True.
     use_sparse : bool, optional
-        Whether or not to use a sparse representation for the posteriors.
+        Whether or not to use a sparse for the calculation of the permutation
+        statistics, by default False. Doesn't affect return values.
     **metric_kwargs : dict, optional
         Additional keyword arguments to pass to the metric function.
 
@@ -173,11 +174,23 @@ def build_coleman_forest(
         # sparse indices and values with an array
         if return_posteriors:
             n_trees = y_pred_proba_orig_perm.shape[0] // 2
+            n_samples = y_pred_proba_orig_perm.shape[1]
             # slicing a csc matrix this way is not efficient, but it is
             # it is only done once, so I am not sure if it is worth it to
             # optimize this.
-            orig_forest_proba = y_pred_proba_orig_perm[:n_trees, :]
-            perm_forest_proba = y_pred_proba_orig_perm[n_trees:, :]
+            to_coords_data = lambda x: (x.row.astype(int), x.col.astype(int), x.data)
+
+            row, col, data = to_coords_data(y_pred_proba_orig_perm[:n_trees, :].tocoo())
+            orig_forest_proba = np.full((n_trees, n_samples), np.nan, dtype=np.float64)
+            orig_forest_proba[row, col] = data
+
+            row, col, data = to_coords_data(y_pred_proba_orig_perm[n_trees:, :].tocoo())
+            perm_forest_proba = np.full((n_trees, n_samples), np.nan, dtype=np.float64)
+            perm_forest_proba[row, col] = data
+
+            if y.shape[1] == 2:
+                orig_forest_proba = np.column_stack((orig_forest_proba, 1 - orig_forest_proba))
+                perm_forest_proba = np.column_stack((perm_forest_proba, 1 - perm_forest_proba))
     else:
         metric_star, metric_star_pi = _compute_null_distribution_coleman(
             y,

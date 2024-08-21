@@ -238,21 +238,20 @@ def test_comight_repeated_feature_sets(seed):
 
 @pytest.mark.parametrize(
     ("use_bottleneck", "use_sparse"),
-    itertools.product([True, False], [True, False]),
+    itertools.product([False, True], [False, True]),
 )
 def test_build_coleman_forest(use_bottleneck: bool, use_sparse: bool):
     """Simple test for building a Coleman forest.
 
     Test the function under alternative and null hypothesis for a very simple dataset.
     """
-    if use_bottleneck and utils.DISABLE_BN_ENV_VAR in os.environ:
-        del os.environ[utils.DISABLE_BN_ENV_VAR]
-        importlib.reload(utils)
-        importlib.reload(stats)
-    else:
+    if not use_bottleneck and utils.DISABLE_BN_ENV_VAR not in os.environ:
         os.environ[utils.DISABLE_BN_ENV_VAR] = "1"
-        importlib.reload(utils)
-        importlib.reload(stats)
+    elif use_bottleneck and utils.DISABLE_BN_ENV_VAR in os.environ:
+        del os.environ[utils.DISABLE_BN_ENV_VAR]
+
+    importlib.reload(utils)
+    importlib.reload(stats)
 
     n_estimators = 100
     n_samples = 30
@@ -436,3 +435,7 @@ def test_build_oob_random_forest():
         assert len(np.unique(structure_samples[tree_idx])) + len(oob_samples_list[tree_idx]) == len(
             samples
         ), f"{tree_idx} {len(structure_samples[tree_idx])} + {len(oob_samples_list[tree_idx])} != {len(samples)}"
+
+
+if __name__ == "__main__":
+    test_build_coleman_forest(False, False)
