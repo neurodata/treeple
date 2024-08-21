@@ -464,7 +464,7 @@ def _compute_null_distribution_coleman_sparse(
     )  # (n_oob_samples)
     all_oob_idxs = np.concatenate(all_oob_idxs, axis=0)  # (n_oob_samples)
 
-    # Because we are assuming 2D sparse matrices for binary classification or
+    # XXX: Because we are assuming 2D sparse matrices for binary classification or
     # regression, we can assume that the number of outputs is 1. This is necessary
     # to use scipy's sparse matrix format. However pydata has a general sparse
     # matrix format that can be used for multi-output problems, but currently uses
