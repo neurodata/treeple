@@ -238,7 +238,7 @@ def test_comight_repeated_feature_sets(seed):
 
 @pytest.mark.parametrize(
     ("use_bottleneck", "use_sparse"),
-    itertools.product([False, True], [False, True]),
+    itertools.product([True, False], [True, False]),
 )
 def test_build_coleman_forest(use_bottleneck: bool, use_sparse: bool):
     """Simple test for building a Coleman forest.

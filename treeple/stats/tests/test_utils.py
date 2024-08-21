@@ -67,3 +67,24 @@ def test_non_nan_samples(use_bottleneck: bool):
     expected = np.array([0, 2])
     actual = utils._non_nan_samples(posterior_array)
     np.testing.assert_array_equal(expected, actual)
+
+
+@pytest.mark.parametrize("use_bottleneck", [True, False])
+def test_nanmean_f(use_bottleneck: bool):
+    if use_bottleneck and utils.DISABLE_BN_ENV_VAR in os.environ:
+        del os.environ[utils.DISABLE_BN_ENV_VAR]
+        importlib.reload(utils)
+    else:
+        os.environ[utils.DISABLE_BN_ENV_VAR] = "1"
+        importlib.reload(utils)
+
+    posterior_array = np.array(
+        [
+            [1, 2, np.nan],
+            [3, 4, np.nan],
+        ]
+    )
+
+    expected = np.array([1.5, 3.5])
+    actual = utils.nanmean_f(posterior_array, axis=1)
+    np.testing.assert_array_equal(expected, actual)
