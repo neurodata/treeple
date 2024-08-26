@@ -40,7 +40,7 @@ Next, install necessary build dependencies. For more information, see <https://s
 
 Assuming these steps have worked properly and you have read and followed any necessary scikit-learn advanced installation instructions, you can then install dependencies for treeple.
 
-If you are developing locally, you will need the build dependencies to compile the Cython / C++ code.
+If you are developing locally, you will need the build dependencies to compile the Cython / C++ code:
 
     pip install -r build_requirements.txt
 
