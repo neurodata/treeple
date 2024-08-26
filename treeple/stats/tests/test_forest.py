@@ -250,6 +250,8 @@ def test_build_coleman_forest(use_bottleneck: bool, use_sparse: bool):
     elif use_bottleneck and utils.DISABLE_BN_ENV_VAR in os.environ:
         del os.environ[utils.DISABLE_BN_ENV_VAR]
 
+    # We need to reload the modules after changing the environment variable
+    # because an environment variable is used to disable bottleneck
     importlib.reload(utils)
     importlib.reload(stats)
 

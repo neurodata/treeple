@@ -171,13 +171,12 @@ def build_coleman_forest(
         )
 
         # if we are returning the posteriors, then we need to replace the
-        # sparse indices and values with an array
+        # sparse indices and values with an array. We convert the sparse data
+        # to dense data, so that the function returns results in a consistent format.
         if return_posteriors:
             n_trees = y_pred_proba_orig_perm.shape[0] // 2
             n_samples = y_pred_proba_orig_perm.shape[1]
-            # slicing a csc matrix this way is not efficient, but it is
-            # it is only done once, so I am not sure if it is worth it to
-            # optimize this.
+
             to_coords_data = lambda x: (x.row.astype(int), x.col.astype(int), x.data)
 
             row, col, data = to_coords_data(y_pred_proba_orig_perm[:n_trees, :].tocoo())
