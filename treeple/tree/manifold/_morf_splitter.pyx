@@ -192,7 +192,9 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
                 self.feature_weight.base if self.feature_weight is not None else None,
             ), self.__getstate__())
 
-    cdef (intp_t, intp_t) sample_top_left_seed(self) noexcept nogil:
+    cdef inline (intp_t, intp_t) sample_top_left_seed(
+        self
+    ) noexcept nogil:
         """Sample the top-left seed for the n-dim patch.
 
         Returns
@@ -213,10 +215,11 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
         # define parameters for the random patch
         cdef intp_t patch_dim
         cdef intp_t delta_patch_dim
-
         cdef intp_t dim
-
         cdef intp_t idx
+        
+        # create a vector to store the unraveled patch top left seed point
+        cdef vector[intp_t] unraveled_patch_point = vector[intp_t](self.ndim)
 
         for idx in range(self.ndim):
             # compute random patch width and height
@@ -258,10 +261,10 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
                 # Convert the top-left-seed value to it's appropriate index in the full image.
                 top_left_patch_seed = max(0, dim - patch_dim + 1)
 
-            self.unraveled_patch_point[idx] = top_left_patch_seed
+            unraveled_patch_point[idx] = top_left_patch_seed
 
         top_left_patch_seed = ravel_multi_index_cython(
-            self.unraveled_patch_point,
+            unraveled_patch_point,
             self.data_dims
         )
         return top_left_patch_seed, patch_size
@@ -521,112 +524,3 @@ cdef class BestPatchSplitterTester(BestPatchSplitter):
             Whether or not a feature has missing values.
         """
         self.init(X, y, sample_weight, missing_values_in_feature_mask)
-
-
-cdef class UserKernelSplitter(PatchSplitter):
-    def __cinit__(
-        self,
-        criterion: Criterion,
-        max_features: inpt_t,
-        min_samples_leaf: inpt_t,
-        min_weight_leaf: double,
-        random_state: object,
-        min_patch_dims: inpt_t,
-        max_patch_dims: inpt_t,
-        dim_contiguous: cnp.uint8_t,
-        data_dims: inpt_t,
-        boundary: str,
-        feature_weight: float32_t,
-        kernel_dictionary: object,
-        kernel_dims: object,
-        *argv
-    ):
-        # initialize the kernel dictionary into a vector to allow Cython to see it
-        # see: https://stackoverflow.com/questions/46240207/passing-list-of-numpy-arrays-to-c-using-cython
-        cdef int n_arrays = len(kernel_dictionary)
-        self.kernel_dictionary = vector[float32_t_ptr](n_arrays)  # A list of C-contiguous 2D kernels
-        self.kernel_dims = vector[inpt_t_ptr](n_arrays)         # A list of arrays storing the dimensions of each kernel in `kernel_dictionary`
-
-        # buffers to point to each element in the list
-        cdef float32_t[:] kernel
-        cdef inpt_t[:] kernel_dim
-
-        cdef int i
-        for i in range(n_arrays):
-            kernel = kernel_dictionary[i]
-            kernel_dim = kernel_dims[i]
-
-            # store a pointer to the data
-            self.kernel_dictionary.push_back(&kernel[0])
-            self.kernel_dims.push_back(&kernel_dim[0])
-
-    cdef void sample_proj_mat(
-        self,
-        vector[vector[float32_t]]& proj_mat_weights,
-        vector[vector[inpt_t]]& proj_mat_indices
-    ) noexcept nogil:
-        """Sample projection matrix using a contiguous patch.
-        Randomly sample patches with weight of 1.
-        """
-        cdef inpt_t max_features = self.max_features
-        cdef int proj_i
-
-        # define parameters for vectorized points in the original data shape
-        # and top-left seed
-        cdef inpt_t top_left_patch_seed
-
-        # size of the sampled patch, which is just the size of the n-dim patch
-        # (\prod_i self.patch_dims_buff[i])
-        cdef inpt_t patch_size
-
-        cdef float32_t[:] kernel
-        cdef inpt_t[:] kernel_dim
-
-        for proj_i in range(0, max_features):
-            # now get the top-left seed that is used to then determine the top-left
-            # position in patch
-            # compute top-left seed for the multi-dimensional patch
-            top_left_patch_seed, patch_size = self.sample_top_left_seed()
-
-            # sample a random index in the kernel library
-            # kernel_idx = 
-
-            # get that kernel and add it to the projection vector indices and weights
-            kernel = self.kernel_dictionary[kernel_idx]
-            kernel_dim = self.kernel_dims[kernel_idx]
-
-            # convert top-left-patch-seed to unraveled indices
-            # get the top-left index in the original data
-            top_left_idx = self.unravel_index(top_left_patch_seed, self.data_dims_buff, self.ndim)
-
-            # loop over the kernel and add the weights and indices to the projection
-            for idim in range(self.ndim):
-                # get the dimension of the kernel
-                kernel_dim = self.kernel_dims[kernel_idx][idim]
-
-                # get the top-left index in the kernel
-                top_left_kernel_idx = self.unravel_index(top_left_patch_seed, kernel_dim, self.ndim)
-
-                # loop over the kernel and add the weights and indices to the projection
-                # for i in range(kernel_dim):
-                #     # get the index in the original data
-                #     idx = self.ravel_multi_index(top_left_idx, self.data_dims_buff, self.ndim)
-
-                #     # get the index in the kernel
-                #     kernel_idx = self.ravel_multi_index(top_left_kernel_idx, kernel_dim, self.ndim)
-
-                #     # add the weight and index to the projection matrix
-                #     proj_mat_weights[proj_i].push_back(kernel[kernel_idx])
-                #     proj_mat_indices[proj_i].push_back(idx)
-
-                #     # increment the top-left index in the original data
-                #     top_left_idx[idim] += 1
-
-                #     # increment the top-left index in the kernel
-                #     top_left_kernel_idx[idim] += 1
-
-                # # increment the top-left index in the original data
-                # top_left_idx[idim] += self.patch_dims_buff[idim] - kernel_dim
-
-                # # increment the top-left index in the kernel
-                # top_left_kernel_idx[idim] += self.patch_dims_buff[idim] - kernel_dim

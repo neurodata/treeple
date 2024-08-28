@@ -5,6 +5,8 @@
 # cython: wraparound=False
 # cython: initializedcheck=False
 
+from libcpp.vector cimport vector
+
 import numpy as np
 
 cimport numpy as cnp
@@ -14,7 +16,10 @@ cnp.import_array()
 from .._lib.sklearn.tree._utils cimport rand_uniform
 
 
-cdef inline int rand_weighted_binary(float64_t p0, uint32_t* random_state) noexcept nogil:
+cdef inline intp_t rand_weighted_binary(
+    float64_t p0,
+    uint32_t* random_state
+) noexcept nogil:
     """Sample from integers 0 and 1 with different probabilities.
 
     Parameters
@@ -83,7 +88,11 @@ cpdef ravel_multi_index(intp_t[:] coords, const intp_t[:] shape):
     return ravel_multi_index_cython(coords, shape)
 
 
-cdef void unravel_index_cython(intp_t index, const intp_t[:] shape, intp_t[:] coords) noexcept nogil:
+cdef inline void unravel_index_cython(
+    intp_t index,
+    const intp_t[:] shape, 
+    const intp_t[:] coords
+) noexcept nogil:
     """Converts a flat index into a tuple of coordinate arrays.
 
     Parameters
@@ -109,8 +118,11 @@ cdef void unravel_index_cython(intp_t index, const intp_t[:] shape, intp_t[:] co
         index //= size
 
 
-cdef intp_t ravel_multi_index_cython(intp_t[:] coords, const intp_t[:] shape) noexcept nogil:
-    """Converts a tuple of coordinate arrays into a flat index.
+cdef inline intp_t ravel_multi_index_cython(
+    const intp_t[:] coords,
+    const intp_t[:] shape
+) noexcept nogil:
+    """Converts a tuple of coordinate arrays into a flat index in the vectorized dimension.
 
     Parameters
     ----------
@@ -145,3 +157,23 @@ cdef intp_t ravel_multi_index_cython(intp_t[:] coords, const intp_t[:] shape) no
             flat_index *= shape[i + 1]
 
     return flat_index
+
+
+cdef vector[vector[intp_t]] cartesian_cython(
+    vector[vector[intp_t]] sequences
+) noexcept nogil:
+     cdef vector[vector[intp_t]] results = vector[vector[intp_t]](1)
+     cdef vector[vector[intp_t]] next_results
+     for new_values in sequences:
+         for result in results:
+             for value in new_values:
+                 result_copy = result
+                 result_copy.push_back(value)
+                 next_results.push_back(result_copy)
+         results = next_results
+         next_results.clear()
+     return results
+
+
+cpdef cartesian_python(vector[vector[intp_t]]& sequences):
+    return cartesian_cython(sequences)

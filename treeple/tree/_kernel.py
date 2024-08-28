@@ -1,7 +1,7 @@
 import copy
 
 import numpy as np
-from scipy.sparse import issparse
+from scipy.sparse import csr_matrix, issparse
 
 from .._lib.sklearn.tree._criterion import BaseCriterion
 from .._lib.sklearn.tree._tree import BestFirstTreeBuilder, DepthFirstTreeBuilder
@@ -18,6 +18,88 @@ def gaussian_kernel(shape, sigma=1.0, mu=0.0):
     d = np.sqrt(np.sum([x * x for x in m], axis=0))
     g = np.exp(-((d - mu) ** 2 / (2.0 * sigma**2)))
     return g / np.sum(g)
+
+
+def sample_gaussian_kernels(n_kernels, min_size, max_size, mu=0.0, sigma=1.0):
+    """
+    Sample a set of Gaussian kernels and arrange them into a sparse kernel matrix.
+
+    Parameters:
+    -----------
+    n_kernels : int
+        The number of Gaussian kernels to sample.
+    min_size : int
+        The minimum size of the kernel (inclusive).
+    max_size : int
+        The maximum size of the kernel (inclusive).
+    mu : float or tuple of floats
+        The mean(s) of the Gaussian distribution. If a tuple, random mean values are sampled.
+    sigma : float or tuple of floats
+        The standard deviation(s) of the Gaussian distribution. If a tuple, random sigma values are sampled.
+
+    Returns:
+    --------
+    kernel_matrix : csr_matrix
+        The sparse matrix containing vectorized kernels.
+    kernel_params : dict of arrays
+        The parameters of the kernels that were sampled with keys:
+        - 'size': the size of each kernel; since the kernels are 2D square matrices
+            this is the side length of the kernel.
+        - 'mu': the mean of each kernel
+        - 'sigma': the standard deviation
+    """
+    data = []
+    indices = []
+    indptr = [0]
+    kernel_params = {
+        "size": np.zeros(n_kernels, dtype=np.intp),
+        "mu": np.zeros(n_kernels),
+        "sigma": np.zeros(n_kernels),
+    }
+
+    for i in range(n_kernels):
+        # Sample the size of the kernel
+        size = np.random.randint(min_size, max_size + 1)
+
+        # Sample mu and sigma if they are tuples
+        if isinstance(mu, tuple):
+            mu_sample = np.random.uniform(mu[0], mu[1])
+        else:
+            mu_sample = mu
+
+        if isinstance(sigma, tuple):
+            sigma_sample = np.random.uniform(sigma[0], sigma[1])
+        else:
+            sigma_sample = sigma
+
+        # Create a meshgrid for the kernel
+        x = np.linspace(-1, 1, size)
+        y = np.linspace(-1, 1, size)
+        X, Y = np.meshgrid(x, y)
+
+        # Create the Gaussian kernel
+        kernel = np.exp(-((X - mu_sample) ** 2 + (Y - mu_sample) ** 2) / (2 * sigma_sample**2))
+
+        # Vectorize the kernel and store it in the sparse matrix format
+        kernel_vectorized = kernel.flatten()
+        data.extend(kernel_vectorized)
+        indices.extend(range(size * size))
+        indptr.append(len(data))
+
+        # Store the kernel parameters
+        kernel_params["size"][i] = size
+        kernel_params["mu"][i] = mu_sample
+        kernel_params["sigma"][i] = sigma_sample
+
+    # Convert lists to the appropriate format
+    data = np.array(data)
+    indices = np.array(indices)
+    indptr = np.array(indptr)
+
+    # Create a sparse matrix
+    kernel_matrix = csr_matrix((data, indices, indptr), shape=(n_kernels, max_size * max_size))
+
+    return kernel_matrix, kernel_params
 
 
 class KernelDecisionTreeClassifier(PatchObliqueDecisionTreeClassifier):

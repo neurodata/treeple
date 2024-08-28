@@ -309,7 +309,7 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
         cdef intp_t end = self.end
 
         # pointer array to store feature values to split on
-        cdef float32_t[::1]  feature_values = self.feature_values
+        cdef float32_t[::1] feature_values = self.feature_values
         cdef intp_t max_features = self.max_features
         cdef intp_t min_samples_leaf = self.min_samples_leaf
 
