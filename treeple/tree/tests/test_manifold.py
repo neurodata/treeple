@@ -1,11 +1,6 @@
-import joblib
 import numpy as np
-import pytest
+from numpy.testing import assert_array_equal
 from sklearn import datasets
-from numpy.testing import assert_almost_equal, assert_array_equal
-from sklearn.base import is_classifier
-from sklearn.datasets import load_iris, make_blobs
-from sklearn.tree._tree import TREE_LEAF
 
 from treeple.tree import (
     ExtraObliqueDecisionTreeClassifier,
@@ -36,7 +31,6 @@ digits = datasets.load_digits()
 perm = rng.permutation(digits.target.size)
 digits.data = digits.data[perm]
 digits.target = digits.target[perm]
-
 
 
 def test_splitters():
