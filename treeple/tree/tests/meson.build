@@ -8,6 +8,7 @@ python_sources = [
   'test_unsupervised_tree.py',
   'test_multiview.py',
   'test_kernel.py',
+  'test_manifold.py',
 ]
 
 py.install_sources(

@@ -33,19 +33,15 @@ cdef class PatchSplitter(BestObliqueSplitter):
     # `data_width` are used to determine the vectorized indices corresponding to
     # (x,y) coordinates in the original un-vectorized data.
 
-    cdef public intp_t max_patch_height                 # Maximum height of the patch to sample
-    cdef public intp_t max_patch_width                  # Maximum width of the patch to sample
-    cdef public intp_t min_patch_height                 # Minimum height of the patch to sample
-    cdef public intp_t min_patch_width                  # Minimum width of the patch to sample
-    cdef public intp_t data_height                      # Height of the input data
-    cdef public intp_t data_width                       # Width of the input data
-
     cdef public intp_t ndim                       # The number of dimensions of the input data
+    cdef const intp_t[:] data_dims                # The dimensions of the input data
+    cdef const intp_t[:] min_patch_dims           # The minimum size of the patch to sample in each dimension
+    cdef const intp_t[:] max_patch_dims           # The maximum size of the patch to sample in each dimension
+    cdef const uint8_t[:] dim_contiguous          # A boolean array indicating whether each dimension is contiguous
 
-    cdef const intp_t[:] data_dims                      # The dimensions of the input data
-    cdef const intp_t[:] min_patch_dims                 # The minimum size of the patch to sample in each dimension
-    cdef const intp_t[:] max_patch_dims                 # The maximum size of the patch to sample in each dimension
-    cdef const uint8_t[:] dim_contiguous            # A boolean array indicating whether each dimension is contiguous
+    # TODO: assumes all oblique splitters only work with dense data
+    cdef public memoryview X_reshaped
+    cdef memoryview patch_nd_indices
 
     # TODO: check if this works and is necessary for discontiguous data
     # cdef intp_t[:] stride_offsets                # The stride offsets for each dimension
@@ -56,13 +52,13 @@ cdef class PatchSplitter(BestObliqueSplitter):
 
     cdef intp_t[::1] _index_data_buffer
     cdef intp_t[::1] _index_patch_buffer
-    cdef intp_t[:] patch_dims_buff                # A buffer to store the dimensions of the sampled patch
+    cdef intp_t[:] patch_sampled_size             # A buffer to store the dimensions of the sampled patch
     cdef intp_t[:] unraveled_patch_point          # A buffer to store the unraveled patch point
 
     # All oblique splitters (i.e. non-axis aligned splitters) require a
     # function to sample a projection matrix that is applied to the feature matrix
     # to quickly obtain the sampled projections for candidate splits.
-    cdef (intp_t, intp_t) sample_top_left_seed(
+    cdef intp_t sample_top_left_seed(
         self
     ) noexcept nogil
 
