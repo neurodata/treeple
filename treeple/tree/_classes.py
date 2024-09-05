@@ -820,7 +820,7 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
 
     tree_type = "oblique"
 
-    _parameter_constraints = {
+    _parameter_constraints: dict = {
         **DecisionTreeClassifier._parameter_constraints,
         "feature_combinations": [
             Interval(Real, 1.0, None, closed="left"),
@@ -1283,7 +1283,7 @@ class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
 
     tree_type = "oblique"
 
-    _parameter_constraints = {
+    _parameter_constraints: dict = {
         **DecisionTreeRegressor._parameter_constraints,
         "feature_combinations": [
             Interval(Real, 1.0, None, closed="left"),
@@ -1684,7 +1684,7 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
     """
 
     tree_type = "oblique"
-    _parameter_constraints = {
+    _parameter_constraints: dict = {
         **DecisionTreeClassifier._parameter_constraints,
         "min_patch_dims": ["array-like", None],
         "max_patch_dims": ["array-like", None],
@@ -2166,7 +2166,7 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
     """
 
     tree_type = "oblique"
-    _parameter_constraints = {
+    _parameter_constraints: dict = {
         **DecisionTreeRegressor._parameter_constraints,
         "min_patch_dims": ["array-like", None],
         "max_patch_dims": ["array-like", None],
@@ -2669,7 +2669,7 @@ class ExtraObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
 
     tree_type = "oblique"
 
-    _parameter_constraints = {
+    _parameter_constraints: dict = {
         **DecisionTreeClassifier._parameter_constraints,
         "feature_combinations": [
             Interval(Real, 1.0, None, closed="left"),
@@ -3069,7 +3069,7 @@ class ExtraObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         -0.26552594, -0.00642017, -0.07108117, -0.40726765, -0.40315294])
     """
 
-    _parameter_constraints = {
+    _parameter_constraints: dict = {
         **DecisionTreeRegressor._parameter_constraints,
         "feature_combinations": [
             Interval(Real, 1.0, None, closed="left"),
