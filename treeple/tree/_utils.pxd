@@ -15,7 +15,7 @@ ctypedef fused vector_or_memview:
     intp_t[:]
 
 
-cdef inline void fisher_yates_shuffle(
+cdef void fisher_yates_shuffle(
     vector_or_memview indices_to_sample,
     intp_t grid_size,
     uint32_t* random_state,

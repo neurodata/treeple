@@ -103,10 +103,10 @@ scikit_learn_cython_args = [
   '-X language_level=3', '-X boundscheck=' + boundscheck, '-X wraparound=False',
   '-X initializedcheck=False', '-X nonecheck=False', '-X cdivision=True',
   '-X profile=False',
+  '-X embedsignature=True',
   # Needed for cython imports across subpackages, e.g. cluster pyx that
   # cimports metrics pxd
   '--include-dir', meson.global_build_root(),
-  '--embedsignature', 'True',
 ]
 cython_c_args += scikit_learn_cython_args
 
