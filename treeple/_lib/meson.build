@@ -8,16 +8,15 @@ tempita = files('./sklearn/_build_utils/tempita.py')
 # Write file in Meson build dir to be able to figure out from Python code
 # whether scikit-learn was built with Meson. Adapted from pandas
 # _version_meson.py.
-option('enable_custom_target', type: 'boolean', value: false, description: 'Enable custom target')
 
-custom_target('write_built_with_meson_file',
-    output: '_built_with_meson.py',
-    command: [
-        py, '-c', 'with open("./treeple/_lib/sklearn/_built_with_meson.py", "w") as f: f.write("")'
-    ],
-    install: true,
-    install_dir: py.get_install_dir() / 'sklearn'
-)
+# custom_target('write_built_with_meson_file',
+#     output: '_built_with_meson.py',
+#     command: [
+#         py, '-c', 'with open("./treeple/_lib/sklearn/_built_with_meson.py", "w") as f: f.write("")'
+#     ],
+#     install: true,
+#     install_dir: py.get_install_dir() / 'sklearn'
+# )
 
 # install tree/ submodule
 # tree_extension_metadata = {
@@ -111,4 +110,5 @@ custom_target('write_built_with_meson_file',
 #   )
 # endforeach
 
-subdir('sklearn')
+# subdir('sklearn')
+subproject('sklearn', default_options: ['enable_custom_target=false'])
