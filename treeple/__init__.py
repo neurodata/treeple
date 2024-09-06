@@ -64,7 +64,8 @@ else:
         msg = """Error importing treeple: you cannot import treeple while
         being in treeple source directory; please exit the treeple source
         tree first and relaunch your Python interpreter."""
-        raise ImportError(msg) from e
+        raise Exception(e)
+        # raise ImportError(msg) from e
 
     __all__ = [
         "_lib",
