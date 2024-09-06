@@ -60,37 +60,38 @@ endforeach
 
 # TODO: Can remove if included in scikit-learn eventually
 # install tree/ submodule
-extensions = [
-  '_quad_tree',
-]
+# extensions = [
+#   '_quad_tree',
+# ]
 
-foreach ext: extensions
-  py.extension_module(
-    ext,
-    ['./sklearn/neighbors/' + ext + '.pyx'],
-    c_args: c_args,
-    dependencies: [np_dep],
-    cython_args: cython_c_args,
-    override_options : ['optimization=3', 'cython_language=cpp'],
-    install: true,
-    subdir: 'treeple/_lib/sklearn/neighbors/',
-  )
-endforeach
+# foreach ext: extensions
+#   py.extension_module(
+#     ext,
+#     ['./sklearn/neighbors/' + ext + '.pyx'],
+#     c_args: c_args,
+#     dependencies: [np_dep],
+#     cython_args: cython_c_args,
+#     override_options : ['optimization=3', 'cython_language=cpp'],
+#     install: true,
+#     subdir: 'treeple/_lib/sklearn/neighbors/',
+#   )
+# endforeach
 
-# install tree/ submodule
-extensions = [
-  '_typedefs',
-  '_random',
-]
+# # install tree/ submodule
+# extensions = [
+#   '_typedefs',
+#   '_random',
+# ]
 
-foreach ext: extensions
-  py.extension_module(ext,
-    ['./sklearn/utils/' + ext + '.pyx'],
-    c_args: c_args,
-    dependencies: [np_dep],
-    cython_args: cython_c_args,
-    override_options : ['optimization=3', 'cython_language=cpp'],
-    install: true,
-    subdir: 'treeple/_lib/sklearn/utils/',
-  )
-endforeach
+# foreach ext: extensions
+#   py.extension_module(ext,
+#     ['./sklearn/utils/' + ext + '.pyx'],
+#     c_args: c_args,
+#     dependencies: [np_dep],
+#     cython_args: cython_c_args,
+#     override_options : ['optimization=3', 'cython_language=cpp'],
+#     install: true,
+#     subdir: 'treeple/_lib/sklearn/utils/',
+#   )
+# endforeach
+
