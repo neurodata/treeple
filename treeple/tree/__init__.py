@@ -1,9 +1,9 @@
-# from .._lib.sklearn.tree import (
-#     DecisionTreeClassifier,
-#     DecisionTreeRegressor,
-#     ExtraTreeClassifier,
-#     ExtraTreeRegressor,
-# )
+from .._lib.sklearn.tree import (
+    DecisionTreeClassifier,
+    DecisionTreeRegressor,
+    ExtraTreeClassifier,
+    ExtraTreeRegressor,
+)
 from ._classes import (
     ExtraObliqueDecisionTreeClassifier,
     ExtraObliqueDecisionTreeRegressor,

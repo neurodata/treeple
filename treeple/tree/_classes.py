@@ -8,7 +8,7 @@ from sklearn.base import ClusterMixin, TransformerMixin
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.utils import check_random_state
 from sklearn.utils._param_validation import Interval
-from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 from .._lib.sklearn.tree import (
     BaseDecisionTree,
@@ -216,7 +216,7 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
         if check_input:
             # TODO: allow X to be sparse
             check_X_params = dict(dtype=DTYPE)  # , accept_sparse="csc"
-            X = self._validate_data(X, validate_separately=(check_X_params))
+            X = validate_data(self, X, validate_separately=(check_X_params))
             if issparse(X):
                 X.sort_indices()
 
@@ -1798,8 +1798,8 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
         self.feature_combinations_ = 1
 
         if self.feature_weight is not None:
-            self.feature_weight = self._validate_data(
-                self.feature_weight, ensure_2d=True, dtype=DTYPE
+            self.feature_weight = validate_data(
+                self, self.feature_weight, ensure_2d=True, dtype=DTYPE
             )
             if self.feature_weight.shape != X.shape:
                 raise ValueError(
@@ -2277,8 +2277,8 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         self.feature_combinations_ = 1
 
         if self.feature_weight is not None:
-            self.feature_weight = self._validate_data(
-                self.feature_weight, ensure_2d=True, dtype=DTYPE
+            self.feature_weight = validate_data(
+                self, self.feature_weight, ensure_2d=True, dtype=DTYPE
             )
             if self.feature_weight.shape != X.shape:
                 raise ValueError(
