@@ -13,10 +13,17 @@ from cython.operator cimport dereference as deref
 from libcpp.vector cimport vector
 
 from ..._lib.sklearn.tree._criterion cimport Criterion
-from ..._lib.sklearn.tree._utils cimport rand_int
 from ..._lib.sklearn.tree._tree cimport ParentInfo
-from .._utils cimport init_2dmemoryview, ravel_multi_index_cython, unravel_index_cython, fisher_yates_shuffle, compute_vectorized_indices_from_cartesian
+from ..._lib.sklearn.tree._utils cimport rand_int
 from .._sklearn_splitter cimport sort
+from .._utils cimport (
+    compute_vectorized_indices_from_cartesian,
+    fisher_yates_shuffle,
+    init_2dmemoryview,
+    ravel_multi_index_cython,
+    unravel_index_cython,
+)
+
 
 cdef float64_t INFINITY = np.inf
 

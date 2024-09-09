@@ -1,11 +1,6 @@
-import joblib
 import numpy as np
-import pytest
+from numpy.testing import assert_array_equal
 from sklearn import datasets
-from numpy.testing import assert_almost_equal, assert_array_equal
-from sklearn.base import is_classifier
-from sklearn.datasets import load_iris, make_blobs
-from sklearn.tree._tree import TREE_LEAF
 
 from treeple.tree import (
     ExtraObliqueDecisionTreeClassifier,
@@ -38,14 +33,13 @@ digits.data = digits.data[perm]
 digits.target = digits.target[perm]
 
 
-
 def test_splitters():
     """Test that splitters are picklable."""
     X, y = digits.data, digits.target
     X = X.astype(np.float32)
     sample_weight = np.ones(len(y), dtype=np.float64).squeeze()
     y = y.reshape(-1, 1).astype(np.float64)
-    missing_values_in_feature_mask = None
+    # missing_values_in_feature_mask = None
 
     print(X.shape, y.shape)
     from treeple._lib.sklearn.tree._criterion import Gini

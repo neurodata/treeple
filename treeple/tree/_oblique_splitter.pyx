@@ -97,8 +97,8 @@ cdef class BaseObliqueSplitter(Splitter):
         intp_t end,
         const intp_t[:] samples,
         float32_t[:] feature_values,
-        vector[float32_t]* proj_vec_weights,  # weights of the vector for this projection (n_non_zeros',)
-        vector[intp_t]* proj_vec_indices      # indices of the features for this projection (n_non_zeros',)
+        vector[float32_t]* proj_vec_weights,  # weights of the vector (n_non_zeros,)
+        vector[intp_t]* proj_vec_indices      # indices of the features (n_non_zeros,)
     ) noexcept nogil:
         """Compute the feature values for the samples[start:end] range.
 
@@ -120,6 +120,13 @@ cdef class BaseObliqueSplitter(Splitter):
                 if jdx == 0:
                     feature_values[idx] = 0.0
                 feature_values[idx] += self.X[samples[idx], col_idx] * col_weight
+
+    cdef void sample_proj_vec(
+        self,
+        vector[float32_t]& proj_vec_weights,
+        vector[intp_t]& proj_vec_indices
+    ) noexcept nogil:
+        pass
 
 cdef class ObliqueSplitter(BaseObliqueSplitter):
     def __cinit__(

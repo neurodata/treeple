@@ -68,7 +68,7 @@ build = [
   'twine',
   'meson',
   'meson-python',
-  'spin',
+  'spin>=0.12',
   'doit',
   'scikit-learn>=1.5.0',
   'Cython>=3.0.10',

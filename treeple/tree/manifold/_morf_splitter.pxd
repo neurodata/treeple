@@ -32,7 +32,6 @@ cdef class PatchSplitter(BestObliqueSplitter):
     # an input data vector. The input data is vectorized, so `data_height` and
     # `data_width` are used to determine the vectorized indices corresponding to
     # (x,y) coordinates in the original un-vectorized data.
-
     cdef public intp_t ndim                       # The number of dimensions of the input data
     cdef const intp_t[:] data_dims                # The dimensions of the input data
     cdef const intp_t[:] min_patch_dims           # The minimum size of the patch to sample in each dimension

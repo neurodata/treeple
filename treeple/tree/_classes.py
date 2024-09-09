@@ -8,7 +8,7 @@ from sklearn.base import ClusterMixin, TransformerMixin
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.utils import check_random_state
 from sklearn.utils._param_validation import Interval
-from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 from .._lib.sklearn.tree import (
     BaseDecisionTree,
@@ -216,7 +216,7 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
         if check_input:
             # TODO: allow X to be sparse
             check_X_params = dict(dtype=DTYPE)  # , accept_sparse="csc"
-            X = self._validate_data(X, validate_separately=(check_X_params))
+            X = validate_data(self, X, validate_separately=(check_X_params))
             if issparse(X):
                 X.sort_indices()
 
@@ -377,6 +377,13 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
         # apply agglomerative clustering to obtain cluster labels
         predict_labels = cluster.fit_predict(affinity_matrix)
         return predict_labels
+
+    def __sklearn_tags__(self):
+        # XXX: nans should be supportable in SPORF by just using RF-like splits on missing values
+        # However, for MORF it is not supported
+        tags = super().__sklearn_tags__()
+        tags.input_tags.allow_nan = False
+        return tags
 
 
 class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
@@ -576,6 +583,13 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
 
         builder.build(self.tree_, X, sample_weight)
         return self
+
+    def __sklearn_tags__(self):
+        # XXX: nans should be supportable in SPORF by just using RF-like splits on missing values
+        # However, for MORF it is not supported
+        tags = super().__sklearn_tags__()
+        tags.input_tags.allow_nan = False
+        return tags
 
 
 class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
@@ -820,7 +834,7 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
 
     tree_type = "oblique"
 
-    _parameter_constraints = {
+    _parameter_constraints: dict = {
         **DecisionTreeClassifier._parameter_constraints,
         "feature_combinations": [
             Interval(Real, 1.0, None, closed="left"),
@@ -1069,6 +1083,13 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
 
         self._prune_tree()
         return self
+
+    def __sklearn_tags__(self):
+        # XXX: nans should be supportable in SPORF by just using RF-like splits on missing values
+        # However, for MORF it is not supported
+        tags = super().__sklearn_tags__()
+        tags.input_tags.allow_nan = False
+        return tags
 
 
 class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
@@ -1450,6 +1471,13 @@ class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         builder.build(self.tree_, X, y, sample_weight, None)
         return self
 
+    def __sklearn_tags__(self):
+        # XXX: nans should be supportable in SPORF by just using RF-like splits on missing values
+        # However, for MORF it is not supported
+        tags = super().__sklearn_tags__()
+        tags.input_tags.allow_nan = False
+        return tags
+
 
 class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
     """A oblique decision tree classifier that operates over patches of data.
@@ -1798,8 +1826,8 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
         self.feature_combinations_ = 1
 
         if self.feature_weight is not None:
-            self.feature_weight = self._validate_data(
-                self.feature_weight, ensure_2d=True, dtype=DTYPE
+            self.feature_weight = validate_data(
+                self, self.feature_weight, ensure_2d=True, dtype=DTYPE
             )
             if self.feature_weight.shape != X.shape:
                 raise ValueError(
@@ -1927,11 +1955,13 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
 
         return self
 
-    def _more_tags(self):
+    def __sklearn_tags__(self):
         # XXX: nans should be supportable in SPORF by just using RF-like splits on missing values
         # However, for MORF it is not supported
-        allow_nan = False
-        return {"multilabel": True, "allow_nan": allow_nan}
+        tags = super().__sklearn_tags__()
+        tags.classifier_tags.multi_label = True
+        tags.input_tags.allow_nan = False
+        return tags
 
     @property
     def _inheritable_fitted_attribute(self):
@@ -2277,8 +2307,8 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         self.feature_combinations_ = 1
 
         if self.feature_weight is not None:
-            self.feature_weight = self._validate_data(
-                self.feature_weight, ensure_2d=True, dtype=DTYPE
+            self.feature_weight = validate_data(
+                self, self.feature_weight, ensure_2d=True, dtype=DTYPE
             )
             if self.feature_weight.shape != X.shape:
                 raise ValueError(
@@ -2407,11 +2437,13 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
 
         return self
 
-    def _more_tags(self):
+    def __sklearn_tags__(self):
         # XXX: nans should be supportable in SPORF by just using RF-like splits on missing values
         # However, for MORF it is not supported
-        allow_nan = False
-        return {"multilabel": True, "allow_nan": allow_nan}
+        tags = super().__sklearn_tags__()
+        tags.regressor_tags.multi_label = True
+        tags.input_tags.allow_nan = False
+        return tags
 
 
 class ExtraObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
@@ -2669,7 +2701,7 @@ class ExtraObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
 
     tree_type = "oblique"
 
-    _parameter_constraints = {
+    _parameter_constraints: dict = {
         **DecisionTreeClassifier._parameter_constraints,
         "feature_combinations": [
             Interval(Real, 1.0, None, closed="left"),
@@ -2845,6 +2877,13 @@ class ExtraObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
         return [
             "feature_combinations_",
         ]
+
+    def __sklearn_tags__(self):
+        # XXX: nans should be supportable in SPORF by just using RF-like splits on missing values
+        # However, for MORF it is not supported
+        tags = super().__sklearn_tags__()
+        tags.input_tags.allow_nan = False
+        return tags
 
 
 class ExtraObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
@@ -3069,7 +3108,7 @@ class ExtraObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         -0.26552594, -0.00642017, -0.07108117, -0.40726765, -0.40315294])
     """
 
-    _parameter_constraints = {
+    _parameter_constraints: dict = {
         **DecisionTreeRegressor._parameter_constraints,
         "feature_combinations": [
             Interval(Real, 1.0, None, closed="left"),
@@ -3237,3 +3276,10 @@ class ExtraObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         builder.build(self.tree_, X, y, sample_weight)
 
         return self
+
+    def __sklearn_tags__(self):
+        # XXX: nans should be supportable in SPORF by just using RF-like splits on missing values
+        # However, for MORF it is not supported
+        tags = super().__sklearn_tags__()
+        tags.input_tags.allow_nan = False
+        return tags

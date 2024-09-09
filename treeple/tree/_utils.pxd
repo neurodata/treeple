@@ -1,3 +1,5 @@
+from libcpp.vector cimport vector
+
 import numpy as np
 
 cimport numpy as cnp
@@ -15,7 +17,7 @@ ctypedef fused vector_or_memview:
     intp_t[:]
 
 
-cdef inline void fisher_yates_shuffle(
+cdef void fisher_yates_shuffle(
     vector_or_memview indices_to_sample,
     intp_t grid_size,
     uint32_t* random_state,
@@ -28,10 +30,14 @@ cdef intp_t rand_weighted_binary(
 ) noexcept nogil
 
 cpdef unravel_index(
-    intp_t index, cnp.ndarray[intp_t, ndim=1] shape
+    intp_t index,
+    cnp.ndarray[intp_t, ndim=1] shape
 )
 
-cpdef ravel_multi_index(intp_t[:] coords, const intp_t[:] shape)
+cpdef ravel_multi_index(
+    intp_t[:] coords,
+    const intp_t[:] shape
+)
 
 cdef void unravel_index_cython(
     intp_t index,

@@ -8,5 +8,5 @@ click
 rich-click
 doit
 pydevtool
-spin
+spin>=0.12
 build

@@ -720,8 +720,12 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
             oob_samples.append(_oob_samples)
         return oob_samples
 
-    def _more_tags(self):
-        return {"multioutput": False}
+    def __sklearn_tags__(self):
+        # XXX: nans should be supportable in HRF
+        tags = super().__sklearn_tags__()
+        tags.classifier_tags.multi_output = False
+        tags.input_tags.allow_nan = False
+        return tags
 
     def decision_path(self, X):
         """

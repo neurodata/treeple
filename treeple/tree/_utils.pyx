@@ -67,7 +67,61 @@ cdef inline intp_t rand_weighted_binary(
 
 cdef inline void unravel_index_cython(
     intp_t index,
-    const intp_t[:] shape, 
+    cnp.ndarray[intp_t, ndim=1] shape
+):
+    """Converts a flat index or array of flat indices into a tuple of coordinate arrays.
+
+    Purely used for testing purposes.
+
+    Parameters
+    ----------
+    index : intp_t
+        A flat index.
+    shape : numpy.ndarray[intp_t, ndim=1]
+        The shape of the array into which the flat indices should be converted.
+
+    Returns
+    -------
+    numpy.ndarray[intp_t, ndim=1]
+        A coordinate array having the same shape as the input `shape`.
+    """
+    index = np.intp(index)
+    shape = np.array(shape)
+    coords = np.empty(shape.shape[0], dtype=np.intp)
+    cdef const intp_t[:] shape_memview = shape
+    cdef intp_t[:] coords_memview = coords
+    unravel_index_cython(index, shape_memview, coords_memview)
+    return coords
+
+
+cpdef ravel_multi_index(intp_t[:] coords, const intp_t[:] shape):
+    """Converts a tuple of coordinate arrays into a flat index.
+
+    Purely used for testing purposes.
+
+    Parameters
+    ----------
+    coords : numpy.ndarray[intp_t, ndim=1]
+        An array of coordinate arrays to be converted.
+    shape : numpy.ndarray[intp_t, ndim=1]
+        The shape of the array into which the coordinates should be converted.
+
+    Returns
+    -------
+    intp_t
+        The resulting flat index.
+
+    Raises
+    ------
+    ValueError
+        If the input `coords` have invalid indices.
+    """
+    return ravel_multi_index_cython(coords, shape)
+
+
+cdef inline void unravel_index_cython(
+    intp_t index,
+    const intp_t[:] shape,
     vector_or_memview coords
 ) noexcept nogil:
     """Converts a flat index into a tuple of coordinate arrays.
@@ -100,7 +154,7 @@ cdef inline intp_t ravel_multi_index_cython(
     Parameters
     ----------
     coords : intp_t[:] or vector[intp_t]
-        An array of coordinates to be converted and vectorized into a sinlg
+        An array of coordinates to be converted and vectorized into a single index.
     shape : numpy.ndarray[intp_t, ndim=1]
         The shape of the array into which the coordinates should be converted.
 
@@ -184,17 +238,17 @@ cdef inline void compute_vectorized_indices_from_cartesian(
 cdef vector[vector[intp_t]] cartesian_cython(
     vector[vector[intp_t]] sequences
 ) noexcept nogil:
-     cdef vector[vector[intp_t]] results = vector[vector[intp_t]](1)
-     cdef vector[vector[intp_t]] next_results
-     for new_values in sequences:
-         for result in results:
-             for value in new_values:
-                 result_copy = result
-                 result_copy.push_back(value)
-                 next_results.push_back(result_copy)
-         results = next_results
-         next_results.clear()
-     return results
+    cdef vector[vector[intp_t]] results = vector[vector[intp_t]](1)
+    cdef vector[vector[intp_t]] next_results
+    for new_values in sequences:
+        for result in results:
+            for value in new_values:
+                result_copy = result
+                result_copy.push_back(value)
+                next_results.push_back(result_copy)
+        results = next_results
+        next_results.clear()
+    return results
 
 
 cpdef cartesian_python(vector[vector[intp_t]]& sequences):
@@ -207,11 +261,11 @@ cdef memoryview[float32_t, ndim=3] init_2dmemoryview(
 ):
     cdef intp_t n_samples = array.shape[0]
     cdef intp_t ndim = data_dims.shape[0]
-    assert ndim == 2, f"Currently only 2D images are accepted."
+    assert ndim == 2, "Currently only 2D images are accepted."
 
     # Reshape the array into (n_samples, *data_dims)
     cdef cnp.ndarray reshaped_array = array.reshape((n_samples, data_dims[0], data_dims[1]))
-    
+
     # Create a memoryview with the appropriate number of dimensions
     cdef memoryview[float32_t, ndim=3] view = <memoryview[float32_t, ndim=3]>reshaped_array
     return view
