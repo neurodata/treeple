@@ -90,8 +90,6 @@ class ForestCluster(SimMatrixMixin, TransformerMixin, ClusterMixin, BaseForest):
         self : object
             Returns the instance itself.
         """
-        self._validate_params()
-
         # Validate or convert input data
         X = validate_data(
             self,
