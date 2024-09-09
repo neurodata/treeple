@@ -5,7 +5,7 @@ import numpy as np
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from sklearn.exceptions import NotFittedError
 from sklearn.neighbors import NearestNeighbors
-from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 from treeple.tree._neighbors import _compute_distance_matrix, compute_forest_similarity_matrix
 
@@ -56,7 +56,7 @@ class NearestNeighborsMetaEstimator(BaseEstimator, MetaEstimatorMixin):
         self : object
             Fitted estimator.
         """
-        X, y = self._validate_data(X, y, accept_sparse="csc")
+        X, y = validate_data(self, X, y, accept_sparse="csc")
 
         self.estimator_ = copy(self.estimator)
         try:
