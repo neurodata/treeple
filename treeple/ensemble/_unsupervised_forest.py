@@ -21,7 +21,12 @@ from sklearn.ensemble._forest import (
 )
 from sklearn.metrics import calinski_harabasz_score
 from sklearn.utils.parallel import Parallel, delayed
-from sklearn.utils.validation import _check_sample_weight, check_is_fitted, check_random_state
+from sklearn.utils.validation import (
+    _check_sample_weight,
+    check_is_fitted,
+    check_random_state,
+    validate_data,
+)
 
 from .._lib.sklearn.ensemble._forest import BaseForest
 from .._lib.sklearn.tree._tree import DTYPE
@@ -88,7 +93,8 @@ class ForestCluster(SimMatrixMixin, TransformerMixin, ClusterMixin, BaseForest):
         self._validate_params()
 
         # Validate or convert input data
-        X = self._validate_data(
+        X = validate_data(
+            self,
             X,
             dtype=DTYPE,  # accept_sparse="csc",
         )

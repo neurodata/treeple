@@ -378,6 +378,13 @@ class UnsupervisedDecisionTree(SimMatrixMixin, TransformerMixin, ClusterMixin, B
         predict_labels = cluster.fit_predict(affinity_matrix)
         return predict_labels
 
+    def __sklearn_tags__(self):
+        # XXX: nans should be supportable in SPORF by just using RF-like splits on missing values
+        # However, for MORF it is not supported
+        tags = super().__sklearn_tags__()
+        tags.input_tags.allow_nan = False
+        return tags
+
 
 class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
     """Unsupervised oblique decision tree.
@@ -576,6 +583,13 @@ class UnsupervisedObliqueDecisionTree(UnsupervisedDecisionTree):
 
         builder.build(self.tree_, X, sample_weight)
         return self
+
+    def __sklearn_tags__(self):
+        # XXX: nans should be supportable in SPORF by just using RF-like splits on missing values
+        # However, for MORF it is not supported
+        tags = super().__sklearn_tags__()
+        tags.input_tags.allow_nan = False
+        return tags
 
 
 class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
@@ -1070,6 +1084,13 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         self._prune_tree()
         return self
 
+    def __sklearn_tags__(self):
+        # XXX: nans should be supportable in SPORF by just using RF-like splits on missing values
+        # However, for MORF it is not supported
+        tags = super().__sklearn_tags__()
+        tags.input_tags.allow_nan = False
+        return tags
+
 
 class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
     """An oblique decision tree Regressor.
@@ -1449,6 +1470,13 @@ class ObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
 
         builder.build(self.tree_, X, y, sample_weight, None)
         return self
+
+    def __sklearn_tags__(self):
+        # XXX: nans should be supportable in SPORF by just using RF-like splits on missing values
+        # However, for MORF it is not supported
+        tags = super().__sklearn_tags__()
+        tags.input_tags.allow_nan = False
+        return tags
 
 
 class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
@@ -1927,11 +1955,13 @@ class PatchObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
 
         return self
 
-    def _more_tags(self):
+    def __sklearn_tags__(self):
         # XXX: nans should be supportable in SPORF by just using RF-like splits on missing values
         # However, for MORF it is not supported
-        allow_nan = False
-        return {"multilabel": True, "allow_nan": allow_nan}
+        tags = super().__sklearn_tags__()
+        tags.classifier_tags.multi_label = True
+        tags.input_tags.allow_nan = False
+        return tags
 
     @property
     def _inheritable_fitted_attribute(self):
@@ -2407,11 +2437,13 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
 
         return self
 
-    def _more_tags(self):
+    def __sklearn_tags__(self):
         # XXX: nans should be supportable in SPORF by just using RF-like splits on missing values
         # However, for MORF it is not supported
-        allow_nan = False
-        return {"multilabel": True, "allow_nan": allow_nan}
+        tags = super().__sklearn_tags__()
+        tags.regressor_tags.multi_label = True
+        tags.input_tags.allow_nan = False
+        return tags
 
 
 class ExtraObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
@@ -2846,6 +2878,13 @@ class ExtraObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier)
             "feature_combinations_",
         ]
 
+    def __sklearn_tags__(self):
+        # XXX: nans should be supportable in SPORF by just using RF-like splits on missing values
+        # However, for MORF it is not supported
+        tags = super().__sklearn_tags__()
+        tags.input_tags.allow_nan = False
+        return tags
+
 
 class ExtraObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
     """An oblique decision tree Regressor.
@@ -3237,3 +3276,10 @@ class ExtraObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         builder.build(self.tree_, X, y, sample_weight)
 
         return self
+
+    def __sklearn_tags__(self):
+        # XXX: nans should be supportable in SPORF by just using RF-like splits on missing values
+        # However, for MORF it is not supported
+        tags = super().__sklearn_tags__()
+        tags.input_tags.allow_nan = False
+        return tags
