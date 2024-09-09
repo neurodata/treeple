@@ -3,21 +3,6 @@ if not fs.exists('sklearn')
   error('Missing the `sklearn` fork submodule! Run `git submodule update --init` to fix this.')
 endif
 
-tempita = files('./sklearn/_build_utils/tempita.py')
-
-# Write file in Meson build dir to be able to figure out from Python code
-# whether scikit-learn was built with Meson. Adapted from pandas
-# _version_meson.py.
-
-# custom_target('write_built_with_meson_file',
-#     output: '_built_with_meson.py',
-#     command: [
-#         py, '-c', 'with open("./treeple/_lib/sklearn/_built_with_meson.py", "w") as f: f.write("")'
-#     ],
-#     install: true,
-#     install_dir: py.get_install_dir() / 'sklearn'
-# )
-
 # install tree/ submodule
 # tree_extension_metadata = {
 #   '_tree':
@@ -73,8 +58,8 @@ tempita = files('./sklearn/_build_utils/tempita.py')
 #   )
 # endforeach
 
-# TODO: Can remove if included in scikit-learn eventually
-# install tree/ submodule
+# # TODO: Can remove if included in scikit-learn eventually
+# # install tree/ submodule
 # extensions = [
 #   '_quad_tree',
 # ]
@@ -110,5 +95,21 @@ tempita = files('./sklearn/_build_utils/tempita.py')
 #   )
 # endforeach
 
-# subdir('sklearn')
-subproject('sklearn', default_options: ['enable_custom_target=false'])
+
+python_sources = [
+  '__init__.py',
+]
+
+py.install_sources(
+  python_sources,
+  subdir: 'treeple/_lib'   # Folder relative to site-packages to install to
+)
+
+tempita = files('./sklearn/_build_utils/tempita.py')
+
+# Copy all the .py files to the install dir, rather than using
+# py.install_sources and needing to list them explicitely one by one
+# install_subdir('sklearn', install_dir: py.get_install_dir())
+install_subdir('sklearn', install_dir: join_paths(py.get_install_dir(), 'treeple/_lib'))
+
+subdir('sklearn')

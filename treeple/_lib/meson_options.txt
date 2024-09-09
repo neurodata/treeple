@@ -1,1 +1,0 @@
-option('enable_custom_target', type: 'boolean', value: false, description: 'Enable custom target')
