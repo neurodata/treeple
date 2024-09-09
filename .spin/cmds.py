@@ -5,6 +5,7 @@ import sys
 import click
 from spin import util
 from spin.cmds import meson
+from spin.cmds.meson import build_dir_option
 
 
 def get_git_revision_hash(submodule) -> str:
@@ -145,14 +146,18 @@ def setup_submodule(forcesubmodule=False):
 @click.option(
     "--forcesubmodule", is_flag=True, help="Force submodule pull.", envvar="FORCE_SUBMODULE"
 )
+@build_dir_option
 @click.pass_context
 def build(
     ctx,
+    *,
     meson_args,
     jobs=None,
     clean=False,
     verbose=False,
     gcov=False,
+    quiet=False,
+    build_dir=None,
     forcesubmodule=False,
 ):
     """Build treeple using submodules.
