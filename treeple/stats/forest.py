@@ -1,6 +1,7 @@
 import threading
 from collections import namedtuple
 from typing import Callable
+from warnings import warn
 
 import numpy as np
 from joblib import Parallel, delayed
@@ -10,6 +11,8 @@ from sklearn.ensemble._base import _partition_estimators
 from sklearn.utils.multiclass import type_of_target
 
 from .._lib.sklearn.ensemble._forest import ForestClassifier
+from ..ensemble import HonestForestClassifier
+from ..tree import MultiViewDecisionTreeClassifier
 from ..tree._classes import DTYPE
 from .permuteforest import PermutationHonestForestClassifier
 from .utils import METRIC_FUNCTIONS, POSITIVE_METRICS, _compute_null_distribution_coleman
@@ -38,8 +41,8 @@ ForestTestResult = namedtuple(
 
 
 def build_coleman_forest(
-    est,
-    perm_est,
+    est: HonestForestClassifier,
+    perm_est: PermutationHonestForestClassifier,
     X,
     y,
     covariate_index=None,
@@ -111,6 +114,9 @@ def build_coleman_forest(
     """
     metric_func: Callable[[ArrayLike, ArrayLike], float] = METRIC_FUNCTIONS[metric]
 
+    if not isinstance(est, HonestForestClassifier):
+        raise RuntimeError(f"Original forest must be a HonestForestClassifier, got {type(est)}")
+
     # build two sets of forests
     est, orig_forest_proba = build_oob_forest(est, X, y, verbose=verbose)
 
@@ -118,6 +124,13 @@ def build_coleman_forest(
         raise RuntimeError(
             f"Permutation forest must be a PermutationHonestForestClassifier, got {type(perm_est)}"
         )
+
+    if covariate_index is None and isinstance(est.tree_estimator, MultiViewDecisionTreeClassifier):
+        warn(
+            "Covariate index is not defined, but a MultiViewDecisionTreeClassifier is used. "
+            "If using CoMIGHT, one should define the covariate index to permute."
+        )
+
     perm_est, perm_forest_proba = build_oob_forest(
         perm_est, X, y, verbose=verbose, covariate_index=covariate_index
     )
