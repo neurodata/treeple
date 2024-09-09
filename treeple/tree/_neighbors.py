@@ -64,7 +64,3 @@ class SimMatrixMixin:
             The similarity matrix among the samples.
         """
         return compute_forest_similarity_matrix(self, X)
-
-    def _more_tags(self):
-        # XXX: no treeple estimators support NaNs as of now
-        return {"allow_nan": False}
