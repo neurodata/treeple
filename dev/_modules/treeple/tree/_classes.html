@@ -444,7 +444,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">AgglomerativeClustering</span>
 <span class="kn">from</span> <span class="nn">sklearn.utils</span> <span class="kn">import</span> <span class="n">check_random_state</span>
 <span class="kn">from</span> <span class="nn">sklearn.utils._param_validation</span> <span class="kn">import</span> <span class="n">Interval</span>
-<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">check_is_fitted</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">check_is_fitted</span><span class="p">,</span> <span class="n">validate_data</span>
 
 <span class="kn">from</span> <span class="nn">.._lib.sklearn.tree</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">BaseDecisionTree</span><span class="p">,</span>
@@ -654,7 +654,7 @@ document.write(`
         <span class="k">if</span> <span class="n">check_input</span><span class="p">:</span>
             <span class="c1"># TODO: allow X to be sparse</span>
             <span class="n">check_X_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>  <span class="c1"># , accept_sparse=&quot;csc&quot;</span>
-            <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_data</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">validate_separately</span><span class="o">=</span><span class="p">(</span><span class="n">check_X_params</span><span class="p">))</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">validate_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">validate_separately</span><span class="o">=</span><span class="p">(</span><span class="n">check_X_params</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">issparse</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
                 <span class="n">X</span><span class="o">.</span><span class="n">sort_indices</span><span class="p">()</span>
 
@@ -820,7 +820,14 @@ document.write(`
 
         <span class="c1"># apply agglomerative clustering to obtain cluster labels</span>
         <span class="n">predict_labels</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">affinity_matrix</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">predict_labels</span></div>
+        <span class="k">return</span> <span class="n">predict_labels</span>
+
+    <span class="k">def</span> <span class="nf">__sklearn_tags__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># XXX: nans should be supportable in SPORF by just using RF-like splits on missing values</span>
+        <span class="c1"># However, for MORF it is not supported</span>
+        <span class="n">tags</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__sklearn_tags__</span><span class="p">()</span>
+        <span class="n">tags</span><span class="o">.</span><span class="n">input_tags</span><span class="o">.</span><span class="n">allow_nan</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">tags</span></div>
 
 
 
@@ -1022,7 +1029,14 @@ document.write(`
             <span class="p">)</span>
 
         <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span></div>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__sklearn_tags__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># XXX: nans should be supportable in SPORF by just using RF-like splits on missing values</span>
+        <span class="c1"># However, for MORF it is not supported</span>
+        <span class="n">tags</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__sklearn_tags__</span><span class="p">()</span>
+        <span class="n">tags</span><span class="o">.</span><span class="n">input_tags</span><span class="o">.</span><span class="n">allow_nan</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">tags</span></div>
 
 
 
@@ -1270,7 +1284,7 @@ document.write(`
 
     <span class="n">tree_type</span> <span class="o">=</span> <span class="s2">&quot;oblique&quot;</span>
 
-    <span class="n">_parameter_constraints</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">_parameter_constraints</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span>
         <span class="o">**</span><span class="n">DecisionTreeClassifier</span><span class="o">.</span><span class="n">_parameter_constraints</span><span class="p">,</span>
         <span class="s2">&quot;feature_combinations&quot;</span><span class="p">:</span> <span class="p">[</span>
             <span class="n">Interval</span><span class="p">(</span><span class="n">Real</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">),</span>
@@ -1518,7 +1532,14 @@ document.write(`
         <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_prune_tree</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span></div>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__sklearn_tags__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># XXX: nans should be supportable in SPORF by just using RF-like splits on missing values</span>
+        <span class="c1"># However, for MORF it is not supported</span>
+        <span class="n">tags</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__sklearn_tags__</span><span class="p">()</span>
+        <span class="n">tags</span><span class="o">.</span><span class="n">input_tags</span><span class="o">.</span><span class="n">allow_nan</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">tags</span></div>
 
 
 
@@ -1736,7 +1757,7 @@ document.write(`
 
     <span class="n">tree_type</span> <span class="o">=</span> <span class="s2">&quot;oblique&quot;</span>
 
-    <span class="n">_parameter_constraints</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">_parameter_constraints</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span>
         <span class="o">**</span><span class="n">DecisionTreeRegressor</span><span class="o">.</span><span class="n">_parameter_constraints</span><span class="p">,</span>
         <span class="s2">&quot;feature_combinations&quot;</span><span class="p">:</span> <span class="p">[</span>
             <span class="n">Interval</span><span class="p">(</span><span class="n">Real</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">),</span>
@@ -1901,7 +1922,14 @@ document.write(`
             <span class="p">)</span>
 
         <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span></div>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__sklearn_tags__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># XXX: nans should be supportable in SPORF by just using RF-like splits on missing values</span>
+        <span class="c1"># However, for MORF it is not supported</span>
+        <span class="n">tags</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__sklearn_tags__</span><span class="p">()</span>
+        <span class="n">tags</span><span class="o">.</span><span class="n">input_tags</span><span class="o">.</span><span class="n">allow_nan</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">tags</span></div>
 
 
 
@@ -2140,7 +2168,7 @@ document.write(`
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">tree_type</span> <span class="o">=</span> <span class="s2">&quot;oblique&quot;</span>
-    <span class="n">_parameter_constraints</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">_parameter_constraints</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span>
         <span class="o">**</span><span class="n">DecisionTreeClassifier</span><span class="o">.</span><span class="n">_parameter_constraints</span><span class="p">,</span>
         <span class="s2">&quot;min_patch_dims&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;array-like&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
         <span class="s2">&quot;max_patch_dims&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;array-like&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
@@ -2254,8 +2282,8 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">feature_combinations_</span> <span class="o">=</span> <span class="mi">1</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_data</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span><span class="p">,</span> <span class="n">ensure_2d</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span> <span class="o">=</span> <span class="n">validate_data</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span><span class="p">,</span> <span class="n">ensure_2d</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span>
             <span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -2383,11 +2411,13 @@ document.write(`
 
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="nf">_more_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__sklearn_tags__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># XXX: nans should be supportable in SPORF by just using RF-like splits on missing values</span>
         <span class="c1"># However, for MORF it is not supported</span>
-        <span class="n">allow_nan</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;multilabel&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;allow_nan&quot;</span><span class="p">:</span> <span class="n">allow_nan</span><span class="p">}</span>
+        <span class="n">tags</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__sklearn_tags__</span><span class="p">()</span>
+        <span class="n">tags</span><span class="o">.</span><span class="n">classifier_tags</span><span class="o">.</span><span class="n">multi_label</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">tags</span><span class="o">.</span><span class="n">input_tags</span><span class="o">.</span><span class="n">allow_nan</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">tags</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_inheritable_fitted_attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -2625,7 +2655,7 @@ document.write(`
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">tree_type</span> <span class="o">=</span> <span class="s2">&quot;oblique&quot;</span>
-    <span class="n">_parameter_constraints</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">_parameter_constraints</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span>
         <span class="o">**</span><span class="n">DecisionTreeRegressor</span><span class="o">.</span><span class="n">_parameter_constraints</span><span class="p">,</span>
         <span class="s2">&quot;min_patch_dims&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;array-like&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
         <span class="s2">&quot;max_patch_dims&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;array-like&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
@@ -2736,8 +2766,8 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">feature_combinations_</span> <span class="o">=</span> <span class="mi">1</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_data</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span><span class="p">,</span> <span class="n">ensure_2d</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span> <span class="o">=</span> <span class="n">validate_data</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span><span class="p">,</span> <span class="n">ensure_2d</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span>
             <span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_weight</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -2866,11 +2896,13 @@ document.write(`
 
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="nf">_more_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__sklearn_tags__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># XXX: nans should be supportable in SPORF by just using RF-like splits on missing values</span>
         <span class="c1"># However, for MORF it is not supported</span>
-        <span class="n">allow_nan</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;multilabel&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;allow_nan&quot;</span><span class="p">:</span> <span class="n">allow_nan</span><span class="p">}</span></div>
+        <span class="n">tags</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__sklearn_tags__</span><span class="p">()</span>
+        <span class="n">tags</span><span class="o">.</span><span class="n">regressor_tags</span><span class="o">.</span><span class="n">multi_label</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">tags</span><span class="o">.</span><span class="n">input_tags</span><span class="o">.</span><span class="n">allow_nan</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">tags</span></div>
 
 
 
@@ -3129,7 +3161,7 @@ document.write(`
 
     <span class="n">tree_type</span> <span class="o">=</span> <span class="s2">&quot;oblique&quot;</span>
 
-    <span class="n">_parameter_constraints</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">_parameter_constraints</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span>
         <span class="o">**</span><span class="n">DecisionTreeClassifier</span><span class="o">.</span><span class="n">_parameter_constraints</span><span class="p">,</span>
         <span class="s2">&quot;feature_combinations&quot;</span><span class="p">:</span> <span class="p">[</span>
             <span class="n">Interval</span><span class="p">(</span><span class="n">Real</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">),</span>
@@ -3305,6 +3337,13 @@ document.write(`
         <span class="k">return</span> <span class="p">[</span>
             <span class="s2">&quot;feature_combinations_&quot;</span><span class="p">,</span>
         <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__sklearn_tags__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># XXX: nans should be supportable in SPORF by just using RF-like splits on missing values</span>
+        <span class="c1"># However, for MORF it is not supported</span>
+        <span class="n">tags</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__sklearn_tags__</span><span class="p">()</span>
+        <span class="n">tags</span><span class="o">.</span><span class="n">input_tags</span><span class="o">.</span><span class="n">allow_nan</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">tags</span>
 
 
 <span class="k">class</span> <span class="nc">ExtraObliqueDecisionTreeRegressor</span><span class="p">(</span><span class="n">SimMatrixMixin</span><span class="p">,</span> <span class="n">DecisionTreeRegressor</span><span class="p">):</span>
@@ -3529,7 +3568,7 @@ document.write(`
 <span class="sd">        -0.26552594, -0.00642017, -0.07108117, -0.40726765, -0.40315294])</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">_parameter_constraints</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">_parameter_constraints</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span>
         <span class="o">**</span><span class="n">DecisionTreeRegressor</span><span class="o">.</span><span class="n">_parameter_constraints</span><span class="p">,</span>
         <span class="s2">&quot;feature_combinations&quot;</span><span class="p">:</span> <span class="p">[</span>
             <span class="n">Interval</span><span class="p">(</span><span class="n">Real</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">),</span>
@@ -3697,6 +3736,13 @@ document.write(`
         <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__sklearn_tags__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># XXX: nans should be supportable in SPORF by just using RF-like splits on missing values</span>
+        <span class="c1"># However, for MORF it is not supported</span>
+        <span class="n">tags</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__sklearn_tags__</span><span class="p">()</span>
+        <span class="n">tags</span><span class="o">.</span><span class="n">input_tags</span><span class="o">.</span><span class="n">allow_nan</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">tags</span>
 </pre></div>
 
                 </article>
@@ -3737,7 +3783,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, treeple Developers. Last updated on 2024-08-20.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-09-09.
       <br/>
     
   </p>

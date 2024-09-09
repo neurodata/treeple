@@ -528,7 +528,7 @@ document.write(`
 <h1><a class="reference internal" href="../api.html#module-treeple" title="treeple"><code class="xref py py-mod docutils literal notranslate"><span class="pre">treeple</span></code></a>.NearestNeighborsMetaEstimator<a class="headerlink" href="#treeple-nearestneighborsmetaestimator" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="treeple.NearestNeighborsMetaEstimator">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">treeple.</span></span><span class="sig-name descname"><span class="pre">NearestNeighborsMetaEstimator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_neighbors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/treeple/neighbors.html#NearestNeighborsMetaEstimator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#treeple.NearestNeighborsMetaEstimator" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">treeple.</span></span><span class="sig-name descname"><span class="pre">NearestNeighborsMetaEstimator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_neighbors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/treeple/neighbors.html#NearestNeighborsMetaEstimator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#treeple.NearestNeighborsMetaEstimator" title="Link to this definition">#</a></dt>
 <dd><p>Meta-estimator for nearest neighbors.</p>
 <p>Uses a decision-tree, or forest model to compute distances between samples
 and then uses the sklearn’s nearest-neighbors API to compute neighbors.</p>
@@ -569,6 +569,13 @@ See <a class="reference external" href="https://scikit-learn.org/dev/modules/gen
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#treeple.NearestNeighborsMetaEstimator.set_params" title="treeple.NearestNeighborsMetaEstimator.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</p></td>
 <td><p>Set the parameters of this estimator.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="table">
+<tbody>
+<tr class="row-odd"><td><p><strong>get_estimator</strong></p></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -823,7 +830,7 @@ possible to update each component of a nested object.</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, treeple Developers. Last updated on 2024-08-20.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-09-09.
       <br/>
     
   </p>

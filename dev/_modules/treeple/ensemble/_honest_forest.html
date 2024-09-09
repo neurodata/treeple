@@ -1164,8 +1164,12 @@ document.write(`
             <span class="n">oob_samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_oob_samples</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">oob_samples</span>
 
-    <span class="k">def</span> <span class="nf">_more_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;multioutput&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+    <span class="k">def</span> <span class="nf">__sklearn_tags__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># XXX: nans should be supportable in HRF</span>
+        <span class="n">tags</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__sklearn_tags__</span><span class="p">()</span>
+        <span class="n">tags</span><span class="o">.</span><span class="n">classifier_tags</span><span class="o">.</span><span class="n">multi_output</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">tags</span><span class="o">.</span><span class="n">input_tags</span><span class="o">.</span><span class="n">allow_nan</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">tags</span>
 
 <div class="viewcode-block" id="HonestForestClassifier.decision_path">
 <a class="viewcode-back" href="../../../generated/treeple.HonestForestClassifier.html#treeple.HonestForestClassifier.decision_path">[docs]</a>
@@ -1318,7 +1322,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, treeple Developers. Last updated on 2024-08-20.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-09-09.
       <br/>
     
   </p>
