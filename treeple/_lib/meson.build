@@ -94,3 +94,22 @@ foreach ext: extensions
     subdir: 'treeple/_lib/sklearn/utils/',
   )
 endforeach
+
+
+# python_sources = [
+#   '__init__.py',
+# ]
+
+# py.install_sources(
+#   python_sources,
+#   subdir: 'treeple/_lib'   # Folder relative to site-packages to install to
+# )
+
+# tempita = files('./sklearn/_build_utils/tempita.py')
+
+# # Copy all the .py files to the install dir, rather than using
+# # py.install_sources and needing to list them explicitely one by one
+# # install_subdir('sklearn', install_dir: py.get_install_dir())
+# install_subdir('sklearn', install_dir: join_paths(py.get_install_dir(), 'treeple/_lib'))
+
+# subdir('sklearn')

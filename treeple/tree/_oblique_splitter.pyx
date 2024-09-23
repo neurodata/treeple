@@ -11,6 +11,7 @@ from libcpp.vector cimport vector
 
 from .._lib.sklearn.tree._criterion cimport Criterion
 from .._lib.sklearn.tree._utils cimport rand_int, rand_uniform
+from ._utils cimport fisher_yates_shuffle
 
 
 cdef float64_t INFINITY = np.inf
@@ -46,8 +47,12 @@ cdef class BaseObliqueSplitter(Splitter):
     def __setstate__(self, d):
         pass
 
-    cdef int node_reset(self, intp_t start, intp_t end,
-                        float64_t* weighted_n_node_samples) except -1 nogil:
+    cdef int node_reset(
+        self,
+        intp_t start,
+        intp_t end,
+        float64_t* weighted_n_node_samples
+    ) except -1 nogil:
         """Reset splitter on node samples[start:end].
 
         Returns -1 in case of failure to allocate memory (and raise MemoryError)
@@ -62,17 +67,7 @@ cdef class BaseObliqueSplitter(Splitter):
         weighted_n_node_samples : ndarray, dtype=float64_t pointer
             The total weight of those samples
         """
-
-        self.start = start
-        self.end = end
-
-        self.criterion.init(self.y,
-                            self.sample_weight,
-                            self.weighted_n_samples,
-                            self.samples)
-        self.criterion.set_sample_pointers(start, end)
-
-        weighted_n_node_samples[0] = self.criterion.weighted_n_node_samples
+        Splitter.node_reset(self, start, end, weighted_n_node_samples)
 
         # Clear all projection vectors
         for i in range(self.max_features):
@@ -102,8 +97,8 @@ cdef class BaseObliqueSplitter(Splitter):
         intp_t end,
         const intp_t[:] samples,
         float32_t[:] feature_values,
-        vector[float32_t]* proj_vec_weights,  # weights of the vector (max_features,)
-        vector[intp_t]* proj_vec_indices    # indices of the features (max_features,)
+        vector[float32_t]* proj_vec_weights,  # weights of the vector (n_non_zeros,)
+        vector[intp_t]* proj_vec_indices    # indices of the features (n_non_zeros,)
     ) noexcept nogil:
         """Compute the feature values for the samples[start:end] range.
 
@@ -126,19 +121,6 @@ cdef class BaseObliqueSplitter(Splitter):
                     feature_values[idx] = 0.0
                 feature_values[idx] += self.X[samples[idx], col_idx] * col_weight
 
-    cdef inline void fisher_yates_shuffle_memview(
-        self,
-        intp_t[::1] indices_to_sample,
-        intp_t grid_size,
-        uint32_t* random_state,
-    ) noexcept nogil:
-        cdef intp_t i, j
-
-        # XXX: should this be `i` or `i+1`? for valid Fisher-Yates?
-        for i in range(0, grid_size - 1):
-            j = rand_int(i, grid_size, random_state)
-            indices_to_sample[j], indices_to_sample[i] = \
-                indices_to_sample[i], indices_to_sample[j]
 
 cdef class ObliqueSplitter(BaseObliqueSplitter):
     def __cinit__(
@@ -257,7 +239,7 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         cdef intp_t grid_size = self.max_features * self.n_features
 
         # shuffle indices over the 2D grid to sample using Fisher-Yates
-        self.fisher_yates_shuffle_memview(indices_to_sample, grid_size, random_state)
+        fisher_yates_shuffle(indices_to_sample, grid_size, random_state)
 
         # sample 'n_non_zeros' in a mtry X n_features projection matrix
         # which consists of +/- 1's chosen at a 1/2s rate
@@ -309,7 +291,7 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
         cdef intp_t end = self.end
 
         # pointer array to store feature values to split on
-        cdef float32_t[::1]  feature_values = self.feature_values
+        cdef float32_t[::1] feature_values = self.feature_values
         cdef intp_t max_features = self.max_features
         cdef intp_t min_samples_leaf = self.min_samples_leaf
 

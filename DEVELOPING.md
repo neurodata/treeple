@@ -44,6 +44,10 @@ If you are developing locally, you will need the build dependencies to compile t
 
     pip install -r build_requirements.txt
 
+Additionally, you need to install the latest build of scikit-learn:
+
+    pip install --force -r build_sklearn_requirements.txt
+
 Other requirements can be installed as such:
 
     pip install .
@@ -132,7 +136,7 @@ You can also do the same thing using Meson/Ninja itself. Run the following to bu
     export PYTHONPATH=${PWD}/build/lib/python<YOUR_PYTHON_VERSION>/site-packages
 
     # to check installation, you need to be in a different directory
-    cd docs;  
+    cd docs;
     python -c "from treeple import tree"
     python -c "import sklearn; print(sklearn.__version__);"
 
@@ -188,7 +192,7 @@ GH Actions will build wheels for each Python version and OS. Then the wheels nee
 <https://github.com/neurodata/treeple/actions/workflows/build_wheels.yml> will have all the wheels for common OSes built for each Python version.
 
 2. Upload wheels to test PyPi
-This is to ensure that the wheels are built correctly and can be installed on a fresh environment. For more information, see <https://packaging.python.org/guides/using-testpypi/>. You will need to follow the instructions to create an account and get your API token for testpypi and pypi. 
+This is to ensure that the wheels are built correctly and can be installed on a fresh environment. For more information, see <https://packaging.python.org/guides/using-testpypi/>. You will need to follow the instructions to create an account and get your API token for testpypi and pypi.
 
 ```
 twine upload dist/* --repository testpypi

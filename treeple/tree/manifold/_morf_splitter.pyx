@@ -151,7 +151,7 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
         self.data_dims = data_dims
 
         # create a buffer for storing the patch dimensions sampled per projection matrix
-        self.patch_dims_buff = np.zeros(data_dims.shape[0], dtype=np.intp)
+        self.patch_sampled_size = np.zeros(data_dims.shape[0], dtype=np.intp)
         self.unraveled_patch_point = np.zeros(data_dims.shape[0], dtype=np.intp)
 
         # store the min and max patch dimension constraints
@@ -237,7 +237,7 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
                 top_left_patch_seed = rand_int(0, delta_patch_dim, random_state)
 
                 # write to buffer
-                self.patch_dims_buff[idx] = patch_dim
+                self.patch_sampled_size[idx] = patch_dim
                 patch_size *= patch_dim
             elif self.boundary == "wrap":
                 # add circular boundary conditions
@@ -251,7 +251,7 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
 
                 # resample the patch dimension due to padding
                 patch_dim = min(patch_dim, min(dim+1, self.data_dims[idx] + patch_dim - dim - 1))
-                self.patch_dims_buff[idx] = patch_dim
+                self.patch_sampled_size[idx] = patch_dim
                 patch_size *= patch_dim
 
                 # TODO: make this work
@@ -283,7 +283,7 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
         cdef intp_t top_left_patch_seed
 
         # size of the sampled patch, which is just the size of the n-dim patch
-        # (\prod_i self.patch_dims_buff[i])
+        # (\prod_i self.patch_sampled_size[i])
         cdef intp_t patch_size
 
         for proj_i in range(0, max_features):
@@ -299,7 +299,7 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
                 proj_i,
                 patch_size,
                 top_left_patch_seed,
-                self.patch_dims_buff
+                self.patch_sampled_size
             )
 
     cdef void sample_proj_vec(
@@ -389,7 +389,7 @@ cdef class BestPatchSplitter(BaseDensePatchSplitter):
                         if not self.dim_contiguous[idx]:
                             row_index += (
                                 (self.unraveled_patch_point[idx] // other_dims_offset) %
-                                self.patch_dims_buff[idx]
+                                self.patch_sampled_size[idx]
                             ) * other_dims_offset
                             other_dims_offset //= self.data_dims[idx]
 
@@ -445,7 +445,7 @@ cdef class BestPatchSplitterTester(BestPatchSplitter):
     """A class to expose a Python interface for testing."""
     cpdef sample_top_left_seed_cpdef(self):
         top_left_patch_seed, patch_size = self.sample_top_left_seed()
-        patch_dims = np.array(self.patch_dims_buff, dtype=np.intp)
+        patch_dims = np.array(self.patch_sampled_size, dtype=np.intp)
         return top_left_patch_seed, patch_size, patch_dims
 
     cpdef sample_projection_vector(
