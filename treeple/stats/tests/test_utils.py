@@ -3,6 +3,7 @@ import os
 
 import numpy as np
 import pytest
+import scipy.sparse as sp
 from numpy.testing import assert_array_equal
 
 import treeple.stats.utils as utils
@@ -88,3 +89,48 @@ def test_nanmean_f(use_bottleneck: bool):
     expected = np.array([1.5, 3.5])
     actual = utils.nanmean_f(posterior_array, axis=1)
     np.testing.assert_array_equal(expected, actual)
+
+
+@pytest.mark.parametrize(
+    ("forest_indices", "expected"),
+    [
+        (np.arange(3), np.array([0.375, 0.75, 0.25])),
+        (np.arange(3) + 2, np.array([0.10, 0.05, 0.25])),
+        (np.arange(3) + 3, np.array([0.10, 0.45, np.nan])),
+    ],
+)
+def test_get_forest_preds_sparse(
+    forest_indices,
+    expected,
+):
+
+    all_y_pred = sp.csc_matrix(
+        np.array(
+            [
+                [0.50, 0.00, 0.00],
+                [0.25, 0.75, 0.00],
+                [0.00, 0.00, 0.25],
+                [0.10, 0.00, 0.00],
+                [0.00, 0.05, 0.00],
+                [0.00, 0.85, 0.00],
+            ]
+        )
+    )
+
+    all_y_indicator = sp.csc_matrix(
+        np.array(
+            [
+                [1, 0, 0],
+                [1, 1, 0],
+                [0, 0, 1],
+                [1, 0, 0],
+                [0, 1, 0],
+                [0, 1, 0],
+            ]
+        )
+    )
+
+    np.testing.assert_array_equal(
+        utils._get_forest_preds_sparse(all_y_pred, all_y_indicator, forest_indices),
+        expected,
+    )
