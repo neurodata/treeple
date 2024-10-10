@@ -1479,17 +1479,19 @@ document.write(`
 <span class="sd">    max_features : int, float or {&quot;sqrt&quot;, &quot;log2&quot;}, default=None</span>
 <span class="sd">        The number of features to consider when looking for the best split:</span>
 
-<span class="sd">            - If int, then consider `max_features` features at each split.</span>
-<span class="sd">            - If float, then `max_features` is a fraction and</span>
-<span class="sd">              `max(1, int(max_features * n_features_in_))` features are considered at</span>
-<span class="sd">              each split.</span>
-<span class="sd">            - If &quot;sqrt&quot;, then `max_features=sqrt(n_features)`.</span>
-<span class="sd">            - If &quot;log2&quot;, then `max_features=log2(n_features)`.</span>
-<span class="sd">            - If None, then `max_features=n_features`.</span>
+<span class="sd">        - If int, then consider `max_features` features at each split.</span>
+<span class="sd">        - If float, then `max_features` is a fraction and</span>
+<span class="sd">          `max(1, int(max_features * n_features_in_))` features are considered at</span>
+<span class="sd">          each split.</span>
+<span class="sd">        - If &quot;sqrt&quot;, then `max_features=sqrt(n_features)`.</span>
+<span class="sd">        - If &quot;log2&quot;, then `max_features=log2(n_features)`.</span>
+<span class="sd">        - If None, then `max_features=n_features`.</span>
 
-<span class="sd">        Note: the search for a split does not stop until at least one</span>
-<span class="sd">        valid partition of the node samples is found, even if it requires to</span>
-<span class="sd">        effectively inspect more than ``max_features`` features.</span>
+<span class="sd">        .. note::</span>
+
+<span class="sd">            The search for a split does not stop until at least one</span>
+<span class="sd">            valid partition of the node samples is found, even if it requires to</span>
+<span class="sd">            effectively inspect more than ``max_features`` features.</span>
 
 <span class="sd">    random_state : int, RandomState instance or None, default=None</span>
 <span class="sd">        Controls the randomness of the estimator. The features are always</span>
@@ -1551,7 +1553,9 @@ document.write(`
 <span class="sd">        Complexity parameter used for Minimal Cost-Complexity Pruning. The</span>
 <span class="sd">        subtree with the largest cost complexity that is smaller than</span>
 <span class="sd">        ``ccp_alpha`` will be chosen. By default, no pruning is performed. See</span>
-<span class="sd">        :ref:`minimal_cost_complexity_pruning` for details.</span>
+<span class="sd">        :ref:`minimal_cost_complexity_pruning` for details. See</span>
+<span class="sd">        :ref:`sphx_glr_auto_examples_tree_plot_cost_complexity_pruning.py`</span>
+<span class="sd">        for an example of such pruning.</span>
 
 <span class="sd">        .. versionadded:: 0.22</span>
 
@@ -2096,7 +2100,9 @@ document.write(`
 <span class="sd">        Complexity parameter used for Minimal Cost-Complexity Pruning. The</span>
 <span class="sd">        subtree with the largest cost complexity that is smaller than</span>
 <span class="sd">        ``ccp_alpha`` will be chosen. By default, no pruning is performed. See</span>
-<span class="sd">        :ref:`minimal_cost_complexity_pruning` for details.</span>
+<span class="sd">        :ref:`minimal_cost_complexity_pruning` for details. See</span>
+<span class="sd">        :ref:`sphx_glr_auto_examples_tree_plot_cost_complexity_pruning.py`</span>
+<span class="sd">        for an example of such pruning.</span>
 
 <span class="sd">        .. versionadded:: 0.22</span>
 
@@ -2483,7 +2489,9 @@ document.write(`
 <span class="sd">        Complexity parameter used for Minimal Cost-Complexity Pruning. The</span>
 <span class="sd">        subtree with the largest cost complexity that is smaller than</span>
 <span class="sd">        ``ccp_alpha`` will be chosen. By default, no pruning is performed. See</span>
-<span class="sd">        :ref:`minimal_cost_complexity_pruning` for details.</span>
+<span class="sd">        :ref:`minimal_cost_complexity_pruning` for details. See</span>
+<span class="sd">        :ref:`sphx_glr_auto_examples_tree_plot_cost_complexity_pruning.py`</span>
+<span class="sd">        for an example of such pruning.</span>
 
 <span class="sd">        .. versionadded:: 0.22</span>
 
@@ -2788,7 +2796,9 @@ document.write(`
 <span class="sd">        Complexity parameter used for Minimal Cost-Complexity Pruning. The</span>
 <span class="sd">        subtree with the largest cost complexity that is smaller than</span>
 <span class="sd">        ``ccp_alpha`` will be chosen. By default, no pruning is performed. See</span>
-<span class="sd">        :ref:`minimal_cost_complexity_pruning` for details.</span>
+<span class="sd">        :ref:`minimal_cost_complexity_pruning` for details. See</span>
+<span class="sd">        :ref:`sphx_glr_auto_examples_tree_plot_cost_complexity_pruning.py`</span>
+<span class="sd">        for an example of such pruning.</span>
 
 <span class="sd">        .. versionadded:: 0.22</span>
 
@@ -2984,7 +2994,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, treeple Developers. Last updated on 2024-09-11.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-10-10.
       <br/>
     
   </p>

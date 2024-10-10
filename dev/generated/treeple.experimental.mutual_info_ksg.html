@@ -541,25 +541,25 @@ document.write(`
 <dt><strong>Z</strong><span class="classifier">ArrayLike of shape (n_samples, n_features_z), optional</span></dt><dd><p>The Z covariate space, by default None. If None, then the MI is computed.
 If Z is defined, then the CMI is computed.</p>
 </dd>
-<dt><strong>k</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, optional</span></dt><dd><p>The number of neighbors to use in defining the radius, by default 0.2.</p>
+<dt><strong>k</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, optional</span></dt><dd><p>The number of neighbors to use in defining the radius, by default 0.2.</p>
 </dd>
-<dt><strong>metric</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>Any distance metric accepted by <a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.neighbors.NearestNeighbors.html#sklearn.neighbors.NearestNeighbors" title="(in scikit-learn v1.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.neighbors.NearestNeighbors</span></code></a>.
+<dt><strong>metric</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>Any distance metric accepted by <a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.neighbors.NearestNeighbors.html#sklearn.neighbors.NearestNeighbors" title="(in scikit-learn v1.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.neighbors.NearestNeighbors</span></code></a>.
 If ‘forest’ (default), then uses an
 <a class="reference internal" href="treeple.UnsupervisedObliqueRandomForest.html#treeple.UnsupervisedObliqueRandomForest" title="treeple.UnsupervisedObliqueRandomForest"><code class="xref py py-class docutils literal notranslate"><span class="pre">treeple.UnsupervisedObliqueRandomForest</span></code></a> to compute geodesic distances.</p>
 </dd>
-<dt><strong>algorithm</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>Method to use, by default ‘knn’. Can be (‘ball_tree’, ‘kd_tree’, ‘brute’).</p>
+<dt><strong>algorithm</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>Method to use, by default ‘knn’. Can be (‘ball_tree’, ‘kd_tree’, ‘brute’).</p>
 </dd>
-<dt><strong>n_jobs</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>Number of parallel jobs, by default -1.</p>
+<dt><strong>n_jobs</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>Number of parallel jobs, by default -1.</p>
 </dd>
 <dt><strong>transform</strong><span class="classifier">one of {‘rank’, ‘standardize’, ‘uniform’}</span></dt><dd><p>Preprocessing, by default “rank”.</p>
 </dd>
-<dt><strong>random_seed</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>Random seed, by default None.</p>
+<dt><strong>random_seed</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>Random seed, by default None.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>val</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>The estimated MI, or CMI value.</p>
+<dt><strong>val</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>The estimated MI, or CMI value.</p>
 </dd>
 </dl>
 </dd>
@@ -659,7 +659,7 @@ X, Y, XZ, etc. subspaces. This term does not include the sample itself.</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, treeple Developers. Last updated on 2024-09-11.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-10-10.
       <br/>
     
   </p>

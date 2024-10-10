@@ -446,7 +446,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">_fit_context</span><span class="p">,</span> <span class="n">clone</span>
 <span class="kn">from</span> <span class="nn">sklearn.ensemble._base</span> <span class="kn">import</span> <span class="n">_partition_estimators</span><span class="p">,</span> <span class="n">_set_random_states</span>
 <span class="kn">from</span> <span class="nn">sklearn.utils</span> <span class="kn">import</span> <span class="n">compute_sample_weight</span><span class="p">,</span> <span class="n">resample</span>
-<span class="kn">from</span> <span class="nn">sklearn.utils._param_validation</span> <span class="kn">import</span> <span class="n">Interval</span><span class="p">,</span> <span class="n">RealNotInt</span><span class="p">,</span> <span class="n">StrOptions</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils._param_validation</span> <span class="kn">import</span> <span class="n">HasMethods</span><span class="p">,</span> <span class="n">Interval</span><span class="p">,</span> <span class="n">RealNotInt</span><span class="p">,</span> <span class="n">StrOptions</span>
 <span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">check_is_fitted</span>
 
 <span class="kn">from</span> <span class="nn">.._lib.sklearn.ensemble._forest</span> <span class="kn">import</span> <span class="n">ForestClassifier</span>
@@ -855,11 +855,18 @@ document.write(`
         <span class="n">Interval</span><span class="p">(</span><span class="n">RealNotInt</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span>
         <span class="n">Interval</span><span class="p">(</span><span class="n">Integral</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">),</span>
     <span class="p">]</span>
-    <span class="n">_parameter_constraints</span><span class="p">[</span><span class="s2">&quot;honest_fraction&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">Interval</span><span class="p">(</span><span class="n">RealNotInt</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">)]</span>
-    <span class="n">_parameter_constraints</span><span class="p">[</span><span class="s2">&quot;honest_prior&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">StrOptions</span><span class="p">({</span><span class="s2">&quot;empirical&quot;</span><span class="p">,</span> <span class="s2">&quot;uniform&quot;</span><span class="p">,</span> <span class="s2">&quot;ignore&quot;</span><span class="p">}),</span>
-    <span class="p">]</span>
-    <span class="n">_parameter_constraints</span><span class="p">[</span><span class="s2">&quot;stratify&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;boolean&quot;</span><span class="p">]</span>
+    <span class="n">_parameter_constraints</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;tree_estimator&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">HasMethods</span><span class="p">([</span><span class="s2">&quot;fit&quot;</span><span class="p">,</span> <span class="s2">&quot;predict&quot;</span><span class="p">,</span> <span class="s2">&quot;predict_proba&quot;</span><span class="p">,</span> <span class="s2">&quot;apply&quot;</span><span class="p">]),</span>
+                <span class="kc">None</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;honest_fraction&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">Interval</span><span class="p">(</span><span class="n">RealNotInt</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s2">&quot;neither&quot;</span><span class="p">)],</span>
+            <span class="s2">&quot;honest_prior&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">StrOptions</span><span class="p">({</span><span class="s2">&quot;empirical&quot;</span><span class="p">,</span> <span class="s2">&quot;uniform&quot;</span><span class="p">,</span> <span class="s2">&quot;ignore&quot;</span><span class="p">})],</span>
+            <span class="s2">&quot;stratify&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;boolean&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;tree_estimator_params&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;dict&quot;</span><span class="p">],</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1322,7 +1329,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, treeple Developers. Last updated on 2024-09-11.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-10-10.
       <br/>
     
   </p>

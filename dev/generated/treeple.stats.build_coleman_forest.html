@@ -550,30 +550,30 @@ For full details, see <a class="footnote-reference brackets" href="#footcite-col
 <dt><strong>covariate_index</strong><span class="classifier">ArrayLike, optional of shape (n_covariates,)</span></dt><dd><p>The index array of covariates to shuffle, by default None, which
 defaults to all covariates.</p>
 </dd>
-<dt><strong>metric</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>The metric to compute, by default “<a class="reference external" href="mailto:s&#37;&#52;&#48;98">s<span>&#64;</span>98</a>”, for sensitivity at
+<dt><strong>metric</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>The metric to compute, by default “<a class="reference external" href="mailto:s&#37;&#52;&#48;98">s<span>&#64;</span>98</a>”, for sensitivity at
 98% specificity.</p>
 </dd>
-<dt><strong>n_repeats</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>Number of times to bootstrap sample the two forests to construct
+<dt><strong>n_repeats</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>Number of times to bootstrap sample the two forests to construct
 the null distribution, by default 10000. The construction of the
 null forests will be parallelized according to the <code class="docutils literal notranslate"><span class="pre">n_jobs</span></code>
 argument of the <code class="docutils literal notranslate"><span class="pre">est</span></code> forest.</p>
 </dd>
-<dt><strong>verbose</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>Verbosity, by default False.</p>
+<dt><strong>verbose</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>Verbosity, by default False.</p>
 </dd>
-<dt><strong>seed</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>Random seed, by default None.</p>
+<dt><strong>seed</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>Random seed, by default None.</p>
 </dd>
-<dt><strong>return_posteriors</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>Whether or not to return the posteriors, by default True.</p>
+<dt><strong>return_posteriors</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>Whether or not to return the posteriors, by default True.</p>
 </dd>
-<dt><strong>**metric_kwargs</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">dict</span></code></a>, optional</span></dt><dd><p>Additional keyword arguments to pass to the metric function.</p>
+<dt><strong>**metric_kwargs</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">dict</span></code></a>, optional</span></dt><dd><p>Additional keyword arguments to pass to the metric function.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>observe_stat</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>The test statistic. To compute the test statistic, take
+<dt><strong>observe_stat</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>The test statistic. To compute the test statistic, take
 <code class="docutils literal notranslate"><span class="pre">permute_stat_</span></code> and subtract <code class="docutils literal notranslate"><span class="pre">observe_stat_</span></code>.</p>
 </dd>
-<dt><strong>pvalue</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>The p-value of the test statistic.</p>
+<dt><strong>pvalue</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>The p-value of the test statistic.</p>
 </dd>
 <dt><strong>orig_forest_proba</strong><span class="classifier">ArrayLike of shape (n_estimators, n_samples, n_outputs)</span></dt><dd><p>The predicted posterior probabilities for each estimator on their
 out of bag samples.</p>
@@ -680,7 +680,7 @@ on their out of bag samples.</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, treeple Developers. Last updated on 2024-09-11.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-10-10.
       <br/>
     
   </p>

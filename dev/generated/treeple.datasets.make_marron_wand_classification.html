@@ -542,15 +542,15 @@ that follows <a class="footnote-reference brackets" href="#footcite-bickel-2008"
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>n_samples</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>Number of sample to generate. Must be an even number, else the total number of samples generated will be <code class="docutils literal notranslate"><span class="pre">n_samples</span> <span class="pre">-</span> <span class="pre">1</span></code>.</p>
+<dt><strong>n_samples</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>Number of sample to generate. Must be an even number, else the total number of samples generated will be <code class="docutils literal notranslate"><span class="pre">n_samples</span> <span class="pre">-</span> <span class="pre">1</span></code>.</p>
 </dd>
-<dt><strong>n_dim</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>The dimensionality of the dataset and the number of
+<dt><strong>n_dim</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>The dimensionality of the dataset and the number of
 unique labels, by default 4096.</p>
 </dd>
-<dt><strong>n_informative</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>The informative dimensions. All others for <code class="docutils literal notranslate"><span class="pre">n_dim</span> <span class="pre">-</span> <span class="pre">n_informative</span></code>
+<dt><strong>n_informative</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>The informative dimensions. All others for <code class="docutils literal notranslate"><span class="pre">n_dim</span> <span class="pre">-</span> <span class="pre">n_informative</span></code>
 are Gaussian noise. Default is 256.</p>
 </dd>
-<dt><strong>simulation</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>Which simulation to run. Must be one of the
+<dt><strong>simulation</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>Which simulation to run. Must be one of the
 following Marron-Wand simulations: ‘gaussian’, ‘skewed_unimodal’, ‘strongly_skewed’,
 ‘kurtotic_unimodal’, ‘outlier’, ‘bimodal’, ‘separated_bimodal’, ‘skewed_bimodal’,
 ‘trimodal’, ‘claw’, ‘double_claw’, ‘asymmetric_claw’, ‘asymmetric_double_claw’,
@@ -559,16 +559,16 @@ When calling the Marron-Wand simulations, only the covariance parameters are con
 (<code class="docutils literal notranslate"><span class="pre">rho</span></code> and <code class="docutils literal notranslate"><span class="pre">band_type</span></code>). Means are taken from <a class="footnote-reference brackets" href="#footcite-marron1992exact" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.
 By default ‘gaussian’.</p>
 </dd>
-<dt><strong>rho</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, optional</span></dt><dd><p>The covariance value of the bands. By default 0 indicating, an identity matrix is used.</p>
+<dt><strong>rho</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, optional</span></dt><dd><p>The covariance value of the bands. By default 0 indicating, an identity matrix is used.</p>
 </dd>
-<dt><strong>band_type</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>The band type to use. For details, see Example 1 and 2 in <a class="footnote-reference brackets" href="#footcite-bickel-2008" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.
+<dt><strong>band_type</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>The band type to use. For details, see Example 1 and 2 in <a class="footnote-reference brackets" href="#footcite-bickel-2008" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.
 Either ‘ma’, or ‘ar’.</p>
 </dd>
-<dt><strong>return_params</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>Whether or not to return the distribution parameters of the classes normal distributions.</p>
+<dt><strong>return_params</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>Whether or not to return the distribution parameters of the classes normal distributions.</p>
 </dd>
-<dt><strong>scaling_factor</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, optional</span></dt><dd><p>The scaling factor for the covariance matrix. By default 1.</p>
+<dt><strong>scaling_factor</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, optional</span></dt><dd><p>The scaling factor for the covariance matrix. By default 1.</p>
 </dd>
-<dt><strong>seed</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>Random seed, by default None.</p>
+<dt><strong>seed</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>Random seed, by default None.</p>
 </dd>
 </dl>
 </dd>
@@ -693,7 +693,7 @@ Full details for the trunk simulation can be found in <a class="footnote-referen
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, treeple Developers. Last updated on 2024-09-11.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-10-10.
       <br/>
     
   </p>

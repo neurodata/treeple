@@ -437,6 +437,7 @@ document.write(`
 <span></span><span class="kn">import</span> <span class="nn">threading</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">joblib</span> <span class="kn">import</span> <span class="n">Parallel</span><span class="p">,</span> <span class="n">delayed</span>
@@ -446,6 +447,8 @@ document.write(`
 <span class="kn">from</span> <span class="nn">sklearn.utils.multiclass</span> <span class="kn">import</span> <span class="n">type_of_target</span>
 
 <span class="kn">from</span> <span class="nn">.._lib.sklearn.ensemble._forest</span> <span class="kn">import</span> <span class="n">ForestClassifier</span>
+<span class="kn">from</span> <span class="nn">..ensemble</span> <span class="kn">import</span> <span class="n">HonestForestClassifier</span>
+<span class="kn">from</span> <span class="nn">..tree</span> <span class="kn">import</span> <span class="n">MultiViewDecisionTreeClassifier</span>
 <span class="kn">from</span> <span class="nn">..tree._classes</span> <span class="kn">import</span> <span class="n">DTYPE</span>
 <span class="kn">from</span> <span class="nn">.permuteforest</span> <span class="kn">import</span> <span class="n">PermutationHonestForestClassifier</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">METRIC_FUNCTIONS</span><span class="p">,</span> <span class="n">POSITIVE_METRICS</span><span class="p">,</span> <span class="n">_compute_null_distribution_coleman</span>
@@ -476,8 +479,8 @@ document.write(`
 <div class="viewcode-block" id="build_coleman_forest">
 <a class="viewcode-back" href="../../../generated/treeple.stats.build_coleman_forest.html#treeple.stats.build_coleman_forest">[docs]</a>
 <span class="k">def</span> <span class="nf">build_coleman_forest</span><span class="p">(</span>
-    <span class="n">est</span><span class="p">,</span>
-    <span class="n">perm_est</span><span class="p">,</span>
+    <span class="n">est</span><span class="p">:</span> <span class="n">HonestForestClassifier</span><span class="p">,</span>
+    <span class="n">perm_est</span><span class="p">:</span> <span class="n">PermutationHonestForestClassifier</span><span class="p">,</span>
     <span class="n">X</span><span class="p">,</span>
     <span class="n">y</span><span class="p">,</span>
     <span class="n">covariate_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -549,6 +552,9 @@ document.write(`
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">metric_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">ArrayLike</span><span class="p">,</span> <span class="n">ArrayLike</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">METRIC_FUNCTIONS</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span>
 
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">est</span><span class="p">,</span> <span class="n">HonestForestClassifier</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Original forest must be a HonestForestClassifier, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">est</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
     <span class="c1"># build two sets of forests</span>
     <span class="n">est</span><span class="p">,</span> <span class="n">orig_forest_proba</span> <span class="o">=</span> <span class="n">build_oob_forest</span><span class="p">(</span><span class="n">est</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
 
@@ -556,6 +562,14 @@ document.write(`
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Permutation forest must be a PermutationHonestForestClassifier, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">perm_est</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">covariate_index</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">est</span><span class="o">.</span><span class="n">tree_estimator</span><span class="p">,</span> <span class="n">MultiViewDecisionTreeClassifier</span><span class="p">):</span>
+        <span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;Covariate index is not defined, but a MultiViewDecisionTreeClassifier is used. &quot;</span>
+            <span class="s2">&quot;If using CoMIGHT, one should define the covariate index to permute. &quot;</span>
+            <span class="s2">&quot;Defaulting to use MIGHT.&quot;</span>
+        <span class="p">)</span>
+
     <span class="n">perm_est</span><span class="p">,</span> <span class="n">perm_forest_proba</span> <span class="o">=</span> <span class="n">build_oob_forest</span><span class="p">(</span>
         <span class="n">perm_est</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">covariate_index</span><span class="o">=</span><span class="n">covariate_index</span>
     <span class="p">)</span>
@@ -718,7 +732,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, treeple Developers. Last updated on 2024-09-11.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-10-10.
       <br/>
     
   </p>

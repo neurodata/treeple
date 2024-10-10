@@ -545,33 +545,33 @@ that follows <a class="footnote-reference brackets" href="#footcite-bickel-2008"
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>n_samples</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>Number of sample to generate. Must be an even number, else the total number of samples generated will be <code class="docutils literal notranslate"><span class="pre">n_samples</span> <span class="pre">-</span> <span class="pre">1</span></code>.</p>
+<dt><strong>n_samples</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>Number of sample to generate. Must be an even number, else the total number of samples generated will be <code class="docutils literal notranslate"><span class="pre">n_samples</span> <span class="pre">-</span> <span class="pre">1</span></code>.</p>
 </dd>
-<dt><strong>n_dim</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>The dimensionality of the dataset and the number of
+<dt><strong>n_dim</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>The dimensionality of the dataset and the number of
 unique labels, by default 4096.</p>
 </dd>
-<dt><strong>n_informative</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>The informative dimensions. All others for <code class="docutils literal notranslate"><span class="pre">n_dim</span> <span class="pre">-</span> <span class="pre">n_informative</span></code>
+<dt><strong>n_informative</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>The informative dimensions. All others for <code class="docutils literal notranslate"><span class="pre">n_dim</span> <span class="pre">-</span> <span class="pre">n_informative</span></code>
 are Gaussian noise. Default is 256.</p>
 </dd>
-<dt><strong>mu_0</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>The mean of the first distribution. By default -1. The mean of the distribution will decrease
+<dt><strong>mu_0</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>The mean of the first distribution. By default -1. The mean of the distribution will decrease
 by a factor of <code class="docutils literal notranslate"><span class="pre">sqrt(i)</span></code> for each dimension <code class="docutils literal notranslate"><span class="pre">i</span></code>.</p>
 </dd>
-<dt><strong>mu_1</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>The mean of the second distribution. By default 1. The mean of the distribution will decrease
+<dt><strong>mu_1</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>The mean of the second distribution. By default 1. The mean of the distribution will decrease
 by a factor of <code class="docutils literal notranslate"><span class="pre">sqrt(i)</span></code> for each dimension <code class="docutils literal notranslate"><span class="pre">i</span></code>.</p>
 </dd>
-<dt><strong>rho</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, optional</span></dt><dd><p>The covariance value of the bands. By default 0 indicating, an identity matrix is used.</p>
+<dt><strong>rho</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, optional</span></dt><dd><p>The covariance value of the bands. By default 0 indicating, an identity matrix is used.</p>
 </dd>
-<dt><strong>band_type</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>The band type to use. For details, see Example 1 and 2 in <a class="footnote-reference brackets" href="#footcite-bickel-2008" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.
+<dt><strong>band_type</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>The band type to use. For details, see Example 1 and 2 in <a class="footnote-reference brackets" href="#footcite-bickel-2008" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.
 Either ‘ma’, or ‘ar’.</p>
 </dd>
-<dt><strong>return_params</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>Whether or not to return the distribution parameters of the classes normal distributions.</p>
+<dt><strong>return_params</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>Whether or not to return the distribution parameters of the classes normal distributions.</p>
 </dd>
-<dt><strong>mix</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>The probabilities associated with the mixture of Gaussians in the <code class="docutils literal notranslate"><span class="pre">trunk-mix</span></code> simulation.
+<dt><strong>mix</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>The probabilities associated with the mixture of Gaussians in the <code class="docutils literal notranslate"><span class="pre">trunk-mix</span></code> simulation.
 By default 0.5.</p>
 </dd>
-<dt><strong>scaling_factor</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, optional</span></dt><dd><p>The scaling factor for the covariance matrix. By default 1.</p>
+<dt><strong>scaling_factor</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, optional</span></dt><dd><p>The scaling factor for the covariance matrix. By default 1.</p>
 </dd>
-<dt><strong>seed</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>Random seed, by default None.</p>
+<dt><strong>seed</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>Random seed, by default None.</p>
 </dd>
 </dl>
 </dd>
@@ -581,10 +581,10 @@ By default 0.5.</p>
 </dd>
 <dt><strong>y</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a> of shape (n_samples,), dtype=np.intp</span></dt><dd><p>Labels of the dataset.</p>
 </dd>
-<dt><strong>means</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of ArrayLike of shape (n_dim,), dtype=np.float64</span></dt><dd><p>The mean vector for each class starting with class 0.
+<dt><strong>means</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of ArrayLike of shape (n_dim,), dtype=np.float64</span></dt><dd><p>The mean vector for each class starting with class 0.
 Returned if <code class="docutils literal notranslate"><span class="pre">return_params</span></code> is True.</p>
 </dd>
-<dt><strong>covs</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of ArrayLike of shape (n_dim, n_dim), dtype=np.float64</span></dt><dd><p>The covariance for each class. Returned if <code class="docutils literal notranslate"><span class="pre">return_params</span></code> is True.</p>
+<dt><strong>covs</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of ArrayLike of shape (n_dim, n_dim), dtype=np.float64</span></dt><dd><p>The covariance for each class. Returned if <code class="docutils literal notranslate"><span class="pre">return_params</span></code> is True.</p>
 </dd>
 <dt><strong>X_mixture</strong><span class="classifier"><a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np.ndarray</span></code></a> of shape (n_samples, n_dim), dtype=np.float64</span></dt><dd><p>The mixture of Gaussians.
 Returned if <code class="docutils literal notranslate"><span class="pre">return_params</span></code> is True.</p>
@@ -703,7 +703,7 @@ from one dimension to the next.</p>
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, treeple Developers. Last updated on 2024-09-11.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-10-10.
       <br/>
     
   </p>
