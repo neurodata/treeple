@@ -128,7 +128,8 @@ def build_coleman_forest(
     if covariate_index is None and isinstance(est.tree_estimator, MultiViewDecisionTreeClassifier):
         warn(
             "Covariate index is not defined, but a MultiViewDecisionTreeClassifier is used. "
-            "If using CoMIGHT, one should define the covariate index to permute."
+            "If using CoMIGHT, one should define the covariate index to permute. "
+            "Defaulting to use MIGHT."
         )
 
     perm_est, perm_forest_proba = build_oob_forest(
