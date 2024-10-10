@@ -10,7 +10,7 @@ from joblib import Parallel, delayed
 from sklearn.base import _fit_context, clone
 from sklearn.ensemble._base import _partition_estimators, _set_random_states
 from sklearn.utils import compute_sample_weight, resample
-from sklearn.utils._param_validation import Interval, RealNotInt, StrOptions
+from sklearn.utils._param_validation import HasMethods, Interval, RealNotInt, StrOptions
 from sklearn.utils.validation import check_is_fitted
 
 from .._lib.sklearn.ensemble._forest import ForestClassifier
@@ -417,11 +417,18 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
         Interval(RealNotInt, 0.0, None, closed="right"),
         Interval(Integral, 1, None, closed="left"),
     ]
-    _parameter_constraints["honest_fraction"] = [Interval(RealNotInt, 0.0, 1.0, closed="both")]
-    _parameter_constraints["honest_prior"] = [
-        StrOptions({"empirical", "uniform", "ignore"}),
-    ]
-    _parameter_constraints["stratify"] = ["boolean"]
+    _parameter_constraints.update(
+        {
+            "tree_estimator": [
+                HasMethods(["fit", "predict", "predict_proba", "apply"]),
+                None,
+            ],
+            "honest_fraction": [Interval(RealNotInt, 0.0, 1.0, closed="neither")],
+            "honest_prior": [StrOptions({"empirical", "uniform", "ignore"})],
+            "stratify": ["boolean"],
+            "tree_estimator_params": ["dict"],
+        }
+    )
 
     def __init__(
         self,

@@ -430,3 +430,30 @@ def test_build_oob_random_forest():
         assert len(np.unique(structure_samples[tree_idx])) + len(oob_samples_list[tree_idx]) == len(
             samples
         ), f"{tree_idx} {len(structure_samples[tree_idx])} + {len(oob_samples_list[tree_idx])} != {len(samples)}"
+
+
+def test_build_coleman_warning_with_multiview_without_covariate_index():
+    """Test warning is raised in build_coleman_forest with multiview without covariate_index."""
+
+    est = HonestForestClassifier(
+        n_estimators=100,
+        random_state=0,
+        bootstrap=True,
+        max_samples=1.0,
+        honest_fraction=0.5,
+        stratify=True,
+        tree_estimator=MultiViewDecisionTreeClassifier(),
+    )
+    perm_est = PermutationHonestForestClassifier(
+        n_estimators=100,
+        random_state=0,
+        bootstrap=True,
+        max_samples=1.0,
+        honest_fraction=0.5,
+        stratify=True,
+        tree_estimator=MultiViewDecisionTreeClassifier(),
+    )
+    X = rng.normal(0, 1, (100, 2))
+    y = np.array([0, 1] * 50)
+    with pytest.warns(UserWarning, match="Covariate index is not defined"):
+        build_coleman_forest(est, perm_est, X, y, metric="s@98", n_repeats=1000, seed=0)

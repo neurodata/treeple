@@ -284,6 +284,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         "honest_fraction": [Interval(RealNotInt, 0.0, 1.0, closed="neither")],
         "honest_prior": [StrOptions({"empirical", "uniform", "ignore"})],
         "stratify": ["boolean"],
+        "tree_estimator_params": ["dict"],
     }
 
     def __init__(
