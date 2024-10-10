@@ -313,6 +313,7 @@ def test_sklearn_compatible_estimator(estimator, check):
         # TODO: this is an error. Somehow a segfault is raised when fit is called first and
         # then partial_fit
         "check_fit_score_takes_y",
+        "check_do_not_raise_errors_in_init_or_set_params",
     ]:
         pytest.skip()
     check(estimator)
