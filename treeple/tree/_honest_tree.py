@@ -309,6 +309,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         "honest_prior": [StrOptions({"empirical", "uniform", "ignore"})],
         "honest_method": [StrOptions({"apply", "prune"}), None],
         "stratify": ["boolean"],
+        "tree_estimator_params": ["dict"],
     }
     _parameter_constraints.pop("max_features")
     _parameter_constraints["max_features"] = [

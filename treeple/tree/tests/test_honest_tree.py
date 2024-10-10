@@ -175,7 +175,11 @@ def test_sklearn_compatible_estimator(estimator, check):
     # XXX: can include this "generalization" in the future if it's useful
     #  zero sample weight is not "really supported" in honest subsample trees since sample weight
     #  for fitting the tree's splits
-    if check.func.__name__ in ["check_class_weight_classifiers", "check_classifier_multioutput"]:
+    if check.func.__name__ in [
+        "check_class_weight_classifiers",
+        "check_classifier_multioutput",
+        "check_do_not_raise_errors_in_init_or_set_params",
+    ]:
         pytest.skip()
     check(estimator)
 

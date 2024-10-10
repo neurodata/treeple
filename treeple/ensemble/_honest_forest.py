@@ -10,7 +10,7 @@ from joblib import Parallel, delayed
 from sklearn.base import _fit_context, clone
 from sklearn.ensemble._base import _partition_estimators, _set_random_states
 from sklearn.utils import compute_sample_weight, resample
-from sklearn.utils._param_validation import Interval, RealNotInt, StrOptions
+from sklearn.utils._param_validation import HasMethods, Interval, RealNotInt, StrOptions
 from sklearn.utils.validation import check_is_fitted
 
 from .._lib.sklearn.ensemble._forest import ForestClassifier
@@ -429,7 +429,18 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
         Interval(RealNotInt, 0.0, None, closed="right"),
         Interval(Integral, 1, None, closed="left"),
     ]
-    _parameter_constraints["stratify"] = ["boolean"]
+    _parameter_constraints.update(
+        {
+            "tree_estimator": [
+                HasMethods(["fit", "predict", "predict_proba", "apply"]),
+                None,
+            ],
+            "honest_fraction": [Interval(RealNotInt, 0.0, 1.0, closed="neither")],
+            "honest_prior": [StrOptions({"empirical", "uniform", "ignore"})],
+            "stratify": ["boolean"],
+            "tree_estimator_params": ["dict"],
+        }
+    )
 
     def __init__(
         self,
@@ -731,8 +742,12 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
             oob_samples.append(_oob_samples)
         return oob_samples
 
-    def _more_tags(self):
-        return {"multioutput": False}
+    def __sklearn_tags__(self):
+        # XXX: nans should be supportable in HRF
+        tags = super().__sklearn_tags__()
+        tags.classifier_tags.multi_output = False
+        tags.input_tags.allow_nan = False
+        return tags
 
     def decision_path(self, X):
         """

@@ -80,7 +80,11 @@ print(incdir)
 endif
 
 inc_np = include_directories(incdir_numpy)
-np_dep = declare_dependency(include_directories: inc_np)
+# Don't use the deprecated NumPy C API. Define this to a fixed version instead of
+# NPY_API_VERSION in order not to break compilation for released SciPy versions
+# when NumPy introduces a new deprecation.
+numpy_no_deprecated_api = ['-DNPY_NO_DEPRECATED_API=NPY_1_9_API_VERSION']
+np_dep = declare_dependency(include_directories: inc_np, compile_args: numpy_no_deprecated_api)
 
 cc = meson.get_compiler('c')
 
@@ -91,7 +95,6 @@ cc = meson.get_compiler('c')
 # py.extension_module('_name',
 #   'source_fname',
 #   numpy_nodepr_api)
-numpy_nodepr_api = '-DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION'
 
 # TODO XXX: ENABLE WHEN DEBUGGING
 boundscheck = 'False'
@@ -100,13 +103,12 @@ scikit_learn_cython_args = [
   '-X language_level=3', '-X boundscheck=' + boundscheck, '-X wraparound=False',
   '-X initializedcheck=False', '-X nonecheck=False', '-X cdivision=True',
   '-X profile=False',
+  '-X embedsignature=True',
   # Needed for cython imports across subpackages, e.g. cluster pyx that
   # cimports metrics pxd
   '--include-dir', meson.global_build_root(),
 ]
 cython_c_args += scikit_learn_cython_args
-
-c_args += numpy_nodepr_api
 
 python_sources = [
   '__init__.py',
