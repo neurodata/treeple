@@ -451,7 +451,12 @@ document.write(`
 <span class="kn">from</span> <span class="nn">..tree</span> <span class="kn">import</span> <span class="n">MultiViewDecisionTreeClassifier</span>
 <span class="kn">from</span> <span class="nn">..tree._classes</span> <span class="kn">import</span> <span class="n">DTYPE</span>
 <span class="kn">from</span> <span class="nn">.permuteforest</span> <span class="kn">import</span> <span class="n">PermutationHonestForestClassifier</span>
-<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">METRIC_FUNCTIONS</span><span class="p">,</span> <span class="n">POSITIVE_METRICS</span><span class="p">,</span> <span class="n">_compute_null_distribution_coleman</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">METRIC_FUNCTIONS</span><span class="p">,</span>
+    <span class="n">POSITIVE_METRICS</span><span class="p">,</span>
+    <span class="n">_compute_null_distribution_coleman</span><span class="p">,</span>
+    <span class="n">_compute_null_distribution_coleman_sparse</span><span class="p">,</span>
+<span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_parallel_predict_proba_oob</span><span class="p">(</span><span class="n">predict_proba</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">test_idx</span><span class="p">,</span> <span class="n">lock</span><span class="p">):</span>
@@ -468,6 +473,20 @@ document.write(`
     <span class="k">with</span> <span class="n">lock</span><span class="p">:</span>
         <span class="n">out</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">test_idx</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">prediction</span><span class="p">[</span><span class="n">test_idx</span><span class="p">,</span> <span class="p">:]</span>
     <span class="k">return</span> <span class="n">prediction</span>
+
+
+<span class="k">def</span> <span class="nf">_parallel_predict_proba_oob_sparse</span><span class="p">(</span><span class="n">predict_proba</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">test_idx</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is a utility function for joblib&#39;s Parallel.</span>
+<span class="sd">    It can&#39;t go locally in ForestClassifier or ForestRegressor, because joblib</span>
+<span class="sd">    complains that it cannot pickle it when placed there. Different from</span>
+<span class="sd">    _parallel_predict_proba_oob, this function returns the predictions and</span>
+<span class="sd">    indices for those values that are finite (not nan or inf).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># each tree predicts proba with a list of output (n_samples, n_classes[i])</span>
+    <span class="n">prediction</span> <span class="o">=</span> <span class="n">predict_proba</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">test_idx</span><span class="p">,</span> <span class="p">:],</span> <span class="n">check_input</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">good_value_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">prediction</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">test_idx</span><span class="p">[</span><span class="n">good_value_mask</span><span class="p">],</span> <span class="n">prediction</span><span class="p">[</span><span class="n">good_value_mask</span><span class="p">]</span>
 
 
 <span class="n">ForestTestResult</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span>
@@ -489,6 +508,7 @@ document.write(`
     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">return_posteriors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">use_sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a hypothesis testing forest using a two-forest approach.</span>
@@ -527,6 +547,9 @@ document.write(`
 <span class="sd">        Random seed, by default None.</span>
 <span class="sd">    return_posteriors : bool, optional</span>
 <span class="sd">        Whether or not to return the posteriors, by default True.</span>
+<span class="sd">    use_sparse : bool, optional</span>
+<span class="sd">        Whether or not to use a sparse for the calculation of the permutation</span>
+<span class="sd">        statistics, by default False. Doesn&#39;t affect return values.</span>
 <span class="sd">    **metric_kwargs : dict, optional</span>
 <span class="sd">        Additional keyword arguments to pass to the metric function.</span>
 
@@ -556,7 +579,7 @@ document.write(`
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Original forest must be a HonestForestClassifier, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">est</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># build two sets of forests</span>
-    <span class="n">est</span><span class="p">,</span> <span class="n">orig_forest_proba</span> <span class="o">=</span> <span class="n">build_oob_forest</span><span class="p">(</span><span class="n">est</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="n">est</span><span class="p">,</span> <span class="n">orig_forest_proba</span> <span class="o">=</span> <span class="n">build_oob_forest</span><span class="p">(</span><span class="n">est</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">use_sparse</span><span class="o">=</span><span class="n">use_sparse</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">perm_est</span><span class="p">,</span> <span class="n">PermutationHonestForestClassifier</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
@@ -571,7 +594,12 @@ document.write(`
         <span class="p">)</span>
 
     <span class="n">perm_est</span><span class="p">,</span> <span class="n">perm_forest_proba</span> <span class="o">=</span> <span class="n">build_oob_forest</span><span class="p">(</span>
-        <span class="n">perm_est</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">covariate_index</span><span class="o">=</span><span class="n">covariate_index</span>
+        <span class="n">perm_est</span><span class="p">,</span>
+        <span class="n">X</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">,</span>
+        <span class="n">use_sparse</span><span class="o">=</span><span class="n">use_sparse</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+        <span class="n">covariate_index</span><span class="o">=</span><span class="n">covariate_index</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="c1"># get the number of jobs</span>
@@ -579,21 +607,57 @@ document.write(`
 
     <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">metric_star</span><span class="p">,</span> <span class="n">metric_star_pi</span> <span class="o">=</span> <span class="n">_compute_null_distribution_coleman</span><span class="p">(</span>
-        <span class="n">y</span><span class="p">,</span>
-        <span class="n">orig_forest_proba</span><span class="p">,</span>
-        <span class="n">perm_forest_proba</span><span class="p">,</span>
-        <span class="n">metric</span><span class="p">,</span>
-        <span class="n">n_repeats</span><span class="o">=</span><span class="n">n_repeats</span><span class="p">,</span>
-        <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
-        <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">,</span>
-    <span class="p">)</span>
 
-    <span class="n">y_pred_proba_orig</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">orig_forest_proba</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="n">y_pred_proba_perm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">perm_forest_proba</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="n">observe_stat</span> <span class="o">=</span> <span class="n">metric_func</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_pred_proba_orig</span><span class="p">,</span> <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">)</span>
-    <span class="n">permute_stat</span> <span class="o">=</span> <span class="n">metric_func</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_pred_proba_perm</span><span class="p">,</span> <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">use_sparse</span><span class="p">:</span>
+        <span class="n">y_pred_proba_orig_perm</span><span class="p">,</span> <span class="n">observe_stat</span><span class="p">,</span> <span class="n">permute_stat</span><span class="p">,</span> <span class="n">metric_star</span><span class="p">,</span> <span class="n">metric_star_pi</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">_compute_null_distribution_coleman_sparse</span><span class="p">(</span>
+                <span class="n">y</span><span class="p">,</span>
+                <span class="n">orig_forest_proba</span><span class="p">,</span>
+                <span class="n">perm_forest_proba</span><span class="p">,</span>
+                <span class="n">metric</span><span class="p">,</span>
+                <span class="n">n_repeats</span><span class="o">=</span><span class="n">n_repeats</span><span class="p">,</span>
+                <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+                <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># if we are returning the posteriors, then we need to replace the</span>
+        <span class="c1"># sparse indices and values with an array. We convert the sparse data</span>
+        <span class="c1"># to dense data, so that the function returns results in a consistent format.</span>
+        <span class="k">if</span> <span class="n">return_posteriors</span><span class="p">:</span>
+            <span class="n">n_trees</span> <span class="o">=</span> <span class="n">y_pred_proba_orig_perm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span>
+            <span class="n">n_samples</span> <span class="o">=</span> <span class="n">y_pred_proba_orig_perm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">to_coords_data</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">row</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span> <span class="n">x</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span> <span class="n">x</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+            <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">to_coords_data</span><span class="p">(</span><span class="n">y_pred_proba_orig_perm</span><span class="p">[:</span><span class="n">n_trees</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">tocoo</span><span class="p">())</span>
+            <span class="n">orig_forest_proba</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_trees</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+            <span class="n">orig_forest_proba</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+
+            <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">to_coords_data</span><span class="p">(</span><span class="n">y_pred_proba_orig_perm</span><span class="p">[</span><span class="n">n_trees</span><span class="p">:,</span> <span class="p">:]</span><span class="o">.</span><span class="n">tocoo</span><span class="p">())</span>
+            <span class="n">perm_forest_proba</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_trees</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+            <span class="n">perm_forest_proba</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+
+            <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">orig_forest_proba</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">orig_forest_proba</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">orig_forest_proba</span><span class="p">))</span>
+                <span class="n">perm_forest_proba</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">perm_forest_proba</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">perm_forest_proba</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">metric_star</span><span class="p">,</span> <span class="n">metric_star_pi</span> <span class="o">=</span> <span class="n">_compute_null_distribution_coleman</span><span class="p">(</span>
+            <span class="n">y</span><span class="p">,</span>
+            <span class="n">orig_forest_proba</span><span class="p">,</span>
+            <span class="n">perm_forest_proba</span><span class="p">,</span>
+            <span class="n">metric</span><span class="p">,</span>
+            <span class="n">n_repeats</span><span class="o">=</span><span class="n">n_repeats</span><span class="p">,</span>
+            <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+            <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">y_pred_proba_orig</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">orig_forest_proba</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">y_pred_proba_perm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">perm_forest_proba</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">observe_stat</span> <span class="o">=</span> <span class="n">metric_func</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_pred_proba_orig</span><span class="p">,</span> <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">)</span>
+        <span class="n">permute_stat</span> <span class="o">=</span> <span class="n">metric_func</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_pred_proba_perm</span><span class="p">,</span> <span class="o">**</span><span class="n">metric_kwargs</span><span class="p">)</span>
 
     <span class="c1"># metric^\pi - metric = observed test statistic, which under the</span>
     <span class="c1"># null is normally distributed around 0</span>
@@ -620,7 +684,9 @@ document.write(`
 
 <div class="viewcode-block" id="build_oob_forest">
 <a class="viewcode-back" href="../../../generated/treeple.stats.build_oob_forest.html#treeple.stats.build_oob_forest">[docs]</a>
-<span class="k">def</span> <span class="nf">build_oob_forest</span><span class="p">(</span><span class="n">est</span><span class="p">:</span> <span class="n">ForestClassifier</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">est_kwargs</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">build_oob_forest</span><span class="p">(</span>
+    <span class="n">est</span><span class="p">:</span> <span class="n">ForestClassifier</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">use_sparse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">est_kwargs</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a hypothesis testing forest using oob samples.</span>
 
 <span class="sd">    Parameters</span>
@@ -634,6 +700,8 @@ document.write(`
 <span class="sd">        Data.</span>
 <span class="sd">    y : ArrayLike of shape (n_samples, n_outputs)</span>
 <span class="sd">        Binary target, so ``n_outputs`` should be at most 1.</span>
+<span class="sd">    use_sparse : bool, optional</span>
+<span class="sd">        Whether or not to use a sparse representation for the posteriors.</span>
 <span class="sd">    verbose : bool, optional</span>
 <span class="sd">        Verbosity, by default False.</span>
 <span class="sd">    **est_kwargs : dict, optional</span>
@@ -668,27 +736,47 @@ document.write(`
     <span class="c1"># Assign chunk of trees to jobs</span>
     <span class="n">n_jobs</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_partition_estimators</span><span class="p">(</span><span class="n">est</span><span class="o">.</span><span class="n">n_estimators</span><span class="p">,</span> <span class="n">est</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">)</span>
 
-    <span class="c1"># avoid storing the output of every estimator by summing them here</span>
-    <span class="n">lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
-    <span class="c1"># accumulate the predictions across all trees</span>
-    <span class="n">all_proba</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
-        <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">est</span><span class="o">.</span><span class="n">estimators_</span><span class="p">),</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">est</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span>
-    <span class="p">)</span>
-    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">est</span><span class="p">,</span> <span class="s2">&quot;oob_samples_&quot;</span><span class="p">):</span>
-        <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">require</span><span class="o">=</span><span class="s2">&quot;sharedmem&quot;</span><span class="p">)(</span>
-            <span class="n">delayed</span><span class="p">(</span><span class="n">_parallel_predict_proba_oob</span><span class="p">)(</span><span class="n">e</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">all_proba</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">test_idx</span><span class="p">,</span> <span class="n">lock</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">test_idx</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">est</span><span class="o">.</span><span class="n">estimators_</span><span class="p">,</span> <span class="n">est</span><span class="o">.</span><span class="n">oob_samples_</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">use_sparse</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">est</span><span class="p">,</span> <span class="s2">&quot;oob_samples_&quot;</span><span class="p">):</span>
+            <span class="n">oob_samples_list</span> <span class="o">=</span> <span class="n">est</span><span class="o">.</span><span class="n">oob_samples_</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">inbag_samples</span> <span class="o">=</span> <span class="n">est</span><span class="o">.</span><span class="n">estimators_samples_</span>
+            <span class="n">all_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">oob_samples_list</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">(</span><span class="n">all_samples</span><span class="p">,</span> <span class="n">inbag_samples</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">inbag_samples</span><span class="p">))</span>
+            <span class="p">]</span>
+
+        <span class="n">oob_preds_test_idxs</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">require</span><span class="o">=</span><span class="s2">&quot;sharedmem&quot;</span><span class="p">)(</span>
+            <span class="n">delayed</span><span class="p">(</span><span class="n">_parallel_predict_proba_oob_sparse</span><span class="p">)(</span><span class="n">e</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">test_idx</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">e</span><span class="p">,</span> <span class="n">test_idx</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">est</span><span class="o">.</span><span class="n">estimators_</span><span class="p">,</span> <span class="n">oob_samples_list</span><span class="p">)</span>
         <span class="p">)</span>
+        <span class="n">all_proba</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">oob_preds_test_idxs</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">inbag_samples</span> <span class="o">=</span> <span class="n">est</span><span class="o">.</span><span class="n">estimators_samples_</span>
-        <span class="n">all_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">oob_samples_list</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">(</span><span class="n">all_samples</span><span class="p">,</span> <span class="n">inbag_samples</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">inbag_samples</span><span class="p">))</span>
-        <span class="p">]</span>
-        <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">require</span><span class="o">=</span><span class="s2">&quot;sharedmem&quot;</span><span class="p">)(</span>
-            <span class="n">delayed</span><span class="p">(</span><span class="n">_parallel_predict_proba_oob</span><span class="p">)(</span><span class="n">e</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">all_proba</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">test_idx</span><span class="p">,</span> <span class="n">lock</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">test_idx</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">est</span><span class="o">.</span><span class="n">estimators_</span><span class="p">,</span> <span class="n">oob_samples_list</span><span class="p">))</span>
+        <span class="c1"># avoid storing the output of every estimator by summing them here</span>
+        <span class="n">lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+        <span class="c1"># accumulate the predictions across all trees</span>
+        <span class="n">all_proba</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
+            <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">est</span><span class="o">.</span><span class="n">estimators_</span><span class="p">),</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">est</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span>
         <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">est</span><span class="p">,</span> <span class="s2">&quot;oob_samples_&quot;</span><span class="p">):</span>
+            <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">require</span><span class="o">=</span><span class="s2">&quot;sharedmem&quot;</span><span class="p">)(</span>
+                <span class="n">delayed</span><span class="p">(</span><span class="n">_parallel_predict_proba_oob</span><span class="p">)(</span>
+                    <span class="n">e</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">all_proba</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">test_idx</span><span class="p">,</span> <span class="n">lock</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">test_idx</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">est</span><span class="o">.</span><span class="n">estimators_</span><span class="p">,</span> <span class="n">est</span><span class="o">.</span><span class="n">oob_samples_</span><span class="p">))</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">inbag_samples</span> <span class="o">=</span> <span class="n">est</span><span class="o">.</span><span class="n">estimators_samples_</span>
+            <span class="n">all_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">oob_samples_list</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">(</span><span class="n">all_samples</span><span class="p">,</span> <span class="n">inbag_samples</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">inbag_samples</span><span class="p">))</span>
+            <span class="p">]</span>
+            <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">require</span><span class="o">=</span><span class="s2">&quot;sharedmem&quot;</span><span class="p">)(</span>
+                <span class="n">delayed</span><span class="p">(</span><span class="n">_parallel_predict_proba_oob</span><span class="p">)(</span>
+                    <span class="n">e</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">all_proba</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">test_idx</span><span class="p">,</span> <span class="n">lock</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">test_idx</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">est</span><span class="o">.</span><span class="n">estimators_</span><span class="p">,</span> <span class="n">oob_samples_list</span><span class="p">))</span>
+            <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">est</span><span class="p">,</span> <span class="n">all_proba</span></div>
 
@@ -732,7 +820,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, treeple Developers. Last updated on 2024-10-10.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-10-11.
       <br/>
     
   </p>
