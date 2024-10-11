@@ -1,4 +1,5 @@
 import importlib
+import itertools
 import os
 
 import numpy as np
@@ -235,20 +236,24 @@ def test_comight_repeated_feature_sets(seed):
     assert result.pvalue > 0.05, f"{result.pvalue}"
 
 
-@pytest.mark.parametrize("use_bottleneck", [True, False])
-def test_build_coleman_forest(use_bottleneck: bool):
+@pytest.mark.parametrize(
+    ("use_bottleneck", "use_sparse"),
+    itertools.product([True, False], [True, False]),
+)
+def test_build_coleman_forest(use_bottleneck: bool, use_sparse: bool):
     """Simple test for building a Coleman forest.
 
     Test the function under alternative and null hypothesis for a very simple dataset.
     """
-    if use_bottleneck and utils.DISABLE_BN_ENV_VAR in os.environ:
-        del os.environ[utils.DISABLE_BN_ENV_VAR]
-        importlib.reload(utils)
-        importlib.reload(stats)
-    else:
+    if not use_bottleneck and utils.DISABLE_BN_ENV_VAR not in os.environ:
         os.environ[utils.DISABLE_BN_ENV_VAR] = "1"
-        importlib.reload(utils)
-        importlib.reload(stats)
+    elif use_bottleneck and utils.DISABLE_BN_ENV_VAR in os.environ:
+        del os.environ[utils.DISABLE_BN_ENV_VAR]
+
+    # We need to reload the modules after changing the environment variable
+    # because an environment variable is used to disable bottleneck
+    importlib.reload(utils)
+    importlib.reload(stats)
 
     n_estimators = 100
     n_samples = 30
@@ -290,7 +295,9 @@ def test_build_coleman_forest(use_bottleneck: bool):
         perm_forest_proba,
         clf_fitted,
         perm_clf_fitted,
-    ) = stats.build_coleman_forest(clf, perm_clf, X, y, metric="s@98", n_repeats=1000, seed=seed)
+    ) = stats.build_coleman_forest(
+        clf, perm_clf, X, y, metric="s@98", n_repeats=1000, seed=seed, use_sparse=use_sparse
+    )
     assert clf_fitted._n_samples_bootstrap == round(n_samples * 1.6)
     assert perm_clf_fitted._n_samples_bootstrap == round(n_samples * 1.6)
     assert_array_equal(perm_clf_fitted.permutation_indices_.shape, (n_samples, 1))
