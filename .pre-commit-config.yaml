@@ -22,7 +22,7 @@ repos:
 
   # Ruff treeple
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.4
+    rev: v0.6.9
     hooks:
       - id: ruff
         name: ruff treeple
@@ -31,7 +31,7 @@ repos:
 
   # Ruff tutorials and examples
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.4
+    rev: v0.6.9
     hooks:
       - id: ruff
         name: ruff tutorials and examples

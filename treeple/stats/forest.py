@@ -15,7 +15,12 @@ from ..ensemble import HonestForestClassifier
 from ..tree import MultiViewDecisionTreeClassifier
 from ..tree._classes import DTYPE
 from .permuteforest import PermutationHonestForestClassifier
-from .utils import METRIC_FUNCTIONS, POSITIVE_METRICS, _compute_null_distribution_coleman
+from .utils import (
+    METRIC_FUNCTIONS,
+    POSITIVE_METRICS,
+    _compute_null_distribution_coleman,
+    _compute_null_distribution_coleman_sparse,
+)
 
 
 def _parallel_predict_proba_oob(predict_proba, X, out, idx, test_idx, lock):
@@ -32,6 +37,20 @@ def _parallel_predict_proba_oob(predict_proba, X, out, idx, test_idx, lock):
     with lock:
         out[idx, test_idx, :] = prediction[test_idx, :]
     return prediction
+
+
+def _parallel_predict_proba_oob_sparse(predict_proba, X, test_idx):
+    """
+    This is a utility function for joblib's Parallel.
+    It can't go locally in ForestClassifier or ForestRegressor, because joblib
+    complains that it cannot pickle it when placed there. Different from
+    _parallel_predict_proba_oob, this function returns the predictions and
+    indices for those values that are finite (not nan or inf).
+    """
+    # each tree predicts proba with a list of output (n_samples, n_classes[i])
+    prediction = predict_proba(X[test_idx, :], check_input=False)
+    good_value_mask = np.isfinite(prediction[:, 0])
+    return test_idx[good_value_mask], prediction[good_value_mask]
 
 
 ForestTestResult = namedtuple(
@@ -51,6 +70,7 @@ def build_coleman_forest(
     verbose=False,
     seed=None,
     return_posteriors=True,
+    use_sparse=False,
     **metric_kwargs,
 ):
     """Build a hypothesis testing forest using a two-forest approach.
@@ -89,6 +109,9 @@ def build_coleman_forest(
         Random seed, by default None.
     return_posteriors : bool, optional
         Whether or not to return the posteriors, by default True.
+    use_sparse : bool, optional
+        Whether or not to use a sparse for the calculation of the permutation
+        statistics, by default False. Doesn't affect return values.
     **metric_kwargs : dict, optional
         Additional keyword arguments to pass to the metric function.
 
@@ -118,7 +141,7 @@ def build_coleman_forest(
         raise RuntimeError(f"Original forest must be a HonestForestClassifier, got {type(est)}")
 
     # build two sets of forests
-    est, orig_forest_proba = build_oob_forest(est, X, y, verbose=verbose)
+    est, orig_forest_proba = build_oob_forest(est, X, y, use_sparse=use_sparse, verbose=verbose)
 
     if not isinstance(perm_est, PermutationHonestForestClassifier):
         raise RuntimeError(
@@ -133,7 +156,12 @@ def build_coleman_forest(
         )
 
     perm_est, perm_forest_proba = build_oob_forest(
-        perm_est, X, y, verbose=verbose, covariate_index=covariate_index
+        perm_est,
+        X,
+        y,
+        use_sparse=use_sparse,
+        verbose=verbose,
+        covariate_index=covariate_index,
     )
 
     # get the number of jobs
@@ -141,21 +169,57 @@ def build_coleman_forest(
 
     if y.ndim == 1:
         y = y.reshape(-1, 1)
-    metric_star, metric_star_pi = _compute_null_distribution_coleman(
-        y,
-        orig_forest_proba,
-        perm_forest_proba,
-        metric,
-        n_repeats=n_repeats,
-        seed=seed,
-        n_jobs=n_jobs,
-        **metric_kwargs,
-    )
 
-    y_pred_proba_orig = np.nanmean(orig_forest_proba, axis=0)
-    y_pred_proba_perm = np.nanmean(perm_forest_proba, axis=0)
-    observe_stat = metric_func(y, y_pred_proba_orig, **metric_kwargs)
-    permute_stat = metric_func(y, y_pred_proba_perm, **metric_kwargs)
+    if use_sparse:
+        y_pred_proba_orig_perm, observe_stat, permute_stat, metric_star, metric_star_pi = (
+            _compute_null_distribution_coleman_sparse(
+                y,
+                orig_forest_proba,
+                perm_forest_proba,
+                metric,
+                n_repeats=n_repeats,
+                seed=seed,
+                n_jobs=n_jobs,
+                **metric_kwargs,
+            )
+        )
+
+        # if we are returning the posteriors, then we need to replace the
+        # sparse indices and values with an array. We convert the sparse data
+        # to dense data, so that the function returns results in a consistent format.
+        if return_posteriors:
+            n_trees = y_pred_proba_orig_perm.shape[0] // 2
+            n_samples = y_pred_proba_orig_perm.shape[1]
+
+            to_coords_data = lambda x: (x.row.astype(int), x.col.astype(int), x.data)
+
+            row, col, data = to_coords_data(y_pred_proba_orig_perm[:n_trees, :].tocoo())
+            orig_forest_proba = np.full((n_trees, n_samples), np.nan, dtype=np.float64)
+            orig_forest_proba[row, col] = data
+
+            row, col, data = to_coords_data(y_pred_proba_orig_perm[n_trees:, :].tocoo())
+            perm_forest_proba = np.full((n_trees, n_samples), np.nan, dtype=np.float64)
+            perm_forest_proba[row, col] = data
+
+            if y.shape[1] == 2:
+                orig_forest_proba = np.column_stack((orig_forest_proba, 1 - orig_forest_proba))
+                perm_forest_proba = np.column_stack((perm_forest_proba, 1 - perm_forest_proba))
+    else:
+        metric_star, metric_star_pi = _compute_null_distribution_coleman(
+            y,
+            orig_forest_proba,
+            perm_forest_proba,
+            metric,
+            n_repeats=n_repeats,
+            seed=seed,
+            n_jobs=n_jobs,
+            **metric_kwargs,
+        )
+
+        y_pred_proba_orig = np.nanmean(orig_forest_proba, axis=0)
+        y_pred_proba_perm = np.nanmean(perm_forest_proba, axis=0)
+        observe_stat = metric_func(y, y_pred_proba_orig, **metric_kwargs)
+        permute_stat = metric_func(y, y_pred_proba_perm, **metric_kwargs)
 
     # metric^\pi - metric = observed test statistic, which under the
     # null is normally distributed around 0
@@ -179,7 +243,9 @@ def build_coleman_forest(
         return forest_result
 
 
-def build_oob_forest(est: ForestClassifier, X, y, verbose=False, **est_kwargs):
+def build_oob_forest(
+    est: ForestClassifier, X, y, use_sparse: bool = False, verbose=False, **est_kwargs
+):
     """Build a hypothesis testing forest using oob samples.
 
     Parameters
@@ -193,6 +259,8 @@ def build_oob_forest(est: ForestClassifier, X, y, verbose=False, **est_kwargs):
         Data.
     y : ArrayLike of shape (n_samples, n_outputs)
         Binary target, so ``n_outputs`` should be at most 1.
+    use_sparse : bool, optional
+        Whether or not to use a sparse representation for the posteriors.
     verbose : bool, optional
         Verbosity, by default False.
     **est_kwargs : dict, optional
@@ -227,26 +295,46 @@ def build_oob_forest(est: ForestClassifier, X, y, verbose=False, **est_kwargs):
     # Assign chunk of trees to jobs
     n_jobs, _, _ = _partition_estimators(est.n_estimators, est.n_jobs)
 
-    # avoid storing the output of every estimator by summing them here
-    lock = threading.Lock()
-    # accumulate the predictions across all trees
-    all_proba = np.full(
-        (len(est.estimators_), X.shape[0], est.n_classes_), np.nan, dtype=np.float64
-    )
-    if hasattr(est, "oob_samples_"):
-        Parallel(n_jobs=n_jobs, verbose=verbose, require="sharedmem")(
-            delayed(_parallel_predict_proba_oob)(e.predict_proba, X, all_proba, idx, test_idx, lock)
-            for idx, (e, test_idx) in enumerate(zip(est.estimators_, est.oob_samples_))
+    if use_sparse:
+        if hasattr(est, "oob_samples_"):
+            oob_samples_list = est.oob_samples_
+        else:
+            inbag_samples = est.estimators_samples_
+            all_samples = np.arange(X.shape[0])
+            oob_samples_list = [
+                np.setdiff1d(all_samples, inbag_samples[i]) for i in range(len(inbag_samples))
+            ]
+
+        oob_preds_test_idxs = Parallel(n_jobs=n_jobs, verbose=verbose, require="sharedmem")(
+            delayed(_parallel_predict_proba_oob_sparse)(e.predict_proba, X, test_idx)
+            for e, test_idx in zip(est.estimators_, oob_samples_list)
         )
+        all_proba = list(zip(*oob_preds_test_idxs))
     else:
-        inbag_samples = est.estimators_samples_
-        all_samples = np.arange(X.shape[0])
-        oob_samples_list = [
-            np.setdiff1d(all_samples, inbag_samples[i]) for i in range(len(inbag_samples))
-        ]
-        Parallel(n_jobs=n_jobs, verbose=verbose, require="sharedmem")(
-            delayed(_parallel_predict_proba_oob)(e.predict_proba, X, all_proba, idx, test_idx, lock)
-            for idx, (e, test_idx) in enumerate(zip(est.estimators_, oob_samples_list))
+        # avoid storing the output of every estimator by summing them here
+        lock = threading.Lock()
+        # accumulate the predictions across all trees
+        all_proba = np.full(
+            (len(est.estimators_), X.shape[0], est.n_classes_), np.nan, dtype=np.float64
         )
+        if hasattr(est, "oob_samples_"):
+            Parallel(n_jobs=n_jobs, verbose=verbose, require="sharedmem")(
+                delayed(_parallel_predict_proba_oob)(
+                    e.predict_proba, X, all_proba, idx, test_idx, lock
+                )
+                for idx, (e, test_idx) in enumerate(zip(est.estimators_, est.oob_samples_))
+            )
+        else:
+            inbag_samples = est.estimators_samples_
+            all_samples = np.arange(X.shape[0])
+            oob_samples_list = [
+                np.setdiff1d(all_samples, inbag_samples[i]) for i in range(len(inbag_samples))
+            ]
+            Parallel(n_jobs=n_jobs, verbose=verbose, require="sharedmem")(
+                delayed(_parallel_predict_proba_oob)(
+                    e.predict_proba, X, all_proba, idx, test_idx, lock
+                )
+                for idx, (e, test_idx) in enumerate(zip(est.estimators_, oob_samples_list))
+            )
 
     return est, all_proba
