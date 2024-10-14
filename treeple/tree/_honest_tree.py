@@ -772,23 +772,25 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         self.tree_.value[:, :, :] = 0
 
         # XXX: Note this method does not make these into a proportion of the leaf
-        total_n_node_samples = 0.0
+        # total_n_node_samples = 0.0
 
         # apply sample-weight to the leaf nodes
-        seen_leaf_ids = set()
+        # seen_leaf_ids = set()
         for leaf_id, yval, y_weight in zip(
             leaf_ids, y[self.honest_indices_, :], sample_weight[self.honest_indices_]
         ):
-            total_n_node_samples += y_weight
+            # XXX: this treats the leaf node values as a sum of the leaf
+            self.tree_.value[leaf_id][:, yval] += y_weight
 
-            if leaf_id in seen_leaf_ids:
-                self.tree_.value[leaf_id][:, yval] += y_weight
-            else:
-                self.tree_.value[leaf_id][:, yval] = y_weight
-            seen_leaf_ids.add(leaf_id)
-
-        for leaf_id in seen_leaf_ids:
-            self.tree_.value[leaf_id] /= total_n_node_samples
+            # XXX: this normalizes the leaf node values to be a proportion of the leaf
+            # total_n_node_samples += y_weight
+            # if leaf_id in seen_leaf_ids:
+            #     self.tree_.value[leaf_id][:, yval] += y_weight
+            # else:
+            #     self.tree_.value[leaf_id][:, yval] = y_weight
+            # seen_leaf_ids.add(leaf_id)
+        # for leaf_id in seen_leaf_ids:
+        #     self.tree_.value[leaf_id] /= total_n_node_samples
 
     def _inherit_estimator_attributes(self):
         """Initialize necessary attributes from the provided tree estimator"""

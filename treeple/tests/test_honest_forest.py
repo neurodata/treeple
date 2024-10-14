@@ -310,6 +310,7 @@ def test_sklearn_compatible_estimator(estimator, check):
     #  for fitting the tree's splits
     if check.func.__name__ in [
         "check_class_weight_classifiers",
+        "check_sample_weight_equivalence",
         # TODO: this is an error. Somehow a segfault is raised when fit is called first and
         # then partial_fit
         "check_fit_score_takes_y",
