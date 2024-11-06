@@ -107,7 +107,7 @@ def test_sklearn_compatible_transformer(estimator, check):
         # clustering accuracy is poor when using TwoMeans on 1 single tree
         "check_clustering",
         # sample weights do not necessarily imply a sample is not used in clustering
-        "check_sample_weights_invariance",
+        "check_sample_weight_equivalence",
         # sample order is not preserved in predict
         "check_methods_sample_order_invariance",
     ]:
