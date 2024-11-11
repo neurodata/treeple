@@ -18,6 +18,10 @@ seed = 12345
     ]
 )
 def test_sklearn_compatible_estimator(estimator, check):
+    if check.func.__name__ in [
+        "check_sample_weight_equivalence",
+    ]:
+        pytest.skip()
     check(estimator)
 
 

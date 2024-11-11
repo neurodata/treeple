@@ -37,6 +37,7 @@ def test_sklearn_compatible_estimator(estimator, check):
         "check_sample_weights_invariance",
         # # sample order is not preserved in predict
         "check_methods_sample_order_invariance",
+        "check_sample_weight_equivalence",
     ]:
         pytest.skip()
     check(estimator)

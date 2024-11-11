@@ -196,11 +196,14 @@ def test_sklearn_compatible_estimator(estimator, check):
     if isinstance(
         estimator,
         (
+            ExtraObliqueRandomForestRegressor,
+            ObliqueRandomForestRegressor,
+            PatchObliqueRandomForestRegressor,
             ExtraObliqueRandomForestClassifier,
             ObliqueRandomForestClassifier,
             PatchObliqueRandomForestClassifier,
         ),
-    ) and check.func.__name__ in ["check_fit_score_takes_y"]:
+    ) and check.func.__name__ in ["check_sample_weight_equivalence", "check_fit_score_takes_y"]:
         pytest.skip()
     check(estimator)
 

@@ -195,7 +195,7 @@ class PermutationHonestForestClassifier(HonestForestClassifier):
     **tree_estimator_params : dict
         Parameters to pass to the underlying base tree estimators.
         These must be parameters for ``tree_estimator``.
-        
+
     Attributes
     ----------
     estimator : treeple.tree.HonestTreeClassifier

@@ -11,7 +11,7 @@ from treeple.tree import DecisionTreeClassifier
 from treeple.tree._neighbors import _compute_distance_matrix, compute_forest_similarity_matrix
 
 
-class NearestNeighborsMetaEstimator(BaseEstimator, MetaEstimatorMixin):
+class NearestNeighborsMetaEstimator(MetaEstimatorMixin, BaseEstimator):
     """Meta-estimator for nearest neighbors.
 
     Uses a decision-tree, or forest model to compute distances between samples
