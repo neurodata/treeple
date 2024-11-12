@@ -5,8 +5,7 @@ from typing import Optional, Tuple
 
 import numpy as np
 import scipy.sparse as sp
-from joblib import parallel_config
-from joblib import Parallel, delayed
+from joblib import Parallel, delayed, parallel_config
 from numpy.typing import ArrayLike
 from scipy.stats import entropy
 from sklearn.ensemble._forest import _generate_unsampled_indices, _get_n_samples_bootstrap
@@ -248,7 +247,6 @@ def _compute_null_distribution_coleman(
             )
             for i, seed in zip(range(n_repeats), ss.spawn(n_repeats))
         )
-
 
     for idx, (first_half_metric, second_half_metric) in enumerate(out):
         metric_star[idx] = first_half_metric
