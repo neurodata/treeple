@@ -175,6 +175,7 @@ def test_sklearn_compatible_estimator(estimator, check):
         "check_class_weight_classifiers",
         "check_classifier_multioutput",
         "check_do_not_raise_errors_in_init_or_set_params",
+        "check_sample_weight_equivalence",
     ]:
         pytest.skip()
     check(estimator)

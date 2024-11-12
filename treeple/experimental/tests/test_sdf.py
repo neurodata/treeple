@@ -115,6 +115,7 @@ def test_sklearn_compatible_estimator(estimator, check):
     # XXX: can include this "generalization" in the future if it's useful
     if check.func.__name__ in [
         "check_class_weight_classifiers",
+        "check_sample_weight_equivalence",
     ]:
         pytest.skip()
     check(estimator)

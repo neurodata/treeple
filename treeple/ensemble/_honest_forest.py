@@ -728,10 +728,16 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
         return oob_samples
 
     def __sklearn_tags__(self):
-        # XXX: nans should be supportable in HRF
         tags = super().__sklearn_tags__()
-        tags.classifier_tags.multi_output = False
+        # XXX: nans should be supportable in HRF
         tags.input_tags.allow_nan = False
+
+        try:
+            # sklearn >= 1.6 tags were revamped
+            tags.target_tags.multi_output = False
+        except AttributeError:
+            tags.classifier_tags.multi_output = False
+
         return tags
 
     def decision_path(self, X):

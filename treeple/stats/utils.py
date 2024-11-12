@@ -5,7 +5,7 @@ from typing import Optional, Tuple
 
 import numpy as np
 import scipy.sparse as sp
-from joblib import Parallel, delayed
+from joblib import Parallel, delayed, parallel_config
 from numpy.typing import ArrayLike
 from scipy.stats import entropy
 from sklearn.ensemble._forest import _generate_unsampled_indices, _get_n_samples_bootstrap
@@ -234,18 +234,19 @@ def _compute_null_distribution_coleman(
 
     # generate the random seeds for the parallel jobs
     ss = np.random.SeedSequence(seed)
-    out = Parallel(n_jobs=n_jobs)(
-        delayed(_parallel_build_null_forests)(
-            y_pred_ind_arr,
-            n_estimators,
-            all_y_pred,
-            y_test,
-            seed,
-            metric,
-            **metric_kwargs,
+    with parallel_config("multiprocessing"):
+        out = Parallel(n_jobs=n_jobs)(
+            delayed(_parallel_build_null_forests)(
+                y_pred_ind_arr,
+                n_estimators,
+                all_y_pred,
+                y_test,
+                seed,
+                metric,
+                **metric_kwargs,
+            )
+            for i, seed in zip(range(n_repeats), ss.spawn(n_repeats))
         )
-        for i, seed in zip(range(n_repeats), ss.spawn(n_repeats))
-    )
 
     for idx, (first_half_metric, second_half_metric) in enumerate(out):
         metric_star[idx] = first_half_metric
@@ -512,20 +513,21 @@ def _compute_null_distribution_coleman_sparse(
 
     # generate the random seeds for the parallel jobs
     ss = np.random.SeedSequence(seed)
-    out = Parallel(n_jobs=n_jobs)(
-        delayed(_parallel_build_null_forests_sparse)(
-            np.arange(n_trees),
-            oob_predictions,
-            oob_indicators,
-            y_test,
-            n_outputs,
-            seed,
-            True,
-            metric,
-            **metric_kwargs,
+    with parallel_config("multiprocessing"):
+        out = Parallel(n_jobs=n_jobs)(
+            delayed(_parallel_build_null_forests_sparse)(
+                np.arange(n_trees),
+                oob_predictions,
+                oob_indicators,
+                y_test,
+                n_outputs,
+                seed,
+                True,
+                metric,
+                **metric_kwargs,
+            )
+            for _, seed in zip(range(n_repeats), ss.spawn(n_repeats))
         )
-        for _, seed in zip(range(n_repeats), ss.spawn(n_repeats))
-    )
 
     metric_star = np.zeros((n_repeats,))
     metric_star_pi = np.zeros((n_repeats,))
