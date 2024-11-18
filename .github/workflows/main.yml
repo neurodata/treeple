@@ -240,7 +240,7 @@ jobs:
           # cp $PWD/build-install/usr/lib/python${{matrix.python-version}}/site-packages/coverage.xml ./coverage.xml
 
       - name: Upload coverage stats to codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           # spin goes into the INSTALLED path in order to run pytest
           files: ./coverage.xml
