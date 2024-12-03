@@ -113,6 +113,10 @@ def test_max_samples():
 def test_sklearn_compatible_estimator(estimator, check):
     # 1. check_class_weight_classifiers is not supported since it requires sample weight
     # XXX: can include this "generalization" in the future if it's useful
-    if check.func.__name__ in ["check_class_weight_classifiers", "check_sample_weight_equivalence"]:
-        pytest.skip()
+    if check.func.__name__ in [
+        "check_class_weight_classifiers",
+        "check_sample_weight_equivalence",
+        "check_sample_weight_equivalence_on_dense_data",
+        "check_sample_weight_equivalence_on_sparse_data",
+    ]:
     check(estimator)
