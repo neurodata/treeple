@@ -108,6 +108,8 @@ def test_sklearn_compatible_transformer(estimator, check):
         "check_clustering",
         # sample weights do not necessarily imply a sample is not used in clustering
         "check_sample_weight_equivalence",
+        "check_sample_weight_equivalence_on_dense_data",
+        "check_sample_weight_equivalence_on_sparse_data",
         # sample order is not preserved in predict
         "check_methods_sample_order_invariance",
     ]:
