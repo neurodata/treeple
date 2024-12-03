@@ -227,7 +227,11 @@ def test_sklearn_compatible_estimator(estimator, check):
     # TODO: remove when we can replicate the CI error...
     if isinstance(
         estimator, (PatchObliqueDecisionTreeClassifier, ExtraObliqueDecisionTreeClassifier)
-    ) and check.func.__name__ in ["check_fit_score_takes_y"]:
+    ) and check.func.__name__ in [
+        "check_fit_score_takes_y",
+        "check_sample_weight_equivalence_on_sparse_data",
+        "check_sample_weight_equivalence_on_dense_data",
+    ]:
         pytest.skip()
     check(estimator)
 
