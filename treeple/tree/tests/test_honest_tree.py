@@ -180,6 +180,8 @@ def test_sklearn_compatible_estimator(estimator, check):
         "check_classifier_multioutput",
         "check_do_not_raise_errors_in_init_or_set_params",
         "check_sample_weight_equivalence",
+        "check_sample_weight_equivalence_on_dense_data",
+        "check_sample_weight_equivalence_on_sparse_data",
     ]:
         pytest.skip()
     check(estimator)
