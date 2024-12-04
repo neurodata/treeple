@@ -289,7 +289,7 @@ def build_oob_forest(
     # the Histogram Gradient Boosting Tree does, where the binning thresholds
     # are passed into the tree itself, thus allowing us to set the node feature
     # value thresholds within the tree itself.
-    if est.max_bins is not None:
+    if hasattr(est, "max_bins") and est.max_bins is not None:
         X = est._bin_data(X, is_training_data=False).astype(DTYPE)
 
     # Assign chunk of trees to jobs

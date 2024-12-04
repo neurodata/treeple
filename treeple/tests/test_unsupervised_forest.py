@@ -33,9 +33,11 @@ def test_sklearn_compatible_estimator(estimator, check):
     if check.func.__name__ in [
         # Cannot apply agglomerative clustering on < 2 samples
         "check_methods_subset_invariance",
-        # # sample weights do not necessarily imply a sample is not used in clustering
-        "check_sample_weights_invariance",
-        # # sample order is not preserved in predict
+        # sample weights do not necessarily imply a sample is not used in clustering
+        "check_sample_weight_equivalence",
+        "check_sample_weight_equivalence_on_dense_data",
+        "check_sample_weight_equivalence_on_sparse_data",
+        # sample order is not preserved in predict
         "check_methods_sample_order_invariance",
     ]:
         pytest.skip()
