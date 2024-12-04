@@ -745,7 +745,7 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
     def __sklearn_tags__(self):
         # XXX: nans should be supportable in HRF
         tags = super().__sklearn_tags__()
-        tags.classifier_tags.multi_output = False
+        # tags.classifier_tags.multi_output = False
         tags.input_tags.allow_nan = False
         return tags
 
