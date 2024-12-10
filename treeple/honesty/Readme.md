@@ -1,5 +1,8 @@
 # Honesty
 
+## Use
+There is now a submodule called `_lib_experimental/sklearn_fork`, parallel to `_lib/sklearn_fork`. Build, install, and import it as an editable install using the same procedure you use with the main `neurodata` fork submodule. This of course means you must either pick one or the other at a time, or import them under different aliases.
+
 ## `scikit-learn`
 ### Architectural Changes
 Adding honesty to `scikit-learn` in a sensible way required adding some architectural elements to the existing `scikit-learn` tree implementation. In particular, in order to make honesty a module composable into arbitrary types of trees, I added:
@@ -40,4 +43,6 @@ Adding honesty to `scikit-learn` in a sensible way required adding some architec
 
 ### Suggested Future Work
 The `tree` package in `scikit-learn` is overdue for a good deal of refactoring. I would do it in multiple passes, at least the following:
-- Eliminate all the introspection 
+- Eliminate all the introspection high up in the inheritance hierarchy. An obvious example is in `BaseDecisionTree._prep_data` (formerly in `BaseDecisionTree._fit`), where the function asks its containing class "am I a classifier?" This antipattern of switching behavior which requires foreknowledge of future structure occurs throughout the existing codebase, and makes it impossible to extend and reuse existing code without either modifying it or duplicating a great deal of it. In the case of `is_classifier(self)`, stop calling it from functions in `BaseDecisionTree`, and push that switched functionality down into actual classifiers where it belongs.
+- Hoist commitments to particular implementations of interfaces. For instance, the aforementioned `Criterion` selection logic buried in the implementation of tree build. Parameterize these things, and defer commitment as "late" as possible, all the way back to the runtime interface presented to the user if possible.
+- Be more judicious with inheritance, and more prolific with composition. Functionality inserted at some point in the inheritance hierarchy cannot easily be reused in sibling branches; if you want the functionality, you have to inherit, forcing your new code into a corner of the hierarchy where it doesn't necessarily belong. An obvious place to begin unwinding this in the current codebase is to merge upstream the defused `Partitioner` refactor that I did, and eliminate all the classes that were forced to exist by the fused `Partitioner`, deferring selection of concrete implementation to runtime and passing it in as a parameter value.
