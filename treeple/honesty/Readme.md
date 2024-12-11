@@ -3,6 +3,9 @@
 ## Use
 There is now a submodule called `_lib_experimental/sklearn_fork`, parallel to `_lib/sklearn_fork`. Build, install, and import it as an editable install using the same procedure you use with the main `neurodata` fork submodule. This of course means you must either pick one or the other at a time, or import them under different aliases.
 
+For examples of `HonestRandomForestClassifier` use, see the test functions `test_honest_forest_separation` and `test_honest_forest_iris_criterion` in `_lib_experimental/sklearn_fork/sklearn/ensemble/tests/test_forest.py`.
+
+
 ## `scikit-learn`
 ### Architectural Changes
 Adding honesty to `scikit-learn` in a sensible way required adding some architectural elements to the existing `scikit-learn` tree implementation. In particular, in order to make honesty a module composable into arbitrary types of trees, I added:
