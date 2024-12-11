@@ -9,6 +9,9 @@ Adding honesty to `scikit-learn` in a sensible way required adding some architec
 1. Added an injectable split rejection criteria pattern to `Splitter` so that arbitrary lists of split rejection criteria could be specified at runtime, and execute with no perceivable marginal overhead.
 2. A lightweight event broker and handler framework to `TreeBuilder` so that interested parties can observe tree build status. In particular, this feature is used by the honesty module to grow a shadow tree which partitions the honest set using structure tree splits, and has veto power over structure tree candidate splits using the aforementioned injectable split rejection criteria.
 
+There are more technically detailed comments in the files themselves.
+
+
 ### Summary of File Changes
 - `ensemble/forest.py`
     - Added `HonestRandomForestClassifier`.
