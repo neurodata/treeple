@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>treeple.stats.permuteforest &#8212; treeple 0.9.0dev0 documentation</title>
+    <title>treeple.stats.permuteforest &#8212; treeple 0.10.0dev0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=ac02cc09edc035673794" />
   <script src="../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=ac02cc09edc035673794"></script>
 
-    <script src="../../../_static/documentation_options.js?v=54a029fc"></script>
+    <script src="../../../_static/documentation_options.js?v=2512dea2"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -131,7 +131,7 @@
   
   
   
-    <p class="title logo__title">treeple 0.9.0dev0 documentation</p>
+    <p class="title logo__title">treeple 0.10.0dev0 documentation</p>
   
 </a></div>
     
@@ -617,6 +617,11 @@ document.write(`
 <span class="sd">        remaining samples will be used to learn the tree structure. A larger</span>
 <span class="sd">        fraction creates shallower trees with lower variance estimates.</span>
 
+<span class="sd">    honest_method : {&quot;prune&quot;, &quot;apply&quot;}, default=&quot;prune&quot;</span>
+<span class="sd">        Method for enforcing honesty. If &quot;prune&quot;, the tree is pruned to enforce</span>
+<span class="sd">        honesty. If &quot;apply&quot;, the tree is not pruned, but the leaf estimates are</span>
+<span class="sd">        adjusted to enforce honesty.</span>
+
 <span class="sd">    tree_estimator : object, default=None</span>
 <span class="sd">        Type of decision tree classifier to use. By default `None`, which</span>
 <span class="sd">        defaults to `treeple.tree.DecisionTreeClassifier`. Note</span>
@@ -736,35 +741,37 @@ document.write(`
         <span class="n">max_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">honest_prior</span><span class="o">=</span><span class="s2">&quot;empirical&quot;</span><span class="p">,</span>
         <span class="n">honest_fraction</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">honest_method</span><span class="o">=</span><span class="s2">&quot;apply&quot;</span><span class="p">,</span>
         <span class="n">tree_estimator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">stratify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">permute_per_tree</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="o">**</span><span class="n">tree_estimator_params</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">n_estimators</span><span class="p">,</span>
-            <span class="n">criterion</span><span class="p">,</span>
-            <span class="n">splitter</span><span class="p">,</span>
-            <span class="n">max_depth</span><span class="p">,</span>
-            <span class="n">min_samples_split</span><span class="p">,</span>
-            <span class="n">min_samples_leaf</span><span class="p">,</span>
-            <span class="n">min_weight_fraction_leaf</span><span class="p">,</span>
-            <span class="n">max_features</span><span class="p">,</span>
-            <span class="n">max_leaf_nodes</span><span class="p">,</span>
-            <span class="n">min_impurity_decrease</span><span class="p">,</span>
-            <span class="n">bootstrap</span><span class="p">,</span>
-            <span class="n">oob_score</span><span class="p">,</span>
-            <span class="n">n_jobs</span><span class="p">,</span>
-            <span class="n">random_state</span><span class="p">,</span>
-            <span class="n">verbose</span><span class="p">,</span>
-            <span class="n">warm_start</span><span class="p">,</span>
-            <span class="n">class_weight</span><span class="p">,</span>
-            <span class="n">ccp_alpha</span><span class="p">,</span>
-            <span class="n">max_samples</span><span class="p">,</span>
-            <span class="n">honest_prior</span><span class="p">,</span>
-            <span class="n">honest_fraction</span><span class="p">,</span>
-            <span class="n">tree_estimator</span><span class="p">,</span>
-            <span class="n">stratify</span><span class="p">,</span>
+            <span class="n">n_estimators</span><span class="o">=</span><span class="n">n_estimators</span><span class="p">,</span>
+            <span class="n">criterion</span><span class="o">=</span><span class="n">criterion</span><span class="p">,</span>
+            <span class="n">splitter</span><span class="o">=</span><span class="n">splitter</span><span class="p">,</span>
+            <span class="n">max_depth</span><span class="o">=</span><span class="n">max_depth</span><span class="p">,</span>
+            <span class="n">min_samples_split</span><span class="o">=</span><span class="n">min_samples_split</span><span class="p">,</span>
+            <span class="n">min_samples_leaf</span><span class="o">=</span><span class="n">min_samples_leaf</span><span class="p">,</span>
+            <span class="n">min_weight_fraction_leaf</span><span class="o">=</span><span class="n">min_weight_fraction_leaf</span><span class="p">,</span>
+            <span class="n">max_features</span><span class="o">=</span><span class="n">max_features</span><span class="p">,</span>
+            <span class="n">max_leaf_nodes</span><span class="o">=</span><span class="n">max_leaf_nodes</span><span class="p">,</span>
+            <span class="n">min_impurity_decrease</span><span class="o">=</span><span class="n">min_impurity_decrease</span><span class="p">,</span>
+            <span class="n">bootstrap</span><span class="o">=</span><span class="n">bootstrap</span><span class="p">,</span>
+            <span class="n">oob_score</span><span class="o">=</span><span class="n">oob_score</span><span class="p">,</span>
+            <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">warm_start</span><span class="o">=</span><span class="n">warm_start</span><span class="p">,</span>
+            <span class="n">class_weight</span><span class="o">=</span><span class="n">class_weight</span><span class="p">,</span>
+            <span class="n">ccp_alpha</span><span class="o">=</span><span class="n">ccp_alpha</span><span class="p">,</span>
+            <span class="n">max_samples</span><span class="o">=</span><span class="n">max_samples</span><span class="p">,</span>
+            <span class="n">honest_prior</span><span class="o">=</span><span class="n">honest_prior</span><span class="p">,</span>
+            <span class="n">honest_fraction</span><span class="o">=</span><span class="n">honest_fraction</span><span class="p">,</span>
+            <span class="n">honest_method</span><span class="o">=</span><span class="n">honest_method</span><span class="p">,</span>
+            <span class="n">tree_estimator</span><span class="o">=</span><span class="n">tree_estimator</span><span class="p">,</span>
+            <span class="n">stratify</span><span class="o">=</span><span class="n">stratify</span><span class="p">,</span>
             <span class="o">**</span><span class="n">tree_estimator_params</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">permute_per_tree</span> <span class="o">=</span> <span class="n">permute_per_tree</span>
@@ -957,7 +964,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, treeple Developers. Last updated on 2024-10-11.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-12-12.
       <br/>
     
   </p>

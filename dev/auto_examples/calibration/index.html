@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Calibrated decision trees via honesty &#8212; treeple 0.9.0dev0 documentation</title>
+    <title>Calibrated decision trees via honesty &#8212; treeple 0.10.0dev0 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=ac02cc09edc035673794" />
   <script src="../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=ac02cc09edc035673794"></script>
 
-    <script src="../../_static/documentation_options.js?v=54a029fc"></script>
+    <script src="../../_static/documentation_options.js?v=2512dea2"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -56,7 +56,7 @@
         </script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Plot honest forest calibrations on overlapping gaussian simulations" href="plot_overlapping_gaussians.html" />
+    <link rel="next" title="Comparison of Decision Tree and Honest Tree" href="plot_honest_tree.html" />
     <link rel="prev" title="Examples using treeple" href="../../use.html" />
     <link rel="canonical" href="https://neurodata.github.io/treeple/stable/index.html" />
     <script type="text/javascript" src="../../_static/copybutton.js"></script>
@@ -134,7 +134,7 @@
   
   
   
-    <p class="title logo__title">treeple 0.9.0dev0 documentation</p>
+    <p class="title logo__title">treeple 0.10.0dev0 documentation</p>
   
 </a></div>
     
@@ -390,6 +390,7 @@ document.write(`
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Calibrated decision trees via honesty</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="plot_honest_tree.html">Comparison of Decision Tree and Honest Tree</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_overlapping_gaussians.html">Plot honest forest calibrations on overlapping gaussian simulations</a></li>
 </ul>
 </li>
@@ -498,7 +499,10 @@ document.write(`
   <section id="calibrated-decision-trees-via-honesty">
 <span id="calibration-examples"></span><span id="sphx-glr-auto-examples-calibration"></span><h1>Calibrated decision trees via honesty<a class="headerlink" href="#calibrated-decision-trees-via-honesty" title="Link to this heading">#</a></h1>
 <p>Examples demonstrating the usage of honest decision trees to obtain calibrated predictions.</p>
-<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Compare the prediction results of honest forests and random forests with various methods of calibrations. Honest trees are a method for achieving improved calibration in random forests. See User Guide &lt;honest_trees&gt; for more information."><img alt="" src="../../_images/sphx_glr_plot_overlapping_gaussians_thumb.png" />
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example compares the treeple.tree.HonestTreeClassifier from the treeple library with the sklearn.tree.DecisionTreeClassifier from scikit-learn on the Iris dataset."><img alt="" src="../../_images/sphx_glr_plot_honest_tree_thumb.png" />
+<p><a class="reference internal" href="plot_honest_tree.html#sphx-glr-auto-examples-calibration-plot-honest-tree-py"><span class="std std-ref">Comparison of Decision Tree and Honest Tree</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Comparison of Decision Tree and Honest Tree</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Compare the prediction results of honest forests and random forests with various methods of calibrations. Honest trees are a method for achieving improved calibration in random forests. See User Guide &lt;honest_trees&gt; for more information."><img alt="" src="../../_images/sphx_glr_plot_overlapping_gaussians_thumb.png" />
 <p><a class="reference internal" href="plot_overlapping_gaussians.html#sphx-glr-auto-examples-calibration-plot-overlapping-gaussians-py"><span class="std std-ref">Plot honest forest calibrations on overlapping gaussian simulations</span></a></p>
   <div class="sphx-glr-thumbnail-title">Plot honest forest calibrations on overlapping gaussian simulations</div>
 </div></div><div class="toctree-wrapper compound">
@@ -525,11 +529,11 @@ document.write(`
       </div>
     </a>
     <a class="right-next"
-       href="plot_overlapping_gaussians.html"
+       href="plot_honest_tree.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Plot honest forest calibrations on overlapping gaussian simulations</p>
+        <p class="prev-next-title">Comparison of Decision Tree and Honest Tree</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -562,7 +566,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, treeple Developers. Last updated on 2024-10-11.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-12-12.
       <br/>
     
   </p>

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>treeple.tree._honest_tree &#8212; treeple 0.9.0dev0 documentation</title>
+    <title>treeple.tree._honest_tree &#8212; treeple 0.10.0dev0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=ac02cc09edc035673794" />
   <script src="../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=ac02cc09edc035673794"></script>
 
-    <script src="../../../_static/documentation_options.js?v=54a029fc"></script>
+    <script src="../../../_static/documentation_options.js?v=2512dea2"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -131,7 +131,7 @@
   
   
   
-    <p class="title logo__title">treeple 0.9.0dev0 documentation</p>
+    <p class="title logo__title">treeple 0.10.0dev0 documentation</p>
   
 </a></div>
     
@@ -434,18 +434,35 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for treeple.tree._honest_tree</h1><div class="highlight"><pre>
-<span></span><span class="c1"># Adopted from: https://github.com/neurodata/honest-forests</span>
-
+<span></span><span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span>
+<span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Integral</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">ClassifierMixin</span><span class="p">,</span> <span class="n">MetaEstimatorMixin</span><span class="p">,</span> <span class="n">_fit_context</span><span class="p">,</span> <span class="n">clone</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">ClassifierMixin</span><span class="p">,</span> <span class="n">MetaEstimatorMixin</span><span class="p">,</span> <span class="n">_fit_context</span><span class="p">,</span> <span class="n">clone</span><span class="p">,</span> <span class="n">is_classifier</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">StratifiedShuffleSplit</span>
 <span class="kn">from</span> <span class="nn">sklearn.utils._param_validation</span> <span class="kn">import</span> <span class="n">HasMethods</span><span class="p">,</span> <span class="n">Interval</span><span class="p">,</span> <span class="n">RealNotInt</span><span class="p">,</span> <span class="n">StrOptions</span>
 <span class="kn">from</span> <span class="nn">sklearn.utils.multiclass</span> <span class="kn">import</span> <span class="n">_check_partial_fit_first_call</span><span class="p">,</span> <span class="n">check_classification_targets</span>
-<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">check_is_fitted</span><span class="p">,</span> <span class="n">check_X_y</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">check_is_fitted</span><span class="p">,</span> <span class="n">check_random_state</span><span class="p">,</span> <span class="n">check_X_y</span>
 
-<span class="kn">from</span> <span class="nn">.._lib.sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span>
+<span class="kn">from</span> <span class="nn">.._lib.sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span><span class="p">,</span> <span class="n">_criterion</span><span class="p">,</span> <span class="n">_tree</span>
 <span class="kn">from</span> <span class="nn">.._lib.sklearn.tree._classes</span> <span class="kn">import</span> <span class="n">BaseDecisionTree</span>
+<span class="kn">from</span> <span class="nn">.._lib.sklearn.tree._criterion</span> <span class="kn">import</span> <span class="n">BaseCriterion</span>
+<span class="kn">from</span> <span class="nn">.._lib.sklearn.tree._tree</span> <span class="kn">import</span> <span class="n">Tree</span>
+<span class="kn">from</span> <span class="nn">.honesty._honest_prune</span> <span class="kn">import</span> <span class="n">HonestPruner</span><span class="p">,</span> <span class="n">_build_pruned_tree_honesty</span>
+
+<span class="n">CRITERIA_CLF</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;gini&quot;</span><span class="p">:</span> <span class="n">_criterion</span><span class="o">.</span><span class="n">Gini</span><span class="p">,</span>
+    <span class="s2">&quot;log_loss&quot;</span><span class="p">:</span> <span class="n">_criterion</span><span class="o">.</span><span class="n">Entropy</span><span class="p">,</span>
+    <span class="s2">&quot;entropy&quot;</span><span class="p">:</span> <span class="n">_criterion</span><span class="o">.</span><span class="n">Entropy</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">CRITERIA_REG</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;squared_error&quot;</span><span class="p">:</span> <span class="n">_criterion</span><span class="o">.</span><span class="n">MSE</span><span class="p">,</span>
+    <span class="s2">&quot;friedman_mse&quot;</span><span class="p">:</span> <span class="n">_criterion</span><span class="o">.</span><span class="n">FriedmanMSE</span><span class="p">,</span>
+    <span class="s2">&quot;absolute_error&quot;</span><span class="p">:</span> <span class="n">_criterion</span><span class="o">.</span><span class="n">MAE</span><span class="p">,</span>
+    <span class="s2">&quot;poisson&quot;</span><span class="p">:</span> <span class="n">_criterion</span><span class="o">.</span><span class="n">Poisson</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">DOUBLE</span> <span class="o">=</span> <span class="n">_tree</span><span class="o">.</span><span class="n">DOUBLE</span>
 
 
 <div class="viewcode-block" id="HonestTreeClassifier">
@@ -611,6 +628,13 @@ document.write(`
 <span class="sd">        Whether or not to stratify sample when considering structure and leaf indices.</span>
 <span class="sd">        By default False.</span>
 
+<span class="sd">    honest_method : {&quot;apply&quot;, &quot;prune&quot;}, default=&quot;apply&quot;</span>
+<span class="sd">        Method to use for fitting the leaf nodes. If &quot;apply&quot;, the leaf nodes</span>
+<span class="sd">        are fit using the structure as is. In this case, empty leaves may occur</span>
+<span class="sd">        if not enough data. If &quot;prune&quot;, the leaf nodes are fit</span>
+<span class="sd">        by pruning using the honest-set of data after the tree structure is built</span>
+<span class="sd">        using the structure-set of data.</span>
+
 <span class="sd">    **tree_estimator_params : dict</span>
 <span class="sd">        Parameters to pass to the underlying base tree estimators.</span>
 <span class="sd">        These must be parameters for ``tree_estimator``.</span>
@@ -721,9 +745,18 @@ document.write(`
         <span class="p">],</span>
         <span class="s2">&quot;honest_fraction&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">Interval</span><span class="p">(</span><span class="n">RealNotInt</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s2">&quot;neither&quot;</span><span class="p">)],</span>
         <span class="s2">&quot;honest_prior&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">StrOptions</span><span class="p">({</span><span class="s2">&quot;empirical&quot;</span><span class="p">,</span> <span class="s2">&quot;uniform&quot;</span><span class="p">,</span> <span class="s2">&quot;ignore&quot;</span><span class="p">})],</span>
+        <span class="s2">&quot;honest_method&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">StrOptions</span><span class="p">({</span><span class="s2">&quot;apply&quot;</span><span class="p">,</span> <span class="s2">&quot;prune&quot;</span><span class="p">}),</span> <span class="kc">None</span><span class="p">],</span>
         <span class="s2">&quot;stratify&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;boolean&quot;</span><span class="p">],</span>
         <span class="s2">&quot;tree_estimator_params&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;dict&quot;</span><span class="p">],</span>
     <span class="p">}</span>
+    <span class="n">_parameter_constraints</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;max_features&quot;</span><span class="p">)</span>
+    <span class="n">_parameter_constraints</span><span class="p">[</span><span class="s2">&quot;max_features&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">Interval</span><span class="p">(</span><span class="n">Integral</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">),</span>
+        <span class="n">Interval</span><span class="p">(</span><span class="n">RealNotInt</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span>
+        <span class="n">StrOptions</span><span class="p">({</span><span class="s2">&quot;sqrt&quot;</span><span class="p">,</span> <span class="s2">&quot;log2&quot;</span><span class="p">}),</span>
+        <span class="s2">&quot;array-like&quot;</span><span class="p">,</span>
+        <span class="kc">None</span><span class="p">,</span>
+    <span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -744,6 +777,7 @@ document.write(`
         <span class="n">honest_fraction</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
         <span class="n">honest_prior</span><span class="o">=</span><span class="s2">&quot;empirical&quot;</span><span class="p">,</span>
         <span class="n">stratify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">honest_method</span><span class="o">=</span><span class="s2">&quot;apply&quot;</span><span class="p">,</span>
         <span class="o">**</span><span class="n">tree_estimator_params</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tree_estimator</span> <span class="o">=</span> <span class="n">tree_estimator</span>
@@ -764,6 +798,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">honest_fraction</span> <span class="o">=</span> <span class="n">honest_fraction</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">honest_prior</span> <span class="o">=</span> <span class="n">honest_prior</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stratify</span> <span class="o">=</span> <span class="n">stratify</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">honest_method</span> <span class="o">=</span> <span class="n">honest_method</span>
 
         <span class="c1"># XXX: to enable this, we need to also reset the leaf node samples during `_set_leaf_nodes`</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">store_leaf_values</span> <span class="o">=</span> <span class="kc">False</span>
@@ -1108,16 +1143,59 @@ document.write(`
         <span class="n">y</span> <span class="o">=</span> <span class="n">y_encoded</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">)</span>
 
-        <span class="c1"># XXX: implement honest pruning</span>
-        <span class="n">honest_method</span> <span class="o">=</span> <span class="s2">&quot;apply&quot;</span>
-        <span class="k">if</span> <span class="n">honest_method</span> <span class="o">==</span> <span class="s2">&quot;apply&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">honest_method</span> <span class="o">==</span> <span class="s2">&quot;apply&quot;</span><span class="p">:</span>
             <span class="c1"># Fit leaves using other subsample</span>
             <span class="n">honest_leaves</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span><span class="p">])</span>
 
             <span class="c1"># y-encoded ensures that y values match the indices of the classes</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_leaf_nodes</span><span class="p">(</span><span class="n">honest_leaves</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">honest_method</span> <span class="o">==</span> <span class="s2">&quot;prune&quot;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Pruning is not yet implemented.&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">honest_method</span> <span class="o">==</span> <span class="s2">&quot;prune&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="n">DOUBLE</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">y</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">contiguous</span><span class="p">:</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DOUBLE</span><span class="p">)</span>
+
+            <span class="n">n_samples</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1"># Build tree</span>
+            <span class="n">criterion</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">criterion</span><span class="p">,</span> <span class="n">BaseCriterion</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">is_classifier</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                    <span class="n">criterion</span> <span class="o">=</span> <span class="n">CRITERIA_CLF</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">criterion</span> <span class="o">=</span> <span class="n">CRITERIA_REG</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Make a deepcopy in case the criterion has mutable attributes that</span>
+                <span class="c1"># might be shared and modified concurrently during parallel fitting</span>
+                <span class="n">criterion</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">criterion</span><span class="p">)</span>
+
+            <span class="n">random_state</span> <span class="o">=</span> <span class="n">check_random_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+            <span class="n">pruner</span> <span class="o">=</span> <span class="n">HonestPruner</span><span class="p">(</span>
+                <span class="n">criterion</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">max_features_</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">min_samples_leaf_</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">min_weight_leaf_</span><span class="p">,</span>
+                <span class="n">random_state</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">monotonic_cst_</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># build pruned tree</span>
+            <span class="k">if</span> <span class="n">is_classifier</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="n">n_classes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">)</span>
+                <span class="n">pruned_tree</span> <span class="o">=</span> <span class="n">Tree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span><span class="p">,</span> <span class="n">n_classes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pruned_tree</span> <span class="o">=</span> <span class="n">Tree</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span><span class="p">,</span>
+                    <span class="c1"># TODO: the tree shouldn&#39;t need this param</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="c1"># get the leaves</span>
+            <span class="n">missing_values_in_feature_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_missing_values_in_feature_mask</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+            <span class="n">_build_pruned_tree_honesty</span><span class="p">(</span>
+                <span class="n">pruned_tree</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">pruner</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">,</span> <span class="n">missing_values_in_feature_mask</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span> <span class="o">=</span> <span class="n">pruned_tree</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_outputs_</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -1137,11 +1215,26 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">value</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
 
+        <span class="c1"># XXX: Note this method does not make these into a proportion of the leaf</span>
+        <span class="c1"># total_n_node_samples = 0.0</span>
+
         <span class="c1"># apply sample-weight to the leaf nodes</span>
+        <span class="c1"># seen_leaf_ids = set()</span>
         <span class="k">for</span> <span class="n">leaf_id</span><span class="p">,</span> <span class="n">yval</span><span class="p">,</span> <span class="n">y_weight</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
             <span class="n">leaf_ids</span><span class="p">,</span> <span class="n">y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span><span class="p">,</span> <span class="p">:],</span> <span class="n">sample_weight</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">honest_indices_</span><span class="p">]</span>
         <span class="p">):</span>
+            <span class="c1"># XXX: this treats the leaf node values as a sum of the leaf</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">leaf_id</span><span class="p">][:,</span> <span class="n">yval</span><span class="p">]</span> <span class="o">+=</span> <span class="n">y_weight</span>
+
+            <span class="c1"># XXX: this normalizes the leaf node values to be a proportion of the leaf</span>
+            <span class="c1"># total_n_node_samples += y_weight</span>
+            <span class="c1"># if leaf_id in seen_leaf_ids:</span>
+            <span class="c1">#     self.tree_.value[leaf_id][:, yval] += y_weight</span>
+            <span class="c1"># else:</span>
+            <span class="c1">#     self.tree_.value[leaf_id][:, yval] = y_weight</span>
+            <span class="c1"># seen_leaf_ids.add(leaf_id)</span>
+        <span class="c1"># for leaf_id in seen_leaf_ids:</span>
+        <span class="c1">#     self.tree_.value[leaf_id] /= total_n_node_samples</span>
 
     <span class="k">def</span> <span class="nf">_inherit_estimator_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize necessary attributes from the provided tree estimator&quot;&quot;&quot;</span>
@@ -1270,7 +1363,20 @@ document.write(`
         <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_X_predict</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">check_input</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
-</div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">feature_importances_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Feature importances.</span>
+
+<span class="sd">        This is the impurity-based feature importances. The higher, the more important</span>
+<span class="sd">        that the feature was used in constructing the structure.</span>
+
+<span class="sd">        Note: this does not give the feature importances relative for setting the</span>
+<span class="sd">        leaf node posterior estimates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: technically, the feature importances is built rn using the structure set</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">feature_importances_</span></div>
 
 </pre></div>
 
@@ -1312,7 +1418,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, treeple Developers. Last updated on 2024-10-11.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-12-12.
       <br/>
     
   </p>

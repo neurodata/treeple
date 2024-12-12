@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>treeple.ensemble._honest_forest &#8212; treeple 0.9.0dev0 documentation</title>
+    <title>treeple.ensemble._honest_forest &#8212; treeple 0.10.0dev0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=ac02cc09edc035673794" />
   <script src="../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=ac02cc09edc035673794"></script>
 
-    <script src="../../../_static/documentation_options.js?v=54a029fc"></script>
+    <script src="../../../_static/documentation_options.js?v=2512dea2"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -131,7 +131,7 @@
   
   
   
-    <p class="title logo__title">treeple 0.9.0dev0 documentation</p>
+    <p class="title logo__title">treeple 0.10.0dev0 documentation</p>
   
 </a></div>
     
@@ -708,6 +708,11 @@ document.write(`
 <span class="sd">        Fraction of training samples used for estimates in the trees. The</span>
 <span class="sd">        remaining samples will be used to learn the tree structure. A larger</span>
 <span class="sd">        fraction creates shallower trees with lower variance estimates.</span>
+<span class="sd">    </span>
+<span class="sd">    honest_method : {&quot;prune&quot;, &quot;apply&quot;}, default=&quot;prune&quot;</span>
+<span class="sd">        Method for enforcing honesty. If &quot;prune&quot;, the tree is pruned to enforce</span>
+<span class="sd">        honesty. If &quot;apply&quot;, the tree is not pruned, but the leaf estimates are</span>
+<span class="sd">        adjusted to enforce honesty.</span>
 
 <span class="sd">    tree_estimator : object, default=None</span>
 <span class="sd">        Instantiated tree of type BaseDecisionTree from treeple.</span>
@@ -848,6 +853,13 @@ document.write(`
 
     <span class="n">_parameter_constraints</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span>
         <span class="o">**</span><span class="n">ForestClassifier</span><span class="o">.</span><span class="n">_parameter_constraints</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">HonestTreeClassifier</span><span class="o">.</span><span class="n">_parameter_constraints</span><span class="p">,</span>
+        <span class="s2">&quot;class_weight&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="n">StrOptions</span><span class="p">({</span><span class="s2">&quot;balanced_subsample&quot;</span><span class="p">,</span> <span class="s2">&quot;balanced&quot;</span><span class="p">}),</span>
+            <span class="nb">dict</span><span class="p">,</span>
+            <span class="nb">list</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
+        <span class="p">],</span>
     <span class="p">}</span>
     <span class="n">_parameter_constraints</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;max_samples&quot;</span><span class="p">)</span>
     <span class="n">_parameter_constraints</span><span class="p">[</span><span class="s2">&quot;max_samples&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
@@ -891,6 +903,7 @@ document.write(`
         <span class="n">max_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">honest_prior</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span>
         <span class="n">honest_fraction</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">honest_method</span><span class="o">=</span><span class="s2">&quot;apply&quot;</span><span class="p">,</span>
         <span class="n">tree_estimator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">stratify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="o">**</span><span class="n">tree_estimator_params</span><span class="p">,</span>
@@ -913,6 +926,7 @@ document.write(`
                 <span class="s2">&quot;tree_estimator&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;honest_fraction&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;honest_prior&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;honest_method&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;stratify&quot;</span><span class="p">,</span>
             <span class="p">),</span>
             <span class="n">bootstrap</span><span class="o">=</span><span class="n">bootstrap</span><span class="p">,</span>
@@ -936,6 +950,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">ccp_alpha</span> <span class="o">=</span> <span class="n">ccp_alpha</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">honest_fraction</span> <span class="o">=</span> <span class="n">honest_fraction</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">honest_prior</span> <span class="o">=</span> <span class="n">honest_prior</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">honest_method</span> <span class="o">=</span> <span class="n">honest_method</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tree_estimator</span> <span class="o">=</span> <span class="n">tree_estimator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stratify</span> <span class="o">=</span> <span class="n">stratify</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tree_estimator_params</span> <span class="o">=</span> <span class="n">tree_estimator_params</span>
@@ -1174,7 +1189,7 @@ document.write(`
     <span class="k">def</span> <span class="nf">__sklearn_tags__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># XXX: nans should be supportable in HRF</span>
         <span class="n">tags</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__sklearn_tags__</span><span class="p">()</span>
-        <span class="n">tags</span><span class="o">.</span><span class="n">classifier_tags</span><span class="o">.</span><span class="n">multi_output</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># tags.classifier_tags.multi_output = False</span>
         <span class="n">tags</span><span class="o">.</span><span class="n">input_tags</span><span class="o">.</span><span class="n">allow_nan</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="n">tags</span>
 
@@ -1329,7 +1344,7 @@ document.write(`
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2022-2024, treeple Developers. Last updated on 2024-10-11.
+      © Copyright 2022-2024, treeple Developers. Last updated on 2024-12-12.
       <br/>
     
   </p>
