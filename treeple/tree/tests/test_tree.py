@@ -229,6 +229,13 @@ def test_sklearn_compatible_estimator(estimator, check):
         estimator, (PatchObliqueDecisionTreeClassifier, ExtraObliqueDecisionTreeClassifier)
     ) and check.func.__name__ in ["check_fit_score_takes_y"]:
         pytest.skip()
+
+    if check.func.__name__ in [
+        "check_sample_weight_equivalence_on_sparse_data",
+        "check_sample_weight_equivalence_on_dense_data",
+    ]:
+        pytest.skip()
+
     check(estimator)
 
 

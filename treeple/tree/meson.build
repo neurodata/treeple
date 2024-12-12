@@ -43,7 +43,7 @@ py.install_sources(
   subdir: 'treeple/tree'   # Folder relative to site-packages to install to
 )
 
-# TODO: comment in if we include tests
 subdir('tests')
 subdir('unsupervised')
 subdir('manifold')
+subdir('honesty')

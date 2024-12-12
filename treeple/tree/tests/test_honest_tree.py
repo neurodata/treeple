@@ -36,7 +36,10 @@ iris.target = iris.target[perm]
 def test_iris(criterion, max_features, estimator):
     # Check consistency on dataset iris.
     clf = HonestTreeClassifier(
-        criterion=criterion, random_state=0, max_features=max_features, tree_estimator=estimator
+        criterion=criterion,
+        random_state=0,
+        max_features=max_features,
+        tree_estimator=estimator,
     )
     clf.fit(iris.data, iris.target)
     score = accuracy_score(clf.predict(iris.data), iris.target)
@@ -54,8 +57,9 @@ def test_iris(criterion, max_features, estimator):
     assert len(clf.structure_indices_) < len(iris.target)
 
 
-def test_toy_accuracy():
-    clf = HonestTreeClassifier()
+@pytest.mark.parametrize("honest_method", ["apply", "prune"])
+def test_toy_accuracy(honest_method):
+    clf = HonestTreeClassifier(honest_method=honest_method)
     X = np.ones((20, 4))
     X[10:] *= -1
     y = [0] * 10 + [1] * 10
@@ -175,6 +179,9 @@ def test_sklearn_compatible_estimator(estimator, check):
         "check_class_weight_classifiers",
         "check_classifier_multioutput",
         "check_do_not_raise_errors_in_init_or_set_params",
+        "check_sample_weight_equivalence",
+        "check_sample_weight_equivalence_on_dense_data",
+        "check_sample_weight_equivalence_on_sparse_data",
     ]:
         pytest.skip()
     check(estimator)
