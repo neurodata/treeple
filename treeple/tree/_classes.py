@@ -2441,7 +2441,7 @@ class PatchObliqueDecisionTreeRegressor(SimMatrixMixin, DecisionTreeRegressor):
         # XXX: nans should be supportable in SPORF by just using RF-like splits on missing values
         # However, for MORF it is not supported
         tags = super().__sklearn_tags__()
-        tags.regressor_tags.multi_label = True
+        # tags.regressor_tags.multi_label = True TODO: add regression support
         tags.input_tags.allow_nan = False
         return tags
 
