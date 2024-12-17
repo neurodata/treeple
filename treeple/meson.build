@@ -96,7 +96,7 @@ cc = meson.get_compiler('c')
 #   'source_fname',
 #   numpy_nodepr_api)
 
-# XXX: ENABLE WHEN DEBUGGING
+# TODO XXX: ENABLE WHEN DEBUGGING
 boundscheck = 'False'
 
 scikit_learn_cython_args = [

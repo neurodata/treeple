@@ -200,7 +200,17 @@ def test_sklearn_compatible_estimator(estimator, check):
             ObliqueRandomForestClassifier,
             PatchObliqueRandomForestClassifier,
         ),
-    ) and check.func.__name__ in ["check_fit_score_takes_y"]:
+    ) and check.func.__name__ in [
+        "check_fit_score_takes_y",
+    ]:
+        pytest.skip()
+
+    if check.func.__name__ in [
+        # sample weights do not necessarily imply a sample is not used in clustering
+        "check_sample_weight_equivalence",
+        "check_sample_weight_equivalence_on_dense_data",
+        "check_sample_weight_equivalence_on_sparse_data",
+    ]:
         pytest.skip()
     check(estimator)
 
