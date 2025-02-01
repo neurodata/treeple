@@ -752,6 +752,12 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
                 pruned_tree, self.tree_, pruner, X, y, sample_weight, missing_values_in_feature_mask
             )
             self.tree_ = pruned_tree
+            
+            honest_leaves = self.tree_.apply(X[self.honest_indices_])
+
+            # # y-encoded ensures that y values match the indices of the classes
+            y = y_encoded
+            self._set_leaf_nodes(honest_leaves, y, sample_weight)
 
         if self.n_outputs_ == 1:
             self.n_classes_ = self.n_classes_[0]

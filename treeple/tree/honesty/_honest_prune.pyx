@@ -153,9 +153,13 @@ cdef class HonestPruner(Splitter):
 
                 n_missing += 1
                 current_end -= 1
-            elif p > pos and X_ndarray[sample_idx, feature] <= threshold:
-                self.samples[p], self.samples[pos] = \
-                    self.samples[pos], self.samples[p]
+
+            # Leverage sklearn's forked API to compute the feature value at this split node
+            # and then compare that to the corresponding threshold
+            # Note: this enables this function to work w/ both axis-aligned and oblique splits.
+            
+            elif p > pos and (self.tree._compute_feature(X_ndarray, sample_idx,&self.tree.nodes[node_idx])<= threshold):
+                self.samples[p], self.samples[pos] = self.samples[pos], self.samples[p]
                 pos += 1
 
         # this is the split point for left/right children
@@ -368,8 +372,13 @@ cdef _honest_prune(
             split_is_degenerate = (
                 pruner.n_left_samples() == 0 or pruner.n_right_samples() == 0
             )
-            is_leaf_in_origtree = child_l[node_idx] == _TREE_LEAF
-            if invalid_split or split_is_degenerate or is_leaf_in_origtree:
+            # is_leaf_in_origtree = child_l[node_idx] == _TREE_LEAF
+            ## consider whether lef or right children node is a leaf node.
+            is_leaf_in_origtree = ( child_l[node_idx] ==_TREE_LEAF and child_r[node_idx] == _TREE_LEAF)
+            
+            if invalid_split or split_is_degenerate or is_leaf_in_origtree: 
+                # invalid_split or is_leaf_in_origtree:
+                # or split_is_degenerate or is_leaf_in_origtree:
                 # ... and child_r[node_idx] == _TREE_LEAF:
                 #
                 # 1) if node is not degenerate, that means there are still honest-samples in
