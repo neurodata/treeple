@@ -875,9 +875,9 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
 
         if self.n_outputs_ == 1:
             proba = proba[:, : self._tree_n_classes_]
-            normalizer = proba.sum(axis=1)[:, np.newaxis]
-            normalizer[normalizer == 0.0] = 1.0
-            proba /= normalizer
+            # normalizer = proba.sum(axis=1)[:, np.newaxis]
+            # normalizer[normalizer == 0.0] = 1.0
+            # proba /= normalizer
             proba = self._empty_leaf_correction(proba)
 
             return proba
@@ -887,9 +887,9 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
 
             for k in range(self.n_outputs_):
                 proba_k = proba[:, k, : self._tree_n_classes_[k]]
-                normalizer = proba_k.sum(axis=1)[:, np.newaxis]
-                normalizer[normalizer == 0.0] = 1.0
-                proba_k /= normalizer
+                # normalizer = proba_k.sum(axis=1)[:, np.newaxis]
+                # normalizer[normalizer == 0.0] = 1.0
+                # proba_k /= normalizer
                 proba_k = self._empty_leaf_correction(proba_k, k)
                 all_proba.append(proba_k)
 
