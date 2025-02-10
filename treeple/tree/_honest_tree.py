@@ -752,7 +752,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
                 pruned_tree, self.tree_, pruner, X, y, sample_weight, missing_values_in_feature_mask
             )
             self.tree_ = pruned_tree
-            
+
             # Fit leaves using other subsample
             honest_leaves = self.tree_.apply(X[self.honest_indices_])
 

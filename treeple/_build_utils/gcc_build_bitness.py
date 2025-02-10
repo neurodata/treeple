@@ -1,6 +1,5 @@
 #!python
-""" Detect bitness (32 or 64) of Mingw-w64 gcc build target on Windows.
-"""
+"""Detect bitness (32 or 64) of Mingw-w64 gcc build target on Windows."""
 
 import re
 from subprocess import run
