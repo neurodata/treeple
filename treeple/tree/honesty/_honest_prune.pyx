@@ -153,7 +153,7 @@ cdef class HonestPruner(Splitter):
 
                 n_missing += 1
                 current_end -= 1
-            elif p > pos and (self.tree._compute_feature(X_ndarray, sample_idx,&self.tree.nodes[node_idx])<= threshold):
+            elif p > pos and (self.tree._compute_feature(X_ndarray, sample_idx, &self.tree.nodes[node_idx])<= threshold):
                 self.samples[p], self.samples[pos] = \
                     self.samples[pos], self.samples[p]
                 pos += 1
