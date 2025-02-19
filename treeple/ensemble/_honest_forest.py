@@ -276,6 +276,12 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
         honesty. If "apply", the tree is not pruned, but the leaf estimates are
         adjusted to enforce honesty.
 
+    kernel_method : bool, default=True
+        Method for normalizing ``predict_proba`` posteriors by the number of
+        samples in the leaf nodes across the forest. Contrary to the average of
+        posteriors, the kernel method only normalizes the probabilities once.
+        By default True.
+
     tree_estimator : object, default=None
         Instantiated tree of type BaseDecisionTree from treeple.
         If None, then sklearn's DecisionTreeClassifier with default parameters will
@@ -287,7 +293,7 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
         Whether or not to stratify sample when considering structure and leaf indices.
         This will also stratify samples when bootstrap sampling is used. For more
         information, see :func:`sklearn.utils.resample`.
-        By default False.
+        By default True.
 
     **tree_estimator_params : dict
         Parameters to pass to the underlying base tree estimators.
@@ -466,6 +472,7 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
         honest_prior="ignore",
         honest_fraction=0.5,
         honest_method="prune",
+        kernel_method=True,
         tree_estimator=None,
         stratify=True,
         **tree_estimator_params,
@@ -490,6 +497,7 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
                 "honest_prior",
                 "honest_method",
                 "stratify",
+                "kernel_method",
             ),
             bootstrap=bootstrap,
             oob_score=oob_score,
