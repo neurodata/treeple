@@ -186,9 +186,9 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         classes). If "empirical", the prior tree posterior is the relative
         class frequency in the voting subsample.
 
-    stratify : bool
+    stratify : bool, default=True
         Whether or not to stratify sample when considering structure and leaf indices.
-        By default False.
+        By default True.
 
     honest_method : {"apply", "prune"}, default="apply"
         Method to use for fitting the leaf nodes. If "apply", the leaf nodes
@@ -196,6 +196,12 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         if not enough data. If "prune", the leaf nodes are fit
         by pruning using the honest-set of data after the tree structure is built
         using the structure-set of data.
+
+    kernel_method : bool, default=False
+        Method for normalizing ``predict_proba`` posteriors by the number of
+        samples in the leaf nodes across the forest. Not applicalble to single
+        honest trees.
+        By default False.
 
     **tree_estimator_params : dict
         Parameters to pass to the underlying base tree estimators.
@@ -338,8 +344,9 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         monotonic_cst=None,
         honest_fraction=0.5,
         honest_prior="empirical",
-        stratify=False,
+        stratify=True,
         honest_method="apply",
+        kernel_method=False,
         **tree_estimator_params,
     ):
         self.tree_estimator = tree_estimator
@@ -361,6 +368,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
         self.honest_prior = honest_prior
         self.stratify = stratify
         self.honest_method = honest_method
+        self.kernel_method = kernel_method
 
         # XXX: to enable this, we need to also reset the leaf node samples during `_set_leaf_nodes`
         self.store_leaf_values = False
@@ -875,9 +883,10 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
 
         if self.n_outputs_ == 1:
             proba = proba[:, : self._tree_n_classes_]
-            normalizer = proba.sum(axis=1)[:, np.newaxis]
-            normalizer[normalizer == 0.0] = 1.0
-            proba /= normalizer
+            if not self.kernel_method:
+                normalizer = proba.sum(axis=1)[:, np.newaxis]
+                normalizer[normalizer == 0.0] = 1.0
+                proba /= normalizer
             proba = self._empty_leaf_correction(proba)
 
             return proba
@@ -887,10 +896,11 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
 
             for k in range(self.n_outputs_):
                 proba_k = proba[:, k, : self._tree_n_classes_[k]]
-                normalizer = proba_k.sum(axis=1)[:, np.newaxis]
-                normalizer[normalizer == 0.0] = 1.0
-                proba_k /= normalizer
-                proba_k = self._empty_leaf_correction(proba_k, k)
+                if not self.kernel_method:
+                    normalizer = proba_k.sum(axis=1)[:, np.newaxis]
+                    normalizer[normalizer == 0.0] = 1.0
+                    proba_k /= normalizer
+                    proba_k = self._empty_leaf_correction(proba_k, k)
                 all_proba.append(proba_k)
 
             return all_proba

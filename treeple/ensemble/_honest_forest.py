@@ -182,7 +182,7 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
         ``N``, ``N_t``, ``N_t_R`` and ``N_t_L`` all refer to the weighted sum,
         if ``sample_weight`` is passed.
 
-    bootstrap : bool, default=False
+    bootstrap : bool, default=True
         Whether bootstrap samples are used when building trees. If False, the
         whole dataset is used to build each tree.
 
@@ -270,11 +270,17 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
         Fraction of training samples used for estimates in the trees. The
         remaining samples will be used to learn the tree structure. A larger
         fraction creates shallower trees with lower variance estimates.
-    
+
     honest_method : {"prune", "apply"}, default="prune"
         Method for enforcing honesty. If "prune", the tree is pruned to enforce
         honesty. If "apply", the tree is not pruned, but the leaf estimates are
         adjusted to enforce honesty.
+
+    kernel_method : bool, default=True
+        Method for normalizing ``predict_proba`` posteriors by the number of
+        samples in the leaf nodes across the forest. Contrary to the average of
+        posteriors, the kernel method only normalizes the probabilities once.
+        By default True.
 
     tree_estimator : object, default=None
         Instantiated tree of type BaseDecisionTree from treeple.
@@ -283,11 +289,11 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
         to be set. The parameters of the ``tree_estimator`` can be set using
         the ``tree_estimator_params`` keyword argument.
 
-    stratify : bool
+    stratify : bool, default=True
         Whether or not to stratify sample when considering structure and leaf indices.
         This will also stratify samples when bootstrap sampling is used. For more
         information, see :func:`sklearn.utils.resample`.
-        By default False.
+        By default True.
 
     **tree_estimator_params : dict
         Parameters to pass to the underlying base tree estimators.
@@ -462,12 +468,13 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
         warm_start=False,
         class_weight=None,
         ccp_alpha=0.0,
-        max_samples=None,
+        max_samples=1.6,
         honest_prior="ignore",
         honest_fraction=0.5,
-        honest_method="apply",
+        honest_method="prune",
+        kernel_method=True,
         tree_estimator=None,
-        stratify=False,
+        stratify=True,
         **tree_estimator_params,
     ):
         super().__init__(
@@ -490,6 +497,7 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
                 "honest_prior",
                 "honest_method",
                 "stratify",
+                "kernel_method",
             ),
             bootstrap=bootstrap,
             oob_score=oob_score,
