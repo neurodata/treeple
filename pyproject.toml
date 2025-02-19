@@ -10,7 +10,7 @@ requires = [
   "setuptools<=65.5",
   "packaging",
   "Cython>=3.0.10",
-  "scikit-learn>=1.5.0",
+  "scikit-learn>=1.6.0",
   "scipy>=1.5.0",
   "numpy>=1.25; python_version>='3.9'"
 ]
@@ -52,7 +52,7 @@ include = [
 dependencies = [
   'numpy>=1.25.0',
   'scipy>=1.5.0',
-  'scikit-learn>=1.5.0'
+  'scikit-learn>=1.6.0'
 ]
 
 [project.optional-dependencies]
@@ -70,7 +70,7 @@ build = [
   'meson-python',
   'spin>=0.12',
   'doit',
-  'scikit-learn>=1.5.0',
+  'scikit-learn>=1.6.0',
   'Cython>=3.0.10',
   'ninja',
   'numpy>=1.25.0',
