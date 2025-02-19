@@ -17,7 +17,7 @@ requires = [
 
 [project]
 name = "treeple"
-version = "0.10.0"
+version = "0.10.1"
 description = "Modern decision trees in Python"
 maintainers = [
   {name = "Neurodata", email = "adam.li@columbia.edu"}
