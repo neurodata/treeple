@@ -372,6 +372,7 @@ cdef _honest_prune(
             split_is_degenerate = (
                 pruner.n_left_samples() == 0 or pruner.n_right_samples() == 0
             )
+
             is_leaf_in_origtree = child_l[node_idx] == _TREE_LEAF
             
             if invalid_split or split_is_degenerate or is_leaf_in_origtree: 
