@@ -4,7 +4,7 @@ project(
   # Note that the git commit hash cannot be added dynamically here
   # That only happens when importing from a git repository.
   # See `treeple/__init__.py`
-  version: '0.10.1',
+  version: '0.10.2',
   license: 'PolyForm Noncommercial 1.0.0',
   meson_version: '>= 1.1.0',
   default_options: [
