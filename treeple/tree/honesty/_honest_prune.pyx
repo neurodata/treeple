@@ -371,8 +371,8 @@ cdef _honest_prune(
             # is_leaf_in_origtree = child_l[node_idx] == _TREE_LEAF
             # consider whether left or right children node is a leaf node.
             is_leaf_in_origtree = (child_l[node_idx] == _TREE_LEAF and child_r[node_idx] == _TREE_LEAF)
-            
-            if invalid_split or split_is_degenerate or is_leaf_in_origtree: 
+
+            if invalid_split or split_is_degenerate or is_leaf_in_origtree:
                 # invalid_split or is_leaf_in_origtree:
                 # or split_is_degenerate or is_leaf_in_origtree:
                 # ... and child_r[node_idx] == _TREE_LEAF:
