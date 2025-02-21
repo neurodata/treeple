@@ -368,8 +368,13 @@ cdef _honest_prune(
             split_is_degenerate = (
                 pruner.n_left_samples() == 0 or pruner.n_right_samples() == 0
             )
-            is_leaf_in_origtree = child_l[node_idx] == _TREE_LEAF
+            # is_leaf_in_origtree = child_l[node_idx] == _TREE_LEAF
+            # consider whether left or right children node is a leaf node.
+            is_leaf_in_origtree = (child_l[node_idx] == _TREE_LEAF and child_r[node_idx] == _TREE_LEAF)
+
             if invalid_split or split_is_degenerate or is_leaf_in_origtree:
+                # invalid_split or is_leaf_in_origtree:
+                # or split_is_degenerate or is_leaf_in_origtree:
                 # ... and child_r[node_idx] == _TREE_LEAF:
                 #
                 # 1) if node is not degenerate, that means there are still honest-samples in
