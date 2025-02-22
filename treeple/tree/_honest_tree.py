@@ -756,7 +756,6 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
             y = y_encoded
             # Fit leaves using other subsample
             honest_leaves = self.tree_.apply(X[self.honest_indices_])
-            # print(sample_weight)
 
             # y-encoded ensures that y values match the indices of the classes
             self._set_leaf_nodes(honest_leaves, y, sample_weight)
