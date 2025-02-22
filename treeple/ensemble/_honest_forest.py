@@ -513,6 +513,7 @@ class HonestForestClassifier(ForestClassifier, ForestClassifierMixin):
         self.honest_fraction = honest_fraction
         self.honest_prior = honest_prior
         self.honest_method = honest_method
+        print(self.honest_method)
         self.tree_estimator = tree_estimator
         self.stratify = stratify
         self._tree_estimator_params = tree_estimator_params
