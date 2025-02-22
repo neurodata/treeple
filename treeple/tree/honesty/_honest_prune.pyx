@@ -147,7 +147,7 @@ cdef class HonestPruner(Splitter):
             sample_idx = self.samples[p]
 
             # missing-values are always placed at the right-most end
-            if isnan(X_ndarray[sample_idx, feature]):
+            if isnan(self.tree._compute_feature(X_ndarray, sample_idx, &self.tree.nodes[node_idx])):
                 self.samples[p], self.samples[current_end] = \
                     self.samples[current_end], self.samples[p]
 
