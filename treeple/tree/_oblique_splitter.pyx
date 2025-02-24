@@ -98,7 +98,7 @@ cdef class BaseObliqueSplitter(Splitter):
         const intp_t[:] samples,
         float32_t[:] feature_values,
         vector[float32_t]* proj_vec_weights,  # weights of the vector (n_non_zeros,)
-        vector[intp_t]* proj_vec_indices    # indices of the features (n_non_zeros,)
+        vector[intp_t]* proj_vec_indices      # indices of the features (n_non_zeros,)
     ) noexcept nogil:
         """Compute the feature values for the samples[start:end] range.
 
@@ -121,6 +121,12 @@ cdef class BaseObliqueSplitter(Splitter):
                     feature_values[idx] = 0.0
                 feature_values[idx] += self.X[samples[idx], col_idx] * col_weight
 
+    cdef void sample_proj_vec(
+        self,
+        vector[float32_t]& proj_vec_weights,
+        vector[intp_t]& proj_vec_indices
+    ) noexcept nogil:
+        pass
 
 cdef class ObliqueSplitter(BaseObliqueSplitter):
     def __cinit__(
@@ -201,6 +207,43 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         # XXX: Just to initialize stuff
         # self.feature_weights = np.ones((self.n_features,), dtype=float32_t) / self.n_features
         return 0
+
+    cdef void sample_proj_vec(
+        self,
+        vector[float32_t]& proj_vec_weights,
+        vector[intp_t]& proj_vec_indices
+    ) noexcept nogil:
+        cdef intp_t n_features = self.n_features
+        cdef intp_t n_non_zeros = self.n_non_zeros
+        cdef uint32_t* random_state = &self.rand_r_state
+
+        cdef intp_t i, feat_i, proj_i, rand_vec_index
+        cdef float32_t weight
+
+        # construct an array to sample from mTry x n_features set of indices
+        cdef intp_t[::1] indices_to_sample = self.indices_to_sample
+        cdef intp_t grid_size = self.max_features * self.n_features
+
+        # shuffle indices over the 2D grid to sample using Fisher-Yates
+        fisher_yates_shuffle(indices_to_sample, grid_size, random_state)
+
+        # sample 'n_non_zeros' in a mtry X n_features projection matrix
+        # which consists of +/- 1's chosen at a 1/2s rate
+        for i in range(0, n_non_zeros):
+            # get the next index from the shuffled index array
+            rand_vec_index = indices_to_sample[i]
+
+            # get the projection index (i.e. row of the projection matrix) and
+            # feature index (i.e. column of the projection matrix)
+            proj_i = rand_vec_index // n_features
+            feat_i = rand_vec_index % n_features
+
+            # sample a random weight
+            weight = 1 if (rand_int(0, 2, random_state) == 1) else -1
+
+            proj_vec_indices[proj_i].push_back(feat_i)  # Store index of nonzero
+            proj_vec_weights[proj_i].push_back(weight)  # Store weight of nonzero
+
 
     cdef void sample_proj_mat(
         self,
@@ -322,6 +365,8 @@ cdef class BestObliqueSplitter(ObliqueSplitter):
             # XXX: 'feature' is not actually used in oblique split records
             # Just indicates which split was sampled
             current_split.feature = feat_i
+            
+            # sample the projection vector
             current_split.proj_vec_weights = &self.proj_mat_weights[feat_i]
             current_split.proj_vec_indices = &self.proj_mat_indices[feat_i]
 
