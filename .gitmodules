@@ -2,3 +2,7 @@
 	path = treeple/_lib/sklearn_fork
 	url = https://github.com/neurodata/scikit-learn
 	branch = submodulev3
+[submodule "treeple/_lib_experimental/sklearn_fork"]
+	path = treeple/_lib_experimental/sklearn_fork
+	url = https://github.com/neurodata/scikit-learn.git
+	branch = scarliles/honesty
