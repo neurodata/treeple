@@ -147,12 +147,12 @@ cdef class HonestPruner(Splitter):
             sample_idx = self.samples[p]
 
             # missing-values are always placed at the right-most end
-            if isnan(X_ndarray[sample_idx,feature]):
+            if isnan(self.tree._compute_feature(X_ndarray, sample_idx, &self.tree.nodes[node_idx])):
                 self.samples[p], self.samples[current_end] = \
                     self.samples[current_end], self.samples[p]
                 n_missing += 1
                 current_end -= 1
-            elif p > pos and (self.tree._compute_feature(X_ndarray, sample_idx, &self.tree.nodes[node_idx])<= threshold):
+            elif p > pos and (self.tree._compute_feature(X_ndarray, sample_idx, &self.tree.nodes[node_idx]) <= threshold):
                 self.samples[p], self.samples[pos] = \
                     self.samples[pos], self.samples[p]
                 pos += 1
@@ -367,7 +367,7 @@ cdef _honest_prune(
             split_is_degenerate = (
                 pruner.n_left_samples() == 0 or pruner.n_right_samples() == 0
             )
-            is_leaf_in_origtree = (child_l[node_idx] == _TREE_LEAF or child_r[node_idx] == _TREE_LEAF)
+            is_leaf_in_origtree = child_l[node_idx] == _TREE_LEAF
             if invalid_split or split_is_degenerate or is_leaf_in_origtree:
                 # ... and child_r[node_idx] == _TREE_LEAF:
                 #
