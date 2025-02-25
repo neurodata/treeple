@@ -110,7 +110,7 @@ cdef class HonestPruner(Splitter):
             The original tree to be pruned.
         """
         self.tree = orig_tree
-        self.capacity = 0
+        self.capacity = 2047
 
     cdef int init(
         self,
@@ -133,7 +133,6 @@ cdef class HonestPruner(Splitter):
         right-most end of `samples`, that is `samples[end_non_missing:end]`.
         """
         cdef float64_t threshold = self.tree.nodes[node_idx].threshold
-        cdef intp_t feature = self.tree.nodes[node_idx].feature
         cdef intp_t n_missing = 0
         cdef intp_t pos = self.start
         cdef intp_t p
@@ -160,7 +159,7 @@ cdef class HonestPruner(Splitter):
                 self.samples[p], self.samples[pos] = \
                     self.samples[pos], self.samples[p]
                 pos += 1
-    
+
         # this is the split point for left/right children
         self.pos = pos
         self.n_missing = n_missing
