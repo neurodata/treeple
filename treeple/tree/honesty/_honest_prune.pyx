@@ -110,7 +110,7 @@ cdef class HonestPruner(Splitter):
             The original tree to be pruned.
         """
         self.tree = orig_tree
-        self.capacity = 0
+        self.capacity = 2047
 
     cdef int init(
         self,
@@ -133,7 +133,6 @@ cdef class HonestPruner(Splitter):
         right-most end of `samples`, that is `samples[end_non_missing:end]`.
         """
         cdef float64_t threshold = self.tree.nodes[node_idx].threshold
-        cdef intp_t feature = self.tree.nodes[node_idx].feature
         cdef intp_t n_missing = 0
         cdef intp_t pos = self.start
         cdef intp_t p
@@ -147,10 +146,9 @@ cdef class HonestPruner(Splitter):
             sample_idx = self.samples[p]
 
             # missing-values are always placed at the right-most end
-            if isnan(X_ndarray[sample_idx, feature]):
+            if isnan(self.tree._compute_feature(X_ndarray, sample_idx, &self.tree.nodes[node_idx])):
                 self.samples[p], self.samples[current_end] = \
                     self.samples[current_end], self.samples[p]
-
                 n_missing += 1
                 current_end -= 1
 

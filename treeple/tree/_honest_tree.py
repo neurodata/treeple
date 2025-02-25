@@ -761,6 +761,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
             )
             self.tree_ = pruned_tree
 
+            y = y_encoded
             # Fit leaves using other subsample
             honest_leaves = self.tree_.apply(X[self.honest_indices_])
 
@@ -883,6 +884,7 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
 
         if self.n_outputs_ == 1:
             proba = proba[:, : self._tree_n_classes_]
+
             if not self.kernel_method:
                 normalizer = proba.sum(axis=1)[:, np.newaxis]
                 normalizer[normalizer == 0.0] = 1.0
@@ -896,11 +898,13 @@ class HonestTreeClassifier(MetaEstimatorMixin, ClassifierMixin, BaseDecisionTree
 
             for k in range(self.n_outputs_):
                 proba_k = proba[:, k, : self._tree_n_classes_[k]]
+
                 if not self.kernel_method:
                     normalizer = proba_k.sum(axis=1)[:, np.newaxis]
                     normalizer[normalizer == 0.0] = 1.0
                     proba_k /= normalizer
                     proba_k = self._empty_leaf_correction(proba_k, k)
+
                 all_proba.append(proba_k)
 
             return all_proba
