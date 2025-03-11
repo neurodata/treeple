@@ -36,6 +36,12 @@ DENSE_SPLITTERS = {
     "best": _oblique_splitter.MultiViewSplitter,
 }
 
+OBLIQUE_DENSE_SPLITTERS = {
+    "best": _oblique_splitter.BestObliqueSplitter,
+    "random": _oblique_splitter.RandomObliqueSplitter,
+    "best-multiview": _oblique_splitter.MultiViewSplitter,
+}
+
 
 class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
     """A multi-view axis-aligned decision tree classifier.
@@ -160,7 +166,14 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         through the fit method) if sample_weight is specified.
 
     feature_combinations : float, default=None
-        Not used.
+        The number of features to combine on average at each split
+        of the decision trees. If ``None``, then will default to the minimum of
+        1. This controls the number of non-zeros is the
+        projection matrix. Setting the value to 1.0 is equivalent to a
+        traditional decision-tree. ``feature_combinations * max_features``
+        gives the number of expected non-zeros in the projection matrix of shape
+        ``(max_features, n_features)``. Thus this value must always be less than
+        ``n_features`` in order to be valid.
 
     ccp_alpha : non-negative float, default=0.0
         Not used.
@@ -279,7 +292,7 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         max_leaf_nodes=None,
         min_impurity_decrease=0.0,
         class_weight=None,
-        feature_combinations=None,
+        feature_combinations=1,
         ccp_alpha=0.0,
         store_leaf_values=False,
         monotonic_cst=None,
@@ -303,7 +316,7 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
             monotonic_cst=monotonic_cst,
         )
 
-        self.feature_combinations = feature_combinations
+        self.feature_combinations = 1 if feature_combinations is None else feature_combinations
         self.feature_set_ends = feature_set_ends
         self.apply_max_features_per_feature_set = apply_max_features_per_feature_set
         self._max_features_arr = None
@@ -364,7 +377,7 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
         self.monotonic_cst_ = monotonic_cst
         _, n_features = X.shape
 
-        self.feature_combinations_ = 1
+        self.feature_combinations_ = self.feature_combinations
 
         # Build tree
         criterion = self.criterion
@@ -393,7 +406,10 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                 "Please convert your data to a dense array."
             )
         else:
-            SPLITTERS = DENSE_SPLITTERS
+            if self.feature_combinations_ == 1:
+                SPLITTERS = DENSE_SPLITTERS
+            else:
+                SPLITTERS = OBLIQUE_DENSE_SPLITTERS
 
         if isinstance(self._max_features_arr, (Integral, Real, str, type(None))):
             max_features_arr_ = [self._max_features_arr] * self.n_feature_sets_
@@ -554,7 +570,10 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                 "Please convert your data to a dense array."
             )
         else:
-            SPLITTERS = DENSE_SPLITTERS
+            if self.feature_combinations_ == 1:
+                SPLITTERS = DENSE_SPLITTERS
+            else:
+                SPLITTERS = OBLIQUE_DENSE_SPLITTERS
         if not isinstance(self.splitter, ObliqueSplitter):
             splitter = SPLITTERS[self.splitter](
                 criterion,
