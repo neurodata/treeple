@@ -6,6 +6,8 @@ cimport numpy as cnp
 
 cnp.import_array()
 
+from libcpp.vector cimport vector
+
 from .._lib.sklearn.tree._splitter cimport SplitRecord
 from .._lib.sklearn.utils._typedefs cimport float32_t, float64_t, int32_t, intp_t, uint32_t
 
@@ -22,7 +24,7 @@ cdef void fisher_yates_shuffle(
 ) noexcept nogil
 
 
-cdef int rand_weighted_binary(
+cdef intp_t rand_weighted_binary(
     float64_t p0,
     uint32_t* random_state
 ) noexcept nogil
@@ -47,3 +49,15 @@ cdef intp_t ravel_multi_index_cython(
     vector_or_memview coords,
     const intp_t[:] shape
 ) noexcept nogil
+
+cdef void compute_vectorized_indices_from_cartesian(
+    intp_t base_index,
+    vector[vector[intp_t]]& index_arrays,
+    const intp_t[:] data_dims,
+    vector[intp_t]& result
+) noexcept nogil
+
+cdef memoryview[float32_t, ndim=3] init_2dmemoryview(
+    cnp.ndarray array,
+    const intp_t[:] data_dims
+)

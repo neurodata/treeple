@@ -2,6 +2,9 @@ tree_extension_metadata = {
   '_morf_splitter':
     {'sources': ['_morf_splitter.pyx'],
      'override_options': ['cython_language=cpp', 'optimization=3']},
+  '_kernel_splitter':
+    {'sources': ['_kernel_splitter.pyx'],
+     'override_options': ['cython_language=cpp', 'optimization=3']},
 }
 
 foreach ext_name, ext_dict : tree_extension_metadata
