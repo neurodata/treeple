@@ -61,6 +61,7 @@ endif
 
 # r = run_command('git', 'submodule', 'update', '--init', check: false)
 r = run_command('mv', 'treeple/_lib/sklearn_fork/sklearn', 'treeple/_lib/sklearn', check: false)
+r = run_command('mv', 'treeple/_lib_experimental/sklearn_fork/sklearn', 'treeple/_lib_experimental/sklearn', check: false)
 
 # Setup Python:
 # https://mesonbuild.com/Python-module.html
