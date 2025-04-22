@@ -92,9 +92,7 @@ class ForestCluster(SimMatrixMixin, TransformerMixin, ClusterMixin, BaseForest):
         """
         # Validate or convert input data
         X = validate_data(
-            self,
-            X,
-            dtype=DTYPE,  # accept_sparse="csc",
+            self, X, dtype=DTYPE, ensure_all_finite="allow-nan"  # accept_sparse="csc",
         )
         if sample_weight is not None:
             sample_weight = _check_sample_weight(sample_weight, X)
