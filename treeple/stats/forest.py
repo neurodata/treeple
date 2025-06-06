@@ -8,7 +8,6 @@ from joblib import Parallel, delayed
 from numpy.typing import ArrayLike
 from sklearn.base import clone
 from sklearn.ensemble._base import _partition_estimators
-from sklearn.utils.multiclass import type_of_target
 
 from .._lib.sklearn.ensemble._forest import ForestClassifier
 from ..ensemble import HonestForestClassifier
@@ -275,7 +274,7 @@ def build_oob_forest(
         out of bag samples.
     """
     assert est.bootstrap
-    assert type_of_target(y) in ("binary")
+    # assert type_of_target(y) in ("binary")
     est = clone(est)
 
     # build forest
