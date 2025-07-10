@@ -11,6 +11,8 @@ cimport numpy as cnp
 
 cnp.import_array()
 
+from libcpp.unordered_set cimport unordered_set
+
 from .._lib.sklearn.tree._utils cimport rand_int, rand_uniform
 
 
@@ -39,6 +41,39 @@ cdef inline void fisher_yates_shuffle(
         j = rand_int(i, grid_size, random_state)
         indices_to_sample[j], indices_to_sample[i] = \
             indices_to_sample[i], indices_to_sample[j]
+
+
+cdef inline void floyd_sample_indices(
+    intp_t[::1] out,
+    intp_t k,
+    intp_t n,
+    uint32_t* random_state
+) noexcept nogil:
+    """
+    Rober Floyd's algorithm for sampling without replacement
+
+    Parameters
+    ----------
+    out : intp_t[::1]
+        Output memoryview where the sampled integers are stored.
+    k : intp_t
+        Number of samples to draw.
+    n : intp_t
+        Size of the domain to sample from
+    random_state : uint32_t*
+        The random state.
+    """
+    cdef unordered_set[intp_t] seen
+    cdef intp_t i, r = 0
+
+    for i in range(n - k, n):
+        r = rand_int(0, i + 1, random_state)
+        if seen.find(r) == seen.end():
+            seen.insert(r)
+            out[i - n + k] = r
+        else:
+            seen.insert(i)
+            out[i - n + k] = i
 
 
 cdef inline int rand_weighted_binary(

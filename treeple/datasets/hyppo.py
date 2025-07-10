@@ -562,7 +562,6 @@ def make_trunk_classification(
         )
 
     y = np.concatenate((np.zeros(n_samples // 2), np.ones(n_samples // 2)))
-
     if return_params:
         return [X, y, [mu_0_vec, mu_1_vec], [cov, cov]]
     return X, y

@@ -11,7 +11,7 @@ from libcpp.vector cimport vector
 
 from .._lib.sklearn.tree._criterion cimport Criterion
 from .._lib.sklearn.tree._utils cimport rand_int, rand_uniform
-from ._utils cimport fisher_yates_shuffle
+from ._utils cimport floyd_sample_indices
 
 
 cdef float64_t INFINITY = np.inf
@@ -194,9 +194,8 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
 
         self.X = X
 
-        # create a helper array for allowing efficient Fisher-Yates
-        self.indices_to_sample = np.arange(self.max_features * self.n_features,
-                                           dtype=np.intp)
+        # create a helper array for allowing efficient Fisher-Yates/ Floyd's method
+        self.indices_to_sample = np.zeros(self.n_non_zeros, dtype=np.intp)
 
         # XXX: Just to initialize stuff
         # self.feature_weights = np.ones((self.n_features,), dtype=float32_t) / self.n_features
@@ -238,8 +237,8 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         cdef intp_t[::1] indices_to_sample = self.indices_to_sample
         cdef intp_t grid_size = self.max_features * self.n_features
 
-        # shuffle indices over the 2D grid to sample using Fisher-Yates
-        fisher_yates_shuffle(indices_to_sample, grid_size, random_state)
+        # draw n_non_zeros random indices from the mTry x n_features set of indices
+        floyd_sample_indices(indices_to_sample, n_non_zeros, grid_size, random_state)
 
         # sample 'n_non_zeros' in a mtry X n_features projection matrix
         # which consists of +/- 1's chosen at a 1/2s rate
