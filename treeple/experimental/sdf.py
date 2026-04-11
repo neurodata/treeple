@@ -238,7 +238,7 @@ class StreamDecisionForest(RandomForestClassifier):
                         min_weight_fraction_leaf=self.min_weight_fraction_leaf,
                         max_features=self.max_features,
                         max_leaf_nodes=self.max_leaf_nodes,
-                        class_weight=self.lass_weight,
+                        class_weight=self.class_weight,
                         random_state=self.random_state,
                         min_impurity_decrease=self.min_impurity_decrease,
                         monotonic_cst=self.monotonic_cst,
@@ -259,5 +259,266 @@ class StreamDecisionForest(RandomForestClassifier):
 
         # Update existing stream decision trees
         super().partial_fit(X, y, classes=classes)
+
+        return self
+
+
+class CascadeStreamForest(RandomForestClassifier):
+    """
+    A class used to represent a cascading ensemble of stream decision trees.
+
+    Unlike :class:`StreamDecisionForest`, which maintains a fixed-size ensemble
+    and swaps out weak trees, CascadeStreamForest *grows* the ensemble: it adds
+    one new tree per batch (up to ``n_estimators``) while incrementally updating
+    all existing trees via ``partial_fit``.
+
+    Parameters
+    ----------
+    n_estimators : int, default=100
+        The maximum number of stream decision trees in the ensemble.
+
+    criterion : {"gini", "entropy"}, default="gini"
+        The function to measure the quality of a split.
+
+    max_depth : int, default=None
+        The maximum depth of the tree.
+
+    min_samples_split : int or float, default=2
+        The minimum number of samples required to split an internal node.
+
+    min_samples_leaf : int or float, default=1
+        The minimum number of samples required to be at a leaf node.
+
+    min_weight_fraction_leaf : float, default=0.0
+        The minimum weighted fraction of the sum total of weights required
+        to be at a leaf node.
+
+    max_features : {"sqrt", "log2"}, int or float, default="sqrt"
+        The number of features to consider when looking for the best split.
+
+    max_leaf_nodes : int, default=None
+        Grow trees with ``max_leaf_nodes`` in best-first fashion.
+
+    min_impurity_decrease : float, default=0.0
+        A node will be split if this split induces a decrease of the impurity
+        greater than or equal to this value.
+
+    bootstrap : bool, default=True
+        Whether bootstrap samples are used when building trees.
+
+    oob_score : bool, default=False
+        Whether to use out-of-bag samples to estimate the generalization score.
+
+    n_jobs : int, default=None
+        The number of jobs to run in parallel.
+
+    random_state : int, RandomState instance or None, default=None
+        Controls both the randomness of the bootstrapping and feature sampling.
+
+    verbose : int, default=0
+        Controls the verbosity when fitting and predicting.
+
+    warm_start : bool, default=False
+        When set to ``True``, reuse the solution of the previous call to fit.
+
+    class_weight : dict, list of dict or "balanced", default=None
+        Weights associated with classes.
+
+    ccp_alpha : non-negative float, default=0.0
+        Complexity parameter used for Minimal Cost-Complexity Pruning.
+
+    max_samples : int or float, default=None
+        If bootstrap is True, the number of samples to draw from X
+        to train each base estimator.
+
+    max_bins : int, default=None
+        The maximum number of bins to use for non-missing values.
+
+    store_leaf_values : bool, default=False
+        Whether to store the leaf values.
+
+    monotonic_cst : array-like of int, default=None
+        Monotonic constraints for the features.
+
+    Attributes
+    ----------
+    estimators_ : list of DecisionTreeClassifier
+        The collection of fitted sub-estimators.
+
+    classes_ : ndarray of shape (n_classes,)
+        The classes labels.
+
+    References
+    ----------
+    .. [1] H. Xu, et al. "Streaming Decision Trees and Forests."
+       arXiv:2110.08483, 2021.
+    """
+
+    def __init__(
+        self,
+        n_estimators=100,
+        *,
+        criterion="gini",
+        max_depth=None,
+        min_samples_split=2,
+        min_samples_leaf=1,
+        min_weight_fraction_leaf=0.0,
+        max_features="sqrt",
+        max_leaf_nodes=None,
+        min_impurity_decrease=0.0,
+        bootstrap=True,
+        oob_score=False,
+        n_jobs=None,
+        random_state=None,
+        verbose=0,
+        warm_start=False,
+        class_weight=None,
+        ccp_alpha=0.0,
+        max_samples=None,
+        max_bins=None,
+        store_leaf_values=False,
+        monotonic_cst=None,
+    ):
+        super().__init__(
+            n_estimators=n_estimators,
+            criterion=criterion,
+            max_depth=max_depth,
+            min_samples_split=min_samples_split,
+            min_samples_leaf=min_samples_leaf,
+            min_weight_fraction_leaf=min_weight_fraction_leaf,
+            max_features=max_features,
+            max_leaf_nodes=max_leaf_nodes,
+            min_impurity_decrease=min_impurity_decrease,
+            ccp_alpha=ccp_alpha,
+            monotonic_cst=monotonic_cst,
+            bootstrap=bootstrap,
+            oob_score=oob_score,
+            n_jobs=n_jobs,
+            random_state=random_state,
+            verbose=verbose,
+            warm_start=warm_start,
+            class_weight=class_weight,
+            max_samples=max_samples,
+            max_bins=max_bins,
+            store_leaf_values=store_leaf_values,
+        )
+
+    def fit(self, X, y, sample_weight=None, classes=None):
+        """
+        Fits the forest to data X with labels y.
+
+        On the first call this builds a single-tree forest using the standard
+        ``RandomForestClassifier.fit``. Subsequent batches should use
+        :meth:`partial_fit`.
+
+        Parameters
+        ----------
+        X : {array-like, sparse matrix} of shape (n_samples, n_features)
+            The training input samples.
+
+        y : array-like of shape (n_samples,) or (n_samples, n_outputs)
+            The target values (class labels).
+
+        sample_weight : array-like of shape (n_samples,), default=None
+            Sample weights.
+
+        classes : ndarray, default=None
+            List of all the classes that can possibly appear in the y vector.
+
+        Returns
+        -------
+        self : CascadeStreamForest
+            The object itself.
+        """
+        # Build the first tree via the parent class, but only one tree
+        orig_n_estimators = self.n_estimators
+        self.n_estimators = 1
+        super().fit(X, y, sample_weight=sample_weight, classes=classes)
+        self.n_estimators = orig_n_estimators
+        return self
+
+    def partial_fit(self, X, y, sample_weight=None, classes=None):
+        """
+        Partially fits the forest to data X with labels y.
+
+        All existing trees are updated via ``partial_fit``. If the ensemble
+        has fewer than ``n_estimators`` trees, one new tree is added and
+        fitted on a bootstrap sample of the current batch.
+
+        Parameters
+        ----------
+        X : {array-like, sparse matrix} of shape (n_samples, n_features)
+            The training input samples.
+
+        y : array-like of shape (n_samples,) or (n_samples, n_outputs)
+            The target values (class labels).
+
+        sample_weight : array-like of shape (n_samples,), default=None
+            Sample weights.
+
+        classes : ndarray, default=None
+            List of all the classes that can possibly appear in the y vector.
+            Must be provided at the first call to partial_fit, can be omitted
+            in subsequent calls.
+
+        Returns
+        -------
+        self : CascadeStreamForest
+            The object itself.
+        """
+        self._validate_params()
+
+        # validate input parameters
+        first_call = _check_partial_fit_first_call(self, classes=classes)
+
+        # Fit if no tree exists yet
+        if first_call:
+            self.fit(X, y, sample_weight=sample_weight, classes=classes)
+            return self
+
+        if self.bootstrap:
+            n_samples_bootstrap = _get_n_samples_bootstrap(X.shape[0], self.max_samples)
+        else:
+            n_samples_bootstrap = X.shape[0]
+
+        # Update existing stream decision trees
+        trees = Parallel(n_jobs=self.n_jobs)(
+            delayed(_partial_fit)(
+                tree,
+                X,
+                y,
+                n_samples_bootstrap=n_samples_bootstrap,
+                classes=self.classes_,
+            )
+            for tree in self.estimators_
+        )
+        self.estimators_ = trees
+
+        # Grow the ensemble: add one new tree per batch until n_estimators
+        if len(self.estimators_) < self.n_estimators:
+            sdt = DecisionTreeClassifier(
+                criterion=self.criterion,
+                splitter="best",
+                max_depth=self.max_depth,
+                min_samples_split=self.min_samples_split,
+                min_samples_leaf=self.min_samples_leaf,
+                min_weight_fraction_leaf=self.min_weight_fraction_leaf,
+                max_features=self.max_features,
+                max_leaf_nodes=self.max_leaf_nodes,
+                class_weight=self.class_weight,
+                random_state=self.random_state,
+                min_impurity_decrease=self.min_impurity_decrease,
+                monotonic_cst=self.monotonic_cst,
+                ccp_alpha=self.ccp_alpha,
+                store_leaf_values=self.store_leaf_values,
+            )
+            _partial_fit(
+                sdt,
+                X,
+                y,
+                n_samples_bootstrap=n_samples_bootstrap,
+                classes=self.classes_,
+            )
+            self.estimators_.append(sdt)
 
         return self

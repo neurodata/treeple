@@ -4,7 +4,7 @@ from sklearn import datasets
 from sklearn.metrics import accuracy_score, r2_score
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
-from treeple.experimental import StreamDecisionForest
+from treeple.experimental import CascadeStreamForest, StreamDecisionForest
 
 CLF_CRITERIONS = ("gini", "entropy")
 
@@ -118,6 +118,80 @@ def test_sklearn_compatible_estimator(estimator, check):
         "check_sample_weight_equivalence",
         "check_sample_weight_equivalence_on_dense_data",
         "check_sample_weight_equivalence_on_sparse_data",
+        "check_estimator_sparse_tag",
+    ]:
+        pytest.skip()
+    check(estimator)
+
+
+# ---- CascadeStreamForest tests ----
+
+
+def test_csf_toy_accuracy():
+    clf = CascadeStreamForest(n_estimators=10)
+    X = np.ones((20, 4))
+    X[10:] *= -1
+    y = [0] * 10 + [1] * 10
+    clf = clf.fit(X, y)
+    np.testing.assert_array_equal(clf.predict(X), y)
+
+
+def test_csf_first_fit():
+    clf = CascadeStreamForest(n_estimators=10)
+    with pytest.raises(
+        ValueError, match="classes must be passed on the first call to partial_fit."
+    ):
+        clf.partial_fit(iris.data, iris.target)
+
+
+@pytest.mark.parametrize("criterion", ["gini", "entropy"])
+@pytest.mark.parametrize("max_features", [None, 2])
+def test_csf_iris(criterion, max_features):
+    # Check consistency on dataset iris with cascading growth.
+    clf = CascadeStreamForest(
+        criterion=criterion,
+        random_state=0,
+        max_features=max_features,
+        n_estimators=10,
+    )
+
+    # Split iris into 3 batches to test cascading growth
+    n = len(iris.data)
+    classes = np.unique(iris.target)
+    clf.partial_fit(iris.data[: n // 3], iris.target[: n // 3], classes=classes)
+    assert len(clf.estimators_) == 1, "Should start with 1 tree"
+
+    clf.partial_fit(iris.data[n // 3 : 2 * n // 3], iris.target[n // 3 : 2 * n // 3])
+    assert len(clf.estimators_) == 2, "Should grow to 2 trees"
+
+    clf.partial_fit(iris.data[2 * n // 3 :], iris.target[2 * n // 3 :])
+    assert len(clf.estimators_) == 3, "Should grow to 3 trees"
+
+    score = accuracy_score(clf.predict(iris.data), iris.target)
+    assert score > 0.5 and score <= 1.0, f"Failed with CSF, criterion={criterion}, score={score}"
+
+
+def test_csf_max_estimators():
+    """Ensemble should stop growing at n_estimators."""
+    clf = CascadeStreamForest(n_estimators=3, random_state=0)
+    X = rng.normal(0, 1, (100, 4))
+    y = rng.randint(0, 2, 100)
+    classes = np.array([0, 1])
+
+    for i in range(5):
+        clf.partial_fit(X, y, classes=classes if i == 0 else None)
+
+    assert len(clf.estimators_) == 3, f"Should cap at n_estimators=3, got {len(clf.estimators_)}"
+
+
+@parametrize_with_checks([CascadeStreamForest(n_estimators=10, random_state=0)])
+def test_csf_sklearn_compatible_estimator(estimator, check):
+    if check.func.__name__ in [
+        "check_class_weight_classifiers",
+        "check_sample_weight_equivalence",
+        "check_sample_weight_equivalence_on_dense_data",
+        "check_sample_weight_equivalence_on_sparse_data",
+        "check_estimator_sparse_tag",
     ]:
         pytest.skip()
     check(estimator)

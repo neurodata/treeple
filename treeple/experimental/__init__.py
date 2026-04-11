@@ -10,4 +10,4 @@ from .mutual_info import (
     mi_gaussian,
     mutual_info_ksg,
 )
-from .sdf import StreamDecisionForest
+from .sdf import CascadeStreamForest, StreamDecisionForest
