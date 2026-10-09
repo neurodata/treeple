@@ -1,3 +1,6 @@
+%pip install -q ydf numpy pandas openpyxl matplotlib scikit-learn
+print("Environment setup complete.")
+
 import os
 import subprocess
 import sys
