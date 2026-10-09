@@ -8,9 +8,7 @@ import pandas as pd
 
 dataset = "/content/Sam's length_filtered.reconstructed.20pc.xlsx"
 runner = "/content/ydf_standalone_runner_20261009.py"
-trees = 15000
-
-os.environ["MPLBACKEND"] = "Agg"
+trees = 1000
 
 subprocess.run(
     [sys.executable, runner, "--dataset", dataset, "--trees", str(trees)],
